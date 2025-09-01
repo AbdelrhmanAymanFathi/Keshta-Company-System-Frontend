@@ -27,7 +27,7 @@
         </button>
       </form>
 
-      <p class="text-xs text-center text-gray-400">Responsive & modern — متجاوب وعصري</p>
+      <p class="text-xs text-center text-gray-400">شركة قشطة للمقاولات</p>
     </div>
   </div>
 </template>
