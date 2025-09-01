@@ -63,11 +63,14 @@
         ]"
         style="width: 18rem;"
       >
-        <!-- TopMenus for mobile -->
+        <!-- Mobile TopMenus inside sidebar overlay -->
         <div v-if="sidebarOpen && isMobile" class="sm:hidden mb-4 space-y-2">
           <button v-for="(label, key) in topMenus" :key="key"
                   @click="selectTop(key)"
-                  class="w-full text-left px-3 py-2 rounded bg-indigo-100 hover:bg-indigo-200">
+                  :class="[
+                    'w-full text-left px-3 py-2 rounded',
+                    selectedTop === key ? 'bg-indigo-500 text-white' : 'bg-indigo-100 hover:bg-indigo-200'
+                  ]">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
