@@ -88,26 +88,4 @@ npm run serve
 
 ---
 
-## 🔹 Git Commit Messages المقترحة / Suggested Git Commits
 
-```bash
-git add .
-git commit -m "✨ Add LoginPage with multi-language support and Tailwind styling"
-git commit -m "🔧 Fix ESLint multi-word component names in Dashboard"
-git commit -m "🛠 Fix Dashboard menuMap brackets and dynamic components"
-git commit -m "✅ Finalize responsive Dashboard layout with top navbar and vertical sidebar"
-git commit -m "📦 Update README.md with project structure, features, and instructions"
-```
-
----
-
-> المشروع حاليا frontend فقط، يمكن لاحقًا ربطه بـ backend وVue Router للحصول على تطبيق كامل.
-> Currently frontend-only; backend & Vue Router integration can be added later.
-
-```
-
----
-
-لو تحب، أقدر أجهزلك **i18n.js جاهز** للغة العربي والإنجليزي لكل الكلمات اللي موجودة في dashboard + login بحيث كل شيء يترجم مباشر.  
-
-تحب أعمل ده دلوقتي؟
