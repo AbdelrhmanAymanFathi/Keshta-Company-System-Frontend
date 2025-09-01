@@ -1,13 +1,13 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen px-4">
-    <div class="max-w-md w-full card space-y-6">
+  <div class="flex items-center justify-center min-h-screen px-4 bg-indigo-50">
+    <div class="max-w-md w-full bg-white shadow rounded-lg p-6 space-y-6">
       <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-extrabold">{{ $t('login.title') }}</h2>
+        <h2 class="text-2xl font-extrabold text-gray-800">{{ $t('login.title') }}</h2>
         <div class="flex gap-2">
-          <button @click="switchLang('en')" :class="btnClass('en')" class="p-2 rounded-md">
+          <button @click="switchLang('en')" :class="btnClass('en')" class="p-2 rounded-md bg-white">
             <img src="/flags/us.png" alt="EN" class="w-6 h-6"/>
           </button>
-          <button @click="switchLang('ar')" :class="btnClass('ar')" class="p-2 rounded-md">
+          <button @click="switchLang('ar')" :class="btnClass('ar')" class="p-2 rounded-md bg-white">
             <img src="/flags/eg.png" alt="AR" class="w-6 h-6"/>
           </button>
         </div>
@@ -16,13 +16,13 @@
       <form @submit.prevent="login" class="space-y-4">
         <div>
           <label class="text-sm font-medium block mb-1">{{ $t('login.username') }}</label>
-          <input v-model="username" type="text" placeholder="example" class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400"/>
+          <input v-model="username" type="text" placeholder="example" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"/>
         </div>
         <div>
           <label class="text-sm font-medium block mb-1">{{ $t('login.password') }}</label>
-          <input v-model="password" type="password" placeholder="••••••" class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400"/>
+          <input v-model="password" type="password" placeholder="••••••" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"/>
         </div>
-        <button type="submit" class="w-full btn-gradient">
+        <button type="submit" class="w-full px-4 py-2 rounded-lg text-white font-semibold bg-gradient-to-r from-indigo-500 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800">
           {{ $t('login.button') }}
         </button>
       </form>
@@ -36,24 +36,15 @@
 export default {
   name: 'LoginPage',
   emits: ['login-success'],
-  data() {
-    return { username: '', password: '' }
-  },
+  data() { return { username: '', password: '' } },
   methods: {
-    login() {
-      console.log('login', this.username, this.password)
-      this.$emit('login-success')
-    },
-    switchLang(lang) {
-      this.$i18n.locale = lang
-    },
-    btnClass(lang) {
-      return this.$i18n.locale === lang ? 'ring-2 ring-teal-400' : ''
-    }
+    login() { console.log('login', this.username, this.password); this.$emit('login-success') },
+    switchLang(lang) { this.$i18n.locale = lang },
+    btnClass(lang) { return this.$i18n.locale === lang ? 'ring-2 ring-indigo-400' : '' }
   }
 }
 </script>
 
 <style scoped>
-/* small local tweaks */
+/* Tailwind handles responsiveness & shadows */
 </style>
