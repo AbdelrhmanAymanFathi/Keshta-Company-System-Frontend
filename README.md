@@ -87,5 +87,75 @@ npm run serve
 * يمكن إضافة Vue Router لاحقًا لتسهيل التنقل بين الصفحات بدل التحكم بالـ component ديناميكي
 
 ---
+# Project structure snapshot
+
+هذا المستند يحتفظ بصورة لحالة شجرة الملفات في مشروعك (لقطة من بيئة العمل الآن). احفظت هنا المسارات حتى تقدر ترجع لها لاحقًا.
+
+> **ملاحظة:** هذا المستند مرئي داخل واجهة المحادثة (canvas). إذا تريد حفظه في المستودع Git فعّل الأوامر في قسم "حفظ snapshot إلى repo" أدناه.
+
+---
+
+## الملفات والمجلدات الرئيسية (كما في VSCode screenshot)
+
+```
+my-vue-app/
+├─ node_modules/
+├─ public/
+│  ├─ flags/
+│  ├─ favicon.ico
+│  └─ index.html
+├─ src/
+│  ├─ assets/
+│  ├─ components/
+│  │  ├─ dashboard/
+│  │  │  ├─ ContractorsList.vue
+│  │  │  ├─ Dashboard.vue
+│  │  │  ├─ NewSupply.vue
+│  │  │  ├─ SuppliesList.vue
+│  │  │  └─ VehiclesList.vue
+│  │  ├─ Login.vue
+│  │  └─ App.vue
+│  ├─ i18n.js
+│  └─ main.js
+├─ .gitignore
+├─ babel.config.js
+├─ jsconfig.json
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.js
+├─ README.md
+└─ tailwind.config.js
+```
+
+---
+
+## ملاحظات سريعة من اللقطة
+
+* ملف `i18n.js` مفتوح على السطر \~102 ويحتوي إعدادات الترجمات (locale/messages).
+* الطرفية (terminal) أظهرت تحذير: `37 vulnerabilities (3 low, 20 moderate, 12 high, 2 critical)` — أنصح تشغيل `npm audit` و/أو `npm audit fix` بعد مراجعة التغييرات.
+* رفعت سابقًا ملفي Excel إلى المسار: `/mnt/data/توريدات سن طريق الامتداد2025.xlsx` و`/mnt/data/توريد سن 6 جديد سفنكس.xlsx` (موجودان على الـ container الخاص بالجلسة).
+
+---
+
+## حفظ snapshot داخل المستودع (git)
+
+إذا حابب تحفظ نسخة من هذه الشجرة داخل repo كملف `project-structure.txt`، شغّل الأوامر التالية في طرفية المشروع:
+
+**إذا مثبت `tree`:**
+
+```bash
+# استثناء node_modules
+tree -I node_modules -a > project-structure.txt
+```
+
+**إن لم يكن `tree` مثبتاً (بديل باستخدام find):**
+
+
+
+---
+
+
+
+
 
 

@@ -26,7 +26,27 @@ const messages = {
       actions: "Actions",
       addRow: "Add Row",
       saveSupply: "Save Supply",
-      next: "Next"
+      next: "Next",
+      '#': '#',
+      save: 'Save',
+      cancel: 'Cancel',
+      edit: 'Edit',
+      delete: 'Delete'
+    },
+    contractors: {
+      title: "Contractors",
+      add: "Add Contractor",
+      editContractor: "Edit Contractor",
+      addContractor: "Add Contractor",
+      importExcel: "Import Excel",
+      name: "Name",
+      phone: "Phone",
+      type: "Type",
+      noResults: "No contractors found",
+      imported: "Imported {count} new contractors",
+      deleteConfirm: "Are you sure you want to delete",
+      validationName: "Please enter contractor name",
+      searchPlaceholder: "Search by name or phone..."
     }
   },
   ar: {
@@ -54,7 +74,27 @@ const messages = {
       actions: "إجراءات",
       addRow: "إضافة صف",
       saveSupply: "حفظ التوريدات",
-      next: "التالي"
+      next: "التالي",
+      '#': '#',
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      edit: 'تعديل',
+      delete: 'حذف'
+    },
+    contractors: {
+      title: "المقاولين",
+      add: "إضافة مقاول",
+      editContractor: "تعديل مقاول",
+      addContractor: "إضافة مقاول",
+      importExcel: "استيراد Excel",
+      name: "الاسم",
+      phone: "الهاتف",
+      type: "النوع",
+      noResults: "لا توجد نتائج",
+      imported: "تم استيراد {count} مقاولين جدد",
+      deleteConfirm: "هل أنت متأكد أنك تريد حذف",
+      validationName: "من فضلك أدخل اسم المقاول",
+      searchPlaceholder: "ابحث بالاسم أو الهاتف..."
     }
   }
 }
