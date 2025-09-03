@@ -2,13 +2,23 @@ import { createI18n } from 'vue-i18n'
 
 const messages = {
   en: {
+    appName: 'Qeshta Co.',
     login: { title: "Login", username: "Username", password: "Password", button: "Login" },
     navbar: { 
       supplies: "Supplies", transport: "Transport", expenses: "Expenses", 
       equipmentRent: "Equipment Rent", companyEquipment: "Company Equipment" 
     },
     dashboard: {
-      newSupply: "New Supply", suppliesList: "Supplies List", contractorsList: "Contractors List", vehiclesList: "Vehicles List"
+      newSupply: "New Supply",
+      suppliesList: "Supplies List",
+      contractorsList: "Contractors List",
+      vehiclesList: "Vehicles List",
+      collapse: "Collapse",
+      expand: "Expand",
+      collapseSidebar: "Collapse sidebar",
+      expandSidebar: "Expand sidebar",
+      openMenu: "Open menu",
+      closeMenu: "Close menu"
     },
     labels: {
       site: "Site",
@@ -31,7 +41,12 @@ const messages = {
       save: 'Save',
       cancel: 'Cancel',
       edit: 'Edit',
-      delete: 'Delete'
+      delete: 'Delete',
+      logout: 'Logout',
+      subtotal: 'Subtotal',
+      totalDiscount: 'Total Discount',
+      grandTotal: 'Grand Total',
+      duplicate: 'Duplicate'
     },
     contractors: {
       title: "Contractors",
@@ -50,13 +65,23 @@ const messages = {
     }
   },
   ar: {
+    appName: 'شركة قشطة',
     login: { title: "تسجيل الدخول", username: "اسم المستخدم", password: "كلمة المرور", button: "دخول" },
     navbar: { 
       supplies: "التوريدات", transport: "النقل", expenses: "المصروفات", 
       equipmentRent: "ايجار المعدات", companyEquipment: "معدات الشركة" 
     },
     dashboard: {
-      newSupply: "إنشاء توريده جديدة", suppliesList: "عرض التوريدات", contractorsList: "عرض المقاولين", vehiclesList: "عرض السيارات"
+      newSupply: "إنشاء توريده جديدة",
+      suppliesList: "عرض التوريدات",
+      contractorsList: "عرض المقاولين",
+      vehiclesList: "عرض السيارات",
+      collapse: "طي",
+      expand: "توسيع",
+      collapseSidebar: "طي الشريط الجانبي",
+      expandSidebar: "توسيع الشريط الجانبي",
+      openMenu: "فتح القائمة",
+      closeMenu: "إغلاق القائمة"
     },
     labels: {
       site: "الموقع",
@@ -79,7 +104,12 @@ const messages = {
       save: 'حفظ',
       cancel: 'إلغاء',
       edit: 'تعديل',
-      delete: 'حذف'
+      delete: 'حذف',
+      logout: 'تسجبل الخروج',
+      subtotal: 'المجموع الجزئي',
+      totalDiscount: 'إجمالي الخصم',
+      grandTotal: 'الإجمالي الكلي',
+      duplicate: 'تكرار'
     },
     contractors: {
       title: "المقاولين",
@@ -101,8 +131,8 @@ const messages = {
 
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',         // اللغة الافتراضية
-  fallbackLocale: 'en', // لو الترجمة مش موجودة
+  locale: 'en',         // default language
+  fallbackLocale: 'en', // fallback
   messages,
 })
 

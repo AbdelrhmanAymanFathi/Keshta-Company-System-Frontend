@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl p-6' : 'p-6'">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
       <h1 class="text-2xl font-semibold">{{ $t('contractors.title') }}</h1>
 
@@ -27,34 +27,34 @@
              class="w-full sm:w-1/2 px-3 py-2 border rounded" />
     </div>
 
-    <!-- Responsive display: table on large screens, cards on small -->
+    <!-- Desktop table -->
     <div class="hidden sm:block">
       <div class="overflow-auto bg-white rounded shadow">
         <table class="min-w-full divide-y">
-          <thead class="bg-indigo-50 text-left">
+          <thead class="bg-indigo-50">
             <tr>
-              <th class="p-3">{{ $t('labels.#') }}</th>
-              <th class="p-3">{{ $t('contractors.name') }}</th>
-              <th class="p-3">{{ $t('contractors.type') }}</th>
-              <th class="p-3">{{ $t('contractors.phone') }}</th>
-              <th class="p-3">{{ $t('labels.actions') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.#') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.name') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.type') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.phone') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.actions') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(c, idx) in filtered" :key="c.id" class="hover:bg-gray-50">
-              <td class="p-3">{{ idx + 1 }}</td>
-              <td class="p-3">{{ c.name }}</td>
-              <td class="p-3">{{ c.type || '-' }}</td>
-              <td class="p-3">{{ c.phone || '-' }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ idx + 1 }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.name }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.type || '-' }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.phone || '-' }}</td>
               <td class="p-3">
-                <div class="flex gap-2">
+                <div :class="['flex gap-2', isRTL ? 'flex-row-reverse' : '']">
                   <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white">{{ $t('labels.edit') }}</button>
                   <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white">{{ $t('labels.delete') }}</button>
                 </div>
               </td>
             </tr>
             <tr v-if="filtered.length === 0">
-              <td class="p-3" colspan="5">{{ $t('contractors.noResults') }}</td>
+              <td class="p-3" colspan="5" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.noResults') }}</td>
             </tr>
           </tbody>
         </table>
@@ -63,8 +63,8 @@
 
     <!-- Mobile cards -->
     <div class="sm:hidden grid gap-3">
-      <div v-for="c in filtered" :key="c.id" class="p-3 bg-white rounded shadow flex justify-between items-start">
-        <div>
+      <div v-for="c in filtered" :key="c.id" :class="['p-3 bg-white rounded shadow flex justify-between items-start', isRTL ? 'flex-row-reverse' : '']">
+        <div :class="isRTL ? 'text-right' : ''">
           <div class="font-semibold">{{ c.name }}</div>
           <div class="text-sm text-gray-500">{{ c.type || '-' }} • {{ c.phone || '-' }}</div>
         </div>
@@ -80,26 +80,26 @@
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
       <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 z-10">
-        <h3 class="text-lg font-semibold mb-4">{{ editing ? $t('contractors.editContractor') : $t('contractors.addContractor') }}</h3>
+        <h3 class="text-lg font-semibold mb-4" :class="isRTL ? 'text-right' : ''">{{ editing ? $t('contractors.editContractor') : $t('contractors.addContractor') }}</h3>
 
         <div class="grid grid-cols-1 gap-3">
           <label>
-            <div class="text-sm mb-1">{{ $t('contractors.name') }}</div>
-            <input v-model="form.name" class="w-full px-3 py-2 border rounded" />
+            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.name') }}</div>
+            <input v-model="form.name" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
           </label>
 
           <label>
-            <div class="text-sm mb-1">{{ $t('contractors.phone') }}</div>
-            <input v-model="form.phone" class="w-full px-3 py-2 border rounded" />
+            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.phone') }}</div>
+            <input v-model="form.phone" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
           </label>
 
           <label>
-            <div class="text-sm mb-1">{{ $t('contractors.type') }}</div>
-            <input v-model="form.type" class="w-full px-3 py-2 border rounded" />
+            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.type') }}</div>
+            <input v-model="form.type" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
           </label>
         </div>
 
-        <div class="mt-4 flex gap-2 justify-end">
+        <div class="mt-4 flex gap-2 justify-end" :class="isRTL ? 'flex-row-reverse' : ''">
           <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
           <button @click="saveContractor" :class="['px-4 py-2 rounded text-white', editing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-indigo-600 hover:bg-indigo-700']">
             {{ $t('labels.save') }}
@@ -112,8 +112,8 @@
     <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="fixed inset-0 bg-black opacity-40" @click="cancelDelete"></div>
       <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 z-10">
-        <p class="mb-4">{{ $t('contractors.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?</p>
-        <div class="flex justify-end gap-2">
+        <p class="mb-4" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?</p>
+        <div class="flex justify-end gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
           <button @click="cancelDelete" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
           <button @click="doDelete" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">{{ $t('labels.delete') }}</button>
         </div>
@@ -127,7 +127,7 @@
 import * as XLSX from 'xlsx'
 
 export default {
-  name: 'ContractorsPage',
+  name: 'ContractorsList',
   data() {
     return {
       q: '',
@@ -143,6 +143,7 @@ export default {
     }
   },
   computed: {
+    isRTL() { return this.$i18n && this.$i18n.locale === 'ar' },
     filtered() {
       if (!this.q) return this.contractors
       const s = this.q.toLowerCase()
@@ -214,7 +215,7 @@ export default {
       if (!Array.isArray(json) || json.length === 0) return
       let headerRowIndex = 0
       for (let i=0;i<Math.min(5,json.length);i++){
-        const row = json[i].map(cell => (cell || '').toString())
+        const row = (json[i] || []).map(cell => (cell || '').toString())
         if (row.some(r => /مقاول|Contractor/i.test(r))) { headerRowIndex = i; break }
       }
       const header = (json[headerRowIndex] || []).map(h => (h||'').toString().trim())
@@ -248,7 +249,16 @@ export default {
 }
 </script>
 
-<!-- Remove btn-primary helper and use Tailwind classes directly on elements -->
 <style scoped>
-/* No custom CSS needed; use Tailwind classes in template */
+/* small helper in case some elements still need forced RTL alignment */
+.direction-rtl input,
+.direction-rtl select,
+.direction-rtl textarea {
+  direction: rtl;
+  text-align: right;
+}
+.direction-rtl table th,
+.direction-rtl table td {
+  text-align: right;
+}
 </style>
