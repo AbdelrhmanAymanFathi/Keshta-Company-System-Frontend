@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-col h-screen" :class="{ 'direction-rtl': isRTL }">
     <!-- Top horizontal navbar (darker indigo gradient) -->
-    <header class="flex items-center justify-between px-4 py-3 shadow text-white"
-            :class="headerGradient">
+    <header class="flex items-center justify-between px-4 py-3 shadow text-white" :class="headerGradient">
       <div class="flex items-center gap-4">
         <!-- Hamburger for mobile -->
-        <button @click="toggleSidebar" class="sm:hidden p-2 rounded hover:bg-white/10" :aria-expanded="sidebarOpen.toString()">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
-               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <button @click="toggleSidebar" class="sm:hidden p-2 rounded hover:bg-white/10"
+          :aria-expanded="sidebarOpen.toString()">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+            stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
@@ -15,19 +15,15 @@
         <!-- Brand -->
         <div class="flex items-center gap-3">
           <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
-            ق
+            <img src="../../assets/logo.png" alt="logoKeshta">
           </div>
           <div class="text-xl font-bold whitespace-nowrap">{{ $t('appName') }}</div>
         </div>
 
         <!-- top menus (desktop) -->
         <nav class="hidden sm:flex gap-2 ml-4">
-          <button
-            v-for="(labelKey, key) in topMenus"
-            :key="key"
-            @click="selectTop(key)"
-            :class="['px-3 py-1 rounded text-sm transition', selectedTop === key ? 'bg-white/10 backdrop-blur-sm' : 'hover:bg-white/8']"
-          >
+          <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
+            :class="['px-3 py-1 rounded text-sm transition', selectedTop === key ? 'bg-white/10 backdrop-blur-sm' : 'hover:bg-white/8']">
             {{ $t('navbar.' + key) }}
           </button>
         </nav>
@@ -37,10 +33,10 @@
       <div class="flex items-center gap-3">
         <div class="flex gap-2">
           <button @click="switchLang('en')" :class="langBtnClass('en')" aria-label="English" class="rounded">
-            <img src="/flags/us.png" alt="EN" class="w-6 h-6"/>
+            <img src="/flags/us.png" alt="EN" class="w-6 h-6" />
           </button>
           <button @click="switchLang('ar')" :class="langBtnClass('ar')" aria-label="Arabic" class="rounded">
-            <img src="/flags/eg.png" alt="AR" class="w-6 h-6"/>
+            <img src="/flags/eg.png" alt="AR" class="w-6 h-6" />
           </button>
         </div>
 
@@ -50,25 +46,25 @@
 
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar -->
-      <aside
-        role="navigation"
-        :class="asideClasses"
-        :aria-hidden="isMobile ? (!sidebarOpen).toString() : 'false'"
-      >
+      <aside role="navigation" :class="asideClasses" :aria-hidden="isMobile ? (!sidebarOpen).toString() : 'false'">
         <!-- Desktop top area: brand + collapse icon (only desktop) -->
         <div class="hidden sm:flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
-            <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">ق</div>
+            <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
+              <img src="../../assets/logo.png" alt="logokeshta"></div>
             <div v-if="!effectiveCollapsed" class="font-semibold">{{ $t('appName') }}</div>
           </div>
 
           <!-- collapse icon: visible only on desktop -->
-          <button v-if="!isMobile" @click="toggleCollapsed" class="p-2 rounded hover:bg-indigo-100" :title="effectiveCollapsed ? $t('dashboard.expand') : $t('dashboard.collapse')">
+          <button v-if="!isMobile" @click="toggleCollapsed" class="p-2 rounded hover:bg-indigo-100"
+            :title="effectiveCollapsed ? $t('dashboard.expand') : $t('dashboard.collapse')">
             <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6h12M6 12h12M6 18h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 6h12M6 12h12M6 18h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
             <svg v-else class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
             </svg>
           </button>
         </div>
@@ -76,22 +72,22 @@
         <!-- Mobile header inside sidebar (close button) -->
         <div v-if="isMobile" class="sm:hidden flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
-            <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">ق</div>
+            <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
+              <img src="../../assets/logo.png" alt="logoKeshta">
+            </div>
             <div class="font-semibold">{{ $t('appName') }}</div>
           </div>
           <button @click="toggleSidebar" class="p-2 rounded hover:bg-indigo-100">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
           </button>
         </div>
 
         <!-- Mobile only: top menu inside sidebar -->
         <div v-if="isMobile" class="sm:hidden mb-4 space-y-2">
-          <button
-            v-for="(labelKey, key) in topMenus"
-            :key="key"
-            @click="selectTop(key)"
-            :class="['w-full text-left px-3 py-2 rounded', selectedTop === key ? 'bg-indigo-500 text-white' : 'bg-indigo-100 hover:bg-indigo-200']"
-          >
+          <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
+            :class="['w-full text-left px-3 py-2 rounded', selectedTop === key ? 'bg-indigo-500 text-white' : 'bg-indigo-100 hover:bg-indigo-200']">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
@@ -99,15 +95,11 @@
         <!-- Vertical menu -->
         <ul class="space-y-2">
           <li v-for="item in verticalMenu" :key="item.name">
-            <button
-              @click="selectVertical(item.name)"
-              :class="[
-                'w-full text-left px-3 py-2 rounded flex items-center gap-3 transition',
-                selectedVertical === item.name ? activeItemClass : 'hover:bg-indigo-100',
-                effectiveCollapsed ? 'justify-center' : ''
-              ]"
-              :title="effectiveCollapsed ? $t(item.label) : ''"
-            >
+            <button @click="selectVertical(item.name)" :class="[
+              'w-full text-left px-3 py-2 rounded flex items-center gap-3 transition',
+              selectedVertical === item.name ? activeItemClass : 'hover:bg-indigo-100',
+              effectiveCollapsed ? 'justify-center' : ''
+            ]" :title="effectiveCollapsed ? $t(item.label) : ''">
               <span v-html="menuIcon(item.name)" class="w-5 h-5 flex-shrink-0"></span>
               <span v-if="!effectiveCollapsed" class="flex-1 text-sm" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t(item.label) }}
@@ -299,7 +291,7 @@ export default {
       document.documentElement.lang = lang
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
       // keep existing collapsedSidebar state
-      this.$nextTick(() => {})
+      this.$nextTick(() => { })
     },
 
     langBtnClass(lang) {
@@ -354,24 +346,47 @@ export default {
 </script>
 
 <style scoped>
-.direction-rtl { direction: rtl; }
+.direction-rtl {
+  direction: rtl;
+}
 
 /* Fade overlay transition */
-.fade-enter-active, .fade-leave-active { transition: opacity .18s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-.fade-enter-to, .fade-leave-from { opacity: 1; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .18s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
 
 /* small visual polish */
-.bg-indigo-50 { background-color: #eef2ff; }
+.bg-indigo-50 {
+  background-color: #eef2ff;
+}
 
 /* ensure collapsed icon buttons center */
-.w-20 button { justify-content: center !important; }
+.w-20 button {
+  justify-content: center !important;
+}
 
 /* subtle hover background (supports dark indigo family) */
-.hover\:bg-white\/8:hover { background-color: rgba(255,255,255,0.08); }
+.hover\:bg-white\/8:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
 
 /* reduced opacity for smaller screens */
 @media (max-width: 639px) {
-  aside { width: 16rem; } /* mobile drawer width */
+  aside {
+    width: 16rem;
+  }
+
+  /* mobile drawer width */
 }
 </style>
