@@ -123,8 +123,8 @@
 </template>
 
 <script>
-// You'll need 'xlsx' installed (npm i xlsx)
 import * as XLSX from 'xlsx'
+import { getUsers, createContractor, deleteUser } from '../../api'
 
 export default {
   name: 'ContractorsList',
@@ -134,11 +134,7 @@ export default {
       modalOpen: false,
       editing: false,
       form: { id: null, name: '', phone: '', type: '' },
-      contractors: [
-        // initial demo data (you can replace with API fetch)
-        { id: 1, name: 'عبده الشناوي', phone: '', type: 'عام' },
-        { id: 2, name: 'حمد الصريحي', phone: '', type: 'مدني' }
-      ],
+      contractors: [],
       deleteConfirm: { open: false, item: null }
     }
   },
@@ -148,6 +144,14 @@ export default {
       if (!this.q) return this.contractors
       const s = this.q.toLowerCase()
       return this.contractors.filter(c => (c.name||'').toLowerCase().includes(s) || (c.phone||'').toLowerCase().includes(s))
+    }
+  },
+  async mounted() {
+    try {
+      const res = await getUsers();
+      this.contractors = Array.isArray(res.data) ? res.data : [];
+    } catch (e) {
+      // fallback to demo data if error
     }
   },
   methods: {
@@ -164,7 +168,7 @@ export default {
     closeModal() {
       this.modalOpen = false
     },
-    saveContractor() {
+    async saveContractor() {
       const name = (this.form.name || '').trim()
       if (!name) {
         alert(this.$t('contractors.validationName'))
@@ -174,20 +178,23 @@ export default {
         const idx = this.contractors.findIndex(x => x.id === this.form.id)
         if (idx !== -1) this.contractors.splice(idx, 1, Object.assign({}, this.form))
       } else {
-        const id = this.contractors.length ? Math.max(...this.contractors.map(c=>c.id)) + 1 : 1
-        this.contractors.push({ id, name, phone: this.form.phone, type: this.form.type })
+        try {
+          const res = await createContractor({ name: this.form.name, phone: this.form.phone, notes: this.form.notes || '' })
+          this.contractors.push(res.data)
+        } catch (e) {
+          alert('Error adding contractor')
+        }
       }
       this.modalOpen = false
     },
-    confirmDelete(c) {
-      this.deleteConfirm = { open: true, item: c }
-    },
-    cancelDelete() {
-      this.deleteConfirm = { open: false, item: null }
-    },
-    doDelete() {
+    async doDelete() {
       const id = this.deleteConfirm.item.id
-      this.contractors = this.contractors.filter(c => c.id !== id)
+      try {
+        await deleteUser(id)
+        this.contractors = this.contractors.filter(c => c.id !== id)
+      } catch (e) {
+        alert('Error deleting contractor')
+      }
       this.cancelDelete()
     },
 

@@ -238,6 +238,8 @@
 </template>
 
 <script>
+import { createDelivery, getLocations, getContractors, getCrushers, getVehicles } from '../../api'
+
 export default {
   name: 'NewSupply',
   data() {
@@ -245,14 +247,8 @@ export default {
       step2: false,
       site: '',
       area: '',
-      sites: [
-        { id: 1, name: 'Site A' },
-        { id: 2, name: 'Site B' },
-      ],
-      areas: [
-        { id: 1, name: 'Area 1' },
-        { id: 2, name: 'Area 2' },
-      ],
+      sites: [],
+      areas: [],
       rows: [
         {
           id: Date.now(),
@@ -268,16 +264,32 @@ export default {
           availableVehicles: []
         }
       ],
-      contractors: [
-        { id: 1, name: 'Contractor A' },
-        { id: 2, name: 'Contractor B' },
-      ],
-      // sample crushers with vehicles (each vehicle has cubicMeter value)
-      crushers: [
-        { id: 1, name: 'Crusher 1', vehicles: [{ id: 1, name: 'Truck 101', cubic: 12.5 }, { id: 2, name: 'Truck 102', cubic: 11.8 }] },
-        { id: 2, name: 'Crusher 2', vehicles: [{ id: 3, name: 'Truck 201', cubic: 13.0 }, { id: 4, name: 'Truck 202', cubic: 12.0 }] }
-      ]
+      contractors: [],
+      crushers: [],
+      vehicles: []
     }
+  },
+  async mounted() {
+    // جلب المواقع
+    try {
+      const locRes = await getLocations();
+      this.sites = Array.isArray(locRes.data) ? locRes.data : [];
+    } catch { /* error fetching locations */ }
+    // جلب المقاولين
+    try {
+      const contRes = await getContractors();
+      this.contractors = Array.isArray(contRes.data) ? contRes.data : [];
+    } catch { /* error fetching contractors */ }
+    // جلب الكسارات
+    try {
+      const crushersRes = await getCrushers();
+      this.crushers = Array.isArray(crushersRes.data) ? crushersRes.data : [];
+    } catch { /* error fetching crushers */ }
+    // جلب السيارات
+    try {
+      const vehiclesRes = await getVehicles();
+      this.vehicles = Array.isArray(vehiclesRes.data) ? vehiclesRes.data : [];
+    } catch { /* error fetching vehicles */ }
   },
   computed: {
     isRTL() {
@@ -372,7 +384,7 @@ export default {
     formatNumber(v) {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
-    saveData() {
+    async saveData() {
       // prepare payload
       const payload = {
         site: this.site,
@@ -393,12 +405,13 @@ export default {
         totalDiscount: this.totalDiscount,
         grandTotal: this.grandTotal
       }
-
-      // currently just log — replace with axios.post('/api/supplies', payload)
-      console.log('Saving supply payload:', payload)
-      alert(this.$t('labels.saveSupply') + ' — OK')
-
-      // reset after save (optional)
+      try {
+        await createDelivery(payload)
+        alert(this.$t('labels.saveSupply') + ' — OK')
+      } catch (e) {
+        alert('Error saving supply')
+      }
+      // reset after save (اختياري)
       // this.step2 = false
       // this.resetRows()
     }

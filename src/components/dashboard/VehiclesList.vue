@@ -13,11 +13,22 @@
 </template>
 
 <script>
+import { getVehicles } from '../../api'
+
 export default {
   name: 'VehiclesList',
   data() {
     return {
-      vehicles: [
+      vehicles: []
+    }
+  },
+  async mounted() {
+    try {
+      const res = await getVehicles();
+      this.vehicles = Array.isArray(res.data) ? res.data : [];
+    } catch (e) {
+      // fallback demo data
+      this.vehicles = [
         { name: 'Truck A', reg: 'ABC-123', status: 'Available' },
         { name: 'Mixer 1', reg: 'MIX-456', status: 'In Use' },
       ]

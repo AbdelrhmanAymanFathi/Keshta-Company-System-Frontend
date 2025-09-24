@@ -13,7 +13,7 @@
         </div>
       </div>
 
-      <form @submit.prevent="login" class="space-y-4">
+      <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <label class="text-sm font-medium block mb-1">{{ $t('login.username') }}</label>
           <input v-model="username" type="text" placeholder="example" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400"/>
@@ -26,19 +26,41 @@
           {{ $t('login.button') }}
         </button>
       </form>
-
+      <div v-if="error" class="error text-red-500 text-sm text-center">{{ error }}</div>
       <p class="text-xs text-center text-gray-400">شركة قشطة للمقاولات</p>
     </div>
   </div>
 </template>
 
 <script>
+import { login } from '../api';
+
 export default {
   name: 'LoginPage',
   emits: ['login-success'],
-  data() { return { username: '', password: '' } },
+  data() {
+    return {
+      username: '',
+      password: '',
+      error: null,
+      loading: false,
+    };
+  },
   methods: {
-    login() { console.log('login', this.username, this.password); this.$emit('login-success') },
+    async handleLogin() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const res = await login(this.username, this.password);
+        // احفظ التوكن أو بيانات المستخدم حسب الحاجة
+        // مثال: localStorage.setItem('token', res.data.token);
+        this.$emit('login-success', res.data);
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Login failed';
+      } finally {
+        this.loading = false;
+      }
+    },
     switchLang(lang) { this.$i18n.locale = lang },
     btnClass(lang) { return this.$i18n.locale === lang ? 'ring-2 ring-indigo-400' : '' }
   }
