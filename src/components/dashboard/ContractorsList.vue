@@ -124,7 +124,7 @@
 
 <script>
 import * as XLSX from 'xlsx'
-import { getUsers, createContractor, deleteUser } from '../../api'
+import { getContractors, createContractor, deleteContractor } from '../../api'
 
 export default {
   name: 'ContractorsList',
@@ -133,7 +133,7 @@ export default {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', type: '' },
+      form: { id: null, name: '', phone: '', type: '', notes: '' },
       contractors: [],
       deleteConfirm: { open: false, item: null }
     }
@@ -148,7 +148,7 @@ export default {
   },
   async mounted() {
     try {
-      const res = await getUsers();
+      const res = await getContractors();
       this.contractors = Array.isArray(res.data) ? res.data : [];
     } catch (e) {
       // fallback to demo data if error
@@ -157,7 +157,7 @@ export default {
   methods: {
     openAdd() {
       this.editing = false
-      this.form = { id: null, name: '', phone: '', type: '' }
+      this.form = { id: null, name: '', phone: '', type: '', notes: '' }
       this.modalOpen = true
     },
     openEdit(c) {
@@ -175,22 +175,28 @@ export default {
         return
       }
       if (this.editing) {
+        // Only update locally (no backend update API)
         const idx = this.contractors.findIndex(x => x.id === this.form.id)
         if (idx !== -1) this.contractors.splice(idx, 1, Object.assign({}, this.form))
-      } else {
-        try {
-          const res = await createContractor({ name: this.form.name, phone: this.form.phone, notes: this.form.notes || '' })
-          this.contractors.push(res.data)
-        } catch (e) {
-          alert('Error adding contractor')
-        }
+        this.modalOpen = false
+        return
+      }
+      try {
+        const res = await createContractor({
+          name: this.form.name,
+          phone: this.form.phone,
+          notes: this.form.notes || ''
+        })
+        this.contractors.push(res.data)
+      } catch (e) {
+        alert('Error adding contractor')
       }
       this.modalOpen = false
     },
     async doDelete() {
       const id = this.deleteConfirm.item.id
       try {
-        await deleteUser(id)
+        await deleteContractor(id)
         this.contractors = this.contractors.filter(c => c.id !== id)
       } catch (e) {
         alert('Error deleting contractor')
@@ -244,10 +250,16 @@ export default {
       let added = 0
       for (const n of imported) {
         if (!existingNames.has(n)) {
-          const id = this.contractors.length ? Math.max(...this.contractors.map(c=>c.id)) + 1 : 1
-          this.contractors.push({ id, name: n, phone: '', type: '' })
-          existingNames.add(n)
-          added++
+          // Add via backend
+          try {
+            createContractor({ name: n, phone: '', notes: '' }).then(res => {
+              this.contractors.push(res.data)
+            })
+            existingNames.add(n)
+            added++
+          } catch (e) {
+            // skip on error
+          }
         }
       }
       alert(this.$t('contractors.imported', { count: added }))

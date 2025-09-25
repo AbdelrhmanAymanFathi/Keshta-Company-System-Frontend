@@ -234,6 +234,70 @@
         </div>
         <div v-if="saveError" class="mt-2 text-red-600 text-sm">{{ saveError }}</div>
       </div>
+
+      <!-- Select Location -->
+      <div v-if="!step2" class="mt-6">
+        <label class="block mb-1 font-medium">{{ $t('labels.location') }}</label>
+        <select v-model="selectedLocation" @change="onLocationChange" class="w-full border rounded-md px-3 py-2">
+          <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+        </select>
+      </div>
+
+      <!-- Delivery Table (visible after location selected) -->
+      <div v-if="selectedLocation" class="mt-6">
+        <table class="min-w-full border mb-4">
+          <thead>
+            <tr>
+              <th>{{ $t('labels.crusher') }}</th>
+              <th>{{ $t('labels.contractor') }}</th>
+              <th>{{ $t('labels.date') }}</th>
+              <th>{{ $t('labels.crusherTicket') }}</th>
+              <th>{{ $t('labels.companyTicket') }}</th>
+              <th>{{ $t('labels.companyCapacity') }}</th>
+              <th>{{ $t('labels.crusherCapacity') }}</th>
+              <th>{{ $t('labels.unitPrice') }}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, idx) in deliveries" :key="idx">
+              <td>
+                <select v-model="row.crusherId" class="border rounded px-1 py-1">
+                  <option v-for="c in crushers" :key="c.id" :value="c.id">{{ c.name }}</option>
+                </select>
+              </td>
+              <td>
+                <select v-model="row.contractorId" class="border rounded px-1 py-1">
+                  <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
+                </select>
+              </td>
+              <td>
+                <input type="date" v-model="row.date" class="border rounded px-1 py-1" />
+              </td>
+              <td>
+                <input v-model="row.crusherTicket" class="border rounded px-1 py-1" />
+              </td>
+              <td>
+                <input v-model="row.companyTicket" class="border rounded px-1 py-1" />
+              </td>
+              <td>
+                <input type="number" v-model.number="row.companyCapacity" class="border rounded px-1 py-1" />
+              </td>
+              <td>
+                <input type="number" v-model.number="row.crusherCapacity" class="border rounded px-1 py-1" />
+              </td>
+              <td>
+                <input type="number" v-model.number="row.unitPrice" class="border rounded px-1 py-1" />
+              </td>
+              <td>
+                <button @click="removeRow(idx)" class="text-red-600 px-2">×</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button @click="addRow" class="bg-indigo-500 text-white px-3 py-1 rounded mb-2">{{ $t('labels.addRow') }}</button>
+        <button @click="submitDeliveries" class="bg-green-600 text-white px-4 py-2 rounded">{{ $t('labels.save') }}</button>
+      </div>
     </div>
   </div>
 </template>
