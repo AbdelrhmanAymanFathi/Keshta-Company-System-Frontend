@@ -6,8 +6,8 @@
 
         <!-- site/area summary on desktop -->
         <div v-if="step2" class="hidden sm:flex flex-col items-end text-sm text-gray-600">
-          <div><span class="font-medium">{{ $t('labels.site') }}:</span> {{ site }}</div>
-          <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area }}</div>
+          <div><span class="font-medium">{{ $t('labels.site') }}:</span> {{ site ? site.name : '' }}</div>
+          <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area ? area.name : '' }}</div>
         </div>
       </div>
 
@@ -16,16 +16,16 @@
         <div>
           <label class="block mb-1 font-medium">{{ $t('labels.site') }}</label>
           <select v-model="site" class="w-full border rounded-md px-3 py-2">
-            <option value="">{{ $t('labels.site') }} —</option>
-            <option v-for="s in sites" :key="s.id" :value="s.name">{{ s.name }}</option>
+            <option :value="null">{{ $t('labels.site') }} —</option>
+            <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
           </select>
         </div>
 
         <div>
           <label class="block mb-1 font-medium">{{ $t('labels.area') }}</label>
           <select v-model="area" class="w-full border rounded-md px-3 py-2">
-            <option value="">{{ $t('labels.area') }} —</option>
-            <option v-for="a in areas" :key="a.id" :value="a.name">{{ a.name }}</option>
+            <option :value="null">{{ $t('labels.area') }} —</option>
+            <option v-for="a in areas" :key="a.id" :value="a">{{ a.name }}</option>
           </select>
         </div>
 
@@ -45,8 +45,8 @@
       <div v-else class="mt-6">
         <!-- mobile site/area row -->
         <div class="sm:hidden mb-4 text-sm text-gray-700">
-          <div><span class="font-medium">{{ $t('labels.site') }}:</span> {{ site }}</div>
-          <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area }}</div>
+          <div><span class="font-medium">{{ $t('labels.site') }}:</span> {{ site ? site.name : '' }}</div>
+          <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area ? area.name : '' }}</div>
         </div>
 
         <!-- responsive table -->
@@ -80,22 +80,22 @@
 
                 <td class="px-3 py-2">
                   <select v-model="row.contractor" class="w-full border rounded-md px-2 py-1">
-                    <option value="">{{ $t('labels.contractor') }} —</option>
-                    <option v-for="c in contractors" :key="c.id" :value="c.name">{{ c.name }}</option>
+                    <option :value="null">{{ $t('labels.contractor') }} —</option>
+                    <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
                   <select v-model="row.crusher" @change="updateVehicles(row)" class="w-full border rounded-md px-2 py-1">
-                    <option value="">{{ $t('labels.crusher') }} —</option>
-                    <option v-for="c in crushers" :key="c.id" :value="c.name">{{ c.name }}</option>
+                    <option :value="null">{{ $t('labels.crusher') }} —</option>
+                    <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
                   <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1">
-                    <option value="">{{ $t('labels.vehicle') }} —</option>
-                    <option v-for="v in row.availableVehicles" :key="v.id" :value="v.name">{{ v.name }}</option>
+                    <option :value="null">{{ $t('labels.vehicle') }} —</option>
+                    <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                   </select>
                 </td>
 
@@ -169,24 +169,24 @@
               <label class="text-sm">
                 {{ $t('labels.contractor') }}
                 <select v-model="row.contractor" class="w-full border rounded-md px-2 py-1">
-                  <option value="">{{ $t('labels.contractor') }} —</option>
-                  <option v-for="c in contractors" :key="c.id" :value="c.name">{{ c.name }}</option>
+                  <option :value="null">{{ $t('labels.contractor') }} —</option>
+                  <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                 </select>
               </label>
 
               <label class="text-sm">
                 {{ $t('labels.crusher') }}
                 <select v-model="row.crusher" @change="updateVehicles(row)" class="w-full border rounded-md px-2 py-1">
-                  <option value="">{{ $t('labels.crusher') }} —</option>
-                  <option v-for="c in crushers" :key="c.id" :value="c.name">{{ c.name }}</option>
+                  <option :value="null">{{ $t('labels.crusher') }} —</option>
+                  <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                 </select>
               </label>
 
               <label class="text-sm">
                 {{ $t('labels.vehicle') }}
                 <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1">
-                  <option value="">{{ $t('labels.vehicle') }} —</option>
-                  <option v-for="v in row.availableVehicles" :key="v.id" :value="v.name">{{ v.name }}</option>
+                  <option :value="null">{{ $t('labels.vehicle') }} —</option>
+                  <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                 </select>
               </label>
 
@@ -232,6 +232,7 @@
             {{ $t('labels.saveSupply') }}
           </button>
         </div>
+        <div v-if="saveError" class="mt-2 text-red-600 text-sm">{{ saveError }}</div>
       </div>
     </div>
   </div>
@@ -245,17 +246,18 @@ export default {
   data() {
     return {
       step2: false,
-      site: '',
-      area: '',
+      site: null, // store selected site object
+      area: null, // store selected area object
       sites: [],
       areas: [],
+      allLocations: [],
       rows: [
         {
           id: Date.now(),
           date: '',
-          contractor: '',
-          crusher: '',
-          vehicle: '',
+          contractor: null, // store selected contractor object
+          crusher: null,    // store selected crusher object
+          vehicle: null,    // store selected vehicle object
           crusherBon: '',
           companyBon: '',
           discount: 0,
@@ -266,14 +268,17 @@ export default {
       ],
       contractors: [],
       crushers: [],
-      vehicles: []
+      vehicles: [],
+      saveError: ''
     }
   },
   async mounted() {
     // جلب المواقع
     try {
       const locRes = await getLocations();
-      this.sites = Array.isArray(locRes.data) ? locRes.data : [];
+      this.allLocations = Array.isArray(locRes.data) ? locRes.data : [];
+      // filter sites (parentId == null)
+      this.sites = this.allLocations.filter(l => l.parentId == null);
     } catch { /* error fetching locations */ }
     // جلب المقاولين
     try {
@@ -290,6 +295,17 @@ export default {
       const vehiclesRes = await getVehicles();
       this.vehicles = Array.isArray(vehiclesRes.data) ? vehiclesRes.data : [];
     } catch { /* error fetching vehicles */ }
+  },
+  watch: {
+    site(newSiteObj) {
+      // newSiteObj is now the selected site object
+      if (newSiteObj && newSiteObj.id) {
+        this.areas = this.allLocations.filter(l => l.parentId === newSiteObj.id);
+      } else {
+        this.areas = [];
+      }
+      this.area = null;
+    }
   },
   computed: {
     isRTL() {
@@ -311,16 +327,16 @@ export default {
       this.step2 = true
     },
     clearSiteArea() {
-      this.site = ''
-      this.area = ''
+      this.site = null
+      this.area = null
     },
     addRow() {
       this.rows.push({
         id: Date.now() + Math.random(),
         date: '',
-        contractor: '',
-        crusher: '',
-        vehicle: '',
+        contractor: null,
+        crusher: null,
+        vehicle: null,
         crusherBon: '',
         companyBon: '',
         discount: 0,
@@ -349,9 +365,9 @@ export default {
         {
           id: Date.now(),
           date: '',
-          contractor: '',
-          crusher: '',
-          vehicle: '',
+          contractor: null,
+          crusher: null,
+          vehicle: null,
           crusherBon: '',
           companyBon: '',
           discount: 0,
@@ -362,15 +378,14 @@ export default {
       ]
     },
     updateVehicles(row) {
-      const selectedCrusher = this.crushers.find(c => c.name === row.crusher)
+      const selectedCrusher = row.crusher
       row.availableVehicles = selectedCrusher ? selectedCrusher.vehicles : []
-      row.vehicle = ''
+      row.vehicle = null
       row.cubic = 0
     },
     onVehicleSelect(row) {
-      const v = (row.availableVehicles || []).find(x => x.name === row.vehicle)
+      const v = row.vehicle
       if (v && v.cubic) {
-        // auto-fill cubic from vehicle record
         row.cubic = v.cubic
       }
     },
@@ -385,15 +400,23 @@ export default {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
     async saveData() {
+      this.saveError = ''
+      // Validate required fields in all rows
+      for (const [i, r] of this.rows.entries()) {
+        if (!r.date || !r.contractor || !r.crusher || !r.vehicle) {
+          this.saveError = `Please fill all required fields in row ${i + 1}.`
+          return
+        }
+      }
       // prepare payload
       const payload = {
-        site: this.site,
-        area: this.area,
+        siteId: this.site ? this.site.id : null,
+        areaId: this.area ? this.area.id : null,
         rows: this.rows.map(r => ({
           date: r.date,
-          contractor: r.contractor,
-          crusher: r.crusher,
-          vehicle: r.vehicle,
+          contractorId: r.contractor ? r.contractor.id : null,
+          crusherId: r.crusher ? r.crusher.id : null,
+          vehicleId: r.vehicle ? r.vehicle.id : null,
           crusherBon: r.crusherBon,
           companyBon: r.companyBon,
           discount: r.discount,
@@ -409,7 +432,13 @@ export default {
         await createDelivery(payload)
         alert(this.$t('labels.saveSupply') + ' — OK')
       } catch (e) {
-        alert('Error saving supply')
+        // Show backend error message if available
+        let msg = 'Error saving supply'
+        if (e && e.response && e.response.data && e.response.data.message) {
+          msg += ': ' + e.response.data.message
+        }
+        this.saveError = msg
+        console.error('Error saving supply:', e)
       }
       // reset after save (اختياري)
       // this.step2 = false
@@ -445,6 +474,6 @@ export default {
   }
 }
 @media (min-width: 640px) {
-  .sm\\:hidden { display: none; }
+  .sm\:hidden { display: none; }
 }
 </style>

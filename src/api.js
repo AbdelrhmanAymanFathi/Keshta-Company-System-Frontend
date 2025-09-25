@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000'; // غيّرها حسب إعدادات السيرفر
-
+const BASE_URL = 'http://localhost:3000'; 
 // Users
 export const getUsers = () =>
   axios.get(`${BASE_URL}/api/users`);
