@@ -3,6 +3,7 @@ import { createApp, watch } from 'vue'
 import App from './App.vue'
 import './assets/main.css'
 import i18n from './i18n'
+import axios from 'axios'
 
 const app = createApp(App)
 
@@ -32,3 +33,8 @@ watch(
     setDocumentLocale(newLocale)
   }
 )
+
+const token = localStorage.getItem('accessToken')
+if (token) {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}

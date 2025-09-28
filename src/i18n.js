@@ -3,7 +3,20 @@ import { createI18n } from 'vue-i18n'
 const messages = {
   en: {
     appName: 'Qeshta Co.',
-    login: { title: "Login", username: "Username", password: "Password", button: "Login" },
+    login: { 
+      title: "Login", username: "Username", password: "Password", button: "Login",
+      noAccount: "Don't have an account?", register: "Register"
+    },
+    register: {
+      title: "Register",
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      password: "Password",
+      button: "Register",
+      haveAccount: "Already have an account?",
+      login: "Login"
+    },
     navbar: { 
       supplies: "Supplies", transport: "Transport", expenses: "Expenses", 
       equipmentRent: "Equipment Rent", companyEquipment: "Company Equipment" 
@@ -61,12 +74,28 @@ const messages = {
       imported: "Imported {count} new contractors",
       deleteConfirm: "Are you sure you want to delete",
       validationName: "Please enter contractor name",
-      searchPlaceholder: "Search by name or phone..."
+      searchPlaceholder: "Search by name or phone...",
+      bankName: "Bank Name",
+      accountNumber: "Account Number",
+      notes: "Notes"
     }
   },
   ar: {
     appName: 'شركة قشطة',
-    login: { title: "تسجيل الدخول", username: "اسم المستخدم", password: "كلمة المرور", button: "دخول" },
+    login: { 
+      title: "تسجيل الدخول", username: "اسم المستخدم", password: "كلمة المرور", button: "دخول",
+      noAccount: "ليس لديك حساب؟", register: "تسجيل"
+    },
+    register: {
+      title: "تسجيل حساب جديد",
+      name: "الاسم",
+      email: "البريد الإلكتروني",
+      phone: "الهاتف",
+      password: "كلمة المرور",
+      button: "تسجيل",
+      haveAccount: "لديك حساب بالفعل؟",
+      login: "دخول"
+    },
     navbar: { 
       supplies: "التوريدات", transport: "النقل", expenses: "المصروفات", 
       equipmentRent: "ايجار المعدات", companyEquipment: "معدات الشركة" 
@@ -124,7 +153,10 @@ const messages = {
       imported: "تم استيراد {count} مقاولين جدد",
       deleteConfirm: "هل أنت متأكد أنك تريد حذف",
       validationName: "من فضلك أدخل اسم المقاول",
-      searchPlaceholder: "ابحث بالاسم أو الهاتف..."
+      searchPlaceholder: "ابحث بالاسم أو الهاتف...",
+      bankName: "اسم البنك",
+      accountNumber: "رقم الحساب",
+      notes: "ملاحظات"
     }
   }
 }

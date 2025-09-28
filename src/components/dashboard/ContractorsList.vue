@@ -35,8 +35,10 @@
             <tr>
               <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.#') }}</th>
               <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.name') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.type') }}</th>
               <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.phone') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.bankName') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.accountNumber') }}</th>
+              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.notes') }}</th>
               <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.actions') }}</th>
             </tr>
           </thead>
@@ -44,8 +46,10 @@
             <tr v-for="(c, idx) in filtered" :key="c.id" class="hover:bg-gray-50">
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ idx + 1 }}</td>
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.name }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.type || '-' }}</td>
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.phone || '-' }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.bankName || '-' }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.accountNumber || '-' }}</td>
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.notes || '-' }}</td>
               <td class="p-3">
                 <div :class="['flex gap-2', isRTL ? 'flex-row-reverse' : '']">
                   <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white">{{ $t('labels.edit') }}</button>
@@ -54,7 +58,7 @@
               </td>
             </tr>
             <tr v-if="filtered.length === 0">
-              <td class="p-3" colspan="5" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.noResults') }}</td>
+              <td class="p-3" colspan="7" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.noResults') }}</td>
             </tr>
           </tbody>
         </table>
@@ -66,7 +70,12 @@
       <div v-for="c in filtered" :key="c.id" :class="['p-3 bg-white rounded shadow flex justify-between items-start', isRTL ? 'flex-row-reverse' : '']">
         <div :class="isRTL ? 'text-right' : ''">
           <div class="font-semibold">{{ c.name }}</div>
-          <div class="text-sm text-gray-500">{{ c.type || '-' }} • {{ c.phone || '-' }}</div>
+          <div class="text-sm text-gray-500">
+            {{ c.phone || '-' }}<br>
+            <span v-if="c.bankName">{{ $t('contractors.bankName') }}: {{ c.bankName }}</span><br>
+            <span v-if="c.accountNumber">{{ $t('contractors.accountNumber') }}: {{ c.accountNumber }}</span><br>
+            <span v-if="c.notes">{{ $t('contractors.notes') }}: {{ c.notes }}</span>
+          </div>
         </div>
         <div class="flex flex-col gap-2">
           <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs">{{ $t('labels.edit') }}</button>
@@ -94,8 +103,18 @@
           </label>
 
           <label>
-            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.type') }}</div>
-            <input v-model="form.type" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.bankName') }}</div>
+            <input v-model="form.bankName" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+          </label>
+
+          <label>
+            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.accountNumber') }}</div>
+            <input v-model="form.accountNumber" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+          </label>
+
+          <label>
+            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.notes') }}</div>
+            <input v-model="form.notes" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
           </label>
         </div>
 
@@ -133,7 +152,7 @@ export default {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', type: '', notes: '' },
+      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '' },
       contractors: [],
       deleteConfirm: { open: false, item: null }
     }
@@ -143,7 +162,12 @@ export default {
     filtered() {
       if (!this.q) return this.contractors
       const s = this.q.toLowerCase()
-      return this.contractors.filter(c => (c.name||'').toLowerCase().includes(s) || (c.phone||'').toLowerCase().includes(s))
+      return this.contractors.filter(c =>
+        (c.name||'').toLowerCase().includes(s) ||
+        (c.phone||'').toLowerCase().includes(s) ||
+        (c.bankName||'').toLowerCase().includes(s) ||
+        (c.accountNumber||'').toLowerCase().includes(s)
+      )
     }
   },
   async mounted() {
@@ -157,7 +181,7 @@ export default {
   methods: {
     openAdd() {
       this.editing = false
-      this.form = { id: null, name: '', phone: '', type: '', notes: '' }
+      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '' }
       this.modalOpen = true
     },
     openEdit(c) {
@@ -185,6 +209,8 @@ export default {
         const res = await createContractor({
           name: this.form.name,
           phone: this.form.phone,
+          bankName: this.form.bankName,
+          accountNumber: this.form.accountNumber,
           notes: this.form.notes || ''
         })
         this.contractors.push(res.data)
@@ -233,29 +259,37 @@ export default {
       }
       const header = (json[headerRowIndex] || []).map(h => (h||'').toString().trim())
       const rows = json.slice(headerRowIndex+1)
-      // try to find contractor column index
-      let contractorCol = -1
-      for (let i=0;i<header.length;i++){
-        if (/مقاول|Contractor/i.test(header[i])) { contractorCol = i; break }
+      // Find column indices
+      const colIdx = {
+        name: header.findIndex(h => /مقاول|Contractor/i.test(h)),
+        phone: header.findIndex(h => /هاتف|Phone/i.test(h)),
+        bankName: header.findIndex(h => /بنك|Bank/i.test(h)),
+        accountNumber: header.findIndex(h => /حساب|Account/i.test(h)),
+        notes: header.findIndex(h => /ملاحظات|Notes/i.test(h)),
       }
-      // fallback: if header not found, assume column 1 (index 1)
-      if (contractorCol === -1) contractorCol = 1
       const imported = []
       for (const r of rows) {
-        const name = (r[contractorCol] || '').toString().trim()
-        if (name) imported.push(name)
+        const name = (colIdx.name !== -1 && r[colIdx.name]) ? r[colIdx.name].toString().trim() : ''
+        if (name) {
+          imported.push({
+            name,
+            phone: (colIdx.phone !== -1 && r[colIdx.phone]) ? r[colIdx.phone].toString().trim() : '',
+            bankName: (colIdx.bankName !== -1 && r[colIdx.bankName]) ? r[colIdx.bankName].toString().trim() : '',
+            accountNumber: (colIdx.accountNumber !== -1 && r[colIdx.accountNumber]) ? r[colIdx.accountNumber].toString().trim() : '',
+            notes: (colIdx.notes !== -1 && r[colIdx.notes]) ? r[colIdx.notes].toString().trim() : ''
+          })
+        }
       }
       // dedupe and add to contractors list (avoid duplicates by name)
       const existingNames = new Set(this.contractors.map(c => c.name))
       let added = 0
       for (const n of imported) {
-        if (!existingNames.has(n)) {
-          // Add via backend
+        if (!existingNames.has(n.name)) {
           try {
-            createContractor({ name: n, phone: '', notes: '' }).then(res => {
+            createContractor(n).then(res => {
               this.contractors.push(res.data)
             })
-            existingNames.add(n)
+            existingNames.add(n.name)
             added++
           } catch (e) {
             // skip on error
@@ -263,6 +297,12 @@ export default {
         }
       }
       alert(this.$t('contractors.imported', { count: added }))
+    },
+    confirmDelete(c) {
+      this.deleteConfirm = { open: true, item: c }
+    },
+    cancelDelete() {
+      this.deleteConfirm = { open: false, item: null }
     }
   }
 }

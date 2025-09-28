@@ -1,6 +1,20 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000'; 
+const BASE_URL = 'http://localhost:3000';
+
+// --- AUTH ---
+export const login = (data) =>
+  axios.post(`${BASE_URL}/api/auth/login`, data);
+
+export const register = (data) =>
+  axios.post(`${BASE_URL}/api/auth/register`, data);
+
+export const refreshToken = () =>
+  axios.post(`${BASE_URL}/api/auth/refresh`);
+
+export const logout = () =>
+  axios.post(`${BASE_URL}/api/auth/logout`);
+
 // Users
 export const getUsers = () =>
   axios.get(`${BASE_URL}/api/users`);
