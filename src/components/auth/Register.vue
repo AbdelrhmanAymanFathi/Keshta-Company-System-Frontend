@@ -16,7 +16,7 @@
       </div>
       <div class="mb-3">
         <label class="block mb-1">{{ $t('register.password') }}</label>
-        <input v-model="password" type="password" class="w-full border rounded px-2 py-1" required />
+        <input v-model="password" type="password" class="w-full border rounded px-2 py-1" required minlength="6" />
       </div>
       <button type="submit" class="w-full bg-green-600 text-white py-2 rounded">{{ $t('register.button') }}</button>
       <div v-if="error" class="text-red-600 mt-2 text-sm">{{ error }}</div>
@@ -38,6 +38,10 @@ export default {
   methods: {
     async submit() {
       this.error = ''
+      if (this.password.length < 6) {
+        this.error = 'Password must be at least 6 characters.'
+        return
+      }
       try {
         await register({
           name: this.name,
@@ -48,7 +52,11 @@ export default {
         // Optionally auto-login after register
         this.$emit('switch-auth', 'login')
       } catch (e) {
-        this.error = e?.response?.data?.message || 'Register failed'
+        // Try to show backend validation error if available
+        const backendMsg = Array.isArray(e?.response?.data) && e.response.data[0]?.message
+          ? e.response.data[0].message
+          : e?.response?.data?.message || 'Register failed'
+        this.error = backendMsg
       }
     }
   }

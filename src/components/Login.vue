@@ -99,4 +99,3 @@ export default {
 <style scoped>
 /* Tailwind handles responsiveness & shadows */
 </style>
-  

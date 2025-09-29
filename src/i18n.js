@@ -4,7 +4,11 @@ const messages = {
   en: {
     appName: 'Qeshta Co.',
     login: { 
-      title: "Login", username: "Username", password: "Password", button: "Login",
+      title: "Login",
+      username: "Username",
+      email: "Email",
+      password: "Password",
+      button: "Login",
       noAccount: "Don't have an account?", register: "Register"
     },
     register: {
@@ -83,7 +87,11 @@ const messages = {
   ar: {
     appName: 'شركة قشطة',
     login: { 
-      title: "تسجيل الدخول", username: "اسم المستخدم", password: "كلمة المرور", button: "دخول",
+      title: "تسجيل الدخول",
+      username: "اسم المستخدم",
+      email: "البريد الإلكتروني",
+      password: "كلمة المرور",
+      button: "دخول",
       noAccount: "ليس لديك حساب؟", register: "تسجيل"
     },
     register: {

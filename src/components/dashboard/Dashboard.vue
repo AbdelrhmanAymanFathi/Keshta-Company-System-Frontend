@@ -135,6 +135,7 @@ import NewSupply from './NewSupply.vue'
 import SuppliesList from './SuppliesList.vue'
 import ContractorsList from './ContractorsList.vue'
 import VehiclesList from './VehiclesList.vue'
+import { logout as apiLogout } from '@/api' // <-- import logout API
 
 export default {
   name: 'DashboardPage',
@@ -281,8 +282,19 @@ export default {
       this.collapsedSidebar = !this.collapsedSidebar
     },
 
-    logout() {
-      alert(this.$t('labels.logout') || 'Logout')
+    async logout() {
+      try {
+        await apiLogout()
+      } catch (e) {
+        // ignore error
+      }
+      localStorage.removeItem('accessToken')
+      // Remove axios auth header if set
+      if (window.axios) {
+        delete window.axios.defaults.headers.common['Authorization']
+      }
+      // reload to show login
+      window.location.reload()
     },
 
     // language switch

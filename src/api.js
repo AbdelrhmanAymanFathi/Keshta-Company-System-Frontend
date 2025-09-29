@@ -65,3 +65,57 @@ export const createDelivery = (data) =>
   axios.post(`${BASE_URL}/api/exports`, data);
 export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
+
+// Example helper to refresh and set token (call this where needed)
+export async function refreshAndSetToken() {
+  try {
+    const res = await refreshToken();
+    const token = res?.data?.accessToken;
+    if (token) {
+      localStorage.setItem('accessToken', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    return token;
+  } catch (e) {
+    // handle error (e.g., logout user)
+    localStorage.removeItem('accessToken');
+    delete axios.defaults.headers.common['Authorization'];
+    throw e;
+  }
+}
+
+// Attach token to every request if available
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Optionally: Auto-refresh token on 401 and retry once
+axios.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      try {
+        const { refreshAndSetToken } = await import('./api');
+        await refreshAndSetToken();
+        // retry original request with new token
+        return axios(originalRequest);
+      } catch (e) {
+        // logout user if refresh fails
+        localStorage.removeItem('accessToken');
+        delete axios.defaults.headers.common['Authorization'];
+        window.location.reload();
+      }
+    }
+    return Promise.reject(error);
+  }
+);

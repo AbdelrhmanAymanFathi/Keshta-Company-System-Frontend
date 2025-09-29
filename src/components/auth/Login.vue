@@ -1,5 +1,14 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen">
+    <!-- Language switcher (merged from old Login.vue) -->
+    <div class="flex gap-2 absolute top-4 right-4">
+      <button @click="switchLang('en')" :class="btnClass('en')" class="p-2 rounded-md bg-white">
+        <img src="/flags/us.png" alt="EN" class="w-6 h-6" />
+      </button>
+      <button @click="switchLang('ar')" :class="btnClass('ar')" class="p-2 rounded-md bg-white">
+        <img src="/flags/eg.png" alt="AR" class="w-6 h-6" />
+      </button>
+    </div>
     <form @submit.prevent="submit" class="bg-white p-6 rounded shadow w-80">
       <h2 class="text-xl font-bold mb-4">{{ $t('login.title') }}</h2>
 
@@ -80,7 +89,9 @@ export default {
         const apiMsg = e?.response?.data?.message || e?.response?.data?.error || ''
         this.error = apiMsg || (e?.response?.status === 401 ? 'Invalid email or password' : 'Login failed')
       }
-    }
+    },
+    switchLang (lang) { this.$i18n.locale = lang },
+    btnClass (lang) { return this.$i18n.locale === lang ? 'ring-2 ring-indigo-400' : '' }
   }
 }
 </script>

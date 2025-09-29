@@ -15,18 +15,26 @@
       <div v-if="!step2" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block mb-1 font-medium">{{ $t('labels.site') }}</label>
-          <select v-model="site" class="w-full border rounded-md px-3 py-2">
-            <option :value="null">{{ $t('labels.site') }} —</option>
-            <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
-          </select>
+          <div class="flex gap-2">
+            <select v-model="site" class="w-full border rounded-md px-3 py-2">
+              <option :value="null">{{ $t('labels.site') }} —</option>
+              <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
+            </select>
+            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded" title="Add Site">+</button>
+            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded" title="Edit Site">✎</button>
+          </div>
         </div>
 
         <div>
           <label class="block mb-1 font-medium">{{ $t('labels.area') }}</label>
-          <select v-model="area" class="w-full border rounded-md px-3 py-2">
-            <option :value="null">{{ $t('labels.area') }} —</option>
-            <option v-for="a in areas" :key="a.id" :value="a">{{ a.name }}</option>
-          </select>
+          <div class="flex gap-2">
+            <select v-model="area" class="w-full border rounded-md px-3 py-2">
+              <option :value="null">{{ $t('labels.area') }} —</option>
+              <option v-for="a in areas" :key="a.id" :value="a">{{ a.name }}</option>
+            </select>
+            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded" title="Add Area">+</button>
+            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded" title="Edit Area">✎</button>
+          </div>
         </div>
 
         <div class="sm:col-span-2 flex items-center gap-3 mt-2">
@@ -228,26 +236,72 @@
         </div>
 
         <div class="mt-4 flex justify-end gap-3">
-          <button @click="saveData" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            {{ $t('labels.saveSupply') }}
+          <button @click="saveData" :disabled="saving" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            {{ saving ? ($t('labels.saving') || 'Saving...') : ($t('labels.saveSupply') || 'Save') }}
           </button>
         </div>
-        <div v-if="saveError" class="mt-2 text-red-600 text-sm">{{ saveError }}</div>
+        <div v-if="saveError" class="mt-2 text-red-600 text-sm break-words">{{ saveError }}</div>
+      </div>
+    </div>
+
+    <!-- Add Site Dialog -->
+    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-80">
+        <h3 class="text-lg font-bold mb-2">Add Site</h3>
+        <input v-model="newSiteName" placeholder="Site name" class="w-full border rounded px-2 py-1 mb-2" />
+        <div class="flex gap-2 justify-end">
+          <button @click="showAddSite = false" class="px-3 py-1 border rounded">Cancel</button>
+          <button @click="addSite" :disabled="!newSiteName" class="bg-green-600 text-white px-3 py-1 rounded">Add</button>
+        </div>
+      </div>
+    </div>
+    <!-- Add Area Dialog -->
+    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-80">
+        <h3 class="text-lg font-bold mb-2">Add Area</h3>
+        <input v-model="newAreaName" placeholder="Area name" class="w-full border rounded px-2 py-1 mb-2" />
+        <div class="flex gap-2 justify-end">
+          <button @click="showAddArea = false" class="px-3 py-1 border rounded">Cancel</button>
+          <button @click="addArea" :disabled="!newAreaName" class="bg-green-600 text-white px-3 py-1 rounded">Add</button>
+        </div>
+      </div>
+    </div>
+    <!-- Edit Site Dialog -->
+    <div v-if="editSiteObj" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-80">
+        <h3 class="text-lg font-bold mb-2">Edit Site</h3>
+        <input v-model="editSiteName" class="w-full border rounded px-2 py-1 mb-2" />
+        <div class="flex gap-2 justify-end">
+          <button @click="editSiteObj = null" class="px-3 py-1 border rounded">Cancel</button>
+          <button @click="updateSite" :disabled="!editSiteName" class="bg-yellow-500 text-white px-3 py-1 rounded">Save</button>
+        </div>
+      </div>
+    </div>
+    <!-- Edit Area Dialog -->
+    <div v-if="editAreaObj" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-80">
+        <h3 class="text-lg font-bold mb-2">Edit Area</h3>
+        <input v-model="editAreaName" class="w-full border rounded px-2 py-1 mb-2" />
+        <div class="flex gap-2 justify-end">
+          <button @click="editAreaObj = null" class="px-3 py-1 border rounded">Cancel</button>
+          <button @click="updateArea" :disabled="!editAreaName" class="bg-yellow-500 text-white px-3 py-1 rounded">Save</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { createDelivery, getLocations, getContractors, getCrushers, getVehicles } from '../../api'
+import axios from 'axios'
+import { createLocation, updateLocation, getLocations, getContractors, getCrushers, getVehicles, createDelivery } from '../../api'
 
 export default {
   name: 'NewSupply',
   data() {
     return {
       step2: false,
-      site: null, // store selected site object
-      area: null, // store selected area object
+      site: null,
+      area: null,
       sites: [],
       areas: [],
       allLocations: [],
@@ -255,9 +309,9 @@ export default {
         {
           id: Date.now(),
           date: '',
-          contractor: null, // store selected contractor object
-          crusher: null,    // store selected crusher object
-          vehicle: null,    // store selected vehicle object
+          contractor: null,
+          crusher: null,
+          vehicle: null, // optional
           crusherBon: '',
           companyBon: '',
           discount: 0,
@@ -272,37 +326,43 @@ export default {
       saveError: '',
       locations: [],
       selectedLocation: null,
-      deliveries: []
+      deliveries: [],
+      showAddSite: false,
+      showAddArea: false,
+      newSiteName: '',
+      newAreaName: '',
+      editSiteObj: null,
+      editSiteName: '',
+      editAreaObj: null,
+      editAreaName: '',
+      saving: false
     }
   },
   async mounted() {
-    // جلب المواقع
     try {
       const locRes = await getLocations();
       this.allLocations = Array.isArray(locRes.data) ? locRes.data : [];
-      // filter sites (parentId == null)
       this.sites = this.allLocations.filter(l => l.parentId == null);
-      this.locations = locRes.data
-    } catch { /* error fetching locations */ }
-    // جلب المقاولين
+      this.locations = locRes.data;
+    } catch (e) { console.warn('getLocations failed', e) }
+
     try {
       const contRes = await getContractors();
       this.contractors = Array.isArray(contRes.data) ? contRes.data : [];
-    } catch { /* error fetching contractors */ }
-    // جلب الكسارات
+    } catch (e) { console.warn('getContractors failed', e) }
+
     try {
       const crushersRes = await getCrushers();
       this.crushers = Array.isArray(crushersRes.data) ? crushersRes.data : [];
-    } catch { /* error fetching crushers */ }
-    // جلب السيارات
+    } catch (e) { console.warn('getCrushers failed', e) }
+
     try {
       const vehiclesRes = await getVehicles();
       this.vehicles = Array.isArray(vehiclesRes.data) ? vehiclesRes.data : [];
-    } catch { /* error fetching vehicles */ }
+    } catch (e) { console.warn('getVehicles failed', e) }
   },
   watch: {
     site(newSiteObj) {
-      // newSiteObj is now the selected site object
       if (newSiteObj && newSiteObj.id) {
         this.areas = this.allLocations.filter(l => l.parentId === newSiteObj.id);
       } else {
@@ -328,7 +388,13 @@ export default {
   },
   methods: {
     goToTable() {
-      this.step2 = true
+      if (!this.site || !this.area) return;
+      this.step2 = true;
+      if (this.rows && this.rows.length) {
+        this.rows.forEach(r => {
+          if (!r.date) r.date = new Date().toISOString().slice(0, 10);
+        });
+      }
     },
     clearSiteArea() {
       this.site = null
@@ -348,7 +414,6 @@ export default {
         cubic: 0,
         availableVehicles: []
       })
-      // keep mobile view stable
       this.$nextTick(() => {
         const tbl = this.$el.querySelector('table')
         if (tbl) tbl.scrollLeft = tbl.scrollWidth
@@ -404,55 +469,113 @@ export default {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
     async saveData() {
-      this.saveError = ''
-      // Validate required fields in all rows
-      for (const [i, r] of this.rows.entries()) {
-        if (!r.date || !r.contractor || !r.crusher || !r.vehicle) {
-          this.saveError = `Please fill all required fields in row ${i + 1}.`
-          return
-        }
-      }
-      // prepare payload
-      const payload = {
-        siteId: this.site ? this.site.id : null,
-        areaId: this.area ? this.area.id : null,
-        rows: this.rows.map(r => ({
-          date: r.date,
-          contractorId: r.contractor ? r.contractor.id : null,
-          crusherId: r.crusher ? r.crusher.id : null,
-          vehicleId: r.vehicle ? r.vehicle.id : null,
-          crusherBon: r.crusherBon,
-          companyBon: r.companyBon,
-          discount: r.discount,
-          price: r.price,
-          cubic: r.cubic,
-          total: this.totalPerRow(r)
-        })),
-        subtotal: this.subtotal,
-        totalDiscount: this.totalDiscount,
-        grandTotal: this.grandTotal
-      }
+      this.saveError = '';
+      this.saving = true;
+
       try {
-        await createDelivery(payload)
-        alert(this.$t('labels.saveSupply') + ' — OK')
-      } catch (e) {
-        // Show backend error message if available
-        let msg = 'Error saving supply'
-        if (e && e.response && e.response.data && e.response.data.message) {
-          msg += ': ' + e.response.data.message
+        console.log('Saving rows:', JSON.parse(JSON.stringify(this.rows)));
+
+        // rows that actually contain any data
+        const rowsToSave = this.rows.filter(r => {
+          const hasAny =
+            (r.date && r.date.toString().trim() !== '') ||
+            (r.contractor) ||
+            (r.crusher) ||
+            (r.price && Number(r.price) !== 0) ||
+            (r.cubic && Number(r.cubic) !== 0) ||
+            (r.discount && Number(r.discount) !== 0) ||
+            (r.crusherBon && r.crusherBon.toString().trim() !== '') ||
+            (r.companyBon && r.companyBon.toString().trim() !== '');
+          return hasAny;
+        });
+
+        if (rowsToSave.length === 0) {
+          this.saveError = 'No rows to save. يرجى إدخال بيانات على الأقل في صف واحد.';
+          return;
         }
-        this.saveError = msg
-        console.error('Error saving supply:', e)
+
+        // validate required fields for rows with data (vehicle is OPTIONAL)
+        for (const [i, r] of rowsToSave.entries()) {
+          const missing = [];
+          if (!r.date || r.date.toString().trim() === '') missing.push('date');
+          if (!r.contractor) missing.push('contractor');
+          if (!r.crusher) missing.push('crusher');
+          if (missing.length) {
+            this.saveError = `Please fill required fields (${missing.join(', ')}) in row ${i + 1}. / من فضلك املأ: ${missing.join(', ')} في الصف ${i + 1}.`;
+            console.warn('Row missing fields:', { rowIndex: i + 1, row: r, missing });
+            return;
+          }
+        }
+
+        // set Authorization header globally if token present
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
+
+        // send each row
+        for (const r of rowsToSave) {
+          const payload = {
+            crusherId: Number(r.crusher.id),
+            contractorId: Number(r.contractor.id),
+            locationId: this.area ? Number(this.area.id) : null,
+            date: r.date,
+            crusherTicket: r.crusherBon || null,
+            companyTicket: r.companyBon || null,
+            companyCapacity: r.cubic ? parseFloat(r.cubic) : 0,
+            crusherCapacity: r.cubic ? parseFloat(r.cubic) : 0,
+            unitPrice: r.price ? parseFloat(r.price) : 0,
+            discount: r.discount ? parseFloat(r.discount) : 0,
+            vehicleName: r.vehicle ? (r.vehicle.name || (typeof r.vehicle === 'string' ? r.vehicle : null)) : null,
+            notes: r.notes || null
+          };
+
+          console.log('Posting payload:', payload);
+          await createDelivery(payload);
+        }
+
+        alert(this.$t('labels.saveSupply') + ' — OK');
+      } catch (e) {
+        console.error('Error saving supply (full error):', e);
+        const resp = e && e.response && e.response.data ? e.response.data : null;
+        const status = e && e.response && e.response.status ? e.response.status : (e && e.status) || 'unknown';
+
+        let userMsg = `Error saving supply (HTTP ${status}). / خطأ أثناء الحفظ (الكود ${status}).`;
+
+        if (resp) {
+          // include common server error shapes
+          if (typeof resp === 'string') {
+            userMsg += ` ${resp}`;
+          } else if (resp.message) {
+            userMsg += ` ${resp.message}`;
+          }
+
+          if (resp.errors) {
+            try {
+              userMsg += ` Details: ${JSON.stringify(resp.errors)}`;
+            } catch (ex) { /* ignore */ }
+          } else if (resp.validation) {
+            try {
+              userMsg += ` Details: ${JSON.stringify(resp.validation)}`;
+            } catch (ex) { /* ignore */ }
+          }
+
+          console.log('Server response body:', resp);
+        } else {
+          if (e && e.message) userMsg += ` ${e.message}`;
+        }
+
+        this.saveError = userMsg;
+      } finally {
+        this.saving = false;
       }
-      // reset after save (اختياري)
-      // this.step2 = false
-      // this.resetRows()
     },
     async onLocationChange() {
-      // fetch crushers and contractors for the selected location
-      this.crushers = (await getCrushers()).data
-      this.contractors = (await getContractors()).data
-      // reset deliveries table
+      try {
+        this.crushers = (await getCrushers()).data;
+        this.contractors = (await getContractors()).data;
+      } catch (e) { console.warn('onLocationChange error', e) }
+
       this.deliveries = [
         {
           crusherId: '',
@@ -469,13 +592,79 @@ export default {
     },
     async submitDeliveries() {
       for (const row of this.deliveries) {
-        // send each delivery to backend
         await createDelivery(row)
       }
       alert(this.$t('labels.saved') || 'Saved!')
       this.deliveries = []
       this.selectedLocation = null
-    }
+    },
+    async addSite() {
+      if (!this.newSiteName) return
+      try {
+        await createLocation({ name: this.newSiteName, parentId: null })
+        this.showAddSite = false
+        this.newSiteName = ''
+        await this.refreshLocations()
+      } catch (e) {
+        alert('Failed to add site')
+      }
+    },
+    async addArea() {
+      if (!this.newAreaName || !this.site) return
+      try {
+        await createLocation({ name: this.newAreaName, parentId: this.site.id })
+        this.showAddArea = false
+        this.newAreaName = ''
+        await this.refreshLocations()
+      } catch (e) {
+        alert('Failed to add area')
+      }
+    },
+    editSiteDialog(site) {
+      this.editSiteObj = site
+      this.editSiteName = site.name
+    },
+    async updateSite() {
+      if (!this.editSiteObj || !this.editSiteName) return
+      try {
+        await updateLocation(this.editSiteObj.id, { name: this.editSiteName })
+        this.editSiteObj = null
+        this.editSiteName = ''
+        await this.refreshLocations()
+      } catch (e) {
+        alert('Failed to update site')
+      }
+    },
+    editAreaDialog(area) {
+      this.editAreaObj = area
+      this.editAreaName = area.name
+    },
+    async updateArea() {
+      if (!this.editAreaObj || !this.editAreaName) return
+      try {
+        await updateLocation(this.editAreaObj.id, { name: this.editAreaName })
+        this.editAreaObj = null
+        this.editAreaName = ''
+        await this.refreshLocations()
+      } catch (e) {
+        alert('Failed to update area')
+      }
+    },
+    async refreshLocations() {
+      try {
+        const locRes = await getLocations();
+        this.allLocations = Array.isArray(locRes.data) ? locRes.data : [];
+        this.sites = this.allLocations.filter(l => l.parentId == null);
+        if (this.site && this.site.id) {
+          this.areas = this.allLocations.filter(l => l.parentId === this.site.id);
+        } else {
+          this.areas = [];
+        }
+        this.locations = locRes.data
+      } catch (e) {
+        console.warn('refreshLocations failed', e)
+      }
+    },
   }
 }
 </script>
