@@ -4,14 +4,13 @@
       <div class="flex items-start justify-between gap-4">
         <h2 class="text-2xl font-semibold">{{ $t('dashboard.newSupply') }}</h2>
 
-        <!-- site/area summary on desktop -->
         <div v-if="step2" class="hidden sm:flex flex-col items-end text-sm text-gray-600">
           <div><span class="font-medium">{{ $t('labels.site') }}:</span> {{ site ? site.name : '' }}</div>
           <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area ? area.name : '' }}</div>
         </div>
       </div>
 
-      <!-- Step 1: select site & area -->
+      <!-- Step 1 -->
       <div v-if="!step2" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block mb-1 font-medium">{{ $t('labels.site') }}</label>
@@ -20,8 +19,8 @@
               <option :value="null">{{ $t('labels.site') }} —</option>
               <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
             </select>
-            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded" title="Add Site">+</button>
-            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded" title="Edit Site">✎</button>
+            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded">✎</button>
           </div>
         </div>
 
@@ -32,8 +31,8 @@
               <option :value="null">{{ $t('labels.area') }} —</option>
               <option v-for="a in areas" :key="a.id" :value="a">{{ a.name }}</option>
             </select>
-            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded" title="Add Area">+</button>
-            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded" title="Edit Area">✎</button>
+            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded">+</button>
+            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded">✎</button>
           </div>
         </div>
 
@@ -49,17 +48,14 @@
         </div>
       </div>
 
-      <!-- Step 2: table / excel-like -->
+      <!-- Step 2 -->
       <div v-else class="mt-6">
-        <!-- mobile site/area row -->
         <div class="sm:hidden mb-4 text-sm text-gray-700">
           <div><span class="font-medium">{{ $t('labels.site') }}:</span> {{ site ? site.name : '' }}</div>
           <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area ? area.name : '' }}</div>
         </div>
 
-        <!-- responsive table -->
         <div class="overflow-x-auto">
-          <!-- desktop table -->
           <table class="min-w-full divide-y divide-gray-200 border">
             <thead class="bg-indigo-50">
               <tr>
@@ -81,10 +77,7 @@
             <tbody class="divide-y divide-gray-200">
               <tr v-for="(row, index) in rows" :key="row.id" class="bg-white">
                 <td class="px-3 py-2 align-top text-sm">{{ index + 1 }}</td>
-
-                <td class="px-3 py-2">
-                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" />
-                </td>
+                <td class="px-3 py-2"><input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" /></td>
 
                 <td class="px-3 py-2">
                   <select v-model="row.contractor" class="w-full border rounded-md px-2 py-1">
@@ -107,57 +100,27 @@
                   </select>
                 </td>
 
+                <td class="px-3 py-2"><input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" /></td>
+                <td class="px-3 py-2"><input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" /></td>
+
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" />
+                  <input type="number" inputmode="numeric" v-model.number="row.discount" class="w-full border rounded-md px-2 py-1" placeholder="0" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" />
+                  <input type="number" step="any" inputmode="decimal" v-model.number="row.price" class="w-full border rounded-md px-2 py-1 no-spinner" placeholder="0" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input
-                    type="number"
-                    inputmode="numeric"
-                    v-model.number="row.discount"
-                    class="w-full border rounded-md px-2 py-1"
-                    placeholder="0"
-                  />
-                </td>
-
-                <!-- price and cubic: no spinner, keyboard entry only -->
-                <td class="px-3 py-2">
-                  <input
-                    type="number"
-                    step="any"
-                    inputmode="decimal"
-                    v-model.number="row.price"
-                    class="w-full border rounded-md px-2 py-1 no-spinner"
-                    placeholder="0"
-                  />
-                </td>
-
-                <td class="px-3 py-2">
-                  <input
-                    type="number"
-                    step="any"
-                    inputmode="decimal"
-                    v-model.number="row.cubic"
-                    class="w-full border rounded-md px-2 py-1 no-spinner"
-                    placeholder="0"
-                  />
+                  <input type="number" step="any" inputmode="decimal" v-model.number="row.cubic" class="w-full border rounded-md px-2 py-1 no-spinner" placeholder="0" />
                 </td>
 
                 <td class="px-3 py-2 font-semibold">{{ formatNumber(totalPerRow(row)) }}</td>
 
                 <td class="px-3 py-2">
                   <div class="flex gap-2">
-                    <button @click="duplicateRow(index)" title="Duplicate" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
-                      ⤷
-                    </button>
-                    <button @click="removeRow(index)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                      ✕
-                    </button>
+                    <button @click="duplicateRow(index)" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">⤷</button>
+                    <button @click="removeRow(index)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">✕</button>
                   </div>
                 </td>
               </tr>
@@ -165,7 +128,6 @@
           </table>
         </div>
 
-        <!-- Mobile: show rows as cards for easier editing -->
         <div class="sm:hidden mt-4 space-y-3">
           <div v-for="(row, i) in rows" :key="row.id" class="bg-white p-3 rounded-md shadow">
             <div class="flex justify-between items-start mb-2">
@@ -218,12 +180,9 @@
           </div>
         </div>
 
-        <!-- actions & summary -->
         <div class="mt-4 sm:flex sm:items-center sm:justify-between gap-4">
           <div class="flex gap-2">
-            <button @click="addRow" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-              {{ $t('labels.addRow') }}
-            </button>
+            <button @click="addRow" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">{{ $t('labels.addRow') }}</button>
             <button @click="resetRows" class="px-4 py-2 border rounded">{{ $t('labels.cancel') }}</button>
           </div>
 
@@ -243,55 +202,11 @@
         <div v-if="saveError" class="mt-2 text-red-600 text-sm break-words">{{ saveError }}</div>
       </div>
     </div>
-
-    <!-- Add Site Dialog -->
-    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded shadow w-80">
-        <h3 class="text-lg font-bold mb-2">Add Site</h3>
-        <input v-model="newSiteName" placeholder="Site name" class="w-full border rounded px-2 py-1 mb-2" />
-        <div class="flex gap-2 justify-end">
-          <button @click="showAddSite = false" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="addSite" :disabled="!newSiteName" class="bg-green-600 text-white px-3 py-1 rounded">Add</button>
-        </div>
-      </div>
-    </div>
-    <!-- Add Area Dialog -->
-    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded shadow w-80">
-        <h3 class="text-lg font-bold mb-2">Add Area</h3>
-        <input v-model="newAreaName" placeholder="Area name" class="w-full border rounded px-2 py-1 mb-2" />
-        <div class="flex gap-2 justify-end">
-          <button @click="showAddArea = false" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="addArea" :disabled="!newAreaName" class="bg-green-600 text-white px-3 py-1 rounded">Add</button>
-        </div>
-      </div>
-    </div>
-    <!-- Edit Site Dialog -->
-    <div v-if="editSiteObj" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded shadow w-80">
-        <h3 class="text-lg font-bold mb-2">Edit Site</h3>
-        <input v-model="editSiteName" class="w-full border rounded px-2 py-1 mb-2" />
-        <div class="flex gap-2 justify-end">
-          <button @click="editSiteObj = null" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="updateSite" :disabled="!editSiteName" class="bg-yellow-500 text-white px-3 py-1 rounded">Save</button>
-        </div>
-      </div>
-    </div>
-    <!-- Edit Area Dialog -->
-    <div v-if="editAreaObj" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div class="bg-white p-6 rounded shadow w-80">
-        <h3 class="text-lg font-bold mb-2">Edit Area</h3>
-        <input v-model="editAreaName" class="w-full border rounded px-2 py-1 mb-2" />
-        <div class="flex gap-2 justify-end">
-          <button @click="editAreaObj = null" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="updateArea" :disabled="!editAreaName" class="bg-yellow-500 text-white px-3 py-1 rounded">Save</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable */
 import axios from 'axios'
 import { createLocation, updateLocation, getLocations, getContractors, getCrushers, getVehicles, createDelivery } from '../../api'
 
@@ -311,12 +226,13 @@ export default {
           date: '',
           contractor: null,
           crusher: null,
-          vehicle: null, // optional
+          vehicle: null,
           crusherBon: '',
           companyBon: '',
           discount: 0,
           price: 0,
           cubic: 0,
+          notes: '',            // allow notes input on UI if needed
           availableVehicles: []
         }
       ],
@@ -356,6 +272,7 @@ export default {
       this.crushers = Array.isArray(crushersRes.data) ? crushersRes.data : [];
     } catch (e) { console.warn('getCrushers failed', e) }
 
+    // vehicles endpoint may not exist yet — fail gracefully
     try {
       const vehiclesRes = await getVehicles();
       this.vehicles = Array.isArray(vehiclesRes.data) ? vehiclesRes.data : [];
@@ -396,10 +313,7 @@ export default {
         });
       }
     },
-    clearSiteArea() {
-      this.site = null
-      this.area = null
-    },
+    clearSiteArea() { this.site = null; this.area = null; },
     addRow() {
       this.rows.push({
         id: Date.now() + Math.random(),
@@ -412,6 +326,7 @@ export default {
         discount: 0,
         price: 0,
         cubic: 0,
+        notes: '',
         availableVehicles: []
       })
       this.$nextTick(() => {
@@ -419,63 +334,20 @@ export default {
         if (tbl) tbl.scrollLeft = tbl.scrollWidth
       })
     },
-    duplicateRow(index) {
-      const src = this.rows[index]
-      const copy = JSON.parse(JSON.stringify(src))
-      copy.id = Date.now() + Math.random()
-      this.rows.splice(index + 1, 0, copy)
-    },
-    removeRow(index) {
-      this.rows.splice(index, 1)
-      if (this.rows.length === 0) this.addRow()
-    },
-    resetRows() {
-      this.rows = [
-        {
-          id: Date.now(),
-          date: '',
-          contractor: null,
-          crusher: null,
-          vehicle: null,
-          crusherBon: '',
-          companyBon: '',
-          discount: 0,
-          price: 0,
-          cubic: 0,
-          availableVehicles: []
-        }
-      ]
-    },
-    updateVehicles(row) {
-      const selectedCrusher = row.crusher
-      row.availableVehicles = selectedCrusher ? selectedCrusher.vehicles : []
-      row.vehicle = null
-      row.cubic = 0
-    },
-    onVehicleSelect(row) {
-      const v = row.vehicle
-      if (v && v.cubic) {
-        row.cubic = v.cubic
-      }
-    },
-    totalPerRow(row) {
-      const price = parseFloat(row.price || 0) || 0
-      const cubic = parseFloat(row.cubic || 0) || 0
-      const discount = parseFloat(row.discount || 0) || 0
-      const total = (price * cubic) - discount
-      return total > 0 ? total : 0
-    },
-    formatNumber(v) {
-      return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
-    },
+    duplicateRow(index) { const src = this.rows[index]; const copy = JSON.parse(JSON.stringify(src)); copy.id = Date.now() + Math.random(); this.rows.splice(index + 1, 0, copy) },
+    removeRow(index) { this.rows.splice(index, 1); if (this.rows.length === 0) this.addRow() },
+    resetRows() { this.rows = [ { id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: [] } ] },
+    updateVehicles(row) { const selectedCrusher = row.crusher; row.availableVehicles = selectedCrusher ? selectedCrusher.vehicles : []; row.vehicle = null; row.cubic = 0 },
+    onVehicleSelect(row) { const v = row.vehicle; if (v && v.cubic) row.cubic = v.cubic },
+    totalPerRow(row) { const price = parseFloat(row.price || 0) || 0; const cubic = parseFloat(row.cubic || 0) || 0; const discount = parseFloat(row.discount || 0) || 0; const total = (price * cubic) - discount; return total > 0 ? total : 0 },
+    formatNumber(v) { return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 }) },
+
     async saveData() {
       this.saveError = '';
       this.saving = true;
-
       try {
         console.log('Saving rows:', JSON.parse(JSON.stringify(this.rows)));
 
-        // rows that actually contain any data
         const rowsToSave = this.rows.filter(r => {
           const hasAny =
             (r.date && r.date.toString().trim() !== '') ||
@@ -494,7 +366,6 @@ export default {
           return;
         }
 
-        // validate required fields for rows with data (vehicle is OPTIONAL)
         for (const [i, r] of rowsToSave.entries()) {
           const missing = [];
           if (!r.date || r.date.toString().trim() === '') missing.push('date');
@@ -507,14 +378,11 @@ export default {
           }
         }
 
-        // set Authorization header globally if token present
         const token = localStorage.getItem('accessToken');
-        if (token) {
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        }
+        if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-        // send each row
         for (const r of rowsToSave) {
+          // build payload but DO NOT include notes if empty -> backend expects string when present
           const payload = {
             crusherId: Number(r.crusher.id),
             contractorId: Number(r.contractor.id),
@@ -525,10 +393,14 @@ export default {
             companyCapacity: r.cubic ? parseFloat(r.cubic) : 0,
             crusherCapacity: r.cubic ? parseFloat(r.cubic) : 0,
             unitPrice: r.price ? parseFloat(r.price) : 0,
-            discount: r.discount ? parseFloat(r.discount) : 0,
-            vehicleName: r.vehicle ? (r.vehicle.name || (typeof r.vehicle === 'string' ? r.vehicle : null)) : null,
-            notes: r.notes || null
+            discount: r.discount ? parseFloat(r.discount) : 0
+            // notes omitted for now if empty
           };
+
+          // Only attach notes if non-empty string (avoid sending null)
+          if (r.notes !== undefined && r.notes !== null && String(r.notes).trim() !== '') {
+            payload.notes = String(r.notes);
+          }
 
           console.log('Posting payload:', payload);
           await createDelivery(payload);
@@ -543,24 +415,33 @@ export default {
         let userMsg = `Error saving supply (HTTP ${status}). / خطأ أثناء الحفظ (الكود ${status}).`;
 
         if (resp) {
-          // include common server error shapes
-          if (typeof resp === 'string') {
-            userMsg += ` ${resp}`;
-          } else if (resp.message) {
-            userMsg += ` ${resp.message}`;
-          }
+          try { console.log('Server response (full):\n', JSON.stringify(resp, null, 2)); } catch (ex) { console.log('Server response body:', resp); }
+          if (resp.message) userMsg += ` ${resp.message}`;
 
-          if (resp.errors) {
+          if (Array.isArray(resp.issues) && resp.issues.length > 0) {
+            const lines = resp.issues.map((it, idx) => {
+              const path = it.path ? (Array.isArray(it.path) ? it.path.join('.') : String(it.path)) : (it.field || it.key || `item${idx+1}`);
+              const msg = it.message || it.msg || it.error || JSON.stringify(it);
+              return `${path}: ${msg}`;
+            });
+            userMsg += ` Details: ${lines.join(' | ')}`;
+            try { console.table(resp.issues); } catch (ex) { console.log('issues:', resp.issues); }
+          } else if (resp.errors) {
             try {
-              userMsg += ` Details: ${JSON.stringify(resp.errors)}`;
-            } catch (ex) { /* ignore */ }
+              if (Array.isArray(resp.errors)) {
+                const msgs = resp.errors.map(x => (x.message || JSON.stringify(x)));
+                userMsg += ` Details: ${msgs.join(' | ')}`;
+              } else if (typeof resp.errors === 'object') {
+                userMsg += ` Details: ${JSON.stringify(resp.errors)}`;
+              } else {
+                userMsg += ` Details: ${resp.errors}`;
+              }
+            } catch (ex) { userMsg += ' (validation errors)'; }
           } else if (resp.validation) {
-            try {
-              userMsg += ` Details: ${JSON.stringify(resp.validation)}`;
-            } catch (ex) { /* ignore */ }
+            try { userMsg += ` Details: ${JSON.stringify(resp.validation)}` } catch (ex) {}
+          } else {
+            try { userMsg += ` Details: ${JSON.stringify(resp)}` } catch (ex) {}
           }
-
-          console.log('Server response body:', resp);
         } else {
           if (e && e.message) userMsg += ` ${e.message}`;
         }
@@ -570,6 +451,7 @@ export default {
         this.saving = false;
       }
     },
+
     async onLocationChange() {
       try {
         this.crushers = (await getCrushers()).data;
@@ -577,124 +459,81 @@ export default {
       } catch (e) { console.warn('onLocationChange error', e) }
 
       this.deliveries = [
-        {
-          crusherId: '',
-          contractorId: '',
-          date: new Date().toISOString().slice(0, 10),
-          crusherTicket: '',
-          companyTicket: '',
-          companyCapacity: '',
-          crusherCapacity: '',
-          unitPrice: '',
-          locationId: this.selectedLocation
-        }
+        { crusherId: '', contractorId: '', date: new Date().toISOString().slice(0,10), crusherTicket: '', companyTicket: '', companyCapacity: '', crusherCapacity: '', unitPrice: '', locationId: this.selectedLocation }
       ]
     },
+
     async submitDeliveries() {
-      for (const row of this.deliveries) {
-        await createDelivery(row)
-      }
-      alert(this.$t('labels.saved') || 'Saved!')
-      this.deliveries = []
-      this.selectedLocation = null
+      try {
+        for (const row of this.deliveries) await createDelivery(row);
+        alert(this.$t('labels.saved') || 'Saved!');
+        this.deliveries = [];
+        this.selectedLocation = null;
+      } catch (e) { console.warn('submitDeliveries failed', e); this.saveError = 'Failed to submit deliveries.'; }
     },
+
     async addSite() {
-      if (!this.newSiteName) return
+      if (!this.newSiteName) return;
       try {
-        await createLocation({ name: this.newSiteName, parentId: null })
-        this.showAddSite = false
-        this.newSiteName = ''
-        await this.refreshLocations()
-      } catch (e) {
-        alert('Failed to add site')
-      }
+        await createLocation({ name: this.newSiteName, parentId: null });
+        this.showAddSite = false;
+        this.newSiteName = '';
+        await this.refreshLocations();
+      } catch (e) { console.warn('addSite failed', e); alert('Failed to add site') }
     },
+
     async addArea() {
-      if (!this.newAreaName || !this.site) return
+      if (!this.newAreaName || !this.site) return;
       try {
-        await createLocation({ name: this.newAreaName, parentId: this.site.id })
-        this.showAddArea = false
-        this.newAreaName = ''
-        await this.refreshLocations()
-      } catch (e) {
-        alert('Failed to add area')
-      }
+        await createLocation({ name: this.newAreaName, parentId: this.site.id });
+        this.showAddArea = false;
+        this.newAreaName = '';
+        await this.refreshLocations();
+      } catch (e) { console.warn('addArea failed', e); alert('Failed to add area') }
     },
-    editSiteDialog(site) {
-      this.editSiteObj = site
-      this.editSiteName = site.name
-    },
+
+    editSiteDialog(site) { this.editSiteObj = site; this.editSiteName = site.name },
+
     async updateSite() {
-      if (!this.editSiteObj || !this.editSiteName) return
+      if (!this.editSiteObj || !this.editSiteName) return;
       try {
-        await updateLocation(this.editSiteObj.id, { name: this.editSiteName })
-        this.editSiteObj = null
-        this.editSiteName = ''
-        await this.refreshLocations()
-      } catch (e) {
-        alert('Failed to update site')
-      }
+        await updateLocation(this.editSiteObj.id, { name: this.editSiteName });
+        this.editSiteObj = null;
+        this.editSiteName = '';
+        await this.refreshLocations();
+      } catch (e) { console.warn('updateSite failed', e); alert('Failed to update site') }
     },
-    editAreaDialog(area) {
-      this.editAreaObj = area
-      this.editAreaName = area.name
-    },
+
+    editAreaDialog(area) { this.editAreaObj = area; this.editAreaName = area.name },
+
     async updateArea() {
-      if (!this.editAreaObj || !this.editAreaName) return
+      if (!this.editAreaObj || !this.editAreaName) return;
       try {
-        await updateLocation(this.editAreaObj.id, { name: this.editAreaName })
-        this.editAreaObj = null
-        this.editAreaName = ''
-        await this.refreshLocations()
-      } catch (e) {
-        alert('Failed to update area')
-      }
+        await updateLocation(this.editAreaObj.id, { name: this.editAreaName });
+        this.editAreaObj = null;
+        this.editAreaName = '';
+        await this.refreshLocations();
+      } catch (e) { console.warn('updateArea failed', e); alert('Failed to update area') }
     },
+
     async refreshLocations() {
       try {
         const locRes = await getLocations();
         this.allLocations = Array.isArray(locRes.data) ? locRes.data : [];
         this.sites = this.allLocations.filter(l => l.parentId == null);
-        if (this.site && this.site.id) {
-          this.areas = this.allLocations.filter(l => l.parentId === this.site.id);
-        } else {
-          this.areas = [];
-        }
-        this.locations = locRes.data
-      } catch (e) {
-        console.warn('refreshLocations failed', e)
-      }
-    },
+        if (this.site && this.site.id) this.areas = this.allLocations.filter(l => l.parentId === this.site.id);
+        else this.areas = [];
+        this.locations = locRes.data;
+      } catch (e) { console.warn('refreshLocations failed', e) }
+    }
   }
 }
 </script>
 
 <style scoped>
-/* remove number spinners for Chrome/Edge and Firefox so users type values only */
-.no-spinner::-webkit-outer-spin-button,
-.no-spinner::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.no-spinner {
-  -moz-appearance: textfield;
-}
-
-/* RTL helpers */
-.direction-rtl input,
-.direction-rtl select,
-.direction-rtl textarea {
-  direction: rtl;
-  text-align: right;
-}
-
-/* improve table readability on small screens */
-@media (max-width: 639px) {
-  table {
-    display: none; /* hide big table on small screens (we show cards instead) */
-  }
-}
-@media (min-width: 640px) {
-  .sm\:hidden { display: none; }
-}
+.no-spinner::-webkit-outer-spin-button, .no-spinner::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.no-spinner { -moz-appearance: textfield; }
+.direction-rtl input, .direction-rtl select, .direction-rtl textarea { direction: rtl; text-align: right; }
+@media (max-width: 639px) { table { display: none; } }
+@media (min-width: 640px) { .sm\:hidden { display: none; } }
 </style>
