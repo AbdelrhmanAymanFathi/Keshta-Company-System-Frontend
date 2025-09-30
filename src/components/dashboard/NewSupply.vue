@@ -21,10 +21,10 @@
             </select>
 
             <!-- Add site -->
-            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded" title="Add Site">+</button>
+            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded" :title="$t('supply.addSite')">+</button>
 
             <!-- Edit selected site -->
-            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded" title="Edit Site">✎</button>
+            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded" :title="$t('supply.editSite')">✎</button>
           </div>
         </div>
 
@@ -37,10 +37,10 @@
             </select>
 
             <!-- Add area (requires site) -->
-            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded" title="Add Area">+</button>
+            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded" :title="$t('supply.addArea')">+</button>
 
             <!-- Edit selected area -->
-            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded" title="Edit Area">✎</button>
+            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded" :title="$t('supply.editArea')">✎</button>
           </div>
         </div>
 
@@ -159,7 +159,7 @@
 
                 <td class="px-3 py-2">
                   <div class="flex gap-2">
-                    <button @click="duplicateRow(index)" title="Duplicate" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                    <button @click="duplicateRow(index)" :title="$t('supply.duplicate')" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
                       ⤷
                     </button>
                     <button @click="removeRow(index)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
@@ -178,14 +178,14 @@
             <button @click="addRow" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
               {{ $t('labels.addRow') || 'Add row' }}
             </button>
-            <button @click="resetRows" class="px-4 py-2 border rounded">{{ $t('labels.cancel') || 'Reset' }}</button>
+            <button @click="resetRows" class="px-4 py-2 border rounded">{{ $t('supply.reset') }}</button>
           </div>
 
           <div class="mt-3 sm:mt-0 text-sm text-gray-700">
-            <div><span class="font-medium">Subtotal:</span> {{ formatNumber(subtotal) }}</div>
-            <div><span class="font-medium">Total Discount:</span> -{{ formatNumber(totalDiscount) }}</div>
-            <div class="font-semibold mt-1">Grand Total: {{ formatNumber(grandTotal) }}</div>
-            <div class="text-xs text-gray-500 mt-1">Values calculated automatically (Price × Cubic − Discount).</div>
+            <div><span class="font-medium">{{ $t('supply.subtotal') }}:</span> {{ formatNumber(subtotal) }}</div>
+            <div><span class="font-medium">{{ $t('supply.totalDiscount') }}:</span> -{{ formatNumber(totalDiscount) }}</div>
+            <div class="font-semibold mt-1">{{ $t('supply.grandTotal') }}: {{ formatNumber(grandTotal) }}</div>
+            <div class="text-xs text-gray-500 mt-1">{{ $t('supply.valuesCalculated') }}</div>
           </div>
         </div>
 
@@ -199,14 +199,16 @@
         <!-- Recent exports (kept from prior version) -->
         <div class="mt-8 border-t pt-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold">Recent Exports</h3>
+            <h3 class="text-lg font-semibold">{{ $t('supply.recentExports') }}</h3>
             <div class="flex items-center gap-2">
-              <button @click="fetchExports" :disabled="exportsLoading" class="px-3 py-1 border rounded bg-white hover:bg-gray-50">Refresh</button>
-              <div v-if="exportsLoading" class="text-sm text-gray-500">Loading...</div>
+              <button @click="fetchExports" :disabled="exportsLoading" class="px-3 py-1 border rounded bg-white hover:bg-gray-50">{{ $t('supply.refresh') }}</button>
+              <div v-if="exportsLoading" class="text-sm text-gray-500">{{ $t('supply.loading') }}</div>
             </div>
           </div>
 
-          <div class="mb-2 text-sm text-gray-600">Showing: {{ displayedExports.length }} / {{ exportsData.total }}</div>
+          <div class="mb-2 text-sm text-gray-600">
+            {{ $t('supply.showing') }}: {{ displayedExports.length }} {{ $t('supply.of') }} {{ filteredExportsCount }}
+          </div>
 
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 border">
@@ -246,13 +248,65 @@
                   </td>
                 </tr>
                 <tr v-if="!displayedExports || displayedExports.length === 0">
-                  <td colspan="12" class="px-3 py-4 text-center text-sm text-gray-500">No exports found for selected site/area.</td>
+                  <td colspan="12" class="px-3 py-4 text-center text-sm text-gray-500">{{ $t('supply.noExportsFound') }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="mt-3 text-xs text-gray-600">Page: {{ exportsData.page }} — Total: {{ exportsData.total }} — PageSize: {{ exportsData.pageSize }}</div>
+          <div class="mt-3 text-xs text-gray-600">{{ $t('supply.page') }}: {{ exportsData.page }} — {{ $t('supply.total') }}: {{ exportsData.total }} — {{ $t('supply.pageSize') }}: {{ exportsData.pageSize }}</div>
+          
+          <!-- Pagination Controls -->
+          <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Items per page selector -->
+            <div class="flex items-center gap-2">
+              <label class="text-sm text-gray-600">{{ $t('supply.itemsPerPage') }}:</label>
+              <select v-model="itemsPerPage" @change="onItemsPerPageChange" class="border rounded px-2 py-1 text-sm">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+
+            <!-- Pagination buttons -->
+            <div class="flex items-center gap-2">
+              <!-- Previous button -->
+              <button 
+                @click="goToPreviousPage" 
+                :disabled="exportsData.page <= 1"
+                class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                {{ $t('supply.previous') }}
+              </button>
+
+              <!-- Page numbers -->
+              <div class="flex items-center gap-1">
+                <button
+                  v-for="page in visiblePages"
+                  :key="page"
+                  @click="goToPage(page)"
+                  :class="[
+                    'px-3 py-1 text-sm border rounded',
+                    page === exportsData.page 
+                      ? 'bg-indigo-600 text-white border-indigo-600' 
+                      : 'hover:bg-gray-50'
+                  ]"
+                >
+                  {{ page }}
+                </button>
+              </div>
+
+              <!-- Next button -->
+              <button 
+                @click="goToNextPage" 
+                :disabled="exportsData.page >= totalPages"
+                class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                {{ $t('supply.next') }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -260,13 +314,13 @@
     <!-- Add Site Dialog -->
     <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow w-96">
-        <h3 class="text-lg font-bold mb-2">Add Site</h3>
-        <label class="block text-sm mb-1">Name</label>
-        <input v-model="newSiteName" placeholder="Site name" class="w-full border rounded px-2 py-1 mb-3" />
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
+        <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
+        <input v-model="newSiteName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddSite = false" class="px-3 py-1 border rounded">Cancel</button>
           <button @click="addSite" :disabled="!newSiteName || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">
-            {{ addingLocation ? 'Adding...' : 'Add' }}
+            {{ addingLocation ? $t('supply.adding') : $t('supply.add') }}
           </button>
         </div>
         <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
@@ -276,13 +330,13 @@
     <!-- Add Area Dialog -->
     <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow w-96">
-        <h3 class="text-lg font-bold mb-2">Add Area (under: {{ site ? site.name : '-' }})</h3>
-        <label class="block text-sm mb-1">Name</label>
-        <input v-model="newAreaName" placeholder="Area name" class="w-full border rounded px-2 py-1 mb-3" />
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }} ({{ $t('supply.under') }}: {{ site ? site.name : '-' }})</h3>
+        <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
+        <input v-model="newAreaName" :placeholder="$t('supply.areaName')" class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddArea = false" class="px-3 py-1 border rounded">Cancel</button>
           <button @click="addArea" :disabled="!newAreaName || !site || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">
-            {{ addingLocation ? 'Adding...' : 'Add' }}
+            {{ addingLocation ? $t('supply.adding') : $t('supply.add') }}
           </button>
         </div>
         <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
@@ -292,13 +346,13 @@
     <!-- Edit Site Dialog -->
     <div v-if="editSiteObj" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow w-96">
-        <h3 class="text-lg font-bold mb-2">Edit Site</h3>
-        <label class="block text-sm mb-1">Name</label>
-        <input v-model="editSiteName" placeholder="Site name" class="w-full border rounded px-2 py-1 mb-3" />
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.editSite') }}</h3>
+        <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
+        <input v-model="editSiteName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="editSiteObj = null" class="px-3 py-1 border rounded">Cancel</button>
           <button @click="updateSite" :disabled="!editSiteName || addingLocation" class="bg-yellow-500 text-white px-3 py-1 rounded">
-            {{ addingLocation ? 'Saving...' : 'Save' }}
+            {{ addingLocation ? $t('supply.saving') : $t('supply.save') }}
           </button>
         </div>
         <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
@@ -308,13 +362,13 @@
     <!-- Edit Area Dialog -->
     <div v-if="editAreaObj" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow w-96">
-        <h3 class="text-lg font-bold mb-2">Edit Area</h3>
-        <label class="block text-sm mb-1">Name</label>
-        <input v-model="editAreaName" placeholder="Area name" class="w-full border rounded px-2 py-1 mb-3" />
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.editArea') }}</h3>
+        <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
+        <input v-model="editAreaName" :placeholder="$t('supply.areaName')" class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="editAreaObj = null" class="px-3 py-1 border rounded">Cancel</button>
           <button @click="updateArea" :disabled="!editAreaName || addingLocation" class="bg-yellow-500 text-white px-3 py-1 rounded">
-            {{ addingLocation ? 'Saving...' : 'Save' }}
+            {{ addingLocation ? $t('supply.saving') : $t('supply.save') }}
           </button>
         </div>
         <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
@@ -389,7 +443,11 @@ export default {
       // exports list
       exportsData: { page: 1, pageSize: 20, total: 0, items: [] },
       exportsLoading: false,
-      exportsError: ''
+      exportsError: '',
+      
+      // pagination
+      itemsPerPage: 20,
+      currentPage: 1
     }
   },
 
@@ -410,6 +468,13 @@ export default {
       }
       // reset area selection when site changes
       this.area = null;
+      // reset pagination when site changes
+      this.currentPage = 1;
+    },
+    
+    // reset pagination when area changes
+    area() {
+      this.currentPage = 1;
     }
   },
 
@@ -431,17 +496,107 @@ export default {
     // filter exports client-side based on selected site/area
     displayedExports() {
       const items = Array.isArray(this.exportsData.items) ? this.exportsData.items : []
+      let filteredItems = []
+      
       if (this.area && this.area.id) {
-        return items.filter(it => Number(it.locationId) === Number(this.area.id))
-      }
-      if (this.site && this.site.id) {
+        filteredItems = items.filter(it => Number(it.locationId) === Number(this.area.id))
+      } else if (this.site && this.site.id) {
         const areaIds = this.allLocations.filter(l => l.parentId === this.site.id).map(l => Number(l.id))
         if (areaIds.length === 0) {
-          return items.filter(it => Number(it.locationId) === Number(this.site.id))
+          filteredItems = items.filter(it => Number(it.locationId) === Number(this.site.id))
+        } else {
+          filteredItems = items.filter(it => areaIds.includes(Number(it.locationId)))
         }
-        return items.filter(it => areaIds.includes(Number(it.locationId)))
+      } else {
+        filteredItems = items
       }
-      return items
+      
+      // Apply pagination
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage
+      const endIndex = startIndex + this.itemsPerPage
+      return filteredItems.slice(startIndex, endIndex)
+    },
+    
+    // pagination computed properties
+    totalPages() {
+      const items = Array.isArray(this.exportsData.items) ? this.exportsData.items : []
+      let filteredItems = []
+      
+      if (this.area && this.area.id) {
+        filteredItems = items.filter(it => Number(it.locationId) === Number(this.area.id))
+      } else if (this.site && this.site.id) {
+        const areaIds = this.allLocations.filter(l => l.parentId === this.site.id).map(l => Number(l.id))
+        if (areaIds.length === 0) {
+          filteredItems = items.filter(it => Number(it.locationId) === Number(this.site.id))
+        } else {
+          filteredItems = items.filter(it => areaIds.includes(Number(it.locationId)))
+        }
+      } else {
+        filteredItems = items
+      }
+      
+      return Math.ceil(filteredItems.length / this.itemsPerPage)
+    },
+    
+    visiblePages() {
+      const total = this.totalPages
+      const current = this.currentPage
+      const pages = []
+      
+      if (total <= 7) {
+        // Show all pages if 7 or fewer
+        for (let i = 1; i <= total; i++) {
+          pages.push(i)
+        }
+      } else {
+        // Show first page
+        pages.push(1)
+        
+        if (current > 3) {
+          pages.push('...')
+        }
+        
+        // Show pages around current page
+        const start = Math.max(2, current - 1)
+        const end = Math.min(total - 1, current + 1)
+        
+        for (let i = start; i <= end; i++) {
+          if (!pages.includes(i)) {
+            pages.push(i)
+          }
+        }
+        
+        if (current < total - 2) {
+          pages.push('...')
+        }
+        
+        // Show last page
+        if (total > 1) {
+          pages.push(total)
+        }
+      }
+      
+      return pages
+    },
+    
+    filteredExportsCount() {
+      const items = Array.isArray(this.exportsData.items) ? this.exportsData.items : []
+      let filteredItems = []
+      
+      if (this.area && this.area.id) {
+        filteredItems = items.filter(it => Number(it.locationId) === Number(this.area.id))
+      } else if (this.site && this.site.id) {
+        const areaIds = this.allLocations.filter(l => l.parentId === this.site.id).map(l => Number(l.id))
+        if (areaIds.length === 0) {
+          filteredItems = items.filter(it => Number(it.locationId) === Number(this.site.id))
+        } else {
+          filteredItems = items.filter(it => areaIds.includes(Number(it.locationId)))
+        }
+      } else {
+        filteredItems = items
+      }
+      
+      return filteredItems.length
     }
   },
 
@@ -773,7 +928,7 @@ export default {
     },
 
     confirmDeleteExport(id) {
-      if (!confirm('Delete this export? / هل تريد حذف هذا السجل؟')) return;
+      if (!confirm(this.$t('supply.confirmDeleteExport'))) return;
       this.deleteExport(id);
     },
 
@@ -785,6 +940,29 @@ export default {
         console.warn('deleteExport failed', e);
         this.exportsError = 'Failed to delete export.';
       }
+    },
+
+    // pagination methods
+    goToPage(page) {
+      if (page !== '...' && page >= 1 && page <= this.totalPages) {
+        this.currentPage = page
+      }
+    },
+    
+    goToPreviousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--
+      }
+    },
+    
+    goToNextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++
+      }
+    },
+    
+    onItemsPerPageChange() {
+      this.currentPage = 1 // Reset to first page when changing items per page
     },
 
     // small utilities
@@ -811,6 +989,7 @@ export default {
 }
 .no-spinner {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /* RTL helpers */
