@@ -135,11 +135,12 @@ import NewSupply from './NewSupply.vue'
 import SuppliesList from './SuppliesList.vue'
 import ContractorsList from './ContractorsList.vue'
 import VehiclesList from './VehiclesList.vue'
+import TransportList from './TransportList.vue'
 import { logout as apiLogout } from '@/api' // <-- import logout API
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, ContractorsList, VehiclesList },
+  components: { NewSupply, SuppliesList, ContractorsList, VehiclesList, TransportList },
   data() {
     return {
       // menus
@@ -154,7 +155,7 @@ export default {
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' }
         ],
         transport: [
-          { name: 'transportPage', label: 'dashboard.transport', component: { template: '<div>Transport Page</div>' } }
+          { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' }
         ],
         expenses: [
           { name: 'expensesPage', label: 'dashboard.expenses', component: { template: '<div>Expenses Page</div>' } }
@@ -201,7 +202,7 @@ export default {
     // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return { template: '<div>Select an item</div>' }
-      const mapping = { NewSupply, SuppliesList, ContractorsList, VehiclesList }
+      const mapping = { NewSupply, SuppliesList, ContractorsList, VehiclesList, TransportList }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || { template: '<div>Component not found</div>' }
@@ -317,7 +318,7 @@ export default {
         suppliesList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         contractorsList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         vehiclesList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 13h18l-2 4H5zM7 9h10l2 4H5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-        transportPage: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 13h18v-5H3v5zM5 18h2v2H5v-2zM17 18h2v2h-2v-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        transportList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 13h18v-5H3v5zM5 18h2v2H5v-2zM17 18h2v2h-2v-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         default: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg>`
       }
       return icons[name] || icons['default']

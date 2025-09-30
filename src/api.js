@@ -66,6 +66,18 @@ export const createDelivery = (data) =>
 export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
 
+// Transports
+export const getTransports = () =>
+  axios.get(`${BASE_URL}/api/transports`);
+export const getTransport = (id) =>
+  axios.get(`${BASE_URL}/api/transports/${id}`);
+export const createTransport = (data) =>
+  axios.post(`${BASE_URL}/api/transports`, data);
+export const updateTransport = (id, data) =>
+  axios.patch(`${BASE_URL}/api/transports/${id}`, data);
+export const deleteTransport = (id) =>
+  axios.delete(`${BASE_URL}/api/transports/${id}`);
+
 // Example helper to refresh and set token (call this where needed)
 export async function refreshAndSetToken() {
   try {
@@ -98,6 +110,23 @@ axios.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
+    
+    // Log detailed error information for debugging
+    if (error.response) {
+      console.error('API Error Response:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        responseData: error.response.data,
+        url: originalRequest.url,
+        method: originalRequest.method,
+        requestData: originalRequest.data
+      });
+    } else if (error.request) {
+      console.error('API Error Request:', error.request);
+    } else {
+      console.error('API Error:', error.message);
+    }
+    
     if (
       error.response &&
       error.response.status === 401 &&
