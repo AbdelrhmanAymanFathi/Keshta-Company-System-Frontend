@@ -40,7 +40,12 @@
           </button>
         </div>
 
-        <button @click="logout" class="px-3 py-1 rounded hover:bg-white/10">{{ $t('labels.logout') }}</button>
+        <button @click="showLogoutDialog = true" class="px-3 py-1 rounded hover:bg-white/10 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          {{ $t('labels.logout') }}
+        </button>
       </div>
     </header>
 
@@ -87,7 +92,7 @@
         <!-- Mobile only: top menu inside sidebar -->
         <div v-if="isMobile" class="sm:hidden mb-4 space-y-2">
           <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
-            :class="['w-full text-left px-3 py-2 rounded', selectedTop === key ? 'bg-indigo-500 text-white' : 'bg-indigo-100 hover:bg-indigo-200']">
+            :class="['w-full px-3 py-2 rounded', selectedTop === key ? 'bg-indigo-500 text-white' : 'bg-indigo-100 hover:bg-indigo-200', isRTL ? 'text-right' : 'text-left']">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
@@ -96,12 +101,13 @@
         <ul class="space-y-2">
           <li v-for="item in verticalMenu" :key="item.name">
             <button @click="selectVertical(item.name)" :class="[
-              'w-full text-left px-3 py-2 rounded flex items-center gap-3 transition',
+              'w-full px-3 py-2 rounded flex items-center gap-3 transition',
               selectedVertical === item.name ? activeItemClass : 'hover:bg-indigo-100',
-              effectiveCollapsed ? 'justify-center' : ''
+              effectiveCollapsed ? 'justify-center' : '',
+              isRTL ? 'flex-row-reverse text-right' : 'text-left'
             ]" :title="effectiveCollapsed ? $t(item.label) : ''">
               <span v-html="menuIcon(item.name)" class="w-5 h-5 flex-shrink-0"></span>
-              <span v-if="!effectiveCollapsed" class="flex-1 text-sm" :class="isRTL ? 'text-right' : 'text-left'">
+              <span v-if="!effectiveCollapsed" class="flex-1 text-sm">
                 {{ $t(item.label) }}
               </span>
             </button>
@@ -127,6 +133,13 @@
         <component :is="currentComponent" />
       </main>
     </div>
+
+    <!-- Logout Dialog -->
+    <AuthLogout 
+      v-if="showLogoutDialog"
+      @cancel="showLogoutDialog = false"
+      @logout-success="handleLogoutSuccess"
+    />
   </div>
 </template>
 
@@ -134,13 +147,20 @@
 import NewSupply from './NewSupply.vue'
 import SuppliesList from './SuppliesList.vue'
 import ContractorsList from './ContractorsList.vue'
+import CrushersList from './CrushersList.vue'
 import VehiclesList from './VehiclesList.vue'
 import TransportList from './TransportList.vue'
-import { logout as apiLogout } from '@/api' // <-- import logout API
+import RentalList from './RentalList.vue'
+import AuthLogout from '../auth/Logout.vue'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, ContractorsList, VehiclesList, TransportList },
+  components: { NewSupply, SuppliesList, ContractorsList, CrushersList, VehiclesList, TransportList, RentalList, AuthLogout },
+  setup() {
+    const { logout: authLogout } = useAuth()
+    return { authLogout }
+  },
   data() {
     return {
       // menus
@@ -151,6 +171,7 @@ export default {
         supplies: [
           { name: 'newSupply', label: 'dashboard.newSupply', component: 'NewSupply' },
           { name: 'suppliesList', label: 'dashboard.suppliesList', component: 'SuppliesList' },
+          { name: 'crushersList', label: 'dashboard.crushersList', component: 'CrushersList' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', component: 'ContractorsList' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' }
         ],
@@ -161,7 +182,7 @@ export default {
           { name: 'expensesPage', label: 'dashboard.expenses', component: { template: '<div>Expenses Page</div>' } }
         ],
         equipmentRent: [
-          { name: 'equipmentRentPage', label: 'dashboard.equipmentRent', component: { template: '<div>Equipment rent content</div>' } }
+          { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' }
         ],
         companyEquipment: [
           { name: 'companyEquipmentPage', label: 'dashboard.companyEquipment', component: { template: '<div>Company equipment content</div>' } }
@@ -172,6 +193,7 @@ export default {
       selectedVertical: 'newSupply',
       sidebarOpen: false,
       collapsedSidebar: JSON.parse(localStorage.getItem('sidebarCollapsed') || 'false'),
+      showLogoutDialog: false,
 
       // responsive helper
       isMobile: window.innerWidth < 640
@@ -202,7 +224,7 @@ export default {
     // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return { template: '<div>Select an item</div>' }
-      const mapping = { NewSupply, SuppliesList, ContractorsList, VehiclesList, TransportList }
+      const mapping = { NewSupply, SuppliesList, ContractorsList, CrushersList, VehiclesList, TransportList, RentalList }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || { template: '<div>Component not found</div>' }
@@ -283,18 +305,9 @@ export default {
       this.collapsedSidebar = !this.collapsedSidebar
     },
 
-    async logout() {
-      try {
-        await apiLogout()
-      } catch (e) {
-        // ignore error
-      }
-      localStorage.removeItem('accessToken')
-      // Remove axios auth header if set
-      if (window.axios) {
-        delete window.axios.defaults.headers.common['Authorization']
-      }
-      // reload to show login
+    handleLogoutSuccess() {
+      this.showLogoutDialog = false
+      // The auth system will handle the logout and redirect
       window.location.reload()
     },
 
@@ -316,9 +329,11 @@ export default {
       const icons = {
         newSupply: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
         suppliesList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        crushersList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`,
         contractorsList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         vehiclesList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 13h18l-2 4H5zM7 9h10l2 4H5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         transportList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M3 13h18v-5H3v5zM5 18h2v2H5v-2zM17 18h2v2h-2v-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        rentalList: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14h8M8 18h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
         default: `<svg class="w-5 h-5 text-indigo-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg>`
       }
       return icons[name] || icons['default']
@@ -392,6 +407,45 @@ export default {
 /* subtle hover background (supports dark indigo family) */
 .hover\:bg-white\/8:hover {
   background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* RTL specific adjustments */
+.direction-rtl .flex-row-reverse {
+  flex-direction: row-reverse !important;
+}
+
+.direction-rtl .text-right {
+  text-align: right !important;
+}
+
+.direction-rtl .text-left {
+  text-align: left !important;
+}
+
+.direction-rtl button {
+  text-align: right !important;
+}
+
+.direction-rtl .gap-3 {
+  gap: 0.75rem !important;
+}
+
+.direction-rtl .gap-2 {
+  gap: 0.5rem !important;
+}
+
+/* Force RTL layout for sidebar menu items */
+.direction-rtl .space-y-2 button {
+  flex-direction: row-reverse !important;
+  text-align: right !important;
+}
+
+.direction-rtl .space-y-2 button span:first-child {
+  order: 2 !important;
+}
+
+.direction-rtl .space-y-2 button span:last-child {
+  order: 1 !important;
 }
 
 /* reduced opacity for smaller screens */

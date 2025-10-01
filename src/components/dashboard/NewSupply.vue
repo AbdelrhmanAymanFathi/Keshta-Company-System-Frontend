@@ -215,17 +215,17 @@
               <thead class="bg-gray-50 text-xs text-gray-600">
                 <tr>
                   <th class="px-3 py-2">#</th>
-                  <th class="px-3 py-2">Date</th>
-                  <th class="px-3 py-2">Contractor</th>
-                  <th class="px-3 py-2">Crusher</th>
-                  <th class="px-3 py-2">Location</th>
-                  <th class="px-3 py-2">Company Ticket</th>
-                  <th class="px-3 py-2">Crusher Ticket</th>
-                  <th class="px-3 py-2">Cubic</th>
-                  <th class="px-3 py-2">Unit Price</th>
-                  <th class="px-3 py-2">Discount</th>
-                  <th class="px-3 py-2">Notes</th>
-                  <th class="px-3 py-2">Actions</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.date') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.contractor') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.crusher') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.location') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.companyTicket') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.crusherTicket') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.cubic') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.unitPrice') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.discount') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.notes') }}</th>
+                  <th class="px-3 py-2">{{ $t('supply.exportTable.actions') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 text-sm bg-white">
@@ -243,7 +243,7 @@
                   <td class="px-3 py-2 align-top break-words">{{ it.notes || '-' }}</td>
                   <td class="px-3 py-2 align-top">
                     <div class="flex gap-2">
-                      <button @click="confirmDeleteExport(it.id)" class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                      <button @click="confirmDeleteExport(it.id)" class="px-2 py-1 bg-red-500 text-white rounded">{{ $t('labels.delete') }}</button>
                     </div>
                   </td>
                 </tr>
@@ -870,8 +870,7 @@ export default {
           }
         }
 
-        const token = localStorage.getItem('accessToken');
-        if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        // Token is automatically handled by the API interceptor
 
         for (const r of rowsToSave) {
           const payload = {

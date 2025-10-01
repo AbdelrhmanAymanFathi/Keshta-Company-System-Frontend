@@ -3,12 +3,16 @@ import { createApp, watch } from 'vue'
 import App from './App.vue'
 import './assets/main.css'
 import i18n from './i18n'
-import axios from 'axios'
+import authManager from './auth'
+import './api' // Initialize API with token management
 
 const app = createApp(App)
 
 // use i18n
 app.use(i18n)
+
+// Provide auth manager globally
+app.provide('authManager', authManager)
 
 // mount app
 app.mount('#app')
@@ -34,7 +38,14 @@ watch(
   }
 )
 
-const token = localStorage.getItem('accessToken')
-if (token) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-}
+// Listen for auth state changes
+authManager.addListener((event, data) => {
+  console.log('Auth event:', event, data);
+  
+  if (event === 'auth:logout') {
+    // Handle logout - redirect to login if not already there
+    if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+      window.location.href = '/login';
+    }
+  }
+});

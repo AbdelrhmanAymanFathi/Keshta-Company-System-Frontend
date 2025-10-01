@@ -1,5 +1,5 @@
 {
-  "appName": "نظام شركة كشتة",
+  "appName": "نظام شركة قشطة",
   "navbar": {
     "supplies": "التوريدات",
     "transport": "النقل",
@@ -10,6 +10,7 @@
   "dashboard": {
     "newSupply": "توريدة جديدة",
     "suppliesList": "قائمة التوريدات",
+    "crushersList": "قائمة الكسارات",
     "contractorsList": "قائمة المقاولين",
     "vehiclesList": "قائمة المركبات",
     "transportList": "قائمة النقل",
@@ -69,7 +70,16 @@
     "companyTicket": "تذكرة الشركة",
     "companyCapacity": "سعة الشركة",
     "crusherCapacity": "سعة الكسارة",
-    "unitPrice": "سعر الوحدة"
+    "unitPrice": "سعر الوحدة",
+    "#": "#",
+    "edit": "تعديل",
+    "save": "حفظ",
+    "saving": "جاري الحفظ...",
+    "deleting": "جاري الحذف...",
+    "update": "تحديث",
+    "to": "إلى",
+    "results": "النتائج",
+    "showing": "عرض"
   },
   "common": {
     "error": "خطأ",
@@ -83,6 +93,56 @@
     "loadError": "خطأ في تحميل البيانات",
     "saveError": "خطأ في حفظ البيانات",
     "deleteError": "خطأ في حذف البيانات"
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "subtitle": "مرحباً بك! يرجى تسجيل الدخول إلى حسابك",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "rememberMe": "تذكرني",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "button": "تسجيل الدخول",
+      "noAccount": "ليس لديك حساب؟",
+      "register": "إنشاء حساب",
+      "loading": "جاري تسجيل الدخول...",
+      "success": "تم تسجيل الدخول بنجاح!",
+      "errors": {
+        "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك",
+        "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً",
+        "required": "هذا الحقل مطلوب",
+        "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح"
+      }
+    },
+    "register": {
+      "title": "إنشاء حساب",
+      "subtitle": "سجل للحصول على حساب جديد",
+      "firstName": "الاسم الأول",
+      "lastName": "الاسم الأخير",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "agreeTerms": "أوافق على الشروط والأحكام",
+      "button": "إنشاء حساب",
+      "hasAccount": "لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول",
+      "loading": "جاري إنشاء الحساب...",
+      "success": "تم إنشاء الحساب بنجاح!",
+      "errors": {
+        "passwordMismatch": "كلمات المرور غير متطابقة",
+        "emailExists": "البريد الإلكتروني موجود بالفعل",
+        "weakPassword": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
+        "required": "هذا الحقل مطلوب",
+        "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح"
+      }
+    },
+    "logout": {
+      "title": "تسجيل الخروج",
+      "message": "هل أنت متأكد من تسجيل الخروج؟",
+      "button": "تسجيل الخروج",
+      "cancel": "إلغاء"
+    }
   },
   "supply": {
     "addSite": "إضافة موقع",
@@ -115,6 +175,75 @@
     "saving": "جاري الحفظ...",
     "add": "إضافة",
     "save": "حفظ",
-    "under": "تحت"
+    "under": "تحت",
+    "exportTable": {
+      "date": "التاريخ",
+      "contractor": "المقاول",
+      "crusher": "الكسارة",
+      "location": "الموقع",
+      "companyTicket": "تذكرة الشركة",
+      "crusherTicket": "تذكرة الكسارة",
+      "cubic": "المكعب",
+      "unitPrice": "سعر الوحدة",
+      "discount": "الخصم",
+      "notes": "ملاحظات",
+      "actions": "الإجراءات"
+    }
+  },
+  "contractors": {
+    "title": "المقاولين",
+    "importExcel": "استيراد إكسل",
+    "add": "إضافة مقاول",
+    "searchPlaceholder": "البحث في المقاولين...",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "bankName": "اسم البنك",
+    "accountNumber": "رقم الحساب",
+    "notes": "ملاحظات",
+    "noResults": "لا توجد مقاولين",
+    "addContractor": "إضافة مقاول",
+    "editContractor": "تعديل المقاول",
+    "deleteConfirm": "هل أنت متأكد من حذف المقاول",
+    "validationName": "الاسم مطلوب",
+    "imported": "تم استيراد {count} مقاول بنجاح"
+  },
+  "crushers": {
+    "title": "الكسارات",
+    "add": "إضافة كسارة",
+    "searchPlaceholder": "البحث في الكسارات...",
+    "name": "الاسم",
+    "createdAt": "تاريخ الإنشاء",
+    "noResults": "لا توجد كسارات",
+    "addCrusher": "إضافة كسارة",
+    "editCrusher": "تعديل الكسارة",
+    "deleteConfirm": "هل أنت متأكد من حذف الكسارة",
+    "validationName": "الاسم مطلوب",
+    "namePlaceholder": "أدخل اسم الكسارة",
+    "saveError": "خطأ في حفظ الكسارة",
+    "deleteError": "خطأ في حذف الكسارة"
+  },
+  "rental": {
+    "rentalList": "إيجار المعدات",
+    "addRental": "إضافة إيجار",
+    "editRental": "تعديل الإيجار",
+    "deleteRental": "حذف الإيجار",
+    "date": "التاريخ",
+    "equipment": "المعدة",
+    "name": "الاسم",
+    "hours": "الساعات",
+    "hourlyRate": "المعدل بالساعة",
+    "total": "المجموع",
+    "notes": "ملاحظات",
+    "deleteConfirmation": "هل أنت متأكد من حذف هذا الإيجار؟",
+    "loadError": "خطأ في تحميل الإيجارات",
+    "saveError": "خطأ في حفظ الإيجار",
+    "deleteError": "خطأ في حذف الإيجار",
+    "searchPlaceholder": "البحث في الإيجارات...",
+    "noResults": "لا توجد إيجارات",
+    "searchBy": "البحث بالمعدة، الاسم، أو الملاحظات",
+    "clearSearch": "مسح البحث",
+    "pageSize": "العناصر في الصفحة",
+    "goToPage": "الذهاب إلى الصفحة",
+    "totalRentals": "إجمالي الإيجارات"
   }
 }
