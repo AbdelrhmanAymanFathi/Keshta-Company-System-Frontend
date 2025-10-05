@@ -189,3 +189,4 @@ config.headers['X-Custom-Header'] = 'value'
 2. Network tab للطلبات
 3. Application tab للبيانات المخزنة
 
+

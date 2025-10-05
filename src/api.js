@@ -268,6 +268,26 @@ export const updateRental = (id, data) =>
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
 
+// Expenses
+export const getExpenses = (page = 1, pageSize = 20, search = '') => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  if (search) {
+    params.append('q', search);
+  }
+  return axios.get(`${BASE_URL}/api/expenses?${params.toString()}`);
+};
+export const getExpense = (id) =>
+  axios.get(`${BASE_URL}/api/expenses/${id}`);
+export const createExpense = (data) =>
+  axios.post(`${BASE_URL}/api/expenses`, data);
+export const updateExpense = (id, data) =>
+  axios.patch(`${BASE_URL}/api/expenses/${id}`, data);
+export const deleteExpense = (id) =>
+  axios.delete(`${BASE_URL}/api/expenses/${id}`);
+
 // Export token manager for external use
 export { tokenManager };
 

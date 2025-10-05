@@ -245,5 +245,51 @@
     "pageSize": "العناصر في الصفحة",
     "goToPage": "الذهاب إلى الصفحة",
     "totalRentals": "إجمالي الإيجارات"
+  },
+  "expenses": {
+    "title": "المصروفات",
+    "addExpense": "إضافة مصروف",
+    "editExpense": "تعديل المصروف",
+    "deleteExpense": "حذف المصروف",
+    "date": "التاريخ",
+    "category": "الفئة",
+    "description": "الوصف",
+    "amount": "المبلغ",
+    "notes": "ملاحظات",
+    "total": "المجموع",
+    "actions": "الإجراءات",
+    "searchPlaceholder": "البحث في المصروفات...",
+    "noResults": "لا توجد مصروفات",
+    "searchBy": "البحث بالفئة، الوصف، أو الملاحظات",
+    "clearSearch": "مسح البحث",
+    "pageSize": "العناصر في الصفحة",
+    "goToPage": "الذهاب إلى الصفحة",
+    "totalExpenses": "إجمالي المصروفات",
+    "deleteConfirmation": "هل أنت متأكد من حذف هذا المصروف؟",
+    "loadError": "خطأ في تحميل المصروفات",
+    "saveError": "خطأ في حفظ المصروف",
+    "deleteError": "خطأ في حذف المصروف",
+    "categories": {
+      "Travel": "السفر",
+      "Meals": "الوجبات",
+      "Office": "المكتب",
+      "Equipment": "المعدات",
+      "Maintenance": "الصيانة",
+      "Utilities": "المرافق",
+      "Marketing": "التسويق",
+      "Other": "أخرى"
+    },
+    "validation": {
+      "dateRequired": "التاريخ مطلوب",
+      "categoryRequired": "الفئة مطلوبة",
+      "descriptionRequired": "الوصف مطلوب",
+      "amountRequired": "المبلغ مطلوب",
+      "amountInvalid": "المبلغ يجب أن يكون رقماً صحيحاً"
+    },
+    "success": {
+      "created": "تم إنشاء المصروف بنجاح",
+      "updated": "تم تحديث المصروف بنجاح",
+      "deleted": "تم حذف المصروف بنجاح"
+    }
   }
 }
