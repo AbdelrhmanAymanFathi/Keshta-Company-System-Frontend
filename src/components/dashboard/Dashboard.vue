@@ -42,7 +42,8 @@
 
         <button @click="showLogoutDialog = true" class="px-3 py-1 rounded hover:bg-white/10 flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
           </svg>
           {{ $t('labels.logout') }}
         </button>
@@ -56,7 +57,8 @@
         <div class="hidden sm:flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
             <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
-              <img src="../../assets/logo.png" alt="logokeshta"></div>
+              <img src="../../assets/logo.png" alt="logokeshta">
+            </div>
             <div v-if="!effectiveCollapsed" class="font-semibold">{{ $t('appName') }}</div>
           </div>
 
@@ -135,11 +137,7 @@
     </div>
 
     <!-- Logout Dialog -->
-    <AuthLogout 
-      v-if="showLogoutDialog"
-      @cancel="showLogoutDialog = false"
-      @logout-success="handleLogoutSuccess"
-    />
+    <AuthLogout v-if="showLogoutDialog" @cancel="showLogoutDialog = false" @logout-success="handleLogoutSuccess" />
   </div>
 </template>
 
@@ -173,10 +171,11 @@ export default {
         supplies: [
           { name: 'newSupply', label: 'dashboard.newSupply', component: 'NewSupply' },
           { name: 'suppliesList', label: 'dashboard.suppliesList', component: 'SuppliesList' },
-          { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' },
           { name: 'crushersList', label: 'dashboard.crushersList', component: 'CrushersList' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', component: 'ContractorsList' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' }
+          ,
+          { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' }
         ],
         transport: [
           { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' }
