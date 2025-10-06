@@ -238,6 +238,13 @@ export const createDelivery = (data) =>
 export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
 
+// Reports
+export const getSuppliesReport = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/exports/report${search ? `?${search}` : ''}`;
+  return axios.get(url, { responseType: 'blob' });
+};
+
 // Transports
 export const getTransports = () =>
   axios.get(`${BASE_URL}/api/transports`);
