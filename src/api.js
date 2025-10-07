@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://38.242.152.149:3000';
+// Default to current origin so requests go through nginx in prod and avoid CORS
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8080');
 
 // Token management utilities
 class TokenManager {
@@ -171,6 +172,9 @@ class TokenManager {
 
 // Create global token manager instance
 const tokenManager = new TokenManager();
+
+// Ensure cookies are sent for refresh/logout endpoints that rely on httpOnly cookies
+axios.defaults.withCredentials = true;
 
 // --- AUTH ---
 export const login = (data) =>

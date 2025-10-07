@@ -1,6 +1,9 @@
 // Authentication utilities and token management
 import { tokenManager } from './api';
 
+// Use same-origin by default to route through nginx and avoid CORS
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8080');
+
 // Auth state management
 class AuthManager {
   constructor() {
@@ -55,11 +58,12 @@ class AuthManager {
   // Login user
   async login(credentials) {
     try {
-      const response = await fetch(`${process.env.VUE_APP_API_BASE_URL || 'http://38.242.152.149:3000'}/api/auth/login`, {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(credentials)
       });
 
@@ -106,11 +110,12 @@ class AuthManager {
       
       // Call logout API if needed
       try {
-        await fetch(`${process.env.VUE_APP_API_BASE_URL || 'http://38.242.152.149:3000'}/api/auth/logout`, {
+        await fetch(`${BASE_URL}/api/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          }
+          },
+          credentials: 'include'
         });
       } catch (apiError) {
         console.warn('Logout API call failed:', apiError);
