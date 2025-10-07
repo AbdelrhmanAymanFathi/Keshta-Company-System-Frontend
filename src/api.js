@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://38.242.152.149:3000';
 
 // Token management utilities
 class TokenManager {
