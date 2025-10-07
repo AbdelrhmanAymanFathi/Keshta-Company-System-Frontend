@@ -87,6 +87,30 @@
             </div>
           </div>
 
+          <!-- Phone Field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ $t('auth.register.phone') }}
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498A1 1 0 0121 16.72V20a2 2 0 01-2 2h-1C9.163 22 2 14.837 2 6V5a2 2 0 011-1.732z" />
+                </svg>
+              </div>
+              <input
+                v-model="phone"
+                type="tel"
+                autocomplete="tel"
+                :placeholder="$t('auth.register.phone')"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                :class="{ 'border-red-500': phoneError }"
+                required
+              />
+            </div>
+            <p v-if="phoneError" class="mt-1 text-sm text-red-600">{{ phoneError }}</p>
+          </div>
+
           <!-- Email Field -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -273,6 +297,7 @@ export default {
     return {
       firstName: '',
       lastName: '',
+      phone: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -284,6 +309,7 @@ export default {
       success: '',
       firstNameError: '',
       lastNameError: '',
+      phoneError: '',
       emailError: '',
       passwordError: '',
       confirmPasswordError: ''
@@ -308,6 +334,7 @@ export default {
       try {
         const userData = {
           name: `${this.firstName} ${this.lastName}`.trim(),
+          phone: this.phone.trim(),
           email: this.email.trim().toLowerCase(),
           password: this.password
         }
@@ -352,6 +379,15 @@ export default {
         isValid = false
       }
 
+      // Phone validation (basic)
+      if (!this.phone.trim()) {
+        this.phoneError = this.$t('auth.register.errors.required')
+        isValid = false
+      } else if (!this.isValidPhone(this.phone)) {
+        this.phoneError = this.$t('auth.register.errors.invalidPhone')
+        isValid = false
+      }
+
       // Password validation
       if (!this.password) {
         this.passwordError = this.$t('auth.register.errors.required')
@@ -382,6 +418,11 @@ export default {
     isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       return emailRegex.test(email)
+    },
+
+    isValidPhone(phone) {
+      const digitsOnly = phone.replace(/\D/g, '')
+      return digitsOnly.length >= 10 && digitsOnly.length <= 15
     },
 
     handleRegisterError(error) {
@@ -416,6 +457,7 @@ export default {
       this.success = ''
       this.firstNameError = ''
       this.lastNameError = ''
+      this.phoneError = ''
       this.emailError = ''
       this.passwordError = ''
       this.confirmPasswordError = ''

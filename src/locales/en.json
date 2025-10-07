@@ -126,6 +126,7 @@
       "subtitle": "Sign up to get started with our platform",
       "firstName": "First Name",
       "lastName": "Last Name",
+      "phone": "Phone Number",
       "email": "Email Address",
       "password": "Password",
       "confirmPassword": "Confirm Password",
@@ -139,6 +140,7 @@
         "passwordMismatch": "Passwords do not match",
         "emailExists": "Email already exists",
         "weakPassword": "Password must be at least 8 characters",
+        "invalidPhone": "Please enter a valid phone number",
         "required": "This field is required",
         "invalidEmail": "Please enter a valid email address"
       }
