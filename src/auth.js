@@ -55,7 +55,7 @@ class AuthManager {
   // Login user
   async login(credentials) {
     try {
-      const response = await fetch(`${process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000'}/api/auth/login`, {
+      const response = await fetch(`${process.env.VUE_APP_API_BASE_URL || 'http://38.242.152.149:3000'}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ class AuthManager {
       
       // Call logout API if needed
       try {
-        await fetch(`${process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000'}/api/auth/logout`, {
+        await fetch(`${process.env.VUE_APP_API_BASE_URL || 'http://38.242.152.149:3000'}/api/auth/logout`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
