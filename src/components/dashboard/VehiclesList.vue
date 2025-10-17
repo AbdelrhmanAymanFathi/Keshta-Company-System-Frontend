@@ -1,12 +1,16 @@
 <template>
   <div>
+    <CreateVehicle @created="loadVehicles" />
+
     <div class="space-y-4">
       <div v-for="(v, i) in vehicles" :key="i" class="p-4 border rounded-lg bg-white flex items-center justify-between">
         <div>
           <div class="font-semibold">{{ v.name }}</div>
-          <div class="text-sm text-gray-500">Registration: {{ v.reg }}</div>
+          <div class="text-sm text-gray-500">Crusher #: {{ v.crusherNumber || '-' }}</div>
+          <div class="text-sm text-gray-500">Company: {{ v.company || '-' }}</div>
+          <div class="text-sm text-gray-500" v-if="v.contractor">Contractor: {{ v.contractor.name }}</div>
         </div>
-        <div class="text-sm">{{ v.status }}</div>
+        <div class="text-sm">ID: {{ v.id }}</div>
       </div>
     </div>
   </div>
@@ -14,24 +18,27 @@
 
 <script>
 import { getVehicles } from '../../api'
+import CreateVehicle from './CreateVehicle.vue'
 
 export default {
   name: 'VehiclesList',
+  components: { CreateVehicle },
   data() {
     return {
       vehicles: []
     }
   },
-  async mounted() {
-    try {
+  methods: {
+    async loadVehicles() {
       const res = await getVehicles();
       this.vehicles = Array.isArray(res.data) ? res.data : [];
+    }
+  },
+  async mounted() {
+    try {
+      await this.loadVehicles()
     } catch (e) {
-      // fallback demo data
-      this.vehicles = [
-        { name: 'Truck A', reg: 'ABC-123', status: 'Available' },
-        { name: 'Mixer 1', reg: 'MIX-456', status: 'In Use' },
-      ]
+      this.vehicles = []
     }
   }
 }
