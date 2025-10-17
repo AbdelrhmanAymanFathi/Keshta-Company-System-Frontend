@@ -89,36 +89,36 @@
                 <td class="px-3 py-2 align-top text-sm">{{ index + 1 }}</td>
 
                 <td class="px-3 py-2">
-                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 0)" />
+                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 0)" @keydown.tab.prevent="focusNext(index, 0)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.contractor" @change="onContractorChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)">
+                  <select v-model="row.contractor" @change="onContractorChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)" @keydown.tab.prevent="focusNext(index, 1)">
                     <option :value="null">{{ $t('labels.contractor') }} —</option>
                     <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.crusher" @change="onCrusherChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)">
+                  <select v-model="row.crusher" @change="onCrusherChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)" @keydown.tab.prevent="focusNext(index, 2)">
                     <option :value="null">{{ $t('labels.crusher') }} —</option>
                     <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)">
+                  <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)" @keydown.tab.prevent="focusNext(index, 3)">
                     <option :value="null">{{ $t('labels.vehicle') }} —</option>
                     <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 4)" />
+                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 4)" @keydown.tab.prevent="focusNext(index, 4)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 5)" />
+                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 5)" @keydown.tab.prevent="focusNext(index, 5)" />
                 </td>
 
                 <td class="px-3 py-2">
@@ -129,6 +129,7 @@
                     class="w-full border rounded-md px-2 py-1"
                     placeholder="0"
                     @keydown.enter.prevent="focusNext(index, 6)"
+                    @keydown.tab.prevent="focusNext(index, 6)"
                   />
                 </td>
 
@@ -141,6 +142,7 @@
                     class="w-full border rounded-md px-2 py-1 no-spinner"
                     placeholder="0"
                     @keydown.enter.prevent="focusNext(index, 7)"
+                    @keydown.tab.prevent="focusNext(index, 7)"
                   />
                 </td>
 
@@ -153,6 +155,7 @@
                     class="w-full border rounded-md px-2 py-1 no-spinner"
                     placeholder="0"
                     @keydown.enter.prevent="focusNext(index, 8)"
+                    @keydown.tab.prevent="focusNext(index, 8)"
                   />
                 </td>
 
@@ -987,7 +990,19 @@ export default {
     onContractorChange(row) {
       // Filter vehicles by contractor if selected, else show all
       const contractorId = row.contractor && row.contractor.id ? Number(row.contractor.id) : null
-      row.availableVehicles = contractorId ? this.vehicles.filter(v => Number(v.contractorId) === contractorId) : this.vehicles
+      console.log('Contractor changed:', contractorId, 'Available vehicles:', this.vehicles.length)
+      if (!contractorId) {
+        console.log('No contractor selected, showing all vehicles')
+        row.availableVehicles = this.vehicles
+      } else {
+        const filtered = this.vehicles.filter(v => {
+          const vehicleContractorId = Number(v.contractorId || 0)
+          console.log('Vehicle:', v.name, 'Contractor ID:', vehicleContractorId, 'Matches:', vehicleContractorId === contractorId)
+          return vehicleContractorId === contractorId
+        })
+        console.log('Filtered vehicles for contractor', contractorId, ':', filtered.length)
+        row.availableVehicles = filtered
+      }
       row.vehicle = null
     },
 

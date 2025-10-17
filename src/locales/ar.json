@@ -43,6 +43,7 @@
     "trips": "الرحلات",
     "distance": "المسافة",
     "selectContractor": "اختر المقاول",
+    "selectVehicle": "اختر المركبة",
     "noTransports": "لا توجد عمليات نقل",
     "noTransportsDesc": "ابدأ بإنشاء سجل نقل جديد.",
     "confirmDelete": "هل أنت متأكد من حذف هذا النقل؟",

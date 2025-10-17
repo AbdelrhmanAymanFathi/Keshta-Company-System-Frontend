@@ -225,8 +225,18 @@ export default {
     isEditing() { return !!this.transport },
     filteredVehicles() {
       const contractorId = Number(this.form.contractorId || 0)
-      if (!contractorId) return this.vehicles
-      return this.vehicles.filter(v => Number(v.contractorId) === contractorId)
+      console.log('Filtering vehicles for contractor:', contractorId, 'Total vehicles:', this.vehicles.length)
+      if (!contractorId) {
+        console.log('No contractor selected, showing all vehicles')
+        return this.vehicles
+      }
+      const filtered = this.vehicles.filter(v => {
+        const vehicleContractorId = Number(v.contractorId || 0)
+        console.log('Vehicle:', v.name, 'Contractor ID:', vehicleContractorId, 'Matches:', vehicleContractorId === contractorId)
+        return vehicleContractorId === contractorId
+      })
+      console.log('Filtered vehicles count:', filtered.length)
+      return filtered
     },
     totalDisplay() { const total = this.totalFromServer != null ? this.totalFromServer : 0; return this.formatCurrency(total) },
     perTripFareDisplay() { return this.perTripFare != null ? this.formatCurrency(this.perTripFare) : '-' },
@@ -263,6 +273,8 @@ export default {
       // reset vehicle when contractor changes
       this.selectedVehicleId = ''
       this.form.vehicleName = ''
+      console.log('Contractor changed to:', this.form.contractorId, 'Available vehicles:', this.vehicles.length)
+      console.log('Filtered vehicles:', this.filteredVehicles.length)
     },
 
     onVehicleChange() {
