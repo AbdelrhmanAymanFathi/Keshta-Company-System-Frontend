@@ -1,7 +1,11 @@
 import axios from 'axios';
+// Default to current origin so requests go through nginx in prod and 
+// avoid CORS
+// const BASE_URL = process.env.VUE_APP_API_BASE_URL || (typeof window !== 
+// 'undefined' ? window.location.origin : 'http://127.0.0.1:8080');
 
-// Default to current origin so requests go through nginx in prod and avoid CORS
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8080');
+// Base URL for API requests
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
 class TokenManager {
@@ -390,3 +394,13 @@ axios.interceptors.response.use(
 
 // Initialize token management when module loads
 tokenManager.initialize();
+
+// --- Additional Transport helpers ---
+export const calculateTransportFare = (data) =>
+  axios.post(`${BASE_URL}/api/transports/calculate-fare`, data);
+
+export const getTransportReport = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/transports/report${search ? `?${search}` : ''}`;
+  return axios.get(url, { responseType: 'blob' });
+};

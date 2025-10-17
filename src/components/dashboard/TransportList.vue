@@ -3,13 +3,15 @@
     <!-- Header with Add Button -->
     <div class="flex justify-between items-center">
       <h3 class="text-lg font-semibold text-gray-900">{{ $t('transport.transportList') }}</h3>
-      <button @click="showAddModal = true" 
-              class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        {{ $t('transport.addTransport') }}
-      </button>
+      <div class="flex items-center gap-2">
+        <button @click="showAddModal = true" 
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          {{ $t('transport.addTransport') }}
+        </button>
+      </div>
     </div>
 
     <!-- Loading State -->

@@ -149,6 +149,7 @@ import ContractorsList from './ContractorsList.vue'
 import CrushersList from './CrushersList.vue'
 import VehiclesList from './VehiclesList.vue'
 import TransportList from './TransportList.vue'
+import TransportReport from './TransportReport.vue'
 import RentalList from './RentalList.vue'
 import ExpensesList from './ExpensesList.vue'
 import AuthLogout from '../auth/Logout.vue'
@@ -156,7 +157,7 @@ import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, RentalList, ExpensesList, AuthLogout },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, AuthLogout },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -178,7 +179,8 @@ export default {
           { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' }
         ],
         transport: [
-          { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' }
+          { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' },
+          { name: 'transportReport', label: 'transport.reportMenu', component: 'TransportReport' }
         ],
         expenses: [
           { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' }
@@ -226,7 +228,7 @@ export default {
     // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return { template: '<div>Select an item</div>' }
-      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, RentalList, ExpensesList }
+      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || { template: '<div>Component not found</div>' }

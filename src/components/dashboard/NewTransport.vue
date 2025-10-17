@@ -75,14 +75,34 @@
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
 
-          <!-- Rate -->
+          <!-- Pricing: First Km -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('transport.rate') }} *
+              First Km
             </label>
-            <input v-model.number="form.rate" type="number" step="0.01" min="0" required
+            <input v-model.number="form.firstKm" type="number" step="1" min="0"
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
+
+          <!-- Pricing: First Km Price -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              First Km Price
+            </label>
+            <input v-model.number="form.firstKmPrice" type="number" step="0.01" min="0"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+          </div>
+
+          <!-- Pricing: Per Km Price -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Per Km Price
+            </label>
+            <input v-model.number="form.perKmPrice" type="number" step="0.01" min="0"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+          </div>
+
+          
 
           <!-- Vehicle Name -->
           <div>
@@ -105,9 +125,26 @@
 
         <!-- Total Display -->
         <div class="bg-gray-50 p-4 rounded-lg">
-          <div class="flex justify-between items-center">
-            <span class="text-lg font-medium text-gray-900">{{ $t('transport.total') }}:</span>
-            <span class="text-xl font-bold text-indigo-600">{{ formatCurrency(calculatedTotal) }}</span>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div>
+              <div class="text-sm text-gray-600">Per-trip fare</div>
+              <div class="text-lg font-semibold text-gray-900">{{ perTripFareDisplay }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-600">{{ $t('transport.rate') }}</div>
+              <div class="text-lg font-semibold text-gray-900">{{ effectiveRateDisplay }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-600">{{ $t('transport.total') }}</div>
+              <div class="text-xl font-bold text-indigo-600">{{ totalDisplay }}</div>
+            </div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button type="button" @click="calculateFare" :disabled="calculating || !canCalculate"
+                    class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-md transition-colors flex items-center gap-2">
+              <div v-if="calculating" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Calculate Fare
+            </button>
           </div>
         </div>
 
@@ -142,7 +179,7 @@
 </template>
 
 <script>
-import { createTransport, updateTransport, getContractors } from '@/api'
+import { createTransport, updateTransport, getContractors, calculateTransportFare } from '@/api'
 
 export default {
   name: 'NewTransport',
@@ -161,21 +198,39 @@ export default {
         toLoc: '',
         numTrips: 1,
         distanceKm: 0,
-        rate: 0,
         vehicleName: '',
-        notes: ''
+        notes: '',
+        // pricing
+        firstKm: 0,
+        firstKmPrice: 0,
+        perKmPrice: 0
       },
       contractors: [],
       loading: false,
-      error: null
+      calculating: false,
+      error: null,
+      // fare preview
+      perTripFare: null,
+      effectiveRate: null,
+      totalFromServer: null
     }
   },
   computed: {
     isEditing() {
       return !!this.transport
     },
-    calculatedTotal() {
-      return this.form.numTrips * this.form.distanceKm * this.form.rate
+    totalDisplay() {
+      const total = this.totalFromServer != null ? this.totalFromServer : 0
+      return this.formatCurrency(total)
+    },
+    perTripFareDisplay() {
+      return this.perTripFare != null ? this.formatCurrency(this.perTripFare) : '-'
+    },
+    effectiveRateDisplay() {
+      return this.effectiveRate != null ? this.effectiveRate.toFixed(2) : '-'
+    },
+    canCalculate() {
+      return this.form.distanceKm > 0 && this.form.numTrips > 0 && (this.form.firstKmPrice > 0 || this.form.perKmPrice > 0)
     }
   },
   async mounted() {
@@ -217,9 +272,36 @@ export default {
         toLoc: this.transport.toLoc || '',
         numTrips: parseInt(this.transport.numTrips) || 1,
         distanceKm: parseFloat(this.transport.distanceKm) || 0,
-        rate: parseFloat(this.transport.rate) || 0,
         vehicleName: this.transport.vehicleName || '',
-        notes: this.transport.notes || ''
+        notes: this.transport.notes || '',
+        firstKm: this.transport.pricing?.firstKm || 0,
+        firstKmPrice: this.transport.pricing?.firstKmPrice || 0,
+        perKmPrice: this.transport.pricing?.perKmPrice || 0
+      }
+      // seed preview values if present
+      this.effectiveRate = this.transport.rate ? parseFloat(this.transport.rate) : null
+      this.totalFromServer = this.transport.total ? parseFloat(this.transport.total) : null
+    },
+
+    async calculateFare() {
+      this.calculating = true
+      this.error = null
+      try {
+        const payload = {
+          distanceKm: parseFloat(this.form.distanceKm),
+          numTrips: parseInt(this.form.numTrips),
+          firstKm: parseFloat(this.form.firstKm || 0),
+          firstKmPrice: parseFloat(this.form.firstKmPrice || 0),
+          perKmPrice: parseFloat(this.form.perKmPrice || 0)
+        }
+        const { data } = await calculateTransportFare(payload)
+        this.perTripFare = data?.perTripFare ?? null
+        this.effectiveRate = data?.effectiveRate ?? null
+        this.totalFromServer = data?.total ?? null
+      } catch (error) {
+        this.error = error.response?.data?.message || error.message || this.$t('common.saveError')
+      } finally {
+        this.calculating = false
       }
     },
 
@@ -236,14 +318,22 @@ export default {
           toLoc: this.form.toLoc.trim(),
           numTrips: parseInt(this.form.numTrips),
           distanceKm: parseFloat(this.form.distanceKm),
-          rate: parseFloat(this.form.rate),
           vehicleName: this.form.vehicleName.trim(),
-          notes: this.form.notes.trim(),
-          total: this.calculatedTotal
+          notes: this.form.notes.trim()
         }
 
+        // include pricing if provided
+        if (this.form.firstKm || this.form.firstKmPrice || this.form.perKmPrice) {
+          formData.pricing = {
+            firstKm: parseFloat(this.form.firstKm || 0),
+            firstKmPrice: parseFloat(this.form.firstKmPrice || 0),
+            perKmPrice: parseFloat(this.form.perKmPrice || 0)
+          }
+        }
+        // Do not send rate/total; backend derives them from pricing
+
         // Validate required fields
-        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !formData.vehicleName) {
+        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleName) {
           throw new Error('Please fill in all required fields')
         }
 
@@ -260,7 +350,6 @@ export default {
         this.error = error.response?.data?.message || error.message || this.$t('common.saveError')
         console.error('Error saving transport:', error)
         console.error('Form data:', this.form)
-        // Note: formData is not available in catch block scope
       } finally {
         this.loading = false
       }

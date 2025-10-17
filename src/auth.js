@@ -1,8 +1,5 @@
 // Authentication utilities and token management
-import { tokenManager } from './api';
-
-// Use same-origin by default to route through nginx and avoid CORS
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8080');
+import { tokenManager, login as apiLogin, logout as apiLogout } from './api';
 
 // Auth state management
 class AuthManager {
@@ -58,18 +55,10 @@ class AuthManager {
   // Login user
   async login(credentials) {
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(credentials)
-      });
+      const response = await apiLogin(credentials);
+      const data = response.data;
 
-      const data = await response.json();
-
-      if (response.ok && data.accessToken) {
+      if (data && data.accessToken) {
         tokenManager.setToken(data.accessToken);
         tokenManager.scheduleTokenRefresh(data.accessToken);
         
@@ -82,7 +71,7 @@ class AuthManager {
         this.setAuthState(true, this.user);
         return { success: true, data };
       } else {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data?.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -110,13 +99,7 @@ class AuthManager {
       
       // Call logout API if needed
       try {
-        await fetch(`${BASE_URL}/api/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include'
-        });
+        await apiLogout();
       } catch (apiError) {
         console.warn('Logout API call failed:', apiError);
       }
