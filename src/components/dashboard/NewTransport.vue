@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click="closeModal">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white" @click.stop>
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white" @click.stop @keydown.alt.s.prevent="submitForm" @keydown.alt.c.prevent="calculateFare">
       <!-- Modal Header -->
       <div class="flex justify-between items-center pb-4 border-b">
         <h3 class="text-lg font-semibold text-gray-900">
@@ -30,7 +30,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ $t('transport.contractor') }} *
             </label>
-            <select v-model="form.contractorId" required
+            <select v-model="form.contractorId" required @change="onContractorChange"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('transport.selectContractor') }}</option>
               <option v-for="contractor in contractors" :key="contractor.id" :value="contractor.id">
@@ -102,18 +102,30 @@
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
 
+<<<<<<< HEAD
           
 
           <!-- Vehicle Selection -->
+=======
+          <!-- Vehicle (select filtered by contractor) -->
+>>>>>>> test-vehicles
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ $t('transport.vehicle') }} *
             </label>
+<<<<<<< HEAD
             <select v-model="form.vehicleId" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('transport.selectVehicle') }}</option>
               <option v-for="vehicle in availableVehicles" :key="vehicle.id" :value="vehicle.id">
                 {{ vehicle.name }} - {{ vehicle.company || '' }} {{ vehicle.crusherNumber ? `(${vehicle.crusherNumber})` : '' }}
+=======
+            <select v-model="selectedVehicleId" @change="onVehicleChange" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              <option value="">{{ $t('transport.selectVehicle') || 'Select vehicle' }}</option>
+              <option v-for="v in filteredVehicles" :key="v.id" :value="v.id">
+                {{ v.name }}
+>>>>>>> test-vehicles
               </option>
             </select>
           </div>
@@ -148,7 +160,7 @@
             <button type="button" @click="calculateFare" :disabled="calculating || !canCalculate"
                     class="px-3 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-md transition-colors flex items-center gap-2">
               <div v-if="calculating" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Calculate Fare
+              Calculate Fare (Alt+C)
             </button>
           </div>
         </div>
@@ -175,7 +187,7 @@
           <button type="submit" :disabled="loading"
                   class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-md transition-colors flex items-center gap-2">
             <div v-if="loading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            {{ isEditing ? $t('common.update') : $t('common.create') }}
+            {{ isEditing ? $t('common.update') : $t('common.create') }} (Alt+S)
           </button>
         </div>
       </form>
@@ -184,7 +196,12 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { createTransport, updateTransport, getContractors, calculateTransportFare, getContractorsWithVehicles } from '@/api'
+=======
+import { createTransport, updateTransport, getContractors } from '@/api'
+import { getVehicles } from '../../api'
+>>>>>>> test-vehicles
 
 export default {
   name: 'NewTransport',
@@ -211,7 +228,12 @@ export default {
         perKmPrice: 0
       },
       contractors: [],
+<<<<<<< HEAD
       contractorsWithVehicles: [],
+=======
+      vehicles: [],
+      selectedVehicleId: '',
+>>>>>>> test-vehicles
       loading: false,
       calculating: false,
       error: null,
@@ -222,9 +244,23 @@ export default {
     }
   },
   computed: {
-    isEditing() {
-      return !!this.transport
+    isEditing() { return !!this.transport },
+    filteredVehicles() {
+      const contractorId = Number(this.form.contractorId || 0)
+      console.log('Filtering vehicles for contractor:', contractorId, 'Total vehicles:', this.vehicles.length)
+      if (!contractorId) {
+        console.log('No contractor selected, showing all vehicles')
+        return this.vehicles
+      }
+      const filtered = this.vehicles.filter(v => {
+        const vehicleContractorId = Number(v.contractorId || 0)
+        console.log('Vehicle:', v.name, 'Contractor ID:', vehicleContractorId, 'Matches:', vehicleContractorId === contractorId)
+        return vehicleContractorId === contractorId
+      })
+      console.log('Filtered vehicles count:', filtered.length)
+      return filtered
     },
+<<<<<<< HEAD
     totalDisplay() {
       const total = this.totalFromServer != null ? this.totalFromServer : 0
       return this.formatCurrency(total)
@@ -243,13 +279,18 @@ export default {
       const contractor = this.contractorsWithVehicles.find(c => c.id === parseInt(this.form.contractorId))
       return contractor ? contractor.vehicles || [] : []
     }
+=======
+    totalDisplay() { const total = this.totalFromServer != null ? this.totalFromServer : 0; return this.formatCurrency(total) },
+    perTripFareDisplay() { return this.perTripFare != null ? this.formatCurrency(this.perTripFare) : '-' },
+    effectiveRateDisplay() { return this.effectiveRate != null ? this.effectiveRate.toFixed(2) : '-' },
+    canCalculate() { return this.form.distanceKm > 0 && this.form.numTrips > 0 && (this.form.firstKmPrice > 0 || this.form.perKmPrice > 0) }
+>>>>>>> test-vehicles
   },
   async mounted() {
-    await this.loadContractors()
+    await Promise.all([this.loadContractors(), this.loadVehicles()])
     if (this.isEditing) {
       this.populateForm()
     } else {
-      // Set default date to today
       this.form.date = new Date().toISOString().split('T')[0]
     }
   },
@@ -266,9 +307,29 @@ export default {
         console.error('Error loading contractors:', error)
       }
     },
+    async loadVehicles() {
+      try {
+        const response = await getVehicles()
+        this.vehicles = Array.isArray(response.data) ? response.data : []
+      } catch (error) {
+        console.error('Error loading vehicles:', error)
+      }
+    },
+
+    onContractorChange() {
+      // reset vehicle when contractor changes
+      this.selectedVehicleId = ''
+      this.form.vehicleName = ''
+      console.log('Contractor changed to:', this.form.contractorId, 'Available vehicles:', this.vehicles.length)
+      console.log('Filtered vehicles:', this.filteredVehicles.length)
+    },
+
+    onVehicleChange() {
+      const v = this.vehicles.find(x => String(x.id) === String(this.selectedVehicleId))
+      this.form.vehicleName = v ? v.name : ''
+    },
 
     populateForm() {
-      // Handle date formatting properly
       let formattedDate = ''
       if (this.transport.date) {
         try {
@@ -293,7 +354,6 @@ export default {
         firstKmPrice: this.transport.pricing?.firstKmPrice || 0,
         perKmPrice: this.transport.pricing?.perKmPrice || 0
       }
-      // seed preview values if present
       this.effectiveRate = this.transport.rate ? parseFloat(this.transport.rate) : null
       this.totalFromServer = this.transport.total ? parseFloat(this.transport.total) : null
     },
@@ -309,7 +369,7 @@ export default {
           firstKmPrice: parseFloat(this.form.firstKmPrice || 0),
           perKmPrice: parseFloat(this.form.perKmPrice || 0)
         }
-        const { data } = await calculateTransportFare(payload)
+        const { data } = await this.$api.calculateTransportFare(payload)
         this.perTripFare = data?.perTripFare ?? null
         this.effectiveRate = data?.effectiveRate ?? null
         this.totalFromServer = data?.total ?? null
@@ -325,7 +385,6 @@ export default {
       this.error = null
 
       try {
-        // Prepare form data with proper validation
         const formData = {
           date: this.form.date,
           contractorId: parseInt(this.form.contractorId),
@@ -337,7 +396,6 @@ export default {
           notes: this.form.notes.trim()
         }
 
-        // include pricing if provided
         if (this.form.firstKm || this.form.firstKmPrice || this.form.perKmPrice) {
           formData.pricing = {
             firstKm: parseFloat(this.form.firstKm || 0),
@@ -345,10 +403,13 @@ export default {
             perKmPrice: parseFloat(this.form.perKmPrice || 0)
           }
         }
-        // Do not send rate/total; backend derives them from pricing
 
+<<<<<<< HEAD
         // Validate required fields
         if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleId) {
+=======
+        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleName) {
+>>>>>>> test-vehicles
           throw new Error('Please fill in all required fields')
         }
 
@@ -370,16 +431,8 @@ export default {
       }
     },
 
-    closeModal() {
-      this.$emit('close')
-    },
-
-    formatCurrency(amount) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP'
-      }).format(amount)
-    }
+    closeModal() { this.$emit('close') },
+    formatCurrency(amount) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount) }
   }
 }
 </script>

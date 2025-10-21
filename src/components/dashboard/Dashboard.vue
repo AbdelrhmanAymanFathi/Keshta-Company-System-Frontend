@@ -318,6 +318,7 @@ export default {
     // language switch
     switchLang(lang) {
       this.$i18n.locale = lang
+      localStorage.setItem('app-locale', lang)
       document.documentElement.lang = lang
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
       // keep existing collapsedSidebar state

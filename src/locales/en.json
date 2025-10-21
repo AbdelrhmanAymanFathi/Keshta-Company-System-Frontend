@@ -43,6 +43,7 @@
     "trips": "Trips",
     "distance": "Distance",
     "selectContractor": "Select Contractor",
+    "selectVehicle": "Select Vehicle",
     "noTransports": "No transports found",
     "noTransportsDesc": "Get started by creating a new transport record.",
     "confirmDelete": "Are you sure you want to delete this transport?",

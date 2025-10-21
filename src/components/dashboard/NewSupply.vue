@@ -1,5 +1,5 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6" @keydown.alt.n.prevent="addRow" @keydown.alt.s.prevent="saveData" @keydown.alt.r.prevent="resetRows" @keydown.alt.d.prevent="duplicateRow(rows.length - 1)">
     <div class="bg-white rounded-xl shadow-md p-6">
       <div class="flex items-start justify-between gap-4">
         <h2 class="text-2xl font-semibold">{{ $t('dashboard.newSupply') || 'New Supply' }}</h2>
@@ -65,8 +65,6 @@
           <div><span class="font-medium">{{ $t('labels.area') }}:</span> {{ area ? area.name : '' }}</div>
         </div>
 
-        <!-- ... table form omitted for brevity, kept same as before ... -->
-        <!-- (Full table form + actions identical to previous working version) -->
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 border">
             <thead class="bg-indigo-50">
@@ -91,36 +89,36 @@
                 <td class="px-3 py-2 align-top text-sm">{{ index + 1 }}</td>
 
                 <td class="px-3 py-2">
-                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" />
+                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 0)" @keydown.tab.prevent="focusNext(index, 0)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.contractor" class="w-full border rounded-md px-2 py-1">
+                  <select v-model="row.contractor" @change="onContractorChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)" @keydown.tab.prevent="focusNext(index, 1)">
                     <option :value="null">{{ $t('labels.contractor') }} —</option>
                     <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.crusher" @change="updateVehicles(row)" class="w-full border rounded-md px-2 py-1">
+                  <select v-model="row.crusher" @change="onCrusherChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)" @keydown.tab.prevent="focusNext(index, 2)">
                     <option :value="null">{{ $t('labels.crusher') }} —</option>
                     <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1">
+                  <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)" @keydown.tab.prevent="focusNext(index, 3)">
                     <option :value="null">{{ $t('labels.vehicle') }} —</option>
                     <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" />
+                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 4)" @keydown.tab.prevent="focusNext(index, 4)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" />
+                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 5)" @keydown.tab.prevent="focusNext(index, 5)" />
                 </td>
 
                 <td class="px-3 py-2">
@@ -130,6 +128,8 @@
                     v-model.number="row.discount"
                     class="w-full border rounded-md px-2 py-1"
                     placeholder="0"
+                    @keydown.enter.prevent="focusNext(index, 6)"
+                    @keydown.tab.prevent="focusNext(index, 6)"
                   />
                 </td>
 
@@ -141,6 +141,8 @@
                     v-model.number="row.price"
                     class="w-full border rounded-md px-2 py-1 no-spinner"
                     placeholder="0"
+                    @keydown.enter.prevent="focusNext(index, 7)"
+                    @keydown.tab.prevent="focusNext(index, 7)"
                   />
                 </td>
 
@@ -152,6 +154,8 @@
                     v-model.number="row.cubic"
                     class="w-full border rounded-md px-2 py-1 no-spinner"
                     placeholder="0"
+                    @keydown.enter.prevent="focusNext(index, 8)"
+                    @keydown.tab.prevent="focusNext(index, 8)"
                   />
                 </td>
 
@@ -176,9 +180,9 @@
         <div class="mt-4 sm:flex sm:items-center sm:justify-between gap-4">
           <div class="flex gap-2">
             <button @click="addRow" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-              {{ $t('labels.addRow') || 'Add row' }}
+              {{ $t('labels.addRow') || 'Add row' }} (Alt+N)
             </button>
-            <button @click="resetRows" class="px-4 py-2 border rounded">{{ $t('supply.reset') }}</button>
+            <button @click="resetRows" class="px-4 py-2 border rounded">{{ $t('supply.reset') }} (Alt+R)</button>
           </div>
 
           <div class="mt-3 sm:mt-0 text-sm text-gray-700">
@@ -191,7 +195,7 @@
 
         <div class="mt-4 flex justify-end gap-3">
           <button @click="saveData" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            {{ $t('labels.saveSupply') || 'Save' }}
+            {{ $t('labels.saveSupply') || 'Save' }} (Alt+S)
           </button>
         </div>
         <div v-if="saveError" class="mt-2 text-red-600 text-sm">{{ saveError }}</div>
@@ -621,6 +625,11 @@ export default {
       try {
         const vehiclesRes = await getVehicles(); this.vehicles = Array.isArray(vehiclesRes.data) ? vehiclesRes.data : [];
       } catch (e) { console.warn('getVehicles failed', e) }
+
+      // seed availableVehicles for first row
+      if (this.rows && this.rows.length) {
+        this.rows[0].availableVehicles = this.vehicles
+      }
     },
 
     // refresh locations from backend and keep selection by id if possible
@@ -810,7 +819,7 @@ export default {
         price: 0,
         cubic: 0,
         notes: '',
-        availableVehicles: []
+        availableVehicles: this.vehicles
       });
       this.$nextTick(() => {
         const tbl = this.$el.querySelector('table')
@@ -818,9 +827,9 @@ export default {
       })
     },
 
-    duplicateRow(index) { const src = this.rows[index]; const copy = JSON.parse(JSON.stringify(src)); copy.id = Date.now() + Math.random(); this.rows.splice(index + 1, 0, copy) },
+    duplicateRow(index) { const src = this.rows[index]; if (!src) return; const copy = JSON.parse(JSON.stringify(src)); copy.id = Date.now() + Math.random(); this.rows.splice(index + 1, 0, copy) },
     removeRow(index) { this.rows.splice(index, 1); if (this.rows.length === 0) this.addRow() },
-    resetRows() { this.rows = [ { id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: [] } ] },
+    resetRows() { this.rows = [ { id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: this.vehicles } ] },
 
     updateVehicles(row) {
       // Get vehicles for the selected contractor
@@ -853,12 +862,12 @@ export default {
     async saveData() {
       this.saveError = '';
       try {
-        // validate rows quickly
         const rowsToSave = this.rows.filter(r => {
           const hasAny =
             (r.date && r.date.toString().trim() !== '') ||
             (r.contractor) ||
             (r.crusher) ||
+            (r.vehicle) ||
             (r.price && Number(r.price) !== 0) ||
             (r.cubic && Number(r.cubic) !== 0) ||
             (r.discount && Number(r.discount) !== 0) ||
@@ -877,13 +886,12 @@ export default {
           if (!r.date || r.date.toString().trim() === '') missing.push('date');
           if (!r.contractor) missing.push('contractor');
           if (!r.crusher) missing.push('crusher');
+          if (!r.vehicle) missing.push('vehicle');
           if (missing.length) {
             this.saveError = `Please fill required fields (${missing.join(', ')}) in row ${i + 1}. / من فضلك املأ: ${missing.join(', ')} في الصف ${i + 1}.`;
             return;
           }
         }
-
-        // Token is automatically handled by the API interceptor
 
         for (const r of rowsToSave) {
           const payload = {
@@ -896,7 +904,9 @@ export default {
             companyCapacity: r.cubic ? parseFloat(r.cubic) : 0,
             crusherCapacity: r.cubic ? parseFloat(r.cubic) : 0,
             unitPrice: r.price ? parseFloat(r.price) : 0,
-            discount: r.discount ? parseFloat(r.discount) : 0
+            discount: r.discount ? parseFloat(r.discount) : 0,
+            vehicleId: r.vehicle?.id || null,
+            vehicleName: r.vehicle?.name || null
           };
           if (r.vehicle && r.vehicle.id) {
             payload.vehicleId = Number(r.vehicle.id);
@@ -990,6 +1000,57 @@ export default {
       } catch {
         return d;
       }
+    },
+
+    // Row helpers
+    onContractorChange(row) {
+      // Filter vehicles by contractor if selected, else show all
+      const contractorId = row.contractor && row.contractor.id ? Number(row.contractor.id) : null
+      console.log('Contractor changed:', contractorId, 'Available vehicles:', this.vehicles.length)
+      if (!contractorId) {
+        console.log('No contractor selected, showing all vehicles')
+        row.availableVehicles = this.vehicles
+      } else {
+        const filtered = this.vehicles.filter(v => {
+          const vehicleContractorId = Number(v.contractorId || 0)
+          console.log('Vehicle:', v.name, 'Contractor ID:', vehicleContractorId, 'Matches:', vehicleContractorId === contractorId)
+          return vehicleContractorId === contractorId
+        })
+        console.log('Filtered vehicles for contractor', contractorId, ':', filtered.length)
+        row.availableVehicles = filtered
+      }
+      row.vehicle = null
+    },
+
+    onCrusherChange(row) {
+      // Keep current contractor filter; if none, still show all
+      this.onContractorChange(row)
+      row.cubic = 0
+    },
+
+    focusNext(rowIndex, colIndex) {
+      // Move focus to next focusable cell in the same row
+      // columns order indexes: date(0), contractor(1), crusher(2), vehicle(3), crusherBon(4), companyBon(5), discount(6), price(7), cubic(8)
+      const order = [
+        'input[type="date"]',
+        'select',
+        'select',
+        'select',
+        'input[type="text"]',
+        'input[type="text"]',
+        'input[type="number"]',
+        'input[type="number"]',
+        'input[type="number"]'
+      ]
+      const nextIndex = Math.min(colIndex + 1, order.length - 1)
+      this.$nextTick(() => {
+        const rows = this.$el.querySelectorAll('tbody tr')
+        const rowEl = rows[rowIndex]
+        if (!rowEl) return
+        const selector = order[nextIndex]
+        const inputs = rowEl.querySelectorAll(selector)
+        if (inputs && inputs[0]) inputs[0].focus()
+      })
     }
   }
 }
