@@ -102,30 +102,16 @@
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
 
-<<<<<<< HEAD
-          
-
           <!-- Vehicle Selection -->
-=======
-          <!-- Vehicle (select filtered by contractor) -->
->>>>>>> test-vehicles
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('transport.vehicle') }} *
+              {{ $t('labels.vehicle') }} *
             </label>
-<<<<<<< HEAD
             <select v-model="form.vehicleId" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('transport.selectVehicle') }}</option>
               <option v-for="vehicle in availableVehicles" :key="vehicle.id" :value="vehicle.id">
                 {{ vehicle.name }} - {{ vehicle.company || '' }} {{ vehicle.crusherNumber ? `(${vehicle.crusherNumber})` : '' }}
-=======
-            <select v-model="selectedVehicleId" @change="onVehicleChange" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-              <option value="">{{ $t('transport.selectVehicle') || 'Select vehicle' }}</option>
-              <option v-for="v in filteredVehicles" :key="v.id" :value="v.id">
-                {{ v.name }}
->>>>>>> test-vehicles
               </option>
             </select>
           </div>
@@ -196,12 +182,7 @@
 </template>
 
 <script>
-<<<<<<< HEAD
 import { createTransport, updateTransport, getContractors, calculateTransportFare, getContractorsWithVehicles } from '@/api'
-=======
-import { createTransport, updateTransport, getContractors } from '@/api'
-import { getVehicles } from '../../api'
->>>>>>> test-vehicles
 
 export default {
   name: 'NewTransport',
@@ -228,12 +209,7 @@ export default {
         perKmPrice: 0
       },
       contractors: [],
-<<<<<<< HEAD
       contractorsWithVehicles: [],
-=======
-      vehicles: [],
-      selectedVehicleId: '',
->>>>>>> test-vehicles
       loading: false,
       calculating: false,
       error: null,
@@ -245,22 +221,6 @@ export default {
   },
   computed: {
     isEditing() { return !!this.transport },
-    filteredVehicles() {
-      const contractorId = Number(this.form.contractorId || 0)
-      console.log('Filtering vehicles for contractor:', contractorId, 'Total vehicles:', this.vehicles.length)
-      if (!contractorId) {
-        console.log('No contractor selected, showing all vehicles')
-        return this.vehicles
-      }
-      const filtered = this.vehicles.filter(v => {
-        const vehicleContractorId = Number(v.contractorId || 0)
-        console.log('Vehicle:', v.name, 'Contractor ID:', vehicleContractorId, 'Matches:', vehicleContractorId === contractorId)
-        return vehicleContractorId === contractorId
-      })
-      console.log('Filtered vehicles count:', filtered.length)
-      return filtered
-    },
-<<<<<<< HEAD
     totalDisplay() {
       const total = this.totalFromServer != null ? this.totalFromServer : 0
       return this.formatCurrency(total)
@@ -279,15 +239,9 @@ export default {
       const contractor = this.contractorsWithVehicles.find(c => c.id === parseInt(this.form.contractorId))
       return contractor ? contractor.vehicles || [] : []
     }
-=======
-    totalDisplay() { const total = this.totalFromServer != null ? this.totalFromServer : 0; return this.formatCurrency(total) },
-    perTripFareDisplay() { return this.perTripFare != null ? this.formatCurrency(this.perTripFare) : '-' },
-    effectiveRateDisplay() { return this.effectiveRate != null ? this.effectiveRate.toFixed(2) : '-' },
-    canCalculate() { return this.form.distanceKm > 0 && this.form.numTrips > 0 && (this.form.firstKmPrice > 0 || this.form.perKmPrice > 0) }
->>>>>>> test-vehicles
   },
   async mounted() {
-    await Promise.all([this.loadContractors(), this.loadVehicles()])
+    await this.loadContractors()
     if (this.isEditing) {
       this.populateForm()
     } else {
@@ -307,26 +261,9 @@ export default {
         console.error('Error loading contractors:', error)
       }
     },
-    async loadVehicles() {
-      try {
-        const response = await getVehicles()
-        this.vehicles = Array.isArray(response.data) ? response.data : []
-      } catch (error) {
-        console.error('Error loading vehicles:', error)
-      }
-    },
-
     onContractorChange() {
       // reset vehicle when contractor changes
-      this.selectedVehicleId = ''
-      this.form.vehicleName = ''
-      console.log('Contractor changed to:', this.form.contractorId, 'Available vehicles:', this.vehicles.length)
-      console.log('Filtered vehicles:', this.filteredVehicles.length)
-    },
-
-    onVehicleChange() {
-      const v = this.vehicles.find(x => String(x.id) === String(this.selectedVehicleId))
-      this.form.vehicleName = v ? v.name : ''
+      this.form.vehicleId = ''
     },
 
     populateForm() {
@@ -369,7 +306,7 @@ export default {
           firstKmPrice: parseFloat(this.form.firstKmPrice || 0),
           perKmPrice: parseFloat(this.form.perKmPrice || 0)
         }
-        const { data } = await this.$api.calculateTransportFare(payload)
+        const { data } = await calculateTransportFare(payload)
         this.perTripFare = data?.perTripFare ?? null
         this.effectiveRate = data?.effectiveRate ?? null
         this.totalFromServer = data?.total ?? null
@@ -404,12 +341,8 @@ export default {
           }
         }
 
-<<<<<<< HEAD
         // Validate required fields
-        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleId) {
-=======
-        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleName) {
->>>>>>> test-vehicles
+        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !formData.vehicleId) {
           throw new Error('Please fill in all required fields')
         }
 

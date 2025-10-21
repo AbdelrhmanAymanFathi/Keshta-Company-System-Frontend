@@ -413,3 +413,7 @@ export const getTransportReport = (params = {}) => {
   const url = `${BASE_URL}/api/transports/report${search ? `?${search}` : ''}`;
   return axios.get(url, { responseType: 'blob' });
 };
+
+// --- Additional API helpers ---
+export const getTransportById = (id) =>
+  axios.get(`${BASE_URL}/api/transports/${id}`);

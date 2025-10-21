@@ -905,12 +905,8 @@ export default {
             crusherCapacity: r.cubic ? parseFloat(r.cubic) : 0,
             unitPrice: r.price ? parseFloat(r.price) : 0,
             discount: r.discount ? parseFloat(r.discount) : 0,
-            vehicleId: r.vehicle?.id || null,
-            vehicleName: r.vehicle?.name || null
+            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null
           };
-          if (r.vehicle && r.vehicle.id) {
-            payload.vehicleId = Number(r.vehicle.id);
-          }
           if (r.notes !== undefined && r.notes !== null && String(r.notes).trim() !== '') {
             payload.notes = String(r.notes);
           }
@@ -1012,7 +1008,8 @@ export default {
         row.availableVehicles = this.vehicles
       } else {
         const filtered = this.vehicles.filter(v => {
-          const vehicleContractorId = Number(v.contractorId || 0)
+          // Check both old format (contractorId) and new format (contractor.id)
+          const vehicleContractorId = Number(v.contractorId || v.contractor?.id || 0)
           console.log('Vehicle:', v.name, 'Contractor ID:', vehicleContractorId, 'Matches:', vehicleContractorId === contractorId)
           return vehicleContractorId === contractorId
         })

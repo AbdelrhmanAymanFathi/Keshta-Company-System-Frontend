@@ -6,9 +6,9 @@
       <div v-for="(v, i) in vehicles" :key="i" class="p-4 border rounded-lg bg-white flex items-center justify-between">
         <div>
           <div class="font-semibold">{{ v.name }}</div>
-          <div class="text-sm text-gray-500">Crusher #: {{ v.crusherNumber || '-' }}</div>
-          <div class="text-sm text-gray-500">Company: {{ v.company || '-' }}</div>
-          <div class="text-sm text-gray-500" v-if="v.contractor">Contractor: {{ v.contractor.name }}</div>
+          <div class="text-sm text-gray-500">{{ $t('vehicles.crusherNumber') }}: {{ v.crusherNumber || '-' }}</div>
+          <div class="text-sm text-gray-500">{{ $t('vehicles.company') }}: {{ v.company || '-' }}</div>
+          <div class="text-sm text-gray-500" v-if="v.contractor">{{ $t('vehicles.contractor') }}: {{ v.contractor.name }}</div>
         </div>
         <div class="text-sm">ID: {{ v.id }}</div>
       </div>

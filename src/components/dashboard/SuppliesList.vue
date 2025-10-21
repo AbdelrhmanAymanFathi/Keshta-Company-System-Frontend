@@ -10,6 +10,7 @@
             <th class="p-3">{{ $t('labels.location') }}</th>
             <th class="p-3">{{ $t('labels.crusher') }}</th>
             <th class="p-3">{{ $t('labels.contractor') }}</th>
+            <th class="p-3">{{ $t('labels.vehicle') }}</th>
             <th class="p-3">{{ $t('labels.total') }}</th>
             <th class="p-3">{{ $t('labels.actions') }}</th>
           </tr>
@@ -21,13 +22,14 @@
             <td class="p-3">{{ s.location?.name || '-' }}</td>
             <td class="p-3">{{ s.crusher?.name || '-' }}</td>
             <td class="p-3">{{ s.contractor?.name || '-' }}</td>
+            <td class="p-3">{{ s.vehicle?.name || '-' }}</td>
             <td class="p-3">{{ formatNumber(calculateTotal(s)) }}</td>
             <td class="p-3">
               <button @click="openEdit(s)" class="px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">{{ $t('labels.edit') }}</button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3" colspan="7">{{ $t('dashboard.suppliesList') }}: {{ $t('contractors.noResults') }}</td>
+            <td class="p-3" colspan="8">{{ $t('dashboard.suppliesList') }}: {{ $t('contractors.noResults') }}</td>
           </tr>
         </tbody>
       </table>
