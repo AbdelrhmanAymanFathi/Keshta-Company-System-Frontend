@@ -238,6 +238,15 @@ export const createVehicle = (data) =>
 export const deleteVehicle = (id) =>
   axios.delete(`${BASE_URL}/api/vehicles`, { data: { id } });
 
+// Contractors with vehicles
+export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
+  const params = new URLSearchParams();
+  if (onlyWithVehicles) {
+    params.append('onlyWithVehicles', 'true');
+  }
+  return axios.get(`${BASE_URL}/api/contractors/with-vehicles?${params.toString()}`);
+};
+
 // Exports (Deliveries)
 export const getDeliveries = () =>
   axios.get(`${BASE_URL}/api/exports`);

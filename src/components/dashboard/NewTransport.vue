@@ -104,13 +104,18 @@
 
           
 
-          <!-- Vehicle Name -->
+          <!-- Vehicle Selection -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('transport.vehicleName') }} *
+              {{ $t('transport.vehicle') }} *
             </label>
-            <input v-model="form.vehicleName" type="text" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            <select v-model="form.vehicleId" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              <option value="">{{ $t('transport.selectVehicle') }}</option>
+              <option v-for="vehicle in availableVehicles" :key="vehicle.id" :value="vehicle.id">
+                {{ vehicle.name }} - {{ vehicle.company || '' }} {{ vehicle.crusherNumber ? `(${vehicle.crusherNumber})` : '' }}
+              </option>
+            </select>
           </div>
         </div>
 
@@ -179,7 +184,7 @@
 </template>
 
 <script>
-import { createTransport, updateTransport, getContractors, calculateTransportFare } from '@/api'
+import { createTransport, updateTransport, getContractors, calculateTransportFare, getContractorsWithVehicles } from '@/api'
 
 export default {
   name: 'NewTransport',
@@ -198,7 +203,7 @@ export default {
         toLoc: '',
         numTrips: 1,
         distanceKm: 0,
-        vehicleName: '',
+        vehicleId: '',
         notes: '',
         // pricing
         firstKm: 0,
@@ -206,6 +211,7 @@ export default {
         perKmPrice: 0
       },
       contractors: [],
+      contractorsWithVehicles: [],
       loading: false,
       calculating: false,
       error: null,
@@ -231,6 +237,11 @@ export default {
     },
     canCalculate() {
       return this.form.distanceKm > 0 && this.form.numTrips > 0 && (this.form.firstKmPrice > 0 || this.form.perKmPrice > 0)
+    },
+    availableVehicles() {
+      if (!this.form.contractorId) return []
+      const contractor = this.contractorsWithVehicles.find(c => c.id === parseInt(this.form.contractorId))
+      return contractor ? contractor.vehicles || [] : []
     }
   },
   async mounted() {
@@ -245,8 +256,12 @@ export default {
   methods: {
     async loadContractors() {
       try {
-        const response = await getContractors()
-        this.contractors = response.data || []
+        const [contractorsResponse, contractorsWithVehiclesResponse] = await Promise.all([
+          getContractors(),
+          getContractorsWithVehicles()
+        ])
+        this.contractors = contractorsResponse.data || []
+        this.contractorsWithVehicles = contractorsWithVehiclesResponse.data || []
       } catch (error) {
         console.error('Error loading contractors:', error)
       }
@@ -272,7 +287,7 @@ export default {
         toLoc: this.transport.toLoc || '',
         numTrips: parseInt(this.transport.numTrips) || 1,
         distanceKm: parseFloat(this.transport.distanceKm) || 0,
-        vehicleName: this.transport.vehicleName || '',
+        vehicleId: this.transport.vehicleId || '',
         notes: this.transport.notes || '',
         firstKm: this.transport.pricing?.firstKm || 0,
         firstKmPrice: this.transport.pricing?.firstKmPrice || 0,
@@ -318,7 +333,7 @@ export default {
           toLoc: this.form.toLoc.trim(),
           numTrips: parseInt(this.form.numTrips),
           distanceKm: parseFloat(this.form.distanceKm),
-          vehicleName: this.form.vehicleName.trim(),
+          vehicleId: this.form.vehicleId ? parseInt(this.form.vehicleId) : null,
           notes: this.form.notes.trim()
         }
 
@@ -333,7 +348,7 @@ export default {
         // Do not send rate/total; backend derives them from pricing
 
         // Validate required fields
-        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleName) {
+        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !this.form.vehicleId) {
           throw new Error('Please fill in all required fields')
         }
 

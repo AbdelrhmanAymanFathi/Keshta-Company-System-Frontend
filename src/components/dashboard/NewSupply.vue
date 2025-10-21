@@ -387,6 +387,7 @@ import {
   getContractors,
   getCrushers,
   getVehicles,
+  getContractorsWithVehicles,
   createDelivery,
   getDeliveries,
   deleteDelivery
@@ -421,6 +422,7 @@ export default {
       ],
 
       contractors: [],
+      contractorsWithVehicles: [],
       crushers: [],
       vehicles: [],
       saveError: '',
@@ -606,6 +608,11 @@ export default {
       try {
         const contRes = await getContractors(); this.contractors = Array.isArray(contRes.data) ? contRes.data : [];
       } catch (e) { console.warn('getContractors failed', e) }
+
+      try {
+        const contractorsWithVehiclesRes = await getContractorsWithVehicles(); 
+        this.contractorsWithVehicles = Array.isArray(contractorsWithVehiclesRes.data) ? contractorsWithVehiclesRes.data : [];
+      } catch (e) { console.warn('getContractorsWithVehicles failed', e) }
 
       try {
         const crushersRes = await getCrushers(); this.crushers = Array.isArray(crushersRes.data) ? crushersRes.data : [];
@@ -816,8 +823,14 @@ export default {
     resetRows() { this.rows = [ { id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: [] } ] },
 
     updateVehicles(row) {
-      const selectedCrusher = row.crusher;
-      row.availableVehicles = selectedCrusher ? selectedCrusher.vehicles : [];
+      // Get vehicles for the selected contractor
+      const selectedContractor = row.contractor;
+      if (selectedContractor) {
+        const contractorWithVehicles = this.contractorsWithVehicles.find(c => c.id === selectedContractor.id);
+        row.availableVehicles = contractorWithVehicles ? contractorWithVehicles.vehicles || [] : [];
+      } else {
+        row.availableVehicles = [];
+      }
       row.vehicle = null;
       row.cubic = 0;
     },
@@ -885,6 +898,9 @@ export default {
             unitPrice: r.price ? parseFloat(r.price) : 0,
             discount: r.discount ? parseFloat(r.discount) : 0
           };
+          if (r.vehicle && r.vehicle.id) {
+            payload.vehicleId = Number(r.vehicle.id);
+          }
           if (r.notes !== undefined && r.notes !== null && String(r.notes).trim() !== '') {
             payload.notes = String(r.notes);
           }

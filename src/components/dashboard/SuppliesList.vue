@@ -7,8 +7,8 @@
           <tr>
             <th class="p-3">#</th>
             <th class="p-3">{{ $t('labels.date') }}</th>
-            <th class="p-3">{{ $t('labels.site') }}</th>
-            <th class="p-3">{{ $t('labels.area') }}</th>
+            <th class="p-3">{{ $t('labels.location') }}</th>
+            <th class="p-3">{{ $t('labels.crusher') }}</th>
             <th class="p-3">{{ $t('labels.contractor') }}</th>
             <th class="p-3">{{ $t('labels.total') }}</th>
             <th class="p-3">{{ $t('labels.actions') }}</th>
@@ -17,11 +17,11 @@
         <tbody>
           <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50">
             <td class="p-3">{{ idx + 1 }}</td>
-            <td class="p-3">{{ s.date || '-' }}</td>
-            <td class="p-3">{{ s.site || '-' }}</td>
-            <td class="p-3">{{ s.area || '-' }}</td>
-            <td class="p-3">{{ s.contractor || '-' }}</td>
-            <td class="p-3">{{ formatNumber(s.grandTotal) }}</td>
+            <td class="p-3">{{ formatDate(s.date) }}</td>
+            <td class="p-3">{{ s.location?.name || '-' }}</td>
+            <td class="p-3">{{ s.crusher?.name || '-' }}</td>
+            <td class="p-3">{{ s.contractor?.name || '-' }}</td>
+            <td class="p-3">{{ formatNumber(calculateTotal(s)) }}</td>
             <td class="p-3">
               <button @click="openEdit(s)" class="px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">{{ $t('labels.edit') }}</button>
             </td>
@@ -87,7 +87,8 @@ export default {
   async mounted() {
     try {
       const res = await getDeliveries();
-      this.supplies = Array.isArray(res.data) ? res.data : [];
+      // Handle the new response structure with items array
+      this.supplies = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []);
     } catch (e) {
       this.supplies = [];
     }
@@ -95,6 +96,21 @@ export default {
   methods: {
     formatNumber(v) {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
+    },
+    formatDate(dateString) {
+      if (!dateString) return '-'
+      try {
+        const date = new Date(dateString)
+        return date.toLocaleDateString()
+      } catch (error) {
+        return dateString
+      }
+    },
+    calculateTotal(supply) {
+      const capacity = parseFloat(supply.companyCapacity || supply.crusherCapacity || 0)
+      const unitPrice = parseFloat(supply.unitPrice || 0)
+      const discount = parseFloat(supply.discount || 0)
+      return (capacity * unitPrice) - discount
     },
     openEdit(supply) {
       this.form = Object.assign({}, supply)
