@@ -90,7 +90,9 @@
     "update": "تحديث",
     "to": "إلى",
     "results": "النتائج",
-    "showing": "عرض"
+    "showing": "عرض",
+    "previous": "السابق",
+    "of": "من"
   },
   "common": {
     "error": "خطأ",

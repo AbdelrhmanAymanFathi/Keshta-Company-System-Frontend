@@ -90,7 +90,9 @@
     "update": "Update",
     "to": "to",
     "results": "results",
-    "showing": "Showing"
+    "showing": "Showing",
+    "previous": "Previous",
+    "of": "of"
   },
   "common": {
     "error": "Error",
