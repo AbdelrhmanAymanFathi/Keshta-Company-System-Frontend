@@ -252,7 +252,7 @@ export default {
 
     // aside classes combine desktop and mobile behavior
     asideClasses() {
-      const base = 'bg-indigo-50 p-4 overflow-auto transition-transform duration-200 z-40 transform';
+      const base = 'bg-indigo-50 p-4 transition-all duration-200 z-40 transform relative';
       // mobile (drawer) behavior
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'
@@ -462,5 +462,11 @@ export default {
   }
 
   /* mobile drawer width */
+}
+
+/* Transition for all properties */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
