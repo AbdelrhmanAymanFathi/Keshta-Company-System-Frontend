@@ -174,30 +174,24 @@ export default {
     // Watch for external changes to modelValue. Only apply the update if
     // the incoming value differs from our local form to avoid causing a
     // loop (parent -> child -> parent ...).
-    const isEqual = (a, b) => {
-      try {
-        return JSON.stringify(a) === JSON.stringify(b)
-      } catch (e) {
-        return false
-      }
-    }
-
+    // Always apply external modelValue changes to localForm. We no longer
+    // emit update:modelValue on every change, so copying here is safe and
+    // ensures the edit form is populated correctly when opened.
     watch(() => props.modelValue, (newVal) => {
-      if (!isEqual(newVal, localForm.value)) {
+      if (newVal && typeof newVal === 'object') {
         localForm.value = { ...newVal }
-        if (localForm.value.isCompanyOwned === undefined) {
-          localForm.value.isCompanyOwned = true
-        }
+      } else {
+        localForm.value = { ...props.modelValue }
+      }
+      if (localForm.value.isCompanyOwned === undefined) {
+        localForm.value.isCompanyOwned = true
       }
     }, { deep: true })
 
-    // Emit changes to parent only when localForm differs from props.modelValue
-    // to avoid emitting updates that came from the parent.
-    watch(localForm, (newVal) => {
-      if (!isEqual(newVal, props.modelValue)) {
-        emit('update:modelValue', newVal)
-      }
-    }, { deep: true })
+    // Do NOT emit update:modelValue on every change — we only emit on submit.
+    // This avoids unnecessary parent <-> child two-way binding that can lead
+    // to recursive update loops. The parent should pass the initial
+    // `modelValue` and react to the `submit` event.
 
     const calculateTotal = () => {
       if (localForm.value.hours && localForm.value.hourlyRate) {

@@ -312,7 +312,6 @@
             :model-value="form.value"
             :loading="saving"
             :is-editing="isEditing"
-            @update:model-value="updateForm"
             @submit="saveRental"
             @cancel="closeModal"
           />
@@ -438,18 +437,36 @@ export default {
       showModal.value = true
     }
 
-    const openEditModal = (rental) => {
+    const openEditModal = async (rental) => {
       isEditing.value = true
-      form.value = {
-        id: rental.id,
-        date: rental.date.split('T')[0],
-        equipment: rental.equipment,
-        name: rental.name,
-        hours: parseFloat(rental.hours),
-        hourlyRate: parseFloat(rental.hourlyRate),
-        total: parseFloat(rental.total),
-        notes: rental.notes || '',
-        isCompanyOwned: rental.isCompanyOwned !== undefined ? rental.isCompanyOwned : true
+      try {
+        // Fetch latest rental from API/store to ensure we have full/clean data
+        const data = await rentalsStore.fetchRental(rental.id)
+        form.value = {
+          id: data.id,
+          date: data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          equipment: data.equipment || '',
+          name: data.name || '',
+          hours: parseFloat(data.hours) || 0,
+          hourlyRate: parseFloat(data.hourlyRate) || 0,
+          total: parseFloat(data.total) || 0,
+          notes: data.notes || '',
+          isCompanyOwned: data.isCompanyOwned !== undefined ? data.isCompanyOwned : true
+        }
+      } catch (error) {
+        console.error('Failed to load rental for edit:', error)
+        // Fallback to given object
+        form.value = {
+          id: rental.id,
+          date: rental.date ? rental.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          equipment: rental.equipment || '',
+          name: rental.name || '',
+          hours: parseFloat(rental.hours) || 0,
+          hourlyRate: parseFloat(rental.hourlyRate) || 0,
+          total: parseFloat(rental.total) || 0,
+          notes: rental.notes || '',
+          isCompanyOwned: rental.isCompanyOwned !== undefined ? rental.isCompanyOwned : true
+        }
       }
       showModal.value = true
     }
@@ -469,14 +486,7 @@ export default {
       }
     }
 
-    const updateForm = (val) => {
-      // Mutate existing object fields instead of replacing the ref itself.
-      // This reduces the chance of creating a new object reference that
-      // triggers child watchers and causes a recursive update loop.
-      if (val && typeof val === 'object') {
-        Object.assign(form.value, val)
-      }
-    }
+    // updateForm removed — RentalForm no longer emits update:model-value
 
     const saveRental = async (rentalData) => {
       saving.value = true
@@ -581,9 +591,8 @@ export default {
       onPageSizeChange,
       openAddModal,
       openEditModal,
-      closeModal,
-      updateForm,
       saveRental,
+  closeModal,
       confirmDelete,
       deleteRental,
       formatDate,
