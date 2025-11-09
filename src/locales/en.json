@@ -5,7 +5,7 @@
     "transport": "Transport",
     "expenses": "Expenses",
     "equipmentRent": "Equipment Rent",
-    "companyEquipment": "Company Equipment"
+    "companyWallet": "Company Wallet"
   },
   "dashboard": {
     "newSupply": "New Supply",
@@ -18,7 +18,8 @@
     "transport": "Transport",
     "expenses": "Expenses",
     "equipmentRent": "Equipment Rent",
-    "companyEquipment": "Company Equipment",
+    "companyWallet": "Company Wallet",
+    "companyWallet": "Company Wallet",
     "expand": "Expand",
     "collapse": "Collapse"
   },
@@ -56,6 +57,19 @@
     "area": "Area",
     "next": "Next",
     "cancel": "Cancel",
+    "save": "Save",
+    "update": "Update",
+    "delete": "Delete",
+    "edit": "Edit",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "processing": "Processing...",
+    "actions": "Actions",
+    "previous": "Previous",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
     "date": "Date",
     "contractor": "Contractor",
     "crusher": "Crusher",
@@ -285,7 +299,32 @@
     "clearSearch": "Clear search",
     "pageSize": "Items per page",
     "goToPage": "Go to page",
-    "totalRentals": "Total rentals"
+    "totalRentals": "Total rentals",
+    "type": "Type",
+    "filterBy": "Filter by",
+    "all": "All",
+  "companyEquipment": "Company Equipment",
+    "companyWallet": "Company Wallet",
+    "externalRental": "External Rental",
+    "isCompanyOwned": "Company Owned Equipment",
+    "isCompanyOwnedDescription": "Check if this equipment belongs to the company",
+    "totalCanOverride": "Total can be manually overridden"
+  },
+  "company": {
+    "wallet": {
+      "balance": "Company Balance",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw",
+      "totalTransactions": "Total transactions",
+      "pageSize": "Items per page",
+      "noTransactions": "No transactions found",
+      "noTransactionsDesc": "Start by making a deposit or withdrawal",
+      "date": "Date",
+      "type": "Type",
+      "amount": "Amount",
+      "description": "Description",
+      "reference": "Reference"
+    }
   },
   "expenses": {
     "title": "Expenses",

@@ -152,12 +152,13 @@ import TransportList from './TransportList.vue'
 import TransportReport from './TransportReport.vue'
 import RentalList from './RentalList.vue'
 import ExpensesList from './ExpensesList.vue'
+import CompanyWallet from './CompanyWallet.vue'
 import AuthLogout from '../auth/Logout.vue'
 import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, AuthLogout },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyWallet, AuthLogout },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -165,7 +166,7 @@ export default {
   data() {
     return {
       // menus
-      topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyEquipment: 'companyEquipment' },
+      topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet' },
       selectedTop: 'supplies',
       // vertical submenus map
       menuMap: {
@@ -188,13 +189,15 @@ export default {
         equipmentRent: [
           { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' }
         ],
-        companyEquipment: [
-          { name: 'companyEquipmentPage', label: 'dashboard.companyEquipment', component: { template: '<div>Company equipment content</div>' } }
+        companyWallet: [
+          { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyWallet' }
         ]
       },
 
       // UI state
       selectedVertical: 'newSupply',
+      // Set default for companyWallet
+      defaultCompanyEquipment: 'companyWallet',
       sidebarOpen: false,
       collapsedSidebar: JSON.parse(localStorage.getItem('sidebarCollapsed') || 'false'),
       showLogoutDialog: false,
@@ -225,10 +228,10 @@ export default {
       return this.currentItem ? this.currentItem.label : ''
     },
 
-    // produce component to render (string -> imported component; or inline component)
+      // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return { template: '<div>Select an item</div>' }
-      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList }
+      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyWallet }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || { template: '<div>Component not found</div>' }
@@ -287,7 +290,11 @@ export default {
       this.selectedTop = key
       // set first vertical child
       const first = (this.menuMap[key] && this.menuMap[key][0]) ? this.menuMap[key][0].name : null
-      if (first) this.selectedVertical = first
+      if (first) {
+        this.selectedVertical = first
+      } else if (key === 'companyWallet') {
+        this.selectedVertical = this.defaultCompanyEquipment
+      }
       this.sidebarOpen = false
     },
 
@@ -341,6 +348,7 @@ export default {
         transportList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 13h18v-5H3v5zM5 18h2v2H5v-2zM17 18h2v2h-2v-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         expensesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         rentalList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14h8M8 18h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+        companyWallet: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" fill="currentColor"/></svg>`,
         default: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg>`
       }
       return icons[name] || icons['default']

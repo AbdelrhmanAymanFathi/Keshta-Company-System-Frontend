@@ -275,22 +275,44 @@ export const deleteTransport = (id) =>
   axios.delete(`${BASE_URL}/api/transports/${id}`);
 
 // Rentals
-export const getRentals = (page = 1, pageSize = 20, search = '') => {
-  const params = new URLSearchParams({
+export const getRentals = (params = {}) => {
+  const { page = 1, pageSize = 20, q = '', isCompanyOwned = null } = params;
+  const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
-  if (search) {
-    params.append('search', search);
+  if (q) {
+    queryParams.append('q', q);
   }
-  return axios.get(`${BASE_URL}/api/rentals?${params.toString()}`);
+  if (isCompanyOwned !== null && isCompanyOwned !== undefined) {
+    queryParams.append('isCompanyOwned', isCompanyOwned.toString());
+  }
+  return axios.get(`${BASE_URL}/api/rentals?${queryParams.toString()}`);
 };
+export const getRental = (id) =>
+  axios.get(`${BASE_URL}/api/rentals/${id}`);
 export const createRental = (data) =>
   axios.post(`${BASE_URL}/api/rentals`, data);
 export const updateRental = (id, data) =>
   axios.patch(`${BASE_URL}/api/rentals/${id}`, data);
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
+
+// Company Wallet
+export const getCompanyTransactions = (params = {}) => {
+  const { page = 1, pageSize = 10 } = params;
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  return axios.get(`${BASE_URL}/api/company/wallet/transactions?${queryParams.toString()}`);
+};
+export const depositToCompanyWallet = (data) =>
+  axios.post(`${BASE_URL}/api/company/wallet/deposit`, data);
+export const withdrawFromCompanyWallet = (data) =>
+  axios.post(`${BASE_URL}/api/company/wallet/withdraw`, data);
+export const getCompany = () =>
+  axios.get(`${BASE_URL}/api/company`);
 
 // Expenses
 export const getExpenses = (page = 1, pageSize = 20, search = '') => {

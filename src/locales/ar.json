@@ -5,7 +5,7 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentRent": "إيجار المعدات",
-    "companyEquipment": "معدات الشركة"
+    "companyWallet": "محفظة الشركة"
   },
   "dashboard": {
     "newSupply": "توريدة جديدة",
@@ -18,7 +18,8 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentRent": "إيجار المعدات",
-    "companyEquipment": "معدات الشركة",
+    "companyWallet": "محفظة الشركة",
+    "companyWallet": "محفظة الشركة",
     "expand": "توسيع",
     "collapse": "طي"
   },
@@ -56,6 +57,19 @@
     "area": "المنطقة",
     "next": "التالي",
     "cancel": "إلغاء",
+    "save": "حفظ",
+    "update": "تحديث",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "saving": "جاري الحفظ...",
+    "deleting": "جاري الحذف...",
+    "processing": "جاري المعالجة...",
+    "actions": "الإجراءات",
+    "previous": "السابق",
+    "showing": "عرض",
+    "to": "إلى",
+    "of": "من",
+    "results": "نتيجة",
     "date": "التاريخ",
     "contractor": "المقاول",
     "crusher": "الكسارة",
@@ -285,7 +299,32 @@
     "clearSearch": "مسح البحث",
     "pageSize": "العناصر في الصفحة",
     "goToPage": "الذهاب إلى الصفحة",
-    "totalRentals": "إجمالي الإيجارات"
+    "totalRentals": "إجمالي الإيجارات",
+    "type": "النوع",
+    "filterBy": "تصفية حسب",
+    "all": "الكل",
+  "companyEquipment": "معدات مملوكة للشركة",
+    "companyWallet": "محفظة الشركة",
+    "externalRental": "إيجار خارجي",
+  "isCompanyOwned": "معدات مملوكة للشركة",
+    "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
+    "totalCanOverride": "يمكن تعديل المجموع يدوياً"
+  },
+  "company": {
+    "wallet": {
+      "balance": "رصيد الشركة",
+      "deposit": "إيداع",
+      "withdraw": "سحب",
+      "totalTransactions": "إجمالي المعاملات",
+      "pageSize": "العناصر في الصفحة",
+      "noTransactions": "لا توجد معاملات",
+      "noTransactionsDesc": "ابدأ بإجراء إيداع أو سحب",
+      "date": "التاريخ",
+      "type": "النوع",
+      "amount": "المبلغ",
+      "description": "الوصف",
+      "reference": "المرجع"
+    }
   },
   "expenses": {
     "title": "المصروفات",

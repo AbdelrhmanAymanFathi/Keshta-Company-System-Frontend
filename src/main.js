@@ -1,5 +1,6 @@
 // src/main.js
 import { createApp, watch } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import './assets/main.css'
 import i18n from './i18n'
@@ -7,7 +8,10 @@ import authManager from './auth'
 import './api' // Initialize API with token management
 
 const app = createApp(App)
+const pinia = createPinia()
 
+// use pinia
+app.use(pinia)
 // use i18n
 app.use(i18n)
 
