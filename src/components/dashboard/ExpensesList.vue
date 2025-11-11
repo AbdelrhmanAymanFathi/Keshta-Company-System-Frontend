@@ -16,6 +16,17 @@
         </svg>
         {{ $t('expenses.addExpense') }}
       </button>
+
+      <button 
+        @click="downloadReport" 
+        :disabled="loading || expenses.length === 0"
+        class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-lg"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v-4m0 0V8m0 4H8m4 0h4M4 12a8 8 0 1116 0 8 8 0 01-16 0z"></path>
+        </svg>
+        {{ $t('expenses.exportReport') }}
+      </button>
     </div>
 
     <!-- Search and Filters -->
@@ -271,52 +282,133 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeModal"></div>
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md relative z-10">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" :dir="isRTL ? 'rtl' : 'ltr'">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative z-10">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 sticky top-0">
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ editing ? $t('expenses.editExpense') : $t('expenses.addExpense') }}
+          </h3>
+          <button @click="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
         <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
-              {{ editing ? $t('expenses.editExpense') : $t('expenses.addExpense') }}
-            </h3>
-            <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
           <form @submit.prevent="saveExpense" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.date') }} <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.date" 
-                type="date" 
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
+            <!-- Two-column grid for date and category -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.date') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  v-model="form.date" 
+                  type="date" 
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.category') }} <span class="text-red-500">*</span>
+                </label>
+                <select 
+                  v-model="form.category" 
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">{{ $t('expenses.category') }}</option>
+                  <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.category') }} <span class="text-red-500">*</span>
-              </label>
-              <select 
-                v-model="form.category" 
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              >
-                <option value="">{{ $t('expenses.category') }}</option>
-                <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
-              </select>
+            <!-- Two-column grid for amount and flow -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.amount') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  v-model="form.amount" 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  required
+                  :placeholder="$t('expenses.amount')"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.flow') }} <span class="text-red-500">*</span>
+                </label>
+                <div class="flex gap-2">
+                  <button 
+                    type="button"
+                    @click="form.flow = 'OUT'"
+                    :class="[
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition',
+                      form.flow === 'OUT' 
+                        ? 'bg-red-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ]"
+                  >
+                    {{ $t('expenses.flowOut') }}
+                  </button>
+                  <button 
+                    type="button"
+                    @click="form.flow = 'IN'"
+                    :class="[
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition',
+                      form.flow === 'IN' 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ]"
+                  >
+                    {{ $t('expenses.flowIn') }}
+                  </button>
+                </div>
+              </div>
             </div>
 
+            <!-- Two-column grid for branch and location -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.branch') }}
+                </label>
+                <select 
+                  v-model="form.branchId" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option :value="null">{{ $t('expenses.branch') }}</option>
+                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.location') }}
+                </label>
+                <input 
+                  v-model="form.locationId" 
+                  type="text"
+                  :placeholder="$t('expenses.location')"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            <!-- Full-width description -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('expenses.description') }} <span class="text-red-500">*</span>
               </label>
               <input 
@@ -325,40 +417,24 @@
                 required
                 :placeholder="$t('expenses.description')"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
               />
             </div>
 
+            <!-- Full-width notes -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.amount') }} <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.amount" 
-                type="number" 
-                step="0.01"
-                min="0"
-                required
-                :placeholder="$t('expenses.amount')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('expenses.notes') }}
               </label>
               <textarea 
                 v-model="form.notes" 
-                rows="3"
+                rows="2"
                 :placeholder="$t('expenses.notes')"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
               ></textarea>
             </div>
 
-            <div class="flex gap-3 pt-4" :class="isRTL ? 'flex-row-reverse' : ''">
+            <!-- Action buttons -->
+            <div class="flex gap-3 pt-4 border-t" :class="isRTL ? 'flex-row-reverse' : ''">
               <button 
                 type="button" 
                 @click="closeModal"
@@ -423,13 +499,14 @@
 </template>
 
 <script>
-import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../api'
+import { getExpenses, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches } from '../../api'
 
 export default {
   name: 'ExpensesList',
   data() {
     return {
       expenses: [],
+      branches: [],
       loading: false,
       error: null,
       searchQuery: '',
@@ -438,13 +515,17 @@ export default {
       editing: false,
       saving: false,
       deleting: false,
+      downloading: false,
       form: {
         id: null,
         date: '',
         category: '',
         description: '',
         amount: '',
-        notes: ''
+        notes: '',
+        flow: 'OUT',
+        branchId: null,
+        locationId: null
       },
       deleteConfirm: { open: false, item: null },
       currentPage: 1,
@@ -513,6 +594,7 @@ export default {
   
   async mounted() {
     await this.loadExpenses()
+    await this.fetchBranches()
   },
   
   methods: {
@@ -599,6 +681,9 @@ export default {
         category: '',
         description: '',
         amount: '',
+        flow: 'OUT',
+        branchId: this.branches.length > 0 ? this.branches[0].id : null,
+        locationId: null,
         notes: ''
       }
       this.modalOpen = true
@@ -612,6 +697,9 @@ export default {
         category: expense.category,
         description: expense.description,
         amount: expense.amount,
+        flow: expense.flow || 'OUT',
+        branchId: expense.branchId || null,
+        locationId: expense.locationId || null,
         notes: expense.notes || ''
       }
       this.modalOpen = true
@@ -625,6 +713,9 @@ export default {
         category: '',
         description: '',
         amount: '',
+        flow: 'OUT',
+        branchId: null,
+        locationId: null,
         notes: ''
       }
     },
@@ -640,6 +731,9 @@ export default {
           category: this.form.category,
           description: this.form.description,
           amount: parseFloat(this.form.amount),
+          flow: this.form.flow || 'OUT',
+          branchId: this.form.branchId || null,
+          locationId: this.form.locationId || null,
           notes: this.form.notes || ''
         }
         
@@ -823,6 +917,64 @@ export default {
         style: 'currency',
         currency: 'EGP'
       }).format(amount)
+    },
+    
+    async downloadReport() {
+      this.downloading = true
+      try {
+        const response = await getExpensesReport()
+        // Ensure we have a Blob object
+        const blob = response.data instanceof Blob ? response.data : new Blob([response.data], { type: response.headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+        
+        // Extract filename from Content-Disposition header if available
+        let filename = `expenses-report-${new Date().toISOString().split('T')[0]}.xlsx`
+        const contentDisposition = response.headers['content-disposition']
+        if (contentDisposition) {
+          const match = /filename\*=UTF-8''(.+)$/.exec(contentDisposition) || /filename="?([^"]+)"?/.exec(contentDisposition)
+          if (match) {
+            filename = decodeURIComponent(match[1])
+          }
+        }
+        
+        // Create and download the file
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode.removeChild(link)
+        window.URL.revokeObjectURL(url)
+        
+        if (window.$toast) {
+          window.$toast(this.$t('expenses.reportDownloadSuccess'), 'success')
+        } else {
+          this.showSuccess('Report downloaded successfully')
+        }
+      } catch (error) {
+        console.error('Error downloading report:', error)
+        const message = error.response?.data?.message || this.$t('expenses.reportError') || 'Failed to download report'
+        if (window.$toast) {
+          window.$toast(message, 'error')
+        } else {
+          this.showError(message)
+        }
+      } finally {
+        this.downloading = false
+      }
+    },
+    
+    async fetchBranches() {
+      try {
+        const response = await getBranches()
+        this.branches = response.data || []
+        if (this.branches.length > 0 && !this.form.branchId) {
+          this.form.branchId = this.branches[0].id
+        }
+      } catch (error) {
+        console.error('Error loading branches:', error)
+        this.branches = []
+      }
     },
     
     showSuccess(message) {

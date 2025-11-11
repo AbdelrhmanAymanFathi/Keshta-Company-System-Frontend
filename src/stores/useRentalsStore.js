@@ -1,5 +1,14 @@
 import { defineStore } from 'pinia'
-import { getRentals, createRental, updateRental, deleteRental, getRental } from '@/api'
+import { 
+  getRentals, 
+  createRental, 
+  updateRental, 
+  deleteRental, 
+  getRental,
+  getRentalPayouts,
+  createRentalPayout,
+  deleteRentalPayout
+} from '@/api'
 
 export const useRentalsStore = defineStore('rentals', {
   state: () => ({
@@ -13,7 +22,10 @@ export const useRentalsStore = defineStore('rentals', {
     },
     loading: false,
     error: null,
-    currentRental: null
+    currentRental: null,
+    payouts: [],
+    payoutsLoading: false,
+    payoutsError: null
   }),
 
   getters: {
@@ -146,6 +158,61 @@ export const useRentalsStore = defineStore('rentals', {
         isCompanyOwned: null
       }
       this.page = 1
+    },
+
+    // Payout actions
+    async fetchRentalPayouts(rentalId) {
+      this.payoutsLoading = true
+      this.payoutsError = null
+      try {
+        const response = await getRentalPayouts(rentalId)
+        this.payouts = response.data || []
+        return this.payouts
+      } catch (error) {
+        console.error('Error fetching rental payouts:', error)
+        this.payoutsError = error.response?.data?.message || 'Failed to fetch payouts'
+        throw error
+      } finally {
+        this.payoutsLoading = false
+      }
+    },
+
+    async createRentalPayout(rentalId, payload) {
+      this.payoutsLoading = true
+      this.payoutsError = null
+      try {
+        const response = await createRentalPayout(rentalId, payload)
+        // Refresh payouts list
+        await this.fetchRentalPayouts(rentalId)
+        // Also refresh rentals to get updated paid/remaining values
+        await this.fetchRentals()
+        return response.data
+      } catch (error) {
+        console.error('Error creating payout:', error)
+        this.payoutsError = error.response?.data?.message || 'Failed to create payout'
+        throw error
+      } finally {
+        this.payoutsLoading = false
+      }
+    },
+
+    async deleteRentalPayout(rentalId, payoutId) {
+      this.payoutsLoading = true
+      this.payoutsError = null
+      try {
+        await deleteRentalPayout(rentalId, payoutId)
+        // Refresh payouts list
+        await this.fetchRentalPayouts(rentalId)
+        // Also refresh rentals to get updated paid/remaining values
+        await this.fetchRentals()
+        return true
+      } catch (error) {
+        console.error('Error deleting payout:', error)
+        this.payoutsError = error.response?.data?.message || 'Failed to delete payout'
+        throw error
+      } finally {
+        this.payoutsLoading = false
+      }
     }
   }
 })

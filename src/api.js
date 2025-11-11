@@ -298,6 +298,14 @@ export const updateRental = (id, data) =>
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
 
+// Rental Payouts
+export const getRentalPayouts = (rentalId) =>
+  axios.get(`${BASE_URL}/api/rentals/${rentalId}/payouts`);
+export const createRentalPayout = (rentalId, data) =>
+  axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
+export const deleteRentalPayout = (rentalId, payoutId) =>
+  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
+
 // Company Wallet
 export const getCompanyTransactions = (params = {}) => {
   const { page = 1, pageSize = 10 } = params;
@@ -333,6 +341,17 @@ export const updateExpense = (id, data) =>
   axios.patch(`${BASE_URL}/api/expenses/${id}`, data);
 export const deleteExpense = (id) =>
   axios.delete(`${BASE_URL}/api/expenses/${id}`);
+export const getExpensesReport = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/expenses/report${search ? `?${search}` : ''}`;
+  return axios.get(url, { responseType: 'blob' });
+};
+
+// Branches
+export const getBranches = () =>
+  axios.get(`${BASE_URL}/api/branches`);
+export const createBranch = (data) =>
+  axios.post(`${BASE_URL}/api/branches`, data);
 
 // Export token manager for external use
 export { tokenManager };
@@ -342,19 +361,26 @@ export async function refreshAndSetToken() {
   return await tokenManager.refreshToken();
 }
 
+// Refresh lock mechanism to queue requests during token refresh
+let refreshSubscribers = [];
+let isRefreshing = false;
+
+function subscribeTokenRefresh(callback) {
+  refreshSubscribers.push(callback);
+}
+
+function onRrefreshed(token) {
+  refreshSubscribers.forEach(callback => callback(token));
+  refreshSubscribers = [];
+}
+
 // Enhanced request interceptor
 axios.interceptors.request.use(
   config => {
     const token = tokenManager.getToken();
-    
-    // Check if token is expired before making request
-    if (token && tokenManager.isTokenExpired(token)) {
-      console.log('Token expired, refreshing before request...');
-      // Don't wait for refresh, let response interceptor handle it
-    } else if (token) {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
     return config;
   },
   error => {
@@ -362,7 +388,7 @@ axios.interceptors.request.use(
   }
 );
 
-// Enhanced response interceptor with better error handling
+// Enhanced response interceptor with request queueing during token refresh
 axios.interceptors.response.use(
   response => {
     // Update token if it's in the response (for login/refresh)
@@ -375,45 +401,55 @@ axios.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
     
-    // Log detailed error information for debugging
-    if (error.response) {
+    // Log detailed error information for debugging (only on error, not retry)
+    if (error.response && !originalRequest._retry) {
       console.error('API Error Response:', {
         status: error.response.status,
         statusText: error.response.statusText,
-        responseData: error.response.data,
         url: originalRequest.url,
-        method: originalRequest.method,
-        requestData: originalRequest.data
+        method: originalRequest.method
       });
-    } else if (error.request) {
-      console.error('API Error Request:', error.request);
-    } else {
+    } else if (error.request && !originalRequest._retry) {
+      console.error('API Error Request (no response):', error.message);
+    } else if (!originalRequest._retry) {
       console.error('API Error:', error.message);
     }
     
-    // Handle 401 Unauthorized errors
+    // Handle 401 Unauthorized errors with request queueing
     if (
       error.response &&
       error.response.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes('/api/auth/refresh') // Don't retry refresh endpoint
     ) {
+      if (isRefreshing) {
+        // Queue this request to retry after token refresh
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(axios(originalRequest));
+          });
+        });
+      }
+
       originalRequest._retry = true;
-      
+      isRefreshing = true;
+
       try {
-        console.log('Attempting to refresh token due to 401 error...');
         await tokenManager.refreshToken();
-        
-        // Update the authorization header with new token
         const newToken = tokenManager.getToken();
+        
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          onRrefreshed(newToken);
         }
-        
+
+        isRefreshing = false;
         // Retry the original request
         return axios(originalRequest);
       } catch (refreshError) {
-        console.error('Token refresh failed, logging out user:', refreshError);
+        isRefreshing = false;
+        refreshSubscribers = [];
         tokenManager.handleRefreshFailure();
         return Promise.reject(refreshError);
       }
