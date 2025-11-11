@@ -298,6 +298,14 @@ export const updateRental = (id, data) =>
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
 
+// Rental Payouts
+export const getRentalPayouts = (rentalId) =>
+  axios.get(`${BASE_URL}/api/rentals/${rentalId}/payouts`);
+export const createRentalPayout = (rentalId, data) =>
+  axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
+export const deleteRentalPayout = (rentalId, payoutId) =>
+  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
+
 // Company Wallet
 export const getCompanyTransactions = (params = {}) => {
   const { page = 1, pageSize = 10 } = params;
@@ -333,6 +341,17 @@ export const updateExpense = (id, data) =>
   axios.patch(`${BASE_URL}/api/expenses/${id}`, data);
 export const deleteExpense = (id) =>
   axios.delete(`${BASE_URL}/api/expenses/${id}`);
+export const getExpensesReport = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/expenses/report${search ? `?${search}` : ''}`;
+  return axios.get(url, { responseType: 'blob' });
+};
+
+// Branches
+export const getBranches = () =>
+  axios.get(`${BASE_URL}/api/branches`);
+export const createBranch = (data) =>
+  axios.post(`${BASE_URL}/api/branches`, data);
 
 // Export token manager for external use
 export { tokenManager };
