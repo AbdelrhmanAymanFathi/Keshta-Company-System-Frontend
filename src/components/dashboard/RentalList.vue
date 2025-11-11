@@ -163,6 +163,12 @@
                 {{ $t('rental.total') }}
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {{ $t('rental.paid') }}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {{ $t('rental.remaining') }}
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ $t('rental.notes') }}
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -195,11 +201,21 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                 {{ formatCurrency(rental.total) }}
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                {{ formatCurrency(rental.paid || 0) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
+                {{ formatCurrency(rental.remaining || 0) }}
+              </td>
               <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                 {{ rental.notes || '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex gap-2">
+                  <button @click="openPayoutsModal(rental)" 
+                    class="text-green-600 hover:text-green-900 transition font-medium">
+                    {{ $t('rental.payouts') }}
+                  </button>
                   <button @click="openEditModal(rental)" 
                     class="text-indigo-600 hover:text-indigo-900 transition">
                     {{ $t('labels.edit') }}
@@ -329,6 +345,78 @@
       @confirm="deleteRental"
       @cancel="showDeleteModal = false"
     />
+
+    <!-- Payouts Modal -->
+    <div v-if="showPayoutsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closePayoutsModal">
+      <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white m-4">
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">
+            {{ $t('rental.payouts') }} - {{ selectedRentalForPayouts?.name }}
+          </h3>
+
+          <!-- Add Payout Form -->
+          <div class="mb-6 pb-6 border-b">
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.addPayout') }}</h4>
+            <div class="grid grid-cols-3 gap-4">
+              <input 
+                v-model="payoutForm.amount" 
+                type="number" 
+                placeholder="Amount" 
+                class="border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+              <input 
+                v-model="payoutForm.date" 
+                type="date" 
+                class="border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+              <input 
+                v-model="payoutForm.notes" 
+                type="text" 
+                placeholder="Notes (optional)" 
+                class="border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+            </div>
+            <button 
+              @click="savePayout" 
+              :disabled="!payoutForm.amount || rentalsStore.payoutsLoading"
+              class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm">
+              {{ rentalsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
+            </button>
+          </div>
+
+          <!-- Payouts List -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.payoutsList') }}</h4>
+            <div v-if="rentalsStore.payouts.length === 0" class="text-center py-4 text-gray-500">
+              {{ $t('rental.noPayouts') }}
+            </div>
+            <div v-else class="space-y-2 max-h-96 overflow-y-auto">
+              <div v-for="payout in rentalsStore.payouts" :key="payout.id" class="flex items-center justify-between bg-gray-50 p-3 rounded border">
+                <div>
+                  <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
+                  <div class="text-xs text-gray-500">{{ formatDate(payout.date) }}</div>
+                  <div v-if="payout.notes" class="text-xs text-gray-600">{{ payout.notes }}</div>
+                </div>
+                <button 
+                  @click="deletePayout(payout.id)" 
+                  :disabled="rentalsStore.payoutsLoading"
+                  class="text-red-600 hover:text-red-900 text-sm">
+                  {{ $t('labels.delete') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex justify-end gap-2">
+            <button 
+              @click="closePayoutsModal" 
+              class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+              {{ $t('labels.close') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -362,6 +450,14 @@ export default {
       total: 0,
       notes: '',
       isCompanyOwned: true
+    })
+
+    const showPayoutsModal = ref(false)
+    const selectedRentalForPayouts = ref(null)
+    const payoutForm = ref({
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
+      notes: ''
     })
 
     const visiblePages = computed(() => {
@@ -554,6 +650,73 @@ export default {
       }).format(amount)
     }
 
+    const openPayoutsModal = async (rental) => {
+      selectedRentalForPayouts.value = rental
+      showPayoutsModal.value = true
+      try {
+        await rentalsStore.fetchRentalPayouts(rental.id)
+      } catch (error) {
+        console.error('Failed to load payouts:', error)
+        if (window.$toast) {
+          window.$toast('Failed to load payouts', 'error')
+        }
+      }
+    }
+
+    const closePayoutsModal = () => {
+      showPayoutsModal.value = false
+      selectedRentalForPayouts.value = null
+      payoutForm.value = {
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        notes: ''
+      }
+    }
+
+    const savePayout = async () => {
+      if (!payoutForm.value.amount || payoutForm.value.amount <= 0) {
+        if (window.$toast) {
+          window.$toast('Please enter a valid amount', 'error')
+        }
+        return
+      }
+
+      try {
+        await rentalsStore.createRentalPayout(selectedRentalForPayouts.value.id, {
+          amount: parseFloat(payoutForm.value.amount),
+          date: payoutForm.value.date,
+          notes: payoutForm.value.notes
+        })
+        if (window.$toast) {
+          window.$toast('Payout created successfully', 'success')
+        }
+        payoutForm.value = {
+          amount: '',
+          date: new Date().toISOString().split('T')[0],
+          notes: ''
+        }
+      } catch (error) {
+        console.error('Error creating payout:', error)
+        if (window.$toast) {
+          window.$toast(error.response?.data?.message || 'Failed to create payout', 'error')
+        }
+      }
+    }
+
+    const deletePayout = async (payoutId) => {
+      try {
+        await rentalsStore.deleteRentalPayout(selectedRentalForPayouts.value.id, payoutId)
+        if (window.$toast) {
+          window.$toast('Payout deleted successfully', 'success')
+        }
+      } catch (error) {
+        console.error('Error deleting payout:', error)
+        if (window.$toast) {
+          window.$toast(error.response?.data?.message || 'Failed to delete payout', 'error')
+        }
+      }
+    }
+
     // Watch only the specific filter properties we care about and reload.
     // Watching the entire filters object with deep: true could re-run when
     // unrelated reactive changes occur; this can lead to recursive updates
@@ -579,6 +742,9 @@ export default {
       rentalsStore,
       showModal,
       showDeleteModal,
+      showPayoutsModal,
+      selectedRentalForPayouts,
+      payoutForm,
       isEditing,
       saving,
       deleting,
@@ -592,7 +758,11 @@ export default {
       openAddModal,
       openEditModal,
       saveRental,
-  closeModal,
+      closeModal,
+      openPayoutsModal,
+      closePayoutsModal,
+      savePayout,
+      deletePayout,
       confirmDelete,
       deleteRental,
       formatDate,
