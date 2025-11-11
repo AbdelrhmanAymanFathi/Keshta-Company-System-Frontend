@@ -424,7 +424,7 @@ axios.interceptors.response.use(
     ) {
       if (isRefreshing) {
         // Queue this request to retry after token refresh
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           subscribeTokenRefresh((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
             resolve(axios(originalRequest));
