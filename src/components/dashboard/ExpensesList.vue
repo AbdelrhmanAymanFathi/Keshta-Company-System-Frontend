@@ -903,17 +903,32 @@ export default {
     async downloadReport() {
       this.downloading = true
       try {
-        const blob = await getExpensesReport()
+        const response = await getExpensesReport()
+        // Ensure we have a Blob object
+        const blob = response.data instanceof Blob ? response.data : new Blob([response.data], { type: response.headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+        
+        // Extract filename from Content-Disposition header if available
+        let filename = `expenses-report-${new Date().toISOString().split('T')[0]}.xlsx`
+        const contentDisposition = response.headers['content-disposition']
+        if (contentDisposition) {
+          const match = /filename\*=UTF-8''(.+)$/.exec(contentDisposition) || /filename="?([^"]+)"?/.exec(contentDisposition)
+          if (match) {
+            filename = decodeURIComponent(match[1])
+          }
+        }
+        
+        // Create and download the file
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', `expenses-report-${new Date().toISOString().split('T')[0]}.xlsx`)
+        link.setAttribute('download', filename)
         document.body.appendChild(link)
         link.click()
         link.parentNode.removeChild(link)
         window.URL.revokeObjectURL(url)
+        
         if (window.$toast) {
-          window.$toast(this.$t('expenses.exportReport') + ' ' + this.$t('common.success'), 'success')
+          window.$toast(this.$t('expenses.reportDownloadSuccess'), 'success')
         } else {
           this.showSuccess('Report downloaded successfully')
         }
