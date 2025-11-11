@@ -84,7 +84,13 @@
     <div class="bg-gray-50 rounded-lg p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div class="text-sm text-gray-600">
-          {{ $t('rental.totalRentals') }}: <span class="font-semibold">{{ rentalsStore.total }}</span>
+          {{ $t('rental.totalRentals') }}:
+          <span class="font-semibold" v-if="rentalsStore.filters.isCompanyOwned === null">
+            {{ rentalsStore.total }}
+          </span>
+          <span class="font-semibold" v-else>
+            {{ filteredItems.length }} / {{ rentalsStore.total }}
+          </span>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <label>{{ $t('rental.pageSize') }}:</label>
@@ -177,7 +183,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="rental in rentalsStore.items" :key="rental.id" class="hover:bg-gray-50">
+            <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ formatDate(rental.date) }}
               </td>
@@ -357,7 +363,7 @@
           <!-- Add Payout Form -->
           <div class="mb-6 pb-6 border-b">
             <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.addPayout') }}</h4>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <input 
                 v-model="payoutForm.amount" 
                 type="number" 
@@ -367,6 +373,12 @@
               <input 
                 v-model="payoutForm.date" 
                 type="date" 
+                class="border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+              <input 
+                v-model="payoutForm.settlementDate" 
+                type="date" 
+                placeholder="Settlement Date (optional)" 
                 class="border border-gray-300 rounded px-3 py-2 text-sm"
               />
               <input 
@@ -457,7 +469,8 @@ export default {
     const payoutForm = ref({
       amount: '',
       date: new Date().toISOString().split('T')[0],
-      notes: ''
+      notes: '',
+      settlementDate: ''
     })
 
     const visiblePages = computed(() => {
@@ -480,6 +493,25 @@ export default {
         pages.push(i)
       }
       return pages
+    })
+
+    // Client-side filtered items as a temporary workaround in case backend
+    // doesn't apply the isCompanyOwned filter. This keeps the UI responsive
+    // while the API is fixed. It does not modify pagination/total from the server.
+    const filteredItems = computed(() => {
+      const filter = rentalsStore.filters.isCompanyOwned
+      if (filter === null || filter === undefined) return rentalsStore.items
+      return rentalsStore.items.filter(item => {
+        const val = item.isCompanyOwned
+        if (typeof val === 'boolean') return val === filter
+        if (typeof val === 'string') {
+          const s = val.toLowerCase()
+          if (s === 'true' || s === '1') return filter === true
+          if (s === 'false' || s === '0') return filter === false
+        }
+        if (typeof val === 'number') return (val === 1) === filter
+        return Boolean(val) === Boolean(filter)
+      })
     })
 
     const onSearchInput = (event) => {
@@ -669,7 +701,8 @@ export default {
       payoutForm.value = {
         amount: '',
         date: new Date().toISOString().split('T')[0],
-        notes: ''
+        notes: '',
+        settlementDate: ''
       }
     }
 
@@ -685,7 +718,9 @@ export default {
         await rentalsStore.createRentalPayout(selectedRentalForPayouts.value.id, {
           amount: parseFloat(payoutForm.value.amount),
           date: payoutForm.value.date,
-          notes: payoutForm.value.notes
+          notes: payoutForm.value.notes,
+          // include settlementDate if provided
+          ...(payoutForm.value.settlementDate ? { settlementDate: payoutForm.value.settlementDate } : {})
         })
         if (window.$toast) {
           window.$toast('Payout created successfully', 'success')
@@ -693,7 +728,8 @@ export default {
         payoutForm.value = {
           amount: '',
           date: new Date().toISOString().split('T')[0],
-          notes: ''
+          notes: '',
+          settlementDate: ''
         }
       } catch (error) {
         console.error('Error creating payout:', error)
@@ -750,6 +786,7 @@ export default {
       deleting,
       form,
       visiblePages,
+  filteredItems,
       onSearchInput,
       clearSearch,
       setCompanyOwnedFilter,
