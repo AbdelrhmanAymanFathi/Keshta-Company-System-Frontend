@@ -89,7 +89,7 @@
             {{ rentalsStore.total }}
           </span>
           <span class="font-semibold" v-else>
-            {{ filteredItems.length }} / {{ rentalsStore.total }}
+            {{ filteredItems.length }}
           </span>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
@@ -502,15 +502,36 @@ export default {
       const filter = rentalsStore.filters.isCompanyOwned
       if (filter === null || filter === undefined) return rentalsStore.items
       return rentalsStore.items.filter(item => {
-        const val = item.isCompanyOwned
-        if (typeof val === 'boolean') return val === filter
-        if (typeof val === 'string') {
-          const s = val.toLowerCase()
-          if (s === 'true' || s === '1') return filter === true
-          if (s === 'false' || s === '0') return filter === false
+        // Primary: explicit boolean field
+  if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) {
+          const val = item.isCompanyOwned
+          if (typeof val === 'boolean') return val === filter
+          if (typeof val === 'string') {
+            const s = val.toLowerCase()
+            if (s === 'true' || s === '1') return filter === true
+            if (s === 'false' || s === '0') return filter === false
+          }
+          if (typeof val === 'number') return (val === 1) === filter
+          return Boolean(val) === Boolean(filter)
         }
-        if (typeof val === 'number') return (val === 1) === filter
-        return Boolean(val) === Boolean(filter)
+
+        // Fallbacks: some APIs use different fields to describe ownership/type
+        const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership]
+        for (const c of candidates) {
+          if (!c && c !== 0) continue
+          const s = String(c).toLowerCase()
+          if (s.includes('company') || s.includes('owned') || s === 'company') {
+            return filter === true
+          }
+          if (s.includes('external') || s.includes('third') || s.includes('vendor') || s === 'external') {
+            return filter === false
+          }
+          if (s === '1' || s === 'true') return filter === true
+          if (s === '0' || s === 'false') return filter === false
+        }
+
+        // Last resort: if no explicit info, assume company-owned=false when field missing
+        return filter === false ? true : false
       })
     })
 
