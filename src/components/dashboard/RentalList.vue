@@ -82,9 +82,14 @@
 
     <!-- Stats Bar -->
     <div class="bg-gray-50 rounded-lg p-4">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div class="text-sm text-gray-600">
-          {{ $t('rental.totalRentals') }}: <span class="font-semibold">{{ rentalsStore.total }}</span>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div class="flex flex-col gap-2 text-sm text-gray-600">
+          <div>
+            {{ $t('rental.totalCount') }}: <span class="font-semibold">{{ filteredItems.length }}</span>
+          </div>
+          <div>
+            {{ $t('rental.totalSum') }}: <span class="font-semibold">{{ formatCurrency(totalSum) }}</span>
+          </div>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <label>{{ $t('rental.pageSize') }}:</label>
@@ -482,6 +487,49 @@ export default {
       return pages
     })
 
+    // Client-side filtered items based on ownership filter
+    const filteredItems = computed(() => {
+      const filter = rentalsStore.filters.isCompanyOwned
+      if (filter === null || filter === undefined) return rentalsStore.items
+      return rentalsStore.items.filter(item => {
+        // Primary: explicit boolean field
+        if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) {
+          const val = item.isCompanyOwned
+          if (typeof val === 'boolean') return val === filter
+          if (typeof val === 'string') {
+            const s = val.toLowerCase()
+            if (s === 'true' || s === '1') return filter === true
+            if (s === 'false' || s === '0') return filter === false
+          }
+          if (typeof val === 'number') return (val === 1) === filter
+          return Boolean(val) === Boolean(filter)
+        }
+        // Fallbacks: some APIs use different fields
+        const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership]
+        for (const c of candidates) {
+          if (!c && c !== 0) continue
+          const s = String(c).toLowerCase()
+          if (s.includes('company') || s.includes('owned') || s === 'company') {
+            return filter === true
+          }
+          if (s.includes('external') || s.includes('third') || s.includes('vendor') || s === 'external') {
+            return filter === false
+          }
+          if (s === '1' || s === 'true') return filter === true
+          if (s === '0' || s === 'false') return filter === false
+        }
+        return filter === false ? true : false
+      })
+    })
+
+    // Calculate total sum of all visible filtered items
+    const totalSum = computed(() => {
+      return filteredItems.value.reduce((sum, item) => {
+        const itemTotal = parseFloat(String(item.total || 0).replace(/,/g, '')) || 0
+        return sum + itemTotal
+      }, 0)
+    })
+
     const onSearchInput = (event) => {
       if (searchTimeout.value) {
         clearTimeout(searchTimeout.value)
@@ -750,6 +798,8 @@ export default {
       deleting,
       form,
       visiblePages,
+      filteredItems,
+      totalSum,
       onSearchInput,
       clearSearch,
       setCompanyOwnedFilter,
