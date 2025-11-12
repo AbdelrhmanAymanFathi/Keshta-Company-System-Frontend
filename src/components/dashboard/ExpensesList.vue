@@ -347,7 +347,7 @@
               <div class="flex gap-2">
                 <button 
                   type="button"
-                  @click="form.flow = 'OUT'"
+                  @click="form.flow = 'OUT'; form.settlementDate = null"
                   :class="[
                     'flex-1 px-3 py-2 rounded-lg font-medium transition',
                     form.flow === 'OUT' 
@@ -370,6 +370,21 @@
                   {{ $t('expenses.flowIn') }}
                 </button>
               </div>
+            </div>
+
+            <!-- Settlement Date (only for IN/Income) -->
+            <div v-if="form.flow === 'IN'" class="animate-in fade-in">
+              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.settlementDate') }}
+              </label>
+              <input 
+                v-model="form.settlementDate" 
+                type="date" 
+                :placeholder="$t('expenses.settlementDatePlaceholder')"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                :class="isRTL ? 'text-right' : 'text-left'"
+              />
+              <p class="text-xs text-gray-500 mt-1">{{ $t('expenses.settlementDateHint') }}</p>
             </div>
 
             <div>
@@ -506,7 +521,8 @@ export default {
         notes: '',
         flow: 'OUT',
         branchId: null,
-        locationId: null
+        locationId: null,
+        settlementDate: null
       },
       deleteConfirm: { open: false, item: null },
       currentPage: 1,
@@ -665,7 +681,8 @@ export default {
         flow: 'OUT',
         branchId: this.branches.length > 0 ? this.branches[0].id : null,
         locationId: null,
-        notes: ''
+        notes: '',
+        settlementDate: null
       }
       this.modalOpen = true
     },
@@ -681,7 +698,8 @@ export default {
         flow: expense.flow || 'OUT',
         branchId: expense.branchId || null,
         locationId: expense.locationId || null,
-        notes: expense.notes || ''
+        notes: expense.notes || '',
+        settlementDate: expense.settlementDate || null
       }
       this.modalOpen = true
     },
@@ -697,7 +715,8 @@ export default {
         flow: 'OUT',
         branchId: null,
         locationId: null,
-        notes: ''
+        notes: '',
+        settlementDate: null
       }
     },
     
@@ -716,6 +735,11 @@ export default {
           branchId: this.form.branchId || null,
           locationId: this.form.locationId || null,
           notes: this.form.notes || ''
+        }
+        
+        // Include settlementDate only for IN flow and when provided
+        if (this.form.flow === 'IN' && this.form.settlementDate) {
+          expenseData.settlementDate = this.form.settlementDate
         }
         
         console.log('Sending expense data:', expenseData)
