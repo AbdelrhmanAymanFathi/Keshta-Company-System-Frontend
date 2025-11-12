@@ -689,6 +689,18 @@ export default {
     
     openEditModal(expense) {
       this.editing = true
+      
+      // Extract settlementDate from nested structure if present
+      let settlementDate = null
+      if (expense.settlementDate) {
+        // Handle both direct and nested settlementDate
+        if (typeof expense.settlementDate === 'string') {
+          settlementDate = expense.settlementDate.split('T')[0]
+        } else if (typeof expense.settlementDate === 'object') {
+          settlementDate = expense.settlementDate.date || null
+        }
+      }
+      
       this.form = {
         id: expense.id,
         date: expense.date.split('T')[0],
@@ -699,7 +711,7 @@ export default {
         branchId: expense.branchId || null,
         locationId: expense.locationId || null,
         notes: expense.notes || '',
-        settlementDate: expense.settlementDate || null
+        settlementDate: settlementDate
       }
       this.modalOpen = true
     },
