@@ -491,34 +491,68 @@ export default {
     const filteredItems = computed(() => {
       const filter = rentalsStore.filters.isCompanyOwned
       if (filter === null || filter === undefined) return rentalsStore.items
+      
       return rentalsStore.items.filter(item => {
-        // Primary: explicit boolean field
+        // Normalize the ownership value with comprehensive fallbacks
+        let isCompanyOwned = null
+        
+        // Primary: explicit isCompanyOwned field
         if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) {
           const val = item.isCompanyOwned
-          if (typeof val === 'boolean') return val === filter
-          if (typeof val === 'string') {
-            const s = val.toLowerCase()
-            if (s === 'true' || s === '1') return filter === true
-            if (s === 'false' || s === '0') return filter === false
+          if (typeof val === 'boolean') {
+            isCompanyOwned = val
+          } else if (typeof val === 'string') {
+            const s = val.toLowerCase().trim()
+            if (s === 'true' || s === '1' || s === 'yes') {
+              isCompanyOwned = true
+            } else if (s === 'false' || s === '0' || s === 'no') {
+              isCompanyOwned = false
+            }
+          } else if (typeof val === 'number') {
+            isCompanyOwned = (val !== 0)
           }
-          if (typeof val === 'number') return (val === 1) === filter
-          return Boolean(val) === Boolean(filter)
+          
+          if (isCompanyOwned !== null) {
+            return isCompanyOwned === filter
+          }
         }
-        // Fallbacks: some APIs use different fields
-        const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership]
-        for (const c of candidates) {
-          if (!c && c !== 0) continue
-          const s = String(c).toLowerCase()
-          if (s.includes('company') || s.includes('owned') || s === 'company') {
+        
+        // Fallback 1: Check ownerType field
+        if (item.ownerType) {
+          const s = String(item.ownerType).toLowerCase().trim()
+          if (s === 'company' || s === 'internal' || s === '1' || s === 'true') {
             return filter === true
           }
-          if (s.includes('external') || s.includes('third') || s.includes('vendor') || s === 'external') {
+          if (s === 'external' || s === 'vendor' || s === 'third-party' || s === '0' || s === 'false') {
             return filter === false
           }
-          if (s === '1' || s === 'true') return filter === true
-          if (s === '0' || s === 'false') return filter === false
         }
-        return filter === false ? true : false
+        
+        // Fallback 2: Check rental type naming patterns
+        if (item.rentalType) {
+          const s = String(item.rentalType).toLowerCase().trim()
+          if (s.includes('company') || s.includes('owned') || s.includes('internal')) {
+            return filter === true
+          }
+          if (s.includes('external') || s.includes('vendor') || s.includes('third')) {
+            return filter === false
+          }
+        }
+        
+        // Fallback 3: Check name for clues (e.g., "Company Truck", "External Equipment")
+        if (item.name) {
+          const n = String(item.name).toLowerCase()
+          if (n.includes('company') || n.includes('internal')) {
+            return filter === true
+          }
+          if (n.includes('external') || n.includes('vendor') || n.includes('rental')) {
+            return filter === false
+          }
+        }
+        
+        // Default: when field is missing or unclear, assume company-owned (true)
+        // This preserves backward compatibility with incomplete data
+        return filter === true
       })
     })
 
