@@ -518,8 +518,8 @@ export default {
           if (s === '1' || s === 'true') return filter === true
           if (s === '0' || s === 'false') return filter === false
         }
-        // Default: if no matching field found, don't filter (show item)
-        return true
+        // Default: if no matching field found, EXCLUDE when a filter is applied
+        return false
       })
     })
 

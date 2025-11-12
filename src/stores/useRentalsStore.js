@@ -42,9 +42,8 @@ export const useRentalsStore = defineStore('rentals', {
           page: this.page,
           pageSize: this.pageSize,
           q: this.filters.q
-        }
-        if (this.filters.isCompanyOwned !== null) {
-          params.isCompanyOwned = this.filters.isCompanyOwned
+          // NOTE: isCompanyOwned filter is handled client-side in RentalList.vue
+          // Do NOT send it to backend - let frontend do the filtering
         }
         const response = await getRentals(params)
         this.items = response.data.items || []
