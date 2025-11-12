@@ -226,6 +226,16 @@ export const updateLocation = (id, data) =>
 export const deleteLocation = (id) =>
   axios.delete(`${BASE_URL}/api/locations`, { data: { id } });
 
+// Branches
+export const getBranches = () =>
+  axios.get(`${BASE_URL}/api/branches`);
+export const createBranch = (data) =>
+  axios.post(`${BASE_URL}/api/branches`, data);
+export const updateBranch = (id, data) =>
+  axios.patch(`${BASE_URL}/api/branches/${id}`, data);
+export const deleteBranch = (id) =>
+  axios.delete(`${BASE_URL}/api/branches/${id}`);
+
 // Vehicles
 export const getVehicles = () =>
   axios.get(`${BASE_URL}/api/vehicles`);

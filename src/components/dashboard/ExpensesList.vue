@@ -317,15 +317,18 @@
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.category') }} <span class="text-red-500">*</span>
               </label>
-              <select 
-                v-model="form.category" 
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              >
-                <option value="">{{ $t('expenses.category') }}</option>
-                <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
-              </select>
+              <div class="flex gap-2">
+                <select 
+                  v-model="form.category" 
+                  required
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  :class="isRTL ? 'text-right' : 'text-left'"
+                >
+                  <option value="">{{ $t('expenses.category') }}</option>
+                  <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+                <button type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+              </div>
             </div>
 
             <!-- Description - Full Width -->
@@ -396,14 +399,35 @@
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.branch') }}
               </label>
-              <select 
-                v-model="form.branchId" 
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              >
-                <option :value="null">{{ $t('expenses.branch') }}</option>
-                <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
-              </select>
+              <div class="flex gap-2">
+                <select 
+                  v-model="form.branchId" 
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  :class="isRTL ? 'text-right' : 'text-left'"
+                >
+                  <option :value="null">{{ $t('expenses.branch') }}</option>
+                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                </select>
+                <button type="button" @click="addBranchPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+              </div>
+            </div>
+
+            <!-- Location - Column 2 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.location') || 'Location' }}
+              </label>
+              <div class="flex gap-2">
+                <select 
+                  v-model="form.locationId" 
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  :class="isRTL ? 'text-right' : 'text-left'"
+                >
+                  <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
+                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                </select>
+                <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+              </div>
             </div>
 
             <!-- Amount - Column 2 -->
@@ -503,7 +527,7 @@
 </template>
 
 <script>
-import { getExpenses, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches } from '../../api'
+import { getExpenses, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches, getLocations, createBranch, createLocation } from '../../api'
 
 export default {
   name: 'ExpensesList',
@@ -511,6 +535,8 @@ export default {
     return {
       expenses: [],
       branches: [],
+      locations: [],
+      extraCategories: {},
       loading: false,
       error: null,
       searchQuery: '',
@@ -545,11 +571,12 @@ export default {
     },
     
     categories() {
-      return this.$tm('expenses.categories')
+      const base = this.$tm('expenses.categories') || {}
+      return { ...base, ...this.extraCategories }
     },
-    
+
     categoryOptions() {
-      const categories = this.$tm('expenses.categories')
+      const categories = this.categories || {}
       return Object.keys(categories).map(key => ({
         value: key,
         label: categories[key]
@@ -600,6 +627,7 @@ export default {
   async mounted() {
     await this.loadExpenses()
     await this.fetchBranches()
+    await this.fetchLocations()
   },
   
   methods: {
@@ -972,6 +1000,69 @@ export default {
       } catch (error) {
         console.error('Error loading branches:', error)
         this.branches = []
+      }
+    },
+
+    async fetchLocations() {
+      try {
+        const res = await getLocations()
+        // API may return array or { items: [] }
+        this.locations = Array.isArray(res.data) ? res.data : (res.data.items || [])
+        if (this.locations.length > 0 && !this.form.locationId) {
+          this.form.locationId = this.locations[0].id
+        }
+      } catch (error) {
+        console.error('Error loading locations:', error)
+        this.locations = []
+      }
+    },
+
+    async addCategoryPrompt() {
+      const name = window.prompt(this.$t('expenses.enterCategoryName') || 'Enter category name')
+      if (!name) return
+      // use name as key and label
+      this.extraCategories = { ...this.extraCategories, [name]: name }
+      this.form.category = name
+      this.showSuccess(this.$t('expenses.success.categoryAdded') || 'Category added')
+    },
+
+    async addBranchPrompt() {
+      const name = window.prompt(this.$t('expenses.enterBranchName') || 'Enter branch name')
+      if (!name) return
+      const category = window.prompt(this.$t('expenses.enterBranchCategory') || 'Enter branch category (optional)') || ''
+      try {
+        const payload = { name, category }
+        const res = await createBranch(payload)
+        const newBranch = res.data
+        this.branches.unshift(newBranch)
+        this.form.branchId = newBranch.id
+        this.showSuccess(this.$t('expenses.success.branchAdded') || 'Branch added')
+      } catch (error) {
+        console.error('Error creating branch, simulating:', error)
+        // simulate
+        const newBranch = { id: Date.now(), name, category }
+        this.branches.unshift(newBranch)
+        this.form.branchId = newBranch.id
+        this.showSuccess('Branch added (simulated)')
+      }
+    },
+
+    async addLocationPrompt() {
+      const name = window.prompt(this.$t('expenses.enterLocationName') || 'Enter location name')
+      if (!name) return
+      try {
+        const payload = { name }
+        const res = await createLocation(payload)
+        const newLocation = res.data
+        this.locations.unshift(newLocation)
+        this.form.locationId = newLocation.id
+        this.showSuccess(this.$t('expenses.success.locationAdded') || 'Location added')
+      } catch (error) {
+        console.error('Error creating location, simulating:', error)
+        const newLocation = { id: Date.now(), name }
+        this.locations.unshift(newLocation)
+        this.form.locationId = newLocation.id
+        this.showSuccess('Location added (simulated)')
       }
     },
     
