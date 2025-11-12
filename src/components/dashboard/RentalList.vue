@@ -182,7 +182,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="rental in rentalsStore.items" :key="rental.id" class="hover:bg-gray-50">
+            <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ formatDate(rental.date) }}
               </td>
@@ -507,7 +507,7 @@ export default {
         // Fallbacks: some APIs use different fields
         const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership]
         for (const c of candidates) {
-          if (!c && c !== 0) continue
+          if (!c && c !== 0) continue  // Skip if null/undefined but allow 0
           const s = String(c).toLowerCase()
           if (s.includes('company') || s.includes('owned') || s === 'company') {
             return filter === true
@@ -518,7 +518,8 @@ export default {
           if (s === '1' || s === 'true') return filter === true
           if (s === '0' || s === 'false') return filter === false
         }
-        return filter === false ? true : false
+        // Default: if no matching field found, don't filter (show item)
+        return true
       })
     })
 
