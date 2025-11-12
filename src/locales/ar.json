@@ -307,7 +307,7 @@
     "pageSize": "العناصر في الصفحة",
     "goToPage": "الذهاب إلى الصفحة",
     "totalRentals": "إجمالي الإيجارات",
-    "totalCount": "العدد",
+        "totalCount": "إجمالي الإيجارات",
     "totalSum": "المجموع الكلي",
     "type": "النوع",
     "filterBy": "تصفية حسب",
