@@ -1,11 +1,7 @@
 import axios from 'axios';
-// Default to current origin so requests go through nginx in prod and 
-// avoid CORS
-// const BASE_URL = process.env.VUE_APP_API_BASE_URL || (typeof window !== 
-// 'undefined' ? window.location.origin : 'http://127.0.0.1:8080');
 
-// Base URL for API requests
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+// Base URL for API requests - loaded from .env file
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
 
 // Token management utilities
 class TokenManager {
@@ -298,14 +294,6 @@ export const updateRental = (id, data) =>
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
 
-// Rental Payouts
-export const getRentalPayouts = (rentalId) =>
-  axios.get(`${BASE_URL}/api/rentals/${rentalId}/payouts`);
-export const createRentalPayout = (rentalId, data) =>
-  axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
-export const deleteRentalPayout = (rentalId, payoutId) =>
-  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
-
 // Company Wallet
 export const getCompanyTransactions = (params = {}) => {
   const { page = 1, pageSize = 10 } = params;
@@ -341,17 +329,6 @@ export const updateExpense = (id, data) =>
   axios.patch(`${BASE_URL}/api/expenses/${id}`, data);
 export const deleteExpense = (id) =>
   axios.delete(`${BASE_URL}/api/expenses/${id}`);
-export const getExpensesReport = (params = {}) => {
-  const search = new URLSearchParams(params).toString();
-  const url = `${BASE_URL}/api/expenses/report${search ? `?${search}` : ''}`;
-  return axios.get(url, { responseType: 'blob' });
-};
-
-// Branches
-export const getBranches = () =>
-  axios.get(`${BASE_URL}/api/branches`);
-export const createBranch = (data) =>
-  axios.post(`${BASE_URL}/api/branches`, data);
 
 // Export token manager for external use
 export { tokenManager };
