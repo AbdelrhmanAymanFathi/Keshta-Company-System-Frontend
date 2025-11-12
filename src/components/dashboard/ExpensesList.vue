@@ -282,63 +282,68 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeModal"></div>
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md relative z-10">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" :dir="isRTL ? 'rtl' : 'ltr'">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative z-10">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 sticky top-0">
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ editing ? $t('expenses.editExpense') : $t('expenses.addExpense') }}
+          </h3>
+          <button @click="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
         <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
-              {{ editing ? $t('expenses.editExpense') : $t('expenses.addExpense') }}
-            </h3>
-            <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
           <form @submit.prevent="saveExpense" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.date') }} <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.date" 
-                type="date" 
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
+            <!-- Two-column grid for date and category -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.date') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  v-model="form.date" 
+                  type="date" 
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.category') }} <span class="text-red-500">*</span>
+                </label>
+                <select 
+                  v-model="form.category" 
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">{{ $t('expenses.category') }}</option>
+                  <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.category') }} <span class="text-red-500">*</span>
-              </label>
-              <select 
-                v-model="form.category" 
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              >
-                <option value="">{{ $t('expenses.category') }}</option>
-                <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.description') }} <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.description" 
-                type="text" 
-                required
-                :placeholder="$t('expenses.description')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
-            </div>
+            <!-- Two-column grid for amount and flow -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.amount') }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  v-model="form.amount" 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  required
+                  :placeholder="$t('expenses.amount')"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
@@ -347,7 +352,7 @@
               <div class="flex gap-2">
                 <button 
                   type="button"
-                  @click="form.flow = 'OUT'; form.settlementDate = null"
+                  @click="form.flow = 'OUT'"
                   :class="[
                     'flex-1 px-3 py-2 rounded-lg font-medium transition',
                     form.flow === 'OUT' 
@@ -387,50 +392,63 @@
               <p class="text-xs text-gray-500 mt-1">{{ $t('expenses.settlementDateHint') }}</p>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.branch') }}
-              </label>
-              <select 
-                v-model="form.branchId" 
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              >
-                <option :value="null">{{ $t('expenses.branch') }}</option>
-                <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
-              </select>
+            <!-- Two-column grid for branch and location -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.branch') }}
+                </label>
+                <select 
+                  v-model="form.branchId" 
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option :value="null">{{ $t('expenses.branch') }}</option>
+                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('expenses.location') }}
+                </label>
+                <input 
+                  v-model="form.locationId" 
+                  type="text"
+                  :placeholder="$t('expenses.location')"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
             </div>
 
+            <!-- Full-width description -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.amount') }} <span class="text-red-500">*</span>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                {{ $t('expenses.description') }} <span class="text-red-500">*</span>
               </label>
               <input 
-                v-model="form.amount" 
-                type="number" 
-                step="0.01"
-                min="0"
+                v-model="form.description" 
+                type="text" 
                 required
-                :placeholder="$t('expenses.amount')"
+                :placeholder="$t('expenses.description')"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
               />
             </div>
 
+            <!-- Full-width notes -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('expenses.notes') }}
               </label>
               <textarea 
                 v-model="form.notes" 
-                rows="3"
+                rows="2"
                 :placeholder="$t('expenses.notes')"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                :class="isRTL ? 'text-right' : 'text-left'"
               ></textarea>
             </div>
 
-            <div class="flex gap-3 pt-4" :class="isRTL ? 'flex-row-reverse' : ''">
+            <!-- Action buttons -->
+            <div class="flex gap-3 pt-4 border-t" :class="isRTL ? 'flex-row-reverse' : ''">
               <button 
                 type="button" 
                 @click="closeModal"
@@ -927,17 +945,32 @@ export default {
     async downloadReport() {
       this.downloading = true
       try {
-        const blob = await getExpensesReport()
+        const response = await getExpensesReport()
+        // Ensure we have a Blob object
+        const blob = response.data instanceof Blob ? response.data : new Blob([response.data], { type: response.headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+        
+        // Extract filename from Content-Disposition header if available
+        let filename = `expenses-report-${new Date().toISOString().split('T')[0]}.xlsx`
+        const contentDisposition = response.headers['content-disposition']
+        if (contentDisposition) {
+          const match = /filename\*=UTF-8''(.+)$/.exec(contentDisposition) || /filename="?([^"]+)"?/.exec(contentDisposition)
+          if (match) {
+            filename = decodeURIComponent(match[1])
+          }
+        }
+        
+        // Create and download the file
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', `expenses-report-${new Date().toISOString().split('T')[0]}.xlsx`)
+        link.setAttribute('download', filename)
         document.body.appendChild(link)
         link.click()
         link.parentNode.removeChild(link)
         window.URL.revokeObjectURL(url)
+        
         if (window.$toast) {
-          window.$toast(this.$t('expenses.exportReport') + ' ' + this.$t('common.success'), 'success')
+          window.$toast(this.$t('expenses.reportDownloadSuccess'), 'success')
         } else {
           this.showSuccess('Report downloaded successfully')
         }

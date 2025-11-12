@@ -255,7 +255,8 @@ export default {
 
     // aside classes combine desktop and mobile behavior
     asideClasses() {
-      const base = 'bg-indigo-50 p-4 transition-all duration-200 z-40 transform relative';
+      // base without 'relative' so mobile fixed positioning doesn't conflict
+      const base = 'bg-indigo-50 p-4 transition-all duration-200 z-40 transform';
       // mobile (drawer) behavior
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'

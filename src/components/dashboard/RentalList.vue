@@ -82,14 +82,9 @@
 
     <!-- Stats Bar -->
     <div class="bg-gray-50 rounded-lg p-4">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div class="flex flex-col gap-2 text-sm text-gray-600">
-          <div>
-            {{ $t('rental.totalCount') }}: <span class="font-semibold">{{ filteredItems.length }}</span>
-          </div>
-          <div>
-            {{ $t('rental.totalSum') }}: <span class="font-semibold">{{ formatCurrency(totalSum) }}</span>
-          </div>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div class="text-sm text-gray-600">
+          {{ $t('rental.totalRentals') }}: <span class="font-semibold">{{ rentalsStore.total }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <label>{{ $t('rental.pageSize') }}:</label>
@@ -182,7 +177,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="rental in rentalsStore.items" :key="rental.id" class="hover:bg-gray-50">
+            <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ formatDate(rental.date) }}
               </td>
@@ -362,7 +357,7 @@
           <!-- Add Payout Form -->
           <div class="mb-6 pb-6 border-b">
             <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.addPayout') }}</h4>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <input 
                 v-model="payoutForm.amount" 
                 type="number" 
@@ -372,6 +367,12 @@
               <input 
                 v-model="payoutForm.date" 
                 type="date" 
+                class="border border-gray-300 rounded px-3 py-2 text-sm"
+              />
+              <input 
+                v-model="payoutForm.settlementDate" 
+                type="date" 
+                placeholder="Settlement Date (optional)" 
                 class="border border-gray-300 rounded px-3 py-2 text-sm"
               />
               <input 
@@ -462,7 +463,8 @@ export default {
     const payoutForm = ref({
       amount: '',
       date: new Date().toISOString().split('T')[0],
-      notes: ''
+      notes: '',
+      settlementDate: ''
     })
 
     const visiblePages = computed(() => {
@@ -485,49 +487,6 @@ export default {
         pages.push(i)
       }
       return pages
-    })
-
-    // Client-side filtered items based on ownership filter
-    const filteredItems = computed(() => {
-      const filter = rentalsStore.filters.isCompanyOwned
-      if (filter === null || filter === undefined) return rentalsStore.items
-      return rentalsStore.items.filter(item => {
-        // Primary: explicit boolean field
-        if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) {
-          const val = item.isCompanyOwned
-          if (typeof val === 'boolean') return val === filter
-          if (typeof val === 'string') {
-            const s = val.toLowerCase()
-            if (s === 'true' || s === '1') return filter === true
-            if (s === 'false' || s === '0') return filter === false
-          }
-          if (typeof val === 'number') return (val === 1) === filter
-          return Boolean(val) === Boolean(filter)
-        }
-        // Fallbacks: some APIs use different fields
-        const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership]
-        for (const c of candidates) {
-          if (!c && c !== 0) continue
-          const s = String(c).toLowerCase()
-          if (s.includes('company') || s.includes('owned') || s === 'company') {
-            return filter === true
-          }
-          if (s.includes('external') || s.includes('third') || s.includes('vendor') || s === 'external') {
-            return filter === false
-          }
-          if (s === '1' || s === 'true') return filter === true
-          if (s === '0' || s === 'false') return filter === false
-        }
-        return filter === false ? true : false
-      })
-    })
-
-    // Calculate total sum of all visible filtered items
-    const totalSum = computed(() => {
-      return filteredItems.value.reduce((sum, item) => {
-        const itemTotal = parseFloat(String(item.total || 0).replace(/,/g, '')) || 0
-        return sum + itemTotal
-      }, 0)
     })
 
     const onSearchInput = (event) => {
@@ -717,7 +676,8 @@ export default {
       payoutForm.value = {
         amount: '',
         date: new Date().toISOString().split('T')[0],
-        notes: ''
+        notes: '',
+        settlementDate: ''
       }
     }
 
@@ -733,7 +693,9 @@ export default {
         await rentalsStore.createRentalPayout(selectedRentalForPayouts.value.id, {
           amount: parseFloat(payoutForm.value.amount),
           date: payoutForm.value.date,
-          notes: payoutForm.value.notes
+          notes: payoutForm.value.notes,
+          // include settlementDate if provided
+          ...(payoutForm.value.settlementDate ? { settlementDate: payoutForm.value.settlementDate } : {})
         })
         if (window.$toast) {
           window.$toast('Payout created successfully', 'success')
@@ -741,7 +703,8 @@ export default {
         payoutForm.value = {
           amount: '',
           date: new Date().toISOString().split('T')[0],
-          notes: ''
+          notes: '',
+          settlementDate: ''
         }
       } catch (error) {
         console.error('Error creating payout:', error)
@@ -798,8 +761,6 @@ export default {
       deleting,
       form,
       visiblePages,
-      filteredItems,
-      totalSum,
       onSearchInput,
       clearSearch,
       setCompanyOwnedFilter,
