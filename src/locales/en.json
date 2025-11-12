@@ -395,7 +395,14 @@
     "success": {
       "created": "Expense created successfully",
       "updated": "Expense updated successfully",
-      "deleted": "Expense deleted successfully"
-    }
+      "deleted": "Expense deleted successfully",
+      "categoryAdded": "Category added successfully",
+      "branchAdded": "Branch added successfully",
+      "locationAdded": "Location added successfully"
+    },
+    "enterLocationName": "Enter location name",
+    "enterBranchName": "Enter branch name",
+    "enterBranchCategory": "Enter branch category (optional)",
+    "enterCategoryName": "Enter category name"
   }
 }

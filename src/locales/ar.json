@@ -395,7 +395,14 @@
     "success": {
       "created": "تم إنشاء المصروف بنجاح",
       "updated": "تم تحديث المصروف بنجاح",
-      "deleted": "تم حذف المصروف بنجاح"
-    }
+      "deleted": "تم حذف المصروف بنجاح",
+      "categoryAdded": "تم إضافة الفئة بنجاح",
+      "branchAdded": "تم إضافة الفرع بنجاح",
+      "locationAdded": "تم إضافة الموقع بنجاح"
+    },
+    "enterLocationName": "أدخل اسم الموقع",
+    "enterBranchName": "أدخل اسم الفرع",
+    "enterBranchCategory": "أدخل فئة الفرع (اختياري)",
+    "enterCategoryName": "أدخل اسم الفئة"
   }
 }

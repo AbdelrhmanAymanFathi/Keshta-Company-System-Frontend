@@ -102,7 +102,19 @@
                 {{ $t('expenses.description') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.branch') }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.location') }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.amount') }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.signedAmount') }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.flow') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.notes') }}
@@ -128,8 +140,28 @@
               <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.description }}
               </td>
+              <td class="px-6 py-4 text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+                <span v-if="expense.branch" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {{ expense.branch.name }}
+                </span>
+                <span v-else class="text-gray-400">-</span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+                <span v-if="expense.location" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  {{ expense.location.name }}
+                </span>
+                <span v-else class="text-gray-400">-</span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatCurrency(expense.amount) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="[isRTL ? 'text-right' : 'text-left', expense.signedAmount < 0 ? 'text-red-600' : 'text-green-600']">
+                {{ formatCurrency(expense.signedAmount) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span :class="expense.flow === 'IN' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                  {{ expense.flow === 'IN' ? $t('expenses.flowIn') : $t('expenses.flowOut') }}
+                </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.notes || '-' }}
@@ -158,7 +190,7 @@
               </td>
             </tr>
             <tr v-if="filteredExpenses.length === 0">
-              <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+              <td colspan="11" class="px-6 py-12 text-center text-gray-500">
                 <div class="flex flex-col items-center">
                   <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
