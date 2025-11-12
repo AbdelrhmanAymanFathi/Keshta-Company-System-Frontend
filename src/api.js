@@ -361,26 +361,19 @@ export async function refreshAndSetToken() {
   return await tokenManager.refreshToken();
 }
 
-// Refresh lock mechanism to queue requests during token refresh
-let refreshSubscribers = [];
-let isRefreshing = false;
-
-function subscribeTokenRefresh(callback) {
-  refreshSubscribers.push(callback);
-}
-
-function onRrefreshed(token) {
-  refreshSubscribers.forEach(callback => callback(token));
-  refreshSubscribers = [];
-}
-
 // Enhanced request interceptor
 axios.interceptors.request.use(
   config => {
     const token = tokenManager.getToken();
-    if (token) {
+    
+    // Check if token is expired before making request
+    if (token && tokenManager.isTokenExpired(token)) {
+      console.log('Token expired, refreshing before request...');
+      // Don't wait for refresh, let response interceptor handle it
+    } else if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
     return config;
   },
   error => {
@@ -388,7 +381,7 @@ axios.interceptors.request.use(
   }
 );
 
-// Enhanced response interceptor with request queueing during token refresh
+// Enhanced response interceptor with better error handling
 axios.interceptors.response.use(
   response => {
     // Update token if it's in the response (for login/refresh)
@@ -401,55 +394,45 @@ axios.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
     
-    // Log detailed error information for debugging (only on error, not retry)
-    if (error.response && !originalRequest._retry) {
+    // Log detailed error information for debugging
+    if (error.response) {
       console.error('API Error Response:', {
         status: error.response.status,
         statusText: error.response.statusText,
+        responseData: error.response.data,
         url: originalRequest.url,
-        method: originalRequest.method
+        method: originalRequest.method,
+        requestData: originalRequest.data
       });
-    } else if (error.request && !originalRequest._retry) {
-      console.error('API Error Request (no response):', error.message);
-    } else if (!originalRequest._retry) {
+    } else if (error.request) {
+      console.error('API Error Request:', error.request);
+    } else {
       console.error('API Error:', error.message);
     }
     
-    // Handle 401 Unauthorized errors with request queueing
+    // Handle 401 Unauthorized errors
     if (
       error.response &&
       error.response.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url.includes('/api/auth/refresh') // Don't retry refresh endpoint
     ) {
-      if (isRefreshing) {
-        // Queue this request to retry after token refresh
-        return new Promise((resolve) => {
-          subscribeTokenRefresh((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            resolve(axios(originalRequest));
-          });
-        });
-      }
-
       originalRequest._retry = true;
-      isRefreshing = true;
-
+      
       try {
+        console.log('Attempting to refresh token due to 401 error...');
         await tokenManager.refreshToken();
-        const newToken = tokenManager.getToken();
         
+        // Update the authorization header with new token
+        const newToken = tokenManager.getToken();
         if (newToken) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          onRrefreshed(newToken);
         }
-
-        isRefreshing = false;
+        
         // Retry the original request
         return axios(originalRequest);
       } catch (refreshError) {
-        isRefreshing = false;
-        refreshSubscribers = [];
+        console.error('Token refresh failed, logging out user:', refreshError);
         tokenManager.handleRefreshFailure();
         return Promise.reject(refreshError);
       }
