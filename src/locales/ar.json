@@ -95,7 +95,13 @@
     "refresh": "تحديث",
     "download": "تحميل",
     "downloading": "جاري التحميل",
-    "noData": "لا توجد بيانات"
+    "noData": "لا توجد بيانات",
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "filters": "عوامل التصفية",
+    "clear": "مسح",
+    "all": "الكل",
+    "totalRecords": "إجمالي السجلات"
   },
   "common": {
     "error": "خطأ",
@@ -308,7 +314,11 @@
     "isCompanyOwned": "معدات مملوكة للشركة",
     "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
     "totalCanOverride": "يمكن تعديل المجموع يدوياً",
-    "useArrowKeys": "استخدم أسهم لوحة المفاتيح (← →) أو A/D للتمرير أفقياً"
+    "useArrowKeys": "استخدم أسهم لوحة المفاتيح (← →) أو A/D للتمرير أفقياً",
+    "report": "تقرير الإيجار",
+    "reportTitle": "تقارير إيجار المعدات",
+    "reportDescription": "قم بتنزيل تقرير إكسل لكل معدات الإيجار مع الفلاتر",
+    "reportMenu": "تقارير الإيجار"
   },
   "finance": {
     "balance": "رصيد الشركة",

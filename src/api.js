@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
 // const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
@@ -310,6 +311,121 @@ export const createRentalPayout = (rentalId, data) =>
   axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
 export const deleteRentalPayout = (rentalId, payoutId) =>
   axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
+
+export const getRentalReportData = async (params = {}, options = { download: false }) => {
+  // params: { q, startDate, endDate, isCompanyOwned }
+  // options: { download: boolean } - if download=true, force binary download
+  const { q = '', startDate = '', endDate = '', isCompanyOwned = null } = params;
+  const axiosParams = {};
+  if (q) axiosParams.q = q;
+  if (startDate) axiosParams.startDate = startDate;
+  if (endDate) axiosParams.endDate = endDate;
+  if (isCompanyOwned !== null && isCompanyOwned !== undefined) axiosParams.isCompanyOwned = isCompanyOwned.toString();
+
+  const url = `${BASE_URL}/api/rentals/report`;
+
+  // Try a HEAD request first to detect Content-Type without downloading body (if server supports HEAD)
+  // Skip HEAD if server returns 5xx errors
+  let contentType = '';
+  try {
+    const headResp = await axios.head(url, { params: axiosParams, withCredentials: true, timeout: 5000 });
+    contentType = (headResp.headers['content-type'] || '').toLowerCase();
+  } catch (headErr) {
+    // HEAD may be not allowed, not implemented, or server error; skip and fallback to GET
+    if (headErr.response?.status >= 500) {
+      console.warn('HEAD request failed with server error; skipping HEAD and using GET directly');
+    }
+    contentType = '';
+  }
+
+  // If download explicitly requested, fetch binary and return for download/parse
+  if (options.download) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    const ct = (headers['content-type'] || '').toLowerCase();
+    if (ct.includes('application/json') || ct.includes('text/')) {
+      try {
+        const text = new TextDecoder('utf-8').decode(resp.data);
+        return { data: JSON.parse(text), headers };
+      } catch (e) {
+        // not JSON, return raw
+        return { data: resp.data, headers };
+      }
+    }
+    return { data: resp.data, headers };
+  }
+
+  // If HEAD indicated JSON, do a normal GET expecting JSON
+  if (contentType && (contentType.includes('application/json') || contentType.includes('text/'))) {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // If HEAD indicated an Excel/zip/binary, fetch as arraybuffer and parse
+  if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    try {
+      const data = new Uint8Array(resp.data);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+      return { data: { items: json }, headers };
+    } catch (e) {
+      console.error('Failed to parse Excel from rental report:', e);
+      return { data: resp.data, headers };
+    }
+  }
+
+  // HEAD was inconclusive or not allowed: do a safe GET with default behaviour and fallback parsing
+  try {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } catch (err) {
+    // If server responded with binary or parsing failed, try fetching arraybuffer and attempt to parse JSON or Excel
+    if (err.response && err.response.data) {
+      try {
+        // Attempt to read as arraybuffer
+        const resp2 = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+        const headers = resp2.headers || {};
+        const ct = (headers['content-type'] || '').toLowerCase();
+        if (ct.includes('application/json') || ct.includes('text/')) {
+          const text = new TextDecoder('utf-8').decode(resp2.data);
+          return { data: JSON.parse(text), headers };
+        }
+        // Parse as Excel
+        try {
+          const data = new Uint8Array(resp2.data);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+          return { data: { items: json }, headers };
+        } catch (e) {
+          console.error('Failed fallback Excel parse:', e);
+          return { data: resp2.data, headers };
+        }
+      } catch (e2) {
+        throw err; // rethrow original
+      }
+    }
+    throw err;
+  }
+};
+
+export const downloadRentalReport = async (params = {}) => {
+  const { q = '', startDate = '', endDate = '', isCompanyOwned = null } = params;
+  const axiosParams = {};
+  if (q) axiosParams.q = q;
+  if (startDate) axiosParams.startDate = startDate;
+  if (endDate) axiosParams.endDate = endDate;
+  if (isCompanyOwned !== null && isCompanyOwned !== undefined) axiosParams.isCompanyOwned = isCompanyOwned.toString();
+
+  const url = `${BASE_URL}/api/rentals/report`;
+  const resp = await axios.get(url, { params: axiosParams, responseType: 'blob', withCredentials: true });
+  return { data: resp.data, headers: resp.headers };
+};
 
 // Company Wallet & Finance
 export const getCompanyTransactions = (params = {}) => {

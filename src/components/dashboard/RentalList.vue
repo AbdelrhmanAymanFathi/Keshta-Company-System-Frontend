@@ -30,13 +30,23 @@
           <p class="text-xs text-gray-500 mt-1">{{ $t('rental.searchBy') }}</p>
         </div>
         
-        <button @click="openAddModal" 
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          {{ $t('rental.addRental') }}
-        </button>
+        <div class="flex gap-2">
+          <button @click="openAddModal" 
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            {{ $t('rental.addRental') }}
+          </button>
+          
+          <button @click="$emit('navigate-report')" 
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
+            </svg>
+            {{ $t('rental.report') }}
+          </button>
+        </div>
       </div>
 
       <!-- Filter Bar -->

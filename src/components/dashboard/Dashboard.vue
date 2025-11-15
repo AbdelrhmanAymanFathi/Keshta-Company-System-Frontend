@@ -132,7 +132,7 @@
       <!-- Main content -->
       <main class="flex-1 min-w-0 p-6 overflow-auto bg-white">
         <h2 class="text-2xl font-semibold mb-4">{{ $t(currentLabel) }}</h2>
-        <component :is="currentComponent" />
+        <component :is="currentComponent" @navigate-report="navigateToReport" />
       </main>
     </div>
 
@@ -151,14 +151,17 @@ import VehiclesList from './VehiclesList.vue'
 import TransportList from './TransportList.vue'
 import TransportReport from './TransportReport.vue'
 import RentalList from './RentalList.vue'
+import RentalReport from './RentalReport.vue'
 import ExpensesList from './ExpensesList.vue'
 import CompanyFinance from './CompanyFinance.vue'
 import AuthLogout from '../auth/Logout.vue'
+import SelectPlaceholder from '../shared/SelectPlaceholder.vue'
+import ComponentNotFound from '../shared/ComponentNotFound.vue'
 import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyFinance, AuthLogout },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -187,7 +190,8 @@ export default {
           { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' }
         ],
         equipmentRent: [
-          { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' }
+          { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' },
+          { name: 'rentalReport', label: 'rental.reportMenu', component: 'RentalReport' }
         ],
         companyWallet: [
           { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
@@ -230,11 +234,11 @@ export default {
 
       // produce component to render (string -> imported component; or inline component)
     currentComponent() {
-      if (!this.currentItem) return { template: '<div>Select an item</div>' }
-      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyFinance }
+      if (!this.currentItem) return SelectPlaceholder
+      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, CompanyFinance }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
-        return mapping[comp] || { template: '<div>Component not found</div>' }
+        return mapping[comp] || ComponentNotFound
       }
       return comp
     },
@@ -315,6 +319,14 @@ export default {
     toggleCollapsed() {
       if (this.isMobile) return
       this.collapsedSidebar = !this.collapsedSidebar
+    },
+
+    // Navigate to rental report
+    navigateToReport() {
+      this.selectedVertical = 'rentalReport'
+      if (this.isMobile) {
+        this.sidebarOpen = false
+      }
     },
 
     handleLogoutSuccess() {

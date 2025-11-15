@@ -95,7 +95,13 @@
     "refresh": "Refresh",
     "download": "Download",
     "downloading": "Downloading",
-    "noData": "No data"
+    "noData": "No data",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "filters": "Filters",
+    "clear": "Clear",
+    "all": "All",
+    "totalRecords": "Total Records"
   },
   "common": {
     "error": "Error",
@@ -308,7 +314,11 @@
     "isCompanyOwned": "Company Owned Equipment",
     "isCompanyOwnedDescription": "Check if this equipment belongs to the company",
     "totalCanOverride": "Total can be manually overridden",
-    "useArrowKeys": "Use keyboard arrow keys (← →) or A/D to scroll horizontally"
+    "useArrowKeys": "Use keyboard arrow keys (← →) or A/D to scroll horizontally",
+    "report": "Rental Report",
+    "reportTitle": "Equipment Rental Reports",
+    "reportDescription": "Download an Excel report of all equipment rentals with filters",
+    "reportMenu": "Rental Reports"
   },
   "finance": {
     "balance": "Company Balance",
