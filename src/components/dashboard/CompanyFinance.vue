@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
     <!-- Balance Card -->
-    <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
+    <!-- <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h3 class="text-lg font-medium text-indigo-100 mb-1">{{ $t('finance.balance') }}</h3>
@@ -28,7 +28,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Summary Stats Bar -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
