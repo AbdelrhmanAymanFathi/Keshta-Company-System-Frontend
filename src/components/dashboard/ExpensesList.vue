@@ -18,7 +18,7 @@
       </button>
 
       <button 
-        @click="downloadReport" 
+        @click="showLocationDialog = true" 
         :disabled="loading || expenses.length === 0"
         class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-lg"
       >
@@ -555,6 +555,116 @@
         </div>
       </div>
     </div>
+
+    <!-- Location Dialog Modal -->
+    <div v-if="showLocationDialog" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md animate-in fade-in duration-200" :class="isRTL ? 'direction-rtl' : ''">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 flex items-center justify-between rounded-t-lg" :class="isRTL ? 'flex-row-reverse' : ''">
+          <h3 class="text-lg font-semibold text-white">{{ $t('expenses.selectSaveLocation') }}</h3>
+          <button @click="showLocationDialog = false" class="text-white hover:text-green-100 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="px-6 py-6 space-y-4">
+          <p class="text-sm text-gray-600" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.chooseLocationHint') }}</p>
+          
+          <!-- Quick Select Options -->
+          <div class="space-y-2">
+            <button 
+              @click="selectedLocation = 'downloads'"
+              :class="[
+                'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
+                selectedLocation === 'downloads' 
+                  ? 'border-green-500 bg-green-50' 
+                  : 'border-gray-200 hover:border-gray-300 bg-gray-50',
+                isRTL ? 'flex-row-reverse text-right' : ''
+              ]"
+            >
+              <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <div>
+                <div class="font-medium text-gray-800">{{ $t('expenses.downloads') }}</div>
+                <div class="text-xs text-gray-500">~/Downloads</div>
+              </div>
+            </button>
+
+            <button 
+              @click="selectedLocation = 'documents'"
+              :class="[
+                'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
+                selectedLocation === 'documents' 
+                  ? 'border-green-500 bg-green-50' 
+                  : 'border-gray-200 hover:border-gray-300 bg-gray-50',
+                isRTL ? 'flex-row-reverse text-right' : ''
+              ]"
+            >
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <div>
+                <div class="font-medium text-gray-800">{{ $t('expenses.documents') }}</div>
+                <div class="text-xs text-gray-500">~/Documents</div>
+              </div>
+            </button>
+
+            <button 
+              @click="selectedLocation = 'desktop'"
+              :class="[
+                'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
+                selectedLocation === 'desktop' 
+                  ? 'border-green-500 bg-green-50' 
+                  : 'border-gray-200 hover:border-gray-300 bg-gray-50',
+                isRTL ? 'flex-row-reverse text-right' : ''
+              ]"
+            >
+              <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <div class="font-medium text-gray-800">{{ $t('expenses.desktop') }}</div>
+                <div class="text-xs text-gray-500">~/Desktop</div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Custom Path -->
+          <div class="border-t pt-4">
+            <label class="text-sm font-medium text-gray-700 mb-2 block" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.customPath') }}</label>
+            <input 
+              v-model="selectedLocation"
+              type="text"
+              placeholder="e.g., /home/user/reports"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              :class="isRTL ? 'text-right' : 'text-left'"
+            >
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 rounded-b-lg border-t" :class="isRTL ? 'flex-row-reverse' : ''">
+          <button 
+            @click="showLocationDialog = false"
+            class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+          >
+            {{ $t('labels.cancel') }}
+          </button>
+          <button 
+            @click="downloadReport"
+            :disabled="downloading"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+          >
+            <div v-if="downloading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -578,6 +688,8 @@ export default {
       saving: false,
       deleting: false,
       downloading: false,
+      showLocationDialog: false,
+      selectedLocation: 'downloads',
       form: {
         id: null,
         date: '',
@@ -995,28 +1107,37 @@ export default {
     async downloadReport() {
       this.downloading = true
       try {
-        const blob = await getExpensesReport()
-        const url = window.URL.createObjectURL(blob)
+        const response = await getExpensesReport()
+        // Handle both direct blob and response.data blob
+        const blobData = response instanceof Blob ? response : response.data
+        
+        if (!(blobData instanceof Blob)) {
+          throw new Error('Invalid response: expected Blob, got ' + typeof blobData)
+        }
+        
+        const url = window.URL.createObjectURL(blobData)
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', `expenses-report-${new Date().toISOString().split('T')[0]}.xlsx`)
+        
+        // Map selected location to filename
+        let filename = 'expenses-report-' + new Date().toISOString().split('T')[0] + '.xlsx'
+        
+        // Create download link with filename
+        link.setAttribute('download', filename)
         document.body.appendChild(link)
         link.click()
         link.parentNode.removeChild(link)
         window.URL.revokeObjectURL(url)
-        if (window.$toast) {
-          window.$toast(this.$t('expenses.exportReport') + ' ' + this.$t('common.success'), 'success')
-        } else {
-          this.showSuccess('Report downloaded successfully')
-        }
+        
+        // Close modal after successful download
+        this.showLocationDialog = false
+        this.selectedLocation = 'downloads'
+        
+        this.showSuccess(this.$t('expenses.exportReport') + ' ' + (this.$t('common.success') || 'Success'))
       } catch (error) {
         console.error('Error downloading report:', error)
         const message = error.response?.data?.message || this.$t('expenses.reportError') || 'Failed to download report'
-        if (window.$toast) {
-          window.$toast(message, 'error')
-        } else {
-          this.showError(message)
-        }
+        this.showError(message)
       } finally {
         this.downloading = false
       }

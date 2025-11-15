@@ -19,7 +19,6 @@
     "expenses": "Expenses",
     "equipmentRent": "Equipment Rent",
     "companyWallet": "Company Wallet",
-    "companyWallet": "Company Wallet",
     "expand": "Expand",
     "collapse": "Collapse"
   },
@@ -53,6 +52,8 @@
   },
   "labels": {
     "logout": "Logout",
+    "close": "Close",
+    "add": "Add",
     "site": "Site",
     "area": "Area",
     "next": "Next",
@@ -80,9 +81,7 @@
     "price": "Price",
     "cubic": "Cubic",
     "total": "Total",
-    "actions": "Actions",
     "addRow": "Add Row",
-    "delete": "Delete",
     "saveSupply": "Save Supply",
     "saved": "Saved!",
     "location": "Location",
@@ -92,21 +91,11 @@
     "crusherCapacity": "Crusher Capacity",
     "unitPrice": "Unit Price",
     "#": "#",
-    "edit": "Edit",
-    "save": "Save",
     "search": "Search",
     "refresh": "Refresh",
     "download": "Download",
     "downloading": "Downloading",
-    "noData": "No data",
-    "saving": "Saving...",
-    "deleting": "Deleting...",
-    "update": "Update",
-    "to": "to",
-    "results": "results",
-    "showing": "Showing",
-    "previous": "Previous",
-    "of": "of"
+    "noData": "No data"
   },
   "common": {
     "error": "Error",
@@ -318,7 +307,25 @@
     "externalRental": "External Rental",
     "isCompanyOwned": "Company Owned Equipment",
     "isCompanyOwnedDescription": "Check if this equipment belongs to the company",
-    "totalCanOverride": "Total can be manually overridden"
+    "totalCanOverride": "Total can be manually overridden",
+    "useArrowKeys": "Use keyboard arrow keys (← →) or A/D to scroll horizontally"
+  },
+  "finance": {
+    "balance": "Company Balance",
+    "currentBalance": "Current Balance",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "last30dIn": "Income (Last 30 days)",
+    "last30dOut": "Expenses (Last 30 days)",
+    "totalTransactions": "Total transactions",
+    "pageSize": "Items per page",
+    "noTransactions": "No transactions found",
+    "noTransactionsDesc": "Start by making a deposit or withdrawal",
+    "date": "Date",
+    "type": "Type",
+    "amount": "Amount",
+    "description": "Description",
+    "reference": "Reference"
   },
   "company": {
     "wallet": {
@@ -361,6 +368,13 @@
     "notSettled": "Not settled",
     "report": "Report",
     "exportReport": "Export Report",
+    "selectLocation": "Select save location",
+    "selectSaveLocation": "Select Save Location",
+    "chooseLocationHint": "Choose a folder to save your report",
+    "downloads": "Downloads",
+    "documents": "Documents",
+    "desktop": "Desktop",
+    "customPath": "Or enter custom path",
     "download": "Download",
     "actions": "Actions",
     "searchPlaceholder": "Search expenses...",
@@ -403,6 +417,7 @@
     "enterLocationName": "Enter location name",
     "enterBranchName": "Enter branch name",
     "enterBranchCategory": "Enter branch category (optional)",
-    "enterCategoryName": "Enter category name"
+    "enterCategoryName": "Enter category name",
+    "reportError": "Failed to download report"
   }
 }

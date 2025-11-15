@@ -130,7 +130,7 @@
       </transition>
 
       <!-- Main content -->
-      <main class="flex-1 p-6 overflow-auto bg-white">
+      <main class="flex-1 min-w-0 p-6 overflow-auto bg-white">
         <h2 class="text-2xl font-semibold mb-4">{{ $t(currentLabel) }}</h2>
         <component :is="currentComponent" />
       </main>
@@ -152,13 +152,13 @@ import TransportList from './TransportList.vue'
 import TransportReport from './TransportReport.vue'
 import RentalList from './RentalList.vue'
 import ExpensesList from './ExpensesList.vue'
-import CompanyWallet from './CompanyWallet.vue'
+import CompanyFinance from './CompanyFinance.vue'
 import AuthLogout from '../auth/Logout.vue'
 import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyWallet, AuthLogout },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyFinance, AuthLogout },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -190,7 +190,7 @@ export default {
           { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' }
         ],
         companyWallet: [
-          { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyWallet' }
+          { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
         ]
       },
 
@@ -231,7 +231,7 @@ export default {
       // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return { template: '<div>Select an item</div>' }
-      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyWallet }
+      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, ExpensesList, CompanyFinance }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || { template: '<div>Component not found</div>' }
@@ -255,16 +255,17 @@ export default {
 
     // aside classes combine desktop and mobile behavior
     asideClasses() {
-      const base = 'bg-indigo-50 p-4 transition-all duration-200 z-40 transform relative';
+      const base = 'bg-indigo-50 p-4 transition-all duration-200 z-40 transform';
       // mobile (drawer) behavior
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'
         const mobileWidth = 'w-64' // 16rem for drawer on mobile
         const transformClass = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
-        return `${base} ${side} fixed top-0 bottom-0 ${mobileWidth} ${transformClass}`
+        const hiddenClass = this.sidebarOpen ? '' : 'pointer-events-none' // Disable pointer events when hidden
+        return `${base} ${side} fixed top-0 bottom-0 ${mobileWidth} ${transformClass} ${hiddenClass}`
       }
-      // desktop behavior: static width (collapsed or expanded)
-      return `${base} ${this.computedSidebarWidthClass} relative`
+      // desktop behavior: static width (collapsed or expanded), relative positioning
+      return `${base} ${this.computedSidebarWidthClass} relative flex-shrink-0`
     },
 
     // active item style (gradient)

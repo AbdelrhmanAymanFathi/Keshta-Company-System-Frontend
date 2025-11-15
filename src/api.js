@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // Base URL for API requests - loaded from .env file
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
+// const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
 class TokenManager {
@@ -303,8 +304,14 @@ export const updateRental = (id, data) =>
   axios.patch(`${BASE_URL}/api/rentals/${id}`, data);
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
+export const getRentalPayouts = (rentalId) =>
+  axios.get(`${BASE_URL}/api/rentals/${rentalId}/payouts`);
+export const createRentalPayout = (rentalId, data) =>
+  axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
+export const deleteRentalPayout = (rentalId, payoutId) =>
+  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
 
-// Company Wallet
+// Company Wallet & Finance
 export const getCompanyTransactions = (params = {}) => {
   const { page = 1, pageSize = 10 } = params;
   const queryParams = new URLSearchParams({
@@ -319,6 +326,8 @@ export const withdrawFromCompanyWallet = (data) =>
   axios.post(`${BASE_URL}/api/company/wallet/withdraw`, data);
 export const getCompany = () =>
   axios.get(`${BASE_URL}/api/company`);
+export const getCompanySummary = () =>
+  axios.get(`${BASE_URL}/api/company/summary`);
 
 // Expenses
 export const getExpenses = (page = 1, pageSize = 20, search = '') => {
@@ -339,6 +348,11 @@ export const updateExpense = (id, data) =>
   axios.patch(`${BASE_URL}/api/expenses/${id}`, data);
 export const deleteExpense = (id) =>
   axios.delete(`${BASE_URL}/api/expenses/${id}`);
+export const getExpensesReport = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/expenses/report${search ? `?${search}` : ''}`;
+  return axios.get(url, { responseType: 'blob' });
+};
 
 // Export token manager for external use
 export { tokenManager };

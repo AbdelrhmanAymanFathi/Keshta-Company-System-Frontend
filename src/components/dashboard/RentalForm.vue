@@ -179,14 +179,15 @@ export default {
     // ensures the edit form is populated correctly when opened.
     watch(() => props.modelValue, (newVal) => {
       if (newVal && typeof newVal === 'object') {
-        localForm.value = { ...newVal }
+        // Deep copy to avoid reference issues
+        localForm.value = JSON.parse(JSON.stringify(newVal))
       } else {
         localForm.value = { ...props.modelValue }
       }
       if (localForm.value.isCompanyOwned === undefined) {
         localForm.value.isCompanyOwned = true
       }
-    }, { deep: true })
+    }, { deep: true, immediate: true })
 
     // Do NOT emit update:modelValue on every change — we only emit on submit.
     // This avoids unnecessary parent <-> child two-way binding that can lead

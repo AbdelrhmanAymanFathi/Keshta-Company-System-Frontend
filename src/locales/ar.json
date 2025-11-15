@@ -19,7 +19,6 @@
     "expenses": "المصروفات",
     "equipmentRent": "إيجار المعدات",
     "companyWallet": "محفظة الشركة",
-    "companyWallet": "محفظة الشركة",
     "expand": "توسيع",
     "collapse": "طي"
   },
@@ -53,6 +52,8 @@
   },
   "labels": {
     "logout": "تسجيل الخروج",
+    "close": "إغلاق",
+    "add": "إضافة",
     "site": "الموقع",
     "area": "المنطقة",
     "next": "التالي",
@@ -69,7 +70,7 @@
     "showing": "عرض",
     "to": "إلى",
     "of": "من",
-    "results": "نتيجة",
+    "results": "النتائج",
     "date": "التاريخ",
     "contractor": "المقاول",
     "crusher": "الكسارة",
@@ -80,9 +81,7 @@
     "price": "السعر",
     "cubic": "المكعب",
     "total": "المجموع",
-    "actions": "الإجراءات",
     "addRow": "إضافة صف",
-    "delete": "حذف",
     "saveSupply": "حفظ التوريدة",
     "saved": "تم الحفظ!",
     "location": "الموقع",
@@ -92,21 +91,11 @@
     "crusherCapacity": "سعة الكسارة",
     "unitPrice": "سعر الوحدة",
     "#": "#",
-    "edit": "تعديل",
-    "save": "حفظ",
     "search": "بحث",
     "refresh": "تحديث",
     "download": "تحميل",
     "downloading": "جاري التحميل",
-    "noData": "لا توجد بيانات",
-    "saving": "جاري الحفظ...",
-    "deleting": "جاري الحذف...",
-    "update": "تحديث",
-    "to": "إلى",
-    "results": "النتائج",
-    "showing": "عرض",
-    "previous": "السابق",
-    "of": "من"
+    "noData": "لا توجد بيانات"
   },
   "common": {
     "error": "خطأ",
@@ -318,7 +307,25 @@
     "externalRental": "إيجار خارجي",
     "isCompanyOwned": "معدات مملوكة للشركة",
     "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
-    "totalCanOverride": "يمكن تعديل المجموع يدوياً"
+    "totalCanOverride": "يمكن تعديل المجموع يدوياً",
+    "useArrowKeys": "استخدم أسهم لوحة المفاتيح (← →) أو A/D للتمرير أفقياً"
+  },
+  "finance": {
+    "balance": "رصيد الشركة",
+    "currentBalance": "الرصيد الحالي",
+    "deposit": "إيداع",
+    "withdraw": "سحب",
+    "last30dIn": "الإيرادات (آخر 30 يوم)",
+    "last30dOut": "المصروفات (آخر 30 يوم)",
+    "totalTransactions": "إجمالي المعاملات",
+    "pageSize": "العناصر في الصفحة",
+    "noTransactions": "لا توجد معاملات",
+    "noTransactionsDesc": "ابدأ بإجراء إيداع أو سحب",
+    "date": "التاريخ",
+    "type": "النوع",
+    "amount": "المبلغ",
+    "description": "الوصف",
+    "reference": "المرجع"
   },
   "company": {
     "wallet": {
@@ -361,6 +368,13 @@
     "notSettled": "غير مسدد",
     "report": "التقرير",
     "exportReport": "تصدير التقرير",
+    "selectLocation": "اختر مكان الحفظ",
+    "selectSaveLocation": "اختر مكان الحفظ",
+    "chooseLocationHint": "اختر مجلد لحفظ التقرير",
+    "downloads": "التنزيلات",
+    "documents": "المستندات",
+    "desktop": "سطح المكتب",
+    "customPath": "أو أدخل مسار مخصص",
     "download": "تحميل",
     "actions": "الإجراءات",
     "searchPlaceholder": "البحث في المصروفات...",
@@ -403,6 +417,7 @@
     "enterLocationName": "أدخل اسم الموقع",
     "enterBranchName": "أدخل اسم الفرع",
     "enterBranchCategory": "أدخل فئة الفرع (اختياري)",
-    "enterCategoryName": "أدخل اسم الفئة"
+    "enterCategoryName": "أدخل اسم الفئة",
+    "reportError": "فشل في تحميل التقرير"
   }
 }
