@@ -17,16 +17,7 @@
         {{ $t('expenses.addExpense') }}
       </button>
 
-      <button 
-        @click="showLocationDialog = true" 
-        :disabled="loading || expenses.length === 0"
-        class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-lg"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16v-4m0 0V8m0 4H8m4 0h4M4 12a8 8 0 1116 0 8 8 0 01-16 0z"></path>
-        </svg>
-        {{ $t('expenses.exportReport') }}
-      </button>
+      <!-- Export button removed as per UI request -->
     </div>
 
     <!-- Search and Filters -->

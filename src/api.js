@@ -264,6 +264,84 @@ export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
 
 // Reports
+// Supplies/Exports Report - Get JSON data by default
+export const getSuppliesReportData = async (params = {}, options = { download: false }) => {
+  try {
+    const axiosParams = {};
+    const { startDate, endDate, q } = params;
+    
+    if (startDate) axiosParams.startDate = startDate;
+    if (endDate) axiosParams.endDate = endDate;
+    if (q) axiosParams.q = q;
+    
+    // Add download flag if needed
+    if (options.download) {
+      axiosParams.download = 'true';
+    }
+
+    const url = `${BASE_URL}/api/exports/report`;
+    
+    // If download requested, use blob
+    if (options.download) {
+      const response = await axios.get(url, {
+        params: axiosParams,
+        responseType: 'blob',
+        withCredentials: true
+      });
+      return response;
+    }
+
+    // Default: try to fetch as arraybuffer and normalize to JSON (server may return XLSX)
+    const response = await axios.get(url, {
+      params: axiosParams,
+      responseType: 'arraybuffer',
+      withCredentials: true
+    });
+
+    const arrayBuffer = response.data;
+    // Try to decode as text and parse JSON first
+    try {
+      const text = new TextDecoder().decode(arrayBuffer);
+      const trimmed = text.trim();
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        const json = JSON.parse(trimmed);
+        return { data: json, headers: response.headers };
+      }
+    } catch (e) {
+      // not JSON text, fall through to try parsing as Excel
+    }
+
+    // Try parsing as XLSX
+    try {
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
+      return { data: json, headers: response.headers };
+    } catch (e) {
+      // fallback: return raw text
+      try {
+        const text = new TextDecoder().decode(arrayBuffer);
+        return { data: text, headers: response.headers };
+      } catch (_) {
+        return { data: null, headers: response.headers };
+      }
+    }
+  } catch (error) {
+    console.error('Error getting supplies report:', error);
+    throw error;
+  }
+};
+
+export const downloadSuppliesReport = async (params = {}) => {
+  const response = await axios.get(`${BASE_URL}/api/exports/report`, {
+    params: { ...params, download: 'true' },
+    responseType: 'blob',
+    withCredentials: true
+  });
+  return response;
+};
+
 export const getSuppliesReport = (params = {}) => {
   const search = new URLSearchParams(params).toString();
   const url = `${BASE_URL}/api/exports/report${search ? `?${search}` : ''}`;
@@ -470,6 +548,83 @@ export const getExpensesReport = (params = {}) => {
   return axios.get(url, { responseType: 'blob' });
 };
 
+// Expenses Report - Get JSON data by default
+export const getExpensesReportData = async (params = {}, options = { download: false }) => {
+  try {
+    const axiosParams = {};
+    const { startDate, endDate, q, category } = params;
+    
+    if (startDate) axiosParams.startDate = startDate;
+    if (endDate) axiosParams.endDate = endDate;
+    if (q) axiosParams.q = q;
+    if (category) axiosParams.category = category;
+    
+    if (options.download) {
+      axiosParams.download = 'true';
+    }
+
+    const url = `${BASE_URL}/api/expenses/report`;
+    
+    if (options.download) {
+      const response = await axios.get(url, {
+        params: axiosParams,
+        responseType: 'blob',
+        withCredentials: true
+      });
+      return response;
+    }
+
+    // Default: try to fetch as arraybuffer and normalize to JSON (server may return XLSX)
+    const response = await axios.get(url, {
+      params: axiosParams,
+      responseType: 'arraybuffer',
+      withCredentials: true
+    });
+
+    const arrayBuffer = response.data;
+    // Try to decode as text and parse JSON first
+    try {
+      const text = new TextDecoder().decode(arrayBuffer);
+      const trimmed = text.trim();
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        const json = JSON.parse(trimmed);
+        return { data: json, headers: response.headers };
+      }
+    } catch (e) {
+      // not JSON text, fall through to try parsing as Excel
+    }
+
+    // Try parsing as XLSX
+    try {
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
+      return { data: json, headers: response.headers };
+    } catch (e) {
+      // fallback: return raw text
+      try {
+        const text = new TextDecoder().decode(arrayBuffer);
+        return { data: text, headers: response.headers };
+      } catch (_) {
+        return { data: null, headers: response.headers };
+      }
+    }
+  } catch (error) {
+    console.error('Error getting expenses report:', error);
+    throw error;
+  }
+};
+
+export const downloadExpensesReport = async (params = {}) => {
+  const response = await axios.get(`${BASE_URL}/api/expenses/report`, {
+    params: { ...params, download: 'true' },
+    responseType: 'blob',
+    withCredentials: true
+  });
+  return response;
+};
+
 // Export token manager for external use
 export { tokenManager };
 
@@ -570,6 +725,82 @@ export const getTransportReport = (params = {}) => {
   const search = new URLSearchParams(params).toString();
   const url = `${BASE_URL}/api/transports/report${search ? `?${search}` : ''}`;
   return axios.get(url, { responseType: 'blob' });
+};
+
+// Transport Report - Get JSON data by default
+export const getTransportReportData = async (params = {}, options = { download: false }) => {
+  try {
+    const axiosParams = {};
+    const { startDate, endDate, q } = params;
+    
+    if (startDate) axiosParams.startDate = startDate;
+    if (endDate) axiosParams.endDate = endDate;
+    if (q) axiosParams.q = q;
+    
+    if (options.download) {
+      axiosParams.download = 'true';
+    }
+
+    const url = `${BASE_URL}/api/transports/report`;
+    
+    if (options.download) {
+      const response = await axios.get(url, {
+        params: axiosParams,
+        responseType: 'blob',
+        withCredentials: true
+      });
+      return response;
+    }
+
+    // Default: try to fetch as arraybuffer and normalize to JSON (server may return XLSX)
+    const response = await axios.get(url, {
+      params: axiosParams,
+      responseType: 'arraybuffer',
+      withCredentials: true
+    });
+
+    const arrayBuffer = response.data;
+    // Try to decode as text and parse JSON first
+    try {
+      const text = new TextDecoder().decode(arrayBuffer);
+      const trimmed = text.trim();
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        const json = JSON.parse(trimmed);
+        return { data: json, headers: response.headers };
+      }
+    } catch (e) {
+      // not JSON text, fall through to try parsing as Excel
+    }
+
+    // Try parsing as XLSX
+    try {
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
+      return { data: json, headers: response.headers };
+    } catch (e) {
+      // fallback: return raw text
+      try {
+        const text = new TextDecoder().decode(arrayBuffer);
+        return { data: text, headers: response.headers };
+      } catch (_) {
+        return { data: null, headers: response.headers };
+      }
+    }
+  } catch (error) {
+    console.error('Error getting transport report:', error);
+    throw error;
+  }
+};
+
+export const downloadTransportReport = async (params = {}) => {
+  const response = await axios.get(`${BASE_URL}/api/transports/report`, {
+    params: { ...params, download: 'true' },
+    responseType: 'blob',
+    withCredentials: true
+  });
+  return response;
 };
 
 // --- Additional API helpers ---

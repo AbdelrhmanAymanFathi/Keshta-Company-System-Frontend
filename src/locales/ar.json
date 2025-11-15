@@ -93,6 +93,8 @@
     "#": "#",
     "search": "بحث",
     "refresh": "تحديث",
+  "componentNotFound": "المكون غير موجود",
+  "componentNotFoundDesc": "هذا المكون غير مسجّل في النظام.",
     "download": "تحميل",
     "downloading": "جاري التحميل",
     "noData": "لا توجد بيانات",
@@ -169,6 +171,7 @@
     }
   },
   "supply": {
+    "exportTableTitle": "تقرير التوريدات / الصادرات",
     "addSite": "إضافة موقع",
     "editSite": "تعديل الموقع",
     "addArea": "إضافة منطقة",
@@ -377,6 +380,8 @@
     "remaining": "المتبقي",
     "notSettled": "غير مسدد",
     "report": "التقرير",
+  "reportTitle": "تقرير المصروفات",
+  "reportDescription": "قم بتنزيل تقرير إكسل لكل المصروفات.",
     "exportReport": "تصدير التقرير",
     "selectLocation": "اختر مكان الحفظ",
     "selectSaveLocation": "اختر مكان الحفظ",

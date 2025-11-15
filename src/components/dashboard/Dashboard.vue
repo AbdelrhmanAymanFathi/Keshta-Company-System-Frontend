@@ -144,12 +144,14 @@
 <script>
 import NewSupply from './NewSupply.vue'
 import SuppliesList from './SuppliesList.vue'
-import SuppliesReport from './SuppliesReport.vue'
+// Use the JSON-first report components (replacements)
+import SuppliesReport from './SuppliesReportNew.vue'
 import ContractorsList from './ContractorsList.vue'
 import CrushersList from './CrushersList.vue'
 import VehiclesList from './VehiclesList.vue'
 import TransportList from './TransportList.vue'
-import TransportReport from './TransportReport.vue'
+import TransportReport from './TransportReportNew.vue'
+import ExpensesReport from './ExpensesReportNew.vue'
 import RentalList from './RentalList.vue'
 import RentalReport from './RentalReport.vue'
 import ExpensesList from './ExpensesList.vue'
@@ -161,7 +163,7 @@ import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -187,7 +189,8 @@ export default {
           { name: 'transportReport', label: 'transport.reportMenu', component: 'TransportReport' }
         ],
         expenses: [
-          { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' }
+          { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
+          { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
         ],
         equipmentRent: [
           { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' },
@@ -235,7 +238,7 @@ export default {
       // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return SelectPlaceholder
-      const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, CompanyFinance }
+  const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || ComponentNotFound

@@ -93,6 +93,8 @@
     "#": "#",
     "search": "Search",
     "refresh": "Refresh",
+  "componentNotFound": "Component not found",
+  "componentNotFoundDesc": "This component is not registered.",
     "download": "Download",
     "downloading": "Downloading",
     "noData": "No data",
@@ -169,6 +171,7 @@
     }
   },
   "supply": {
+    "exportTableTitle": "Exports / Supplies Report",
     "addSite": "Add Site",
     "editSite": "Edit Site",
     "addArea": "Add Area",
@@ -377,6 +380,8 @@
     "remaining": "Remaining",
     "notSettled": "Not settled",
     "report": "Report",
+  "reportTitle": "Expenses Report",
+  "reportDescription": "Download an Excel report of all expenses.",
     "exportReport": "Export Report",
     "selectLocation": "Select save location",
     "selectSaveLocation": "Select Save Location",
