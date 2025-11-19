@@ -106,14 +106,14 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
             <tr v-for="(transport, index) in items" :key="transport.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.createdAt ? formatDate(transport.createdAt) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.contractor || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.fromLocation || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.toLocation || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.numTrips || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.distance || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.date || transport.createdAt ? formatDate(transport.date || transport.createdAt) : '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.contractor || transport.contractorName || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.fromLocation || transport.from || transport.fromLoc || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.toLocation || transport.to || transport.toLoc || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.numTrips || transport.trips || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.distance || transport.distanceKm || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.rate || 0) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport.total || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport.total || transport.totalAmount || 0) }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -168,14 +168,14 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item.total || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item.total || item.totalAmount || 0).replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
 
     const totalDistance = computed(() => {
       return items.value.reduce((sum, item) => {
-        const distance = parseFloat(String(item.distance || 0).replace(/,/g, '')) || 0
+        const distance = parseFloat(String(item.distance || item.distanceKm || 0).replace(/,/g, '')) || 0
         return sum + distance
       }, 0)
     })
@@ -207,9 +207,15 @@ export default {
           endDate: filters.value.endDate
         })
         
-        const { data } = response
-        console.log('Raw response:', { data })
+        // Destructure data and headers from response
+        const { data, headers } = response
+        console.log('Raw response:', { data, headers })
         
+        // Handle various response formats (same as RentalReport):
+        // 1. Direct array: [...]
+        // 2. { items: [...] }
+        // 3. { data: [...] }
+        // 4. Nested { data: { items: [...] } }
         let parsedItems = []
         if (Array.isArray(data)) {
           parsedItems = data
@@ -217,34 +223,19 @@ export default {
           parsedItems = data.items
         } else if (data?.data && Array.isArray(data.data)) {
           parsedItems = data.data
-        }
-
-        // Normalize transport rows to expected fields
-        const normalize = (row) => {
-          const r = {}
-          r.date = row.date || row.Date || row.createdAt || row['التاريخ'] || row['date'] || row['تاريخ']
-          r.contractor = row.contractor || (row.contractorName || row['المقاول'] || row['contractor'])
-          r.fromLocation = row.fromLocation || row.from || row['fromLocation'] || row['من الموقع'] || row['from']
-          r.toLocation = row.toLocation || row.to || row['toLocation'] || row['إلى الموقع'] || row['to']
-          const parseNumber = (v) => {
-            if (v == null) return 0
-            if (typeof v === 'number') return v
-            const s = String(v).replace(/[,\s]/g, '')
-            const n = parseFloat(s)
-            return isNaN(n) ? 0 : n
+        } else if (typeof data === 'string') {
+          // Might be stringified JSON
+          try {
+            const parsed = JSON.parse(data)
+            parsedItems = Array.isArray(parsed) ? parsed : (parsed?.items || parsed?.data || [])
+          } catch (_) {
+            parsedItems = []
           }
-          r.numTrips = parseNumber(row.numTrips || row.trips || row['عدد الرحلات'] || row['trips'])
-          r.distance = parseNumber(row.distance || row.distanceKm || row['المسافة'] || row['distance'] || row['distanceKm'])
-          r.rate = parseNumber(row.rate || row.Rate || row['المعدل'] || row['rate'])
-          r.vehicle = row.vehicle || row.vehicleName || row['vehicle'] || row['اسم المركبة']
-          r.total = parseNumber(row.total || row.totalAmount || row['المجموع'] || row.amount)
-          r.id = row.id || null
-          return r
         }
-
-        const normalized = parsedItems.map(normalize)
-        items.value = normalized
+        
+        items.value = parsedItems
         console.log('Parsed items count:', parsedItems.length)
+        console.log('First item:', parsedItems[0])
       } catch (err) {
         console.error('Error loading transport report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'

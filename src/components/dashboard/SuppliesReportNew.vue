@@ -105,12 +105,12 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
             <tr v-for="(supply, index) in items" :key="supply.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.createdAt ? formatDate(supply.createdAt) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.crusherName || supply.crusher || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.siteName || supply.site || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.date || supply.createdAt ? formatDate(supply.date || supply.createdAt) : '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.crusherName || supply.crusher?.name || supply.crusher || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.siteName || supply.site?.name || supply.site || supply.location?.name || supply.location || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.crusherTicket || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.companyTicket || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(supply.unitPrice || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(supply.unitPrice || supply.price || 0) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(supply.totalAmount || supply.total || 0) }}</td>
             </tr>
           </tbody>
@@ -205,9 +205,15 @@ export default {
           endDate: filters.value.endDate
         })
         
-        const { data } = response
-        console.log('Raw response:', { data })
+        // Destructure data and headers from response
+        const { data, headers } = response
+        console.log('Raw response:', { data, headers })
         
+        // Handle various response formats (same as RentalReport):
+        // 1. Direct array: [...]
+        // 2. { items: [...] }
+        // 3. { data: [...] }
+        // 4. Nested { data: { items: [...] } }
         let parsedItems = []
         if (Array.isArray(data)) {
           parsedItems = data
@@ -215,39 +221,19 @@ export default {
           parsedItems = data.items
         } else if (data?.data && Array.isArray(data.data)) {
           parsedItems = data.data
-        }
-
-        // Normalize possible header variations (Arabic / English / different keys)
-        const normalize = (row) => {
-          const r = {}
-          // date
-          r.createdAt = row.createdAt || row.date || row.Date || row['التاريخ'] || row['التاريخ'] || row['Date'] || row['date'] || row['created_at'] || row['Created At'] || row['تاريخ'] || row['التاريخ']
-          // crusher / crusherName
-          r.crusherName = row.crusherName || row.crusher || row['الكسارة'] || row['crusher'] || row['Crusher'] || row['crusherName']
-          // site / siteName / location
-          r.siteName = row.siteName || row.site || row.location || row['الموقع'] || row['location'] || row['site']
-          // tickets
-          r.crusherTicket = row.crusherTicket || row['تذكرة الكسارة'] || row['crusherTicket'] || row['crusher_ticket']
-          r.companyTicket = row.companyTicket || row['تذكرة الشركة'] || row['companyTicket'] || row['company_ticket']
-          // numeric fields
-          const parseNumber = (v) => {
-            if (v == null) return 0
-            if (typeof v === 'number') return v
-            const s = String(v).replace(/[,\s]/g, '')
-            const n = parseFloat(s)
-            return isNaN(n) ? 0 : n
+        } else if (typeof data === 'string') {
+          // Might be stringified JSON
+          try {
+            const parsed = JSON.parse(data)
+            parsedItems = Array.isArray(parsed) ? parsed : (parsed?.items || parsed?.data || [])
+          } catch (_) {
+            parsedItems = []
           }
-          r.unitPrice = parseNumber(row.unitPrice || row['سعر الوحدة'] || row['unitPrice'] || row.price || row['سعر الوحدة'])
-          r.totalAmount = parseNumber(row.totalAmount || row.total || row['المجموع'] || row['total'] || row.amount)
-          r.quantity = parseNumber(row.quantity || row.cubic || row['المكعب'] || row['quantity'])
-          // preserve original id if present
-          r.id = row.id || row.ID || row.Id || null
-          return r
         }
-
-        const normalized = parsedItems.map(normalize)
-        items.value = normalized
+        
+        items.value = parsedItems
         console.log('Parsed items count:', parsedItems.length)
+        console.log('First item:', parsedItems[0])
       } catch (err) {
         console.error('Error loading supplies report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'

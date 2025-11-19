@@ -118,7 +118,7 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
             <tr v-for="(expense, index) in items" :key="expense.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.expenseDate ? formatDate(expense.expenseDate) : '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.date || expense.expenseDate ? formatDate(expense.date || expense.expenseDate) : '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <Badge :variant="getCategoryVariant(expense.category)">
                   {{ expense.category || '-' }}
@@ -183,7 +183,7 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item.amount || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item.amount || item.total || 0).replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
@@ -195,12 +195,17 @@ export default {
 
     const highestExpense = computed(() => {
       if (items.value.length === 0) return 0
-      return Math.max(...items.value.map(item => parseFloat(String(item.amount || 0).replace(/,/g, '')) || 0))
+      return Math.max(...items.value.map(item => parseFloat(String(item.amount || item.total || 0).replace(/,/g, '')) || 0))
     })
 
     const formatDate = (dateString) => {
       if (!dateString) return '-'
-      return new Date(dateString).toLocaleDateString()
+      // Use Gregorian calendar (en-US) to avoid Hijri dates
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      })
     }
 
     const formatCurrency = (amount) => {
@@ -233,9 +238,15 @@ export default {
           category: filters.value.category
         })
         
-        const { data } = response
-        console.log('Raw response:', { data })
+        // Destructure data and headers from response
+        const { data, headers } = response
+        console.log('Raw response:', { data, headers })
         
+        // Handle various response formats (same as RentalReport):
+        // 1. Direct array: [...]
+        // 2. { items: [...] }
+        // 3. { data: [...] }
+        // 4. Nested { data: { items: [...] } }
         let parsedItems = []
         if (Array.isArray(data)) {
           parsedItems = data
@@ -243,31 +254,19 @@ export default {
           parsedItems = data.items
         } else if (data?.data && Array.isArray(data.data)) {
           parsedItems = data.data
-        }
-
-        // Normalize expense rows to expected fields
-        const normalize = (row) => {
-          const r = {}
-          r.date = row.date || row.Date || row.createdAt || row['التاريخ'] || row['date'] || row['تاريخ']
-          r.category = row.category || row['الفئة'] || row['category']
-          r.description = row.description || row.desc || row['الوصف'] || row['description']
-          const parseNumber = (v) => {
-            if (v == null) return 0
-            if (typeof v === 'number') return v
-            const s = String(v).replace(/[,\s]/g, '')
-            const n = parseFloat(s)
-            return isNaN(n) ? 0 : n
+        } else if (typeof data === 'string') {
+          // Might be stringified JSON
+          try {
+            const parsed = JSON.parse(data)
+            parsedItems = Array.isArray(parsed) ? parsed : (parsed?.items || parsed?.data || [])
+          } catch (_) {
+            parsedItems = []
           }
-          r.amount = parseNumber(row.amount || row.total || row['المبلغ'] || row['amount'])
-          r.paid = parseNumber(row.paid || row.paidAmount || row['المدفوع'] || row['paid'])
-          r.remaining = parseNumber(row.remaining || row.remain || row['المتبقي'] || row['remaining'])
-          r.id = row.id || null
-          return r
         }
-
-        const normalized = parsedItems.map(normalize)
-        items.value = normalized
+        
+        items.value = parsedItems
         console.log('Parsed items count:', parsedItems.length)
+        console.log('First item:', parsedItems[0])
       } catch (err) {
         console.error('Error loading expenses report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'

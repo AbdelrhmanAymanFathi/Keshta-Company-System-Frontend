@@ -264,72 +264,99 @@ export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
 
 // Reports
-// Supplies/Exports Report - Get JSON data by default
+// Supplies/Exports Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getSuppliesReportData = async (params = {}, options = { download: false }) => {
+  const { q = '', startDate = '', endDate = '' } = params;
+  const axiosParams = {};
+  if (q) axiosParams.q = q;
+  if (startDate) axiosParams.startDate = startDate;
+  if (endDate) axiosParams.endDate = endDate;
+
+  const url = `${BASE_URL}/api/exports/report`;
+
+  // Try a HEAD request first to detect Content-Type without downloading body
+  let contentType = '';
   try {
-    const axiosParams = {};
-    const { startDate, endDate, q } = params;
-    
-    if (startDate) axiosParams.startDate = startDate;
-    if (endDate) axiosParams.endDate = endDate;
-    if (q) axiosParams.q = q;
-    
-    // Add download flag if needed
-    if (options.download) {
-      axiosParams.download = 'true';
+    const headResp = await axios.head(url, { params: axiosParams, withCredentials: true, timeout: 5000 });
+    contentType = (headResp.headers['content-type'] || '').toLowerCase();
+  } catch (headErr) {
+    if (headErr.response?.status >= 500) {
+      console.warn('HEAD request failed with server error; skipping HEAD and using GET directly');
     }
+    contentType = '';
+  }
 
-    const url = `${BASE_URL}/api/exports/report`;
-    
-    // If download requested, use blob
-    if (options.download) {
-      const response = await axios.get(url, {
-        params: axiosParams,
-        responseType: 'blob',
-        withCredentials: true
-      });
-      return response;
-    }
-
-    // Default: try to fetch as arraybuffer and normalize to JSON (server may return XLSX)
-    const response = await axios.get(url, {
-      params: axiosParams,
-      responseType: 'arraybuffer',
-      withCredentials: true
-    });
-
-    const arrayBuffer = response.data;
-    // Try to decode as text and parse JSON first
-    try {
-      const text = new TextDecoder().decode(arrayBuffer);
-      const trimmed = text.trim();
-      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-        const json = JSON.parse(trimmed);
-        return { data: json, headers: response.headers };
-      }
-    } catch (e) {
-      // not JSON text, fall through to try parsing as Excel
-    }
-
-    // Try parsing as XLSX
-    try {
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
-      return { data: json, headers: response.headers };
-    } catch (e) {
-      // fallback: return raw text
+  // If download explicitly requested, fetch binary and return for download/parse
+  if (options.download) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    const ct = (headers['content-type'] || '').toLowerCase();
+    if (ct.includes('application/json') || ct.includes('text/')) {
       try {
-        const text = new TextDecoder().decode(arrayBuffer);
-        return { data: text, headers: response.headers };
-      } catch (_) {
-        return { data: null, headers: response.headers };
+        const text = new TextDecoder('utf-8').decode(resp.data);
+        return { data: JSON.parse(text), headers };
+      } catch (e) {
+        return { data: resp.data, headers };
       }
     }
-  } catch (error) {
-    console.error('Error getting supplies report:', error);
-    throw error;
+    return { data: resp.data, headers };
+  }
+
+  // If HEAD indicated JSON, do a normal GET expecting JSON
+  if (contentType && (contentType.includes('application/json') || contentType.includes('text/'))) {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // If HEAD indicated an Excel/zip/binary, fetch as arraybuffer and parse
+  if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    try {
+      const data = new Uint8Array(resp.data);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+      return { data: { items: json }, headers };
+    } catch (e) {
+      console.error('Failed to parse Excel from supplies report:', e);
+      return { data: resp.data, headers };
+    }
+  }
+
+  // HEAD was inconclusive or not allowed: do a safe GET with default behaviour and fallback parsing
+  try {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } catch (err) {
+    // If server responded with binary or parsing failed, try fetching arraybuffer and attempt to parse JSON or Excel
+    if (err.response && err.response.data) {
+      try {
+        const resp2 = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+        const headers = resp2.headers || {};
+        const ct = (headers['content-type'] || '').toLowerCase();
+        if (ct.includes('application/json') || ct.includes('text/')) {
+          const text = new TextDecoder('utf-8').decode(resp2.data);
+          return { data: JSON.parse(text), headers };
+        }
+        // Parse as Excel
+        try {
+          const data = new Uint8Array(resp2.data);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+          return { data: { items: json }, headers };
+        } catch (e) {
+          console.error('Failed fallback Excel parse:', e);
+          return { data: resp2.data, headers };
+        }
+      } catch (e2) {
+        throw err; // rethrow original
+      }
+    }
+    throw err;
   }
 };
 
@@ -548,71 +575,100 @@ export const getExpensesReport = (params = {}) => {
   return axios.get(url, { responseType: 'blob' });
 };
 
-// Expenses Report - Get JSON data by default
+// Expenses Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getExpensesReportData = async (params = {}, options = { download: false }) => {
+  const { q = '', startDate = '', endDate = '', category = '' } = params;
+  const axiosParams = {};
+  if (q) axiosParams.q = q;
+  if (startDate) axiosParams.startDate = startDate;
+  if (endDate) axiosParams.endDate = endDate;
+  if (category) axiosParams.category = category;
+
+  const url = `${BASE_URL}/api/expenses/report`;
+
+  // Try a HEAD request first to detect Content-Type without downloading body
+  let contentType = '';
   try {
-    const axiosParams = {};
-    const { startDate, endDate, q, category } = params;
-    
-    if (startDate) axiosParams.startDate = startDate;
-    if (endDate) axiosParams.endDate = endDate;
-    if (q) axiosParams.q = q;
-    if (category) axiosParams.category = category;
-    
-    if (options.download) {
-      axiosParams.download = 'true';
+    const headResp = await axios.head(url, { params: axiosParams, withCredentials: true, timeout: 5000 });
+    contentType = (headResp.headers['content-type'] || '').toLowerCase();
+  } catch (headErr) {
+    if (headErr.response?.status >= 500) {
+      console.warn('HEAD request failed with server error; skipping HEAD and using GET directly');
     }
+    contentType = '';
+  }
 
-    const url = `${BASE_URL}/api/expenses/report`;
-    
-    if (options.download) {
-      const response = await axios.get(url, {
-        params: axiosParams,
-        responseType: 'blob',
-        withCredentials: true
-      });
-      return response;
-    }
-
-    // Default: try to fetch as arraybuffer and normalize to JSON (server may return XLSX)
-    const response = await axios.get(url, {
-      params: axiosParams,
-      responseType: 'arraybuffer',
-      withCredentials: true
-    });
-
-    const arrayBuffer = response.data;
-    // Try to decode as text and parse JSON first
-    try {
-      const text = new TextDecoder().decode(arrayBuffer);
-      const trimmed = text.trim();
-      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-        const json = JSON.parse(trimmed);
-        return { data: json, headers: response.headers };
-      }
-    } catch (e) {
-      // not JSON text, fall through to try parsing as Excel
-    }
-
-    // Try parsing as XLSX
-    try {
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
-      return { data: json, headers: response.headers };
-    } catch (e) {
-      // fallback: return raw text
+  // If download explicitly requested, fetch binary and return for download/parse
+  if (options.download) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    const ct = (headers['content-type'] || '').toLowerCase();
+    if (ct.includes('application/json') || ct.includes('text/')) {
       try {
-        const text = new TextDecoder().decode(arrayBuffer);
-        return { data: text, headers: response.headers };
-      } catch (_) {
-        return { data: null, headers: response.headers };
+        const text = new TextDecoder('utf-8').decode(resp.data);
+        return { data: JSON.parse(text), headers };
+      } catch (e) {
+        return { data: resp.data, headers };
       }
     }
-  } catch (error) {
-    console.error('Error getting expenses report:', error);
-    throw error;
+    return { data: resp.data, headers };
+  }
+
+  // If HEAD indicated JSON, do a normal GET expecting JSON
+  if (contentType && (contentType.includes('application/json') || contentType.includes('text/'))) {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // If HEAD indicated an Excel/zip/binary, fetch as arraybuffer and parse
+  if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    try {
+      const data = new Uint8Array(resp.data);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+      return { data: { items: json }, headers };
+    } catch (e) {
+      console.error('Failed to parse Excel from expenses report:', e);
+      return { data: resp.data, headers };
+    }
+  }
+
+  // HEAD was inconclusive or not allowed: do a safe GET with default behaviour and fallback parsing
+  try {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } catch (err) {
+    // If server responded with binary or parsing failed, try fetching arraybuffer and attempt to parse JSON or Excel
+    if (err.response && err.response.data) {
+      try {
+        const resp2 = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+        const headers = resp2.headers || {};
+        const ct = (headers['content-type'] || '').toLowerCase();
+        if (ct.includes('application/json') || ct.includes('text/')) {
+          const text = new TextDecoder('utf-8').decode(resp2.data);
+          return { data: JSON.parse(text), headers };
+        }
+        // Parse as Excel
+        try {
+          const data = new Uint8Array(resp2.data);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+          return { data: { items: json }, headers };
+        } catch (e) {
+          console.error('Failed fallback Excel parse:', e);
+          return { data: resp2.data, headers };
+        }
+      } catch (e2) {
+        throw err; // rethrow original
+      }
+    }
+    throw err;
   }
 };
 
@@ -727,70 +783,99 @@ export const getTransportReport = (params = {}) => {
   return axios.get(url, { responseType: 'blob' });
 };
 
-// Transport Report - Get JSON data by default
+// Transport Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getTransportReportData = async (params = {}, options = { download: false }) => {
+  const { q = '', startDate = '', endDate = '' } = params;
+  const axiosParams = {};
+  if (q) axiosParams.q = q;
+  if (startDate) axiosParams.startDate = startDate;
+  if (endDate) axiosParams.endDate = endDate;
+
+  const url = `${BASE_URL}/api/transports/report`;
+
+  // Try a HEAD request first to detect Content-Type without downloading body
+  let contentType = '';
   try {
-    const axiosParams = {};
-    const { startDate, endDate, q } = params;
-    
-    if (startDate) axiosParams.startDate = startDate;
-    if (endDate) axiosParams.endDate = endDate;
-    if (q) axiosParams.q = q;
-    
-    if (options.download) {
-      axiosParams.download = 'true';
+    const headResp = await axios.head(url, { params: axiosParams, withCredentials: true, timeout: 5000 });
+    contentType = (headResp.headers['content-type'] || '').toLowerCase();
+  } catch (headErr) {
+    if (headErr.response?.status >= 500) {
+      console.warn('HEAD request failed with server error; skipping HEAD and using GET directly');
     }
+    contentType = '';
+  }
 
-    const url = `${BASE_URL}/api/transports/report`;
-    
-    if (options.download) {
-      const response = await axios.get(url, {
-        params: axiosParams,
-        responseType: 'blob',
-        withCredentials: true
-      });
-      return response;
-    }
-
-    // Default: try to fetch as arraybuffer and normalize to JSON (server may return XLSX)
-    const response = await axios.get(url, {
-      params: axiosParams,
-      responseType: 'arraybuffer',
-      withCredentials: true
-    });
-
-    const arrayBuffer = response.data;
-    // Try to decode as text and parse JSON first
-    try {
-      const text = new TextDecoder().decode(arrayBuffer);
-      const trimmed = text.trim();
-      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-        const json = JSON.parse(trimmed);
-        return { data: json, headers: response.headers };
-      }
-    } catch (e) {
-      // not JSON text, fall through to try parsing as Excel
-    }
-
-    // Try parsing as XLSX
-    try {
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json(worksheet, { defval: null });
-      return { data: json, headers: response.headers };
-    } catch (e) {
-      // fallback: return raw text
+  // If download explicitly requested, fetch binary and return for download/parse
+  if (options.download) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    const ct = (headers['content-type'] || '').toLowerCase();
+    if (ct.includes('application/json') || ct.includes('text/')) {
       try {
-        const text = new TextDecoder().decode(arrayBuffer);
-        return { data: text, headers: response.headers };
-      } catch (_) {
-        return { data: null, headers: response.headers };
+        const text = new TextDecoder('utf-8').decode(resp.data);
+        return { data: JSON.parse(text), headers };
+      } catch (e) {
+        return { data: resp.data, headers };
       }
     }
-  } catch (error) {
-    console.error('Error getting transport report:', error);
-    throw error;
+    return { data: resp.data, headers };
+  }
+
+  // If HEAD indicated JSON, do a normal GET expecting JSON
+  if (contentType && (contentType.includes('application/json') || contentType.includes('text/'))) {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // If HEAD indicated an Excel/zip/binary, fetch as arraybuffer and parse
+  if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    const headers = resp.headers || {};
+    try {
+      const data = new Uint8Array(resp.data);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+      return { data: { items: json }, headers };
+    } catch (e) {
+      console.error('Failed to parse Excel from transport report:', e);
+      return { data: resp.data, headers };
+    }
+  }
+
+  // HEAD was inconclusive or not allowed: do a safe GET with default behaviour and fallback parsing
+  try {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } catch (err) {
+    // If server responded with binary or parsing failed, try fetching arraybuffer and attempt to parse JSON or Excel
+    if (err.response && err.response.data) {
+      try {
+        const resp2 = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+        const headers = resp2.headers || {};
+        const ct = (headers['content-type'] || '').toLowerCase();
+        if (ct.includes('application/json') || ct.includes('text/')) {
+          const text = new TextDecoder('utf-8').decode(resp2.data);
+          return { data: JSON.parse(text), headers };
+        }
+        // Parse as Excel
+        try {
+          const data = new Uint8Array(resp2.data);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+          return { data: { items: json }, headers };
+        } catch (e) {
+          console.error('Failed fallback Excel parse:', e);
+          return { data: resp2.data, headers };
+        }
+      } catch (e2) {
+        throw err; // rethrow original
+      }
+    }
+    throw err;
   }
 };
 
