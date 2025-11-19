@@ -104,14 +104,14 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(supply, index) in items" :key="supply.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.date || supply.createdAt ? formatDate(supply.date || supply.createdAt) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.crusherName || supply.crusher?.name || supply.crusher || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.siteName || supply.site?.name || supply.site || supply.location?.name || supply.location || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.crusherTicket || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply.companyTicket || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(supply.unitPrice || supply.price || 0) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(supply.totalAmount || supply.total || 0) }}</td>
+            <tr v-for="(supply, index) in items" :key="supply.ID || supply.id || index" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply['التاريخ'] || supply.date || supply.createdAt ? (supply['التاريخ'] || formatDate(supply.date || supply.createdAt)) : '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply['الكسارة'] || supply.crusherName || supply.crusher?.name || supply.crusher || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply['الموقع'] || supply.siteName || supply.site?.name || supply.site || supply.location?.name || supply.location || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply['تذكرة الكسارة'] || supply.crusherTicket || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ supply['تذكرة الشركة'] || supply.companyTicket || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(supply['سعر الوحدة'] || supply.unitPrice || supply.price || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(supply['المجموع'] || supply.totalAmount || supply.total || 0) }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -166,14 +166,14 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item.totalAmount || item.total || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item['المجموع'] || item.totalAmount || item.total || 0).replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
 
     const totalQuantity = computed(() => {
       return items.value.reduce((sum, item) => {
-        const qty = parseFloat(String(item.quantity || 0).replace(/,/g, '')) || 0
+        const qty = parseFloat(String(item['المكعب'] || item.quantity || 0).replace(/,/g, '')) || 0
         return sum + qty
       }, 0)
     })

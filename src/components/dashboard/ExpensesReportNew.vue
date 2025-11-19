@@ -117,15 +117,15 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(expense, index) in items" :key="expense.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.date || expense.expenseDate ? formatDate(expense.date || expense.expenseDate) : '-' }}</td>
+            <tr v-for="(expense, index) in items" :key="expense.ID || expense.id || index" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense['التاريخ'] || expense.date || expense.expenseDate ? (expense['التاريخ'] || formatDate(expense.date || expense.expenseDate)) : '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <Badge :variant="getCategoryVariant(expense.category)">
-                  {{ expense.category || '-' }}
+                <Badge :variant="getCategoryVariant(expense['الفئة'] || expense.category)">
+                  {{ expense['الفئة'] || expense.category || '-' }}
                 </Badge>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ expense.description || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense.amount || 0) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900">{{ expense['الوصف'] || expense.description || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense['المبلغ'] || expense.amount || 0) }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -183,7 +183,7 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item.amount || item.total || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item['المبلغ'] || item.amount || item.total || 0).replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
@@ -195,7 +195,7 @@ export default {
 
     const highestExpense = computed(() => {
       if (items.value.length === 0) return 0
-      return Math.max(...items.value.map(item => parseFloat(String(item.amount || item.total || 0).replace(/,/g, '')) || 0))
+      return Math.max(...items.value.map(item => parseFloat(String(item['المبلغ'] || item.amount || item.total || 0).replace(/,/g, '')) || 0))
     })
 
     const formatDate = (dateString) => {

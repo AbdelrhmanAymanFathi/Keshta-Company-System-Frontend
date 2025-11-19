@@ -105,15 +105,15 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(transport, index) in items" :key="transport.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.date || transport.createdAt ? formatDate(transport.date || transport.createdAt) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.contractor || transport.contractorName || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.fromLocation || transport.from || transport.fromLoc || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.toLocation || transport.to || transport.toLoc || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.numTrips || transport.trips || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.distance || transport.distanceKm || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.rate || 0) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport.total || transport.totalAmount || 0) }}</td>
+            <tr v-for="(transport, index) in items" :key="transport.ID || transport.id || index" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['التاريخ'] || transport.date || transport.createdAt ? (transport['التاريخ'] || formatDate(transport.date || transport.createdAt)) : '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['المقاول'] || transport.contractor || transport.contractorName || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['من'] || transport.fromLocation || transport.from || transport.fromLoc || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['إلى'] || transport.toLocation || transport.to || transport.toLoc || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['عدد النقلات'] || transport.numTrips || transport.trips || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['المسافة (كم)'] || transport['المسافة'] || transport.distance || transport.distanceKm || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport['المعدل'] || transport.rate || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport['الإجمالي'] || transport.total || transport.totalAmount || 0) }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -168,14 +168,14 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item.total || item.totalAmount || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item['الإجمالي'] || item.total || item.totalAmount || 0).replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
 
     const totalDistance = computed(() => {
       return items.value.reduce((sum, item) => {
-        const distance = parseFloat(String(item.distance || item.distanceKm || 0).replace(/,/g, '')) || 0
+        const distance = parseFloat(String(item['المسافة (كم)'] || item['المسافة'] || item.distance || item.distanceKm || 0).replace(/,/g, '')) || 0
         return sum + distance
       }, 0)
     })
