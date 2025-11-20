@@ -223,13 +223,10 @@ export default {
     const loadReport = async () => {
       loading.value = true
       error.value = null
-      try {
-        const response = await getRentalReportData({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate,
-          isCompanyOwned: filters.value.isCompanyOwned
-        })
+        try {
+          const response = await getRentalReportData({
+            ...filters.value
+          }, 'json')
         
         // Destructure data and headers from response
         const { data, headers } = response
@@ -297,13 +294,10 @@ export default {
     const downloadReport = async () => {
       downloading.value = true
       error.value = null
-      try {
-        const { data, headers } = await downloadRentalReport({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate,
-          isCompanyOwned: filters.value.isCompanyOwned
-        })
+        try {
+          const { data, headers } = await downloadRentalReport({
+            ...filters.value
+          }, 'xlsx')
         
         const disposition = headers['content-disposition'] || headers['Content-Disposition']
         let filename = 'rentals-report.xlsx'

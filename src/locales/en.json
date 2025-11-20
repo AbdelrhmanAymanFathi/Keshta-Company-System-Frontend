@@ -357,6 +357,9 @@
     }
   },
   "expenses": {
+    "addCategory": "Add Category",
+    "addBranch": "Add Branch",
+    "addLocation": "Add Location",
     "title": "Expenses",
     "addExpense": "Add Expense",
     "editExpense": "Edit Expense",

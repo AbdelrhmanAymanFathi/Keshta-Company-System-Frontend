@@ -200,12 +200,10 @@ export default {
     const loadReport = async () => {
       loading.value = true
       error.value = null
-      try {
-        const response = await getTransportReportData({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate
-        })
+        try {
+          const response = await getTransportReportData({
+            ...filters.value
+          }, 'json')
         
         // Destructure data and headers from response
         const { data, headers } = response
@@ -260,12 +258,10 @@ export default {
     const downloadReport = async () => {
       downloading.value = true
       error.value = null
-      try {
-        const { data, headers } = await downloadTransportReport({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate
-        })
+        try {
+          const { data, headers } = await downloadTransportReport({
+            ...filters.value
+          })
         
         const filename = `transports-${filters.value.startDate}_${filters.value.endDate}.xlsx`
         const blob = new Blob([data], { type: headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })

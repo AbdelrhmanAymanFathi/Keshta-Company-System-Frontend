@@ -199,11 +199,9 @@ export default {
       loading.value = true
       error.value = null
       try {
-        const response = await getSuppliesReportData({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate
-        })
+          const response = await getSuppliesReportData({
+            ...filters.value
+          }, 'json')
         
         // Destructure data and headers from response
         const { data, headers } = response
@@ -259,11 +257,9 @@ export default {
       downloading.value = true
       error.value = null
       try {
-        const { data, headers } = await downloadSuppliesReport({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate
-        })
+          const { data, headers } = await downloadSuppliesReport({
+            ...filters.value
+          }, 'xlsx')
         
         const filename = `supplies-${filters.value.startDate}_${filters.value.endDate}.xlsx`
         const blob = new Blob([data], { type: headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })

@@ -232,11 +232,8 @@ export default {
       error.value = null
       try {
         const response = await getExpensesReportData({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate,
-          category: filters.value.category
-        })
+          ...filters.value
+        }, 'json')
         
         // Destructure data and headers from response
         const { data, headers } = response
@@ -294,10 +291,7 @@ export default {
       error.value = null
       try {
         const { data, headers } = await downloadExpensesReport({
-          q: filters.value.q,
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate,
-          category: filters.value.category
+          ...filters.value
         })
         
         const filename = `expenses-${filters.value.startDate}_${filters.value.endDate}.xlsx`

@@ -357,6 +357,9 @@
     }
   },
   "expenses": {
+    "addCategory": "إضافة فئة",
+    "addBranch": "إضافة فرع",
+    "addLocation": "إضافة موقع",
     "title": "المصروفات",
     "addExpense": "إضافة مصروف",
     "editExpense": "تعديل المصروف",
