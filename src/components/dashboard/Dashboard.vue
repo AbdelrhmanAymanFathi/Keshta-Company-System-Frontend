@@ -172,7 +172,7 @@ export default {
     return {
       // menus
       topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet' },
-      selectedTop: 'supplies',
+      selectedTop: localStorage.getItem('dashboard-selectedTop') || 'supplies',
       // vertical submenus map
       menuMap: {
         supplies: [
@@ -202,7 +202,7 @@ export default {
       },
 
       // UI state
-      selectedVertical: 'newSupply',
+      selectedVertical: localStorage.getItem('dashboard-selectedVertical') || 'newSupply',
       // Set default for companyWallet
       defaultCompanyEquipment: 'companyWallet',
       sidebarOpen: false,
@@ -296,12 +296,15 @@ export default {
     // top menu selection
     selectTop(key) {
       this.selectedTop = key
+      localStorage.setItem('dashboard-selectedTop', key)
       // set first vertical child
       const first = (this.menuMap[key] && this.menuMap[key][0]) ? this.menuMap[key][0].name : null
       if (first) {
         this.selectedVertical = first
+        localStorage.setItem('dashboard-selectedVertical', first)
       } else if (key === 'companyWallet') {
         this.selectedVertical = this.defaultCompanyEquipment
+        localStorage.setItem('dashboard-selectedVertical', this.defaultCompanyEquipment)
       }
       this.sidebarOpen = false
     },
@@ -309,6 +312,7 @@ export default {
     // vertical selection
     selectVertical(name) {
       this.selectedVertical = name
+      localStorage.setItem('dashboard-selectedVertical', name)
       // close sidebar on mobile for better UX
       if (this.isMobile) this.sidebarOpen = false
     },
@@ -383,9 +387,24 @@ export default {
   },
 
   mounted() {
-    // initial vertical menu selection
-    const first = (this.menuMap[this.selectedTop] && this.menuMap[this.selectedTop][0]) ? this.menuMap[this.selectedTop][0].name : null
-    if (first && !this.selectedVertical) this.selectedVertical = first
+    // استرجاع آخر تبويب وعنصر فرعي من localStorage إذا وجدوا
+    const savedTop = localStorage.getItem('dashboard-selectedTop')
+    const savedVertical = localStorage.getItem('dashboard-selectedVertical')
+    if (savedTop && this.menuMap[savedTop]) {
+      this.selectedTop = savedTop
+      // تحقق أن العنصر الفرعي موجود في القائمة
+      if (savedVertical && this.menuMap[savedTop].some(i => i.name === savedVertical)) {
+        this.selectedVertical = savedVertical
+      } else {
+        // إذا لم يوجد، اختر أول عنصر
+        const first = this.menuMap[savedTop][0]?.name
+        if (first) this.selectedVertical = first
+      }
+    } else {
+      // إذا لم يوجد شيء محفوظ، استخدم الافتراضي
+      const first = (this.menuMap[this.selectedTop] && this.menuMap[this.selectedTop][0]) ? this.menuMap[this.selectedTop][0].name : null
+      if (first && !this.selectedVertical) this.selectedVertical = first
+    }
 
     // set language dir on mount as well
     document.documentElement.lang = this.$i18n.locale || 'en'
