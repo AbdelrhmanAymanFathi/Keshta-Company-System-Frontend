@@ -95,12 +95,12 @@
         </div>
         <div :class="['flex items-center gap-2 text-sm text-gray-600', isRTL ? 'justify-end' : 'justify-start']">
           <label>{{ $t('finance.pageSize') }}:</label>
-          <select :value="transactions.pageSize" @change="onPageSizeChange" 
+          <select v-model.number="transactions.pageSize" @change="onPageSizeChange"
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
+            <option :value="10">10</option>
+            <option :value="20">20</option>
+            <option :value="50">50</option>
+            <option :value="100">100</option>
           </select>
         </div>
       </div>
@@ -214,20 +214,42 @@
             </div>
             <div>
               <nav :class="['relative z-0 inline-flex rounded-md shadow-sm -space-x-px', isRTL ? 'flex-row-reverse' : '']">
-                <button @click="changePage(transactions.page - 1)" 
-                  :disabled="transactions.page <= 1"
-                  :class="['relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed', isRTL ? 'rounded-r-md' : 'rounded-l-md']">
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-                <button @click="changePage(transactions.page + 1)" 
-                  :disabled="transactions.page >= transactions.totalPages"
-                  :class="['relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed', isRTL ? 'rounded-l-md' : 'rounded-r-md']">
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                  </svg>
-                </button>
+                <template v-if="!isRTL">
+                  <!-- Previous Button (LTR: left) -->
+                  <button @click="changePage(transactions.page - 1)"
+                    :disabled="transactions.page <= 1"
+                    class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                  <!-- Next Button (LTR: right) -->
+                  <button @click="changePage(transactions.page + 1)"
+                    :disabled="transactions.page >= transactions.totalPages"
+                    class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </template>
+                <template v-else>
+                  <!-- Next Button (RTL: left, visually first) -->
+                  <button @click="changePage(transactions.page + 1)"
+                    :disabled="transactions.page >= transactions.totalPages"
+                    class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                  <!-- Previous Button (RTL: right, visually last) -->
+                  <button @click="changePage(transactions.page - 1)"
+                    :disabled="transactions.page <= 1"
+                    class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </template>
               </nav>
             </div>
           </div>
@@ -351,7 +373,7 @@
 <script>
 
 import { ref, onMounted, computed } from 'vue'
-import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -394,17 +416,31 @@ export default {
 
     const fetchTransactions = async () => {
       if (!selectedBranch.value) {
-        await financeStore.fetchTransactions()
-        transactions.value = { ...financeStore.transactions, totalPages: financeStore.totalPages }
-      } else {
-        const res = await getBranchWalletTransactions(selectedBranch.value.id, transactions.value.page, transactions.value.pageSize)
+        // Main company wallet
+        const res = await getCompanyTransactions({
+          page: transactions.value.page,
+          pageSize: transactions.value.pageSize
+        });
         transactions.value = {
           items: res.data.items,
           total: res.data.total,
           page: res.data.page,
           pageSize: res.data.pageSize,
           totalPages: Math.ceil(res.data.total / res.data.pageSize)
-        }
+        };
+      } else {
+        // Branch wallet
+        const res = await getBranchWalletTransactions(selectedBranch.value.id, {
+          page: transactions.value.page,
+          pageSize: transactions.value.pageSize
+        });
+        transactions.value = {
+          items: res.data.items,
+          total: res.data.total,
+          page: res.data.page,
+          pageSize: res.data.pageSize,
+          totalPages: Math.ceil(res.data.total / res.data.pageSize)
+        };
       }
     }
 
@@ -434,9 +470,19 @@ export default {
       processing.value = true
       try {
         if (!selectedBranch.value) {
-          await financeStore.deposit(depositForm.value.amount, depositForm.value.description, depositForm.value.date)
+          // Main company wallet
+          await depositToCompanyWallet({
+            amount: depositForm.value.amount,
+            description: depositForm.value.description,
+            date: depositForm.value.date
+          });
         } else {
-          await depositToBranchWallet(selectedBranch.value.id, depositForm.value.amount, depositForm.value.description, depositForm.value.date)
+          // Branch wallet
+          await depositToBranchWallet(selectedBranch.value.id, {
+            amount: depositForm.value.amount,
+            description: depositForm.value.description,
+            date: depositForm.value.date
+          });
         }
         await fetchSummary()
         await fetchTransactions()
@@ -455,9 +501,19 @@ export default {
       processing.value = true
       try {
         if (!selectedBranch.value) {
-          await financeStore.withdraw(withdrawForm.value.amount, withdrawForm.value.description, withdrawForm.value.date)
+          // Main company wallet
+          await withdrawFromCompanyWallet({
+            amount: withdrawForm.value.amount,
+            description: withdrawForm.value.description,
+            date: withdrawForm.value.date
+          });
         } else {
-          await withdrawFromBranchWallet(selectedBranch.value.id, withdrawForm.value.amount, withdrawForm.value.description, withdrawForm.value.date)
+          // Branch wallet
+          await withdrawFromBranchWallet(selectedBranch.value.id, {
+            amount: withdrawForm.value.amount,
+            description: withdrawForm.value.description,
+            date: withdrawForm.value.date
+          });
         }
         await fetchSummary()
         await fetchTransactions()
@@ -474,8 +530,7 @@ export default {
         await fetchTransactions()
       }
     }
-    const onPageSizeChange = async (event) => {
-      transactions.value.pageSize = parseInt(event.target.value)
+    const onPageSizeChange = async () => {
       transactions.value.page = 1
       await fetchTransactions()
     }
