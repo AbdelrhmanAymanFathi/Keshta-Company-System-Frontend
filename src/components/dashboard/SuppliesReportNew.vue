@@ -150,6 +150,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { getSuppliesReportData, downloadSuppliesReport } from '@/api'
+import { buildQueryParams } from '@/utils/buildQueryParams'
 
 export default {
   name: 'SuppliesReport',
@@ -199,36 +200,54 @@ export default {
       loading.value = true
       error.value = null
       try {
-          const response = await getSuppliesReportData({
-            ...filters.value
-          }, 'json')
+          const response = await getSuppliesReportData(
+            buildQueryParams(filters.value),
+            'json'
+          )
         
         // Destructure data and headers from response
         const { data, headers } = response
         console.log('Raw response:', { data, headers })
-        
-        // Handle various response formats (same as RentalReport):
+
+        // Handle various response formats:
         // 1. Direct array: [...]
-        // 2. { items: [...] }
-        // 3. { data: [...] }
-        // 4. Nested { data: { items: [...] } }
+        // 2. { rows: [...] }   <-- backend returns this
+        // 3. { items: [...] }
+        // 4. { data: [...] }
+        // 5. Nested { data: { items: [...] } }
         let parsedItems = []
+
         if (Array.isArray(data)) {
+          // e.g. data = [...]
           parsedItems = data
-        } else if (data?.items && Array.isArray(data.items)) {
+        } else if (Array.isArray(data?.rows)) {
+          // e.g. data = { rows: [...] , count: N }
+          parsedItems = data.rows
+        } else if (Array.isArray(data?.items)) {
           parsedItems = data.items
-        } else if (data?.data && Array.isArray(data.data)) {
+        } else if (Array.isArray(data?.data)) {
           parsedItems = data.data
         } else if (typeof data === 'string') {
           // Might be stringified JSON
           try {
             const parsed = JSON.parse(data)
-            parsedItems = Array.isArray(parsed) ? parsed : (parsed?.items || parsed?.data || [])
+
+            if (Array.isArray(parsed)) {
+              parsedItems = parsed
+            } else if (Array.isArray(parsed?.rows)) {
+              parsedItems = parsed.rows
+            } else if (Array.isArray(parsed?.items)) {
+              parsedItems = parsed.items
+            } else if (Array.isArray(parsed?.data)) {
+              parsedItems = parsed.data
+            } else {
+              parsedItems = []
+            }
           } catch (_) {
             parsedItems = []
           }
         }
-        
+
         items.value = parsedItems
         console.log('Parsed items count:', parsedItems.length)
         console.log('First item:', parsedItems[0])
@@ -257,9 +276,10 @@ export default {
       downloading.value = true
       error.value = null
       try {
-          const { data, headers } = await downloadSuppliesReport({
-            ...filters.value
-          }, 'xlsx')
+          const { data, headers } = await downloadSuppliesReport(
+            buildQueryParams(filters.value),
+            'xlsx'
+          )
         
         const filename = `supplies-${filters.value.startDate}_${filters.value.endDate}.xlsx`
         const blob = new Blob([data], { type: headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
