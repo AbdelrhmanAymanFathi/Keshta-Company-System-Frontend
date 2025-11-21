@@ -1,23 +1,23 @@
 <template>
   <div class="flex space-y-0">
 
-    <aside :class="['bg-white rounded-lg shadow overflow-hidden', isRTL ? 'direction-rtl' : '']" style="min-width: 260px; max-width: 320px;">
-      <h3 class="text-lg font-semibold text-indigo-700 mb-2">{{ $t('finance.wallets') }}</h3>
+    <aside :class="['bg-white rounded-lg shadow overflow-hidden', isRTL ? 'direction-rtl' : '', isRTL ? 'text-end' : 'text-start']" style="min-width: 260px; max-width: 320px;">
+      <h3 :class="['text-lg font-semibold text-indigo-700 mb-2', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.wallets') }}</h3>
       <ul class="space-y-2">
         <li>
-          <button @click="selectBranch(null)" :class="[selectedBranch === null ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full text-left px-3 py-2 rounded transition']">
+          <button @click="selectBranch(null)" :class="[selectedBranch === null ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full', isRTL ? 'text-end' : 'text-start', 'px-3 py-2 rounded transition']">
             <span class="font-semibold">{{ $t('finance.companyWallet') }}</span>
           </button>
         </li>
         <li v-for="branch in branches" :key="branch.id">
-          <button @click="selectBranch(branch)" :class="[selectedBranch && selectedBranch.id === branch.id ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full text-left px-3 py-2 rounded transition']">
+          <button @click="selectBranch(branch)" :class="[selectedBranch && selectedBranch.id === branch.id ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full', isRTL ? 'text-end' : 'text-start', 'px-3 py-2 rounded transition']">
             <span>{{ branch.name }}</span>
           </button>
         </li>
       </ul>
     </aside>
     <!-- Main Content -->
-    <div class="flex-1 p-6 space-y-6">
+    <div :class="['flex-1 p-6 space-y-6', isRTL ? 'text-end' : 'text-start']">
     <!-- Balance Card -->
 
     <!-- <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
@@ -52,7 +52,7 @@
 
     <!-- Summary Stats Bar -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
+      <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600', isRTL ? 'text-end' : 'text-start']">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.currentBalance') }}</p>
@@ -63,7 +63,7 @@
           </svg>
         </div>
       </div>
-      <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
+      <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-green-600', isRTL ? 'text-end' : 'text-start']">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.last30dIn') }}</p>
@@ -74,7 +74,7 @@
           </svg>
         </div>
       </div>
-      <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
+      <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-red-600', isRTL ? 'text-end' : 'text-start']">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.last30dOut') }}</p>
@@ -88,12 +88,12 @@
     </div>
 
     <!-- Transactions Stats Bar -->
-    <div class="bg-gray-50 rounded-lg p-4">
+    <div :class="['bg-gray-50 rounded-lg p-4', isRTL ? 'text-end' : 'text-start']">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div class="text-sm text-gray-600">
+        <div :class="['text-sm text-gray-600', isRTL ? 'text-end' : 'text-start']">
           {{ $t('finance.totalTransactions') }}: <span class="font-semibold">{{ transactions.total }}</span>
         </div>
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+        <div :class="['flex items-center gap-2 text-sm text-gray-600', isRTL ? 'justify-end' : 'justify-start']">
           <label>{{ $t('finance.pageSize') }}:</label>
           <select :value="transactions.pageSize" @change="onPageSizeChange" 
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
@@ -108,13 +108,13 @@
 
     <!-- Loading/Error/Main Content Switch -->
     <template v-if="loading">
-      <div class="flex justify-center py-8">
+      <div :class="['flex justify-center py-8', isRTL ? 'text-end' : 'text-start']">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
     </template>
     <template v-else-if="error">
-      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div class="flex items-center">
+      <div :class="['bg-red-50 border border-red-200 rounded-lg p-4', isRTL ? 'text-end' : 'text-start']">
+        <div :class="['flex items-center', isRTL ? 'justify-end' : 'justify-start']">
           <svg class="w-6 h-6 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -126,7 +126,7 @@
       <!-- Transactions Table -->
       <div class="bg-white rounded-lg shadow overflow-hidden">
         <!-- No Results Message -->
-        <div v-if="transactions.items.length === 0" class="text-center py-12">
+        <div v-if="transactions.items.length === 0" :class="['text-center py-12', isRTL ? 'text-end' : 'text-start']">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
@@ -137,43 +137,43 @@
         </div>
         <!-- Table -->
         <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
+          <table :class="['min-w-full divide-y divide-gray-200', isRTL ? 'text-end' : 'text-start']">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('finance.date') }}
                 </th>
-                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('finance.type') }}
                 </th>
-                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('finance.amount') }}
                 </th>
-                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('finance.description') }}
                 </th>
-                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('finance.reference') }}
                 </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="transaction in transactions.items" :key="transaction.id" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td :class="['px-6 py-4 whitespace-nowrap text-sm text-gray-900', isRTL ? 'text-end' : 'text-start']">
                   {{ formatDate(transaction.date) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <td :class="['px-6 py-4 whitespace-nowrap text-sm', isRTL ? 'text-end' : 'text-start']">
                   <BadgeComponent :variant="getTransactionVariant(transaction.type)">
                     {{ getTransactionTypeLabel(transaction.type) }}
                   </BadgeComponent>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" :class="getAmountColor(transaction.type)">
+                <td :class="['px-6 py-4 whitespace-nowrap text-sm font-semibold', getAmountColor(transaction.type), isRTL ? 'text-end' : 'text-start']">
                   {{ formatCurrency(transaction.amount) }}
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-900">
+                <td :class="['px-6 py-4 text-sm text-gray-900', isRTL ? 'text-end' : 'text-start']">
                   {{ transaction.description || '-' }}
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500">
+                <td :class="['px-6 py-4 text-sm text-gray-500', isRTL ? 'text-end' : 'text-start']">
                   <span v-if="transaction.refType && transaction.refType !== 'NONE'">
                     {{ transaction.refType }}: {{ transaction.refId || '-' }}
                   </span>
@@ -184,14 +184,14 @@
           </table>
         </div>
         <!-- Pagination -->
-        <div v-if="transactions.totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div class="flex-1 flex justify-between sm:hidden">
+        <div v-if="transactions.totalPages > 1" :class="['bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6', isRTL ? 'flex-row-reverse' : '']">
+          <div :class="['flex-1 flex justify-between sm:hidden', isRTL ? 'flex-row-reverse' : '']">
             <button @click="changePage(transactions.page - 1)" 
               :disabled="transactions.page <= 1"
               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               {{ $t('labels.previous') }}
             </button>
-            <span class="text-sm text-gray-700 self-center">
+            <span :class="['text-sm text-gray-700 self-center', isRTL ? 'order-2' : '']">
               {{ transactions.page }} / {{ transactions.totalPages }}
             </span>
             <button @click="changePage(transactions.page + 1)" 
@@ -200,9 +200,9 @@
               {{ $t('labels.next') }}
             </button>
           </div>
-          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div :class="['hidden sm:flex-1 sm:flex sm:items-center sm:justify-between', isRTL ? 'flex-row-reverse' : '']">
             <div>
-              <p class="text-sm text-gray-700">
+              <p :class="['text-sm text-gray-700', isRTL ? 'text-end' : 'text-start']">
                 {{ $t('labels.showing') }} 
                 <span class="font-medium">{{ ((transactions.page - 1) * transactions.pageSize) + 1 }}</span>
                 {{ $t('labels.to') }}
@@ -213,17 +213,17 @@
               </p>
             </div>
             <div>
-              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <nav :class="['relative z-0 inline-flex rounded-md shadow-sm -space-x-px', isRTL ? 'flex-row-reverse' : '']">
                 <button @click="changePage(transactions.page - 1)" 
                   :disabled="transactions.page <= 1"
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                  :class="['relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed', isRTL ? 'rounded-r-md' : 'rounded-l-md']">
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </button>
                 <button @click="changePage(transactions.page + 1)" 
                   :disabled="transactions.page >= transactions.totalPages"
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                  :class="['relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed', isRTL ? 'rounded-l-md' : 'rounded-r-md']">
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                   </svg>
@@ -237,10 +237,10 @@
 
     <!-- Deposit Modal -->
     <div v-if="showDepositModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeDepositModal">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
         <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('finance.deposit') }}</h3>
-          <form @submit.prevent="handleDeposit" class="space-y-4">
+          <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.deposit') }}</h3>
+          <form @submit.prevent="handleDeposit" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('finance.amount') }} *
@@ -292,10 +292,10 @@
 
     <!-- Withdraw Modal -->
     <div v-if="showWithdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeWithdrawModal">
-      <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
         <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('finance.withdraw') }}</h3>
-          <form @submit.prevent="handleWithdraw" class="space-y-4">
+          <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.withdraw') }}</h3>
+          <form @submit.prevent="handleWithdraw" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('finance.amount') }} *
