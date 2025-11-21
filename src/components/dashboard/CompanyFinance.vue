@@ -1,6 +1,25 @@
 <template>
-  <div class="space-y-6">
+  <div class="flex space-y-0">
+
+    <aside :class="['bg-white rounded-lg shadow overflow-hidden', isRTL ? 'direction-rtl' : '']" style="min-width: 260px; max-width: 320px;">
+      <h3 class="text-lg font-semibold text-indigo-700 mb-2">{{ $t('finance.wallets') }}</h3>
+      <ul class="space-y-2">
+        <li>
+          <button @click="selectBranch(null)" :class="[selectedBranch === null ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full text-left px-3 py-2 rounded transition']">
+            <span class="font-semibold">{{ $t('finance.companyWallet') }}</span>
+          </button>
+        </li>
+        <li v-for="branch in branches" :key="branch.id">
+          <button @click="selectBranch(branch)" :class="[selectedBranch && selectedBranch.id === branch.id ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full text-left px-3 py-2 rounded transition']">
+            <span>{{ branch.name }}</span>
+          </button>
+        </li>
+      </ul>
+    </aside>
+    <!-- Main Content -->
+    <div class="flex-1 p-6 space-y-6">
     <!-- Balance Card -->
+
     <!-- <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -23,6 +42,7 @@
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+
             </svg>
             {{ $t('finance.withdraw') }}
           </button>
@@ -32,38 +52,33 @@
 
     <!-- Summary Stats Bar -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Current Balance -->
       <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.currentBalance') }}</p>
-            <p class="text-2xl font-bold text-indigo-600 mt-1">{{ financeStore.formattedBalance }}</p>
+            <p class="text-2xl font-bold text-indigo-600 mt-1">{{ formatCurrency(summary.balance) }}</p>
           </div>
           <svg class="w-10 h-10 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
       </div>
-
-      <!-- Last 30 Days In -->
       <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.last30dIn') }}</p>
-            <p class="text-2xl font-bold text-green-600 mt-1">{{ financeStore.formattedLast30dIn }}</p>
+            <p class="text-2xl font-bold text-green-600 mt-1">{{ formatCurrency(summary.last30dIn) }}</p>
           </div>
           <svg class="w-10 h-10 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
       </div>
-
-      <!-- Last 30 Days Out -->
       <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.last30dOut') }}</p>
-            <p class="text-2xl font-bold text-red-600 mt-1">{{ financeStore.formattedLast30dOut }}</p>
+            <p class="text-2xl font-bold text-red-600 mt-1">{{ formatCurrency(summary.last30dOut) }}</p>
           </div>
           <svg class="w-10 h-10 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -76,11 +91,11 @@
     <div class="bg-gray-50 rounded-lg p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div class="text-sm text-gray-600">
-          {{ $t('finance.totalTransactions') }}: <span class="font-semibold">{{ financeStore.transactions.total }}</span>
+          {{ $t('finance.totalTransactions') }}: <span class="font-semibold">{{ transactions.total }}</span>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <label>{{ $t('finance.pageSize') }}:</label>
-          <select :value="financeStore.transactions.pageSize" @change="onPageSizeChange" 
+          <select :value="transactions.pageSize" @change="onPageSizeChange" 
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
             <option value="10">10</option>
             <option value="20">20</option>
@@ -91,134 +106,134 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div v-if="financeStore.loading" class="flex justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="financeStore.error" class="bg-red-50 border border-red-200 rounded-lg p-4">
-      <div class="flex items-center">
-        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <span class="text-red-800">{{ financeStore.error }}</span>
+    <!-- Loading/Error/Main Content Switch -->
+    <template v-if="loading">
+      <div class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
-    </div>
-
-    <!-- Transactions Table -->
-    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
-      <!-- No Results Message -->
-      <div v-if="financeStore.transactions.items.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('finance.noTransactions') }}</h3>
-        <p class="mt-1 text-sm text-gray-500">
-          {{ $t('finance.noTransactionsDesc') }}
-        </p>
-      </div>
-
-      <!-- Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ $t('finance.date') }}
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ $t('finance.type') }}
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ $t('finance.amount') }}
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ $t('finance.description') }}
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ $t('finance.reference') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="transaction in financeStore.transactions.items" :key="transaction.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatDate(transaction.date) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <Badge :variant="getTransactionVariant(transaction.type)">
-                  {{ getTransactionTypeLabel(transaction.type) }}
-                </Badge>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" :class="getAmountColor(transaction.type)">
-                {{ formatCurrency(transaction.amount) }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900">
-                {{ transaction.description || '-' }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-500">
-                <span v-if="transaction.refType && transaction.refType !== 'NONE'">
-                  {{ transaction.refType }}: {{ transaction.refId || '-' }}
-                </span>
-                <span v-else>-</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="financeStore.totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-        <div class="flex-1 flex justify-between sm:hidden">
-          <button @click="changePage(financeStore.transactions.page - 1)" 
-            :disabled="financeStore.transactions.page <= 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            {{ $t('labels.previous') }}
-          </button>
-          <span class="text-sm text-gray-700 self-center">
-            {{ financeStore.transactions.page }} / {{ financeStore.totalPages }}
-          </span>
-          <button @click="changePage(financeStore.transactions.page + 1)" 
-            :disabled="financeStore.transactions.page >= financeStore.totalPages"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            {{ $t('labels.next') }}
-          </button>
-        </div>
-
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p class="text-sm text-gray-700">
-              {{ $t('labels.showing') }} 
-              <span class="font-medium">{{ ((financeStore.transactions.page - 1) * financeStore.transactions.pageSize) + 1 }}</span>
-              {{ $t('labels.to') }}
-              <span class="font-medium">{{ Math.min(financeStore.transactions.page * financeStore.transactions.pageSize, financeStore.transactions.total) }}</span>
-              {{ $t('labels.of') }}
-              <span class="font-medium">{{ financeStore.transactions.total }}</span>
-              {{ $t('labels.results') }}
-            </p>
-          </div>
-          <div>
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              <button @click="changePage(financeStore.transactions.page - 1)" 
-                :disabled="financeStore.transactions.page <= 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              </button>
-              <button @click="changePage(financeStore.transactions.page + 1)" 
-                :disabled="financeStore.transactions.page >= financeStore.totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-              </button>
-            </nav>
-          </div>
+    </template>
+    <template v-else-if="error">
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          <span>{{ error }}</span>
         </div>
       </div>
-    </div>
+    </template>
+    <template v-else>
+      <!-- Transactions Table -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <!-- No Results Message -->
+        <div v-if="transactions.items.length === 0" class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('finance.noTransactions') }}</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ $t('finance.noTransactionsDesc') }}
+          </p>
+        </div>
+        <!-- Table -->
+        <div v-else class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {{ $t('finance.date') }}
+                </th>
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                  {{ $t('finance.type') }}
+                </th>
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                  {{ $t('finance.amount') }}
+                </th>
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                  {{ $t('finance.description') }}
+                </th>
+                <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', $i18n.locale === 'ar' ? 'text-right' : 'text-left']">
+                  {{ $t('finance.reference') }}
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="transaction in transactions.items" :key="transaction.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ formatDate(transaction.date) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <BadgeComponent :variant="getTransactionVariant(transaction.type)">
+                    {{ getTransactionTypeLabel(transaction.type) }}
+                  </BadgeComponent>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" :class="getAmountColor(transaction.type)">
+                  {{ formatCurrency(transaction.amount) }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900">
+                  {{ transaction.description || '-' }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                  <span v-if="transaction.refType && transaction.refType !== 'NONE'">
+                    {{ transaction.refType }}: {{ transaction.refId || '-' }}
+                  </span>
+                  <span v-else>-</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div v-if="transactions.totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+          <div class="flex-1 flex justify-between sm:hidden">
+            <button @click="changePage(transactions.page - 1)" 
+              :disabled="transactions.page <= 1"
+              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              {{ $t('labels.previous') }}
+            </button>
+            <span class="text-sm text-gray-700 self-center">
+              {{ transactions.page }} / {{ transactions.totalPages }}
+            </span>
+            <button @click="changePage(transactions.page + 1)" 
+              :disabled="transactions.page >= transactions.totalPages"
+              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              {{ $t('labels.next') }}
+            </button>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                {{ $t('labels.showing') }} 
+                <span class="font-medium">{{ ((transactions.page - 1) * transactions.pageSize) + 1 }}</span>
+                {{ $t('labels.to') }}
+                <span class="font-medium">{{ Math.min(transactions.page * transactions.pageSize, transactions.total) }}</span>
+                {{ $t('labels.of') }}
+                <span class="font-medium">{{ transactions.total }}</span>
+                {{ $t('labels.results') }}
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <button @click="changePage(transactions.page - 1)" 
+                  :disabled="transactions.page <= 1"
+                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+                <button @click="changePage(transactions.page + 1)" 
+                  :disabled="transactions.page >= transactions.totalPages"
+                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
 
     <!-- Deposit Modal -->
     <div v-if="showDepositModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeDepositModal">
@@ -329,188 +344,186 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+
+import { ref, onMounted, computed } from 'vue'
+import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
-import Badge from '../shared/Badge.vue'
+import BadgeComponent from '../shared/Badge.vue'
 
 export default {
   name: 'CompanyFinance',
-  components: { Badge },
+  components: { BadgeComponent },
   setup() {
     const financeStore = useCompanyFinanceStore()
     const showDepositModal = ref(false)
     const showWithdrawModal = ref(false)
     const processing = ref(false)
+    const branches = ref([])
+    const selectedBranch = ref(null)
+    const summary = ref({ balance: 0, last30dIn: 0, last30dOut: 0 })
+    const transactions = ref({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 1 })
 
-    const depositForm = ref({
-      amount: 0,
-      description: '',
-      date: new Date().toISOString().split('T')[0]
-    })
+    const depositForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
+    const withdrawForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
 
-    const withdrawForm = ref({
-      amount: 0,
-      description: '',
-      date: new Date().toISOString().split('T')[0]
-    })
+    const fetchBranches = async () => {
+      try {
+        const res = await getBranches()
+        branches.value = res.data
+      } catch (e) { branches.value = [] }
+    }
+
+    const fetchSummary = async () => {
+      if (!selectedBranch.value) {
+        await financeStore.fetchSummary()
+        summary.value = {
+          balance: financeStore.summary.balance,
+          last30dIn: financeStore.summary.last30dIn,
+          last30dOut: financeStore.summary.last30dOut
+        }
+      } else {
+        const res = await getBranchWalletSummary(selectedBranch.value.id)
+        summary.value = res.data
+      }
+    }
+
+    const fetchTransactions = async () => {
+      if (!selectedBranch.value) {
+        await financeStore.fetchTransactions()
+        transactions.value = { ...financeStore.transactions, totalPages: financeStore.totalPages }
+      } else {
+        const res = await getBranchWalletTransactions(selectedBranch.value.id, transactions.value.page, transactions.value.pageSize)
+        transactions.value = {
+          items: res.data.items,
+          total: res.data.total,
+          page: res.data.page,
+          pageSize: res.data.pageSize,
+          totalPages: Math.ceil(res.data.total / res.data.pageSize)
+        }
+      }
+    }
+
+    const selectBranch = async (branch) => {
+      selectedBranch.value = branch
+      transactions.value.page = 1
+      await fetchSummary()
+      await fetchTransactions()
+    }
 
     const openDepositModal = () => {
-      depositForm.value = {
-        amount: 0,
-        description: '',
-        date: new Date().toISOString().split('T')[0]
-      }
+      depositForm.value = { amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
       showDepositModal.value = true
     }
-
-    const closeDepositModal = () => {
-      showDepositModal.value = false
-    }
-
+    const closeDepositModal = () => { showDepositModal.value = false }
     const openWithdrawModal = () => {
-      withdrawForm.value = {
-        amount: 0,
-        description: '',
-        date: new Date().toISOString().split('T')[0]
-      }
+      withdrawForm.value = { amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
       showWithdrawModal.value = true
     }
-
-    const closeWithdrawModal = () => {
-      showWithdrawModal.value = false
-    }
+    const closeWithdrawModal = () => { showWithdrawModal.value = false }
 
     const handleDeposit = async () => {
       if (!depositForm.value.amount || depositForm.value.amount <= 0) {
-        if (window.$toast) {
-          window.$toast('Please enter a valid amount', 'error')
-        }
+        if (window.$toast) window.$toast('Please enter a valid amount', 'error')
         return
       }
-
       processing.value = true
       try {
-        await financeStore.deposit(
-          depositForm.value.amount,
-          depositForm.value.description,
-          depositForm.value.date
-        )
+        if (!selectedBranch.value) {
+          await financeStore.deposit(depositForm.value.amount, depositForm.value.description, depositForm.value.date)
+        } else {
+          await depositToBranchWallet(selectedBranch.value.id, depositForm.value.amount, depositForm.value.description, depositForm.value.date)
+        }
+        await fetchSummary()
+        await fetchTransactions()
         closeDepositModal()
-        if (window.$toast) {
-          window.$toast('Deposit successful', 'success')
-        }
+        if (window.$toast) window.$toast('Deposit successful', 'success')
       } catch (error) {
-        console.error('Error depositing:', error)
-        if (window.$toast) {
-          window.$toast(error.response?.data?.message || 'Failed to deposit', 'error')
-        }
-      } finally {
-        processing.value = false
-      }
+        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to deposit', 'error')
+      } finally { processing.value = false }
     }
 
     const handleWithdraw = async () => {
       if (!withdrawForm.value.amount || withdrawForm.value.amount <= 0) {
-        if (window.$toast) {
-          window.$toast('Please enter a valid amount', 'error')
-        }
+        if (window.$toast) window.$toast('Please enter a valid amount', 'error')
         return
       }
-
       processing.value = true
       try {
-        await financeStore.withdraw(
-          withdrawForm.value.amount,
-          withdrawForm.value.description,
-          withdrawForm.value.date
-        )
+        if (!selectedBranch.value) {
+          await financeStore.withdraw(withdrawForm.value.amount, withdrawForm.value.description, withdrawForm.value.date)
+        } else {
+          await withdrawFromBranchWallet(selectedBranch.value.id, withdrawForm.value.amount, withdrawForm.value.description, withdrawForm.value.date)
+        }
+        await fetchSummary()
+        await fetchTransactions()
         closeWithdrawModal()
-        if (window.$toast) {
-          window.$toast('Withdrawal successful', 'success')
-        }
+        if (window.$toast) window.$toast('Withdrawal successful', 'success')
       } catch (error) {
-        console.error('Error withdrawing:', error)
-        if (window.$toast) {
-          window.$toast(error.response?.data?.message || 'Failed to withdraw', 'error')
-        }
-      } finally {
-        processing.value = false
-      }
+        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to withdraw', 'error')
+      } finally { processing.value = false }
     }
 
-    const changePage = (page) => {
-      if (page >= 1 && page <= financeStore.totalPages) {
-        financeStore.setTransactionPage(page)
-        financeStore.fetchTransactions()
+    const changePage = async (page) => {
+      if (page >= 1 && page <= transactions.value.totalPages) {
+        transactions.value.page = page
+        await fetchTransactions()
       }
     }
-
-    const onPageSizeChange = (event) => {
-      financeStore.setTransactionPageSize(parseInt(event.target.value))
-      financeStore.fetchTransactions()
+    const onPageSizeChange = async (event) => {
+      transactions.value.pageSize = parseInt(event.target.value)
+      transactions.value.page = 1
+      await fetchTransactions()
     }
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
     }
-
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(amount)
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
-      }).format(numAmount)
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(numAmount)
     }
-
     const getTransactionVariant = (type) => {
-      const variants = {
-        'DEPOSIT': 'success',
-        'WITHDRAW': 'danger',
-        'RENT_INCOME': 'success',
-        'EXPENSE': 'warning',
-        'RENT_PAYOUT': 'danger'
-      }
+      const variants = { 'DEPOSIT': 'success', 'WITHDRAW': 'danger', 'RENT_INCOME': 'success', 'EXPENSE': 'warning', 'RENT_PAYOUT': 'danger' }
       return variants[type] || 'info'
     }
-
     const getTransactionTypeLabel = (type) => {
-      const labels = {
-        'DEPOSIT': 'Deposit',
-        'WITHDRAW': 'Withdrawal',
-        'RENT_INCOME': 'Rental Income',
-        'EXPENSE': 'Expense',
-        'RENT_PAYOUT': 'Rental Payout'
-      }
+      const labels = { 'DEPOSIT': 'Deposit', 'WITHDRAW': 'Withdrawal', 'RENT_INCOME': 'Rental Income', 'EXPENSE': 'Expense', 'RENT_PAYOUT': 'Rental Payout' }
       return labels[type] || type
     }
-
     const getAmountColor = (type) => {
-      if (['DEPOSIT', 'RENT_INCOME'].includes(type)) {
-        return 'text-green-600'
-      } else if (['WITHDRAW', 'EXPENSE', 'RENT_PAYOUT'].includes(type)) {
-        return 'text-red-600'
-      }
+      if (["DEPOSIT", "RENT_INCOME"].includes(type)) return 'text-green-600'
+      else if (["WITHDRAW", "EXPENSE", "RENT_PAYOUT"].includes(type)) return 'text-red-600'
       return 'text-gray-900'
     }
 
     onMounted(async () => {
-      await financeStore.fetchCompany()
-      await financeStore.fetchSummary()
-      await financeStore.fetchTransactions()
+      await fetchBranches()
+      await fetchSummary()
+      await fetchTransactions()
+    })
+
+    // Add isRTL computed property
+    const isRTL = computed(() => {
+      if (typeof window !== 'undefined' && window.__VUE_I18N__ && window.__VUE_I18N__.global) {
+        return window.__VUE_I18N__.global.locale.value === 'ar'
+      }
+      if (typeof window !== 'undefined' && window.$i18n) {
+        return window.$i18n.locale === 'ar'
+      }
+      return false
     })
 
     return {
-      financeStore,
+      branches,
+      selectedBranch,
+      summary,
+      transactions,
       showDepositModal,
       showWithdrawModal,
       processing,
@@ -528,7 +541,12 @@ export default {
       formatCurrency,
       getTransactionVariant,
       getTransactionTypeLabel,
-      getAmountColor
+      getAmountColor,
+      selectBranch,
+      isRTL,
+      // Expose loading and error for template
+      loading: financeStore.loading,
+      error: financeStore.error
     }
   }
 }

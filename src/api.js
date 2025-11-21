@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
-// const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+// const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
 class TokenManager {
@@ -237,6 +237,23 @@ export const updateBranch = (id, data) =>
   axios.patch(`${BASE_URL}/api/branches/${id}`, data);
 export const deleteBranch = (id) =>
   axios.delete(`${BASE_URL}/api/branches/${id}`);
+
+// Branch Wallet APIs
+export const getBranchWalletSummary = (branchId) =>
+  axios.get(`${BASE_URL}/api/branches/${branchId}/wallet/summary`);
+export const getBranchWalletTransactions = (branchId, params = {}) => {
+  const { page = 1, pageSize = 20 } = params;
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  return axios.get(`${BASE_URL}/api/branches/${branchId}/wallet/transactions?${queryParams.toString()}`);
+};
+export const depositToBranchWallet = (branchId, data) =>
+  axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/deposit`, data);
+// If withdraw endpoint exists, add it here:
+export const withdrawFromBranchWallet = (branchId, data) =>
+  axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/withdraw`, data);
 
 // Vehicles
 export const getVehicles = () =>

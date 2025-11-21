@@ -1,27 +1,53 @@
 <template>
-  <div class="space-y-6">
-    <!-- Balance Card -->
-    <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h3 class="text-lg font-medium text-indigo-100 mb-1">{{ $t('company.wallet.balance') }}</h3>
-          <p class="text-3xl font-bold">{{ companyStore.formattedBalance }}</p>
-        </div>
-        <div class="flex gap-3">
-          <button
-            @click="openDepositModal"
-            class="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition flex items-center gap-2"
+  <div class="flex gap-6">
+    <!-- Sidebar for branches -->
+    <aside class="w-64 bg-white rounded-lg shadow p-4 h-fit self-start sticky top-4">
+      <h3 class="text-lg font-semibold mb-4">{{ $t('company.wallet.branches') || 'Branches' }}</h3>
+      <ul>
+        <li
+          :class="['mb-2', selectedBranchId === null ? 'font-bold text-indigo-700' : 'text-gray-700', 'cursor-pointer', 'hover:bg-indigo-50', 'rounded', 'px-2', 'py-1']"
+          @click="selectBranch(null)"
+        >
+          <span>{{ $t('company.wallet.mainCompany') || 'Main Company' }}</span>
+        </li>
+        <li
+          v-for="branch in branches"
+          :key="branch.id"
+          :class="['mb-2', selectedBranchId === branch.id ? 'font-bold text-indigo-700' : 'text-gray-700', 'cursor-pointer', 'hover:bg-indigo-50', 'rounded', 'px-2', 'py-1', 'flex', 'justify-between', 'items-center']"
+          @click="selectBranch(branch.id)"
+        >
+          <span>{{ branch.name }}</span>
+          <span v-if="branchSummaries[branch.id]" class="text-xs text-gray-500">{{ formatCurrency(branchSummaries[branch.id].balance) }}</span>
+        </li>
+      </ul>
+    </aside>
+    <div class="flex gap-6">
+      <!-- Sidebar for branches -->
+      <aside class="w-64 bg-white rounded-lg shadow p-4 h-fit self-start sticky top-4">
+        <h3 class="text-lg font-semibold mb-4">{{ $t('company.wallet.branches') || 'Branches' }}</h3>
+        <ul>
+          <li
+            :class="['mb-2', selectedBranchId === null ? 'font-bold text-indigo-700' : 'text-gray-700', 'cursor-pointer', 'hover:bg-indigo-50', 'rounded', 'px-2', 'py-1']"
+            @click="selectBranch(null)"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            {{ $t('company.wallet.deposit') }}
-          </button>
-          <button
-            @click="openWithdrawModal"
-            class="px-4 py-2 bg-indigo-700 text-white rounded-lg font-medium hover:bg-indigo-600 transition flex items-center gap-2"
+            <span>{{ $t('company.wallet.mainCompany') || 'Main Company' }}</span>
+          </li>
+          <li
+            v-for="branch in branches"
+            :key="branch.id"
+            :class="['mb-2', selectedBranchId === branch.id ? 'font-bold text-indigo-700' : 'text-gray-700', 'cursor-pointer', 'hover:bg-indigo-50', 'rounded', 'px-2', 'py-1', 'flex', 'justify-between', 'items-center']"
+            @click="selectBranch(branch.id)"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span>{{ branch.name }}</span>
+            <span v-if="branchSummaries[branch.id]" class="text-xs text-gray-500">{{ formatCurrency(branchSummaries[branch.id].balance) }}</span>
+          </li>
+        </ul>
+      </aside>
+      <div class="flex-1 space-y-6">
+        <!-- كل محتوى المحفظة الرئيسي هنا -->
+        <slot />
+      </div>
+    </div>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
             </svg>
             {{ $t('company.wallet.withdraw') }}
@@ -293,6 +319,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useCompanyStore } from '@/stores/useCompanyStore'
+import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet } from '../../api'
 import Badge from '../shared/Badge.vue'
 
 export default {
@@ -304,18 +331,105 @@ export default {
     const showWithdrawModal = ref(false)
     const processing = ref(false)
 
+    // Sidebar state
+    const branches = ref([])
+    const branchSummaries = ref({})
+    const selectedBranchId = ref(null) // null = main company
+
+    // Branch wallet state
+    const branchTransactions = ref({ items: [], total: 0 })
+    const branchPage = ref(1)
+    const branchPageSize = ref(20)
+    const branchTotalPages = ref(1)
+    const branchLoading = ref(false)
+    const branchError = ref(null)
+
+    // Deposit/Withdraw forms
     const depositForm = ref({
       amount: 0,
       description: '',
       date: new Date().toISOString().split('T')[0]
     })
-
     const withdrawForm = ref({
       amount: 0,
       description: '',
       date: new Date().toISOString().split('T')[0]
     })
 
+    // Fetch branches and summaries
+    const fetchBranchesAndSummaries = async () => {
+      try {
+        const res = await getBranches()
+        branches.value = res.data
+        // Fetch summary for each branch
+        for (const branch of res.data) {
+          getBranchWalletSummary(branch.id).then(summaryRes => {
+            branchSummaries.value[branch.id] = summaryRes.data
+          }).catch(() => {
+            branchSummaries.value[branch.id] = { balance: 0, last30dIn: 0, last30dOut: 0 }
+          })
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Select branch (null = main company)
+    const selectBranch = async (branchId) => {
+      selectedBranchId.value = branchId
+      if (branchId === null) {
+        // Main company
+        await companyStore.fetchCompany()
+        await companyStore.fetchTransactions()
+      } else {
+        await fetchBranchTransactions()
+      }
+    }
+
+    // Fetch branch transactions
+    const fetchBranchTransactions = async () => {
+      if (!selectedBranchId.value) return
+      branchLoading.value = true
+      branchError.value = null
+      try {
+        const res = await getBranchWalletTransactions(selectedBranchId.value, { page: branchPage.value, pageSize: branchPageSize.value })
+        branchTransactions.value = res.data
+        branchTotalPages.value = Math.ceil(res.data.total / branchPageSize.value)
+      } catch (e) {
+        branchError.value = e.message || 'Error loading branch transactions'
+      } finally {
+        branchLoading.value = false
+      }
+    }
+
+    // Pagination
+    const changePage = (page) => {
+      if (selectedBranchId.value === null) {
+        if (page >= 1 && page <= companyStore.totalPages) {
+          companyStore.setTransactionPage(page)
+          companyStore.fetchTransactions()
+        }
+      } else {
+        if (page >= 1 && page <= branchTotalPages.value) {
+          branchPage.value = page
+          fetchBranchTransactions()
+        }
+      }
+    }
+
+    const onPageSizeChange = (event) => {
+      const size = parseInt(event.target.value)
+      if (selectedBranchId.value === null) {
+        companyStore.setTransactionPageSize(size)
+        companyStore.fetchTransactions()
+      } else {
+        branchPageSize.value = size
+        branchPage.value = 1
+        fetchBranchTransactions()
+      }
+    }
+
+    // Deposit/Withdraw logic
     const openDepositModal = () => {
       depositForm.value = {
         amount: 0,
@@ -324,11 +438,9 @@ export default {
       }
       showDepositModal.value = true
     }
-
     const closeDepositModal = () => {
       showDepositModal.value = false
     }
-
     const openWithdrawModal = () => {
       withdrawForm.value = {
         amount: 0,
@@ -337,7 +449,6 @@ export default {
       }
       showWithdrawModal.value = true
     }
-
     const closeWithdrawModal = () => {
       showWithdrawModal.value = false
     }
@@ -349,20 +460,30 @@ export default {
         }
         return
       }
-
       processing.value = true
       try {
-        await companyStore.deposit(
-          depositForm.value.amount,
-          depositForm.value.description,
-          depositForm.value.date
-        )
+        if (selectedBranchId.value === null) {
+          await companyStore.deposit(
+            depositForm.value.amount,
+            depositForm.value.description,
+            depositForm.value.date
+          )
+          await companyStore.fetchCompany()
+          await companyStore.fetchTransactions()
+        } else {
+          await depositToBranchWallet(selectedBranchId.value, {
+            amount: depositForm.value.amount,
+            description: depositForm.value.description,
+            date: depositForm.value.date
+          })
+          await fetchBranchTransactions()
+          await fetchBranchesAndSummaries()
+        }
         closeDepositModal()
         if (window.$toast) {
           window.$toast('Deposit successful', 'success')
         }
       } catch (error) {
-        console.error('Error depositing:', error)
         if (window.$toast) {
           window.$toast(error.response?.data?.message || 'Failed to deposit', 'error')
         }
@@ -378,20 +499,30 @@ export default {
         }
         return
       }
-
       processing.value = true
       try {
-        await companyStore.withdraw(
-          withdrawForm.value.amount,
-          withdrawForm.value.description,
-          withdrawForm.value.date
-        )
+        if (selectedBranchId.value === null) {
+          await companyStore.withdraw(
+            withdrawForm.value.amount,
+            withdrawForm.value.description,
+            withdrawForm.value.date
+          )
+          await companyStore.fetchCompany()
+          await companyStore.fetchTransactions()
+        } else {
+          await withdrawFromBranchWallet(selectedBranchId.value, {
+            amount: withdrawForm.value.amount,
+            description: withdrawForm.value.description,
+            date: withdrawForm.value.date
+          })
+          await fetchBranchTransactions()
+          await fetchBranchesAndSummaries()
+        }
         closeWithdrawModal()
         if (window.$toast) {
           window.$toast('Withdrawal successful', 'success')
         }
       } catch (error) {
-        console.error('Error withdrawing:', error)
         if (window.$toast) {
           window.$toast(error.response?.data?.message || 'Failed to withdraw', 'error')
         }
@@ -400,18 +531,7 @@ export default {
       }
     }
 
-    const changePage = (page) => {
-      if (page >= 1 && page <= companyStore.totalPages) {
-        companyStore.setTransactionPage(page)
-        companyStore.fetchTransactions()
-      }
-    }
-
-    const onPageSizeChange = (event) => {
-      companyStore.setTransactionPageSize(parseInt(event.target.value))
-      companyStore.fetchTransactions()
-    }
-
+    // Format helpers
     const formatDate = (dateString) => {
       const date = new Date(dateString)
       return date.toLocaleDateString('en-US', {
@@ -420,7 +540,6 @@ export default {
         day: 'numeric'
       })
     }
-
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(amount)
       return new Intl.NumberFormat('en-US', {
@@ -433,10 +552,21 @@ export default {
     onMounted(async () => {
       await companyStore.fetchCompany()
       await companyStore.fetchTransactions()
+      await fetchBranchesAndSummaries()
     })
 
     return {
       companyStore,
+      branches,
+      branchSummaries,
+      selectedBranchId,
+      selectBranch,
+      branchTransactions,
+      branchPage,
+      branchPageSize,
+      branchTotalPages,
+      branchLoading,
+      branchError,
       showDepositModal,
       showWithdrawModal,
       processing,
