@@ -51,6 +51,14 @@
     </div> -->
 
     <!-- Summary Stats Bar -->
+    <div :class="['flex items-center justify-end gap-3', isRTL ? 'text-end' : 'text-start']">
+      <button @click="openDepositModal" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+        {{ $t('finance.deposit') }}
+      </button>
+      <button @click="openWithdrawModal" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+        {{ $t('finance.withdraw') }}
+      </button>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600', isRTL ? 'text-end' : 'text-start']">
         <div class="flex items-center justify-between">

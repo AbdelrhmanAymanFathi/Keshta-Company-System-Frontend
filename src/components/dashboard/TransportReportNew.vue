@@ -106,14 +106,14 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
             <tr v-for="(transport, index) in items" :key="transport.ID || transport.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['التاريخ'] || transport.date || transport.createdAt ? (transport['التاريخ'] || formatDate(transport.date || transport.createdAt)) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['المقاول'] || transport.contractor || transport.contractorName || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['من'] || transport.fromLocation || transport.from || transport.fromLoc || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['إلى'] || transport.toLocation || transport.to || transport.toLoc || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['عدد النقلات'] || transport.numTrips || transport.trips || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport['المسافة (كم)'] || transport['المسافة'] || transport.distance || transport.distanceKm || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport['المعدل'] || transport.rate || 0) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport['الإجمالي'] || transport.total || transport.totalAmount || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.date ? formatDate(transport.date) : '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.contractor || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.from || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.to || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.numTrips || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.distance || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.rate || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport.total || 0) }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -169,26 +169,29 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item['الإجمالي'] || item.total || item.totalAmount || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item.total || 0).toString().replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
 
     const totalDistance = computed(() => {
       return items.value.reduce((sum, item) => {
-        const distance = parseFloat(String(item['المسافة (كم)'] || item['المسافة'] || item.distance || item.distanceKm || 0).replace(/,/g, '')) || 0
+        const distance = parseFloat(String(item.distance || 0).toString().replace(/,/g, '')) || 0
         return sum + distance
       }, 0)
     })
 
     const averageRate = computed(() => {
       if (items.value.length === 0) return 0
-      return totalAmount.value / items.value.length
+      return items.value.reduce((s, it) => s + (parseFloat(String(it.rate || 0)) || 0), 0) / items.value.length
     })
 
     const formatDate = (dateString) => {
       if (!dateString) return '-'
-      return new Date(dateString).toLocaleDateString()
+      // Try to parse ISO-style first, otherwise return the original string
+      const d = new Date(dateString)
+      if (!isNaN(d.getTime())) return d.toLocaleDateString()
+      return dateString
     }
 
     const formatCurrency = (amount) => {
@@ -248,9 +251,32 @@ export default {
           }
         }
 
-        items.value = parsedItems
-        console.log('Parsed items count:', parsedItems.length)
-        console.log('First item:', parsedItems[0])
+        // Normalize items to a consistent shape for the template
+        const normalized = parsedItems.map(raw => {
+          const date = raw['التاريخ'] || raw.date || raw.createdAt || raw.created_at || raw.Date || ''
+          const contractor = raw['المقاول'] || raw.contractor || raw.contractorName || raw.name || raw.supplier || ''
+          const from = raw['من'] || raw.fromLocation || raw.from || raw.fromLoc || raw.origin || ''
+          const to = raw['إلى'] || raw.toLocation || raw.to || raw.toLoc || raw.destination || ''
+          const numTrips = raw['عدد النقلات'] || raw.numTrips || raw.trips || raw.count || 0
+          const distance = raw['المسافة (كم)'] || raw['المسافة'] || raw.distance || raw.distanceKm || raw.km || 0
+          const rate = raw['المعدل'] || raw.rate || raw.hourlyRate || raw.price || 0
+          const total = raw['الإجمالي'] || raw.total || raw.totalAmount || raw.amount || 0
+          return {
+            ...raw,
+            date,
+            contractor,
+            from,
+            to,
+            numTrips: Number(numTrips) || 0,
+            distance: Number(distance) || 0,
+            rate: Number(rate) || 0,
+            total: Number(total) || 0
+          }
+        })
+
+        items.value = normalized
+        console.log('Parsed items count:', normalized.length)
+        console.log('First item:', normalized[0])
       } catch (err) {
         console.error('Error loading transport report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'
