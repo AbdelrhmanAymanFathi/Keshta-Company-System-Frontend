@@ -202,9 +202,30 @@ export default {
     }
 
     const loadReport = async () => {
+      // Require start and end dates before loading
+      error.value = null
+      if (!filters.value.startDate || !filters.value.endDate) {
+        items.value = []
+        error.value = 'من فضلك حدد تاريخ البداية وتاريخ النهاية ثم اضغط بحث'
+        return
+      }
+
+      // Ensure endDate is not before startDate
+      try {
+        const s = new Date(filters.value.startDate)
+        const e = new Date(filters.value.endDate)
+        if (e < s) {
+          items.value = []
+          error.value = 'تأكد أن تاريخ النهاية بعد أو يساوي تاريخ البداية'
+          return
+        }
+      } catch (e) {
+        // ignore parse error and let API handle it
+      }
+
       loading.value = true
       error.value = null
-        try {
+      try {
           const response = await getTransportReportData(
             buildQueryParams(filters.value),
             'json'
@@ -295,7 +316,8 @@ export default {
         startDate: '',
         endDate: ''
       }
-      loadReport()
+      // Do not auto-load after clearing filters: user must click Search
+      items.value = []
     }
 
     const downloadReport = async () => {
@@ -330,8 +352,7 @@ export default {
       
       filters.value.endDate = endDate.toISOString().split('T')[0]
       filters.value.startDate = startDate.toISOString().split('T')[0]
-      
-      loadReport()
+      // Do not auto-load: user must click Search
     })
 
     return {
