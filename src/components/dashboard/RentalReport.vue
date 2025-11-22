@@ -222,13 +222,33 @@ export default {
     }
 
     const loadReport = async () => {
-      loading.value = true
+      // Require start and end dates before loading
       error.value = null
-        try {
-          const response = await getRentalReportData(
-            buildQueryParams(filters.value),
-            'json'
-          )
+      if (!filters.value.startDate || !filters.value.endDate) {
+        items.value = []
+        error.value = 'من فضلك حدد تاريخ البداية وتاريخ النهاية ثم اضغط بحث'
+        return
+      }
+
+      // Ensure endDate is not before startDate
+      try {
+        const s = new Date(filters.value.startDate)
+        const e = new Date(filters.value.endDate)
+        if (e < s) {
+          items.value = []
+          error.value = 'تأكد أن تاريخ النهاية بعد أو يساوي تاريخ البداية'
+          return
+        }
+      } catch (e) {
+        // ignore parse error and let API handle it
+      }
+
+      loading.value = true
+      try {
+        const response = await getRentalReportData(
+          buildQueryParams(filters.value),
+          'json'
+        )
         
         // Destructure data and headers from response
         const { data, headers } = response
@@ -271,9 +291,42 @@ export default {
           }
         }
 
-        items.value = parsedItems
-        console.log('Parsed items count:', parsedItems.length)
-        console.log('First item:', parsedItems[0])
+        // Normalize items to include the Arabic keys expected by the template
+        const normalized = parsedItems.map(raw => {
+          // Use existing Arabic keys if present, otherwise map from English keys
+          const date = raw['التاريخ'] || raw.date || raw['date'] || raw.createdAt || raw.dt || ''
+          const equipment = raw['المعدة'] || raw.equipment || raw.item || raw.equipmentName || ''
+          const name = raw['الاسم'] || raw.name || raw.person || ''
+          // Determine type label
+          let typeLabel = raw['النوع'] || ''
+          if (!typeLabel) {
+            if (typeof raw.isCompanyOwned === 'boolean') {
+              typeLabel = raw.isCompanyOwned ? 'شركة' : 'خارجية'
+            } else if (raw.companyOwned || raw.ownedByCompany) {
+              typeLabel = 'شركة'
+            }
+          }
+          const hours = raw['ساعات التشغيل'] || raw.hours || raw.hourlyHours || raw.paidHours || ''
+          const hourlyRate = raw['سعر الساعة'] || raw.hourlyRate || raw.rate || raw.price || 0
+          const total = raw['الإجمالي'] || raw.total || raw.totalAmount || raw.amount || 0
+          const paid = raw['المدفوع'] || raw.paid || raw.paidAmount || 0
+
+          return {
+            ...raw,
+            'التاريخ': date,
+            'المعدة': equipment,
+            'الاسم': name,
+            'النوع': typeLabel,
+            'ساعات التشغيل': hours,
+            'سعر الساعة': hourlyRate,
+            'الإجمالي': total,
+            'المدفوع': paid
+          }
+        })
+
+        items.value = normalized
+        console.log('Parsed items count:', normalized.length)
+        console.log('First item:', items.value[0])
       } catch (err) {
         console.error('Error loading rental report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'
@@ -293,7 +346,8 @@ export default {
         endDate: '',
         isCompanyOwned: null
       }
-      loadReport()
+      // Do not auto-load after clearing filters: user must click Search
+      items.value = []
     }
 
     const fallbackDownload = (data, filename, headers) => {
@@ -364,14 +418,13 @@ export default {
     }
 
     onMounted(() => {
-      // Set default date range (last 30 days)
+      // Set default date range (last 30 days) but DO NOT auto-load.
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
       
       filters.value.endDate = endDate.toISOString().split('T')[0]
       filters.value.startDate = startDate.toISOString().split('T')[0]
-      
-      loadReport()
+      // User must click Search to load data
     })
 
     return {
