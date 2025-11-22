@@ -118,12 +118,12 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(rental, index) in items" :key="rental['م'] || index" class="hover:bg-gray-50">
+            <tr v-for="(rental, index) in items" :key="rental.id || index" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ rental['التاريخ'] || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ rental['المعدة'] || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ rental['الاسم'] || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <Badge :variant="rental['النوع']?.includes('شركة') ? 'company' : 'external'">
+                <Badge :variant="(rental['النوع'] || '').includes('شركة') ? 'company' : 'external'">
                   {{ rental['النوع'] || '-' }}
                 </Badge>
               </td>
@@ -192,14 +192,14 @@ export default {
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item['الإجمالي'] || item.total || item.totalAmount || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item['الإجمالي'] || item.total || item.totalAmount || 0).toString().replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
 
     const totalPaid = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item['المدفوع'] || item.paidAmount || item.paid || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item['المدفوع'] || item.paidAmount || item.paid || 0).toString().replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
@@ -297,15 +297,23 @@ export default {
           const date = raw['التاريخ'] || raw.date || raw['date'] || raw.createdAt || raw.dt || ''
           const equipment = raw['المعدة'] || raw.equipment || raw.item || raw.equipmentName || ''
           const name = raw['الاسم'] || raw.name || raw.person || ''
-          // Determine type label
+          // Determine type label — handle boolean, english flags, and Arabic "نعم"/"لا"
           let typeLabel = raw['النوع'] || ''
+
           if (!typeLabel) {
-            if (typeof raw.isCompanyOwned === 'boolean') {
-              typeLabel = raw.isCompanyOwned ? 'شركة' : 'خارجية'
-            } else if (raw.companyOwned || raw.ownedByCompany) {
+            // explicit Arabic strings from backend
+            if (raw.isCompanyOwned === 'نعم' || raw.isCompanyOwned === 'yes' || raw.isCompanyOwned === 'true' || raw.isCompanyOwned === true) {
               typeLabel = 'شركة'
+            } else if (raw.isCompanyOwned === 'لا' || raw.isCompanyOwned === 'no' || raw.isCompanyOwned === 'false' || raw.isCompanyOwned === false) {
+              typeLabel = 'خارجية'
+            } else if (typeof raw.isCompanyOwned === 'string') {
+              // try to interpret common values (case-insensitive)
+              const v = raw.isCompanyOwned.toLowerCase()
+              if (v === 'نعم' || v === 'yes' || v === 'true') typeLabel = 'شركة'
+              else if (v === 'لا' || v === 'no' || v === 'false') typeLabel = 'خارجية'
             }
           }
+
           const hours = raw['ساعات التشغيل'] || raw.hours || raw.hourlyHours || raw.paidHours || ''
           const hourlyRate = raw['سعر الساعة'] || raw.hourlyRate || raw.rate || raw.price || 0
           const total = raw['الإجمالي'] || raw.total || raw.totalAmount || raw.amount || 0
@@ -313,6 +321,7 @@ export default {
 
           return {
             ...raw,
+            id: raw.id,
             'التاريخ': date,
             'المعدة': equipment,
             'الاسم': name,
@@ -446,3 +455,4 @@ export default {
   }
 }
 </script>
+
