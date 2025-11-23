@@ -156,11 +156,11 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div class="p-4 bg-gray-50 rounded">
               <div class="text-sm text-gray-500">{{ $t('contractors.balance') || 'Balance' }}</div>
-              <div class="text-2xl font-semibold">{{ wallet ? wallet.balance : '-' }}</div>
+              <div class="text-2xl font-semibold text-red-600">{{ wallet ? wallet.balance : '-' }}</div>
             </div>
             <div class="p-4 bg-gray-50 rounded">
               <div class="text-sm text-gray-500">{{ $t('contractors.totalDeposits') || 'Total Deposits' }}</div>
-              <div class="text-lg font-semibold">{{ wallet ? wallet.totalDeposits : '-' }}</div>
+              <div class="text-lg font-semibold text-green-600">{{ wallet ? wallet.totalDeposits : '-' }}</div>
             </div>
             <div class="p-4 bg-gray-50 rounded">
               <div class="text-sm text-gray-500">{{ $t('contractors.sources') || 'Sources' }}</div>
