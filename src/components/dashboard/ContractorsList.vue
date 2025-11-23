@@ -52,6 +52,7 @@
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.notes || '-' }}</td>
               <td class="p-3">
                 <div :class="['flex gap-2', isRTL ? 'flex-row-reverse' : '']">
+                  <button @click="openWallet(c)" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white">{{ $t('contractors.wallet') || 'Wallet' }}</button>
                   <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white">{{ $t('labels.edit') }}</button>
                   <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white">{{ $t('labels.delete') }}</button>
                 </div>
@@ -77,7 +78,8 @@
             <span v-if="c.notes">{{ $t('contractors.notes') }}: {{ c.notes }}</span>
           </div>
         </div>
-        <div class="flex flex-col gap-2">
+          <div class="flex flex-col gap-2">
+          <button @click="openWallet(c)" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs">{{ $t('contractors.wallet') || 'Wallet' }}</button>
           <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs">{{ $t('labels.edit') }}</button>
           <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs">{{ $t('labels.delete') }}</button>
         </div>
@@ -138,12 +140,98 @@
         </div>
       </div>
     </div>
+    
+    <!-- Contractor Wallet Modal -->
+    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black opacity-40" @click="walletModalOpen = false"></div>
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 z-10">
+        <div class="flex items-start justify-between mb-4">
+          <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">{{ selectedContractor ? (selectedContractor.name) : $t('contractors.wallet') }}</h3>
+          <button @click="walletModalOpen = false" class="text-gray-500">✕</button>
+        </div>
+
+        <div v-if="walletLoading" class="text-center py-8">{{ $t('labels.loading') || 'Loading...' }}</div>
+
+        <div v-else>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="p-4 bg-gray-50 rounded">
+              <div class="text-sm text-gray-500">{{ $t('contractors.balance') || 'Balance' }}</div>
+              <div class="text-2xl font-semibold">{{ wallet ? wallet.balance : '-' }}</div>
+            </div>
+            <div class="p-4 bg-gray-50 rounded">
+              <div class="text-sm text-gray-500">{{ $t('contractors.totalDeposits') || 'Total Deposits' }}</div>
+              <div class="text-lg font-semibold">{{ wallet ? wallet.totalDeposits : '-' }}</div>
+            </div>
+            <div class="p-4 bg-gray-50 rounded">
+              <div class="text-sm text-gray-500">{{ $t('contractors.sources') || 'Sources' }}</div>
+              <div class="text-sm">
+                <div>{{ $t('contractors.exports') || 'Exports' }}: {{ wallet && wallet.sources ? wallet.sources.exports : 0 }}</div>
+                <div>{{ $t('contractors.transport') || 'Transport' }}: {{ wallet && wallet.sources ? wallet.sources.transport : 0 }}</div>
+                <div>{{ $t('contractors.expenses') || 'Expenses' }}: {{ wallet && wallet.sources ? wallet.sources.expenses : 0 }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <h4 class="font-semibold mb-2">{{ $t('contractors.transactions') || 'Transactions' }}</h4>
+              <div class="overflow-auto max-h-64 bg-white rounded border">
+                <table class="min-w-full">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="p-2 text-left">{{ $t('labels.type') || 'Type' }}</th>
+                      <th class="p-2 text-left">{{ $t('labels.date') || 'Date' }}</th>
+                      <th class="p-2 text-right">{{ $t('labels.amount') || 'Amount' }}</th>
+                      <th class="p-2 text-right">{{ $t('contractors.balanceAfter') || 'Balance After' }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="!wallet || !wallet.entries || wallet.entries.length === 0">
+                      <td class="p-3" colspan="4">{{ $t('contractors.noTransactions') || 'No transactions' }}</td>
+                    </tr>
+                    <tr v-for="(e, idx) in (wallet && wallet.entries) || []" :key="idx" class="border-t">
+                      <td class="p-2">{{ e.type }}</td>
+                      <td class="p-2">{{ new Date(e.date).toLocaleString() }}</td>
+                      <td class="p-2 text-right">{{ e.signedAmount || e.amount }}</td>
+                      <td class="p-2 text-right">{{ e.balanceAfter != null ? e.balanceAfter : '-' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-semibold mb-2">{{ $t('contractors.deposit') || 'Deposit' }}</h4>
+              <div class="grid gap-2">
+                <label>
+                  <div class="text-sm mb-1">{{ $t('contractors.amount') || 'Amount' }}</div>
+                  <input v-model="depositForm.amount" type="number" class="w-full px-3 py-2 border rounded" />
+                </label>
+                <label>
+                  <div class="text-sm mb-1">{{ $t('labels.date') || 'Date' }}</div>
+                  <input v-model="depositForm.date" type="date" class="w-full px-3 py-2 border rounded" />
+                </label>
+                <label>
+                  <div class="text-sm mb-1">{{ $t('labels.description') || 'Description' }}</div>
+                  <input v-model="depositForm.description" class="w-full px-3 py-2 border rounded" />
+                </label>
+
+                <div class="flex justify-end gap-2 mt-2">
+                  <button @click="walletModalOpen = false" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
+                  <button @click="doDeposit" class="px-4 py-2 rounded bg-indigo-600 text-white">{{ $t('labels.deposit') || 'Deposit' }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import * as XLSX from 'xlsx'
-import { getContractors, createContractor, deleteContractor } from '../../api'
+import { getContractors, createContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../api'
 
 export default {
   name: 'ContractorsList',
@@ -154,7 +242,14 @@ export default {
       editing: false,
       form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '' },
       contractors: [],
-      deleteConfirm: { open: false, item: null }
+      deleteConfirm: { open: false, item: null },
+      // Wallet UI
+      walletModalOpen: false,
+      walletLoading: false,
+      wallet: null,
+      selectedContractor: null,
+      depositForm: { amount: '', description: '', date: '' },
+      historyLoading: false
     }
   },
   computed: {
@@ -228,6 +323,66 @@ export default {
         alert('Error deleting contractor')
       }
       this.cancelDelete()
+    },
+
+    // ---------- Contractor Wallet ----------
+    async openWallet(c) {
+      this.selectedContractor = c
+      this.walletModalOpen = true
+      this.wallet = null
+      this.depositForm = { amount: '', description: '', date: '' }
+      await this.fetchWallet(c.id)
+    },
+
+    async fetchWallet(contractorId) {
+      this.walletLoading = true
+      this.historyLoading = true
+      try {
+        const [wRes, hRes] = await Promise.all([
+          getContractorWallet(contractorId),
+          getContractorWalletHistory(contractorId)
+        ])
+        this.wallet = wRes.data || null
+        // ensure entries exist
+        if (hRes && hRes.data && hRes.data.entries) {
+          // attach entries on wallet object for convenience
+          this.wallet.entries = hRes.data.entries
+        }
+      } catch (err) {
+        console.error('Error fetching contractor wallet', err)
+        alert(this.$t ? this.$t('contractors.walletFetchError') || 'Error fetching wallet' : 'Error fetching wallet')
+      } finally {
+        this.walletLoading = false
+        this.historyLoading = false
+      }
+    },
+
+    async doDeposit() {
+      if (!this.selectedContractor) return
+      const amount = Number(this.depositForm.amount || 0)
+      if (!amount || isNaN(amount) || amount <= 0) {
+        alert(this.$t ? this.$t('contractors.validationAmount') || 'Enter a valid amount' : 'Enter a valid amount')
+        return
+      }
+      try {
+        const payload = {
+          amount,
+          description: this.depositForm.description || '',
+          date: this.depositForm.date || undefined
+        }
+        const res = await depositToContractorWallet(this.selectedContractor.id, payload)
+        // If API returns updated wallet, refresh local wallet
+        if (res && res.data) {
+          this.wallet = res.data
+        }
+        // refresh history as well
+        await this.fetchWallet(this.selectedContractor.id)
+        alert(this.$t ? this.$t('contractors.depositSuccess') || 'Deposit successful' : 'Deposit successful')
+        this.depositForm = { amount: '', description: '', date: '' }
+      } catch (err) {
+        console.error('Error depositing to wallet', err)
+        alert(this.$t ? this.$t('contractors.depositError') || 'Error making deposit' : 'Error making deposit')
+      }
     },
 
     // ---------- Excel import ----------

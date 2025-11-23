@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
-// const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+// const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
 class TokenManager {
@@ -209,6 +209,16 @@ export const createContractor = (data) =>
   axios.post(`${BASE_URL}/api/contractors`, data);
 export const deleteContractor = (id) =>
   axios.delete(`${BASE_URL}/api/contractors`, { data: { id } });
+
+// Contractor Wallet APIs
+export const getContractorWallet = (contractorId) =>
+  axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet`);
+
+export const getContractorWalletHistory = (contractorId) =>
+  axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/history`);
+
+export const depositToContractorWallet = (contractorId, data) =>
+  axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
 
 // Crushers
 export const getCrushers = () =>
