@@ -94,13 +94,13 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.date') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.crusher') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.location') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.crusherTicket') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.companyTicket') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.unitPrice') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.date') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.crusher') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.location') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.crusherTicket') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.companyTicket') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.unitPrice') }}</th>
+              <th class="px-6 py-3 text-start  text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
