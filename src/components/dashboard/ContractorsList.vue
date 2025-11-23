@@ -290,7 +290,7 @@ export default {
     async saveContractor() {
       const name = (this.form.name || '').trim()
       if (!name) {
-        alert(this.$t('contractors.validationName'))
+        window.$toast(this.$t ? this.$t('contractors.validationName') || 'Please enter a name' : 'Please enter a name', 'warning')
         return
       }
       if (this.editing) {
@@ -310,7 +310,7 @@ export default {
         })
         this.contractors.push(res.data)
       } catch (e) {
-        alert('Error adding contractor')
+        window.$toast(this.$t ? this.$t('contractors.addError') || 'Error adding contractor' : 'Error adding contractor', 'error')
       }
       this.modalOpen = false
     },
@@ -320,7 +320,7 @@ export default {
         await deleteContractor(id)
         this.contractors = this.contractors.filter(c => c.id !== id)
       } catch (e) {
-        alert('Error deleting contractor')
+        window.$toast(this.$t ? this.$t('contractors.deleteError') || 'Error deleting contractor' : 'Error deleting contractor', 'error')
       }
       this.cancelDelete()
     },
@@ -350,7 +350,7 @@ export default {
         }
       } catch (err) {
         console.error('Error fetching contractor wallet', err)
-        alert(this.$t ? this.$t('contractors.walletFetchError') || 'Error fetching wallet' : 'Error fetching wallet')
+        window.$toast(this.$t ? this.$t('contractors.walletFetchError') || 'Error fetching wallet' : 'Error fetching wallet', 'error')
       } finally {
         this.walletLoading = false
         this.historyLoading = false
@@ -361,7 +361,7 @@ export default {
       if (!this.selectedContractor) return
       const amount = Number(this.depositForm.amount || 0)
       if (!amount || isNaN(amount) || amount <= 0) {
-        alert(this.$t ? this.$t('contractors.validationAmount') || 'Enter a valid amount' : 'Enter a valid amount')
+        window.$toast(this.$t ? this.$t('contractors.validationAmount') || 'Enter a valid amount' : 'Enter a valid amount', 'warning')
         return
       }
       try {
@@ -377,11 +377,11 @@ export default {
         }
         // refresh history as well
         await this.fetchWallet(this.selectedContractor.id)
-        alert(this.$t ? this.$t('contractors.depositSuccess') || 'Deposit successful' : 'Deposit successful')
+        window.$toast(this.$t ? this.$t('contractors.depositSuccess') || 'Deposit successful' : 'Deposit successful', 'success')
         this.depositForm = { amount: '', description: '', date: '' }
       } catch (err) {
         console.error('Error depositing to wallet', err)
-        alert(this.$t ? this.$t('contractors.depositError') || 'Error making deposit' : 'Error making deposit')
+        window.$toast(this.$t ? this.$t('contractors.depositError') || 'Error making deposit' : 'Error making deposit', 'error')
       }
     },
 
@@ -451,7 +451,7 @@ export default {
           }
         }
       }
-      alert(this.$t('contractors.imported', { count: added }))
+      window.$toast(this.$t ? this.$t('contractors.imported', { count: added }) || (added + ' imported') : (added + ' imported'), 'success')
     },
     confirmDelete(c) {
       this.deleteConfirm = { open: true, item: c }
