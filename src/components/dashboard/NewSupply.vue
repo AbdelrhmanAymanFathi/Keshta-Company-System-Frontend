@@ -1,5 +1,6 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6" @keydown.alt.n.prevent="addRow" @keydown.alt.s.prevent="saveData" @keydown.alt.r.prevent="resetRows" @keydown.alt.d.prevent="duplicateRow(rows.length - 1)">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6" @keydown.alt.n.prevent="addRow" @keydown.alt.s.prevent="saveData"
+    @keydown.alt.r.prevent="resetRows" @keydown.alt.d.prevent="duplicateRow(rows.length - 1)">
     <div class="bg-white rounded-xl shadow-md p-6">
       <div class="flex items-start justify-between gap-4">
         <h2 class="text-2xl font-semibold">{{ $t('dashboard.newSupply') || 'New Supply' }}</h2>
@@ -21,10 +22,12 @@
             </select>
 
             <!-- Add site -->
-            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded" :title="$t('supply.addSite')">+</button>
+            <button @click="showAddSite = true" class="bg-green-500 text-white px-2 py-1 rounded"
+              :title="$t('supply.addSite')">+</button>
 
             <!-- Edit selected site -->
-            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded" :title="$t('supply.editSite')">✎</button>
+            <button v-if="site" @click="editSiteDialog(site)" class="bg-yellow-400 text-white px-2 py-1 rounded"
+              :title="$t('supply.editSite')">✎</button>
           </div>
         </div>
 
@@ -37,17 +40,18 @@
             </select>
 
             <!-- Add area (requires site) -->
-            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded" :title="$t('supply.addArea')">+</button>
+            <button v-if="site" @click="showAddArea = true" class="bg-green-500 text-white px-2 py-1 rounded"
+              :title="$t('supply.addArea')">+</button>
 
             <!-- Edit selected area -->
-            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded" :title="$t('supply.editArea')">✎</button>
+            <button v-if="area" @click="editAreaDialog(area)" class="bg-yellow-400 text-white px-2 py-1 rounded"
+              :title="$t('supply.editArea')">✎</button>
           </div>
         </div>
 
         <div class="sm:col-span-2 flex items-center gap-3 mt-2">
-          <button :disabled="!site || !area"
-                  @click="goToTable"
-                  class="ml-auto sm:ml-0 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded disabled:opacity-50">
+          <button :disabled="!site" @click="goToTable"
+            class="ml-auto sm:ml-0 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded disabled:opacity-50">
             {{ $t('labels.next') || 'Next' }}
           </button>
 
@@ -89,81 +93,71 @@
                 <td class="px-3 py-2 align-top text-sm">{{ index + 1 }}</td>
 
                 <td class="px-3 py-2">
-                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 0)" @keydown.tab.prevent="focusNext(index, 0)" />
+                  <input type="date" v-model="row.date" class="w-full border rounded-md px-2 py-1"
+                    @keydown.enter.prevent="focusNext(index, 0)" @keydown.tab.prevent="focusNext(index, 0)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.contractor" @change="onContractorChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)" @keydown.tab.prevent="focusNext(index, 1)">
+                  <select v-model="row.contractor" @change="onContractorChange(row)"
+                    class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)"
+                    @keydown.tab.prevent="focusNext(index, 1)">
                     <option :value="null">{{ $t('labels.contractor') }} —</option>
                     <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.crusher" @change="onCrusherChange(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)" @keydown.tab.prevent="focusNext(index, 2)">
+                  <select v-model="row.crusher" @change="onCrusherChange(row)"
+                    class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)"
+                    @keydown.tab.prevent="focusNext(index, 2)">
                     <option :value="null">{{ $t('labels.crusher') }} —</option>
                     <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.vehicle" @change="onVehicleSelect(row)" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)" @keydown.tab.prevent="focusNext(index, 3)">
+                  <select v-model="row.vehicle" @change="onVehicleSelect(row)"
+                    class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)"
+                    @keydown.tab.prevent="focusNext(index, 3)">
                     <option :value="null">{{ $t('labels.vehicle') }} —</option>
                     <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                   </select>
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 4)" @keydown.tab.prevent="focusNext(index, 4)" />
+                  <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1"
+                    @keydown.enter.prevent="focusNext(index, 4)" @keydown.tab.prevent="focusNext(index, 4)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 5)" @keydown.tab.prevent="focusNext(index, 5)" />
+                  <input type="text" v-model="row.companyBon" class="w-full border rounded-md px-2 py-1"
+                    @keydown.enter.prevent="focusNext(index, 5)" @keydown.tab.prevent="focusNext(index, 5)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input
-                    type="number"
-                    inputmode="numeric"
-                    v-model.number="row.discount"
-                    class="w-full border rounded-md px-2 py-1"
-                    placeholder="0"
-                    @keydown.enter.prevent="focusNext(index, 6)"
-                    @keydown.tab.prevent="focusNext(index, 6)"
-                  />
+                  <input type="number" inputmode="numeric" v-model.number="row.discount"
+                    class="w-full border rounded-md px-2 py-1" placeholder="0"
+                    @keydown.enter.prevent="focusNext(index, 6)" @keydown.tab.prevent="focusNext(index, 6)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input
-                    type="number"
-                    step="any"
-                    inputmode="decimal"
-                    v-model.number="row.price"
-                    class="w-full border rounded-md px-2 py-1 no-spinner"
-                    placeholder="0"
-                    @keydown.enter.prevent="focusNext(index, 7)"
-                    @keydown.tab.prevent="focusNext(index, 7)"
-                  />
+                  <input type="number" step="any" inputmode="decimal" v-model.number="row.price"
+                    class="w-full border rounded-md px-2 py-1 no-spinner" placeholder="0"
+                    @keydown.enter.prevent="focusNext(index, 7)" @keydown.tab.prevent="focusNext(index, 7)" />
                 </td>
 
                 <td class="px-3 py-2">
-                  <input
-                    type="number"
-                    step="any"
-                    inputmode="decimal"
-                    v-model.number="row.cubic"
-                    class="w-full border rounded-md px-2 py-1 no-spinner"
-                    placeholder="0"
-                    @keydown.enter.prevent="focusNext(index, 8)"
-                    @keydown.tab.prevent="focusNext(index, 8)"
-                  />
+                  <input type="number" step="any" inputmode="decimal" v-model.number="row.cubic"
+                    class="w-full border rounded-md px-2 py-1 no-spinner" placeholder="0"
+                    @keydown.enter.prevent="focusNext(index, 8)" @keydown.tab.prevent="focusNext(index, 8)" />
                 </td>
 
                 <td class="px-3 py-2 font-semibold">{{ formatNumber(totalPerRow(row)) }}</td>
 
                 <td class="px-3 py-2">
                   <div class="flex gap-2">
-                    <button @click="duplicateRow(index)" :title="$t('supply.duplicate')" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                    <button @click="duplicateRow(index)" :title="$t('supply.duplicate')"
+                      class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
                       ⤷
                     </button>
                     <button @click="removeRow(index)" class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
@@ -187,7 +181,8 @@
 
           <div class="mt-3 sm:mt-0 text-sm text-gray-700">
             <div><span class="font-medium">{{ $t('supply.subtotal') }}:</span> {{ formatNumber(subtotal) }}</div>
-            <div><span class="font-medium">{{ $t('supply.totalDiscount') }}:</span> -{{ formatNumber(totalDiscount) }}</div>
+            <div><span class="font-medium">{{ $t('supply.totalDiscount') }}:</span> -{{ formatNumber(totalDiscount) }}
+            </div>
             <div class="font-semibold mt-1">{{ $t('supply.grandTotal') }}: {{ formatNumber(grandTotal) }}</div>
             <div class="text-xs text-gray-500 mt-1">{{ $t('supply.valuesCalculated') }}</div>
           </div>
@@ -205,7 +200,8 @@
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">{{ $t('supply.recentExports') }}</h3>
             <div class="flex items-center gap-2">
-              <button @click="fetchExports" :disabled="exportsLoading" class="px-3 py-1 border rounded bg-white hover:bg-gray-50">{{ $t('supply.refresh') }}</button>
+              <button @click="fetchExports" :disabled="exportsLoading"
+                class="px-3 py-1 border rounded bg-white hover:bg-gray-50">{{ $t('supply.refresh') }}</button>
               <div v-if="exportsLoading" class="text-sm text-gray-500">{{ $t('supply.loading') }}</div>
             </div>
           </div>
@@ -247,19 +243,23 @@
                   <td class="px-3 py-2 align-top break-words">{{ it.notes || '-' }}</td>
                   <td class="px-3 py-2 align-top">
                     <div class="flex gap-2">
-                      <button @click="confirmDeleteExport(it.id)" class="px-2 py-1 bg-red-500 text-white rounded">{{ $t('labels.delete') }}</button>
+                      <button @click="confirmDeleteExport(it.id)" class="px-2 py-1 bg-red-500 text-white rounded">{{
+                        $t('labels.delete') }}</button>
                     </div>
                   </td>
                 </tr>
                 <tr v-if="!displayedExports || displayedExports.length === 0">
-                  <td colspan="12" class="px-3 py-4 text-center text-sm text-gray-500">{{ $t('supply.noExportsFound') }}</td>
+                  <td colspan="12" class="px-3 py-4 text-center text-sm text-gray-500">{{ $t('supply.noExportsFound') }}
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="mt-3 text-xs text-gray-600">{{ $t('supply.page') }}: {{ exportsData.page }} — {{ $t('supply.total') }}: {{ exportsData.total }} — {{ $t('supply.pageSize') }}: {{ exportsData.pageSize }}</div>
-          
+          <div class="mt-3 text-xs text-gray-600">{{ $t('supply.page') }}: {{ exportsData.page }} — {{
+            $t('supply.total') }}: {{ exportsData.total }} — {{ $t('supply.pageSize') }}: {{ exportsData.pageSize }}
+          </div>
+
           <!-- Pagination Controls -->
           <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <!-- Items per page selector -->
@@ -276,37 +276,26 @@
             <!-- Pagination buttons -->
             <div class="flex items-center gap-2">
               <!-- Previous button -->
-              <button 
-                @click="goToPreviousPage" 
-                :disabled="exportsData.page <= 1"
-                class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
+              <button @click="goToPreviousPage" :disabled="exportsData.page <= 1"
+                class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50">
                 {{ $t('supply.previous') }}
               </button>
 
               <!-- Page numbers -->
               <div class="flex items-center gap-1">
-                <button
-                  v-for="page in visiblePages"
-                  :key="page"
-                  @click="goToPage(page)"
-                  :class="[
-                    'px-3 py-1 text-sm border rounded',
-                    page === exportsData.page 
-                      ? 'bg-indigo-600 text-white border-indigo-600' 
-                      : 'hover:bg-gray-50'
-                  ]"
-                >
+                <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" :class="[
+                  'px-3 py-1 text-sm border rounded',
+                  page === exportsData.page
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'hover:bg-gray-50'
+                ]">
                   {{ page }}
                 </button>
               </div>
 
               <!-- Next button -->
-              <button 
-                @click="goToNextPage" 
-                :disabled="exportsData.page >= totalPages"
-                class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
+              <button @click="goToNextPage" :disabled="exportsData.page >= totalPages"
+                class="px-3 py-1 border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50">
                 {{ $t('supply.next') }}
               </button>
             </div>
@@ -320,10 +309,12 @@
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
         <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
-        <input v-model="newSiteName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
+        <input v-model="newSiteName" :placeholder="$t('supply.siteName')"
+          class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddSite = false" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="addSite" :disabled="!newSiteName || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">
+          <button @click="addSite" :disabled="!newSiteName || addingLocation"
+            class="bg-green-600 text-white px-3 py-1 rounded">
             {{ addingLocation ? $t('supply.adding') : $t('supply.add') }}
           </button>
         </div>
@@ -334,12 +325,15 @@
     <!-- Add Area Dialog -->
     <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div class="bg-white p-6 rounded shadow w-96">
-        <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }} ({{ $t('supply.under') }}: {{ site ? site.name : '-' }})</h3>
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }} ({{ $t('supply.under') }}: {{ site ? site.name :
+          '-' }})</h3>
         <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
-        <input v-model="newAreaName" :placeholder="$t('supply.areaName')" class="w-full border rounded px-2 py-1 mb-3" />
+        <input v-model="newAreaName" :placeholder="$t('supply.areaName')"
+          class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddArea = false" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="addArea" :disabled="!newAreaName || !site || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">
+          <button @click="addArea" :disabled="!newAreaName || !site || addingLocation"
+            class="bg-green-600 text-white px-3 py-1 rounded">
             {{ addingLocation ? $t('supply.adding') : $t('supply.add') }}
           </button>
         </div>
@@ -352,10 +346,12 @@
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('supply.editSite') }}</h3>
         <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
-        <input v-model="editSiteName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
+        <input v-model="editSiteName" :placeholder="$t('supply.siteName')"
+          class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="editSiteObj = null" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="updateSite" :disabled="!editSiteName || addingLocation" class="bg-yellow-500 text-white px-3 py-1 rounded">
+          <button @click="updateSite" :disabled="!editSiteName || addingLocation"
+            class="bg-yellow-500 text-white px-3 py-1 rounded">
             {{ addingLocation ? $t('supply.saving') : $t('supply.save') }}
           </button>
         </div>
@@ -368,10 +364,12 @@
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('supply.editArea') }}</h3>
         <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
-        <input v-model="editAreaName" :placeholder="$t('supply.areaName')" class="w-full border rounded px-2 py-1 mb-3" />
+        <input v-model="editAreaName" :placeholder="$t('supply.areaName')"
+          class="w-full border rounded px-2 py-1 mb-3" />
         <div class="flex gap-2 justify-end">
           <button @click="editAreaObj = null" class="px-3 py-1 border rounded">Cancel</button>
-          <button @click="updateArea" :disabled="!editAreaName || addingLocation" class="bg-yellow-500 text-white px-3 py-1 rounded">
+          <button @click="updateArea" :disabled="!editAreaName || addingLocation"
+            class="bg-yellow-500 text-white px-3 py-1 rounded">
             {{ addingLocation ? $t('supply.saving') : $t('supply.save') }}
           </button>
         </div>
@@ -450,7 +448,7 @@ export default {
       exportsData: { page: 1, pageSize: 20, total: 0, items: [] },
       exportsLoading: false,
       exportsError: '',
-      
+
       // pagination
       itemsPerPage: 20,
       currentPage: 1
@@ -477,7 +475,7 @@ export default {
       // reset pagination when site changes
       this.currentPage = 1;
     },
-    
+
     // reset pagination when area changes
     area() {
       this.currentPage = 1;
@@ -503,7 +501,7 @@ export default {
     displayedExports() {
       const items = Array.isArray(this.exportsData.items) ? this.exportsData.items : []
       let filteredItems = []
-      
+
       if (this.area && this.area.id) {
         filteredItems = items.filter(it => Number(it.locationId) === Number(this.area.id))
       } else if (this.site && this.site.id) {
@@ -511,23 +509,24 @@ export default {
         if (areaIds.length === 0) {
           filteredItems = items.filter(it => Number(it.locationId) === Number(this.site.id))
         } else {
+          // If site has child areas and no specific area selected, show items from those areas
           filteredItems = items.filter(it => areaIds.includes(Number(it.locationId)))
         }
       } else {
         filteredItems = items
       }
-      
+
       // Apply pagination
       const startIndex = (this.currentPage - 1) * this.itemsPerPage
       const endIndex = startIndex + this.itemsPerPage
       return filteredItems.slice(startIndex, endIndex)
     },
-    
+
     // pagination computed properties
     totalPages() {
       const items = Array.isArray(this.exportsData.items) ? this.exportsData.items : []
       let filteredItems = []
-      
+
       if (this.area && this.area.id) {
         filteredItems = items.filter(it => Number(it.locationId) === Number(this.area.id))
       } else if (this.site && this.site.id) {
@@ -540,15 +539,15 @@ export default {
       } else {
         filteredItems = items
       }
-      
+
       return Math.ceil(filteredItems.length / this.itemsPerPage)
     },
-    
+
     visiblePages() {
       const total = this.totalPages
       const current = this.currentPage
       const pages = []
-      
+
       if (total <= 7) {
         // Show all pages if 7 or fewer
         for (let i = 1; i <= total; i++) {
@@ -557,38 +556,38 @@ export default {
       } else {
         // Show first page
         pages.push(1)
-        
+
         if (current > 3) {
           pages.push('...')
         }
-        
+
         // Show pages around current page
         const start = Math.max(2, current - 1)
         const end = Math.min(total - 1, current + 1)
-        
+
         for (let i = start; i <= end; i++) {
           if (!pages.includes(i)) {
             pages.push(i)
           }
         }
-        
+
         if (current < total - 2) {
           pages.push('...')
         }
-        
+
         // Show last page
         if (total > 1) {
           pages.push(total)
         }
       }
-      
+
       return pages
     },
-    
+
     filteredExportsCount() {
       const items = Array.isArray(this.exportsData.items) ? this.exportsData.items : []
       let filteredItems = []
-      
+
       if (this.area && this.area.id) {
         filteredItems = items.filter(it => Number(it.locationId) === Number(this.area.id))
       } else if (this.site && this.site.id) {
@@ -601,7 +600,7 @@ export default {
       } else {
         filteredItems = items
       }
-      
+
       return filteredItems.length
     }
   },
@@ -614,7 +613,7 @@ export default {
       } catch (e) { console.warn('getContractors failed', e) }
 
       try {
-        const contractorsWithVehiclesRes = await getContractorsWithVehicles(); 
+        const contractorsWithVehiclesRes = await getContractorsWithVehicles();
         this.contractorsWithVehicles = Array.isArray(contractorsWithVehiclesRes.data) ? contractorsWithVehiclesRes.data : [];
       } catch (e) { console.warn('getContractorsWithVehicles failed', e) }
 
@@ -690,7 +689,7 @@ export default {
         try {
           const msg = e?.response?.data?.message || e?.message;
           if (msg) this.locationError += ` ${msg}`;
-        } catch {}
+        } catch { }
       } finally {
         this.addingLocation = false;
       }
@@ -721,7 +720,7 @@ export default {
         try {
           const msg = e?.response?.data?.message || e?.message;
           if (msg) this.locationError += ` ${msg}`;
-        } catch {}
+        } catch { }
       } finally {
         this.addingLocation = false;
       }
@@ -755,7 +754,7 @@ export default {
         try {
           const msg = e?.response?.data?.message || e?.message;
           if (msg) this.locationError += ` ${msg}`;
-        } catch {}
+        } catch { }
       } finally {
         this.addingLocation = false;
       }
@@ -789,7 +788,7 @@ export default {
         try {
           const msg = e?.response?.data?.message || e?.message;
           if (msg) this.locationError += ` ${msg}`;
-        } catch {}
+        } catch { }
       } finally {
         this.addingLocation = false;
       }
@@ -797,7 +796,7 @@ export default {
 
     // other helpers (rows, saving exports, etc.)
     goToTable() {
-      if (!this.site || !this.area) return;
+      if (!this.site) return; // area is now optional
       this.step2 = true;
       if (this.rows && this.rows.length) {
         this.rows.forEach(r => { if (!r.date) r.date = new Date().toISOString().slice(0, 10); });
@@ -829,7 +828,7 @@ export default {
 
     duplicateRow(index) { const src = this.rows[index]; if (!src) return; const copy = JSON.parse(JSON.stringify(src)); copy.id = Date.now() + Math.random(); this.rows.splice(index + 1, 0, copy) },
     removeRow(index) { this.rows.splice(index, 1); if (this.rows.length === 0) this.addRow() },
-    resetRows() { this.rows = [ { id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: this.vehicles } ] },
+    resetRows() { this.rows = [{ id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: this.vehicles }] },
 
     updateVehicles(row) {
       // Get vehicles for the selected contractor
@@ -897,7 +896,8 @@ export default {
           const payload = {
             crusherId: Number(r.crusher.id),
             contractorId: Number(r.contractor.id),
-            locationId: this.area ? Number(this.area.id) : null,
+            // if area chosen use it, otherwise fall back to selected site
+            locationId: this.area ? Number(this.area.id) : (this.site ? Number(this.site.id) : null),
             date: r.date,
             crusherTicket: r.crusherBon || null,
             companyTicket: r.companyBon || null,
@@ -969,19 +969,19 @@ export default {
         this.currentPage = page
       }
     },
-    
+
     goToPreviousPage() {
       if (this.currentPage > 1) {
         this.currentPage--
       }
     },
-    
+
     goToNextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++
       }
     },
-    
+
     onItemsPerPageChange() {
       this.currentPage = 1 // Reset to first page when changing items per page
     },
@@ -1060,6 +1060,7 @@ export default {
   -webkit-appearance: none;
   margin: 0;
 }
+
 .no-spinner {
   -moz-appearance: textfield;
   appearance: textfield;
@@ -1076,10 +1077,14 @@ export default {
 /* improve table readability on small screens */
 @media (max-width: 639px) {
   table {
-    display: none; /* hide big table on small screens (we show cards instead) */
+    display: none;
+    /* hide big table on small screens (we show cards instead) */
   }
 }
+
 @media (min-width: 640px) {
-  .sm\:hidden { display: none; }
+  .sm\:hidden {
+    display: none;
+  }
 }
 </style>
