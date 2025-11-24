@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start md:items-center justify-center" @click="closeModal">
+  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start md:items-center justify-center" style="margin-top: 0%;" @click="closeModal">
     <div class="relative mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white" @click.stop @keydown.alt.s.prevent="submitForm" @keydown.alt.c.prevent="calculateFare">
       <!-- Modal Header -->
       <div class="flex justify-between items-center pb-4 border-b">
