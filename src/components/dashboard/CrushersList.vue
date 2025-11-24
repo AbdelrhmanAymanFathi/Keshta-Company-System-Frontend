@@ -34,9 +34,7 @@
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                 {{ $t('crushers.name') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
-                {{ $t('crushers.createdAt') }}
-              </th>
+              <!-- removed Created At column -->
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                 {{ $t('labels.actions') }}
               </th>
@@ -72,11 +70,6 @@
                 </div>
               </td>
 
-              <!-- created at -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-start">
-                {{ formatDate(crusher.createdAt) }}
-              </td>
-
               <!-- actions -->
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-start">
                 <!-- make actions start-aligned (so start = right in RTL) -->
@@ -109,7 +102,7 @@
 
             <!-- no results -->
             <tr v-if="filtered.length === 0">
-              <td class="px-6 py-4 text-center text-gray-500 text-start" colspan="4">
+              <td class="px-6 py-4 text-center text-gray-500 text-start" colspan="3">
                 <div class="flex flex-col items-center py-8">
                   <svg class="w-12 h-12 text-gray-400 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M3 7h18M3 12h18M3 17h18" stroke-width="1.5" stroke-linecap="round" />
@@ -124,7 +117,7 @@
       </div>
     </div>
 
-    <!-- Mobile cards (kept same logic) -->
+    <!-- Mobile cards (removed createdAt display) -->
     <div class="sm:hidden grid gap-3">
       <div v-for="crusher in filtered" :key="crusher.id"
         :class="['p-4 bg-white rounded-lg shadow-sm border flex justify-between items-start', isRTL ? 'flex-row-reverse' : 'flex-row']">
@@ -145,9 +138,6 @@
               <div class="font-semibold text-gray-900 text-start">{{ crusher.name }}</div>
               <div class="text-sm text-gray-500 text-start">ID: {{ crusher.id }}</div>
             </div>
-          </div>
-          <div class="text-sm text-gray-500 text-start">
-            {{ $t('crushers.createdAt') }}: {{ formatDate(crusher.createdAt) }}
           </div>
         </div>
 
@@ -419,10 +409,10 @@ export default {
 }
 
 /* Fix: ensure avatar/icon containers render as you set (display: block ruby) */
-/* User reported that applying `display: block ruby;` fixed alignment — keep it for the icon boxes */
+/* keep small compatibility helper you added */
 .h-10.w-10,
 .h-8.w-8 {
-  display: flex !important;
+  display: block ruby !important;
 }
 
 /* keep the direction utilities you already had (optional) */
@@ -436,7 +426,6 @@ export default {
 .direction-rtl table th,
 .direction-rtl table td {
   text-align: right;
-  
 }
 
 /* margin helpers flipping (kept for compatibility) */
