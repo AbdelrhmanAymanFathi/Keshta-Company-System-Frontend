@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl p-6' : 'p-6'">
     <div
       :class="['flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4', isRTL ? 'sm:flex-row-reverse' : '']">
-      <h1 class="text-2xl font-semibold text-start">{{ $t('crushers.title') }}</h1>
+      <h1 class="text-2xl font-semibold" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('crushers.title') }}</h1>
 
       <div :class="['flex items-center gap-2', isRTL ? 'flex-row-reverse' : 'flex-row']">
         <button @click="openAdd()"
@@ -19,7 +19,8 @@
     <!-- Search -->
     <div class="mb-4">
       <input v-model="q" type="search" :placeholder="$t('crushers.searchPlaceholder')"
-        class="w-full sm:w-1/2 px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-start" />
+        class="w-full sm:w-1/2 px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        :class="isRTL ? 'text-right' : 'text-left'" />
     </div>
 
     <!-- Desktop table -->
@@ -28,14 +29,17 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gradient-to-r from-indigo-50 to-indigo-100">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.#') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('crushers.name') }}
               </th>
               <!-- removed Created At column -->
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                :class="isRTL ? 'text-left' : 'text-left'">
                 {{ $t('labels.actions') }}
               </th>
             </tr>
@@ -43,14 +47,15 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="(crusher, idx) in filtered" :key="crusher.id" class="hover:bg-gray-50 transition-colors">
               <!-- index -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-start">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ idx + 1 }}
               </td>
 
               <!-- name + icon -->
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-6 py-4 whitespace-nowrap" style="display: inline-flex;">
                 <div :class="['flex items-center', isRTL ? 'flex-row-reverse' : 'flex-row']">
-                  <div class="flex-shrink-0 h-10 w-10" :class="isRTL ? 'ml-4' : 'mr-4'">
+                  <!-- icon container: flip margin & order -->
+                  <div class="flex-shrink-0 h-10 w-10" :class="isRTL ? 'ml-4 order-2' : 'mr-4 order-1'">
                     <div
                       class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
                       <!-- heavier mechanical crusher SVG -->
@@ -63,20 +68,24 @@
                     </div>
                   </div>
 
-                  <div class="text-start">
-                    <div class="text-sm font-medium text-gray-900 text-start">{{ crusher.name }}</div>
-                    <div class="text-sm text-gray-500 text-start">ID: {{ crusher.id }}</div>
+                  <!-- text block: flip order and alignment -->
+                  <div :class="isRTL ? 'order-1 text-right' : 'order-2 text-left'">
+                    <div class="text-sm font-medium text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">{{
+                      crusher.name }}</div>
+                    <div class="text-sm text-gray-500" :class="isRTL ? 'text-right' : 'text-left'">ID: {{ crusher.id }}
+                    </div>
                   </div>
                 </div>
               </td>
 
               <!-- actions -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-start">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="isRTL ? 'text-right' : 'text-left'">
                 <!-- make actions start-aligned (so start = right in RTL) -->
-                <div :class="['flex gap-2 justify-start items-center', isRTL ? 'flex-row-reverse' : 'flex-row']">
+                <div
+                  :class="['flex gap-2 items-center', isRTL ? 'flex-row-reverse justify-start' : 'flex-row justify-start']">
                   <button @click="openEdit(crusher)"
                     class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
-                    <svg class="w-3 h-3" :class="isRTL ? 'mr-1' : 'ml-1'" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-3 h-3" :class="isRTL ? 'ml-1' : 'mr-1'" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor">
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" />
@@ -88,7 +97,7 @@
 
                   <button @click="confirmDelete(crusher)"
                     class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
-                    <svg class="w-3 h-3" :class="isRTL ? 'mr-1' : 'ml-1'" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-3 h-3" :class="isRTL ? 'ml-1' : 'mr-1'" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor">
                       <path
                         d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
@@ -102,8 +111,8 @@
 
             <!-- no results -->
             <tr v-if="filtered.length === 0">
-              <td class="px-6 py-4 text-center text-gray-500 text-start" colspan="3">
-                <div class="flex flex-col items-center py-8">
+              <td class="px-6 py-4 text-center text-gray-500" :colspan="3">
+                <div class="flex flex-col items-center py-8" :class="isRTL ? 'text-right' : 'text-left'">
                   <svg class="w-12 h-12 text-gray-400 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M3 7h18M3 12h18M3 17h18" stroke-width="1.5" stroke-linecap="round" />
                   </svg>
@@ -121,7 +130,7 @@
     <div class="sm:hidden grid gap-3">
       <div v-for="crusher in filtered" :key="crusher.id"
         :class="['p-4 bg-white rounded-lg shadow-sm border flex justify-between items-start', isRTL ? 'flex-row-reverse' : 'flex-row']">
-        <div class="text-start">
+        <div>
           <div class="flex items-center mb-2" :class="isRTL ? 'flex-row-reverse' : 'flex-row'">
             <div class="flex-shrink-0 h-8 w-8" :class="isRTL ? 'ml-3 mr-0' : 'mr-3'">
               <div
@@ -134,9 +143,9 @@
                 </svg>
               </div>
             </div>
-            <div>
-              <div class="font-semibold text-gray-900 text-start">{{ crusher.name }}</div>
-              <div class="text-sm text-gray-500 text-start">ID: {{ crusher.id }}</div>
+            <div :class="isRTL ? 'text-right' : 'text-left'">
+              <div class="font-semibold text-gray-900">{{ crusher.name }}</div>
+              <div class="text-sm text-gray-500">ID: {{ crusher.id }}</div>
             </div>
           </div>
         </div>
@@ -145,7 +154,7 @@
           <button @click="openEdit(crusher)"
             class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-yellow-500 hover:bg-yellow-600"
             :class="isRTL ? 'flex-row-reverse' : ''">
-            <svg class="w-3 h-3" :class="isRTL ? 'mr-1' : 'ml-1'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg class="w-3 h-3" :class="isRTL ? 'ml-1' : 'mr-1'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round" />
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke-width="2" stroke-linecap="round"
@@ -156,7 +165,7 @@
           <button @click="confirmDelete(crusher)"
             class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-500 hover:bg-red-600"
             :class="isRTL ? 'flex-row-reverse' : ''">
-            <svg class="w-3 h-3" :class="isRTL ? 'mr-1' : 'ml-1'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg class="w-3 h-3" :class="isRTL ? 'ml-1' : 'mr-1'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -178,7 +187,7 @@
       <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 z-10 mx-4">
         <div :class="['flex items-center justify-between mb-4', isRTL ? 'flex-row-reverse' : 'flex-row']">
-          <h3 class="text-lg font-semibold text-gray-900 text-start">
+          <h3 class="text-lg font-semibold text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
             {{ editing ? $t('crushers.editCrusher') : $t('crushers.addCrusher') }}
           </h3>
           <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
@@ -190,16 +199,16 @@
 
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2 text-start">
+            <label class="block text-sm font-medium text-gray-700 mb-2" :class="isRTL ? 'text-right' : 'text-left'">
               {{ $t('crushers.name') }} <span class="text-red-500">*</span>
             </label>
             <input v-model="form.name"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-start"
-              :placeholder="$t('crushers.namePlaceholder')" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              :class="isRTL ? 'text-right' : 'text-left'" :placeholder="$t('crushers.namePlaceholder')" />
           </div>
         </div>
 
-        <div class="mt-6 flex gap-3 justify-end" :class="isRTL ? 'flex-row-reverse' : ''">
+        <div class="mt-6 flex gap-3" :class="isRTL ? 'justify-start flex-row-reverse' : 'justify-end'">
           <button @click="closeModal"
             class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
             {{ $t('labels.cancel') }}
@@ -223,7 +232,7 @@
       </div>
     </div>
 
-    <!-- Confirm delete modal -->
+    <!-- Confirm delete modal (unchanged) -->
     <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="fixed inset-0 bg-black opacity-40" @click="cancelDelete"></div>
       <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 z-10 mx-4">
@@ -236,10 +245,10 @@
             </svg>
           </div>
         </div>
-        <p class="text-center text-gray-900 mb-4 text-start">
+        <p class="text-center text-gray-900 mb-4" :class="isRTL ? 'text-right' : 'text-left'">
           {{ $t('crushers.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
         </p>
-        <div class="flex gap-3 justify-end" :class="isRTL ? 'flex-row-reverse' : ''">
+        <div class="flex gap-3" :class="isRTL ? 'justify-start flex-row-reverse' : 'justify-end'">
           <button @click="cancelDelete"
             class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
             {{ $t('labels.cancel') }}
@@ -390,29 +399,13 @@ export default {
 </script>
 
 <style scoped>
-/* Ensure text-start works with dir attribute */
-.text-start {
-  text-align: start !important;
-}
-
-.text-end {
-  text-align: end !important;
-}
-
-/* Fallback explicit rules */
-[dir="rtl"] .text-start {
-  text-align: right !important;
-}
-
-[dir="ltr"] .text-start {
+/* Explicit left/right helpers via dir attribute */
+.text-left {
   text-align: left !important;
 }
 
-/* Fix: ensure avatar/icon containers render as you set (display: block ruby) */
-/* keep small compatibility helper you added */
-.h-10.w-10,
-.h-8.w-8 {
-  display: block ruby !important;
+.text-right {
+  text-align: right !important;
 }
 
 /* keep the direction utilities you already had (optional) */
@@ -428,7 +421,13 @@ export default {
   text-align: right;
 }
 
-/* margin helpers flipping (kept for compatibility) */
+/* compatibility helper for avatar/icon boxes (إذا احتجت تحتفظ به) */
+.h-10.w-10,
+.h-8.w-8 {
+  display: block ruby !important;
+}
+
+/* flip margin helpers for rtl */
 .direction-rtl .ml-4 {
   margin-left: 0 !important;
   margin-right: 1rem !important;
