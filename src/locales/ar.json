@@ -5,7 +5,7 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentRent": "إيجار المعدات",
-    "companyWallet": "محفظة الشركة"
+    "companyWallet": "الخزينة الرئيسيه"
   },
   "dashboard": {
     "newSupply": "توريدة جديدة",
@@ -18,7 +18,7 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentRent": "إيجار المعدات",
-    "companyWallet": "محفظة الشركة",
+    "companyWallet": "الخزينة الرئيسيه",
     "expand": "توسيع",
     "collapse": "طي"
   },
@@ -333,7 +333,7 @@
     "ownership": "الملكية",
     "all": "الكل",
     "companyEquipment": "معدات مملوكة للشركة",
-    "companyWallet": "محفظة الشركة",
+    "companyWallet": "الخزينة الرئيسيه",
     "externalRental": "إيجار خارجي",
     "isCompanyOwned": "معدات مملوكة للشركة",
     "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
@@ -346,7 +346,7 @@
   },
   "finance": {
     "wallets": "المحافظ",
-    "companyWallet": "محفظة الشركة",
+    "companyWallet": "الخزينة الرئيسيه",
     "balance": "رصيد الشركة",
     "currentBalance": "الرصيد الحالي",
     "deposit": "إيداع",
