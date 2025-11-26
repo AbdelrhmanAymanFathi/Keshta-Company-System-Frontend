@@ -207,8 +207,11 @@ export const getContractors = () =>
   axios.get(`${BASE_URL}/api/contractors`);
 export const createContractor = (data) =>
   axios.post(`${BASE_URL}/api/contractors`, data);
+// Delete contractor by id — backend expects RESTful resource path (/api/contractors/:id)
+// Note: many backends return 204 No Content for successful deletes; axios will resolve
+// with response.status === 204 and an empty body.
 export const deleteContractor = (id) =>
-  axios.delete(`${BASE_URL}/api/contractors`, { data: { id } });
+  axios.delete(`${BASE_URL}/api/contractors/${id}`);
 
 // Contractor Wallet APIs
 export const getContractorWallet = (contractorId) =>
