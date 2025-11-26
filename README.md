@@ -115,6 +115,24 @@ VUE_APP_DEBUG=false
 - EN: Use `npm run serve` for development with hot-reloading.
 - AR: استخدم `npm run serve` للتطوير مع إعادة تحميل ساخنة.
 
+### Fix HMR websocket errors (Docker / remote browsers)
+
+If you see an error like "Firefox can’t establish a connection to the server at ws://172.19.0.2:8080/ws" that means the HMR (hot module reload) client inside the browser is trying to connect to the dev server using the container's internal IP. When running the frontend inside Docker, the container's internal IP is not reachable from your browser.
+
+Fixes:
+
+- Set the websocket host and port for the dev server so the injected HMR client uses a reachable address. We added configuration to `vue.config.js` and you can control it with the following environment variables:
+
+```env
+DEV_SERVER_WS_PROTOCOL=ws       # or wss for HTTPS
+DEV_SERVER_WS_HOST=localhost    # the hostname the browser can reach (e.g. host machine IP or localhost)
+DEV_SERVER_WS_PORT=8080        # the port exposed by the dev server
+```
+
+Example (when running docker-compose): set the DEV_SERVER_WS_HOST to `host.docker.internal` or to the host machine IP and restart the frontend service so the HMR client connects to the correct URL.
+
+AR: إذا رأيت رسالة خطأ مثل "Firefox can’t establish a connection to the server at ws://172.19.0.2:8080/ws" فهذا يعني أن عميل HMR داخل المتصفح يحاول الاتصال بعنوان IP الداخلي للحاوية، وهو غير قابل للوصول من المتصفح. لحل المشكلة عيّن متغيرات البيئة أعلاه أو استخدم `host.docker.internal` ثم أعد تشغيل الخدمة.
+
 ## 🔒 Security / الأمان
 
 - EN: Ensure to set `VUE_APP_API_URL` to your backend API URL.
