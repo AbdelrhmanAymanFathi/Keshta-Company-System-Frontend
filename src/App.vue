@@ -18,6 +18,8 @@
     
     <!-- Toast Notifications -->
     <Toast />
+    <!-- Global error overlay (e.g. 502 Bad Gateway from backend) -->
+    <ErrorOverlay />
   </div>
 </template>
 
@@ -26,12 +28,13 @@ import Dashboard from './components/dashboard/Dashboard.vue'
 import AuthLogin from './components/auth/Login.vue'
 import AuthRegister from './components/auth/Register.vue'
 import Toast from './components/shared/Toast.vue'
+import ErrorOverlay from './components/shared/ErrorOverlay.vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from './composables/useAuth'
 
 export default {
   name: 'AppRoot',
-  components: { Dashboard, AuthLogin, AuthRegister, Toast },
+  components: { Dashboard, AuthLogin, AuthRegister, Toast, ErrorOverlay },
   setup() {
     const { locale } = useI18n()
     const { isLoggedIn, isLoading } = useAuth()

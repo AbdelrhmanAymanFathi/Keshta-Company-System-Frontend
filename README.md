@@ -110,6 +110,25 @@ VUE_APP_DEBUG=false
 - EN: The frontend expects the backend to support RESTful deletes under `/api/rentals/:id` and `/api/rentals/:rentalId/payouts/:payoutId`. Backends commonly return 204 No Content for successful deletes or 404 Not Found if the resource was already removed. The frontend treats 404 on DELETE as a safe/idempotent outcome and will refresh the list instead of showing a hard error.
 - AR: الواجهة الأمامية تتوقع وجود نقاط نهاية حذف RESTful تحت `/api/rentals/:id` و `/api/rentals/:rentalId/payouts/:payoutId`. عادةً ما يعيد الخادم 204 No Content عند حذف ناجح أو 404 Not Found إذا كان المورد محذوفًا بالفعل. الواجهة الآن تتعامل مع 404 في عمليات الحذف باعتبارها نتيجة آمنة (محوِّلة)، وتقوم بتحديث القائمة بدلاً من إظهار خطأ صريح.
 
+## 502 Bad Gateway — Static page + in-app overlay
+
+- EN: This project ships a static error page at `public/502.html` that can be used by your reverse proxy (Nginx/Traefik) to serve a friendly page when the backend returns 502 errors during deploy/downtime. Use the example Nginx snippet below to serve that page.
+- AR: يحتوي المشروع على صفحة ثابتة في `public/502.html` يمكن للخادم (Nginx/Traefik) عرضها عند حدوث خطأ 502 أثناء توقف الخدمات.
+
+Nginx example (place in your server block):
+
+```nginx
+error_page 502 /502.html;
+location = /502.html {
+  root /usr/share/nginx/html; # adjust to container or host path where frontend assets live
+  internal;
+}
+```
+
+Notes:
+- EN: The frontend also listens for 502 responses from API calls and will display a friendly in-app overlay (so users already on the SPA get immediate feedback). This is handled in `src/api.js` (axios interceptor) and `src/components/shared/ErrorOverlay.vue`.
+- AR: كما تعرض الواجهة مكوّنًا داخليًا عند ظهور 502 لطلبات API (حتى المستخدمين داخل التطبيق يحصلون على إشعار مباشر). هذا السلوك مُنفذ في `src/api.js` و `src/components/shared/ErrorOverlay.vue`.
+
 ## 🗄 Database Schema / مخطط قاعدة البيانات
 
 - EN: The database schema is not included in this version.

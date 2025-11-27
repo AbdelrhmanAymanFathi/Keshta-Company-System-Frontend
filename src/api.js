@@ -591,6 +591,16 @@ axios.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
+    // If backend returned 502 Bad Gateway — notify the frontend to show a friendly error overlay
+    if (error.response && error.response.status === 502) {
+      try {
+        window.dispatchEvent(new CustomEvent('app:error', { detail: { code: 502, message: error.response.data?.message || 'Bad Gateway' } }))
+      } catch (e) {
+        // ignore if running server-side
+      }
+      // suppress additional error logging for 502
+    }
     
     return Promise.reject(error);
   }
