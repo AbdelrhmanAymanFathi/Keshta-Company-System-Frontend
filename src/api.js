@@ -538,16 +538,26 @@ axios.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
     
-    // Log detailed error information for debugging
+    // Log detailed error information for debugging — but ignore noisy 404s for DELETE
     if (error.response) {
-      console.error('API Error Response:', {
-        status: error.response.status,
-        statusText: error.response.statusText,
-        responseData: error.response.data,
-        url: originalRequest.url,
-        method: originalRequest.method,
-        requestData: originalRequest.data
-      });
+      const status = error.response.status
+      const method = (originalRequest && originalRequest.method) ? originalRequest.method.toLowerCase() : ''
+
+      // Many backends return 404 for DELETE when resource already removed —
+      // this is not useful noise in the console. Suppress detailed logging for
+      // DELETE+404 case to reduce clutter. Keep a concise warning instead.
+      if (status === 404 && method === 'delete') {
+        console.warn(`API: ${method.toUpperCase()} ${originalRequest.url} -> 404 (Not Found). Resource may already be deleted.`)
+      } else {
+        console.error('API Error Response:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          responseData: error.response.data,
+          url: originalRequest.url,
+          method: originalRequest.method,
+          requestData: originalRequest.data
+        });
+      }
     } else if (error.request) {
       console.error('API Error Request:', error.request);
     } else {

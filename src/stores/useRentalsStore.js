@@ -46,8 +46,28 @@ export const useRentalsStore = defineStore('rentals', {
           // Do NOT send it to backend - let frontend do the filtering
         }
         const response = await getRentals(params)
-        this.items = response.data.items || []
-        this.total = response.data.total || 0
+        // Some backends implement "soft delete" and return deleted items.
+        // Filter common soft-delete indicators so deleted items don't persist in the UI.
+        const items = response.data.items || []
+        this.items = items.filter(item => {
+          // common soft-delete flags/fields: deleted, isDeleted, is_deleted, deleted_at, deletedAt
+          if (!item) return false
+          const keys = Object.keys(item)
+          for (const k of keys) {
+            const lk = String(k).toLowerCase()
+            if (['deleted', 'isdeleted', 'is_deleted'].includes(lk)) {
+              const val = item[k]
+              if (val === true || val === 'true' || val === 1 || String(val) === '1') return false
+            }
+            if (['deletedat', 'deleted_at', 'deletedon', 'deleted_on'].includes(lk)) {
+              const val = item[k]
+              if (val) return false
+            }
+          }
+          return true
+        })
+        // total from the backend may include soft-deleted items; set to length of filtered items
+        this.total = Array.isArray(response.data.items) ? this.items.length : response.data.total || 0
         this.pageSize = response.data.pageSize || this.pageSize
         return response.data
       } catch (error) {
@@ -121,8 +141,15 @@ export const useRentalsStore = defineStore('rentals', {
         await deleteRental(id)
         // Refresh list after deletion
         await this.fetchRentals()
-        return true
+        return { success: true, alreadyDeleted: false }
       } catch (error) {
+        // If the rental was not found (404) we can treat it as already deleted
+        if (error?.response?.status === 404) {
+          console.warn('Rental already deleted (404) — refreshing list to reflect current state')
+          await this.fetchRentals()
+          return { success: true, alreadyDeleted: true }
+        }
+
         console.error('Error deleting rental:', error)
         this.error = error.response?.data?.message || 'Failed to delete rental'
         throw error
@@ -165,7 +192,24 @@ export const useRentalsStore = defineStore('rentals', {
       this.payoutsError = null
       try {
         const response = await getRentalPayouts(rentalId)
-        this.payouts = response.data || []
+        // Filter out soft-deleted payouts (similar to rentals)
+        const items = response.data || []
+        this.payouts = (Array.isArray(items) ? items : []).filter(p => {
+          if (!p) return false
+          const keys = Object.keys(p)
+          for (const k of keys) {
+            const lk = String(k).toLowerCase()
+            if (['deleted', 'isdeleted', 'is_deleted'].includes(lk)) {
+              const val = p[k]
+              if (val === true || val === 'true' || val === 1 || String(val) === '1') return false
+            }
+            if (['deletedat', 'deleted_at', 'deletedon', 'deleted_on'].includes(lk)) {
+              const val = p[k]
+              if (val) return false
+            }
+          }
+          return true
+        })
         return this.payouts
       } catch (error) {
         console.error('Error fetching rental payouts:', error)
@@ -204,8 +248,16 @@ export const useRentalsStore = defineStore('rentals', {
         await this.fetchRentalPayouts(rentalId)
         // Also refresh rentals to get updated paid/remaining values
         await this.fetchRentals()
-        return true
+        return { success: true, alreadyDeleted: false }
       } catch (error) {
+        // Treat missing payout as already deleted — refresh state
+        if (error?.response?.status === 404) {
+          console.warn('Payout already deleted (404) — refreshing lists')
+          await this.fetchRentalPayouts(rentalId).catch(() => {})
+          await this.fetchRentals().catch(() => {})
+          return { success: true, alreadyDeleted: true }
+        }
+
         console.error('Error deleting payout:', error)
         this.payoutsError = error.response?.data?.message || 'Failed to delete payout'
         throw error

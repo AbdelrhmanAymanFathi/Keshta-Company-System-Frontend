@@ -316,6 +316,8 @@
     "noPayouts": "لم يتم تسجيل أي دفعات بعد",
     "notes": "ملاحظات",
     "deleteConfirmation": "هل أنت متأكد من حذف هذا الإيجار؟",
+    "deletedSuccessfully": "تم حذف الإيجار بنجاح",
+    "alreadyDeleted": "هذا الإيجار تم حذفه بالفعل",
     "loadError": "خطأ في تحميل الإيجارات",
     "saveError": "خطأ في حفظ الإيجار",
     "deleteError": "خطأ في حذف الإيجار",
@@ -343,6 +345,9 @@
     "reportTitle": "تقارير إيجار المعدات",
     "reportDescription": "قم بتنزيل تقرير إكسل لكل معدات الإيجار مع الفلاتر",
     "reportMenu": "تقارير الإيجار"
+    ,
+    "payoutDeletedSuccessfully": "تم حذف الدفعة بنجاح",
+    "payoutAlreadyDeleted": "هذه الدفعة تم حذفها بالفعل"
   },
   "finance": {
     "wallets": "المحافظ",

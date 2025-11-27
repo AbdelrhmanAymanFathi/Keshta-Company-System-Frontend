@@ -582,6 +582,15 @@ export default {
       return instance && instance.proxy && instance.proxy.$i18n && instance.proxy.$i18n.locale === 'ar'
     })
 
+    // Short helper for i18n inside setup
+    const t = (key, ...args) => {
+      try {
+        return instance.proxy.$t(key, ...args)
+      } catch (e) {
+        return key
+      }
+    }
+
     const onSearchInput = (event) => {
       if (searchTimeout.value) {
         clearTimeout(searchTimeout.value)
@@ -717,11 +726,15 @@ export default {
     const deleteRental = async () => {
       deleting.value = true
       try {
-        await rentalsStore.deleteRental(rentalToDelete.value.id)
+        const result = await rentalsStore.deleteRental(rentalToDelete.value.id)
         showDeleteModal.value = false
         rentalToDelete.value = null
         if (window.$toast) {
-          window.$toast('Rental deleted successfully', 'success')
+            if (result && result.alreadyDeleted) {
+            window.$toast(t('rental.alreadyDeleted'), 'info')
+          } else {
+            window.$toast(t('rental.deletedSuccessfully'), 'success')
+          }
         }
       } catch (error) {
         console.error('Error deleting rental:', error)
@@ -805,9 +818,13 @@ export default {
 
     const deletePayout = async (payoutId) => {
       try {
-        await rentalsStore.deleteRentalPayout(selectedRentalForPayouts.value.id, payoutId)
+        const result = await rentalsStore.deleteRentalPayout(selectedRentalForPayouts.value.id, payoutId)
         if (window.$toast) {
-          window.$toast('Payout deleted successfully', 'success')
+          if (result && result.alreadyDeleted) {
+            window.$toast(t('rental.payoutAlreadyDeleted'), 'info')
+          } else {
+            window.$toast(t('rental.payoutDeletedSuccessfully'), 'success')
+          }
         }
       } catch (error) {
         console.error('Error deleting payout:', error)

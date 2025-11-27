@@ -316,6 +316,8 @@
     "noPayouts": "No payouts recorded yet",
     "notes": "Notes",
     "deleteConfirmation": "Are you sure you want to delete this rental?",
+    "deletedSuccessfully": "Rental deleted successfully",
+    "alreadyDeleted": "Rental already deleted",
     "loadError": "Error loading rentals",
     "saveError": "Error saving rental",
     "deleteError": "Error deleting rental",
@@ -343,6 +345,9 @@
     "reportTitle": "Equipment Rental Reports",
     "reportDescription": "Download an Excel report of all equipment rentals with filters",
     "reportMenu": "Rental Reports"
+    ,
+    "payoutDeletedSuccessfully": "Payout deleted successfully",
+    "payoutAlreadyDeleted": "Payout already deleted"
   },
   "finance": {
     "wallets": "Wallets",
