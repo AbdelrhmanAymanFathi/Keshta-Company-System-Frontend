@@ -77,38 +77,106 @@ class TokenManager {
       this.refreshPromise = null;
     }
   }
+// old async performance refresh
+  // async _performRefresh() {
+  //   try {
+  //     console.log('Refreshing token...');
+  //     const response = await axios.post(`${BASE_URL}/api/auth/refresh`, {}, {
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
 
-  async _performRefresh() {
-    try {
-      console.log('Refreshing token...');
-      const response = await axios.post(`${BASE_URL}/api/auth/refresh`, {}, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const newToken = response.data?.accessToken;
-      if (newToken) {
-        this.setToken(newToken);
-        console.log('Token refreshed successfully');
+  //     const newToken = response.data?.accessToken;
+  //     if (newToken) {
+  //       this.setToken(newToken);
+  //       console.log('Token refreshed successfully');
         
-        // Schedule next refresh
-        this.scheduleTokenRefresh(newToken);
+  //       // Schedule next refresh
+  //       this.scheduleTokenRefresh(newToken);
         
-        return newToken;
-      } else {
-        throw new Error('No access token in refresh response');
-      }
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      this.removeToken();
-      this.clearRefreshTimer();
+  //       return newToken;
+  //     } else {
+  //       throw new Error('No access token in refresh response');
+  //     }
+  //   } catch (error) {
+  //     console.error('Token refresh failed:', error);
+  //     this.removeToken();
+  //     this.clearRefreshTimer();
       
-      // Redirect to login or emit event
-      this.handleRefreshFailure();
-      throw error;
+  //     // Redirect to login or emit event
+  //     this.handleRefreshFailure();
+  //     throw error;
+  //   }
+  // }
+
+
+  // new functhion 
+  async _performRefresh() {
+  const TIMEOUT_MS = 10000; // 10s timeout
+  const hasAbort = typeof AbortController !== 'undefined';
+  const controller = hasAbort ? new AbortController() : null;
+  let timeoutId = null;
+  if (controller) timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  try {
+    console.log('[API] Refreshing token (using fetch with abort support)...');
+
+    const resp = await fetch(`${BASE_URL}/api/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include', // important if server uses httpOnly cookie
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+      signal: controller ? controller.signal : undefined
+    });
+
+    if (timeoutId) clearTimeout(timeoutId);
+
+    console.debug('[API][refresh][fetch] status:', resp.status);
+
+    // try parse as json
+    let data = null;
+    try {
+      data = await resp.json();
+    } catch (e) {
+      console.warn('[API][refresh] failed to parse JSON body:', e);
     }
+
+    const newToken = data?.accessToken || data?.access_token || data?.token || null;
+
+    if (newToken) {
+      this.setToken(newToken);
+      console.log('[API] Token refreshed successfully (via fetch)');
+      this.scheduleTokenRefresh(newToken);
+      return newToken;
+    }
+
+    // cookie-based refresh: 200 OK and empty/absent body
+    if (resp.status === 200 && (!data || Object.keys(data).length === 0)) {
+      console.log('[API][refresh] 200 OK with empty body — server may use httpOnly cookie for session.');
+      return null;
+    }
+
+    const text = data ? JSON.stringify(data) : await resp.text().catch(()=>null);
+    throw new Error(`No access token in refresh response (status ${resp.status}) - body: ${text}`);
+  } catch (error) {
+    if (timeoutId) clearTimeout(timeoutId);
+
+    if (error?.name === 'AbortError' || error?.name === 'CanceledError') {
+      console.error('[API][refresh] aborted (timeout).');
+    } else {
+      console.error('[API][refresh] fetch error or other:', error);
+    }
+
+    // cleanup and logout
+    try { this.removeToken(); this.clearRefreshTimer(); } catch(e){/*ignore*/}
+
+    this.handleRefreshFailure();
+
+    throw error;
   }
+}
+
 
   // Schedule automatic token refresh
   scheduleTokenRefresh(token) {
