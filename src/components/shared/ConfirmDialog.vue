@@ -1,6 +1,6 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="handleCancel">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+  <div v-if="show" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="handleBackdrop">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white confirm-dialog-inner" :class="{ 'animate-shake': shaking }" tabindex="-1">
       <div class="mt-3">
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full" :class="iconBgClass">
           <svg class="h-6 w-6" :class="iconColorClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,20 @@ export default {
       type: Boolean,
       default: false
     }
+    ,
+    // If true, clicking the backdrop will NOT cancel/close the dialog.
+    // Instead it will trigger a shake animation to indicate the dialog requires an explicit action.
+    preventBackdropClose: {
+      type: Boolean,
+      default: false
+    }
   },
+  data() {
+    return {
+      shaking: false
+    }
+  },
+
   computed: {
     iconBgClass() {
       return this.type === 'danger' ? 'bg-red-100' : 'bg-blue-100'
@@ -86,8 +99,45 @@ export default {
     },
     handleCancel() {
       this.$emit('cancel')
+    },
+    handleBackdrop() {
+      if (this.preventBackdropClose) {
+        // trigger shake animation instead of closing
+        this.triggerShake()
+      } else {
+        this.handleCancel()
+      }
+    },
+    triggerShake() {
+      if (this.shaking) return
+      this.shaking = true
+      setTimeout(() => {
+        this.shaking = false
+        // restore focus to dialog
+        this.$nextTick(() => {
+          const modal = this.$el.querySelector('.confirm-dialog-inner')
+          if (modal && typeof modal.focus === 'function') modal.focus()
+        })
+      }, 500)
     }
   }
 }
 </script>
+
+<style scoped>
+@keyframes shake {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(-8px); }
+  20% { transform: translateX(8px); }
+  30% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  50% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { transform: translateX(-1px); }
+ 100% { transform: translateX(0); }
+}
+.animate-shake { animation: shake 0.5s ease; will-change: transform; }
+</style>
 

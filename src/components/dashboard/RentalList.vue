@@ -349,8 +349,8 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" @click.self="closeModal">
-      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="triggerModalShake">
+      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto rental-modal-inner" :class="{ 'animate-shake': showModalShake }" tabindex="-1">
         <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
           <h3 class="text-lg font-medium text-gray-900">
             {{ isEditing ? $t('rental.editRental') : $t('rental.addRental') }}
@@ -381,13 +381,14 @@
       :message="$t('rental.deleteConfirmation')"
       :loading="deleting"
       type="danger"
+      :prevent-backdrop-close="true"
       @confirm="deleteRental"
       @cancel="showDeleteModal = false"
     />
 
     <!-- Payouts Modal -->
-    <div v-if="showPayoutsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" @click.self="closePayoutsModal">
-      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div v-if="showPayoutsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="triggerPayoutsShake">
+      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner" :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
         <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
           <h3 class="text-lg font-medium text-gray-900">
             {{ $t('rental.payouts') }} - {{ selectedRentalForPayouts?.name }}
@@ -505,6 +506,8 @@ export default {
     })
 
     const showPayoutsModal = ref(false)
+    const showModalShake = ref(false)
+    const showPayoutsShake = ref(false)
     const selectedRentalForPayouts = ref(null)
     const payoutForm = ref({
       amount: '',
@@ -776,6 +779,29 @@ export default {
       }
     }
 
+    const triggerModalShake = () => {
+      if (showModalShake.value) return
+      showModalShake.value = true
+      setTimeout(() => {
+        showModalShake.value = false
+        // try to return focus to inner modal
+        if (tableContainer.value && tableContainer.value.querySelector) {
+          const modalEl = document.querySelector('.rental-modal-inner')
+          if (modalEl && typeof modalEl.focus === 'function') modalEl.focus()
+        }
+      }, 500)
+    }
+
+    const triggerPayoutsShake = () => {
+      if (showPayoutsShake.value) return
+      showPayoutsShake.value = true
+      setTimeout(() => {
+        showPayoutsShake.value = false
+        const modalEl = document.querySelector('.payouts-modal-inner')
+        if (modalEl && typeof modalEl.focus === 'function') modalEl.focus()
+      }, 500)
+    }
+
     const closePayoutsModal = () => {
       showPayoutsModal.value = false
       selectedRentalForPayouts.value = null
@@ -956,6 +982,10 @@ export default {
       closeModal,
       openPayoutsModal,
       closePayoutsModal,
+      showModalShake,
+      showPayoutsShake,
+      triggerModalShake,
+      triggerPayoutsShake,
       savePayout,
       deletePayout,
       confirmDelete,
@@ -966,3 +996,21 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* shake animation (shared with Transport component) */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(-8px); }
+  20% { transform: translateX(8px); }
+  30% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  50% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { transform: translateX(-1px); }
+ 100% { transform: translateX(0); }
+}
+.animate-shake { animation: shake 0.5s ease; will-change: transform; }
+</style>
