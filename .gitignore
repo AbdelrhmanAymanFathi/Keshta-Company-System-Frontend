@@ -56,5 +56,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-package-lock.json
-package.json
+# Do NOT ignore package.json or package-lock.json for applications.
+# package.json
+# package-lock.json
