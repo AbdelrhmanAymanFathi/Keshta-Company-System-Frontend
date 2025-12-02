@@ -3,7 +3,7 @@
     class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start md:items-center justify-center"
     style="margin-top: 0%;" @click="onBackdropClick">
     <div ref="modal"
-      :class="['relative mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white', { 'animate-shake': shake }]"
+      :class="['relative mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white max-h-[95vh] overflow-y-auto', { 'animate-shake': shake }]"
       @click.stop @keydown.alt.s.prevent="submitForm" @keydown.alt.c.prevent="calculateFare" tabindex="-1">
       <!-- Modal Header -->
       <div class="flex justify-between items-center pb-4 border-b">
@@ -29,17 +29,30 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
 
-          <!-- Contractor -->
+          <!-- Contractor (optional) -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ $t('transport.contractor') }} *
+              {{ $t('transport.contractor') }}
             </label>
-            <select v-model="form.contractorId" required @change="onContractorChange"
+            <select v-model="form.contractorId" @change="onContractorChange"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('transport.selectContractor') }}</option>
               <option v-for="contractor in contractors" :key="contractor.id" :value="contractor.id">
                 {{ contractor.name }} - {{ contractor.phone }}
               </option>
+            </select>
+          </div>
+
+          <!-- Transport Category (e.g. تربه / سن) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ $t('transport.category') }}
+            </label>
+            <select v-model="form.category"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+              <option value="">{{ $t('common.select') || 'Select' }}</option>
+              <option value="تربه">تربه</option>
+              <option value="سن">سن</option>
             </select>
           </div>
 
@@ -204,6 +217,7 @@ export default {
       form: {
         date: '',
         contractorId: '',
+        category: '',
         fromLoc: '',
         toLoc: '',
         numTrips: 1,
@@ -291,6 +305,7 @@ export default {
       this.form = {
         date: formattedDate,
         contractorId: this.transport?.contractorId || '',
+        category: this.transport?.category || '',
         fromLoc: this.transport?.fromLoc || '',
         toLoc: this.transport?.toLoc || '',
         numTrips: parseInt(this.transport?.numTrips) || 1,
@@ -346,7 +361,8 @@ export default {
 
         const formData = {
           date: this.form.date,
-          contractorId: parseInt(this.form.contractorId),
+          contractorId: this.form.contractorId ? parseInt(this.form.contractorId) : null,
+          category: this.form.category ? this.form.category.trim() : null,
           fromLoc: this.form.fromLoc.trim(),
           toLoc: this.form.toLoc.trim(),
           numTrips: parseInt(this.form.numTrips),
@@ -364,7 +380,7 @@ export default {
           }
         }
 
-        if (!formData.date || !formData.contractorId || !formData.fromLoc || !formData.toLoc || !formData.vehicleId) {
+        if (!formData.date || !formData.fromLoc || !formData.toLoc || !formData.vehicleId) {
           throw new Error('Please fill in all required fields')
         }
 

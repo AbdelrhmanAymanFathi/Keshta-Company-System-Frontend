@@ -36,6 +36,7 @@
     "numTrips": "Number of Trips",
     "distanceKm": "Distance (Km)",
     "rate": "Rate",
+    "category": "Transport Type",
     "vehicle": "Vehicle",
     "vehicleName": "Vehicle Name",
     "notes": "Notes",
@@ -122,7 +123,8 @@
     "actions": "Actions",
     "loadError": "Error loading data",
     "saveError": "Error saving data",
-    "deleteError": "Error deleting data"
+    "deleteError": "Error deleting data",
+    "select": "Select"
   },
   "auth": {
     "login": {

@@ -36,6 +36,7 @@
     "numTrips": "عدد الرحلات",
     "distanceKm": "المسافة (كم)",
     "rate": "المعدل",
+    "category": "نوع النقل",
     "vehicle": "المركبة",
     "vehicleName": "اسم المركبة",
     "notes": "ملاحظات",
@@ -122,7 +123,8 @@
     "actions": "الإجراءات",
     "loadError": "خطأ في تحميل البيانات",
     "saveError": "خطأ في حفظ البيانات",
-    "deleteError": "خطأ في حذف البيانات"
+    "deleteError": "خطأ في حذف البيانات",
+    "select": "اختر"
   },
   "auth": {
     "login": {

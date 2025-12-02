@@ -271,6 +271,7 @@ export const deleteUser = (id) =>
   axios.delete(`${BASE_URL}/api/users`, { data: { id } });
 
 // Contractors
+// TODO: Backend does not yet support pagination for contractors list. Inform backend team if pagination is required.
 export const getContractors = () =>
   axios.get(`${BASE_URL}/api/contractors`);
 export const createContractor = (data) =>
@@ -292,6 +293,7 @@ export const depositToContractorWallet = (contractorId, data) =>
   axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
 
 // Crushers
+// TODO: Backend does not yet support pagination for crushers list. Inform backend team if pagination is required.
 export const getCrushers = () =>
   axios.get(`${BASE_URL}/api/crushers`);
 export const createCrusher = (data) =>
@@ -337,6 +339,7 @@ export const withdrawFromBranchWallet = (branchId, data) =>
   axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/withdraw`, data);
 
 // Vehicles
+// TODO: Backend does not yet support pagination for vehicles list. Inform backend team if pagination is required.
 export const getVehicles = () =>
   axios.get(`${BASE_URL}/api/vehicles`);
 export const createVehicle = (data) =>
@@ -346,6 +349,7 @@ export const deleteVehicle = (id) =>
 
 // --- Drivers & Vehicle history ---
 // Drivers CRUD
+// TODO: Backend does not yet support pagination for drivers list. Inform backend team if pagination is required.
 export const getDrivers = (params = {}) =>
   axios.get(`${BASE_URL}/api/drivers`, { params });
 
@@ -381,6 +385,7 @@ export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
 };
 
 // Exports (Deliveries)
+// TODO: Backend does not yet support pagination for supplies/deliveries list. Inform backend team if pagination is required.
 export const getDeliveries = () =>
   axios.get(`${BASE_URL}/api/exports`);
 export const createDelivery = (data) =>
@@ -420,6 +425,7 @@ export const getSuppliesReport = (params = {}) => {
 };
 
 // Transports
+// TODO: Backend does not yet support pagination for transports list. Inform backend team if pagination is required.
 export const getTransports = () =>
   axios.get(`${BASE_URL}/api/transports`);
 export const getTransport = (id) =>
