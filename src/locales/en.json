@@ -256,6 +256,23 @@
     "walletFetchError": "Error fetching wallet data",
     "validationAmount": "Amount is required or invalid"
   },
+  "drivers": {
+    "title": "Drivers",
+    "add": "Add Driver",
+    "searchPlaceholder": "Search drivers...",
+    "name": "Name",
+    "phone": "Phone",
+    "contractor": "Contractor",
+    "notes": "Notes",
+    "noResults": "No drivers found",
+    "addDriver": "Add Driver",
+    "editDriver": "Edit Driver",
+    "deleteConfirm": "Are you sure you want to delete driver",
+    "validationName": "Name is required",
+    "saveError": "Error saving driver",
+    "deleteError": "Error deleting driver",
+    "noContractorOption": "No contractor"
+  },
   "crushers": {
     "title": "Crushers",
     "add": "Add Crusher",

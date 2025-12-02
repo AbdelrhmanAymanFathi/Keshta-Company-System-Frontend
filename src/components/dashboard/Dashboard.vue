@@ -147,6 +147,7 @@ import SuppliesList from './SuppliesList.vue'
 // Use the JSON-first report components (replacements)
 import SuppliesReport from './SuppliesReportNew.vue'
 import ContractorsList from './ContractorsList.vue'
+import DriversList from './DriversList.vue'
 import CrushersList from './CrushersList.vue'
 import VehiclesList from './VehiclesList.vue'
 import TransportList from './TransportList.vue'
@@ -163,7 +164,7 @@ import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -180,6 +181,7 @@ export default {
           { name: 'suppliesList', label: 'dashboard.suppliesList', component: 'SuppliesList' },
           { name: 'crushersList', label: 'dashboard.crushersList', component: 'CrushersList' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', component: 'ContractorsList' },
+          { name: 'driversList', label: 'drivers.title', component: 'DriversList' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' }
           ,
           { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' }
@@ -238,7 +240,7 @@ export default {
       // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return SelectPlaceholder
-  const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance }
+  const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || ComponentNotFound

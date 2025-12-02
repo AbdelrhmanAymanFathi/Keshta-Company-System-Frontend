@@ -256,6 +256,23 @@
     "walletFetchError": "خطأ في جلب بيانات المحفظة",
     "validationAmount": "المبلغ المطلوب أو غير صالح"
   },
+  "drivers": {
+    "title": "السائقين",
+    "add": "إضافة سائق",
+    "searchPlaceholder": "البحث في السائقين...",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "contractor": "المقاول",
+    "notes": "ملاحظات",
+    "noResults": "لا يوجد سائقين",
+    "addDriver": "إضافة سائق",
+    "editDriver": "تعديل السائق",
+    "deleteConfirm": "هل أنت متأكد من حذف السائق",
+    "validationName": "الاسم مطلوب",
+    "saveError": "خطأ في حفظ السائق",
+    "deleteError": "خطأ في حذف السائق",
+    "noContractorOption": "بدون مقاول"
+  },
   "crushers": {
     "title": "الكسارات",
     "add": "إضافة كسارة",
