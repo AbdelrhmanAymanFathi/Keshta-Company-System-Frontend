@@ -344,6 +344,33 @@ export const createVehicle = (data) =>
 export const deleteVehicle = (id) =>
   axios.delete(`${BASE_URL}/api/vehicles`, { data: { id } });
 
+// --- Drivers & Vehicle history ---
+// Drivers CRUD
+export const getDrivers = (params = {}) =>
+  axios.get(`${BASE_URL}/api/drivers`, { params });
+
+export const createDriver = (data) =>
+  axios.post(`${BASE_URL}/api/drivers`, data);
+
+export const updateDriver = (id, data) =>
+  axios.patch(`${BASE_URL}/api/drivers/${id}`, data);
+
+export const deleteDriver = (id) =>
+  axios.delete(`${BASE_URL}/api/drivers/${id}`);
+
+// Vehicle ownership & driver assignment
+export const changeVehicleOwner = (vehicleId, data) =>
+  axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/change-owner`, data);
+
+export const getVehicleOwnershipHistory = (vehicleId) =>
+  axios.get(`${BASE_URL}/api/vehicles/${vehicleId}/ownership-history`);
+
+export const assignVehicleDriver = (vehicleId, data) =>
+  axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/assign-driver`, data);
+
+export const getVehicleDriverHistory = (vehicleId) =>
+  axios.get(`${BASE_URL}/api/vehicles/${vehicleId}/driver-history`);
+
 // Contractors with vehicles
 export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
   const params = new URLSearchParams();
