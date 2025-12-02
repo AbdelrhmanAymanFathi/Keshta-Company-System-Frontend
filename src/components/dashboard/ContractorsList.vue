@@ -300,14 +300,27 @@ export default {
         this.modalOpen = false
         return
       }
+
+      // Build payload so that optional fields (like phone) are not required
+      // and are omitted entirely if left empty.
+      const payload = {
+        name: name
+      }
+      if (this.form.phone && this.form.phone.toString().trim() !== '') {
+        payload.phone = this.form.phone.toString().trim()
+      }
+      if (this.form.bankName && this.form.bankName.toString().trim() !== '') {
+        payload.bankName = this.form.bankName.toString().trim()
+      }
+      if (this.form.accountNumber && this.form.accountNumber.toString().trim() !== '') {
+        payload.accountNumber = this.form.accountNumber.toString().trim()
+      }
+      if (this.form.notes && this.form.notes.toString().trim() !== '') {
+        payload.notes = this.form.notes.toString().trim()
+      }
+
       try {
-        const res = await createContractor({
-          name: this.form.name,
-          phone: this.form.phone,
-          bankName: this.form.bankName,
-          accountNumber: this.form.accountNumber,
-          notes: this.form.notes || ''
-        })
+        const res = await createContractor(payload)
         this.contractors.push(res.data)
       } catch (e) {
         window.$toast(this.$t ? this.$t('contractors.addError') || 'Error adding contractor' : 'Error adding contractor', 'error')
