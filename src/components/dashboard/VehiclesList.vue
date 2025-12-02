@@ -390,6 +390,12 @@ export default {
           payload.effectiveDate = new Date(this.changeOwnerForm.effectiveDate).toISOString()
         }
         await changeVehicleOwner(this.selectedVehicle.id, payload)
+        // update UI immediately so cards show the new owner without waiting for refetch
+        const contractor = this.contractors.find(c => c.id === this.changeOwnerForm.contractorId) || null
+        this.applyVehicleUpdates({
+          contractor,
+          contractorId: contractor ? contractor.id : this.changeOwnerForm.contractorId
+        })
         await this.loadVehicles()
         const updated = this.vehicles.find(v => v.id === this.selectedVehicle.id)
         if (updated) {
@@ -434,6 +440,15 @@ export default {
       } catch (e) {
         return value
       }
+    },
+    applyVehicleUpdates(partial) {
+      if (!this.selectedVehicle) return
+      const merged = { ...this.selectedVehicle, ...partial }
+      const idx = this.vehicles.findIndex(v => v.id === merged.id)
+      if (idx !== -1) {
+        this.vehicles.splice(idx, 1, merged)
+      }
+      this.selectedVehicle = merged
     }
   },
   async mounted() {
