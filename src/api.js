@@ -320,6 +320,8 @@ export const updateBranch = (id, data) =>
   axios.patch(`${BASE_URL}/api/branches/${id}`, data);
 export const deleteBranch = (id) =>
   axios.delete(`${BASE_URL}/api/branches/${id}`);
+export const saveBranchesOrder = (data) =>
+  axios.post(`${BASE_URL}/api/branches/save-order`, data);
 
 // Branch Wallet APIs
 export const getBranchWalletSummary = (branchId) =>

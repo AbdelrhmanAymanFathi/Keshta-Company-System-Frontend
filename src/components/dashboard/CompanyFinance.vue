@@ -445,7 +445,7 @@
 <script>
 
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet, saveBranchesOrder } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -533,13 +533,6 @@ export default {
       await fetchTransactions()
     }
 
-    // Local stub for saveBranchesOrder if API not present. We discovered there's no
-    // saveBranchesOrder in @/api, so this stub logs and resolves (safe for UI).
-    const saveBranchesOrder = async (payload) => {
-      console.warn('saveBranchesOrder API not found — payload:', payload)
-      return Promise.resolve()
-    }
-
     // Undo snapshot helper
     const pushSnapshot = () => {
       previousOrders.value.push(branches.value.map(b => ({ id: b.id, pinned: !!b.pinned })))
@@ -625,17 +618,12 @@ export default {
       await saveOrder()
     }
 
-    // saveOrder: call API saveBranchesOrder(payload) if exists, otherwise our local stub above
+    // saveOrder: call API saveBranchesOrder(payload) to persist order and pinned state
     const saveOrder = async () => {
       savingOrder.value = true
       try {
         const payload = branches.value.map((b, idx) => ({ id: b.id, order: idx, pinned: !!b.pinned }))
-        if (typeof saveBranchesOrder === 'function') {
-          await saveBranchesOrder({ items: payload })
-        } else {
-          // fallback stub — also safe if we defined local stub
-          console.warn('saveBranchesOrder API not found — payload:', payload)
-        }
+        await saveBranchesOrder({ items: payload })
         if (window.$toast) window.$toast('Order saved', 'success')
       } catch (err) {
         if (window.$toast) window.$toast(err.response?.data?.message || 'Failed to save order', 'error')
