@@ -114,6 +114,15 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
           </div>
 
+          <!-- Discount -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ $t('labels.discount') }}
+            </label>
+            <input v-model.number="form.discount" type="number" step="0.01" min="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+          </div>
+
           <!-- Vehicle Selection -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -227,7 +236,8 @@ export default {
         // First Km fixed to 1 and hidden from user
         firstKm: 1,
         firstKmPrice: 0,
-        perKmPrice: 0
+        perKmPrice: 0,
+        discount: 0
       },
       contractors: [],
       contractorsWithVehicles: [],
@@ -315,7 +325,8 @@ export default {
         // keep firstKm from transport if present, otherwise enforce 1
         firstKm: (this.transport?.pricing?.firstKm != null) ? parseFloat(this.transport.pricing.firstKm) : 1,
         firstKmPrice: this.transport?.pricing?.firstKmPrice || 0,
-        perKmPrice: this.transport?.pricing?.perKmPrice || 0
+        perKmPrice: this.transport?.pricing?.perKmPrice || 0,
+        discount: parseFloat(this.transport?.discount || 0)
       }
 
       // Ensure firstKm is always 1 in runtime
@@ -337,7 +348,8 @@ export default {
           numTrips: parseInt(this.form.numTrips),
           firstKm: parseFloat(this.form.firstKm || 1),
           firstKmPrice: parseFloat(this.form.firstKmPrice || 0),
-          perKmPrice: parseFloat(this.form.perKmPrice || 0)
+          perKmPrice: parseFloat(this.form.perKmPrice || 0),
+          discount: parseFloat(this.form.discount || 0)
         }
 
         const { data } = await calculateTransportFare(payload)
@@ -368,7 +380,8 @@ export default {
           numTrips: parseInt(this.form.numTrips),
           distanceKm: parseFloat(this.form.distanceKm),
           vehicleId: this.form.vehicleId ? parseInt(this.form.vehicleId) : null,
-          notes: this.form.notes.trim()
+          notes: this.form.notes.trim(),
+          discount: parseFloat(this.form.discount || 0)
         }
 
         if (this.form.firstKm || this.form.firstKmPrice || this.form.perKmPrice) {
