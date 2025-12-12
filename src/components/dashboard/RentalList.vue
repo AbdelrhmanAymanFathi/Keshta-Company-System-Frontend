@@ -230,6 +230,10 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex gap-3 items-center">
+                  <button @click="openDetailModal(rental)" 
+                    class="text-blue-600 hover:text-blue-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
+                    {{ $t('rental.viewDetails') }}
+                  </button>
                   <button @click="openPayoutsModal(rental)" 
                     class="text-green-600 hover:text-green-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
                     {{ $t('rental.payouts') }}
@@ -386,6 +390,16 @@
       @cancel="showDeleteModal = false"
     />
 
+    <!-- Rental Detail Modal -->
+    <div v-if="showDetailModal && selectedRentalForDetail" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="closeDetailModal">
+      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <RentalDetail
+          :rental-id="selectedRentalForDetail.id"
+          @close="closeDetailModal"
+        />
+      </div>
+    </div>
+
     <!-- Payouts Modal -->
     <div v-if="showPayoutsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="triggerPayoutsShake">
       <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner" :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
@@ -471,12 +485,13 @@
 import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance } from 'vue'
 import { useRentalsStore } from '@/stores/useRentalsStore'
 import RentalForm from './RentalForm.vue'
+import RentalDetail from './RentalDetail.vue'
 import Badge from '../shared/Badge.vue'
 import ConfirmDialog from '../shared/ConfirmDialog.vue'
 
 export default {
   name: 'RentalList',
-  components: { RentalForm, Badge, ConfirmDialog },
+  components: { RentalForm, RentalDetail, Badge, ConfirmDialog },
   setup() {
     const instance = getCurrentInstance()
     const rentalsStore = useRentalsStore()
@@ -498,13 +513,13 @@ export default {
       date: new Date().toISOString().split('T')[0],
       equipment: '',
       name: '',
-      hours: 0,
       hourlyRate: 0,
-      total: 0,
       notes: '',
       isCompanyOwned: true
     })
 
+    const showDetailModal = ref(false)
+    const selectedRentalForDetail = ref(null)
     const showPayoutsModal = ref(false)
     const showModalShake = ref(false)
     const showPayoutsShake = ref(false)
@@ -636,9 +651,7 @@ export default {
         date: new Date().toISOString().split('T')[0],
         equipment: '',
         name: '',
-        hours: 0,
         hourlyRate: 0,
-        total: 0,
         notes: '',
         isCompanyOwned: true
       }
@@ -655,9 +668,7 @@ export default {
           date: data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0],
           equipment: data.equipment || '',
           name: data.name || '',
-          hours: parseFloat(data.hours) || 0,
           hourlyRate: parseFloat(data.hourlyRate) || 0,
-          total: parseFloat(data.total) || 0,
           notes: data.notes || '',
           isCompanyOwned: data.isCompanyOwned !== undefined ? data.isCompanyOwned : true
         }
@@ -669,9 +680,7 @@ export default {
           date: rental.date ? rental.date.split('T')[0] : new Date().toISOString().split('T')[0],
           equipment: rental.equipment || '',
           name: rental.name || '',
-          hours: parseFloat(rental.hours) || 0,
           hourlyRate: parseFloat(rental.hourlyRate) || 0,
-          total: parseFloat(rental.total) || 0,
           notes: rental.notes || '',
           isCompanyOwned: rental.isCompanyOwned !== undefined ? rental.isCompanyOwned : true
         }
@@ -686,9 +695,7 @@ export default {
         date: new Date().toISOString().split('T')[0],
         equipment: '',
         name: '',
-        hours: 0,
         hourlyRate: 0,
-        total: 0,
         notes: '',
         isCompanyOwned: true
       }
@@ -701,6 +708,8 @@ export default {
       try {
         if (isEditing.value) {
           await rentalsStore.updateRental(form.value.id, rentalData)
+          // Refetch rental details to get updated computed values
+          await rentalsStore.fetchRental(form.value.id)
           if (window.$toast) {
             window.$toast('Rental updated successfully', 'success')
           }
@@ -766,6 +775,16 @@ export default {
       }).format(amount)
     }
 
+    const openDetailModal = (rental) => {
+      selectedRentalForDetail.value = rental
+      showDetailModal.value = true
+    }
+
+    const closeDetailModal = () => {
+      showDetailModal.value = false
+      selectedRentalForDetail.value = null
+    }
+
     const openPayoutsModal = async (rental) => {
       selectedRentalForPayouts.value = rental
       showPayoutsModal.value = true
@@ -826,6 +845,9 @@ export default {
           date: payoutForm.value.date,
           notes: payoutForm.value.notes
         })
+        // Refresh rental to get updated paid/remaining values
+        await rentalsStore.fetchRental(selectedRentalForPayouts.value.id)
+        await rentalsStore.fetchRentals()
         if (window.$toast) {
           window.$toast('Payout created successfully', 'success')
         }
@@ -845,6 +867,9 @@ export default {
     const deletePayout = async (payoutId) => {
       try {
         const result = await rentalsStore.deleteRentalPayout(selectedRentalForPayouts.value.id, payoutId)
+        // Refresh rental to get updated paid/remaining values
+        await rentalsStore.fetchRental(selectedRentalForPayouts.value.id)
+        await rentalsStore.fetchRentals()
         if (window.$toast) {
           if (result && result.alreadyDeleted) {
             window.$toast(t('rental.payoutAlreadyDeleted'), 'info')
@@ -951,6 +976,8 @@ export default {
     return {
       rentalsStore,
       showModal,
+      showDetailModal,
+      selectedRentalForDetail,
       showDeleteModal,
       showPayoutsModal,
       selectedRentalForPayouts,
@@ -978,6 +1005,8 @@ export default {
       onPageSizeChange,
       openAddModal,
       openEditModal,
+      openDetailModal,
+      closeDetailModal,
       saveRental,
       closeModal,
       openPayoutsModal,

@@ -463,7 +463,7 @@ export const getRental = (id) =>
 export const createRental = (data) =>
   axios.post(`${BASE_URL}/api/rentals`, data);
 export const updateRental = (id, data) =>
-  axios.patch(`${BASE_URL}/api/rentals/${id}`, data);
+  axios.put(`${BASE_URL}/api/rentals/${id}`, data);
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
 export const getRentalPayouts = (rentalId) =>
@@ -472,6 +472,18 @@ export const createRentalPayout = (rentalId, data) =>
   axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
 export const deleteRentalPayout = (rentalId, payoutId) =>
   axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
+
+// Rental Jobs
+export const getRentalJobs = (rentalId) =>
+  axios.get(`${BASE_URL}/api/rentals/${rentalId}/jobs`);
+export const createRentalJob = (rentalId, data) =>
+  axios.post(`${BASE_URL}/api/rentals/${rentalId}/jobs`, data);
+export const updateRentalJob = (rentalId, jobId, data) =>
+  axios.put(`${BASE_URL}/api/rentals/${rentalId}/jobs/${jobId}`, data);
+export const deleteRentalJob = (rentalId, jobId) =>
+  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/jobs/${jobId}`);
+export const getRentalJobsSummary = (rentalId) =>
+  axios.get(`${BASE_URL}/api/rentals/${rentalId}/jobs/summary`);
 
 export const getRentalReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/rentals/report`;

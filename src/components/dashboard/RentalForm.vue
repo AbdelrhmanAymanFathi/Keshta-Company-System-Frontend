@@ -40,21 +40,6 @@
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            {{ $t('rental.hours') }} *
-          </label>
-          <input
-            v-model.number="localForm.hours"
-            type="number"
-            min="0"
-            step="0.5"
-            required
-            @input="calculateTotal"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
             {{ $t('rental.hourlyRate') }} *
           </label>
           <input
@@ -63,23 +48,7 @@
             min="0"
             step="0.01"
             required
-            @input="calculateTotal"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            {{ $t('rental.total') }}
-          </label>
-          <input
-            v-model.number="localForm.total"
-            type="number"
-            min="0"
-            step="0.01"
-            @input="handleTotalChange"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            :title="$t('rental.totalCanOverride')"
           >
         </div>
       </div>
@@ -146,9 +115,7 @@ export default {
         date: new Date().toISOString().split('T')[0],
         equipment: '',
         name: '',
-        hours: 0,
         hourlyRate: 0,
-        total: 0,
         notes: '',
         isCompanyOwned: true
       })
@@ -194,16 +161,6 @@ export default {
     // to recursive update loops. The parent should pass the initial
     // `modelValue` and react to the `submit` event.
 
-    const calculateTotal = () => {
-      if (localForm.value.hours && localForm.value.hourlyRate) {
-        localForm.value.total = localForm.value.hours * localForm.value.hourlyRate
-      }
-    }
-
-    const handleTotalChange = () => {
-      // Allow manual override of total
-    }
-
     const handleSubmit = () => {
       // Validate required fields
       if (!localForm.value.date || !localForm.value.equipment || !localForm.value.name) {
@@ -213,22 +170,23 @@ export default {
         return
       }
 
-      if (localForm.value.hours <= 0 || localForm.value.hourlyRate <= 0) {
+      if (localForm.value.hourlyRate <= 0) {
         if (window.$toast) {
-          window.$toast('Hours and hourly rate must be greater than 0', 'error')
+          window.$toast('Hourly rate must be greater than 0', 'error')
         }
         return
       }
 
-      // Ensure total is calculated if not manually set
-      if (!localForm.value.total || localForm.value.total === 0) {
-        calculateTotal()
-      }
-
-      // Format date to ISO string
+      // Format date to ISO string and prepare payload
+      // Only send: date, equipment, name, hourlyRate, notes, isCompanyOwned
+      // Do NOT send hours or total
       const submitData = {
-        ...localForm.value,
-        date: new Date(localForm.value.date).toISOString()
+        date: new Date(localForm.value.date).toISOString(),
+        equipment: localForm.value.equipment,
+        name: localForm.value.name,
+        hourlyRate: localForm.value.hourlyRate,
+        notes: localForm.value.notes || '',
+        isCompanyOwned: localForm.value.isCompanyOwned !== undefined ? localForm.value.isCompanyOwned : true
       }
 
       emit('submit', submitData)
@@ -236,8 +194,6 @@ export default {
 
     return {
       localForm,
-      calculateTotal,
-      handleTotalChange,
       handleSubmit
     }
   }
