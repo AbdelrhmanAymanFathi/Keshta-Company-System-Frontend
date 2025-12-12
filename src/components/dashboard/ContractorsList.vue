@@ -23,7 +23,7 @@
 
     <!-- Search -->
     <div class="mb-4">
-      <input v-model="q" type="search" :placeholder="$t('contractors.searchPlaceholder')"
+      <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('contractors.searchPlaceholder')"
              class="w-full sm:w-1/2 px-3 py-2 border rounded" />
     </div>
 
@@ -141,6 +141,100 @@
       </div>
     </div>
     
+    <!-- Pagination -->
+    <div v-if="totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
+      <!-- Mobile Pagination -->
+      <div class="flex-1 flex justify-between sm:hidden">
+        <button @click="changePage(page - 1)" 
+          :disabled="page <= 1"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ $t('labels.previous') || 'Previous' }}
+        </button>
+        <span class="text-sm text-gray-700 self-center">
+          {{ page }} / {{ totalPages }}
+        </span>
+        <button @click="changePage(page + 1)" 
+          :disabled="page >= totalPages"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ $t('labels.next') || 'Next' }}
+        </button>
+      </div>
+
+      <!-- Desktop Pagination -->
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+          <p class="text-sm text-gray-700">
+            {{ $t('labels.showing') || 'Showing' }} 
+            <span class="font-medium">{{ ((page - 1) * pageSize) + 1 }}</span>
+            {{ $t('labels.to') || 'to' }}
+            <span class="font-medium">{{ Math.min(page * pageSize, total) }}</span>
+            {{ $t('labels.of') || 'of' }}
+            <span class="font-medium">{{ total }}</span>
+            {{ $t('labels.results') || 'results' }}
+          </p>
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-gray-700">{{ $t('labels.pageSize') || 'Page size' }}:</label>
+            <select v-model="pageSize" @change="onPageSizeChange" 
+              class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Page Numbers -->
+        <div>
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+            <button @click="changePage(1)" 
+              :disabled="page <= 1"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <button @click="changePage(page - 1)" 
+              :disabled="page <= 1"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <template v-for="p in visiblePages" :key="p">
+              <button @click="changePage(p)" 
+                :class="[
+                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                  p === page 
+                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' 
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                ]">
+                {{ p }}
+              </button>
+            </template>
+
+            <button @click="changePage(page + 1)" 
+              :disabled="page >= totalPages"
+              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <button @click="changePage(totalPages)" 
+              :disabled="page >= totalPages"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+
     <!-- Contractor Wallet Modal -->
     <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="fixed inset-0 bg-black opacity-40" @click="walletModalOpen = false"></div>
@@ -249,12 +343,16 @@ export default {
       wallet: null,
       selectedContractor: null,
       depositForm: { amount: '', description: '', date: '' },
-      historyLoading: false
+      historyLoading: false,
+      page: 1,
+      pageSize: 20,
+      total: 0
     }
   },
   computed: {
     isRTL() { return this.$i18n && this.$i18n.locale === 'ar' },
     filtered() {
+      // Client-side filtering is now optional since backend handles search
       if (!this.q) return this.contractors
       const s = this.q.toLowerCase()
       return this.contractors.filter(c =>
@@ -263,17 +361,61 @@ export default {
         (c.bankName||'').toLowerCase().includes(s) ||
         (c.accountNumber||'').toLowerCase().includes(s)
       )
+    },
+    totalPages() {
+      return Math.ceil(this.total / this.pageSize)
+    },
+    visiblePages() {
+      const pages = []
+      const maxVisible = 5
+      let start = Math.max(1, this.page - Math.floor(maxVisible / 2))
+      let end = Math.min(this.totalPages, start + maxVisible - 1)
+      if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1)
+      }
+      for (let i = start; i <= end; i++) {
+        pages.push(i)
+      }
+      return pages
     }
   },
   async mounted() {
-    try {
-      const res = await getContractors();
-      this.contractors = Array.isArray(res.data) ? res.data : [];
-    } catch (e) {
-      // fallback to demo data if error
-    }
+    await this.loadContractors()
   },
   methods: {
+    async loadContractors() {
+      try {
+        const res = await getContractors({
+          page: this.page,
+          pageSize: this.pageSize,
+          q: this.q
+        });
+        this.contractors = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []);
+        this.total = res.data.total || this.contractors.length
+        this.pageSize = res.data.pageSize || this.pageSize
+      } catch (e) {
+        this.contractors = [];
+        this.total = 0
+      }
+    },
+    changePage(newPage) {
+      if (newPage >= 1 && newPage <= this.totalPages) {
+        this.page = newPage
+        this.loadContractors()
+      }
+    },
+    onPageSizeChange() {
+      this.page = 1
+      this.loadContractors()
+    },
+    onSearchInput() {
+      // Debounce search - reload after user stops typing
+      clearTimeout(this.searchTimeout)
+      this.searchTimeout = setTimeout(() => {
+        this.page = 1
+        this.loadContractors()
+      }, 500)
+    },
     openAdd() {
       this.editing = false
       this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '' }
