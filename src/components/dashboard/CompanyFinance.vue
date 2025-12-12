@@ -64,11 +64,12 @@
             </div>
 
             <div class="flex items-center gap-2 ml-3">
+              <button @click.stop="openEditBranch(branch)" title="Edit"
+                class="px-2 py-1 rounded hover:bg-gray-50 text-sm">✏️</button>
               <button @click.stop="togglePin(index)" title="Pin"
                 class="px-2 py-1 rounded hover:bg-gray-50 text-sm">📌</button>
               <button @click.stop="promoteToTop(index)" title="Promote"
                 class="px-2 py-1 rounded hover:bg-gray-50 text-sm">⬆️</button>
-              <button @click.stop class="px-2 py-1 rounded hover:bg-gray-50 text-sm">⋯</button>
             </div>
           </li>
         </ul>
@@ -394,6 +395,38 @@
         </div>
       </div>
 
+    <!-- Edit Branch Modal -->
+    <div v-if="showEditBranchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      @click.self="closeEditBranchModal">
+      <div
+        :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
+        <div class="mt-3">
+          <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">
+            {{ $t('finance.editBranch') || 'Edit Branch' }}
+          </h3>
+          <form @submit.prevent="handleEditBranch" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                {{ $t('finance.branchName') || 'Branch Name' }} *
+              </label>
+              <input v-model.trim="editBranchForm.name" type="text" required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+              <button type="button" @click="closeEditBranchModal"
+                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                {{ $t('labels.cancel') || 'Cancel' }}
+              </button>
+              <button type="submit" :disabled="editBranchProcessing"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition">
+                {{ editBranchProcessing ? ($t('labels.processing') || 'Processing...') : ($t('labels.save') || 'Save') }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
       <!-- Withdraw Modal -->
       <div v-if="showWithdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
         @click.self="closeWithdrawModal">
@@ -445,7 +478,7 @@
 <script>
 
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet, saveBranchesOrder } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet, saveBranchesOrder, updateBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -456,7 +489,9 @@ export default {
     const financeStore = useCompanyFinanceStore()
     const showDepositModal = ref(false)
     const showWithdrawModal = ref(false)
+    const showEditBranchModal = ref(false)
     const processing = ref(false)
+    const editBranchProcessing = ref(false)
     // Sidebar / branches list state
     const branches = ref([])
     const sublistOpen = ref(true)
@@ -472,6 +507,8 @@ export default {
 
     const depositForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
     const withdrawForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
+    const editBranchForm = ref({ name: '' })
+    const editBranchTarget = ref(null)
 
     const fetchBranches = async () => {
       try {
@@ -675,6 +712,44 @@ export default {
     }
     const closeWithdrawModal = () => { showWithdrawModal.value = false }
 
+    const openEditBranch = (branch) => {
+      if (!branch) return
+      editBranchTarget.value = branch
+      editBranchForm.value = { name: branch.name || '' }
+      showEditBranchModal.value = true
+    }
+    const closeEditBranchModal = () => {
+      showEditBranchModal.value = false
+      editBranchTarget.value = null
+    }
+
+    const handleEditBranch = async () => {
+      if (!editBranchTarget.value) return
+      const name = (editBranchForm.value.name || '').trim()
+      if (!name) {
+        if (window.$toast) window.$toast('Please enter a branch name', 'error')
+        return
+      }
+      editBranchProcessing.value = true
+      try {
+        const res = await updateBranch(editBranchTarget.value.id, { name })
+        const updated = res?.data || { ...editBranchTarget.value, name }
+        const idx = branches.value.findIndex(b => b.id === editBranchTarget.value.id)
+        if (idx !== -1) {
+          branches.value[idx] = { ...branches.value[idx], ...updated }
+        }
+        if (selectedBranch.value && selectedBranch.value.id === editBranchTarget.value.id) {
+          selectedBranch.value = { ...selectedBranch.value, ...updated }
+        }
+        closeEditBranchModal()
+        if (window.$toast) window.$toast('Branch updated', 'success')
+      } catch (error) {
+        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to update branch', 'error')
+      } finally {
+        editBranchProcessing.value = false
+      }
+    }
+
     const handleDeposit = async () => {
       if (!depositForm.value.amount || depositForm.value.amount <= 0) {
         if (window.$toast) window.$toast('Please enter a valid amount', 'error')
@@ -798,12 +873,16 @@ export default {
       processing,
       depositForm,
       withdrawForm,
+      editBranchForm,
       openDepositModal,
       closeDepositModal,
       openWithdrawModal,
       closeWithdrawModal,
+      openEditBranch,
+      closeEditBranchModal,
       handleDeposit,
       handleWithdraw,
+      handleEditBranch,
       // drag & drop / sidebar helpers
       onDragStart,
       onDragEnter,
@@ -830,7 +909,9 @@ export default {
       isRTL,
       // Expose loading and error for template
       loading: financeStore.loading,
-      error: financeStore.error
+      error: financeStore.error,
+      showEditBranchModal,
+      editBranchProcessing
     }
   }
 }
