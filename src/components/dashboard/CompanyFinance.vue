@@ -713,7 +713,16 @@ export default {
     const closeWithdrawModal = () => { showWithdrawModal.value = false }
 
     const openEditBranch = (branch) => {
-      if (!branch) return
+      if (!branch) {
+        console.error('No branch provided to openEditBranch')
+        return
+      }
+      console.log('Opening edit modal for branch:', branch)
+      if (!branch.id) {
+        console.error('Branch missing ID:', branch)
+        if (window.$toast) window.$toast('Branch ID is missing', 'error')
+        return
+      }
       editBranchTarget.value = branch
       editBranchForm.value = { name: branch.name || '' }
       showEditBranchModal.value = true
@@ -730,21 +739,34 @@ export default {
         if (window.$toast) window.$toast('Please enter a branch name', 'error')
         return
       }
+      const branchId = editBranchTarget.value.id
+      if (!branchId) {
+        if (window.$toast) window.$toast('Invalid branch ID', 'error')
+        console.error('Branch ID is missing:', editBranchTarget.value)
+        return
+      }
       editBranchProcessing.value = true
       try {
-        const res = await updateBranch(editBranchTarget.value.id, { name })
+        console.log('Updating branch:', branchId, 'with name:', name)
+        const res = await updateBranch(branchId, { name })
         const updated = res?.data || { ...editBranchTarget.value, name }
-        const idx = branches.value.findIndex(b => b.id === editBranchTarget.value.id)
+        const idx = branches.value.findIndex(b => b.id === branchId)
         if (idx !== -1) {
           branches.value[idx] = { ...branches.value[idx], ...updated }
         }
-        if (selectedBranch.value && selectedBranch.value.id === editBranchTarget.value.id) {
+        if (selectedBranch.value && selectedBranch.value.id === branchId) {
           selectedBranch.value = { ...selectedBranch.value, ...updated }
         }
         closeEditBranchModal()
         if (window.$toast) window.$toast('Branch updated', 'success')
       } catch (error) {
-        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to update branch', 'error')
+        console.error('Error updating branch:', error)
+        console.error('Branch ID:', branchId)
+        console.error('Error response:', error.response)
+        if (window.$toast) {
+          const errorMsg = error.response?.data?.message || error.message || 'Failed to update branch'
+          window.$toast(errorMsg, 'error')
+        }
       } finally {
         editBranchProcessing.value = false
       }

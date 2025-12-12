@@ -2,8 +2,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
-// const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
 class TokenManager {
@@ -316,8 +315,13 @@ export const getBranches = () =>
   axios.get(`${BASE_URL}/api/branches`);
 export const createBranch = (data) =>
   axios.post(`${BASE_URL}/api/branches`, data);
-export const updateBranch = (id, data) =>
-  axios.patch(`${BASE_URL}/api/branches/${id}`, data);
+export const updateBranch = (id, data) => {
+  if (!id) {
+    return Promise.reject(new Error('Branch ID is required'))
+  }
+  console.log('[API] Updating branch:', id, 'Data:', data, 'URL:', `${BASE_URL}/api/branches/${id}`)
+  return axios.patch(`${BASE_URL}/api/branches/${id}`, data);
+};
 export const deleteBranch = (id) =>
   axios.delete(`${BASE_URL}/api/branches/${id}`);
 export const saveBranchesOrder = (data) =>
