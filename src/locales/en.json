@@ -421,7 +421,9 @@
     "type": "Type",
     "amount": "Amount",
     "description": "Description",
-    "reference": "Reference"
+    "reference": "Reference",
+    "editBranch": "Edit Branch",
+    "branchName": "Branch Name"
   },
   "company": {
     "wallet": {

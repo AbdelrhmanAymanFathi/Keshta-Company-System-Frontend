@@ -421,7 +421,9 @@
     "type": "النوع",
     "amount": "المبلغ",
     "description": "الوصف",
-    "reference": "المرجع"
+    "reference": "المرجع",
+    "editBranch": "تعديل الفرع",
+    "branchName": "اسم الفرع"
   },
   "company": {
     "wallet": {
