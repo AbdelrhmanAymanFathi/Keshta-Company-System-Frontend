@@ -47,13 +47,15 @@ export function usePagination(fetchFn, { initialPage = 1, initialPageSize = 20, 
 
     const meta = payload.meta || {
       page: payload.page,
-      pageSize: payload.pageSize,
+      pageSize: payload.pageSize || payload.perPage,
+      perPage: payload.perPage,
       total: payload.total,
       totalPages: payload.totalPages
     }
 
     if (typeof meta.page === 'number') page.value = meta.page
-    if (typeof meta.pageSize === 'number') pageSize.value = meta.pageSize
+    const incomingPageSize = meta.pageSize ?? meta.perPage
+    if (typeof incomingPageSize === 'number') pageSize.value = incomingPageSize
 
     total.value =
       typeof meta.total === 'number'

@@ -430,9 +430,18 @@ export default {
         page: this.page,
         pageSize: this.pageSize
       });
-      this.vehicles = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []);
-      this.total = res.data.total || this.vehicles.length
-      this.pageSize = res.data.pageSize || this.pageSize
+      const payload = res.data || {}
+      this.vehicles = Array.isArray(payload.items)
+        ? payload.items
+        : Array.isArray(payload.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : [];
+      const meta = payload.meta || {}
+      this.total = meta.total ?? payload.total ?? this.vehicles.length
+      this.page = meta.page ?? this.page
+      this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
     },
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {

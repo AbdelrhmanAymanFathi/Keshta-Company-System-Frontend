@@ -390,9 +390,18 @@ export default {
           pageSize: this.pageSize,
           q: this.q
         });
-        this.contractors = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []);
-        this.total = res.data.total || this.contractors.length
-        this.pageSize = res.data.pageSize || this.pageSize
+        const payload = res.data || {}
+        this.contractors = Array.isArray(payload.items)
+          ? payload.items
+          : Array.isArray(payload.data)
+            ? payload.data
+            : Array.isArray(payload)
+              ? payload
+              : []
+        const meta = payload.meta || {}
+        this.total = meta.total ?? payload.total ?? this.contractors.length
+        this.page = meta.page ?? this.page
+        this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
       } catch (e) {
         this.contractors = [];
         this.total = 0

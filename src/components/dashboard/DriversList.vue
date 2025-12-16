@@ -352,9 +352,18 @@ export default {
           pageSize: this.pageSize,
           q: this.q
         })
-        this.drivers = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : [])
-        this.total = res.data.total || this.drivers.length
-        this.pageSize = res.data.pageSize || this.pageSize
+        const payload = res.data || {}
+        this.drivers = Array.isArray(payload.items)
+          ? payload.items
+          : Array.isArray(payload.data)
+            ? payload.data
+            : Array.isArray(payload)
+              ? payload
+              : []
+        const meta = payload.meta || {}
+        this.total = meta.total ?? payload.total ?? this.drivers.length
+        this.page = meta.page ?? this.page
+        this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
       } catch (e) {
         this.drivers = []
         this.total = 0
