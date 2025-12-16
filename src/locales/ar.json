@@ -303,6 +303,8 @@
     "crusherNumberPlaceholder": "رقم الكسارة",
     "company": "الشركة",
     "companyPlaceholder": "اسم الشركة",
+    "cubicCapacity": "التكعيب",
+    "cubicCapacityPlaceholder": "التكعيب",
     "createVehicle": "إنشاء مركبة",
     "noResults": "لا توجد مركبات",
     "addVehicle": "إضافة مركبة",

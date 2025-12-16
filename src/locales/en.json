@@ -303,6 +303,8 @@
     "crusherNumberPlaceholder": "Crusher Number",
     "company": "Company",
     "companyPlaceholder": "Company Name",
+    "cubicCapacity": "Cubic Capacity",
+    "cubicCapacityPlaceholder": "Cubic Capacity",
     "createVehicle": "Create Vehicle",
     "noResults": "No vehicles found",
     "addVehicle": "Add Vehicle",

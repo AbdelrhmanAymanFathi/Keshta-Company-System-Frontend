@@ -17,6 +17,7 @@
           <div class="mt-1 space-y-0.5 text-sm text-gray-600">
             <div>{{ $t('vehicles.crusherNumber') }}: <span class="font-medium">{{ v.crusherNumber || '-' }}</span></div>
             <div>{{ $t('vehicles.company') }}: <span class="font-medium">{{ v.company || '-' }}</span></div>
+            <div>{{ $t('vehicles.cubicCapacity') }}: <span class="font-medium">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '-' }}</span></div>
             <div v-if="v.contractor">
               {{ $t('vehicles.contractor') }}:
               <span class="font-medium">{{ v.contractor.name }}</span>

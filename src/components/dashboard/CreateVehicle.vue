@@ -23,6 +23,11 @@
       <input v-model="form.company" type="text" :placeholder="$t('vehicles.companyPlaceholder')" class="w-full border rounded px-3 py-2" />
     </div>
 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
+      <input v-model.number="form.cubicCapacity" type="number" step="any" :placeholder="$t('vehicles.cubicCapacityPlaceholder')" class="w-full border rounded px-3 py-2" />
+    </div>
+
     <div class="md:col-span-4 flex items-center gap-3">
       <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" :disabled="creating">
         {{ creating ? $t('common.saving') : $t('vehicles.createVehicle') }}
@@ -45,7 +50,8 @@ export default {
         name: '',
         contractorId: '',
         crusherNumber: '',
-        company: ''
+        company: '',
+        cubicCapacity: ''
       },
       creating: false,
       error: '',
@@ -71,7 +77,8 @@ export default {
           name: this.form.name,
           contractorId: this.form.contractorId,
           crusherNumber: this.form.crusherNumber || null,
-          company: this.form.company || null
+          company: this.form.company || null,
+          cubicCapacity: this.form.cubicCapacity ? parseFloat(this.form.cubicCapacity) : null
         }
         await createVehicle(payload)
         this.success = true
@@ -80,6 +87,7 @@ export default {
         this.form.contractorId = ''
         this.form.crusherNumber = ''
         this.form.company = ''
+        this.form.cubicCapacity = ''
       } catch (e) {
         this.error = e?.response?.data?.message || this.$t('vehicles.saveError')
       } finally {
