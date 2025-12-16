@@ -221,73 +221,77 @@
 </template>
 
 <script>
+import { onMounted } from 'vue'
 import { getTransports, deleteTransport } from '@/api'
+import { usePagination } from '@/composables/usePagination'
+import Pagination from '@/components/shared/Pagination.vue'
 import NewTransport from './NewTransport.vue'
 
 export default {
   name: 'TransportList',
-  components: { NewTransport },
+  components: { NewTransport, Pagination },
+  setup() {
+    const fetchTransports = (page, pageSize, extra = {}) =>
+      getTransports({ page, pageSize, ...extra })
+
+    const {
+      items,
+      page,
+      pageSize,
+      total,
+      totalPages,
+      loading,
+      load,
+      setPage,
+      setPageSize
+    } = usePagination(fetchTransports, {
+      initialPage: 1,
+      initialPageSize: 20,
+      resourceName: 'transports'
+    })
+
+    onMounted(() => {
+      load()
+    })
+
+    return {
+      transports: items,
+      page,
+      pageSize,
+      total,
+      totalPages,
+      loading,
+      setPage,
+      setPageSize,
+      reloadTransports: load
+    }
+  },
   data() {
     return {
-      transports: [],
-      loading: false,
       error: null,
       showAddModal: false,
-      editingTransport: null,
-      page: 1,
-      pageSize: 20,
-      total: 0
+      editingTransport: null
     }
-  },
-  computed: {
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
-    },
-    visiblePages() {
-      const pages = []
-      const maxVisible = 5
-      let start = Math.max(1, this.page - Math.floor(maxVisible / 2))
-      let end = Math.min(this.totalPages, start + maxVisible - 1)
-      if (end - start < maxVisible - 1) {
-        start = Math.max(1, end - maxVisible + 1)
-      }
-      for (let i = start; i <= end; i++) {
-        pages.push(i)
-      }
-      return pages
-    }
-  },
-  async mounted() {
-    await this.loadTransports()
   },
   methods: {
     async loadTransports() {
-      this.loading = true
       this.error = null
       try {
-        const response = await getTransports({
-          page: this.page,
-          pageSize: this.pageSize
-        })
-        this.transports = response.data.items || []
-        this.total = response.data.total || this.transports.length
-        this.pageSize = response.data.pageSize || this.pageSize
+        await this.reloadTransports()
       } catch (error) {
         this.error = error.response?.data?.message || this.$t('common.loadError')
         console.error('Error loading transports:', error)
-      } finally {
-        this.loading = false
       }
     },
-    changePage(newPage) {
+    async changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {
-        this.page = newPage
-        this.loadTransports()
+        this.setPage(newPage)
+        await this.loadTransports()
       }
     },
-    onPageSizeChange() {
-      this.page = 1
-      this.loadTransports()
+    async onPageSizeChange(newSize) {
+      this.setPageSize(newSize)
+      await this.loadTransports()
     },
 
     async deleteTransport(id) {
@@ -313,9 +317,9 @@ export default {
       this.editingTransport = null
     },
 
-    handleTransportSaved() {
+    async handleTransportSaved() {
       this.closeModal()
-      this.loadTransports()
+      await this.loadTransports()
     },
 
     formatDate(dateString) {
