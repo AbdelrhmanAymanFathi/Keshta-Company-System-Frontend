@@ -23,7 +23,7 @@
         </div>
         <div>
           <div class="text-sm text-gray-600">{{ $t('rental.hours') }} ({{ $t('rental.computed') }})</div>
-          <div class="text-lg font-semibold text-gray-900">{{ (rental?.hours || 0).toFixed(2) }}</div>
+          <div class="text-lg font-semibold text-gray-900">{{ formatHours(rental?.hours) }}</div>
         </div>
         <div>
           <div class="text-sm text-gray-600">{{ $t('rental.total') }} ({{ $t('rental.computed') }})</div>
@@ -174,7 +174,7 @@
             </div>
             <div>
               <div class="text-sm text-gray-600">{{ $t('rental.totalHours') }}</div>
-              <div class="text-xl font-semibold text-gray-900">{{ (summary.totalHours || 0).toFixed(2) }}</div>
+              <div class="text-xl font-semibold text-gray-900">{{ formatHours(summary.totalHours) }}</div>
             </div>
             <div>
               <div class="text-sm text-gray-600">{{ $t('rental.totalPay') }}</div>
@@ -664,6 +664,14 @@ export default {
       }).format(amount)
     }
 
+    const formatHours = (value) => {
+      const num = Number(value || 0)
+      if (Number.isNaN(num)) {
+        return '0.00'
+      }
+      return num.toFixed(2)
+    }
+
     watch(activeTab, (newTab) => {
       if (newTab === 'summary' && !summary.value) {
         loadSummary()
@@ -701,7 +709,8 @@ export default {
       savePayout,
       deletePayout,
       formatDate,
-      formatCurrency
+      formatCurrency,
+      formatHours
     }
   }
 }
