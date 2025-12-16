@@ -335,7 +335,11 @@
     "primary": "Primary",
     "noDriverHistory": "No driver assignment history found",
     "stillAssigned": "Currently assigned",
-    "changeOwner": "Change owner"
+    "changeOwner": "Change owner",
+    "selectCrusher": "Select Crusher",
+    "addNewCrusher": "Add New Crusher",
+    "newCrusherNamePlaceholder": "Enter crusher name",
+    "crusherCreateError": "Error creating crusher"
   },
   "rental": {
     "rentalList": "Equipment Rentals",

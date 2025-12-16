@@ -15,7 +15,20 @@
 
     <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.crusherNumber') }}</label>
-      <input v-model="form.crusherNumber" type="text" :placeholder="$t('vehicles.crusherNumberPlaceholder')" class="w-full border rounded px-3 py-2" />
+      <div class="space-y-2">
+        <select v-model="form.crusherId" @change="onCrusherSelectChange" class="w-full border rounded px-3 py-2">
+          <option value="">{{ $t('vehicles.selectCrusher') }}</option>
+          <option v-for="c in crushers" :key="c.id" :value="c.id">{{ c.name }}</option>
+          <option value="__new__">{{ $t('vehicles.addNewCrusher') }}</option>
+        </select>
+        <input 
+          v-if="form.crusherId === '__new__'"
+          v-model="form.newCrusherName" 
+          type="text" 
+          :placeholder="$t('vehicles.newCrusherNamePlaceholder')" 
+          class="w-full border rounded px-3 py-2" 
+        />
+      </div>
     </div>
 
     <div class="md:col-span-2">
@@ -39,17 +52,20 @@
 </template>
 
 <script>
-import { createVehicle, getContractors } from '../../api'
+import { createVehicle, getContractors, getCrushers, createCrusher } from '../../api'
 
 export default {
   name: 'CreateVehicle',
   data() {
     return {
       contractors: [],
+      crushers: [],
       form: {
         name: '',
         contractorId: '',
+        crusherId: '',
         crusherNumber: '',
+        newCrusherName: '',
         company: '',
         cubicCapacity: ''
       },
@@ -67,16 +83,55 @@ export default {
         console.error('Error loading contractors:', error)
         this.contractors = []
       }
+      try {
+        const crushersRes = await getCrushers({ pageSize: 1000 })
+        // Handle both array response and paginated response
+        this.crushers = Array.isArray(crushersRes.data) 
+          ? crushersRes.data 
+          : (Array.isArray(crushersRes.data.items) ? crushersRes.data.items : [])
+      } catch (error) {
+        console.error('Error loading crushers:', error)
+        this.crushers = []
+      }
+    },
+    onCrusherSelectChange() {
+      if (this.form.crusherId && this.form.crusherId !== '__new__') {
+        const selectedCrusher = this.crushers.find(c => c.id === parseInt(this.form.crusherId))
+        if (selectedCrusher) {
+          this.form.crusherNumber = selectedCrusher.name
+        }
+      } else {
+        this.form.crusherNumber = ''
+        this.form.newCrusherName = ''
+      }
     },
     async onCreate() {
       this.error = ''
       this.success = false
       this.creating = true
       try {
+        let crusherNumber = this.form.crusherNumber || null
+
+        // If user selected "add new crusher", create it first
+        if (this.form.crusherId === '__new__' && this.form.newCrusherName) {
+          const newCrusherName = this.form.newCrusherName.trim()
+          if (newCrusherName) {
+            try {
+              const newCrusherRes = await createCrusher({ name: newCrusherName })
+              crusherNumber = newCrusherRes.data.name
+              // Add to local list for future use
+              this.crushers.push(newCrusherRes.data)
+            } catch (e) {
+              this.error = e?.response?.data?.message || this.$t('vehicles.crusherCreateError')
+              return
+            }
+          }
+        }
+
         const payload = {
           name: this.form.name,
           contractorId: this.form.contractorId,
-          crusherNumber: this.form.crusherNumber || null,
+          crusherNumber: crusherNumber,
           company: this.form.company || null,
           cubicCapacity: this.form.cubicCapacity ? parseFloat(this.form.cubicCapacity) : null
         }
@@ -85,7 +140,9 @@ export default {
         this.$emit('created')
         this.form.name = ''
         this.form.contractorId = ''
+        this.form.crusherId = ''
         this.form.crusherNumber = ''
+        this.form.newCrusherName = ''
         this.form.company = ''
         this.form.cubicCapacity = ''
       } catch (e) {

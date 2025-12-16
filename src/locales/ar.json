@@ -335,7 +335,11 @@
     "primary": "أساسي",
     "noDriverHistory": "لا يوجد سجل لربط السائقين",
     "stillAssigned": "مربوط حالياً",
-    "changeOwner": "تغيير المالك"
+    "changeOwner": "تغيير المالك",
+    "selectCrusher": "اختر الكسارة",
+    "addNewCrusher": "إضافة كسارة جديدة",
+    "newCrusherNamePlaceholder": "أدخل اسم الكسارة",
+    "crusherCreateError": "خطأ في إنشاء الكسارة"
   },
   "rental": {
     "rentalList": "إيجار المعدات",
