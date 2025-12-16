@@ -110,7 +110,8 @@
     "filters": "عوامل التصفية",
     "clear": "مسح",
     "all": "الكل",
-    "totalRecords": "إجمالي السجلات"
+    "totalRecords": "إجمالي السجلات",
+    "pageSize": "حجم الصفحة"
   },
   "common": {
     "error": "خطأ",

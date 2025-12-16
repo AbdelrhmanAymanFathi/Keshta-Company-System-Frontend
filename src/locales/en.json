@@ -110,7 +110,8 @@
     "filters": "Filters",
     "clear": "Clear",
     "all": "All",
-    "totalRecords": "Total Records"
+    "totalRecords": "Total Records",
+    "pageSize": "Page size"
   },
   "common": {
     "error": "Error",

@@ -10,7 +10,7 @@
         :disabled="currentPage <= 1"
         class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ $t?.('labels.previous') || 'Previous' }}
+        Previous
       </button>
       <span class="text-sm text-gray-700 self-center">
         {{ currentPage }} / {{ totalPages }}
@@ -20,7 +20,7 @@
         :disabled="currentPage >= totalPages"
         class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {{ $t?.('labels.next') || 'Next' }}
+        Next
       </button>
     </div>
 
@@ -28,17 +28,17 @@
     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
       <div class="flex items-center gap-4">
         <p class="text-sm text-gray-700">
-          {{ $t?.('labels.showing') || 'Showing' }}
+          Showing
           <span class="font-medium">{{ startItem }}</span>
-          {{ $t?.('labels.to') || 'to' }}
+          to
           <span class="font-medium">{{ endItem }}</span>
-          {{ $t?.('labels.of') || 'of' }}
+          of
           <span class="font-medium">{{ total }}</span>
-          {{ $t?.('labels.results') || 'results' }}
+          results
         </p>
         <div class="flex items-center gap-2">
           <label class="text-sm text-gray-700">
-            {{ $t?.('labels.pageSize') || 'Page size' }}:
+            Page size:
           </label>
           <select
             v-model.number="localPageSize"
