@@ -3,7 +3,8 @@
 
     <aside
       :class="['bg-white rounded-lg shadow overflow-hidden p-3', isRTL ? 'direction-rtl' : '', isRTL ? 'text-end' : 'text-start']"
-      style="min-width: 260px; max-width: 320px;">
+      style="min-width: 19%; max-width: 320px;">
+      <!-- Sidebar header -->
       <div :class="['flex items-center justify-between mb-3']">
         <h3 :class="['text-lg font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{
           $t('finance.wallets') }}</h3>
