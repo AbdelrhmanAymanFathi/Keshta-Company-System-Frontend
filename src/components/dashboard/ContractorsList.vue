@@ -52,6 +52,7 @@
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.notes || '-' }}</td>
               <td class="p-3">
                 <div :class="['flex gap-2', isRTL ? 'flex-row-reverse' : '']">
+                  <button @click="openStatement(c)" class="px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white">{{ $t('contractors.statement') || 'Statement' }}</button>
                   <button @click="openWallet(c)" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white">{{ $t('contractors.wallet') || 'Wallet' }}</button>
                   <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white">{{ $t('labels.edit') }}</button>
                   <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white">{{ $t('labels.delete') }}</button>
@@ -79,6 +80,7 @@
           </div>
         </div>
           <div class="flex flex-col gap-2">
+          <button @click="openStatement(c)" class="px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white text-xs">{{ $t('contractors.statement') || 'Statement' }}</button>
           <button @click="openWallet(c)" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs">{{ $t('contractors.wallet') || 'Wallet' }}</button>
           <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs">{{ $t('labels.edit') }}</button>
           <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs">{{ $t('labels.delete') }}</button>
@@ -622,6 +624,10 @@ export default {
     },
     cancelDelete() {
       this.deleteConfirm = { open: false, item: null }
+    },
+    openStatement(c) {
+      // Emit event to navigate to statement page
+      this.$emit('navigate-statement', c.id)
     }
   }
 }

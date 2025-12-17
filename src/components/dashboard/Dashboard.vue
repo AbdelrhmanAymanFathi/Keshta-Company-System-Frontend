@@ -132,7 +132,7 @@
       <!-- Main content -->
       <main class="flex-1 min-w-0 p-6 overflow-auto bg-white">
         <h2 class="text-2xl font-semibold mb-4">{{ $t(currentLabel) }}</h2>
-        <component :is="currentComponent" @navigate-report="navigateToReport" />
+        <component :is="currentComponent" @navigate-report="navigateToReport" @navigate-statement="navigateToStatement" />
       </main>
     </div>
 
@@ -147,6 +147,7 @@ import SuppliesList from './SuppliesList.vue'
 // Use the JSON-first report components (replacements)
 import SuppliesReport from './SuppliesReportNew.vue'
 import ContractorsList from './ContractorsList.vue'
+import ContractorStatement from './ContractorStatement.vue'
 import DriversList from './DriversList.vue'
 import CrushersList from './CrushersList.vue'
 import VehiclesList from './VehiclesList.vue'
@@ -164,7 +165,7 @@ import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
+  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
   setup() {
     const { logout: authLogout } = useAuth()
     return { authLogout }
@@ -181,6 +182,7 @@ export default {
           { name: 'suppliesList', label: 'dashboard.suppliesList', component: 'SuppliesList' },
           { name: 'crushersList', label: 'dashboard.crushersList', component: 'CrushersList' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', component: 'ContractorsList' },
+          { name: 'contractorStatement', label: 'dashboard.contractorStatement', component: 'ContractorStatement' },
           { name: 'driversList', label: 'drivers.title', component: 'DriversList' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' }
           ,
@@ -240,7 +242,7 @@ export default {
       // produce component to render (string -> imported component; or inline component)
     currentComponent() {
       if (!this.currentItem) return SelectPlaceholder
-  const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance }
+  const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance }
       const comp = this.currentItem.component
       if (typeof comp === 'string') {
         return mapping[comp] || ComponentNotFound
@@ -338,6 +340,21 @@ export default {
       }
     },
 
+    // Navigate to contractor statement
+    navigateToStatement(contractorId) {
+      this.selectedTop = 'supplies'
+      localStorage.setItem('dashboard-selectedTop', 'supplies')
+      this.selectedVertical = 'contractorStatement'
+      localStorage.setItem('dashboard-selectedVertical', 'contractorStatement')
+      // Store contractor ID for the statement component to use
+      if (contractorId) {
+        localStorage.setItem('contractor-statement-id', contractorId.toString())
+      }
+      if (this.isMobile) {
+        this.sidebarOpen = false
+      }
+    },
+
     handleLogoutSuccess() {
       this.showLogoutDialog = false
       // The auth system will handle the logout and redirect
@@ -366,6 +383,7 @@ export default {
         suppliesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         crushersList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`,
         contractorsList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        contractorStatement: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14h8M8 18h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
         vehiclesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 13h18l-2 4H5zM7 9h10l2 4H5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         transportList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 13h18v-5H3v5zM5 18h2v2H5v-2zM17 18h2v2h-2v-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         expensesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,

@@ -299,6 +299,33 @@ export const getContractorWalletHistory = (contractorId) =>
 export const depositToContractorWallet = (contractorId, data) =>
   axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
 
+// Contractor Report/Statement
+export const getContractorReportData = async (contractorId, params = {}, format = 'json') => {
+  const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
+  let axiosParams = { ...params };
+  if (format === 'json') {
+    axiosParams.format = 'json';
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } else if (format === 'xlsx') {
+    axiosParams.format = 'xlsx';
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } else if (format === 'csv') {
+    axiosParams.format = 'csv';
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  } else {
+    // fallback: just get json
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+};
+
+export const downloadContractorReport = async (contractorId, params = {}, format = 'xlsx') => {
+  return getContractorReportData(contractorId, params, format);
+};
+
 // Crushers
 export const getCrushers = (params = {}) => {
   const { page = 1, pageSize = 20, q = '' } = params;
