@@ -119,6 +119,10 @@
           class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
           {{ $t('finance.withdraw') }}
         </button>
+        <button @click="openTransferModal"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+          {{ $t('finance.transfer') }}
+        </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div
@@ -471,6 +475,69 @@
           </div>
         </div>
       </div>
+
+      <!-- Transfer Modal -->
+      <div v-if="showTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+        @click.self="closeTransferModal">
+        <div
+          :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
+          <div class="mt-3">
+            <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">
+              {{ !selectedBranch ? $t('finance.transferToBranch') : $t('finance.transferToCompany') }}
+            </h3>
+            <form @submit.prevent="handleTransfer" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
+              <div v-if="!selectedBranch">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('finance.selectBranch') }} *
+                </label>
+                <select v-model.number="transferForm.branchId" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option :value="null">{{ $t('finance.selectBranch') }}</option>
+                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                    {{ branch.name }}
+                  </option>
+                </select>
+              </div>
+              <div v-else class="p-3 bg-indigo-50 rounded-md">
+                <p class="text-sm text-indigo-700">
+                  {{ $t('finance.transferToCompany') }}: <strong>{{ selectedBranch.name }}</strong> → {{ $t('finance.companyWallet') }}
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('finance.amount') }} *
+                </label>
+                <input v-model.number="transferForm.amount" type="number" min="0.01" step="0.01" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('finance.description') }}
+                </label>
+                <input v-model="transferForm.description" type="text"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  {{ $t('finance.date') }} *
+                </label>
+                <input v-model="transferForm.date" type="date" required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div class="flex justify-end gap-3 pt-4">
+                <button type="button" @click="closeTransferModal"
+                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                  {{ $t('labels.cancel') }}
+                </button>
+                <button type="submit" :disabled="processing"
+                  class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition">
+                  {{ processing ? $t('labels.processing') : $t('finance.transfer') }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -478,7 +545,7 @@
 <script>
 
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet, saveBranchesOrder, updateBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -489,6 +556,7 @@ export default {
     const financeStore = useCompanyFinanceStore()
     const showDepositModal = ref(false)
     const showWithdrawModal = ref(false)
+    const showTransferModal = ref(false)
     const showEditBranchModal = ref(false)
     const processing = ref(false)
     const editBranchProcessing = ref(false)
@@ -507,6 +575,7 @@ export default {
 
     const depositForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
     const withdrawForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
+    const transferForm = ref({ branchId: null, amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
     const editBranchForm = ref({ name: '' })
     const editBranchTarget = ref(null)
 
@@ -711,6 +780,11 @@ export default {
       showWithdrawModal.value = true
     }
     const closeWithdrawModal = () => { showWithdrawModal.value = false }
+    const openTransferModal = () => {
+      transferForm.value = { branchId: null, amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
+      showTransferModal.value = true
+    }
+    const closeTransferModal = () => { showTransferModal.value = false }
 
     const openEditBranch = (branch) => {
       if (!branch) {
@@ -834,6 +908,42 @@ export default {
       } finally { processing.value = false }
     }
 
+    const handleTransfer = async () => {
+      if (!transferForm.value.amount || transferForm.value.amount <= 0) {
+        if (window.$toast) window.$toast('Please enter a valid amount', 'error')
+        return
+      }
+      if (!selectedBranch.value && !transferForm.value.branchId) {
+        if (window.$toast) window.$toast('Please select a branch', 'error')
+        return
+      }
+      processing.value = true
+      try {
+        if (!selectedBranch.value) {
+          // Transfer from company to branch
+          await transferFromCompanyToBranch({
+            branchId: transferForm.value.branchId,
+            amount: transferForm.value.amount,
+            description: transferForm.value.description,
+            date: transferForm.value.date
+          });
+        } else {
+          // Transfer from branch to company
+          await transferFromBranchToCompany(selectedBranch.value.id, {
+            amount: transferForm.value.amount,
+            description: transferForm.value.description,
+            date: transferForm.value.date
+          });
+        }
+        await fetchSummary()
+        await fetchTransactions()
+        closeTransferModal()
+        if (window.$toast) window.$toast('Transfer successful', 'success')
+      } catch (error) {
+        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to transfer', 'error')
+      } finally { processing.value = false }
+    }
+
     const changePage = async (page) => {
       if (page >= 1 && page <= transactions.value.totalPages) {
         transactions.value.page = page
@@ -900,11 +1010,16 @@ export default {
       closeDepositModal,
       openWithdrawModal,
       closeWithdrawModal,
+      openTransferModal,
+      closeTransferModal,
       openEditBranch,
       closeEditBranchModal,
       handleDeposit,
       handleWithdraw,
+      handleTransfer,
       handleEditBranch,
+      transferForm,
+      showTransferModal,
       // drag & drop / sidebar helpers
       onDragStart,
       onDragEnter,

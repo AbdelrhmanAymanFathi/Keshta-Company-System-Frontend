@@ -430,7 +430,12 @@
     "description": "Description",
     "reference": "Reference",
     "editBranch": "Edit Branch",
-    "branchName": "Branch Name"
+    "branchName": "Branch Name",
+    "transfer": "Transfer",
+    "transferToBranch": "Transfer to Branch",
+    "transferToCompany": "Transfer to Main Treasury",
+    "selectBranch": "Select Branch",
+    "transferAmount": "Transfer Amount"
   },
   "company": {
     "wallet": {

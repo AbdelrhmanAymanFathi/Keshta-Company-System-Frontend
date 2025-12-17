@@ -359,6 +359,8 @@ export const depositToBranchWallet = (branchId, data) =>
 // If withdraw endpoint exists, add it here:
 export const withdrawFromBranchWallet = (branchId, data) =>
   axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/withdraw`, data);
+export const transferFromBranchToCompany = (branchId, data) =>
+  axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/transfer-to-company`, data);
 
 // Vehicles
 export const getVehicles = (params = {}) => {
@@ -567,6 +569,8 @@ export const depositToCompanyWallet = (data) =>
   axios.post(`${BASE_URL}/api/company/wallet/deposit`, data);
 export const withdrawFromCompanyWallet = (data) =>
   axios.post(`${BASE_URL}/api/company/wallet/withdraw`, data);
+export const transferFromCompanyToBranch = (data) =>
+  axios.post(`${BASE_URL}/api/company/wallet/transfer-to-branch`, data);
 export const getCompany = () =>
   axios.get(`${BASE_URL}/api/company`);
 export const getCompanySummary = () =>
