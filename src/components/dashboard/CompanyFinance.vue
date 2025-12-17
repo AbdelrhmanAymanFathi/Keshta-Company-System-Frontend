@@ -111,14 +111,14 @@
 
       <!-- Summary Stats Bar -->
       <div :class="['flex items-center justify-end gap-3', isRTL ? 'text-end' : 'text-start']">
-        <button @click="openDepositModal"
+        <!-- <button @click="openDepositModal"
           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
           {{ $t('finance.deposit') }}
-        </button>
-        <button @click="openWithdrawModal"
+        </button> -->
+        <!-- <button @click="openWithdrawModal"
           class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
           {{ $t('finance.withdraw') }}
-        </button>
+        </button> -->
         <button @click="openTransferModal"
           class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
           {{ $t('finance.transfer') }}
