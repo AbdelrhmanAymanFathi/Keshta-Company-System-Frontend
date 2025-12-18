@@ -45,6 +45,8 @@
     "route": "Route",
     "trips": "Trips",
     "distance": "Distance",
+    "vehicleCapacity": "Vehicle Capacity",
+    "vehicleCapacityMissing": "Selected vehicle has no cubic capacity set. Pricing will assume capacity = 1.",
     "selectContractor": "Select Contractor",
     "selectVehicle": "Select Vehicle",
     "noTransports": "No transports found",

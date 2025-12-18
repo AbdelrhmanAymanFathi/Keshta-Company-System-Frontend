@@ -45,6 +45,8 @@
     "route": "المسار",
     "trips": "الرحلات",
     "distance": "المسافة",
+    "vehicleCapacity": "سعة المركبة",
+    "vehicleCapacityMissing": "لا يوجد تكعيب محدد للمركبة المختارة. سيتم احتساب التكعيب = 1 في التسعير.",
     "selectContractor": "اختر المقاول",
     "selectVehicle": "اختر المركبة",
     "noTransports": "لا توجد عمليات نقل",

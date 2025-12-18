@@ -54,6 +54,9 @@
                 {{ $t('transport.distance') }}
               </th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {{ $t('transport.vehicleCapacity') || 'Capacity' }}
+              </th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ $t('transport.total') }}
               </th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -80,18 +83,35 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ transport.distanceKm }} km
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {{ transport.vehicleCubicCapacity != null ? transport.vehicleCubicCapacity : '-' }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ formatCurrency(transport.total) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex space-x-2">
-                  <button @click="editTransport(transport)" 
-                          class="text-indigo-600 hover:text-indigo-900">
-                    {{ $t('common.edit') }}
+                <div class="flex space-x-1">
+                  <button
+                    @click="editTransport(transport)"
+                    class="inline-flex items-center justify-center p-2 rounded-full text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 transition-colors"
+                    :title="$t('common.edit')"
+                    type="button"
+                  >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5h2m-1 0v14m-7-4h14M5 5h14a2 2 0 012 2v2m-2 10H5a2 2 0 01-2-2V7a2 2 0 012-2" />
+                    </svg>
                   </button>
-                  <button @click="deleteTransport(transport.id)" 
-                          class="text-red-600 hover:text-red-900">
-                    {{ $t('common.delete') }}
+                  <button
+                    @click="deleteTransport(transport.id)"
+                    class="inline-flex items-center justify-center p-2 rounded-full text-red-600 hover:text-red-900 hover:bg-red-50 transition-colors"
+                    :title="$t('common.delete')"
+                    type="button"
+                  >
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M6 7h12M10 11v6m4-6v6M9 7l1-2h4l1 2m-9 0l1 11a2 2 0 002 2h4a2 2 0 002-2l1-11" />
+                    </svg>
                   </button>
                 </div>
               </td>
@@ -274,6 +294,19 @@ export default {
     }
   },
   methods: {
+    visiblePages() {
+      const pages = []
+      const maxVisible = 5
+      let start = Math.max(1, this.page - Math.floor(maxVisible / 2))
+      let end = Math.min(this.totalPages, start + maxVisible - 1)
+      if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1)
+      }
+      for (let i = start; i <= end; i++) {
+        pages.push(i)
+      }
+      return pages
+    },
     async loadTransports() {
       this.error = null
       try {

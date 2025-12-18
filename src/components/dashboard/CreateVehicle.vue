@@ -78,17 +78,28 @@ export default {
     async loadLookups() {
       try {
         const contractorsRes = await getContractors()
-        this.contractors = Array.isArray(contractorsRes.data) ? contractorsRes.data : []
+        const contractorsPayload = contractorsRes.data || {}
+        this.contractors = Array.isArray(contractorsPayload.items)
+          ? contractorsPayload.items
+          : Array.isArray(contractorsPayload.data)
+            ? contractorsPayload.data
+            : Array.isArray(contractorsPayload)
+              ? contractorsPayload
+              : []
       } catch (error) {
         console.error('Error loading contractors:', error)
         this.contractors = []
       }
       try {
         const crushersRes = await getCrushers({ pageSize: 1000 })
-        // Handle both array response and paginated response
-        this.crushers = Array.isArray(crushersRes.data) 
-          ? crushersRes.data 
-          : (Array.isArray(crushersRes.data.items) ? crushersRes.data.items : [])
+        const crushersPayload = crushersRes.data || {}
+        this.crushers = Array.isArray(crushersPayload.items)
+          ? crushersPayload.items
+          : Array.isArray(crushersPayload.data)
+            ? crushersPayload.data
+            : Array.isArray(crushersPayload)
+              ? crushersPayload
+              : []
       } catch (error) {
         console.error('Error loading crushers:', error)
         this.crushers = []

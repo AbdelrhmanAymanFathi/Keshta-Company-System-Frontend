@@ -136,6 +136,9 @@
                   : '' }}
               </option>
             </select>
+            <p v-if="vehicleCapacityMissing" class="mt-1 text-xs text-amber-600">
+              {{ $t('transport.vehicleCapacityMissing') || 'Selected vehicle has no cubic capacity set. Pricing will assume capacity = 1.' }}
+            </p>
           </div>
         </div>
 
@@ -148,16 +151,30 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
         </div>
 
-        <!-- Total Display -->
+        <!-- Total Display / Fare Preview -->
         <div class="bg-gray-50 p-4 rounded-lg">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             <div>
-              <div class="text-sm text-gray-600">Per-trip fare</div>
-              <div class="text-lg font-semibold text-gray-900">{{ perTripFareDisplay }}</div>
+              <div class="text-sm text-gray-600">Base per-trip fare (distance)</div>
+              <div class="text-lg font-semibold text-gray-900">{{ basePerTripFareDisplay }}</div>
             </div>
             <div>
-              <div class="text-sm text-gray-600">{{ $t('transport.rate') }}</div>
-              <div class="text-lg font-semibold text-gray-900">{{ effectiveRateDisplay }}</div>
+              <div class="text-sm text-gray-600">Vehicle cubic capacity</div>
+              <div class="text-lg font-semibold text-gray-900">{{ vehicleCapacityDisplay }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-600">Per-trip fare (after capacity)</div>
+              <div class="text-lg font-semibold text-gray-900">{{ perTripFareDisplay }}</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mt-4">
+            <div>
+              <div class="text-sm text-gray-600">{{ $t('transport.trips') }} × per-trip</div>
+              <div class="text-lg font-semibold text-gray-900">{{ subtotalDisplay }}</div>
+            </div>
+            <div>
+              <div class="text-sm text-gray-600">{{ $t('labels.discount') }}</div>
+              <div class="text-lg font-semibold text-gray-900">{{ discountDisplay }}</div>
             </div>
             <div>
               <div class="text-sm text-gray-600">{{ $t('transport.total') }}</div>
@@ -245,6 +262,9 @@ export default {
       calculating: false,
       error: null,
       perTripFare: null,
+      basePerTripFare: null,
+      vehicleCapacitySnapshot: null,
+      subtotal: null,
       effectiveRate: null,
       totalFromServer: null,
       // shake state
@@ -260,6 +280,20 @@ export default {
     perTripFareDisplay() {
       return this.perTripFare != null ? this.formatCurrency(this.perTripFare) : '-'
     },
+    basePerTripFareDisplay() {
+      return this.basePerTripFare != null ? this.formatCurrency(this.basePerTripFare) : '-'
+    },
+    vehicleCapacityDisplay() {
+      if (this.vehicleCapacitySnapshot == null) return '-'
+      return this.vehicleCapacitySnapshot
+    },
+    subtotalDisplay() {
+      return this.subtotal != null ? this.formatCurrency(this.subtotal) : '-'
+    },
+    discountDisplay() {
+      const discount = parseFloat(this.form.discount || 0)
+      return discount > 0 ? this.formatCurrency(discount) : this.formatCurrency(0)
+    },
     effectiveRateDisplay() {
       return this.effectiveRate != null ? this.effectiveRate.toFixed(2) : '-'
     },
@@ -271,6 +305,11 @@ export default {
       if (!this.form.contractorId) return []
       const contractor = this.contractorsWithVehicles.find(c => c.id === parseInt(this.form.contractorId))
       return contractor ? contractor.vehicles || [] : []
+    },
+    vehicleCapacityMissing() {
+      if (!this.form.vehicleId) return false
+      const vehicle = this.availableVehicles.find(v => v.id === parseInt(this.form.vehicleId))
+      return !vehicle || vehicle.cubicCapacity == null
     }
   },
   async mounted() {
@@ -290,8 +329,23 @@ export default {
           getContractors(),
           getContractorsWithVehicles()
         ])
-        this.contractors = contractorsResponse.data || []
-        this.contractorsWithVehicles = contractorsWithVehiclesResponse.data || []
+        const contractorsPayload = contractorsResponse.data || {}
+        this.contractors = Array.isArray(contractorsPayload.items)
+          ? contractorsPayload.items
+          : Array.isArray(contractorsPayload.data)
+            ? contractorsPayload.data
+            : Array.isArray(contractorsPayload)
+              ? contractorsPayload
+              : []
+
+        const contractorsWithVehiclesPayload = contractorsWithVehiclesResponse.data || {}
+        this.contractorsWithVehicles = Array.isArray(contractorsWithVehiclesPayload.items)
+          ? contractorsWithVehiclesPayload.items
+          : Array.isArray(contractorsWithVehiclesPayload.data)
+            ? contractorsWithVehiclesPayload.data
+            : Array.isArray(contractorsWithVehiclesPayload)
+              ? contractorsWithVehiclesPayload
+              : []
       } catch (error) {
         console.error('Error loading contractors:', error)
       }
@@ -349,13 +403,24 @@ export default {
           firstKm: parseFloat(this.form.firstKm || 1),
           firstKmPrice: parseFloat(this.form.firstKmPrice || 0),
           perKmPrice: parseFloat(this.form.perKmPrice || 0),
-          discount: parseFloat(this.form.discount || 0)
+          discount: parseFloat(this.form.discount || 0),
+          vehicleId: this.form.vehicleId ? parseInt(this.form.vehicleId) : null
         }
 
         const { data } = await calculateTransportFare(payload)
         this.perTripFare = data?.perTripFare ?? null
+        this.vehicleCapacitySnapshot = data?.vehicleCubicCapacity ?? null
+        this.subtotal = data?.subtotal ?? null
         this.effectiveRate = data?.effectiveRate ?? null
         this.totalFromServer = data?.total ?? null
+
+        // derive base fare per trip from capacity snapshot when available
+        if (this.perTripFare != null) {
+          const capacity = this.vehicleCapacitySnapshot || 1
+          this.basePerTripFare = capacity > 0 ? this.perTripFare / capacity : this.perTripFare
+        } else {
+          this.basePerTripFare = null
+        }
       } catch (error) {
         this.error = error.response?.data?.message || error.message || this.$t('common.saveError')
       } finally {

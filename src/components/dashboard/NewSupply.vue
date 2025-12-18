@@ -609,20 +609,51 @@ export default {
     // load lookups
     async loadLookups() {
       try {
-        const contRes = await getContractors(); this.contractors = Array.isArray(contRes.data) ? contRes.data : [];
+        const contRes = await getContractors();
+        const contractorsPayload = contRes.data || {};
+        this.contractors = Array.isArray(contractorsPayload.items)
+          ? contractorsPayload.items
+          : Array.isArray(contractorsPayload.data)
+            ? contractorsPayload.data
+            : Array.isArray(contractorsPayload)
+              ? contractorsPayload
+              : [];
       } catch (e) { console.warn('getContractors failed', e) }
 
       try {
         const contractorsWithVehiclesRes = await getContractorsWithVehicles();
-        this.contractorsWithVehicles = Array.isArray(contractorsWithVehiclesRes.data) ? contractorsWithVehiclesRes.data : [];
+        const cvPayload = contractorsWithVehiclesRes.data || {};
+        this.contractorsWithVehicles = Array.isArray(cvPayload.items)
+          ? cvPayload.items
+          : Array.isArray(cvPayload.data)
+            ? cvPayload.data
+            : Array.isArray(cvPayload)
+              ? cvPayload
+              : [];
       } catch (e) { console.warn('getContractorsWithVehicles failed', e) }
 
       try {
-        const crushersRes = await getCrushers(); this.crushers = Array.isArray(crushersRes.data) ? crushersRes.data : [];
+        const crushersRes = await getCrushers();
+        const crushersPayload = crushersRes.data || {};
+        this.crushers = Array.isArray(crushersPayload.items)
+          ? crushersPayload.items
+          : Array.isArray(crushersPayload.data)
+            ? crushersPayload.data
+            : Array.isArray(crushersPayload)
+              ? crushersPayload
+              : [];
       } catch (e) { console.warn('getCrushers failed', e) }
 
       try {
-        const vehiclesRes = await getVehicles(); this.vehicles = Array.isArray(vehiclesRes.data) ? vehiclesRes.data : [];
+        const vehiclesRes = await getVehicles();
+        const vehiclesPayload = vehiclesRes.data || {};
+        this.vehicles = Array.isArray(vehiclesPayload.items)
+          ? vehiclesPayload.items
+          : Array.isArray(vehiclesPayload.data)
+            ? vehiclesPayload.data
+            : Array.isArray(vehiclesPayload)
+              ? vehiclesPayload
+              : [];
       } catch (e) { console.warn('getVehicles failed', e) }
 
       // seed availableVehicles for first row
@@ -845,7 +876,15 @@ export default {
 
     onVehicleSelect(row) {
       const v = row.vehicle;
-      if (v && v.cubic) row.cubic = v.cubic;
+      if (!v) {
+        row.cubic = 0
+        return
+      }
+      // استخدم cubicCapacity لو موجود، ولو مش موجود ارجع للـ cubic القديمة كـ fallback
+      const capacity = v.cubicCapacity != null && v.cubicCapacity !== ''
+        ? Number(v.cubicCapacity)
+        : (v.cubic != null && v.cubic !== '' ? Number(v.cubic) : 0)
+      row.cubic = isNaN(capacity) ? 0 : capacity
     },
 
     totalPerRow(row) {
