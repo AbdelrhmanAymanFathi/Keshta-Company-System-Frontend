@@ -382,7 +382,14 @@ export default {
     async loadContractors() {
       try {
         const res = await getContractors()
-        this.contractors = Array.isArray(res.data) ? res.data : []
+        const payload = res.data || {}
+        this.contractors = Array.isArray(payload.items)
+          ? payload.items
+          : Array.isArray(payload.data)
+            ? payload.data
+            : Array.isArray(payload)
+              ? payload
+              : []
       } catch (e) {
         this.contractors = []
       }
@@ -419,8 +426,11 @@ export default {
         const payload = {
           name: this.form.name,
           phone: this.form.phone || '',
-          contractorId: this.form.contractorId || null,
           notes: this.form.notes || ''
+        }
+        // Only include contractorId if it's not null/undefined
+        if (this.form.contractorId != null) {
+          payload.contractorId = this.form.contractorId
         }
         if (this.editing && this.form.id) {
           const res = await updateDriver(this.form.id, payload)
