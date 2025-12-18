@@ -9,13 +9,8 @@
 
     <!-- Search -->
     <div class="mb-4">
-      <input
-        v-model="q"
-        @input="onSearchInput"
-        type="search"
-        :placeholder="$t('drivers.searchPlaceholder')"
-        class="w-full sm:w-1/2 px-3 py-2 border rounded"
-      />
+      <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('drivers.searchPlaceholder')"
+        class="w-full sm:w-1/2 px-3 py-2 border rounded" />
     </div>
 
     <!-- Desktop table -->
@@ -33,29 +28,24 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(d, idx) in filtered"
-              :key="d.id"
-              class="hover:bg-gray-50 cursor-pointer"
-              @contextmenu.prevent="openContextMenu($event, d)"
-            >
+            <tr v-for="(d, idx) in filtered" :key="d.id" class="hover:bg-gray-50 cursor-pointer"
+              @contextmenu.prevent="openContextMenu($event, d)">
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ idx + 1 }}</td>
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.name }}</td>
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.phone || '-' }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.contractor?.name || '-' }}</td>
+              <!-- Fixed: Show contractor name using contractorId -->
+              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ getContractorName(d.contractorId) || '-' }}
+              </td>
               <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.notes || '-' }}</td>
               <td class="p-3">
                 <div class="flex gap-2" :class="isRTL ? 'justify-start' : 'justify-end'">
-                  <button
-                    @click.stop="openEdit(d)"
-                    class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs sm:text-sm"
-                  >
+                  <button @click.stop="openEdit(d)"
+                    class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs sm:text-sm">
                     {{ $t('labels.edit') }}
                   </button>
-                  <button
-                    @click.stop="confirmDelete(d)"
-                    class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm"
-                  >
+                  <button @click.stop="confirmDelete(d)"
+                    class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm">
                     {{ $t('labels.delete') }}
                   </button>
                 </div>
@@ -73,32 +63,28 @@
 
     <!-- Mobile cards -->
     <div class="sm:hidden grid gap-3">
-      <div
-        v-for="d in filtered"
-        :key="d.id"
+      <div v-for="d in filtered" :key="d.id"
         class="p-3 bg-white rounded shadow flex justify-between items-start cursor-pointer"
-        :class="isRTL ? 'flex-row-reverse' : ''"
-        @contextmenu.prevent="openContextMenu($event, d)"
-      >
+        :class="isRTL ? 'flex-row-reverse' : ''" @contextmenu.prevent="openContextMenu($event, d)">
         <div :class="isRTL ? 'text-right' : ''">
           <div class="font-semibold">{{ d.name }}</div>
           <div class="text-sm text-gray-500">
             {{ d.phone || '-' }}<br />
-            <span v-if="d.contractor">{{ $t('drivers.contractor') }}: {{ d.contractor.name }}</span><br />
+            <!-- Fixed: Show contractor name using contractorId -->
+            <span v-if="d.contractorId">
+              {{ $t('drivers.contractor') }}: {{ getContractorName(d.contractorId) }}
+            </span>
+            <br v-if="d.contractorId" />
             <span v-if="d.notes">{{ $t('drivers.notes') }}: {{ d.notes }}</span>
           </div>
         </div>
         <div class="flex flex-col gap-2" :class="isRTL ? 'items-start' : 'items-end'">
-          <button
-            @click.stop="openEdit(d)"
-            class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs"
-          >
+          <button @click.stop="openEdit(d)"
+            class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs">
             {{ $t('labels.edit') }}
           </button>
-          <button
-            @click.stop="confirmDelete(d)"
-            class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs"
-          >
+          <button @click.stop="confirmDelete(d)"
+            class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs">
             {{ $t('labels.delete') }}
           </button>
         </div>
@@ -109,24 +95,14 @@
     </div>
 
     <!-- Context Menu (Right-click) -->
-    <div
-      v-if="contextMenu.open"
-      class="fixed bg-white rounded-lg shadow-lg py-2 z-50 border min-w-[120px]"
-      :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
-      @contextmenu.prevent
-    >
-      <button
-        @click="contextAction('edit')"
-        class="block w-full px-4 py-2 text-sm hover:bg-gray-100"
-        :class="isRTL ? 'text-right' : 'text-left'"
-      >
+    <div v-if="contextMenu.open" class="fixed bg-white rounded-lg shadow-lg py-2 z-50 border min-w-[120px]"
+      :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }" @contextmenu.prevent>
+      <button @click="contextAction('edit')" class="block w-full px-4 py-2 text-sm hover:bg-gray-100"
+        :class="isRTL ? 'text-right' : 'text-left'">
         {{ $t('labels.edit') }}
       </button>
-      <button
-        @click="contextAction('delete')"
-        class="block w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
-        :class="isRTL ? 'text-right' : 'text-left'"
-      >
+      <button @click="contextAction('delete')" class="block w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
+        :class="isRTL ? 'text-right' : 'text-left'">
         {{ $t('labels.delete') }}
       </button>
     </div>
@@ -149,7 +125,8 @@
           </label>
           <label>
             <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('drivers.contractor') }}</div>
-            <select v-model.number="form.contractorId" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''">
+            <select v-model.number="form.contractorId" class="w-full px-3 py-2 border rounded"
+              :class="isRTL ? 'text-right' : ''">
               <option :value="null">{{ $t('drivers.noContractorOption') }}</option>
               <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
@@ -161,10 +138,8 @@
         </div>
         <div class="mt-4 flex gap-2 justify-end" :class="isRTL ? 'flex-row-reverse' : ''">
           <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button
-            @click="saveDriver"
-            :class="['px-4 py-2 rounded text-white', editing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-indigo-600 hover:bg-indigo-700']"
-          >
+          <button @click="saveDriver"
+            :class="['px-4 py-2 rounded text-white', editing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-indigo-600 hover:bg-indigo-700']">
             {{ $t('labels.save') }}
           </button>
         </div>
@@ -172,7 +147,8 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
+    <div v-if="totalPages > 1"
+      class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
       <!-- Mobile Pagination -->
       <div class="flex-1 flex justify-between sm:hidden">
         <button @click="changePage(page - 1)" :disabled="page <= 1"
@@ -185,7 +161,6 @@
           {{ $t('labels.next') || 'Next' }}
         </button>
       </div>
-
       <!-- Desktop Pagination -->
       <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div class="flex items-center gap-4">
@@ -214,38 +189,41 @@
             <button @click="changePage(1)" :disabled="page <= 1"
               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                  d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
+                  clip-rule="evenodd" />
               </svg>
             </button>
             <button @click="changePage(page - 1)" :disabled="page <= 1"
               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                  clip-rule="evenodd" />
               </svg>
             </button>
-            <button
-              v-for="p in visiblePages"
-              :key="p"
-              @click="changePage(p)"
-              :class="[
-                'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                p === page
-                  ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-              ]"
-            >
+            <button v-for="p in visiblePages" :key="p" @click="changePage(p)" :class="[
+              'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+              p === page
+                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+            ]">
               {{ p }}
             </button>
             <button @click="changePage(page + 1)" :disabled="page >= totalPages"
               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd" />
               </svg>
             </button>
             <button @click="changePage(totalPages)" :disabled="page >= totalPages"
               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                <path fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z"
+                  clip-rule="evenodd" />
               </svg>
             </button>
           </nav>
@@ -303,7 +281,7 @@ export default {
       return this.drivers.filter(d =>
         (d.name || '').toLowerCase().includes(s) ||
         (d.phone || '').toLowerCase().includes(s) ||
-        (d.contractor?.name || '').toLowerCase().includes(s) ||
+        (this.getContractorName(d.contractorId) || '').toLowerCase().includes(s) ||
         (d.notes || '').toLowerCase().includes(s)
       )
     },
@@ -334,8 +312,8 @@ export default {
   methods: {
     extractArray(payload) {
       return Array.isArray(payload?.items) ? payload.items :
-             Array.isArray(payload?.data) ? payload.data :
-             Array.isArray(payload) ? payload : []
+        Array.isArray(payload?.data) ? payload.data :
+          Array.isArray(payload) ? payload : []
     },
     async loadDrivers() {
       if (this.controller) this.controller.abort()
@@ -374,6 +352,12 @@ export default {
         this.contractors = []
       }
     },
+    // New: Get contractor name by ID
+    getContractorName(contractorId) {
+      if (!contractorId) return null
+      const contractor = this.contractors.find(c => c.id === contractorId)
+      return contractor ? contractor.name : '-'
+    },
     openAdd() {
       this.editing = false
       this.form = { id: null, name: '', phone: '', contractorId: null, notes: '' }
@@ -385,7 +369,7 @@ export default {
         id: d.id,
         name: d.name,
         phone: d.phone || '',
-        contractorId: d.contractorId || (d.contractor && d.contractor.id) || null,
+        contractorId: d.contractorId || null,
         notes: d.notes || ''
       }
       this.modalOpen = true
@@ -480,6 +464,7 @@ export default {
   direction: rtl;
   text-align: right;
 }
+
 .direction-rtl table th,
 .direction-rtl table td {
   text-align: right;
