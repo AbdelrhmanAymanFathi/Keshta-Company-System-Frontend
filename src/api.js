@@ -342,7 +342,9 @@ export const getCrushers = (params = {}) => {
 export const createCrusher = (data) =>
   axios.post(`${BASE_URL}/api/crushers`, data);
 export const deleteCrusher = (id) =>
-  axios.delete(`${BASE_URL}/api/crushers`, { data: { id } });
+  axios.delete(`${BASE_URL}/api/crushers/${id}`);
+export const updateCrusher = (id, data) =>
+  axios.put(`${BASE_URL}/api/crushers/${id}`, data);
 
 // Locations
 export const getLocations = () =>
