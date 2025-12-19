@@ -4,7 +4,7 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div class="flex-1 w-full sm:w-auto">
-          <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $t('rental.rentalList') }}</h3>
+          <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('rental.rentalList') }}</h2>
           <!-- Search Bar -->
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

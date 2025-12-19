@@ -1,8 +1,9 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
+
     <!-- Header -->
     <div class="flex items-center" :class="isRTL ? 'justify-between flex-row-reverse' : 'justify-between'">
-      <h1 class="text-2xl font-semibold text-gray-900">{{ $t('crushers.title') }}</h1>
+      <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"
         class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"

@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6 p-6">
     <!-- Header with Add Button -->
     <div class="flex justify-between items-center">
-      <h3 class="text-lg font-semibold text-gray-900">{{ $t('transport.transportList') }}</h3>
+      <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('transport.transportList') }}</h2>
       <button
         @click="showAddModal = true"
         class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"

@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex justify-between items-center gap-4 flex-wrap">
-      <h3 class="text-lg font-semibold text-gray-900">{{ $t('supply.exportTableTitle') }}</h3>
+      <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('supply.exportTableTitle') }}</h2>
       <div class="flex items-center gap-2">
         <button @click="refresh" :disabled="loading"
                 class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg transition-colors disabled:opacity-50">

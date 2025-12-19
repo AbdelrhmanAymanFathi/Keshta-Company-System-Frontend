@@ -126,7 +126,7 @@
 
       <!-- Main Content -->
       <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
-        <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2>
+        <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
         <component :is="currentComponent" @navigate-report="navigateToReport" @navigate-statement="navigateToStatement" />
       </main>
     </div>

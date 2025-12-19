@@ -1,4 +1,7 @@
 <template>
+  <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('vehicles.title') }}</h2>
+  </div>
   <div class="space-y-4">
     <CreateVehicle @created="loadVehicles" />
 
@@ -380,6 +383,7 @@ import CreateVehicle from './CreateVehicle.vue'
 
 export default {
   name: 'VehiclesList',
+  emits: ["navigateReport", "navigateStatement"],
   components: { CreateVehicle },
   data() {
     return {
@@ -407,6 +411,9 @@ export default {
     }
   },
   computed: {
+    isRTL() {
+      return this.$i18n && this.$i18n.locale === 'ar'
+    },
     totalPages() {
       return Math.ceil(this.total / this.pageSize)
     },
