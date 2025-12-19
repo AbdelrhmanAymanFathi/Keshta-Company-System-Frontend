@@ -696,7 +696,7 @@
 import { getExpenses, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches, getLocations, createBranch, createLocation } from '../../api'
 
 export default {
-  emits: ["navigateReport"],
+  emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
   data() {
     return {
