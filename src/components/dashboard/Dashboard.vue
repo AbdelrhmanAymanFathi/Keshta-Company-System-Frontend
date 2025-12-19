@@ -1,137 +1,132 @@
 <template>
   <div class="flex flex-col h-screen" :class="{ 'direction-rtl': isRTL }">
-    <!-- Top horizontal navbar (darker indigo gradient) -->
+    <!-- Top horizontal navbar -->
     <header class="flex items-center justify-between px-4 py-3 shadow text-white" :class="headerGradient">
       <div class="flex items-center gap-4">
         <!-- Hamburger for mobile -->
-        <button @click="toggleSidebar" class="sm:hidden p-2 rounded hover:bg-white/10"
-          :aria-expanded="sidebarOpen.toString()">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 6h16M4 12h16M4 18h16"></path>
+        <button @click="toggleSidebar" class="sm:hidden p-2 rounded hover:bg-white/10">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-
         <!-- Brand -->
         <div class="flex items-center gap-3">
-          <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
-            <img src="../../assets/logo.png" alt="logoKeshta">
+          <div class="w-9 h-9 rounded-md flex items-center justify-center overflow-hidden">
+            <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
           </div>
           <div class="text-xl font-bold whitespace-nowrap">{{ $t('appName') }}</div>
         </div>
-
-        <!-- top menus (desktop) -->
+        <!-- Top menus (desktop) -->
         <nav class="hidden sm:flex gap-2 ml-4">
           <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
-            :class="['px-3 py-1 rounded text-sm transition', selectedTop === key ? 'bg-white/10 backdrop-blur-sm' : 'hover:bg-white/8']">
+            :class="['px-4 py-2 rounded text-sm font-medium transition', selectedTop === key ? 'bg-white/20' : 'hover:bg-white/10']">
             {{ $t('navbar.' + key) }}
           </button>
         </nav>
       </div>
 
-      <!-- actions: language + logout -->
-      <div class="flex items-center gap-3">
-        <div class="flex gap-2">
-          <button @click="switchLang('en')" :class="langBtnClass('en')" aria-label="English" class="rounded">
-            <img src="/flags/us.png" alt="EN" class="w-6 h-6" />
+      <!-- Right side: Language + User Avatar -->
+      <div class="flex items-center gap-4">
+        <!-- Language Switcher -->
+        <div class="flex gap-2 bg-white/10 rounded-lg p-1">
+          <button @click="switchLang('en')" :class="langBtnClass('en')" class="rounded p-1">
+            <img src="/flags/us.png" alt="English" class="w-6 h-6 rounded" />
           </button>
-          <button @click="switchLang('ar')" :class="langBtnClass('ar')" aria-label="Arabic" class="rounded">
-            <img src="/flags/eg.png" alt="AR" class="w-6 h-6" />
+          <button @click="switchLang('ar')" :class="langBtnClass('ar')" class="rounded p-1">
+            <img src="/flags/eg.png" alt="العربية" class="w-6 h-6 rounded" />
           </button>
         </div>
 
-        <button @click="showLogoutDialog = true" class="px-3 py-1 rounded hover:bg-white/10 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          {{ $t('labels.logout') }}
-        </button>
+        <!-- User Avatar with Dropdown -->
+        <div class="relative">
+          <button @click="toggleUserMenu" class="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white font-semibold text-lg hover:bg-white/30 transition">
+            {{ userInitials }}
+          </button>
+          <!-- User Dropdown Menu -->
+          <div v-if="userMenuOpen" class="absolute top-12" :class="isRTL ? 'left-0' : 'right-0'">
+            <div class="bg-white rounded-lg shadow-lg py-2 min-w-[160px] border">
+              <button @click="showLogoutDialog = true; userMenuOpen = false"
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                {{ $t('labels.logout') }}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar -->
-      <aside role="navigation" :class="asideClasses" :aria-hidden="isMobile ? (!sidebarOpen).toString() : 'false'">
-        <!-- Desktop top area: brand + collapse icon (only desktop) -->
-        <div class="hidden sm:flex items-center justify-between mb-3">
+      <aside role="navigation" :class="asideClasses">
+        <!-- Desktop Brand + Collapse -->
+        <div class="hidden sm:flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
-            <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
-              <img src="../../assets/logo.png" alt="logokeshta">
+            <!-- Logo visible only when collapsed -->
+            <div v-if="effectiveCollapsed" class="w-9 h-9 rounded-md overflow-hidden">
+              <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
             </div>
-            <div v-if="!effectiveCollapsed" class="font-semibold">{{ $t('appName') }}</div>
+            <!-- App name visible only when expanded -->
+            <div v-if="!effectiveCollapsed" class="font-semibold text-lg">
+              {{ $t('appName') }}
+            </div>
           </div>
-
-          <!-- collapse icon: visible only on desktop -->
-          <button v-if="!isMobile" @click="toggleCollapsed" class="p-2 rounded hover:bg-indigo-100"
-            :title="effectiveCollapsed ? $t('dashboard.expand') : $t('dashboard.collapse')">
-            <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6h12M6 12h12M6 18h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                stroke-linejoin="round" />
+          <button v-if="!isMobile" @click="toggleCollapsed" class="p-2 rounded hover:bg-indigo-200 transition">
+            <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
-            <svg v-else class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-                stroke-linejoin="round" />
+            <svg v-else class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
             </svg>
           </button>
         </div>
 
-        <!-- Mobile header inside sidebar (close button) -->
-        <div v-if="isMobile" class="sm:hidden flex items-center justify-between mb-3">
+        <!-- Mobile Header -->
+        <div v-if="isMobile" class="sm:hidden flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
-            <div :class="['w-9 h-9 rounded-md flex items-center justify-center font-bold text-white', brandGradient]">
-              <img src="../../assets/logo.png" alt="logoKeshta">
+            <div class="w-9 h-9 rounded-md overflow-hidden">
+              <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
             </div>
-            <div class="font-semibold">{{ $t('appName') }}</div>
+            <div class="font-semibold text-lg">{{ $t('appName') }}</div>
           </div>
-          <button @click="toggleSidebar" class="p-2 rounded hover:bg-indigo-100">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-              <path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <button @click="toggleSidebar" class="p-2 rounded hover:bg-indigo-200">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <!-- Mobile only: top menu inside sidebar -->
-        <div v-if="isMobile" class="sm:hidden mb-4 space-y-2">
+        <!-- Mobile Top Menu -->
+        <div v-if="isMobile" class="sm:hidden mb-4 space-y-1">
           <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
-            :class="['w-full px-3 py-2 rounded', selectedTop === key ? 'bg-indigo-500 text-white' : 'bg-indigo-100 hover:bg-indigo-200', isRTL ? 'text-right' : 'text-left']">
+            :class="['w-full px-4 py-2 rounded text-sm font-medium text-left', selectedTop === key ? 'bg-indigo-600 text-white' : 'hover:bg-indigo-100']">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
 
-        <!-- Vertical menu -->
-        <ul class="space-y-2">
+        <!-- Vertical Menu -->
+        <ul class="space-y-1">
           <li v-for="item in verticalMenu" :key="item.name">
-            <button @click="selectVertical(item.name)" :class="[
-              'w-full px-3 py-2 rounded flex items-center gap-3 transition',
-              selectedVertical === item.name ? activeItemClass : 'hover:bg-indigo-100',
-              effectiveCollapsed ? 'justify-center' : '',
-              isRTL ? 'flex-row-reverse text-right' : 'text-left'
-            ]" :title="effectiveCollapsed ? $t(item.label) : ''">
-              <span v-html="menuIcon(item.name, selectedVertical === item.name)" class="w-5 h-5 flex-shrink-0"></span>
-              <span v-if="!effectiveCollapsed" class="flex-1 text-sm">
+            <button @click="selectVertical(item.name)"
+              :class="['w-full px-4 py-3 rounded flex items-center gap-4 transition', selectedVertical === item.name ? 'bg-indigo-600 text-white shadow' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
+              <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, selectedVertical === item.name)"></div>
+              <span v-if="!effectiveCollapsed" class="text-sm font-medium">
                 {{ $t(item.label) }}
               </span>
             </button>
           </li>
         </ul>
-
-        <!-- footer note (only desktop) -->
-        <div class="mt-6 pt-4 border-t hidden sm:block">
-          <div class="text-xs text-gray-500">
-            {{ $t('appName') }}
-          </div>
-        </div>
       </aside>
 
-      <!-- Overlay for mobile when sidebar open -->
-      <transition name="fade">
-        <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/30 z-30" @click="toggleSidebar"></div>
-      </transition>
+      <!-- Mobile Overlay -->
+      <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/50 z-30" @click="toggleSidebar"></div>
 
-      <!-- Main content -->
-      <main class="flex-1 min-w-0 p-6 overflow-auto bg-white">
-        <h2 class="text-2xl font-semibold mb-4">{{ $t(currentLabel) }}</h2>
+      <!-- Main Content -->
+      <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2>
         <component :is="currentComponent" @navigate-report="navigateToReport" @navigate-statement="navigateToStatement" />
       </main>
     </div>
@@ -144,7 +139,6 @@
 <script>
 import NewSupply from './NewSupply.vue'
 import SuppliesList from './SuppliesList.vue'
-// Use the JSON-first report components (replacements)
 import SuppliesReport from './SuppliesReportNew.vue'
 import ContractorsList from './ContractorsList.vue'
 import ContractorStatement from './ContractorStatement.vue'
@@ -159,23 +153,25 @@ import RentalReport from './RentalReport.vue'
 import ExpensesList from './ExpensesList.vue'
 import CompanyFinance from './CompanyFinance.vue'
 import AuthLogout from '../auth/Logout.vue'
-import SelectPlaceholder from '../shared/SelectPlaceholder.vue'
 import ComponentNotFound from '../shared/ComponentNotFound.vue'
 import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'DashboardPage',
-  components: { NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, AuthLogout, SelectPlaceholder, ComponentNotFound },
+  components: {
+    NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
+    DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
+    RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
+    AuthLogout, ComponentNotFound
+  },
   setup() {
-    const { logout: authLogout } = useAuth()
-    return { authLogout }
+    const { logout: authLogout, user } = useAuth()
+    return { authLogout, user }
   },
   data() {
     return {
-      // menus
       topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet' },
       selectedTop: localStorage.getItem('dashboard-selectedTop') || 'supplies',
-      // vertical submenus map
       menuMap: {
         supplies: [
           { name: 'newSupply', label: 'dashboard.newSupply', component: 'NewSupply' },
@@ -184,8 +180,7 @@ export default {
           { name: 'contractorsList', label: 'dashboard.contractorsList', component: 'ContractorsList' },
           { name: 'contractorStatement', label: 'dashboard.contractorStatement', component: 'ContractorStatement' },
           { name: 'driversList', label: 'drivers.title', component: 'DriversList' },
-          { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' }
-          ,
+          { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' },
           { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' }
         ],
         transport: [
@@ -204,238 +199,140 @@ export default {
           { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
         ]
       },
-
-      // UI state
       selectedVertical: localStorage.getItem('dashboard-selectedVertical') || 'newSupply',
-      // Set default for companyWallet
-      defaultCompanyEquipment: 'companyWallet',
       sidebarOpen: false,
       collapsedSidebar: JSON.parse(localStorage.getItem('sidebarCollapsed') || 'false'),
       showLogoutDialog: false,
-
-      // responsive helper
+      userMenuOpen: false,
       isMobile: window.innerWidth < 640
     }
   },
   computed: {
-    isRTL() { return this.$i18n && this.$i18n.locale === 'ar' },
-
-    // effective collapsed only for desktop (mobile -> always expanded)
-    effectiveCollapsed() {
-      return this.isMobile ? false : this.collapsedSidebar
-    },
-
-    // current vertical menu items based on selected top
-    verticalMenu() {
-      return this.menuMap[this.selectedTop] || []
-    },
-
-    // current item selected
+    isRTL() { return this.$i18n?.locale === 'ar' },
+    effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
+    verticalMenu() { return this.menuMap[this.selectedTop] || [] },
     currentItem() {
-      return this.verticalMenu.find(i => i.name === this.selectedVertical) || (this.verticalMenu[0] || null)
+      return this.verticalMenu.find(i => i.name === this.selectedVertical) || this.verticalMenu[0] || null
     },
-
-    currentLabel() {
-      return this.currentItem ? this.currentItem.label : ''
-    },
-
-      // produce component to render (string -> imported component; or inline component)
+    currentLabel() { return this.currentItem ? this.currentItem.label : '' },
     currentComponent() {
-      if (!this.currentItem) return SelectPlaceholder
-  const mapping = { NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement, DriversList, CrushersList, VehiclesList, TransportList, TransportReport, RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance }
-      const comp = this.currentItem.component
-      if (typeof comp === 'string') {
-        return mapping[comp] || ComponentNotFound
+      if (!this.currentItem) return 'div'
+      const mapping = {
+        NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
+        DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
+        RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance
       }
-      return comp
+      return mapping[this.currentItem.component] || ComponentNotFound
     },
-
-    // header gradient classes (darker modern indigo)
-    headerGradient() {
-      return 'bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-700'
+    headerGradient() { return 'bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600' },
+    userInitials() {
+      if (!this.user || !this.user.name) return '??'
+      const names = this.user.name.trim().split(' ')
+      const first = names[0]?.[0] || ''
+      const second = names[1]?.[0] || ''
+      return (first + second).toUpperCase() || 'U'
     },
-
-    brandGradient() {
-      return 'bg-gradient-to-br from-indigo-800 to-indigo-600'
+    langBtnClass() {
+      return (lang) => this.$i18n.locale === lang ? 'ring-2 ring-white rounded' : 'opacity-70'
     },
-
-    // classes for sidebar width (collapsed shows narrow column)
-    computedSidebarWidthClass() {
-      return this.effectiveCollapsed ? 'w-20' : 'w-72'
-    },
-
-    // aside classes combine desktop and mobile behavior
     asideClasses() {
-      const base = 'bg-indigo-50 p-4 transition-all duration-200 z-40 transform';
-      // mobile (drawer) behavior
+      const base = 'bg-indigo-50 p-4 transition-all duration-300 z-40 flex flex-col'
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'
-        const mobileWidth = 'w-64' // 16rem for drawer on mobile
-        const transformClass = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
-        const hiddenClass = this.sidebarOpen ? '' : 'pointer-events-none' // Disable pointer events when hidden
-        return `${base} ${side} fixed top-0 bottom-0 ${mobileWidth} ${transformClass} ${hiddenClass}`
+        const transform = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
+        return `${base} fixed top-0 bottom-0 w-64 ${side} ${transform}`
       }
-      // desktop behavior: static width (collapsed or expanded), relative positioning
-      return `${base} ${this.computedSidebarWidthClass} relative flex-shrink-0`
-    },
-
-    // active item style (gradient)
-    activeItemClass() {
-      return 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow'
+      const width = this.effectiveCollapsed ? 'w-20' : 'w-72'
+      return `${base} ${width} relative`
     }
   },
   watch: {
-    // persist collapsed state
-    collapsedSidebar(v) {
-      localStorage.setItem('sidebarCollapsed', JSON.stringify(v))
-    },
-    // when mobile sidebar opens/closes lock body scroll
+    collapsedSidebar(v) { localStorage.setItem('sidebarCollapsed', JSON.stringify(v)) },
     sidebarOpen(v) {
-      if (this.isMobile) {
-        document.body.style.overflow = v ? 'hidden' : ''
-      }
+      if (this.isMobile) document.body.style.overflow = v ? 'hidden' : ''
     }
   },
   methods: {
-    // top menu selection
     selectTop(key) {
       this.selectedTop = key
       localStorage.setItem('dashboard-selectedTop', key)
-      // set first vertical child
-      const first = (this.menuMap[key] && this.menuMap[key][0]) ? this.menuMap[key][0].name : null
+      const first = this.menuMap[key]?.[0]?.name
       if (first) {
         this.selectedVertical = first
         localStorage.setItem('dashboard-selectedVertical', first)
-      } else if (key === 'companyWallet') {
-        this.selectedVertical = this.defaultCompanyEquipment
-        localStorage.setItem('dashboard-selectedVertical', this.defaultCompanyEquipment)
       }
       this.sidebarOpen = false
     },
-
-    // vertical selection
     selectVertical(name) {
       this.selectedVertical = name
       localStorage.setItem('dashboard-selectedVertical', name)
-      // close sidebar on mobile for better UX
       if (this.isMobile) this.sidebarOpen = false
     },
-
-    // toggle sidebar drawer (mobile)
-    toggleSidebar() {
-      this.sidebarOpen = !this.sidebarOpen
-    },
-
-    // collapse sidebar to icons only (desktop only)
-    toggleCollapsed() {
-      if (this.isMobile) return
-      this.collapsedSidebar = !this.collapsedSidebar
-    },
-
-    // Navigate to rental report
-    navigateToReport() {
-      this.selectedVertical = 'rentalReport'
-      if (this.isMobile) {
-        this.sidebarOpen = false
-      }
-    },
-
-    // Navigate to contractor statement
+    toggleSidebar() { this.sidebarOpen = !this.sidebarOpen },
+    toggleCollapsed() { if (!this.isMobile) this.collapsedSidebar = !this.collapsedSidebar },
+    toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
+    navigateToReport() { this.selectedVertical = 'rentalReport' },
     navigateToStatement(contractorId) {
       this.selectedTop = 'supplies'
       localStorage.setItem('dashboard-selectedTop', 'supplies')
       this.selectedVertical = 'contractorStatement'
       localStorage.setItem('dashboard-selectedVertical', 'contractorStatement')
-      // Store contractor ID for the statement component to use
-      if (contractorId) {
-        localStorage.setItem('contractor-statement-id', contractorId.toString())
-      }
-      if (this.isMobile) {
-        this.sidebarOpen = false
-      }
+      if (contractorId) localStorage.setItem('contractor-statement-id', contractorId.toString())
+      if (this.isMobile) this.sidebarOpen = false
     },
-
     handleLogoutSuccess() {
       this.showLogoutDialog = false
-      // The auth system will handle the logout and redirect
       window.location.reload()
     },
-
-    // language switch
     switchLang(lang) {
       this.$i18n.locale = lang
       localStorage.setItem('app-locale', lang)
       document.documentElement.lang = lang
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
-      // keep existing collapsedSidebar state
-      this.$nextTick(() => { })
     },
-
-    langBtnClass(lang) {
-      return this.$i18n.locale === lang ? 'ring-2 ring-white/60 rounded' : 'opacity-80'
-    },
-
-    // small helper to return an inline SVG per menu name (you can expand icons here)
     menuIcon(name, isActive) {
-      const colorClass = isActive ? 'text-white' : 'text-indigo-600'
+      const color = isActive ? 'text-white' : 'text-indigo-600'
       const icons = {
-        newSupply: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
-        suppliesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-        crushersList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`,
-        contractorsList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-        contractorStatement: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14h8M8 18h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-        vehiclesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 13h18l-2 4H5zM7 9h10l2 4H5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-        transportList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 13h18v-5H3v5zM5 18h2v2H5v-2zM17 18h2v2h-2v-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-        expensesList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-        rentalList: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14h8M8 18h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-        companyWallet: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" fill="currentColor"/></svg>`,
-        default: `<svg class="w-5 h-5 ${colorClass}" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/></svg>`
+        newSupply: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>`,
+        suppliesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>`,
+        crushersList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>`,
+        contractorsList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>`,
+        contractorStatement: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
+        driversList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>`,
+        vehiclesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-8-4h8M3 8h18M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
+        transportList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2m0 0V5a2 2 0 012-2h8a2 2 0 012 2v2m-12 0h4"/></svg>`,
+        expensesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        rentalList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
+        companyWallet: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
+        default: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8m-4-4h8" stroke-width="2"/></svg>`
       }
-      return icons[name] || icons['default']
+      return icons[name] || icons.default
     },
-
-    // handle resize to update isMobile reactive flag
     onResize() {
-      const nowMobile = window.innerWidth < 640
-      // when switching to desktop ensure body scroll unlocked and sidebarOpen false
-      if (!nowMobile) {
+      this.isMobile = window.innerWidth < 640
+      if (!this.isMobile) {
         document.body.style.overflow = ''
         this.sidebarOpen = false
       }
-      this.isMobile = nowMobile
     }
   },
-
   mounted() {
-    // استرجاع آخر تبويب وعنصر فرعي من localStorage إذا وجدوا
     const savedTop = localStorage.getItem('dashboard-selectedTop')
     const savedVertical = localStorage.getItem('dashboard-selectedVertical')
     if (savedTop && this.menuMap[savedTop]) {
       this.selectedTop = savedTop
-      // تحقق أن العنصر الفرعي موجود في القائمة
       if (savedVertical && this.menuMap[savedTop].some(i => i.name === savedVertical)) {
         this.selectedVertical = savedVertical
-      } else {
-        // إذا لم يوجد، اختر أول عنصر
-        const first = this.menuMap[savedTop][0]?.name
-        if (first) this.selectedVertical = first
       }
-    } else {
-      // إذا لم يوجد شيء محفوظ، استخدم الافتراضي
-      const first = (this.menuMap[this.selectedTop] && this.menuMap[this.selectedTop][0]) ? this.menuMap[this.selectedTop][0].name : null
-      if (first && !this.selectedVertical) this.selectedVertical = first
     }
-
-    // set language dir on mount as well
     document.documentElement.lang = this.$i18n.locale || 'en'
-    document.documentElement.dir = (this.$i18n.locale === 'ar') ? 'rtl' : 'ltr'
-
-    // resize listener
+    document.documentElement.dir = this.isRTL ? 'rtl' : 'ltr'
     window.addEventListener('resize', this.onResize)
-    // initial call to set isMobile correctly
     this.onResize()
+    document.addEventListener('click', (e) => {
+      if (!this.$el.querySelector('.relative')?.contains(e.target)) this.userMenuOpen = false
+    })
   },
-
   beforeUnmount() {
     window.removeEventListener('resize', this.onResize)
     document.body.style.overflow = ''
@@ -444,92 +341,9 @@ export default {
 </script>
 
 <style scoped>
-.direction-rtl {
-  direction: rtl;
-}
-
-/* Fade overlay transition */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity .18s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
-}
-
-/* small visual polish */
-.bg-indigo-50 {
-  background-color: #eef2ff;
-}
-
-/* ensure collapsed icon buttons center */
-.w-20 button {
-  justify-content: center !important;
-}
-
-/* subtle hover background (supports dark indigo family) */
-.hover\:bg-white\/8:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-/* RTL specific adjustments */
-.direction-rtl .flex-row-reverse {
-  flex-direction: row-reverse !important;
-}
-
-.direction-rtl .text-right {
-  text-align: right !important;
-}
-
-.direction-rtl .text-left {
-  text-align: left !important;
-}
-
-.direction-rtl button {
-  text-align: right !important;
-}
-
-.direction-rtl .gap-3 {
-  gap: 0.75rem !important;
-}
-
-.direction-rtl .gap-2 {
-  gap: 0.5rem !important;
-}
-
-/* Force RTL layout for sidebar menu items */
-.direction-rtl .space-y-2 button {
-  flex-direction: row-reverse !important;
-  text-align: right !important;
-}
-
-.direction-rtl .space-y-2 button span:first-child {
-  order: 2 !important;
-}
-
-.direction-rtl .space-y-2 button span:last-child {
-  order: 1 !important;
-}
-
-/* reduced opacity for smaller screens */
-@media (max-width: 639px) {
-  aside {
-    width: 16rem;
-  }
-
-  /* mobile drawer width */
-}
-
-/* Transition for all properties */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+.direction-rtl { direction: rtl; }
+/* Sidebar transition */
+aside {
+  transition: width 0.3s ease, transform 0.3s ease;
 }
 </style>
