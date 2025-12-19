@@ -1,253 +1,231 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl p-6' : 'p-6'">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-      <h1 class="text-2xl font-semibold">{{ $t('contractors.title') }}</h1>
-
-      <div class="flex items-center gap-2">
-        <!-- import excel -->
-        <label class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-flex items-center cursor-pointer">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
+    <!-- Header -->
+    <div class="flex items-center" :class="isRTL ? 'justify-between flex-row-reverse' : 'justify-between'">
+      <h1 class="text-2xl font-semibold text-gray-900">{{ $t('contractors.title') }}</h1>
+      <div class="flex items-center gap-3">
+        <!-- Import Excel -->
+        <label class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-flex items-center cursor-pointer transition-colors">
           <input ref="fileInput" type="file" accept=".xlsx,.xls" class="hidden" @change="onFileChange" />
-          <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg class="w-5 h-5" :class="isRTL ? 'ml-2' : 'mr-2'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M12 3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M8 7l4-4 4 4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <rect x="3" y="13" width="18" height="8" rx="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           {{ $t('contractors.importExcel') }}
         </label>
-
-        <button @click="openAdd()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+        <!-- Add Button -->
+        <button @click="openAdd"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
           {{ $t('contractors.add') }}
         </button>
       </div>
     </div>
 
     <!-- Search -->
-    <div class="mb-4">
+    <div class="max-w-md">
       <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('contractors.searchPlaceholder')"
-             class="w-full sm:w-1/2 px-3 py-2 border rounded" />
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
     </div>
 
-    <!-- Desktop table -->
-    <div class="hidden sm:block">
-      <div class="overflow-auto bg-white rounded shadow">
-        <table class="min-w-full divide-y">
-          <thead class="bg-indigo-50">
-            <tr>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.#') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.name') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.phone') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.bankName') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.accountNumber') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.notes') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.actions') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(c, idx) in filtered" :key="c.id" class="hover:bg-gray-50">
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ idx + 1 }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.name }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.phone || '-' }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.bankName || '-' }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.accountNumber || '-' }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ c.notes || '-' }}</td>
-              <td class="p-3">
-                <div :class="['flex gap-2', isRTL ? 'flex-row-reverse' : '']">
-                  <button @click="openStatement(c)" class="px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white">{{ $t('contractors.statement') || 'Statement' }}</button>
-                  <button @click="openWallet(c)" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white">{{ $t('contractors.wallet') || 'Wallet' }}</button>
-                  <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white">{{ $t('labels.edit') }}</button>
-                  <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white">{{ $t('labels.delete') }}</button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="filtered.length === 0">
-              <td class="p-3" colspan="7" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('contractors.noResults') }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Desktop Table -->
+    <div class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-indigo-50">
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('labels.#') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.name') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.phone') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.bankName') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.accountNumber') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.notes') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('labels.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            v-for="(c, idx) in filtered"
+            :key="c.id"
+            class="hover:bg-gray-50 cursor-pointer transition-colors"
+            @click="openContextMenu($event, c)"
+            @contextmenu.prevent="openContextMenu($event, c)"
+          >
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ idx + 1 }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.accountNumber || '-' }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.notes || '-' }}</td>
+            <td class="px-6 py-4">
+              <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
+                <button @click.stop="openStatement(c)" class="text-purple-600 hover:text-purple-800" :title="$t('contractors.statement')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </button>
+                <button @click.stop="openWallet(c)" class="text-blue-600 hover:text-blue-800" :title="$t('contractors.wallet')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <button @click.stop="openEdit(c)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button @click.stop="confirmDelete(c)" class="text-red-600 hover:text-red-800" :title="$t('labels.delete')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="filtered.length === 0">
+            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+              {{ $t('contractors.noResults') }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- Mobile cards -->
-    <div class="sm:hidden grid gap-3">
-      <div v-for="c in filtered" :key="c.id" :class="['p-3 bg-white rounded shadow flex justify-between items-start', isRTL ? 'flex-row-reverse' : '']">
-        <div :class="isRTL ? 'text-right' : ''">
-          <div class="font-semibold">{{ c.name }}</div>
-          <div class="text-sm text-gray-500">
-            {{ c.phone || '-' }}<br>
-            <span v-if="c.bankName">{{ $t('contractors.bankName') }}: {{ c.bankName }}</span><br>
-            <span v-if="c.accountNumber">{{ $t('contractors.accountNumber') }}: {{ c.accountNumber }}</span><br>
-            <span v-if="c.notes">{{ $t('contractors.notes') }}: {{ c.notes }}</span>
+    <!-- Mobile Cards -->
+    <div class="sm:hidden space-y-4">
+      <div
+        v-for="c in filtered"
+        :key="c.id"
+        class="bg-white rounded-lg shadow-sm border p-4 cursor-pointer"
+        @click="openContextMenu($event, c)"
+        @contextmenu.prevent="openContextMenu($event, c)"
+      >
+        <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
+          <div :class="isRTL ? 'text-right' : 'text-left'">
+            <div class="font-semibold text-gray-900">{{ c.name }}</div>
+            <div class="text-sm text-gray-500">
+              {{ c.phone || '-' }}<br>
+              <span v-if="c.bankName">{{ $t('contractors.bankName') }}: {{ c.bankName }}</span><br>
+              <span v-if="c.accountNumber">{{ $t('contractors.accountNumber') }}: {{ c.accountNumber }}</span><br>
+              <span v-if="c.notes">{{ $t('contractors.notes') }}: {{ c.notes }}</span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-3">
+            <button @click.stop="openStatement(c)" class="text-purple-600 text-xs">{{ $t('contractors.statement') }}</button>
+            <button @click.stop="openWallet(c)" class="text-blue-600 text-xs">{{ $t('contractors.wallet') }}</button>
+            <button @click.stop="openEdit(c)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
+            <button @click.stop="confirmDelete(c)" class="text-red-600 text-xs">{{ $t('labels.delete') }}</button>
           </div>
         </div>
-          <div class="flex flex-col gap-2">
-          <button @click="openStatement(c)" class="px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white text-xs">{{ $t('contractors.statement') || 'Statement' }}</button>
-          <button @click="openWallet(c)" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-xs">{{ $t('contractors.wallet') || 'Wallet' }}</button>
-          <button @click="openEdit(c)" class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs">{{ $t('labels.edit') }}</button>
-          <button @click="confirmDelete(c)" class="px-2 py-1 rounded bg-red-500 hover:bg-red-600 text-white text-xs">{{ $t('labels.delete') }}</button>
-        </div>
       </div>
-      <div v-if="filtered.length === 0" class="text-center text-gray-500">{{ $t('contractors.noResults') }}</div>
+      <div v-if="filtered.length === 0" class="text-center py-12 text-gray-500">
+        {{ $t('contractors.noResults') }}
+      </div>
     </div>
 
-    <!-- Modal: Add / Edit contractor -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 z-10">
-        <h3 class="text-lg font-semibold mb-4" :class="isRTL ? 'text-right' : ''">{{ editing ? $t('contractors.editContractor') : $t('contractors.addContractor') }}</h3>
+    <!-- Shared Pagination -->
+    <Pagination
+      v-if="totalPages > 1"
+      :current-page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      @update:page="changePage"
+      @update:pageSize="onPageSizeChange"
+    />
 
-        <div class="grid grid-cols-1 gap-3">
+    <!-- Context Menu -->
+    <div
+      v-if="contextMenu.open"
+      class="fixed bg-white rounded-lg shadow-lg py-2 z-50 border min-w-[180px]"
+      :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
+      @click.stop
+      @contextmenu.prevent
+    >
+      <button @click="contextAction('edit')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        {{ $t('labels.edit') }}
+      </button>
+      <button @click="contextAction('delete')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        {{ $t('labels.delete') }}
+      </button>
+      <button @click="contextAction('wallet')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z" />
+        </svg>
+        {{ $t('contractors.wallet') }}
+      </button>
+      <button @click="contextAction('statement')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        {{ $t('contractors.statement') }}
+      </button>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">
+            {{ editing ? $t('contractors.editContractor') : $t('contractors.addContractor') }}
+          </h3>
+          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 gap-4">
           <label>
-            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.name') }}</div>
-            <input v-model="form.name" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+            <div class="text-sm mb-1">{{ $t('contractors.name') }}</div>
+            <input v-model="form.name" class="w-full px-3 py-2 border rounded" />
           </label>
-
           <label>
-            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.phone') }}</div>
-            <input v-model="form.phone" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+            <div class="text-sm mb-1">{{ $t('contractors.phone') }}</div>
+            <input v-model="form.phone" class="w-full px-3 py-2 border rounded" />
           </label>
-
           <label>
-            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.bankName') }}</div>
-            <input v-model="form.bankName" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+            <div class="text-sm mb-1">{{ $t('contractors.bankName') }}</div>
+            <input v-model="form.bankName" class="w-full px-3 py-2 border rounded" />
           </label>
-
           <label>
-            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.accountNumber') }}</div>
-            <input v-model="form.accountNumber" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+            <div class="text-sm mb-1">{{ $t('contractors.accountNumber') }}</div>
+            <input v-model="form.accountNumber" class="w-full px-3 py-2 border rounded" />
           </label>
-
           <label>
-            <div class="text-sm mb-1" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.notes') }}</div>
-            <input v-model="form.notes" class="w-full px-3 py-2 border rounded" :class="isRTL ? 'text-right' : ''" />
+            <div class="text-sm mb-1">{{ $t('contractors.notes') }}</div>
+            <input v-model="form.notes" class="w-full px-3 py-2 border rounded" />
           </label>
         </div>
-
-        <div class="mt-4 flex gap-2 justify-end" :class="isRTL ? 'flex-row-reverse' : ''">
-          <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button @click="saveContractor" :class="['px-4 py-2 rounded text-white', editing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-indigo-600 hover:bg-indigo-700']">
+        <div class="mt-6 flex justify-end gap-3">
+          <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+            {{ $t('labels.cancel') }}
+          </button>
+          <button @click="saveContractor" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
             {{ $t('labels.save') }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Confirm delete modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black opacity-40" @click="cancelDelete"></div>
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 z-10">
-        <p class="mb-4" :class="isRTL ? 'text-right' : ''">{{ $t('contractors.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?</p>
-        <div class="flex justify-end gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
-          <button @click="cancelDelete" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="doDelete" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">{{ $t('labels.delete') }}</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
-      <!-- Mobile Pagination -->
-      <div class="flex-1 flex justify-between sm:hidden">
-        <button @click="changePage(page - 1)" 
-          :disabled="page <= 1"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ $t('labels.previous') || 'Previous' }}
-        </button>
-        <span class="text-sm text-gray-700 self-center">
-          {{ page }} / {{ totalPages }}
-        </span>
-        <button @click="changePage(page + 1)" 
-          :disabled="page >= totalPages"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ $t('labels.next') || 'Next' }}
-        </button>
-      </div>
-
-      <!-- Desktop Pagination -->
-      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div class="flex items-center gap-4">
-          <p class="text-sm text-gray-700">
-            {{ $t('labels.showing') || 'Showing' }} 
-            <span class="font-medium">{{ ((page - 1) * pageSize) + 1 }}</span>
-            {{ $t('labels.to') || 'to' }}
-            <span class="font-medium">{{ Math.min(page * pageSize, total) }}</span>
-            {{ $t('labels.of') || 'of' }}
-            <span class="font-medium">{{ total }}</span>
-            {{ $t('labels.results') || 'results' }}
-          </p>
-          <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-700">{{ $t('labels.pageSize') || 'Page size' }}:</label>
-            <select v-model="pageSize" @change="onPageSizeChange" 
-              class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Page Numbers -->
-        <div>
-          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-            <button @click="changePage(1)" 
-              :disabled="page <= 1"
-              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <button @click="changePage(page - 1)" 
-              :disabled="page <= 1"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <template v-for="p in visiblePages" :key="p">
-              <button @click="changePage(p)" 
-                :class="[
-                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                  p === page 
-                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' 
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                ]">
-                {{ p }}
-              </button>
-            </template>
-
-            <button @click="changePage(page + 1)" 
-              :disabled="page >= totalPages"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <button @click="changePage(totalPages)" 
-              :disabled="page >= totalPages"
-              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </nav>
-        </div>
-      </div>
-    </div>
-
     <!-- Contractor Wallet Modal -->
-    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black opacity-40" @click="walletModalOpen = false"></div>
+    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 z-10">
         <div class="flex items-start justify-between mb-4">
-          <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">{{ selectedContractor ? (selectedContractor.name) : $t('contractors.wallet') }}</h3>
-          <button @click="walletModalOpen = false" class="text-gray-500">✕</button>
+          <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">
+            {{ selectedContractor ? selectedContractor.name : $t('contractors.wallet') }}
+          </h3>
+          <button @click="walletModalOpen = false" class="text-gray-500 hover:text-gray-700">✕</button>
         </div>
-
         <div v-if="walletLoading" class="text-center py-8">{{ $t('labels.loading') || 'Loading...' }}</div>
-
         <div v-else>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div class="p-4 bg-gray-50 rounded">
@@ -267,7 +245,6 @@
               </div>
             </div>
           </div>
-
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <h4 class="font-semibold mb-2">{{ $t('contractors.transactions') || 'Transactions' }}</h4>
@@ -283,7 +260,7 @@
                   </thead>
                   <tbody>
                     <tr v-if="!wallet || !wallet.entries || wallet.entries.length === 0">
-                      <td class="p-3" colspan="4">{{ $t('contractors.noTransactions') || 'No transactions' }}</td>
+                      <td class="p-3 text-center" colspan="4">{{ $t('contractors.noTransactions') || 'No transactions' }}</td>
                     </tr>
                     <tr v-for="(e, idx) in (wallet && wallet.entries) || []" :key="idx" class="border-t">
                       <td class="p-2">{{ e.type }}</td>
@@ -295,7 +272,6 @@
                 </table>
               </div>
             </div>
-
             <div>
               <h4 class="font-semibold mb-2">{{ $t('contractors.deposit') || 'Deposit' }}</h4>
               <div class="grid gap-2">
@@ -311,7 +287,6 @@
                   <div class="text-sm mb-1">{{ $t('labels.description') || 'Description' }}</div>
                   <input v-model="depositForm.description" class="w-full px-3 py-2 border rounded" />
                 </label>
-
                 <div class="flex justify-end gap-2 mt-2">
                   <button @click="walletModalOpen = false" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
                   <button @click="doDeposit" class="px-4 py-2 rounded bg-indigo-600 text-white">{{ $t('labels.deposit') || 'Deposit' }}</button>
@@ -322,15 +297,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirm delete modal -->
+    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 z-10">
+        <p class="mb-4 text-center" :class="isRTL ? 'text-right' : 'text-left'">
+          {{ $t('contractors.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
+        </p>
+        <div class="flex justify-center gap-3">
+          <button @click="cancelDelete" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+            {{ $t('labels.cancel') }}
+          </button>
+          <button @click="doDelete" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+            {{ $t('labels.delete') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import * as XLSX from 'xlsx'
-import { getContractors, createContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../api'
+import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../api'
+import Pagination from '@/components/shared/Pagination.vue'
 
 export default {
   name: 'ContractorsList',
+  components: { Pagination },
   data() {
     return {
       q: '',
@@ -339,88 +333,73 @@ export default {
       form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '' },
       contractors: [],
       deleteConfirm: { open: false, item: null },
-      // Wallet UI
+      contextMenu: { open: false, x: 0, y: 0, item: null },
       walletModalOpen: false,
       walletLoading: false,
       wallet: null,
       selectedContractor: null,
       depositForm: { amount: '', description: '', date: '' },
-      historyLoading: false,
       page: 1,
       pageSize: 20,
-      total: 0
+      total: 0,
+      searchTimeout: null
     }
   },
   computed: {
-    isRTL() { return this.$i18n && this.$i18n.locale === 'ar' },
+    isRTL() {
+      return this.$i18n?.locale === 'ar'
+    },
+    textAlign() {
+      return this.isRTL ? 'text-right' : 'text-left'
+    },
     filtered() {
-      // Client-side filtering is now optional since backend handles search
       if (!this.q) return this.contractors
       const s = this.q.toLowerCase()
       return this.contractors.filter(c =>
-        (c.name||'').toLowerCase().includes(s) ||
-        (c.phone||'').toLowerCase().includes(s) ||
-        (c.bankName||'').toLowerCase().includes(s) ||
-        (c.accountNumber||'').toLowerCase().includes(s)
+        (c.name || '').toLowerCase().includes(s) ||
+        (c.phone || '').toLowerCase().includes(s) ||
+        (c.bankName || '').toLowerCase().includes(s) ||
+        (c.accountNumber || '').toLowerCase().includes(s)
       )
     },
     totalPages() {
       return Math.ceil(this.total / this.pageSize)
-    },
-    visiblePages() {
-      const pages = []
-      const maxVisible = 5
-      let start = Math.max(1, this.page - Math.floor(maxVisible / 2))
-      let end = Math.min(this.totalPages, start + maxVisible - 1)
-      if (end - start < maxVisible - 1) {
-        start = Math.max(1, end - maxVisible + 1)
-      }
-      for (let i = start; i <= end; i++) {
-        pages.push(i)
-      }
-      return pages
     }
   },
-  async mounted() {
-    await this.loadContractors()
+  mounted() {
+    this.loadContractors()
+    document.addEventListener('click', this.closeContextMenu)
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {
     async loadContractors() {
       try {
-        const res = await getContractors({
-          page: this.page,
-          pageSize: this.pageSize,
-          q: this.q
-        });
+        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q })
         const payload = res.data || {}
-        this.contractors = Array.isArray(payload.items)
-          ? payload.items
-          : Array.isArray(payload.data)
-            ? payload.data
-            : Array.isArray(payload)
-              ? payload
-              : []
+        this.contractors = Array.isArray(payload.items) ? payload.items :
+                         Array.isArray(payload.data) ? payload.data :
+                         Array.isArray(payload) ? payload : []
         const meta = payload.meta || {}
         this.total = meta.total ?? payload.total ?? this.contractors.length
-        this.page = meta.page ?? this.page
-        this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
       } catch (e) {
-        this.contractors = [];
+        this.contractors = []
         this.total = 0
       }
     },
-    changePage(newPage) {
-      if (newPage >= 1 && newPage <= this.totalPages) {
-        this.page = newPage
+    changePage(p) {
+      if (p >= 1 && p <= this.totalPages && p !== this.page) {
+        this.page = p
         this.loadContractors()
       }
     },
-    onPageSizeChange() {
+    onPageSizeChange(size) {
+      this.pageSize = size
       this.page = 1
       this.loadContractors()
     },
     onSearchInput() {
-      // Debounce search - reload after user stops typing
       clearTimeout(this.searchTimeout)
       this.searchTimeout = setTimeout(() => {
         this.page = 1
@@ -434,64 +413,59 @@ export default {
     },
     openEdit(c) {
       this.editing = true
-      this.form = Object.assign({}, c)
+      this.form = { ...c }
       this.modalOpen = true
     },
     closeModal() {
       this.modalOpen = false
     },
     async saveContractor() {
-      const name = (this.form.name || '').trim()
+      const name = this.form.name?.trim()
       if (!name) {
-        window.$toast(this.$t ? this.$t('contractors.validationName') || 'Please enter a name' : 'Please enter a name', 'warning')
+        if (window.$toast) window.$toast(this.$t('contractors.validationName') || 'Please enter a name', 'warning')
         return
       }
-      if (this.editing) {
-        // Only update locally (no backend update API)
-        const idx = this.contractors.findIndex(x => x.id === this.form.id)
-        if (idx !== -1) this.contractors.splice(idx, 1, Object.assign({}, this.form))
-        this.modalOpen = false
-        return
-      }
-
-      // Build payload so that optional fields (like phone) are not required
-      // and are omitted entirely if left empty.
-      const payload = {
-        name: name
-      }
-      if (this.form.phone && this.form.phone.toString().trim() !== '') {
-        payload.phone = this.form.phone.toString().trim()
-      }
-      if (this.form.bankName && this.form.bankName.toString().trim() !== '') {
-        payload.bankName = this.form.bankName.toString().trim()
-      }
-      if (this.form.accountNumber && this.form.accountNumber.toString().trim() !== '') {
-        payload.accountNumber = this.form.accountNumber.toString().trim()
-      }
-      if (this.form.notes && this.form.notes.toString().trim() !== '') {
-        payload.notes = this.form.notes.toString().trim()
-      }
+      const payload = { name }
+      if (this.form.phone?.trim()) payload.phone = this.form.phone.trim()
+      if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
+      if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
+      if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
 
       try {
-        const res = await createContractor(payload)
-        this.contractors.push(res.data)
+        if (this.editing && this.form.id) {
+          await updateContractor(this.form.id, payload)
+          if (window.$toast) window.$toast(this.$t('contractors.updateSuccess') || 'Contractor updated successfully', 'success')
+        } else {
+          const res = await createContractor(payload)
+          this.contractors.push(res.data)
+          this.total++
+          if (window.$toast) window.$toast(this.$t('contractors.addSuccess') || 'Contractor added successfully', 'success')
+        }
+        this.closeModal()
+        await this.loadContractors()
       } catch (e) {
-        window.$toast(this.$t ? this.$t('contractors.addError') || 'Error adding contractor' : 'Error adding contractor', 'error')
+        console.error('Error saving contractor:', e)
+        const errorMsg = e.response?.status === 404 
+          ? (this.$t('contractors.updateError404') || 'Contractor not found or update endpoint not available')
+          : (e.response?.data?.message || this.$t('contractors.addError') || 'Error saving contractor')
+        if (window.$toast) window.$toast(errorMsg, 'error')
       }
-      this.modalOpen = false
     },
     async doDelete() {
-      const id = this.deleteConfirm.item.id
       try {
-        await deleteContractor(id)
-        this.contractors = this.contractors.filter(c => c.id !== id)
+        await deleteContractor(this.deleteConfirm.item.id)
+        await this.loadContractors()
+        this.cancelDelete()
       } catch (e) {
-        window.$toast(this.$t ? this.$t('contractors.deleteError') || 'Error deleting contractor' : 'Error deleting contractor', 'error')
+        if (window.$toast) window.$toast(this.$t('contractors.deleteError') || 'Error deleting contractor', 'error')
       }
-      this.cancelDelete()
     },
-
-    // ---------- Contractor Wallet ----------
+    confirmDelete(c) {
+      this.deleteConfirm = { open: true, item: c }
+    },
+    cancelDelete() {
+      this.deleteConfirm = { open: false, item: null }
+    },
     async openWallet(c) {
       this.selectedContractor = c
       this.walletModalOpen = true
@@ -499,35 +473,29 @@ export default {
       this.depositForm = { amount: '', description: '', date: '' }
       await this.fetchWallet(c.id)
     },
-
     async fetchWallet(contractorId) {
       this.walletLoading = true
-      this.historyLoading = true
       try {
         const [wRes, hRes] = await Promise.all([
           getContractorWallet(contractorId),
           getContractorWalletHistory(contractorId)
         ])
         this.wallet = wRes.data || null
-        // ensure entries exist
-        if (hRes && hRes.data && hRes.data.entries) {
-          // attach entries on wallet object for convenience
+        if (hRes?.data?.entries) {
           this.wallet.entries = hRes.data.entries
         }
       } catch (err) {
-        console.error('Error fetching contractor wallet', err)
-        window.$toast(this.$t ? this.$t('contractors.walletFetchError') || 'Error fetching wallet' : 'Error fetching wallet', 'error')
+        console.error('Error fetching wallet', err)
+        if (window.$toast) window.$toast(this.$t('contractors.walletFetchError') || 'Error fetching wallet', 'error')
       } finally {
         this.walletLoading = false
-        this.historyLoading = false
       }
     },
-
     async doDeposit() {
       if (!this.selectedContractor) return
       const amount = Number(this.depositForm.amount || 0)
-      if (!amount || isNaN(amount) || amount <= 0) {
-        window.$toast(this.$t ? this.$t('contractors.validationAmount') || 'Enter a valid amount' : 'Enter a valid amount', 'warning')
+      if (!amount || amount <= 0) {
+        if (window.$toast) window.$toast(this.$t('contractors.validationAmount') || 'Enter a valid amount', 'warning')
         return
       }
       try {
@@ -537,50 +505,42 @@ export default {
           date: this.depositForm.date || undefined
         }
         const res = await depositToContractorWallet(this.selectedContractor.id, payload)
-        // If API returns updated wallet, refresh local wallet
-        if (res && res.data) {
-          this.wallet = res.data
-        }
-        // refresh history as well
+        if (res?.data) this.wallet = res.data
         await this.fetchWallet(this.selectedContractor.id)
-        window.$toast(this.$t ? this.$t('contractors.depositSuccess') || 'Deposit successful' : 'Deposit successful', 'success')
+        if (window.$toast) window.$toast(this.$t('contractors.depositSuccess') || 'Deposit successful', 'success')
         this.depositForm = { amount: '', description: '', date: '' }
       } catch (err) {
-        console.error('Error depositing to wallet', err)
-        window.$toast(this.$t ? this.$t('contractors.depositError') || 'Error making deposit' : 'Error making deposit', 'error')
+        console.error('Error depositing', err)
+        if (window.$toast) window.$toast(this.$t('contractors.depositError') || 'Error making deposit', 'error')
       }
     },
-
-    // ---------- Excel import ----------
     onFileChange(e) {
       const file = e.target.files[0]
       if (!file) return
       const reader = new FileReader()
-      reader.onload = (evt) => {
+      reader.onload = async (evt) => {
         const data = evt.target.result
         const workbook = XLSX.read(data, { type: 'binary' })
-        // take first sheet
         const sheetName = workbook.SheetNames[0]
         const sheet = workbook.Sheets[sheetName]
-        // convert to json (first row may be header or not)
         const json = XLSX.utils.sheet_to_json(sheet, { header: 1 })
-        this.parseExcelJson(json)
+        await this.parseExcelJson(json)
       }
       reader.readAsBinaryString(file)
-      // reset input so same file can be re-selected
       this.$refs.fileInput.value = null
     },
-    parseExcelJson(json) {
-      // json is array of rows (arrays). Find header row by searching for column containing 'مقاول' or 'Contractor'
+    async parseExcelJson(json) {
       if (!Array.isArray(json) || json.length === 0) return
       let headerRowIndex = 0
-      for (let i=0;i<Math.min(5,json.length);i++){
+      for (let i = 0; i < Math.min(5, json.length); i++) {
         const row = (json[i] || []).map(cell => (cell || '').toString())
-        if (row.some(r => /مقاول|Contractor/i.test(r))) { headerRowIndex = i; break }
+        if (row.some(r => /مقاول|Contractor/i.test(r))) {
+          headerRowIndex = i
+          break
+        }
       }
-      const header = (json[headerRowIndex] || []).map(h => (h||'').toString().trim())
-      const rows = json.slice(headerRowIndex+1)
-      // Find column indices
+      const header = (json[headerRowIndex] || []).map(h => (h || '').toString().trim())
+      const rows = json.slice(headerRowIndex + 1)
       const colIdx = {
         name: header.findIndex(h => /مقاول|Contractor/i.test(h)),
         phone: header.findIndex(h => /هاتف|Phone/i.test(h)),
@@ -601,48 +561,51 @@ export default {
           })
         }
       }
-      // dedupe and add to contractors list (avoid duplicates by name)
       const existingNames = new Set(this.contractors.map(c => c.name))
       let added = 0
       for (const n of imported) {
         if (!existingNames.has(n.name)) {
           try {
-            createContractor(n).then(res => {
-              this.contractors.push(res.data)
-            })
+            const res = await createContractor(n)
+            this.contractors.push(res.data)
             existingNames.add(n.name)
             added++
           } catch (e) {
-            // skip on error
+            console.error('Failed to import:', n.name, e)
           }
         }
       }
-      window.$toast(this.$t ? this.$t('contractors.imported', { count: added }) || (added + ' imported') : (added + ' imported'), 'success')
-    },
-    confirmDelete(c) {
-      this.deleteConfirm = { open: true, item: c }
-    },
-    cancelDelete() {
-      this.deleteConfirm = { open: false, item: null }
+      if (window.$toast) window.$toast(this.$t('contractors.imported', { count: added }) || `${added} contractors imported`, 'success')
     },
     openStatement(c) {
-      // Emit event to navigate to statement page
       this.$emit('navigate-statement', c.id)
+    },
+    openContextMenu(event, item) {
+      this.contextMenu = {
+        open: true,
+        x: event.clientX,
+        y: event.clientY,
+        item
+      }
+    },
+    closeContextMenu() {
+      this.contextMenu.open = false
+    },
+    contextAction(action) {
+      const c = this.contextMenu.item
+      if (action === 'edit') this.openEdit(c)
+      if (action === 'delete') this.confirmDelete(c)
+      if (action === 'wallet') this.openWallet(c)
+      if (action === 'statement') this.openStatement(c)
+      this.closeContextMenu()
     }
   }
 }
 </script>
 
 <style scoped>
-/* small helper in case some elements still need forced RTL alignment */
-.direction-rtl input,
-.direction-rtl select,
-.direction-rtl textarea {
-  direction: rtl;
-  text-align: right;
-}
-.direction-rtl table th,
-.direction-rtl table td {
+[dir="rtl"] table th,
+[dir="rtl"] table td {
   text-align: right;
 }
 </style>

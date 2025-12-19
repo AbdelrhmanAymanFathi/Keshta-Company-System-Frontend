@@ -284,6 +284,10 @@ export const getContractors = (params = {}) => {
 };
 export const createContractor = (data) =>
   axios.post(`${BASE_URL}/api/contractors`, data);
+export const updateContractor = (id, data) => {
+  console.log('[API] Updating contractor:', id, 'Data:', data, 'URL:', `${BASE_URL}/api/contractors/${id}`);
+  return axios.patch(`${BASE_URL}/api/contractors/${id}`, data);
+};
 // Delete contractor by id — backend expects RESTful resource path (/api/contractors/:id)
 // Note: many backends return 204 No Content for successful deletes; axios will resolve
 // with response.status === 204 and an empty body.
@@ -720,6 +724,18 @@ axios.interceptors.request.use(
       // Don't wait for refresh, let response interceptor handle it
     } else if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Debug logging for PATCH/PUT requests to contractors
+    if ((config.method === 'patch' || config.method === 'put') && config.url && config.url.includes('/api/contractors/')) {
+      // config.url is already the full URL when using BASE_URL in the function
+      console.log(`[API Request] ${config.method.toUpperCase()} to contractors:`, {
+        url: config.url,
+        baseURL: config.baseURL,
+        fullURL: config.url.startsWith('http') ? config.url : `${config.baseURL || BASE_URL}${config.url}`,
+        headers: config.headers,
+        data: config.data
+      });
     }
     
     return config;
