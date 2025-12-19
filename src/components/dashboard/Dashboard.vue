@@ -11,10 +11,10 @@
         </button>
         <!-- Brand -->
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-md flex items-center justify-center overflow-hidden">
-            <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
+          <div class="w-18 h-9 rounded-md flex items-center justify-center overflow-hidden">
+            <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-fill">
           </div>
-          <div class="text-xl font-bold whitespace-nowrap">{{ $t('appName') }}</div>
+          <div class="text-l font-bold whitespace-nowrap">{{ $t('appName') }}</div>
         </div>
         <!-- Top menus (desktop) -->
         <nav class="hidden sm:flex gap-2 ml-4">
@@ -66,9 +66,9 @@
         <div class="hidden sm:flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <!-- Logo visible only when collapsed -->
-            <div v-if="effectiveCollapsed" class="w-9 h-9 rounded-md overflow-hidden">
+            <!-- <div v-if="effectiveCollapsed" class="w-9 h-9 rounded-md overflow-hidden">
               <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
-            </div>
+            </div> -->
             <!-- App name visible only when expanded -->
             <div v-if="!effectiveCollapsed" class="font-semibold text-lg">
               {{ $t('appName') }}
