@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
 
     <!-- Header -->
-    <div class="flex items-center" :class="isRTL ? 'justify-between flex-row-reverse' : 'justify-between'">
+    <div class="flex items-center" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"

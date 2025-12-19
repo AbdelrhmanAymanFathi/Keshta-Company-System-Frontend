@@ -1,8 +1,8 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
     <!-- Header -->
-    <div class="flex items-center" :class="isRTL ? 'justify-between flex-row-reverse' : 'justify-between'">
-      <h1 class="text-2xl font-semibold text-gray-900">{{ $t('contractors.title') }}</h1>
+    <div class="flex items-center" :class="isRTL ? 'justify-between' : 'justify-between'">
+      <h2 class="text-2xl font-semibold text-gray-900">{{ $t('contractors.title') }}</h2>
       <div class="flex items-center gap-3">
         <!-- Import Excel -->
         <label class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-flex items-center cursor-pointer transition-colors">
