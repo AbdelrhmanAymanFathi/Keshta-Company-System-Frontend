@@ -705,6 +705,52 @@ export const downloadExpensesReport = async (params = {}) => {
   return getExpensesReportData(params, 'xlsx');
 };
 
+// Changes by Date (Admin-only endpoints)
+export const getExportsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/exports/changes?${queryParams.toString()}`);
+};
+
+export const getLocationsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/locations/changes?${queryParams.toString()}`);
+};
+
+export const getContractorsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/contractors/changes?${queryParams.toString()}`);
+};
+
+export const getCrushersChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/crushers/changes?${queryParams.toString()}`);
+};
+
+export const getTransportsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/transports/changes?${queryParams.toString()}`);
+};
+
+export const getRentalsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/rentals/changes?${queryParams.toString()}`);
+};
+
+export const getExpensesChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/expenses/changes?${queryParams.toString()}`);
+};
+
+export const getVehiclesChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/vehicles/changes?${queryParams.toString()}`);
+};
+
+export const getCompanyWalletTransactionsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/company/wallet/transactions/changes?${queryParams.toString()}`);
+};
+
 // Export token manager for external use
 export { tokenManager };
 

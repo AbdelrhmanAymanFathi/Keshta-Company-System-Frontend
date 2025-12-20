@@ -5,7 +5,8 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentRent": "إيجار المعدات",
-    "companyWallet": "الخزينة الرئيسيه"
+    "companyWallet": "الخزينة الرئيسيه",
+    "admin": "الإدارة"
   },
   "dashboard": {
     "newSupply": "توريدة جديدة",
@@ -571,5 +572,29 @@
     "enterBranchCategory": "أدخل فئة الفرع (اختياري)",
     "enterCategoryName": "أدخل اسم الفئة",
     "reportError": "فشل في تحميل التقرير"
+  },
+  "changes": {
+    "title": "التغييرات حسب التاريخ",
+    "description": "عرض جميع التغييرات التي تمت في تاريخ محدد عبر جميع الوحدات",
+    "selectDate": "اختر التاريخ",
+    "selectDatePrompt": "اختر تاريخاً لعرض التغييرات",
+    "selectDateDesc": "اختر تاريخاً من التقويم أعلاه لرؤية جميع التغييرات التي تمت في ذلك اليوم",
+    "loadChanges": "تحميل التغييرات",
+    "loadError": "خطأ في تحميل التغييرات. يرجى المحاولة مرة أخرى.",
+    "changesFor": "التغييرات لـ",
+    "totalChanges": "إجمالي التغييرات",
+    "noChanges": "لم يتم العثور على تغييرات",
+    "noChangesDesc": "لم يتم إجراء أي تغييرات في هذا التاريخ",
+    "modules": {
+      "exports": "التوريدات",
+      "locations": "المواقع",
+      "contractors": "المقاولين",
+      "crushers": "الكسارات",
+      "transports": "النقل",
+      "rentals": "الإيجار",
+      "expenses": "المصروفات",
+      "vehicles": "المركبات",
+      "companyWallet": "خزينة الشركة"
+    }
   }
 }

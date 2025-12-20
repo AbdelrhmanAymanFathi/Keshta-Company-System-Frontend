@@ -5,7 +5,8 @@
     "transport": "Transport",
     "expenses": "Expenses",
     "equipmentRent": "Equipment Rent",
-    "companyWallet": "Main Treasury"
+    "companyWallet": "Main Treasury",
+    "admin": "Admin"
   },
   "dashboard": {
     "newSupply": "New Supply",
@@ -571,5 +572,29 @@
     "enterBranchCategory": "Enter branch category (optional)",
     "enterCategoryName": "Enter category name",
     "reportError": "Failed to download report"
+  },
+  "changes": {
+    "title": "Changes by Date",
+    "description": "View all changes made on a specific date across all modules",
+    "selectDate": "Select Date",
+    "selectDatePrompt": "Select a date to view changes",
+    "selectDateDesc": "Choose a date from the calendar above to see all changes made on that day",
+    "loadChanges": "Load Changes",
+    "loadError": "Error loading changes. Please try again.",
+    "changesFor": "Changes for",
+    "totalChanges": "Total Changes",
+    "noChanges": "No changes found",
+    "noChangesDesc": "There were no changes made on this date",
+    "modules": {
+      "exports": "Exports",
+      "locations": "Locations",
+      "contractors": "Contractors",
+      "crushers": "Crushers",
+      "transports": "Transports",
+      "rentals": "Rentals",
+      "expenses": "Expenses",
+      "vehicles": "Vehicles",
+      "companyWallet": "Company Wallet"
+    }
   }
 }

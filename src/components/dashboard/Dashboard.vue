@@ -18,7 +18,7 @@
         </div>
         <!-- Top menus (desktop) -->
         <nav class="hidden sm:flex gap-2 ml-4">
-          <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
+          <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
             :class="['px-4 py-2 rounded text-sm font-medium transition', selectedTop === key ? 'bg-white/20' : 'hover:bg-white/10']">
             {{ $t('navbar.' + key) }}
           </button>
@@ -101,7 +101,7 @@
 
         <!-- Mobile Top Menu -->
         <div v-if="isMobile" class="sm:hidden mb-4 space-y-1">
-          <button v-for="(labelKey, key) in topMenus" :key="key" @click="selectTop(key)"
+          <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
             :class="['w-full px-4 py-2 rounded text-sm font-medium text-left', selectedTop === key ? 'bg-indigo-600 text-white' : 'hover:bg-indigo-100']">
             {{ $t('navbar.' + key) }}
           </button>
@@ -109,7 +109,7 @@
 
         <!-- Vertical Menu -->
         <ul class="space-y-1">
-          <li v-for="item in verticalMenu" :key="item.name">
+          <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.name)"
               :class="['w-full px-4 py-3 rounded flex items-center gap-4 transition', selectedVertical === item.name ? 'bg-indigo-600 text-white shadow' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
               <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, selectedVertical === item.name)"></div>
@@ -152,6 +152,7 @@ import RentalList from './RentalList.vue'
 import RentalReport from './RentalReport.vue'
 import ExpensesList from './ExpensesList.vue'
 import CompanyFinance from './CompanyFinance.vue'
+import ChangesByDate from './ChangesByDate.vue'
 import AuthLogout from '../auth/Logout.vue'
 import ComponentNotFound from '../shared/ComponentNotFound.vue'
 import { useAuth } from '@/composables/useAuth'
@@ -162,7 +163,7 @@ export default {
     NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
     DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
     RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
-    AuthLogout, ComponentNotFound
+    ChangesByDate, AuthLogout, ComponentNotFound
   },
   setup() {
     const { logout: authLogout, user } = useAuth()
@@ -170,7 +171,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet' },
+      topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
       selectedTop: localStorage.getItem('dashboard-selectedTop') || 'supplies',
       menuMap: {
         supplies: [
@@ -197,6 +198,9 @@ export default {
         ],
         companyWallet: [
           { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
+        ],
+        admin: [
+          { name: 'changesByDate', label: 'changes.title', component: 'ChangesByDate' }
         ]
       },
       selectedVertical: localStorage.getItem('dashboard-selectedVertical') || 'newSupply',
@@ -212,7 +216,8 @@ export default {
     effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
     verticalMenu() { return this.menuMap[this.selectedTop] || [] },
     currentItem() {
-      return this.verticalMenu.find(i => i.name === this.selectedVertical) || this.verticalMenu[0] || null
+      const menu = this.filteredVerticalMenu
+      return menu.find(i => i.name === this.selectedVertical) || menu[0] || null
     },
     currentLabel() { return this.currentItem ? this.currentItem.label : '' },
     currentComponent() {
@@ -220,9 +225,29 @@ export default {
       const mapping = {
         NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
         DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
-        RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance
+        RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
+        ChangesByDate
       }
       return mapping[this.currentItem.component] || ComponentNotFound
+    },
+    isAdmin() {
+      if (!this.user || !this.user.roles) return false
+      return this.user.roles.some(role => role.roleId === 1)
+    },
+    filteredTopMenus() {
+      const menus = { ...this.topMenus }
+      if (!this.isAdmin) {
+        delete menus.admin
+      }
+      return menus
+    },
+    filteredVerticalMenu() {
+      const menu = this.verticalMenu || []
+      // Filter admin menu items if user is not admin
+      if (this.selectedTop === 'admin' && !this.isAdmin) {
+        return []
+      }
+      return menu
     },
     headerGradient() { return 'bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600' },
     userInitials() {
@@ -304,6 +329,7 @@ export default {
         expensesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
         rentalList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
         companyWallet: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
+        changesByDate: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
         default: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8m-4-4h8" stroke-width="2"/></svg>`
       }
       return icons[name] || icons.default
