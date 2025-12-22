@@ -143,7 +143,7 @@
       <!-- Table with Scroll Controls -->
       <div v-else class="relative">
         <!-- Left Scroll Arrow - Visual indicator only -->
-        <div v-if="showLeftScroll" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+        <div v-if="showLeftScroll" class="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none" :class="isRTL ? 'right-0' : 'left-0'">
           <svg class="w-6 h-6 text-indigo-400 opacity-60 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="isRTL ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'"></path>
           </svg>
@@ -159,43 +159,48 @@
           <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50" :class="{ 'direction-rtl': isRTL }">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.date') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.equipment') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.name') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.type') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.hours') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.hourlyRate') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.total') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.paid') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ $t('rental.remaining') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ $t('rental.notes') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ $t('labels.actions') }}
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-gray-50">
+            <tr 
+              v-for="rental in filteredItems" 
+              :key="rental.id" 
+              class="hover:bg-gray-50"
+              @contextmenu.prevent="openContextMenu($event, rental)"
+            >
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ formatDate(rental.date) }}
               </td>
@@ -260,7 +265,7 @@
         </div>
 
         <!-- Right Scroll Arrow - Visual indicator only -->
-        <div v-if="showRightScroll" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+        <div v-if="showRightScroll" class="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none" :class="isRTL ? 'left-0' : 'right-0'">
           <svg class="w-6 h-6 text-indigo-400 opacity-60 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="isRTL ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'"></path>
           </svg>
@@ -392,12 +397,65 @@
 
     <!-- Rental Detail Modal -->
     <div v-if="showDetailModal && selectedRentalForDetail" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="closeDetailModal">
-      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5">
         <RentalDetail
           :rental-id="selectedRentalForDetail.id"
           @close="closeDetailModal"
         />
       </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div 
+      v-if="contextMenu.open" 
+      ref="contextMenuElement"
+      class="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]"
+      :style="{ top: contextMenu.y + 'px', [isRTL ? 'right' : 'left']: contextMenu.x + 'px' }"
+      @click.stop
+      @contextmenu.prevent
+    >
+      <button
+        @click="handleContextMenuAction('viewDetails')"
+        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
+      >
+        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        {{ $t('rental.viewDetails') }}
+      </button>
+      <button
+        @click="handleContextMenuAction('payouts')"
+        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
+      >
+        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        {{ $t('rental.payouts') }}
+      </button>
+      <button
+        @click="handleContextMenuAction('edit')"
+        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
+      >
+        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+        </svg>
+        {{ $t('labels.edit') }}
+      </button>
+      <div class="border-t border-gray-200 my-1"></div>
+      <button
+        @click="handleContextMenuAction('delete')"
+        class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        {{ $t('labels.delete') }}
+      </button>
     </div>
 
     <!-- Payouts Modal -->
@@ -482,7 +540,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance, nextTick } from 'vue'
 import { useRentalsStore } from '@/stores/useRentalsStore'
 import RentalForm from './RentalForm.vue'
 import RentalDetail from './RentalDetail.vue'
@@ -503,6 +561,7 @@ export default {
     const rentalToDelete = ref(null)
     const searchTimeout = ref(null)
     const tableContainer = ref(null)
+    const contextMenuElement = ref(null)
     const showLeftScroll = ref(false)
     const showRightScroll = ref(false)
     const canScrollLeft = ref(false)
@@ -528,6 +587,12 @@ export default {
       amount: '',
       date: new Date().toISOString().split('T')[0],
       notes: ''
+    })
+    const contextMenu = ref({
+      open: false,
+      x: 0,
+      y: 0,
+      rental: null
     })
 
     const visiblePages = computed(() => {
@@ -885,6 +950,141 @@ export default {
       }
     }
 
+    const openContextMenu = (event, rental) => {
+      event.stopPropagation()
+      contextMenu.value.rental = rental
+      
+      // Get viewport dimensions
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      
+      // Approximate menu dimensions
+      const menuWidth = 180
+      const menuHeight = 220
+      
+      let x, y
+      
+      // Calculate horizontal position
+      if (isRTL.value) {
+        // For RTL, we use 'right' positioning
+        // event.clientX is distance from left, we need distance from right
+        const rightPos = viewportWidth - event.clientX
+        
+        // Check if menu would overflow to the left
+        if (rightPos + menuWidth > viewportWidth) {
+          // Menu would overflow, position it from the right edge
+          x = viewportWidth - menuWidth - 10
+        } else {
+          // Use the click position (convert to right positioning)
+          x = viewportWidth - event.clientX
+        }
+        
+        // Ensure minimum distance from edges
+        if (x < 10) x = 10
+        if (x > viewportWidth - menuWidth - 10) x = viewportWidth - menuWidth - 10
+      } else {
+        // For LTR, we use 'left' positioning
+        x = event.clientX
+        
+        // Check if menu would overflow to the right
+        if (x + menuWidth > viewportWidth) {
+          x = viewportWidth - menuWidth - 10
+        }
+        
+        // Ensure minimum distance from edges
+        if (x < 10) x = 10
+      }
+      
+      // Calculate vertical position
+      y = event.clientY
+      
+      // Check if menu would overflow bottom
+      if (y + menuHeight > viewportHeight) {
+        // Show menu above the click point
+        y = Math.max(10, event.clientY - menuHeight - 5)
+      } else if (y < 0) {
+        y = 10
+      }
+      
+      contextMenu.value.x = x
+      contextMenu.value.y = y
+      contextMenu.value.open = true
+      
+      // Fine-tune position after menu is rendered using actual dimensions
+      nextTick(() => {
+        if (contextMenuElement.value) {
+          const rect = contextMenuElement.value.getBoundingClientRect()
+          const actualWidth = rect.width
+          const actualHeight = rect.height
+          
+          let newX = contextMenu.value.x
+          let newY = contextMenu.value.y
+          let needsAdjustment = false
+          
+          // Horizontal adjustment
+          if (isRTL.value) {
+            // For RTL, check right positioning
+            if (newX + actualWidth > viewportWidth) {
+              newX = Math.max(10, viewportWidth - actualWidth - 10)
+              needsAdjustment = true
+            } else if (newX < 10) {
+              newX = 10
+              needsAdjustment = true
+            }
+          } else {
+            // For LTR, check left positioning
+            if (newX + actualWidth > viewportWidth) {
+              newX = Math.max(10, viewportWidth - actualWidth - 10)
+              needsAdjustment = true
+            } else if (newX < 10) {
+              newX = 10
+              needsAdjustment = true
+            }
+          }
+          
+          // Vertical adjustment
+          if (newY + actualHeight > viewportHeight) {
+            newY = Math.max(10, event.clientY - actualHeight - 5)
+            needsAdjustment = true
+          } else if (newY < 10) {
+            newY = 10
+            needsAdjustment = true
+          }
+          
+          if (needsAdjustment) {
+            contextMenu.value.x = newX
+            contextMenu.value.y = newY
+          }
+        }
+      })
+    }
+
+    const closeContextMenu = () => {
+      contextMenu.value.open = false
+    }
+
+    const handleContextMenuAction = (action) => {
+      if (!contextMenu.value.rental) return
+      
+      const rental = contextMenu.value.rental
+      closeContextMenu()
+
+      switch (action) {
+        case 'viewDetails':
+          openDetailModal(rental)
+          break
+        case 'payouts':
+          openPayoutsModal(rental)
+          break
+        case 'edit':
+          openEditModal(rental)
+          break
+        case 'delete':
+          confirmDelete(rental)
+          break
+      }
+    }
+
     // Watch only the specific filter properties we care about and reload.
     // Watching the entire filters object with deep: true could re-run when
     // unrelated reactive changes occur; this can lead to recursive updates
@@ -900,10 +1100,23 @@ export default {
       if (!tableContainer.value) return
       const container = tableContainer.value
       const hasHorizontalScroll = container.scrollWidth > container.clientWidth
-      showLeftScroll.value = hasHorizontalScroll
-      showRightScroll.value = hasHorizontalScroll
-      canScrollLeft.value = container.scrollLeft > 0
-      canScrollRight.value = container.scrollLeft < (container.scrollWidth - container.clientWidth - 10)
+      
+      if (isRTL.value) {
+        // In RTL, scrollLeft behavior is inverted
+        // When scrollLeft is 0, we're at the rightmost position (start in RTL)
+        // When scrollLeft is max, we're at the leftmost position (end in RTL)
+        const maxScroll = container.scrollWidth - container.clientWidth
+        showLeftScroll.value = hasHorizontalScroll && container.scrollLeft < maxScroll - 10
+        showRightScroll.value = hasHorizontalScroll && container.scrollLeft > 10
+        canScrollLeft.value = container.scrollLeft < maxScroll - 10
+        canScrollRight.value = container.scrollLeft > 10
+      } else {
+        // In LTR, normal behavior
+        showLeftScroll.value = hasHorizontalScroll && container.scrollLeft > 10
+        showRightScroll.value = hasHorizontalScroll && container.scrollLeft < (container.scrollWidth - container.clientWidth - 10)
+        canScrollLeft.value = container.scrollLeft > 0
+        canScrollRight.value = container.scrollLeft < (container.scrollWidth - container.clientWidth - 10)
+      }
     }
 
     const scrollTableLeft = () => {
@@ -954,6 +1167,7 @@ export default {
       rentalsStore.fetchRentals()
       updateTableScrollVisibility()
       window.addEventListener('resize', updateTableScrollVisibility)
+      document.addEventListener('click', closeContextMenu)
       if (tableContainer.value) {
         tableContainer.value.addEventListener('scroll', updateTableScrollVisibility)
         tableContainer.value.addEventListener('keydown', handleTableKeydown)
@@ -967,6 +1181,7 @@ export default {
         clearTimeout(searchTimeout.value)
       }
       window.removeEventListener('resize', updateTableScrollVisibility)
+      document.removeEventListener('click', closeContextMenu)
       if (tableContainer.value) {
         tableContainer.value.removeEventListener('scroll', updateTableScrollVisibility)
         tableContainer.value.removeEventListener('keydown', handleTableKeydown)
@@ -1020,7 +1235,11 @@ export default {
       confirmDelete,
       deleteRental,
       formatDate,
-      formatCurrency
+      formatCurrency,
+      openContextMenu,
+      closeContextMenu,
+      handleContextMenuAction,
+      contextMenu
     }
   }
 }
