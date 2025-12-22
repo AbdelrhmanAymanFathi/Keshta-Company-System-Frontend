@@ -269,7 +269,7 @@ export default {
         const transform = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
         return `${base} fixed top-0 bottom-0 w-64 ${side} ${transform}`
       }
-      const width = this.effectiveCollapsed ? 'w-20' : 'w-72'
+      const width = this.effectiveCollapsed ? 'w-20' : 'w-62'
       return `${base} ${width} relative`
     }
   },

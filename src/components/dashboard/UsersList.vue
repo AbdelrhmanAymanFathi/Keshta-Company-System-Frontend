@@ -181,7 +181,7 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center mt-0 bg-black bg-opacity-50">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center mt-0 bg-black bg-opacity-50" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
@@ -278,7 +278,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="deleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center mt-0 bg-black bg-opacity-50">
+    <div v-if="deleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center mt-0 bg-black bg-opacity-50" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
         <h3 class="text-lg font-semibold mb-4">{{ $t('users.deleteConfirm') }}</h3>
         <p class="text-gray-600 mb-6">
