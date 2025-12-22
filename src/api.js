@@ -263,12 +263,21 @@ export const logout = () => {
 };
 
 // Users
-export const getUsers = () =>
-  axios.get(`${BASE_URL}/api/users`);
+export const getUsers = (params = {}) => {
+  const { page = 1, pageSize = 20, q = '' } = params;
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  if (q) {
+    queryParams.append('q', q);
+  }
+  return axios.get(`${BASE_URL}/api/users?${queryParams.toString()}`);
+};
 export const createUser = (data) =>
   axios.post(`${BASE_URL}/api/users`, data);
 export const deleteUser = (id) =>
-  axios.delete(`${BASE_URL}/api/users`, { data: { id } });
+  axios.delete(`${BASE_URL}/api/users/${id}`);
 
 // Contractors
 export const getContractors = (params = {}) => {

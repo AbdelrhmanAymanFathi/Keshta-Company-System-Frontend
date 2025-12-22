@@ -596,5 +596,30 @@
       "vehicles": "Vehicles",
       "companyWallet": "Company Wallet"
     }
+  },
+  "users": {
+    "title": "Users Management",
+    "add": "Add User",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "isActive": "Account is active",
+    "roles": "Roles",
+    "searchPlaceholder": "Search users...",
+    "noResults": "No users found",
+    "loadError": "Error loading users",
+    "saveError": "Error saving user",
+    "addSuccess": "User added successfully",
+    "updateSuccess": "User updated successfully",
+    "deleteSuccess": "User deleted successfully",
+    "deleteError": "Error deleting user",
+    "deleteConfirm": "Delete User",
+    "deleteConfirmMessage": "Are you sure you want to delete user {name}? This action cannot be undone."
   }
 }

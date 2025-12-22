@@ -153,6 +153,7 @@ import RentalReport from './RentalReport.vue'
 import ExpensesList from './ExpensesList.vue'
 import CompanyFinance from './CompanyFinance.vue'
 import ChangesByDate from './ChangesByDate.vue'
+import UsersList from './UsersList.vue'
 import AuthLogout from '../auth/Logout.vue'
 import ComponentNotFound from '../shared/ComponentNotFound.vue'
 import { useAuth } from '@/composables/useAuth'
@@ -163,7 +164,7 @@ export default {
     NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
     DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
     RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
-    ChangesByDate, AuthLogout, ComponentNotFound
+    ChangesByDate, UsersList, AuthLogout, ComponentNotFound
   },
   setup() {
     const { logout: authLogout, user } = useAuth()
@@ -200,7 +201,8 @@ export default {
           { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
         ],
         admin: [
-          { name: 'changesByDate', label: 'changes.title', component: 'ChangesByDate' }
+          { name: 'changesByDate', label: 'changes.title', component: 'ChangesByDate' },
+          { name: 'usersList', label: 'users.title', component: 'UsersList' }
         ]
       },
       selectedVertical: localStorage.getItem('dashboard-selectedVertical') || 'newSupply',
@@ -226,7 +228,7 @@ export default {
         NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
         DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
         RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
-        ChangesByDate
+        ChangesByDate, UsersList
       }
       return mapping[this.currentItem.component] || ComponentNotFound
     },
@@ -330,6 +332,7 @@ export default {
         rentalList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
         companyWallet: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
         changesByDate: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
+        usersList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,
         default: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8m-4-4h8" stroke-width="2"/></svg>`
       }
       return icons[name] || icons.default
