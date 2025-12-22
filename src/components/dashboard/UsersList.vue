@@ -182,7 +182,7 @@
 
     <!-- Add/Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center mt-0 bg-black bg-opacity-50" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6 max-h-[100vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('users.editUser') : $t('users.addUser') }}
