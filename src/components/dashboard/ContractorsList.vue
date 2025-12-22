@@ -171,7 +171,7 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
@@ -217,7 +217,7 @@
     </div>
 
     <!-- Contractor Wallet Modal -->
-    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 z-10">
         <div class="flex items-start justify-between mb-4">
           <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">
@@ -299,7 +299,7 @@
     </div>
 
     <!-- Confirm delete modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 z-10">
         <p class="mb-4 text-center" :class="isRTL ? 'text-right' : 'text-left'">
           {{ $t('contractors.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
