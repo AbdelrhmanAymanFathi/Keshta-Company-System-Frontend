@@ -559,7 +559,7 @@ export const getRental = (id) =>
 export const createRental = (data) =>
   axios.post(`${BASE_URL}/api/rentals`, data);
 export const updateRental = (id, data) =>
-  axios.put(`${BASE_URL}/api/rentals/${id}`, data);
+  axios.patch(`${BASE_URL}/api/rentals/${id}`, data);
 export const deleteRental = (id) =>
   axios.delete(`${BASE_URL}/api/rentals/${id}`);
 export const getRentalPayouts = (rentalId) =>
