@@ -39,7 +39,8 @@
 
         <!-- User Avatar with Dropdown -->
         <div class="relative">
-          <button @click="toggleUserMenu" class="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white font-semibold text-lg hover:bg-white/30 transition">
+          <button @click="toggleUserMenu"
+            class="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white font-semibold text-lg hover:bg-white/30 transition">
             {{ userInitials }}
           </button>
           <!-- User Dropdown Menu -->
@@ -49,7 +50,8 @@
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                  </path>
                 </svg>
                 {{ $t('labels.logout') }}
               </button>
@@ -75,7 +77,8 @@
             </div>
           </div>
           <button v-if="!isMobile" @click="toggleCollapsed" class="px-4 py-3 rounded hover:bg-indigo-200 transition">
-            <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
             <svg v-else class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -127,7 +130,8 @@
       <!-- Main Content -->
       <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
-        <component :is="currentComponent" @navigate-report="navigateToReport" @navigate-statement="navigateToStatement" />
+        <component :is="currentComponent" @navigate-report="navigateToReport"
+          @navigate-statement="navigateToStatement" />
       </main>
     </div>
 
@@ -172,7 +176,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', expenses: 'expenses', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', /*expenses: 'expenses' ,*/ equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
       selectedTop: localStorage.getItem('dashboard-selectedTop') || 'supplies',
       menuMap: {
         supplies: [
@@ -189,16 +193,19 @@ export default {
           { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' },
           { name: 'transportReport', label: 'transport.reportMenu', component: 'TransportReport' }
         ],
-        expenses: [
-          { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
-          { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
-        ],
+        // expenses: [
+        //   { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
+        //   { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
+        // ],
         equipmentRent: [
           { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' },
           { name: 'rentalReport', label: 'rental.reportMenu', component: 'RentalReport' }
         ],
         companyWallet: [
           { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
+          ,
+          { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
+          { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', component: 'ChangesByDate' },
@@ -370,7 +377,10 @@ export default {
 </script>
 
 <style scoped>
-.direction-rtl { direction: rtl; }
+.direction-rtl {
+  direction: rtl;
+}
+
 /* Sidebar transition */
 aside {
   transition: width 0.3s ease, transform 0.3s ease;

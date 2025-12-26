@@ -461,7 +461,7 @@
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   :class="isRTL ? 'text-right' : 'text-left'"
                 >
-                  <option :value="null">{{ $t('expenses.branch') }}</option>
+                  <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
                   <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                 </select>
                 <button type="button" @click="addBranchPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
@@ -885,7 +885,7 @@ export default {
         description: '',
         amount: '',
         flow: 'OUT',
-        branchId: this.branches.length > 0 ? this.branches[0].id : null,
+        branchId: null, // Default to Main Treasury (null)
         locationId: null,
         notes: '',
         settlementDate: null
@@ -1179,9 +1179,7 @@ export default {
       try {
         const response = await getBranches()
         this.branches = response.data || []
-        if (this.branches.length > 0 && !this.form.branchId) {
-          this.form.branchId = this.branches[0].id
-        }
+        // Don't auto-select first branch, default to Main Treasury (null)
       } catch (error) {
         console.error('Error loading branches:', error)
         this.branches = []

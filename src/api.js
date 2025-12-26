@@ -619,6 +619,28 @@ export const getCompany = () =>
 export const getCompanySummary = () =>
   axios.get(`${BASE_URL}/api/company/summary`);
 
+// Company Expenses (branchId = NULL)
+export const getCompanyExpenses = (params = {}) => {
+  const { page = 1, pageSize = 20 } = params;
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  return axios.get(`${BASE_URL}/api/company/expenses?${queryParams.toString()}`);
+};
+
+// Branch Expenses
+export const getBranchExpenses = (branchId, params = {}) => {
+  const { page = 1, pageSize = 20, startDate, endDate } = params;
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  return axios.get(`${BASE_URL}/api/branches/${branchId}/expenses?${queryParams.toString()}`);
+};
+
 // Expenses
 export const getExpenses = (page = 1, pageSize = 20, search = '') => {
   const params = new URLSearchParams({

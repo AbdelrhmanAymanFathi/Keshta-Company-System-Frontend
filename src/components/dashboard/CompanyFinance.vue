@@ -112,17 +112,19 @@
 
       <!-- Summary Stats Bar -->
       <div :class="['flex items-center justify-end gap-3', isRTL ? 'text-end' : 'text-start']">
-        <!-- <button @click="openDepositModal"
-          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-          {{ $t('finance.deposit') }}
-        </button> -->
-        <!-- <button @click="openWithdrawModal"
-          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-          {{ $t('finance.withdraw') }}
-        </button> -->
         <button @click="openTransferModal"
-          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-          {{ $t('finance.transfer') }}
+          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+          </svg>
+          {{ $t('finance.transfer') || 'Transfer' }}
+        </button>
+        <button @click="openExpenseModal"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          {{ $t('expenses.addExpense') || 'Add Expense' }}
         </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -168,15 +170,15 @@
         </div>
       </div>
 
-      <!-- Transactions Stats Bar -->
+      <!-- Expenses Stats Bar -->
       <div :class="['bg-gray-50 rounded-lg p-4', isRTL ? 'text-end' : 'text-start']">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div :class="['text-sm text-gray-600', isRTL ? 'text-end' : 'text-start']">
-            {{ $t('finance.totalTransactions') }}: <span class="font-semibold">{{ transactions.total }}</span>
+            {{ $t('expenses.totalExpenses') || 'Total Expenses' }}: <span class="font-semibold">{{ expenses.total }}</span>
           </div>
           <div :class="['flex items-center gap-2 text-sm text-gray-600', isRTL ? 'justify-end' : 'justify-start']">
-            <label>{{ $t('finance.pageSize') }}:</label>
-            <select v-model.number="transactions.pageSize" @change="onPageSizeChange"
+            <label>{{ $t('finance.pageSize') || 'Page Size' }}:</label>
+            <select v-model.number="expenses.pageSize" @change="onPageSizeChange"
               class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
               <option :value="10">10</option>
               <option :value="20">20</option>
@@ -204,18 +206,18 @@
         </div>
       </template>
       <template v-else>
-        <!-- Transactions Table -->
+        <!-- Expenses Table -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
           <!-- No Results Message -->
-          <div v-if="transactions.items.length === 0" :class="['text-center py-12', isRTL ? 'text-end' : 'text-start']">
+          <div v-if="expenses.items.length === 0" :class="['text-center py-12', isRTL ? 'text-end' : 'text-start']">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
               </path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('finance.noTransactions') }}</h3>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('expenses.noResults') || 'No expenses found' }}</h3>
             <p class="mt-1 text-sm text-gray-500">
-              {{ $t('finance.noTransactionsDesc') }}
+              {{ $t('expenses.searchBy') || 'Start by adding a new expense' }}
             </p>
           </div>
           <!-- Table -->
@@ -225,66 +227,62 @@
                 <tr>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
-                    {{ $t('finance.date') }}
+                    {{ $t('expenses.date') || 'Date' }}
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
-                    {{ $t('finance.type') }}
+                    {{ $t('expenses.category') || 'Category' }}
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
-                    {{ $t('finance.amount') }}
+                    {{ $t('expenses.description') || 'Description' }}
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
-                    {{ $t('finance.description') }}
+                    {{ $t('expenses.amount') || 'Amount' }}
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
-                    {{ $t('finance.reference') }}
+                    {{ $t('expenses.notes') || 'Notes' }}
                   </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="transaction in transactions.items" :key="transaction.id" class="hover:bg-gray-50">
+                <tr v-for="expense in expenses.items" :key="expense.id" class="hover:bg-gray-50">
                   <td :class="['px-6 py-4 whitespace-nowrap text-sm text-gray-900', isRTL ? 'text-end' : 'text-start']">
-                    {{ formatDate(transaction.date) }}
+                    {{ formatDate(expense.date) }}
                   </td>
                   <td :class="['px-6 py-4 whitespace-nowrap text-sm', isRTL ? 'text-end' : 'text-start']">
-                    <BadgeComponent :variant="getTransactionVariant(transaction.type)">
-                      {{ getTransactionTypeLabel(transaction.type) }}
+                    <BadgeComponent variant="warning">
+                      {{ expense.category || '-' }}
                     </BadgeComponent>
                   </td>
-                  <td
-                    :class="['px-6 py-4 whitespace-nowrap text-sm font-semibold', getAmountColor(transaction.type), isRTL ? 'text-end' : 'text-start']">
-                    {{ formatCurrency(transaction.amount) }}
-                  </td>
                   <td :class="['px-6 py-4 text-sm text-gray-900', isRTL ? 'text-end' : 'text-start']">
-                    {{ transaction.description || '-' }}
+                    {{ expense.description || '-' }}
+                  </td>
+                  <td :class="['px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600', isRTL ? 'text-end' : 'text-start']">
+                    {{ formatCurrency(expense.amount) }}
                   </td>
                   <td :class="['px-6 py-4 text-sm text-gray-500', isRTL ? 'text-end' : 'text-start']">
-                    <span v-if="transaction.refType && transaction.refType !== 'NONE'">
-                      {{ transaction.refType }}: {{ transaction.refId || '-' }}
-                    </span>
-                    <span v-else>-</span>
+                    {{ expense.notes || '-' }}
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <!-- Pagination -->
-          <div v-if="transactions.totalPages > 1"
+          <div v-if="expenses.totalPages > 1"
             :class="['bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6', isRTL ? 'flex-row-reverse' : '']">
             <div :class="['flex-1 flex justify-between sm:hidden', isRTL ? 'flex-row-reverse' : '']">
-              <button @click="changePage(transactions.page - 1)" :disabled="transactions.page <= 1"
+              <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ $t('labels.previous') }}
               </button>
               <span :class="['text-sm text-gray-700 self-center', isRTL ? 'order-2' : '']">
-                {{ transactions.page }} / {{ transactions.totalPages }}
+                {{ expenses.page }} / {{ expenses.totalPages }}
               </span>
-              <button @click="changePage(transactions.page + 1)"
-                :disabled="transactions.page >= transactions.totalPages"
+              <button @click="changePage(expenses.page + 1)"
+                :disabled="expenses.page >= expenses.totalPages"
                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ $t('labels.next') }}
               </button>
@@ -294,12 +292,12 @@
               <div>
                 <p :class="['text-sm text-gray-700', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('labels.showing') }}
-                  <span class="font-medium">{{ ((transactions.page - 1) * transactions.pageSize) + 1 }}</span>
+                  <span class="font-medium">{{ ((expenses.page - 1) * expenses.pageSize) + 1 }}</span>
                   {{ $t('labels.to') }}
-                  <span class="font-medium">{{ Math.min(transactions.page * transactions.pageSize, transactions.total)
+                  <span class="font-medium">{{ Math.min(expenses.page * expenses.pageSize, expenses.total)
                   }}</span>
                   {{ $t('labels.of') }}
-                  <span class="font-medium">{{ transactions.total }}</span>
+                  <span class="font-medium">{{ expenses.total }}</span>
                   {{ $t('labels.results') }}
                 </p>
               </div>
@@ -308,7 +306,7 @@
                   :class="['relative z-0 inline-flex rounded-md shadow-sm -space-x-px', isRTL ? 'flex-row-reverse' : '']">
                   <template v-if="!isRTL">
                     <!-- Previous Button (LTR: left) -->
-                    <button @click="changePage(transactions.page - 1)" :disabled="transactions.page <= 1"
+                    <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -317,8 +315,8 @@
                       </svg>
                     </button>
                     <!-- Next Button (LTR: right) -->
-                    <button @click="changePage(transactions.page + 1)"
-                      :disabled="transactions.page >= transactions.totalPages"
+                    <button @click="changePage(expenses.page + 1)"
+                      :disabled="expenses.page >= expenses.totalPages"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -329,8 +327,8 @@
                   </template>
                   <template v-else>
                     <!-- Next Button (RTL: left, visually first) -->
-                    <button @click="changePage(transactions.page + 1)"
-                      :disabled="transactions.page >= transactions.totalPages"
+                    <button @click="changePage(expenses.page + 1)"
+                      :disabled="expenses.page >= expenses.totalPages"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -339,7 +337,7 @@
                       </svg>
                     </button>
                     <!-- Previous Button (RTL: right, visually last) -->
-                    <button @click="changePage(transactions.page - 1)" :disabled="transactions.page <= 1"
+                    <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -355,44 +353,179 @@
         </div>
       </template>
 
-      <!-- Deposit Modal -->
-      <div v-if="showDepositModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-        @click.self="closeDepositModal">
-        <div
-          :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
-          <div class="mt-3">
-            <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">{{
-              $t('finance.deposit') }}</h3>
-            <form @submit.prevent="handleDeposit" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
+      <!-- Add Expense Modal -->
+      <div v-if="showExpenseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeExpenseModal"></div>
+        <div :class="['bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto', isRTL ? 'direction-rtl' : '']">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 :class="['text-lg font-semibold text-gray-900', isRTL ? 'text-right' : 'text-left']">
+                {{ $t('expenses.addExpense') || 'Add Expense' }}
+              </h3>
+              <button @click="closeExpenseModal" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            <form @submit.prevent="handleCreateExpense" class="grid gap-4 grid-cols-1 md:grid-cols-2">
+              <!-- Date - Column 1 -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {{ $t('finance.amount') }} *
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.date') || 'Date' }} <span class="text-red-500">*</span>
                 </label>
-                <input v-model.number="depositForm.amount" type="number" min="0.01" step="0.01" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input 
+                  v-model="expenseForm.date" 
+                  type="date" 
+                  required
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                />
               </div>
+
+              <!-- Category - Column 2 -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {{ $t('finance.description') }}
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.category') || 'Category' }} <span class="text-red-500">*</span>
                 </label>
-                <input v-model="depositForm.description" type="text"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <select 
+                  v-model="expenseForm.category" 
+                  required
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                >
+                  <option value="">{{ $t('expenses.category') || 'Category' }}</option>
+                  <option value="Travel">{{ $t('expenses.categories.Travel') || 'Travel' }}</option>
+                  <option value="Meals">{{ $t('expenses.categories.Meals') || 'Meals' }}</option>
+                  <option value="Office">{{ $t('expenses.categories.Office') || 'Office' }}</option>
+                  <option value="Equipment">{{ $t('expenses.categories.Equipment') || 'Equipment' }}</option>
+                  <option value="Maintenance">{{ $t('expenses.categories.Maintenance') || 'Maintenance' }}</option>
+                  <option value="Utilities">{{ $t('expenses.categories.Utilities') || 'Utilities' }}</option>
+                  <option value="Marketing">{{ $t('expenses.categories.Marketing') || 'Marketing' }}</option>
+                  <option value="Fuel">{{ $t('expenses.categories.Fuel') || 'Fuel' }}</option>
+                  <option value="Other">{{ $t('expenses.categories.Other') || 'Other' }}</option>
+                </select>
               </div>
+
+              <!-- Description - Full Width -->
+              <div class="col-span-1 md:col-span-2">
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.description') || 'Description' }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  v-model="expenseForm.description" 
+                  type="text" 
+                  required
+                  :placeholder="$t('expenses.description') || 'Description'"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
+
+              <!-- Flow Type - Column 1 -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {{ $t('finance.date') }} *
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.flow') || 'Flow' }} <span class="text-red-500">*</span>
                 </label>
-                <input v-model="depositForm.date" type="date" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <div class="flex gap-2">
+                  <button 
+                    type="button"
+                    @click="expenseForm.flow = 'OUT'; expenseForm.settlementDate = null"
+                    :class="[
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition',
+                      expenseForm.flow === 'OUT' 
+                        ? 'bg-red-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ]"
+                  >
+                    {{ $t('expenses.flowOut') || 'Expense' }}
+                  </button>
+                  <button 
+                    type="button"
+                    @click="expenseForm.flow = 'IN'"
+                    :class="[
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition',
+                      expenseForm.flow === 'IN' 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ]"
+                  >
+                    {{ $t('expenses.flowIn') || 'Income' }}
+                  </button>
+                </div>
               </div>
-              <div class="flex justify-end gap-3 pt-4">
-                <button type="button" @click="closeDepositModal"
-                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
-                  {{ $t('labels.cancel') }}
+
+              <!-- Settlement Date (only for IN/Income) - Column 2 -->
+              <div v-if="expenseForm.flow === 'IN'">
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.settlementDate') || 'Settlement Date' }}
+                </label>
+                <input 
+                  v-model="expenseForm.settlementDate" 
+                  type="date" 
+                  :placeholder="$t('expenses.settlementDatePlaceholder') || 'Settlement date (optional)'"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                />
+                <p :class="['text-xs text-gray-500 mt-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.settlementDateHint') || 'Date when this income will be settled' }}</p>
+              </div>
+
+              <!-- Branch - Column 1 -->
+              <div>
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.branch') || 'Branch' }}
+                </label>
+                <select 
+                  v-model.number="expenseForm.branchId" 
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                >
+                  <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
+                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                </select>
+              </div>
+
+              <!-- Amount - Column 2 -->
+              <div>
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.amount') || 'Amount' }} <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  v-model.number="expenseForm.amount" 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  required
+                  :placeholder="$t('expenses.amount') || 'Amount'"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
+
+              <!-- Notes - Full Width -->
+              <div class="col-span-1 md:col-span-2">
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.notes') || 'Notes' }}
+                </label>
+                <textarea 
+                  v-model="expenseForm.notes" 
+                  rows="2"
+                  :placeholder="$t('expenses.notes') || 'Notes'"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                ></textarea>
+              </div>
+
+              <!-- Buttons - Full Width -->
+              <div :class="['col-span-1 md:col-span-2 flex gap-3 pt-4', isRTL ? 'flex-row-reverse' : '']">
+                <button 
+                  type="button" 
+                  @click="closeExpenseModal"
+                  class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  {{ $t('labels.cancel') || 'Cancel' }}
                 </button>
-                <button type="submit" :disabled="processing"
-                  class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition">
-                  {{ processing ? $t('labels.processing') : $t('finance.deposit') }}
+                <button 
+                  type="submit" 
+                  :disabled="expenseProcessing"
+                  class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  <div v-if="expenseProcessing" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  {{ expenseProcessing ? ($t('labels.processing') || 'Processing...') : ($t('expenses.addExpense') || 'Add Expense') }}
                 </button>
               </div>
             </form>
@@ -432,50 +565,6 @@
       </div>
     </div>
 
-      <!-- Withdraw Modal -->
-      <div v-if="showWithdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-        @click.self="closeWithdrawModal">
-        <div
-          :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
-          <div class="mt-3">
-            <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">{{
-              $t('finance.withdraw') }}</h3>
-            <form @submit.prevent="handleWithdraw" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {{ $t('finance.amount') }} *
-                </label>
-                <input v-model.number="withdrawForm.amount" type="number" min="0.01" step="0.01" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {{ $t('finance.description') }}
-                </label>
-                <input v-model="withdrawForm.description" type="text"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {{ $t('finance.date') }} *
-                </label>
-                <input v-model="withdrawForm.date" type="date" required
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              </div>
-              <div class="flex justify-end gap-3 pt-4">
-                <button type="button" @click="closeWithdrawModal"
-                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
-                  {{ $t('labels.cancel') }}
-                </button>
-                <button type="submit" :disabled="processing"
-                  class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition">
-                  {{ processing ? $t('labels.processing') : $t('finance.withdraw') }}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
 
       <!-- Transfer Modal -->
       <div v-if="showTransferModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
@@ -546,7 +635,7 @@
 <script>
 
 import { ref, onMounted, computed, nextTick } from 'vue'
-import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet, getCompanyTransactions, depositToCompanyWallet, withdrawFromCompanyWallet, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -555,8 +644,6 @@ export default {
   components: { BadgeComponent },
   setup() {
     const financeStore = useCompanyFinanceStore()
-    const showDepositModal = ref(false)
-    const showWithdrawModal = ref(false)
     const showTransferModal = ref(false)
     const showEditBranchModal = ref(false)
     const processing = ref(false)
@@ -572,10 +659,22 @@ export default {
     const audioCtxRef = ref(null)
     const selectedBranch = ref(null)
     const summary = ref({ balance: 0, last30dIn: 0, last30dOut: 0 })
-    const transactions = ref({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 1 })
+    const expenses = ref({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 1 })
+    const loading = ref(false)
+    const error = ref(null)
 
-    const depositForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
-    const withdrawForm = ref({ amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
+    const expenseForm = ref({ 
+      date: new Date().toISOString().split('T')[0], 
+      category: '', 
+      description: '', 
+      amount: 0,
+      notes: '',
+      branchId: null,
+      flow: 'OUT',
+      settlementDate: null
+    })
+    const showExpenseModal = ref(false)
+    const expenseProcessing = ref(false)
     const transferForm = ref({ branchId: null, amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
     const editBranchForm = ref({ name: '' })
     const editBranchTarget = ref(null)
@@ -602,42 +701,46 @@ export default {
       }
     }
 
-    const fetchTransactions = async () => {
-      if (!selectedBranch.value) {
-        // Main company wallet
-        const res = await getCompanyTransactions({
-          page: transactions.value.page,
-          pageSize: transactions.value.pageSize
-        });
-        transactions.value = {
-          items: res.data.items,
-          total: res.data.total,
-          page: res.data.page,
-          pageSize: res.data.pageSize,
-          totalPages: Math.ceil(res.data.total / res.data.pageSize)
+    const fetchExpenses = async () => {
+      loading.value = true
+      error.value = null
+      try {
+        let res
+        if (!selectedBranch.value) {
+          // Main company expenses (branchId = NULL)
+          res = await getCompanyExpenses({
+            page: expenses.value.page,
+            pageSize: expenses.value.pageSize
+          });
+        } else {
+          // Branch expenses
+          res = await getBranchExpenses(selectedBranch.value.id, {
+            page: expenses.value.page,
+            pageSize: expenses.value.pageSize
+          });
+        }
+        expenses.value = {
+          items: res.data.items || res.data.rows || [],
+          total: res.data.total || 0,
+          page: res.data.page || expenses.value.page,
+          pageSize: res.data.pageSize || expenses.value.pageSize,
+          totalPages: Math.ceil((res.data.total || 0) / (res.data.pageSize || expenses.value.pageSize))
         };
-      } else {
-        // Branch wallet
-        const res = await getBranchWalletTransactions(selectedBranch.value.id, {
-          page: transactions.value.page,
-          pageSize: transactions.value.pageSize
-        });
-        transactions.value = {
-          items: res.data.items,
-          total: res.data.total,
-          page: res.data.page,
-          pageSize: res.data.pageSize,
-          totalPages: Math.ceil(res.data.total / res.data.pageSize)
-        };
+      } catch (err) {
+        console.error('Error fetching expenses:', err)
+        error.value = err.response?.data?.message || 'Failed to load expenses'
+        expenses.value = { items: [], total: 0, page: 1, pageSize: expenses.value.pageSize, totalPages: 1 }
+      } finally {
+        loading.value = false
       }
     }
 
     const selectBranch = async (branch) => {
-      // set the selected branch (null = main treasury)
+      // set the selected branch (null = main company)
       selectedBranch.value = branch
-      transactions.value.page = 1
+      expenses.value.page = 1
       await fetchSummary()
-      await fetchTransactions()
+      await fetchExpenses()
     }
 
     // Undo snapshot helper
@@ -771,16 +874,6 @@ export default {
       } catch (e) { }
     }
 
-    const openDepositModal = () => {
-      depositForm.value = { amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
-      showDepositModal.value = true
-    }
-    const closeDepositModal = () => { showDepositModal.value = false }
-    const openWithdrawModal = () => {
-      withdrawForm.value = { amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
-      showWithdrawModal.value = true
-    }
-    const closeWithdrawModal = () => { showWithdrawModal.value = false }
     const openTransferModal = () => {
       transferForm.value = { branchId: null, amount: 0, description: '', date: new Date().toISOString().split('T')[0] }
       showTransferModal.value = true
@@ -847,67 +940,6 @@ export default {
       }
     }
 
-    const handleDeposit = async () => {
-      if (!depositForm.value.amount || depositForm.value.amount <= 0) {
-        if (window.$toast) window.$toast('Please enter a valid amount', 'error')
-        return
-      }
-      processing.value = true
-      try {
-        if (!selectedBranch.value) {
-          // Main company wallet
-          await depositToCompanyWallet({
-            amount: depositForm.value.amount,
-            description: depositForm.value.description,
-            date: depositForm.value.date
-          });
-        } else {
-          // Branch wallet
-          await depositToBranchWallet(selectedBranch.value.id, {
-            amount: depositForm.value.amount,
-            description: depositForm.value.description,
-            date: depositForm.value.date
-          });
-        }
-        await fetchSummary()
-        await fetchTransactions()
-        closeDepositModal()
-        if (window.$toast) window.$toast('Deposit successful', 'success')
-      } catch (error) {
-        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to deposit', 'error')
-      } finally { processing.value = false }
-    }
-
-    const handleWithdraw = async () => {
-      if (!withdrawForm.value.amount || withdrawForm.value.amount <= 0) {
-        if (window.$toast) window.$toast('Please enter a valid amount', 'error')
-        return
-      }
-      processing.value = true
-      try {
-        if (!selectedBranch.value) {
-          // Main company wallet
-          await withdrawFromCompanyWallet({
-            amount: withdrawForm.value.amount,
-            description: withdrawForm.value.description,
-            date: withdrawForm.value.date
-          });
-        } else {
-          // Branch wallet
-          await withdrawFromBranchWallet(selectedBranch.value.id, {
-            amount: withdrawForm.value.amount,
-            description: withdrawForm.value.description,
-            date: withdrawForm.value.date
-          });
-        }
-        await fetchSummary()
-        await fetchTransactions()
-        closeWithdrawModal()
-        if (window.$toast) window.$toast('Withdrawal successful', 'success')
-      } catch (error) {
-        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to withdraw', 'error')
-      } finally { processing.value = false }
-    }
 
     const handleTransfer = async () => {
       if (!transferForm.value.amount || transferForm.value.amount <= 0) {
@@ -937,7 +969,7 @@ export default {
           });
         }
         await fetchSummary()
-        await fetchTransactions()
+        // Note: Transfer is for wallet, expenses are separate, so we don't fetch expenses here
         closeTransferModal()
         if (window.$toast) window.$toast('Transfer successful', 'success')
       } catch (error) {
@@ -946,14 +978,14 @@ export default {
     }
 
     const changePage = async (page) => {
-      if (page >= 1 && page <= transactions.value.totalPages) {
-        transactions.value.page = page
-        await fetchTransactions()
+      if (page >= 1 && page <= expenses.value.totalPages) {
+        expenses.value.page = page
+        await fetchExpenses()
       }
     }
     const onPageSizeChange = async () => {
-      transactions.value.page = 1
-      await fetchTransactions()
+      expenses.value.page = 1
+      await fetchExpenses()
     }
 
     const formatDate = (dateString) => {
@@ -964,24 +996,78 @@ export default {
       const numAmount = parseFloat(amount)
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(numAmount)
     }
-    const getTransactionVariant = (type) => {
-      const variants = { 'DEPOSIT': 'success', 'WITHDRAW': 'danger', 'RENT_INCOME': 'success', 'EXPENSE': 'warning', 'RENT_PAYOUT': 'danger' }
-      return variants[type] || 'info'
+
+    // Expense modal handlers
+    const openExpenseModal = () => {
+      expenseForm.value = { 
+        date: new Date().toISOString().split('T')[0], 
+        category: '', 
+        description: '', 
+        amount: 0,
+        notes: '',
+        branchId: selectedBranch.value ? selectedBranch.value.id : null,
+        flow: 'OUT',
+        settlementDate: null
+      }
+      showExpenseModal.value = true
     }
-    const getTransactionTypeLabel = (type) => {
-      const labels = { 'DEPOSIT': 'Deposit', 'WITHDRAW': 'Withdrawal', 'RENT_INCOME': 'Rental Income', 'EXPENSE': 'Expense', 'RENT_PAYOUT': 'Rental Payout' }
-      return labels[type] || type
+    const closeExpenseModal = () => {
+      showExpenseModal.value = false
+      expenseForm.value = {
+        date: new Date().toISOString().split('T')[0],
+        category: '',
+        description: '',
+        amount: 0,
+        notes: '',
+        branchId: null,
+        flow: 'OUT',
+        settlementDate: null
+      }
     }
-    const getAmountColor = (type) => {
-      if (["DEPOSIT", "RENT_INCOME"].includes(type)) return 'text-green-600'
-      else if (["WITHDRAW", "EXPENSE", "RENT_PAYOUT"].includes(type)) return 'text-red-600'
-      return 'text-gray-900'
+    const handleCreateExpense = async () => {
+      if (!expenseForm.value.amount || expenseForm.value.amount <= 0) {
+        if (window.$toast) window.$toast('Please enter a valid amount', 'error')
+        return
+      }
+      if (!expenseForm.value.category) {
+        if (window.$toast) window.$toast('Please select a category', 'error')
+        return
+      }
+      expenseProcessing.value = true
+      try {
+        const expenseData = {
+          date: expenseForm.value.date,
+          category: expenseForm.value.category,
+          description: expenseForm.value.description,
+          amount: expenseForm.value.amount,
+          flow: expenseForm.value.flow || 'OUT',
+          notes: expenseForm.value.notes || undefined
+        }
+        // Include branchId only if a branch is selected (not null)
+        // If branchId is null, don't include it (will be NULL for company expenses)
+        if (expenseForm.value.branchId !== null) {
+          expenseData.branchId = expenseForm.value.branchId
+        }
+        // Include settlementDate only for IN flow and when provided
+        if (expenseForm.value.flow === 'IN' && expenseForm.value.settlementDate) {
+          expenseData.settlementDate = expenseForm.value.settlementDate
+        }
+        await createExpense(expenseData)
+        await fetchExpenses()
+        await fetchSummary()
+        closeExpenseModal()
+        if (window.$toast) window.$toast('Expense created successfully', 'success')
+      } catch (error) {
+        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to create expense', 'error')
+      } finally {
+        expenseProcessing.value = false
+      }
     }
 
     onMounted(async () => {
       await fetchBranches()
       await fetchSummary()
-      await fetchTransactions()
+      await fetchExpenses()
     })
 
     // Add isRTL computed property
@@ -995,32 +1081,28 @@ export default {
       return false
     })
 
-    return {
+      return {
       branches,
       sublistOpen,
       selectedBranch,
       summary,
-      transactions,
-      showDepositModal,
-      showWithdrawModal,
-      processing,
-      depositForm,
-      withdrawForm,
+      expenses,
       editBranchForm,
-      openDepositModal,
-      closeDepositModal,
-      openWithdrawModal,
-      closeWithdrawModal,
+      expenseForm,
+      showExpenseModal,
+      expenseProcessing,
+      openExpenseModal,
+      closeExpenseModal,
+      handleCreateExpense,
       openTransferModal,
       closeTransferModal,
       openEditBranch,
       closeEditBranchModal,
-      handleDeposit,
-      handleWithdraw,
       handleTransfer,
       handleEditBranch,
       transferForm,
       showTransferModal,
+      processing,
       // drag & drop / sidebar helpers
       onDragStart,
       onDragEnter,
@@ -1040,16 +1122,14 @@ export default {
       onPageSizeChange,
       formatDate,
       formatCurrency,
-      getTransactionVariant,
-      getTransactionTypeLabel,
-      getAmountColor,
       selectBranch,
       isRTL,
       // Expose loading and error for template
-      loading: financeStore.loading,
-      error: financeStore.error,
+      loading,
+      error,
       showEditBranchModal,
-      editBranchProcessing
+      editBranchProcessing,
+      fetchExpenses
     }
   }
 }
@@ -1058,6 +1138,17 @@ export default {
 </script>
 
 <style scoped>
+.direction-rtl {
+  direction: rtl;
+}
+
+.direction-rtl input,
+.direction-rtl select,
+.direction-rtl textarea {
+  direction: rtl;
+  text-align: right;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: all .15s ease;
