@@ -404,6 +404,8 @@ export const withdrawFromBranchWallet = (branchId, data) =>
   axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/withdraw`, data);
 export const transferFromBranchToCompany = (branchId, data) =>
   axios.post(`${BASE_URL}/api/branches/${branchId}/wallet/transfer-to-company`, data);
+export const transferFromBranchToBranch = (fromBranchId, data) =>
+  axios.post(`${BASE_URL}/api/branches/${fromBranchId}/wallet/transfer-to-branch`, data);
 
 // Vehicles
 export const getVehicles = (params = {}) => {

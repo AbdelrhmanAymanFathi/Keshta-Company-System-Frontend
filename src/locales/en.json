@@ -472,6 +472,9 @@
     "transfer": "Transfer",
     "transferToBranch": "Transfer to Branch",
     "transferToCompany": "Transfer to Main Treasury",
+    "transferType": "Transfer Type",
+    "fromBranch": "From Branch",
+    "to": "To",
     "selectBranch": "Select Branch",
     "transferAmount": "Transfer Amount"
   },

@@ -472,6 +472,9 @@
     "transfer": "تحويل",
     "transferToBranch": "تحويل إلى فرع",
     "transferToCompany": "تحويل إلى الخزينة الرئيسية",
+    "transferType": "نوع التحويل",
+    "fromBranch": "من الفرع",
+    "to": "إلى",
     "selectBranch": "اختر الفرع",
     "transferAmount": "مبلغ التحويل"
   },
