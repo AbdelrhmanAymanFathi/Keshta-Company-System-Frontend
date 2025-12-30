@@ -303,6 +303,14 @@ export const updateContractor = (id, data) => {
 export const deleteContractor = (id) =>
   axios.delete(`${BASE_URL}/api/contractors/${id}`);
 
+// Suppliers (used by petroleum supplies)
+export const getSuppliers = (params = {}) => {
+  const { page = 1, pageSize = 50, q = '' } = params;
+  const queryParams = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+  if (q) queryParams.append('q', q);
+  return axios.get(`${BASE_URL}/api/suppliers?${queryParams.toString()}`);
+};
+
 // Contractor Wallet APIs
 export const getContractorWallet = (contractorId) =>
   axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet`);
@@ -338,6 +346,57 @@ export const getContractorReportData = async (contractorId, params = {}, format 
 
 export const downloadContractorReport = async (contractorId, params = {}, format = 'xlsx') => {
   return getContractorReportData(contractorId, params, format);
+};
+
+// ------------------------- Petroleum Supplies APIs -------------------------
+export const getPetroleumSupplies = (params = {}) => {
+  const {
+    page = 1,
+    pageSize = 20,
+    q = '',
+    warehouseId,
+    supplierId,
+    transportContractorId,
+    startDate,
+    endDate
+  } = params;
+
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  if (q) queryParams.append('q', q);
+  if (warehouseId) queryParams.append('warehouseId', warehouseId.toString());
+  if (supplierId) queryParams.append('supplierId', supplierId.toString());
+  if (transportContractorId) queryParams.append('transportContractorId', transportContractorId.toString());
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+
+  return axios.get(`${BASE_URL}/api/petroleum-supplies?${queryParams.toString()}`);
+};
+
+export const getPetroleumSupply = (id) =>
+  axios.get(`${BASE_URL}/api/petroleum-supplies/${id}`);
+
+export const createPetroleumSupply = (data) =>
+  axios.post(`${BASE_URL}/api/petroleum-supplies`, data);
+
+export const updatePetroleumSupply = (id, data) =>
+  axios.patch(`${BASE_URL}/api/petroleum-supplies/${id}`, data);
+
+export const deletePetroleumSupply = (id) =>
+  axios.delete(`${BASE_URL}/api/petroleum-supplies/${id}`);
+
+export const exportPetroleumReport = async (params = {}, format = 'xlsx') => {
+  const url = `${BASE_URL}/api/petroleum-supplies/report`;
+  const axiosParams = { ...params, format };
+  if (format === 'json') {
+    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+  // csv / xlsx
+  const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+  return { data: resp.data, headers: resp.headers };
 };
 
 // Crushers

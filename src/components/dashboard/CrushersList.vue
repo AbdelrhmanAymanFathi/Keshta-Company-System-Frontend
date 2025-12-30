@@ -288,7 +288,7 @@ export default {
     this.loadCrushers()
     document.addEventListener('click', this.closeContextMenu)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {

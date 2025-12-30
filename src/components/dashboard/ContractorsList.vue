@@ -370,7 +370,7 @@ export default {
     this.loadContractors()
     document.addEventListener('click', this.closeContextMenu)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {

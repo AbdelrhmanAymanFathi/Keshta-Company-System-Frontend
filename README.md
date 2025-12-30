@@ -46,6 +46,10 @@ EN: Core features: | AR: المميزات الأساسية:
   - EN: Fields for location, date, contractor, vehicle, etc. | AR: حقول للموقع، التاريخ، المقاول، السيارة، إلخ.
   - EN: Buttons for add row, save, cancel | AR: أزرار لإضافة صف، حفظ، إلغاء
 
+- **Petroleum Supplies** | **توريدات البترومين**
+  - EN: List, create/edit form, and export reports (Excel) | AR: قائمة، نموذج إضافة/تعديل، وتصدير تقارير (إكسل)
+  - EN: API integration at `/api/petroleum-supplies` with filters and pagination | AR: تكامل API على `/api/petroleum-supplies` مع فلاتر وترقيم صفحات
+
 ## 🏛 Architecture / البنية
 
 EN: The system follows a modern Vue 3 architecture: | AR: يتبع النظام بنية Vue 3 حديثة:

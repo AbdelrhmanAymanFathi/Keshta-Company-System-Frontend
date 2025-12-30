@@ -151,6 +151,9 @@ import CrushersList from './CrushersList.vue'
 import VehiclesList from './VehiclesList.vue'
 import TransportList from './TransportList.vue'
 import TransportReport from './TransportReportNew.vue'
+import PetroleumList from './PetroleumList.vue'
+import NewPetroleumSupply from './NewPetroleumSupply.vue'
+import PetroleumReport from './PetroleumReport.vue'
 import ExpensesReport from './ExpensesReportNew.vue'
 import RentalList from './RentalList.vue'
 import RentalReport from './RentalReport.vue'
@@ -168,6 +171,7 @@ export default {
   components: {
     NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
     DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
+    PetroleumList, NewPetroleumSupply, PetroleumReport,
     RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
     CompanyTransactions, ChangesByDate, UsersList, AuthLogout, ComponentNotFound
   },
@@ -177,7 +181,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', /*expenses: 'expenses' ,*/ equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
+      topMenus: { supplies: 'supplies', petroleum: 'petroleum', transport: 'transport', /*expenses: 'expenses' ,*/ equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
       selectedTop: localStorage.getItem('dashboard-selectedTop') || 'supplies',
       menuMap: {
         supplies: [
@@ -190,6 +194,12 @@ export default {
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' },
           { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' }
         ],
+        petroleum: [
+          { name: 'petroleumList', label: 'dashboard.petroleumList', component: 'PetroleumList' },
+          { name: 'newPetroleumSupply', label: 'dashboard.newPetroleumSupply', component: 'NewPetroleumSupply' },
+          { name: 'petroleumReport', label: 'dashboard.petroleumReport', component: 'PetroleumReport' }
+        ],
+
         transport: [
           { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' },
           { name: 'transportReport', label: 'transport.reportMenu', component: 'TransportReport' }
@@ -235,6 +245,7 @@ export default {
       const mapping = {
         NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
         DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
+        PetroleumList, NewPetroleumSupply, PetroleumReport,
         RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, CompanyTransactions,
         ChangesByDate, UsersList
       }
@@ -306,7 +317,7 @@ export default {
     toggleSidebar() { this.sidebarOpen = !this.sidebarOpen },
     toggleCollapsed() { if (!this.isMobile) this.collapsedSidebar = !this.collapsedSidebar },
     toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
-    navigateToReport() { this.selectedVertical = 'rentalReport' },
+    navigateToReport(name = 'rentalReport') { this.selectedVertical = name },
     navigateToStatement(contractorId) {
       this.selectedTop = 'supplies'
       localStorage.setItem('dashboard-selectedTop', 'supplies')
@@ -339,6 +350,9 @@ export default {
         expensesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
         rentalList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
         companyWallet: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
+        petroleumList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3v6a6 6 0 0012 0V3h-2v6a4 4 0 01-8 0V3H6z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8v-2H8v2z"/></svg>`,
+        newPetroleumSupply: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>`,
+        petroleumReport: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10"/></svg>`,
         changesByDate: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
         usersList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,
         default: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8m-4-4h8" stroke-width="2"/></svg>`
