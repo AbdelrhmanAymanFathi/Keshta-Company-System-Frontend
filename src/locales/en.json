@@ -1,5 +1,9 @@
 {
   "appName": "Keshta Company System",
+  "transactions": "Transactions",
+  "noTransactions": "No transactions",
+  "transfer": "Transfer",
+  "#": "#",
   "navbar": {
     "supplies": "Supplies",
     "transport": "Transport",
@@ -110,6 +114,7 @@
     "amount": "Amount",
     "description": "Description",
     "deposit": "Deposit",
+    "withdraw": "Withdraw",
     "endDate": "End Date",
     "filters": "Filters",
     "clear": "Clear",
@@ -495,6 +500,7 @@
     }
   },
   "expenses": {
+    "expense": "Expense",
     "addCategory": "Add Category",
     "addBranch": "Add Branch",
     "addLocation": "Add Location",

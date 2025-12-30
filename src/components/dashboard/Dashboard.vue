@@ -156,6 +156,7 @@ import RentalList from './RentalList.vue'
 import RentalReport from './RentalReport.vue'
 import ExpensesList from './ExpensesList.vue'
 import CompanyFinance from './CompanyFinance.vue'
+import CompanyTransactions from './CompanyTransactions.vue'
 import ChangesByDate from './ChangesByDate.vue'
 import UsersList from './UsersList.vue'
 import AuthLogout from '../auth/Logout.vue'
@@ -168,7 +169,7 @@ export default {
     NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
     DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
     RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
-    ChangesByDate, UsersList, AuthLogout, ComponentNotFound
+    CompanyTransactions, ChangesByDate, UsersList, AuthLogout, ComponentNotFound
   },
   setup() {
     const { logout: authLogout, user } = useAuth()
@@ -202,8 +203,8 @@ export default {
           { name: 'rentalReport', label: 'rental.reportMenu', component: 'RentalReport' }
         ],
         companyWallet: [
-          { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' }
-          ,
+          { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' },
+          { name: 'companyTransactions', label: 'transactions', component: 'CompanyTransactions' },
           { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
           { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
         ],
@@ -234,7 +235,7 @@ export default {
       const mapping = {
         NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
         DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
-        RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
+        RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, CompanyTransactions,
         ChangesByDate, UsersList
       }
       return mapping[this.currentItem.component] || ComponentNotFound

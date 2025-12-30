@@ -1,5 +1,9 @@
 {
   "appName": "نظام شركة قشطة",
+  "transactions": "المعاملات",
+  "noTransactions": "لا توجد معاملات",
+  "transfer": "تحويل",
+  "#": "#",
   "navbar": {
     "supplies": "التوريدات",
     "transport": "النقل",
@@ -110,6 +114,7 @@
     "amount": "المبلغ",
     "description": "الوصف",
     "deposit": "إيداع",
+    "withdraw": "سحب",
     "endDate": "تاريخ النهاية",
     "filters": "عوامل التصفية",
     "clear": "مسح",
@@ -495,6 +500,7 @@
     }
   },
   "expenses": {
+    "expense": "مصروف",
     "addCategory": "إضافة فئة",
     "addBranch": "إضافة فرع",
     "addLocation": "إضافة موقع",
