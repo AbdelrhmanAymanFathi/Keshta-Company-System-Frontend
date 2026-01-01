@@ -471,11 +471,12 @@
             <!-- Location - Column 2 -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.location') || 'Location' }}
+                {{ $t('expenses.location') || 'Location' }} <span class="text-red-500">*</span>
               </label>
               <div class="flex gap-2">
                 <select 
                   v-model="form.locationId" 
+                  required
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   :class="isRTL ? 'text-right' : 'text-left'"
                 >
@@ -484,6 +485,14 @@
                 </select>
                 <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
               </div>
+            </div>
+
+            <!-- Classification - optional -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.classification') || 'Classification' }}
+              </label>
+              <input v-model="form.classification" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'" />
             </div>
 
             <!-- Amount - Column 2 -->
@@ -726,7 +735,8 @@ export default {
         flow: 'OUT',
         branchId: null,
         locationId: null,
-        settlementDate: null
+        settlementDate: null,
+        classification: ''
       },
       deleteConfirm: { open: false, item: null },
       currentPage: 1,
@@ -904,6 +914,7 @@ export default {
         flow: expense.flow || 'OUT',
         branchId: expense.branchId || null,
         locationId: expense.locationId || null,
+        classification: expense.classification || '',
         notes: expense.notes || '',
         settlementDate: expense.settlementDate || null
       }
@@ -939,7 +950,9 @@ export default {
           amount: parseFloat(this.form.amount),
           flow: this.form.flow || 'OUT',
           branchId: this.form.branchId || null,
-          locationId: this.form.locationId || null,
+          // send the selected locationId (required and validated)
+          locationId: this.form.locationId,
+          classification: this.form.classification || undefined,
           notes: this.form.notes || ''
         }
         
@@ -990,8 +1003,11 @@ export default {
                 date: expenseData.date + 'T00:00:00.000Z',
                 category: expenseData.category,
                 description: expenseData.description,
-                amount: expenseData.amount.toString(),
-                notes: expenseData.notes,
+                  amount: expenseData.amount.toString(),
+                  notes: expenseData.notes,
+                  location: this.locations.find(l => l.id === expenseData.locationId) || null,
+                  locationId: expenseData.locationId,
+                  classification: expenseData.classification || '' ,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               }
@@ -1033,6 +1049,10 @@ export default {
       }
       if (!this.form.category) {
         this.showError(this.$t('expenses.validation.categoryRequired'))
+        return false
+      }
+      if (this.form.locationId === null) {
+        this.showError((this.$t('expenses.location') || 'Location') + ' ' + (this.$t('common.required') || 'is required'))
         return false
       }
       // Check if category is valid

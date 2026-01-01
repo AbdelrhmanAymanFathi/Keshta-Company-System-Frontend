@@ -172,6 +172,62 @@
 
       <!-- Expenses Stats Bar -->
       <div :class="['bg-gray-50 rounded-lg p-4', isRTL ? 'text-end' : 'text-start']">
+        <!-- Filters row -->
+        <div :class="['flex flex-col md:flex-row gap-3 items-center mb-3', isRTL ? 'text-end' : 'text-start']">
+          <div :class="['flex-1 flex flex-wrap gap-2 items-center', isRTL ? 'justify-end' : 'justify-start']">
+            <input
+              v-model="expensesFilters.q"
+              @keyup.enter="expenses.value.page = 1; fetchExpenses()"
+              :placeholder="$t('labels.search') || 'Search'"
+              :disabled="loading"
+              :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-auto', isRTL ? 'text-right' : 'text-left']"
+            />
+
+            <div class="flex flex-col">
+              <label :class="['text-xs text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.fromDate') || $t('labels.startDate') || 'From Date' }}</label>
+              <input
+                v-model="expensesFilters.startDate"
+                type="date"
+                :disabled="loading"
+                :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+              />
+            </div>
+
+            <div class="flex flex-col">
+              <label :class="['text-xs text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.toDate') || $t('labels.endDate') || 'To Date' }}</label>
+              <input
+                v-model="expensesFilters.endDate"
+                type="date"
+                :disabled="loading"
+                :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+              />
+            </div>
+
+            <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
+              <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
+              <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+            </select>
+
+            <input
+              v-model="expensesFilters.classification"
+              type="text"
+              :placeholder="$t('expenses.classification') || 'Classification'"
+              :disabled="loading"
+              :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+            />
+          </div>
+
+          <div class="flex gap-2 items-center">
+            <button type="button" @click="clearExpensesFilters" :disabled="loading"
+              class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
+              {{ $t('labels.clear') || 'Clear' }}
+            </button>
+            <div v-if="loading" class="ml-2">
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div :class="['text-sm text-gray-600', isRTL ? 'text-end' : 'text-start']">
             {{ $t('expenses.totalExpenses') || 'Total Expenses' }}: <span class="font-semibold">{{ expenses.total }}</span>
@@ -186,6 +242,37 @@
               <option :value="100">100</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      <!-- Expenses Summary -->
+      <div :class="['grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 my-4', isRTL ? 'text-end' : 'text-start']">
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAll }} {{ $t('labels.results') || 'records' }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalMasrouf') || 'Immediate (Masrouf)' }}</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalMasrouf) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countMasrouf }} {{ $t('labels.results') || 'records' }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-400">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalAhd') || 'Deferred (Ahd)' }}</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAhd) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAhd }} {{ $t('labels.results') || 'records' }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalOut') || 'Total Out' }}</p>
+          <p class="text-xl font-semibold text-red-600 mt-1">{{ formatCurrency(expensesSummary.totalOut) }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalIn') || 'Total In' }}</p>
+          <p class="text-xl font-semibold text-green-600 mt-1">{{ formatCurrency(expensesSummary.totalIn) }}</p>
         </div>
       </div>
 
@@ -481,6 +568,34 @@
                 </select>
               </div>
 
+              <!-- Location - Column 2 (required) -->
+              <div>
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.location') || 'Location' }} <span class="text-red-500">*</span>
+                </label>
+                <select 
+                  v-model.number="expenseForm.locationId"
+                  required
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                >
+                  <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
+                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                </select>
+              </div>
+
+              <!-- Classification - optional -->
+              <div>
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                  {{ $t('expenses.classification') || 'Classification' }}
+                </label>
+                <input
+                  v-model="expenseForm.classification"
+                  type="text"
+                  :placeholder="$t('expenses.classification') || 'Classification'"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
+
               <!-- Amount - Column 2 -->
               <div>
                 <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
@@ -718,8 +833,8 @@
 
 <script>
 
-import { ref, onMounted, computed, nextTick } from 'vue'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { ref, onMounted, computed, nextTick, watch } from 'vue'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpensesSummary, getLocations, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -755,7 +870,25 @@ export default {
       notes: '',
       branchId: null,
       flow: 'OUT',
-      settlementDate: null
+      settlementDate: null,
+      locationId: null,
+      classification: ''
+    })
+    // Locations for the location select
+    const locations = ref([])
+
+    // Filters used when fetching expenses and the summary (kept simple for now)
+    const expensesFilters = ref({ q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null })
+
+    const expensesSummary = ref({
+      countAll: 0,
+      countMasrouf: 0,
+      countAhd: 0,
+      totalAll: '0.00',
+      totalMasrouf: '0.00',
+      totalAhd: '0.00',
+      totalOut: '0.00',
+      totalIn: '0.00'
     })
     const showExpenseModal = ref(false)
     const expenseProcessing = ref(false)
@@ -769,6 +902,15 @@ export default {
         // normalize branch objects with pinned flag and _dropped visual flag
         branches.value = (res.data || []).map(b => ({ ...b, pinned: !!b.pinned, _dropped: false }))
       } catch (e) { branches.value = [] }
+    }
+
+    const fetchLocations = async () => {
+      try {
+        const res = await getLocations()
+        locations.value = res.data || []
+      } catch (e) {
+        locations.value = []
+      }
     }
 
     const fetchSummary = async () => {
@@ -789,19 +931,28 @@ export default {
       loading.value = true
       error.value = null
       try {
+        // Helper: remove empty values from query params (backend dislikes empty strings)
+        const cleanParams = (obj) => Object.fromEntries(Object.entries(obj || {}).filter(([k, v]) => v !== '' && v !== null && v !== undefined))
+
+        // Build params for list (paginated) and clean them
+        const listParams = cleanParams({
+          page: expenses.value.page,
+          pageSize: expenses.value.pageSize,
+          q: expensesFilters.value.q,
+          category: expensesFilters.value.category,
+          startDate: expensesFilters.value.startDate,
+          endDate: expensesFilters.value.endDate,
+          classification: expensesFilters.value.classification,
+          locationId: expensesFilters.value.locationId
+        })
+
         let res
         if (!selectedBranch.value) {
           // Main company expenses (branchId = NULL)
-          res = await getCompanyExpenses({
-            page: expenses.value.page,
-            pageSize: expenses.value.pageSize
-          });
+          res = await getCompanyExpenses(listParams);
         } else {
           // Branch expenses
-          res = await getBranchExpenses(selectedBranch.value.id, {
-            page: expenses.value.page,
-            pageSize: expenses.value.pageSize
-          });
+          res = await getBranchExpenses(selectedBranch.value.id, listParams);
         }
         expenses.value = {
           items: res.data.items || res.data.rows || [],
@@ -810,6 +961,23 @@ export default {
           pageSize: res.data.pageSize || expenses.value.pageSize,
           totalPages: Math.ceil((res.data.total || 0) / (res.data.pageSize || expenses.value.pageSize))
         };
+        // Fetch expenses summary (same filters but without pagination)
+        try {
+          const rawSummary = {
+            q: expensesFilters.value.q,
+            category: expensesFilters.value.category,
+            startDate: expensesFilters.value.startDate,
+            endDate: expensesFilters.value.endDate,
+            classification: expensesFilters.value.classification,
+            locationId: expensesFilters.value.locationId
+          }
+          if (selectedBranch.value && selectedBranch.value.id) rawSummary.branchId = selectedBranch.value.id
+          const summaryParams = cleanParams(rawSummary)
+          const s = await getExpensesSummary(summaryParams)
+          expensesSummary.value = { ...expensesSummary.value, ...(s || {}) }
+        } catch (err2) {
+          console.error('Error fetching expenses summary:', err2)
+        }
       } catch (err) {
         console.error('Error fetching expenses:', err)
         error.value = err.response?.data?.message || 'Failed to load expenses'
@@ -1137,6 +1305,8 @@ export default {
         amount: 0,
         notes: '',
         branchId: selectedBranch.value ? selectedBranch.value.id : null,
+        locationId: null,
+        classification: '',
         flow: 'OUT',
         settlementDate: null
       }
@@ -1151,6 +1321,8 @@ export default {
         amount: 0,
         notes: '',
         branchId: null,
+        locationId: null,
+        classification: '',
         flow: 'OUT',
         settlementDate: null
       }
@@ -1162,6 +1334,18 @@ export default {
       }
       if (!expenseForm.value.category) {
         if (window.$toast) window.$toast('Please select a category', 'error')
+        return
+      }
+      if (!expenseForm.value.description || !String(expenseForm.value.description).trim()) {
+        if (window.$toast) window.$toast('Please enter a description', 'error')
+        return
+      }
+      if (!expenseForm.value.date) {
+        if (window.$toast) window.$toast('Please select a date', 'error')
+        return
+      }
+      if (expenseForm.value.locationId === null) {
+        if (window.$toast) window.$toast('Please select a location', 'error')
         return
       }
       expenseProcessing.value = true
@@ -1178,6 +1362,13 @@ export default {
         // If branchId is null, don't include it (will be NULL for company expenses)
         if (expenseForm.value.branchId !== null) {
           expenseData.branchId = expenseForm.value.branchId
+        }
+        // Include locationId (required for backend)
+        if (expenseForm.value.locationId !== null) {
+          expenseData.locationId = expenseForm.value.locationId
+        }
+        if (expenseForm.value.classification) {
+          expenseData.classification = expenseForm.value.classification
         }
         // Include settlementDate only for IN flow and when provided
         if (expenseForm.value.flow === 'IN' && expenseForm.value.settlementDate) {
@@ -1198,6 +1389,7 @@ export default {
     onMounted(async () => {
       await fetchBranches()
       await fetchSummary()
+      await fetchLocations()
       await fetchExpenses()
     })
 
@@ -1221,6 +1413,18 @@ export default {
       // Exclude current branch from the list
       return branches.value.filter(branch => branch.id !== selectedBranch.value.id)
     })
+
+    // Re-fetch expenses when filters change
+    watch(expensesFilters, async () => {
+      expenses.value.page = 1
+      await fetchExpenses()
+    }, { deep: true })
+
+    const clearExpensesFilters = async () => {
+      expensesFilters.value = { q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null }
+      expenses.value.page = 1
+      await fetchExpenses()
+    }
 
       return {
       branches,
@@ -1269,6 +1473,10 @@ export default {
       // Expose loading and error for template
       loading,
       error,
+      locations,
+      expensesSummary,
+      expensesFilters,
+      clearExpensesFilters,
       showEditBranchModal,
       editBranchProcessing,
       fetchExpenses

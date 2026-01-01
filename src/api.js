@@ -734,6 +734,12 @@ export const getExpensesReportData = async (params = {}, format = 'json') => {
   }
 };
 
+// Expenses Summary - totals for all rows matching filters (not paginated)
+export const getExpensesSummary = async (params = {}) => {
+  const resp = await axios.get(`${BASE_URL}/api/expenses/summary`, { params });
+  return resp.data;
+};
+
 export const downloadExpensesReport = async (params = {}) => {
   return getExpensesReportData(params, 'xlsx');
 };
