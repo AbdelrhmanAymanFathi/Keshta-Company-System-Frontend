@@ -107,30 +107,42 @@
     <div v-else class="bg-white shadow-sm rounded-lg overflow-hidden">
       <div class="px-4 py-3 text-sm text-gray-600">{{ $t('expenses.reportDescription') }}</div>
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 table-auto">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.date') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.category') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.description') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.date') }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.type') || 'Type' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.location') || 'Location' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.category') || 'Category' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.classification') || 'Classification' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.description') || 'Description' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') || 'Amount' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.notes') || 'Notes' }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
             <tr v-for="(expense, index) in items" :key="expense.ID || expense.id || index" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense['التاريخ'] || expense.date || expense.expenseDate ? (expense['التاريخ'] || formatDate(expense.date || expense.expenseDate)) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <Badge :variant="getCategoryVariant(expense['الفئة'] || expense.category)">
-                  {{ expense['الفئة'] || expense.category || '-' }}
-                </Badge>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.id || expense.ID || index + 1 }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.type || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.settlementDate || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900" style="display: table-cell !important;">{{ expense.branch || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.locationName || expense.location?.name || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <Badge :variant="getCategoryVariant(expense.category)">{{ expense.category || '-' }}</Badge>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ expense['الوصف'] || expense.description || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense['المبلغ'] || expense.amount || 0) }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.classification || '-' }}</td>
+              <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.description || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense.amount || expense.total || 0) }}</td>
+              <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.notes || '-' }}</td>
             </tr>
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500">{{ $t('labels.noData') }}</td>
+              <td colspan="11" class="px-6 py-8 text-center text-sm text-gray-500">{{ $t('labels.noData') }}</td>
             </tr>
           </tbody>
         </table>
