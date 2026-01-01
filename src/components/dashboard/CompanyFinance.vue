@@ -220,6 +220,40 @@
             </div>
           </div>
 
+          <!-- Field Modal (Add Category/Branch/Location) -->
+          <div v-if="fieldModal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="z-index:1050;">
+            <div class="fixed inset-0 bg-black bg-opacity-50 z-40" @click="closeFieldModal"></div>
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
+              <div class="p-6">
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold text-gray-900">
+                    <span v-if="fieldModal.type === 'category'">{{ $t('expenses.addCategory') || 'Add Category' }}</span>
+                    <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
+                    <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
+                  </h3>
+                </div>
+                <form @submit.prevent="saveFieldModal">
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      <span v-if="fieldModal.type === 'category'">{{ $t('expenses.enterCategoryName') || 'Category Name' }}</span>
+                      <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.enterBranchName') || 'Branch Name' }}</span>
+                      <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.enterLocationName') || 'Location Name' }}</span>
+                    </label>
+                    <input v-model="fieldModal.name" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                  </div>
+                  <div v-if="fieldModal.type === 'branch'" class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
+                    <input v-model="fieldModal.category" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                  </div>
+                  <div class="flex gap-2 mt-6">
+                    <button type="button" @click="closeFieldModal" class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
+                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">{{ $t('labels.save') }}</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
           <div class="flex gap-2 items-center">
             <button type="button" @click="clearExpensesFilters" :disabled="loading"
               class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
@@ -449,22 +483,17 @@
                 <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.category') || 'Category' }} <span class="text-red-500">*</span>
                 </label>
-                <select 
-                  v-model="expenseForm.category" 
-                  required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
-                >
-                  <option value="">{{ $t('expenses.category') || 'Category' }}</option>
-                  <option value="Travel">{{ $t('expenses.categories.Travel') || 'Travel' }}</option>
-                  <option value="Meals">{{ $t('expenses.categories.Meals') || 'Meals' }}</option>
-                  <option value="Office">{{ $t('expenses.categories.Office') || 'Office' }}</option>
-                  <option value="Equipment">{{ $t('expenses.categories.Equipment') || 'Equipment' }}</option>
-                  <option value="Maintenance">{{ $t('expenses.categories.Maintenance') || 'Maintenance' }}</option>
-                  <option value="Utilities">{{ $t('expenses.categories.Utilities') || 'Utilities' }}</option>
-                  <option value="Marketing">{{ $t('expenses.categories.Marketing') || 'Marketing' }}</option>
-                  <option value="Fuel">{{ $t('expenses.categories.Fuel') || 'Fuel' }}</option>
-                  <option value="Other">{{ $t('expenses.categories.Other') || 'Other' }}</option>
-                </select>
+                <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
+                  <select
+                    v-model="expenseForm.category"
+                    required
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  >
+                    <option value="">{{ $t('expenses.category') || 'Category' }}</option>
+                    <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                  </select>
+                  <button type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                </div>
               </div>
 
               <!-- Description - Full Width -->
@@ -808,6 +837,7 @@
 <script>
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpensesSummary, getLocations, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
@@ -853,6 +883,39 @@ export default {
 
     // Filters used when fetching expenses and the summary (kept simple for now)
     const expensesFilters = ref({ q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null })
+
+    // Categories + inline add modal (mirrors ExpensesList.vue UX)
+    const extraCategories = ref({})
+    const fieldModal = ref({ open: false, type: '', name: '', category: '' })
+    const { t, tm, locale } = useI18n()
+
+    const categories = computed(() => {
+      const base = (tm && tm('expenses.categories')) || {}
+      return { ...base, ...extraCategories.value }
+    })
+
+    const categoryOptions = computed(() => {
+      const cats = categories.value || {}
+      return Object.keys(cats).map(key => ({ value: key, label: cats[key] }))
+    })
+
+    const addCategoryPrompt = () => { fieldModal.value = { open: true, type: 'category', name: '', category: '' } }
+    const closeFieldModal = () => { fieldModal.value = { open: false, type: '', name: '', category: '' } }
+    const saveFieldModal = async () => {
+      if (!fieldModal.value.name) {
+        if (window.$toast) window.$toast(t('expenses.enterCategoryName') || 'Please enter a category name', 'error')
+        return
+      }
+      if (fieldModal.value.type === 'category') {
+        extraCategories.value = { ...extraCategories.value, [fieldModal.value.name]: fieldModal.value.name }
+        // Auto-select the newly created category in the expense form
+        expenseForm.value.category = fieldModal.value.name
+        if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
+        closeFieldModal()
+        return
+      }
+      closeFieldModal()
+    }
 
     const expensesSummary = ref({
       countAll: 0,
@@ -1310,6 +1373,12 @@ export default {
         if (window.$toast) window.$toast('Please select a category', 'error')
         return
       }
+      // Ensure the selected category exists in current categories (including user-added)
+      const validCats = Object.keys(categories.value || {})
+      if (!validCats.includes(expenseForm.value.category)) {
+        if (window.$toast) window.$toast('Invalid category selected', 'error')
+        return
+      }
       if (!expenseForm.value.description || !String(expenseForm.value.description).trim()) {
         if (window.$toast) window.$toast('Please enter a description', 'error')
         return
@@ -1454,6 +1523,15 @@ export default {
       showEditBranchModal,
       editBranchProcessing,
       fetchExpenses
+      ,
+      // Category helpers and inline-add modal
+      extraCategories,
+      fieldModal,
+      categories,
+      categoryOptions,
+      addCategoryPrompt,
+      saveFieldModal,
+      closeFieldModal
     }
   }
 }
