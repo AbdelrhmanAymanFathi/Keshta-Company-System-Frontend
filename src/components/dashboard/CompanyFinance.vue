@@ -127,46 +127,33 @@
           {{ $t('expenses.addExpense') || 'Add Expense' }}
         </button>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div
-          :class="['bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600', isRTL ? 'text-end' : 'text-start']">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('finance.currentBalance') }}</p>
-              <p class="text-2xl font-bold text-indigo-600 mt-1">{{ formatCurrency(summary.balance) }}</p>
-            </div>
-            <svg class="w-10 h-10 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-              </path>
-            </svg>
-          </div>
+      <div :class="['grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 my-4', isRTL ? 'text-end' : 'text-start']">
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAll }} {{ $t('labels.results') || 'records' }}</p>
         </div>
-        <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-green-600', isRTL ? 'text-end' : 'text-start']">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('finance.last30dIn') }}</p>
-              <p class="text-2xl font-bold text-green-600 mt-1">{{ formatCurrency(summary.last30dIn) }}</p>
-            </div>
-            <svg class="w-10 h-10 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-              </path>
-            </svg>
-          </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalMasrouf') || 'Immediate (Masrouf)' }}</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalMasrouf) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countMasrouf }} {{ $t('labels.results') || 'records' }}</p>
         </div>
-        <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-red-600', isRTL ? 'text-end' : 'text-start']">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600">{{ $t('finance.last30dOut') }}</p>
-              <p class="text-2xl font-bold text-red-600 mt-1">{{ formatCurrency(summary.last30dOut) }}</p>
-            </div>
-            <svg class="w-10 h-10 text-red-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-              </path>
-            </svg>
-          </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-400">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalAhd') || 'Deferred (Ahd)' }}</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAhd) }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAhd }} {{ $t('labels.results') || 'records' }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalOut') || 'Total Out' }}</p>
+          <p class="text-xl font-semibold text-red-600 mt-1">{{ formatCurrency(expensesSummary.totalOut) }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
+          <p class="text-sm text-gray-600">{{ $t('expenses.totalIn') || 'Total In' }}</p>
+          <p class="text-xl font-semibold text-green-600 mt-1">{{ formatCurrency(expensesSummary.totalIn) }}</p>
         </div>
       </div>
 
@@ -174,47 +161,63 @@
       <div :class="['bg-gray-50 rounded-lg p-4', isRTL ? 'text-end' : 'text-start']">
         <!-- Filters row -->
         <div :class="['flex flex-col md:flex-row gap-3 items-center mb-3', isRTL ? 'text-end' : 'text-start']">
-          <div :class="['flex-1 flex flex-wrap gap-2 items-center', isRTL ? 'justify-end' : 'justify-start']">
-            <input
-              v-model="expensesFilters.q"
-              @keyup.enter="expenses.value.page = 1; fetchExpenses()"
-              :placeholder="$t('labels.search') || 'Search'"
-              :disabled="loading"
-              :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm w-full sm:w-auto', isRTL ? 'text-right' : 'text-left']"
-            />
+          <div :class="['flex-1 w-full', isRTL ? 'text-right' : 'text-left']">
+            <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 items-end']">
+              <!-- Search -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.search') || 'Search' }}</label>
+                <input
+                  v-model="expensesFilters.q"
+                  @keyup.enter="expenses.value.page = 1; fetchExpenses()"
+                  :placeholder="$t('labels.search') || 'Search'"
+                  :disabled="loading"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
 
-            <div class="flex flex-col">
-              <label :class="['text-xs text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.fromDate') || $t('labels.startDate') || 'From Date' }}</label>
-              <input
-                v-model="expensesFilters.startDate"
-                type="date"
-                :disabled="loading"
-                :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
-              />
+              <!-- From Date -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.fromDate') || $t('labels.startDate') || 'From Date' }}</label>
+                <input
+                  v-model="expensesFilters.startDate"
+                  type="date"
+                  :disabled="loading"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
+
+              <!-- To Date -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.toDate') || $t('labels.endDate') || 'To Date' }}</label>
+                <input
+                  v-model="expensesFilters.endDate"
+                  type="date"
+                  :disabled="loading"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
+
+              <!-- Location -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.location') || 'Location' }}</label>
+                <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
+                  <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
+                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                </select>
+              </div>
+
+              <!-- Classification -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.classification') || 'Classification' }}</label>
+                <input
+                  v-model="expensesFilters.classification"
+                  type="text"
+                  :placeholder="$t('expenses.classification') || 'Classification'"
+                  :disabled="loading"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                />
+              </div>
             </div>
-
-            <div class="flex flex-col">
-              <label :class="['text-xs text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.toDate') || $t('labels.endDate') || 'To Date' }}</label>
-              <input
-                v-model="expensesFilters.endDate"
-                type="date"
-                :disabled="loading"
-                :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
-              />
-            </div>
-
-            <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
-              <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
-              <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
-            </select>
-
-            <input
-              v-model="expensesFilters.classification"
-              type="text"
-              :placeholder="$t('expenses.classification') || 'Classification'"
-              :disabled="loading"
-              :class="['px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
-            />
           </div>
 
           <div class="flex gap-2 items-center">
@@ -245,36 +248,7 @@
         </div>
       </div>
 
-      <!-- Expenses Summary -->
-      <div :class="['grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 my-4', isRTL ? 'text-end' : 'text-start']">
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
-          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
-          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAll }} {{ $t('labels.results') || 'records' }}</p>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalMasrouf') || 'Immediate (Masrouf)' }}</p>
-          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalMasrouf) }}</p>
-          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countMasrouf }} {{ $t('labels.results') || 'records' }}</p>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-400">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalAhd') || 'Deferred (Ahd)' }}</p>
-          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAhd) }}</p>
-          <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAhd }} {{ $t('labels.results') || 'records' }}</p>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalOut') || 'Total Out' }}</p>
-          <p class="text-xl font-semibold text-red-600 mt-1">{{ formatCurrency(expensesSummary.totalOut) }}</p>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalIn') || 'Total In' }}</p>
-          <p class="text-xl font-semibold text-green-600 mt-1">{{ formatCurrency(expensesSummary.totalIn) }}</p>
-        </div>
-      </div>
+      
 
       <!-- Loading/Error/Main Content Switch -->
       <template v-if="loading">
