@@ -162,7 +162,10 @@
         <!-- Filters row -->
         <div :class="['flex flex-col md:flex-row gap-3 items-center mb-3', isRTL ? 'text-end' : 'text-start']">
           <div :class="['flex-1 w-full', isRTL ? 'text-start' : 'text-start']">
-            <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 items-end']">
+            <!-- ✅ Updated grid to accommodate new filters (Category + Branch) -->
+            <!-- When Branch filter is visible (selectedBranch === null): 7 filters -->
+            <!-- When Branch filter is hidden: 6 filters -->
+            <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-7 gap-3 items-end']">
               <!-- Search -->
               <div>
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.search') || 'Search' }}</label>
@@ -203,6 +206,56 @@
                 <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
                   <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
                   <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                </select>
+              </div>
+
+              <!-- Category Filter - ✅ NEW: Combobox with inline add support -->
+              <div class="relative">
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.category') || 'Category' }}</label>
+                <div class="relative">
+                  <input
+                    v-model="categoryInput"
+                    @input="handleCategoryInput"
+                    @focus="handleCategoryInput"
+                    @blur="handleCategoryBlur"
+                    @keydown="handleCategoryKeydown"
+                    :disabled="loading"
+                    :placeholder="$t('expenses.category') || 'Category'"
+                    :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right direction-rtl' : 'text-left']"
+                  />
+                  <!-- Dropdown -->
+                  <div
+                    v-if="showCategoryDropdown && (filteredCategoryOptions.length > 0 || canAddNewCategory)"
+                    class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                    :class="isRTL ? 'text-right direction-rtl' : 'text-left'"
+                  >
+                    <!-- Existing categories -->
+                    <div
+                      v-for="(option, index) in filteredCategoryOptions"
+                      :key="option.value"
+                      @mousedown.prevent="selectCategory(option.value)"
+                      :class="['px-3 py-2 cursor-pointer hover:bg-indigo-50 transition-colors', selectedCategoryIndex === index ? 'bg-indigo-100' : '']"
+                    >
+                      {{ option.label }}
+                    </div>
+                    <!-- Add new category option -->
+                    <div
+                      v-if="canAddNewCategory"
+                      @mousedown.prevent="addNewCategory(categoryInput.trim())"
+                      class="px-3 py-2 cursor-pointer hover:bg-green-50 bg-green-50/50 border-t border-gray-200 font-medium text-green-700"
+                    >
+                      {{ $t('expenses.addNewCategory') || 'Add new category' }}: "{{ categoryInput.trim() }}"
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Branch Filter - ✅ NEW: Only shown when selectedBranch is null -->
+              <div v-if="selectedBranch === null">
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.branch') || 'Branch' }}</label>
+                <select v-model.number="expensesFilters.branchId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
+                  <option :value="null">{{ $t('expenses.branch') || 'Branch' }}</option>
+                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                 </select>
               </div>
 
@@ -880,12 +933,18 @@ export default {
     const locations = ref([])
 
     // Filters used when fetching expenses and the summary (kept simple for now)
-    const expensesFilters = ref({ q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null })
+    // ✅ Added category and branchId filters
+    const expensesFilters = ref({ q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null })
 
     // Categories + inline add modal (mirrors ExpensesList.vue UX)
     const extraCategories = ref({})
     const fieldModal = ref({ open: false, type: '', name: '', category: '' })
     const { t, tm, locale } = useI18n()
+
+    // ✅ Category combobox state
+    const categoryInput = ref('')
+    const showCategoryDropdown = ref(false)
+    const selectedCategoryIndex = ref(-1)
 
     const categories = computed(() => {
       const base = (tm && tm('expenses.categories')) || {}
@@ -897,6 +956,29 @@ export default {
       return Object.keys(cats).map(key => ({ value: key, label: cats[key] }))
     })
 
+    // ✅ Filtered category options based on input
+    const filteredCategoryOptions = computed(() => {
+      if (!categoryInput.value.trim()) {
+        return categoryOptions.value
+      }
+      const query = categoryInput.value.toLowerCase().trim()
+      return categoryOptions.value.filter(opt => 
+        opt.label.toLowerCase().includes(query) || opt.value.toLowerCase().includes(query)
+      )
+    })
+
+    // ✅ Check if we can add new category (input doesn't match any existing)
+    const canAddNewCategory = computed(() => {
+      const trimmed = categoryInput.value.trim()
+      if (!trimmed) return false
+      // Check if input exactly matches any existing category
+      const exists = categoryOptions.value.some(opt => 
+        opt.value.toLowerCase() === trimmed.toLowerCase() || 
+        opt.label.toLowerCase() === trimmed.toLowerCase()
+      )
+      return !exists
+    })
+
     const addCategoryPrompt = () => { fieldModal.value = { open: true, type: 'category', name: '', category: '' } }
     const closeFieldModal = () => { fieldModal.value = { open: false, type: '', name: '', category: '' } }
     const saveFieldModal = async () => {
@@ -906,13 +988,101 @@ export default {
       }
       if (fieldModal.value.type === 'category') {
         extraCategories.value = { ...extraCategories.value, [fieldModal.value.name]: fieldModal.value.name }
-        // Auto-select the newly created category in the expense form
+        // ✅ Auto-select the newly created category in both expense form and filter
         expenseForm.value.category = fieldModal.value.name
+        expensesFilters.value.category = fieldModal.value.name
         if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
         closeFieldModal()
         return
       }
       closeFieldModal()
+    }
+
+    // ✅ Category combobox methods
+    const handleCategoryInput = () => {
+      showCategoryDropdown.value = true
+      selectedCategoryIndex.value = -1
+      // Don't update expensesFilters.category here - only update on selection
+    }
+
+    const handleCategoryBlur = () => {
+      // Delay to allow click events on dropdown items (mousedown fires before blur)
+      setTimeout(() => {
+        if (!showCategoryDropdown.value) return // Already handled by click
+        showCategoryDropdown.value = false
+        // If input doesn't match any category, restore to selected value or clear
+        if (expensesFilters.value.category) {
+          const selectedOption = categoryOptions.value.find(opt => opt.value === expensesFilters.value.category)
+          if (selectedOption) {
+            categoryInput.value = selectedOption.label
+          } else {
+            // Category exists in filter but not in options (might be newly added)
+            categoryInput.value = expensesFilters.value.category
+          }
+        } else {
+          categoryInput.value = ''
+        }
+        selectedCategoryIndex.value = -1
+      }, 200)
+    }
+
+    const selectCategory = (categoryValue) => {
+      const option = categoryOptions.value.find(opt => opt.value === categoryValue)
+      if (option) {
+        categoryInput.value = option.label
+        expensesFilters.value.category = option.value
+        showCategoryDropdown.value = false
+        selectedCategoryIndex.value = -1
+      }
+    }
+
+    const addNewCategory = (categoryName) => {
+      if (!categoryName || !categoryName.trim()) {
+        if (window.$toast) window.$toast(t('expenses.enterCategoryName') || 'Please enter a category name', 'error')
+        return
+      }
+      const trimmed = categoryName.trim()
+      // Add to extraCategories
+      extraCategories.value = { ...extraCategories.value, [trimmed]: trimmed }
+      // Select it immediately
+      categoryInput.value = trimmed
+      expensesFilters.value.category = trimmed
+      showCategoryDropdown.value = false
+      selectedCategoryIndex.value = -1
+      if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
+    }
+
+    const handleCategoryKeydown = (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        if (canAddNewCategory.value && categoryInput.value.trim()) {
+          addNewCategory(categoryInput.value.trim())
+        } else if (filteredCategoryOptions.value.length > 0 && selectedCategoryIndex.value >= 0) {
+          const option = filteredCategoryOptions.value[selectedCategoryIndex.value]
+          selectCategory(option.value)
+        } else if (filteredCategoryOptions.value.length === 1) {
+          selectCategory(filteredCategoryOptions.value[0].value)
+        }
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        if (showCategoryDropdown.value) {
+          selectedCategoryIndex.value = Math.min(
+            selectedCategoryIndex.value + 1,
+            filteredCategoryOptions.value.length - 1 + (canAddNewCategory.value ? 1 : 0)
+          )
+        } else {
+          showCategoryDropdown.value = true
+          selectedCategoryIndex.value = 0
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        if (showCategoryDropdown.value) {
+          selectedCategoryIndex.value = Math.max(selectedCategoryIndex.value - 1, -1)
+        }
+      } else if (event.key === 'Escape') {
+        showCategoryDropdown.value = false
+        selectedCategoryIndex.value = -1
+      }
     }
 
     const expensesSummary = ref({
@@ -966,10 +1136,20 @@ export default {
       loading.value = true
       error.value = null
       try {
-        // Helper: remove empty values from query params (backend dislikes empty strings)
-        const cleanParams = (obj) => Object.fromEntries(Object.entries(obj || {}).filter(([k, v]) => v !== '' && v !== null && v !== undefined))
+        // ✅ Updated cleanParams: remove empty strings and null values (backend rejects empty strings)
+        // Returns object with only defined, non-empty values
+        const cleanParams = (obj) => {
+          const cleaned = {}
+          Object.entries(obj || {}).forEach(([k, v]) => {
+            // Only include if value is not empty string, not null, and not undefined
+            if (v !== '' && v !== null && v !== undefined) {
+              cleaned[k] = v
+            }
+          })
+          return cleaned
+        }
 
-        // Build params for list (paginated) and clean them
+        // ✅ Build params for list (paginated) - includes category and branchId filters
         const listParams = cleanParams({
           page: expenses.value.page,
           pageSize: expenses.value.pageSize,
@@ -978,7 +1158,9 @@ export default {
           startDate: expensesFilters.value.startDate,
           endDate: expensesFilters.value.endDate,
           classification: expensesFilters.value.classification,
-          locationId: expensesFilters.value.locationId
+          locationId: expensesFilters.value.locationId,
+          // ✅ Added branchId filter (only when selectedBranch is null, to filter within company expenses)
+          branchId: !selectedBranch.value ? expensesFilters.value.branchId : undefined
         })
 
         let res
@@ -996,7 +1178,7 @@ export default {
           pageSize: res.data.pageSize || expenses.value.pageSize,
           totalPages: Math.ceil((res.data.total || 0) / (res.data.pageSize || expenses.value.pageSize))
         };
-        // Fetch expenses summary (same filters but without pagination)
+        // ✅ Fetch expenses summary (same filters but without pagination) - includes category and branchId
         try {
           const rawSummary = {
             q: expensesFilters.value.q,
@@ -1006,7 +1188,12 @@ export default {
             classification: expensesFilters.value.classification,
             locationId: expensesFilters.value.locationId
           }
-          if (selectedBranch.value && selectedBranch.value.id) rawSummary.branchId = selectedBranch.value.id
+          // ✅ If branch is selected, use its ID; otherwise use branchId filter (if set)
+          if (selectedBranch.value && selectedBranch.value.id) {
+            rawSummary.branchId = selectedBranch.value.id
+          } else if (!selectedBranch.value && expensesFilters.value.branchId) {
+            rawSummary.branchId = expensesFilters.value.branchId
+          }
           const summaryParams = cleanParams(rawSummary)
           const s = await getExpensesSummary(summaryParams)
           expensesSummary.value = { ...expensesSummary.value, ...(s || {}) }
@@ -1461,8 +1648,23 @@ export default {
       await fetchExpenses()
     }, { deep: true })
 
+    // ✅ Sync categoryInput with expensesFilters.category
+    watch(() => expensesFilters.value.category, (newValue) => {
+      if (newValue) {
+        const option = categoryOptions.value.find(opt => opt.value === newValue)
+        if (option) {
+          categoryInput.value = option.label
+        } else {
+          categoryInput.value = newValue
+        }
+      } else {
+        categoryInput.value = ''
+      }
+    }, { immediate: true })
+
+    // ✅ Updated clearExpensesFilters to include category and branchId
     const clearExpensesFilters = async () => {
-      expensesFilters.value = { q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null }
+      expensesFilters.value = { q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null }
       expenses.value.page = 1
       await fetchExpenses()
     }
@@ -1529,7 +1731,18 @@ export default {
       categoryOptions,
       addCategoryPrompt,
       saveFieldModal,
-      closeFieldModal
+      closeFieldModal,
+      // ✅ Category combobox exports
+      categoryInput,
+      showCategoryDropdown,
+      selectedCategoryIndex,
+      filteredCategoryOptions,
+      canAddNewCategory,
+      handleCategoryInput,
+      handleCategoryBlur,
+      selectCategory,
+      addNewCategory,
+      handleCategoryKeydown
     }
   }
 }
@@ -1587,5 +1800,35 @@ export default {
 
 li:focus-within {
   outline: 2px solid rgba(99, 102, 241, 0.12);
+}
+
+/* ✅ Category combobox dropdown styles */
+.direction-rtl .relative input {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Ensure dropdown scrolls properly */
+.max-h-60 {
+  max-height: 15rem;
+}
+
+/* Custom scrollbar for dropdown */
+.overflow-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>
