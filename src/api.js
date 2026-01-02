@@ -623,36 +623,90 @@ export const getCompanySummary = () =>
 
 // Company Expenses (branchId = NULL)
 export const getCompanyExpenses = (params = {}) => {
-  const { page = 1, pageSize = 20 } = params;
+  const { 
+    page = 1, 
+    pageSize = 20, 
+    q, 
+    category, 
+    classification, 
+    branchId, 
+    locationId, 
+    startDate, 
+    endDate,
+    includeSummary 
+  } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+  // Only append non-empty, non-null, non-undefined values
+  if (q) queryParams.append('q', q);
+  if (category) queryParams.append('category', category);
+  if (classification) queryParams.append('classification', classification);
+  if (branchId !== undefined && branchId !== null) queryParams.append('branchId', branchId.toString());
+  if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (includeSummary) queryParams.append('includeSummary', '1');
   return axios.get(`${BASE_URL}/api/company/expenses?${queryParams.toString()}`);
 };
 
 // Branch Expenses
 export const getBranchExpenses = (branchId, params = {}) => {
-  const { page = 1, pageSize = 20, startDate, endDate } = params;
+  const { 
+    page = 1, 
+    pageSize = 20, 
+    q, 
+    category, 
+    classification, 
+    locationId, 
+    startDate, 
+    endDate,
+    includeSummary 
+  } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+  // Only append non-empty, non-null, non-undefined values
+  if (q) queryParams.append('q', q);
+  if (category) queryParams.append('category', category);
+  if (classification) queryParams.append('classification', classification);
+  if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
+  if (includeSummary) queryParams.append('includeSummary', '1');
   return axios.get(`${BASE_URL}/api/branches/${branchId}/expenses?${queryParams.toString()}`);
 };
 
-// Expenses
-export const getExpenses = (page = 1, pageSize = 20, search = '') => {
-  const params = new URLSearchParams({
+// Expenses (general endpoint - for ExpensesList.vue)
+export const getExpenses = (params = {}) => {
+  const { 
+    page = 1, 
+    pageSize = 20, 
+    q, 
+    category, 
+    classification, 
+    branchId, 
+    locationId, 
+    startDate, 
+    endDate,
+    includeSummary 
+  } = params;
+  const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
-  if (search) {
-    params.append('q', search);
-  }
-  return axios.get(`${BASE_URL}/api/expenses?${params.toString()}`);
+  // Only append non-empty, non-null, non-undefined values
+  if (q) queryParams.append('q', q);
+  if (category) queryParams.append('category', category);
+  if (classification) queryParams.append('classification', classification);
+  if (branchId !== undefined && branchId !== null) queryParams.append('branchId', branchId.toString());
+  if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (includeSummary) queryParams.append('includeSummary', '1');
+  return axios.get(`${BASE_URL}/api/expenses?${queryParams.toString()}`);
 };
 export const getExpense = (id) =>
   axios.get(`${BASE_URL}/api/expenses/${id}`);

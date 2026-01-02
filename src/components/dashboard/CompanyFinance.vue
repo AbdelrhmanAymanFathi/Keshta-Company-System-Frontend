@@ -1149,7 +1149,7 @@ export default {
           return cleaned
         }
 
-        // ✅ Build params for list (paginated) - includes category and branchId filters
+        // ✅ Build params for list (paginated) - includes all filters and includeSummary
         const listParams = cleanParams({
           page: expenses.value.page,
           pageSize: expenses.value.pageSize,
@@ -1160,7 +1160,8 @@ export default {
           classification: expensesFilters.value.classification,
           locationId: expensesFilters.value.locationId,
           // ✅ Added branchId filter (only when selectedBranch is null, to filter within company expenses)
-          branchId: !selectedBranch.value ? expensesFilters.value.branchId : undefined
+          branchId: !selectedBranch.value ? expensesFilters.value.branchId : undefined,
+          includeSummary: true // Request summary in the same call
         })
 
         let res
@@ -1178,27 +1179,41 @@ export default {
           pageSize: res.data.pageSize || expenses.value.pageSize,
           totalPages: Math.ceil((res.data.total || 0) / (res.data.pageSize || expenses.value.pageSize))
         };
-        // ✅ Fetch expenses summary (same filters but without pagination) - includes category and branchId
-        try {
-          const rawSummary = {
-            q: expensesFilters.value.q,
-            category: expensesFilters.value.category,
-            startDate: expensesFilters.value.startDate,
-            endDate: expensesFilters.value.endDate,
-            classification: expensesFilters.value.classification,
-            locationId: expensesFilters.value.locationId
+        // ✅ Use summary from response if available, otherwise fetch separately
+        if (res.data.summary) {
+          expensesSummary.value = {
+            countAll: res.data.summary.countAll || 0,
+            countMasrouf: res.data.summary.countMasrouf || 0,
+            countAhd: res.data.summary.countAhd || 0,
+            totalAll: res.data.summary.totalAll || '0.00',
+            totalMasrouf: res.data.summary.totalMasrouf || '0.00',
+            totalAhd: res.data.summary.totalAhd || '0.00',
+            totalOut: res.data.summary.totalOut || '0.00',
+            totalIn: res.data.summary.totalIn || '0.00'
           }
-          // ✅ If branch is selected, use its ID; otherwise use branchId filter (if set)
-          if (selectedBranch.value && selectedBranch.value.id) {
-            rawSummary.branchId = selectedBranch.value.id
-          } else if (!selectedBranch.value && expensesFilters.value.branchId) {
-            rawSummary.branchId = expensesFilters.value.branchId
+        } else {
+          // Fallback: fetch summary separately if not included in response
+          try {
+            const rawSummary = {
+              q: expensesFilters.value.q,
+              category: expensesFilters.value.category,
+              startDate: expensesFilters.value.startDate,
+              endDate: expensesFilters.value.endDate,
+              classification: expensesFilters.value.classification,
+              locationId: expensesFilters.value.locationId
+            }
+            // ✅ If branch is selected, use its ID; otherwise use branchId filter (if set)
+            if (selectedBranch.value && selectedBranch.value.id) {
+              rawSummary.branchId = selectedBranch.value.id
+            } else if (!selectedBranch.value && expensesFilters.value.branchId) {
+              rawSummary.branchId = expensesFilters.value.branchId
+            }
+            const summaryParams = cleanParams(rawSummary)
+            const s = await getExpensesSummary(summaryParams)
+            expensesSummary.value = { ...expensesSummary.value, ...(s || {}) }
+          } catch (err2) {
+            console.error('Error fetching expenses summary:', err2)
           }
-          const summaryParams = cleanParams(rawSummary)
-          const s = await getExpensesSummary(summaryParams)
-          expensesSummary.value = { ...expensesSummary.value, ...(s || {}) }
-        } catch (err2) {
-          console.error('Error fetching expenses summary:', err2)
         }
       } catch (err) {
         console.error('Error fetching expenses:', err)

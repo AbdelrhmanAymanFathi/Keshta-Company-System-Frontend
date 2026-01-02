@@ -816,7 +816,15 @@ export default {
       this.error = null
       
       try {
-        const response = await getExpenses(this.currentPage, this.pageSize, this.searchQuery)
+        // Build params object with all filters (only non-empty values)
+        const params = {
+          page: this.currentPage,
+          pageSize: this.pageSize
+        }
+        if (this.searchQuery) params.q = this.searchQuery
+        if (this.selectedCategory) params.category = this.selectedCategory
+        
+        const response = await getExpenses(params)
         this.expenses = response.data.items || []
         this.totalItems = response.data.total || 0
         this.totalPages = response.data.pages || 1
