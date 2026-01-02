@@ -275,9 +275,9 @@ export default {
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'
         const transform = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
-        return `${base} fixed top-0 bottom-0 w-64 ${side} ${transform}`
+        return `${base} fixed top-0 bottom-0 w-50 ${side} ${transform}`
       }
-      const width = this.effectiveCollapsed ? 'w-20' : 'w-62'
+      const width = this.effectiveCollapsed ? 'w-20' : 'w-50'
       return `${base} ${width} relative`
     }
   },

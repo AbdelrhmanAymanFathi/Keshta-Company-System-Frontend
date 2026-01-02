@@ -161,11 +161,11 @@
       <div :class="['bg-gray-50 rounded-lg p-4', isRTL ? 'text-end' : 'text-start']">
         <!-- Filters row -->
         <div :class="['flex flex-col md:flex-row gap-3 items-center mb-3', isRTL ? 'text-end' : 'text-start']">
-          <div :class="['flex-1 w-full', isRTL ? 'text-right' : 'text-left']">
+          <div :class="['flex-1 w-full', isRTL ? 'text-start' : 'text-start']">
             <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 items-end']">
               <!-- Search -->
               <div>
-                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.search') || 'Search' }}</label>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.search') || 'Search' }}</label>
                 <input
                   v-model="expensesFilters.q"
                   @keyup.enter="expenses.value.page = 1; fetchExpenses()"
@@ -177,7 +177,7 @@
 
               <!-- From Date -->
               <div>
-                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.fromDate') || $t('labels.startDate') || 'From Date' }}</label>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.fromDate') || $t('labels.startDate') || 'From Date' }}</label>
                 <input
                   v-model="expensesFilters.startDate"
                   type="date"
@@ -188,7 +188,7 @@
 
               <!-- To Date -->
               <div>
-                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.toDate') || $t('labels.endDate') || 'To Date' }}</label>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.toDate') || $t('labels.endDate') || 'To Date' }}</label>
                 <input
                   v-model="expensesFilters.endDate"
                   type="date"
@@ -199,7 +199,7 @@
 
               <!-- Location -->
               <div>
-                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.location') || 'Location' }}</label>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.location') || 'Location' }}</label>
                 <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
                   <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
                   <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
@@ -208,7 +208,7 @@
 
               <!-- Classification -->
               <div>
-                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.classification') || 'Classification' }}</label>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.classification') || 'Classification' }}</label>
                 <input
                   v-model="expensesFilters.classification"
                   type="text"
@@ -242,7 +242,7 @@
                     <input v-model="fieldModal.name" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div v-if="fieldModal.type === 'branch'" class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1 ">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
                     <input v-model="fieldModal.category" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div class="flex gap-2 mt-6">
@@ -281,8 +281,6 @@
           </div>
         </div>
       </div>
-
-      
 
       <!-- Loading/Error/Main Content Switch -->
       <template v-if="loading">
@@ -454,7 +452,7 @@
         <div :class="['bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto', isRTL ? 'direction-rtl' : '']">
           <div class="p-6">
             <div class="flex items-center justify-between mb-4">
-              <h3 :class="['text-lg font-semibold text-gray-900', isRTL ? 'text-right' : 'text-left']">
+              <h3 :class="['text-lg font-semibold text-gray-900', isRTL ? 'text-start' : 'text-start']">
                 {{ $t('expenses.addExpense') || 'Add Expense' }}
               </h3>
               <button @click="closeExpenseModal" class="text-gray-400 hover:text-gray-600">
@@ -467,27 +465,27 @@
             <form @submit.prevent="handleCreateExpense" class="grid gap-4 grid-cols-1 md:grid-cols-2">
               <!-- Date - Column 1 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.date') || 'Date' }} <span class="text-red-500">*</span>
                 </label>
                 <input 
                   v-model="expenseForm.date" 
                   type="date" 
                   required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
                 />
               </div>
 
               <!-- Category - Column 2 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.category') || 'Category' }} <span class="text-red-500">*</span>
                 </label>
                 <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
                   <select
                     v-model="expenseForm.category"
                     required
-                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
                   >
                     <option value="">{{ $t('expenses.category') || 'Category' }}</option>
                     <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
@@ -498,7 +496,7 @@
 
               <!-- Description - Full Width -->
               <div class="col-span-1 md:col-span-2">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.description') || 'Description' }} <span class="text-red-500">*</span>
                 </label>
                 <input 
@@ -506,7 +504,7 @@
                   type="text" 
                   required
                   :placeholder="$t('expenses.description') || 'Description'"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
                 />
               </div>
 
