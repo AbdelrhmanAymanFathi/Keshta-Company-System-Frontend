@@ -12,7 +12,7 @@
           <h3 :class="['text-sm font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.wallets') }}</h3>
           <button
             @click="sidebarCollapsed = !sidebarCollapsed"
-            class="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded"
+            class="sidebar-toggle-glow text-gray-500 hover:text-gray-700 transition-colors p-1 rounded"
             :title="sidebarCollapsed ? ($t('finance.showSidebar') || 'Show wallets') : ($t('finance.hideSidebar') || 'Hide wallets')"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1957,4 +1957,55 @@ li:focus-within {
 
 /* Ensure floating button is visible above other elements */
 .fixed.top-20.right-6 { z-index: 40; }
+
+/* Strong pulsing orange flash for sidebar toggle button */
+.sidebar-toggle-glow {
+  position: relative;
+  animation: pulse-color 1.8s infinite ease-in-out;
+}
+
+/* Glow halo that expands and intensifies */
+.sidebar-toggle-glow::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.8) 0%, transparent 60%);
+  animation: pulse-glow-strong 1.8s infinite ease-in-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes pulse-glow-strong {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+}
+
+/* Color pulse: gray → bright orange → gray */
+@keyframes pulse-color {
+  0% {
+    color: #6b7280; /* gray-500 (اللون الأصلي للـ button) */
+  }
+  50% {
+    color: #fb923c; /* orange-400 قوي */
+  }
+  100% {
+    color: #6b7280;
+  }
+}
+
+/* SVG stroke follows the button color for perfect sync */
+.sidebar-toggle-glow svg {
+  stroke: currentColor !important; /* مهم جدًا عشان يلغي أي لون ثابت */
+}
 </style>
