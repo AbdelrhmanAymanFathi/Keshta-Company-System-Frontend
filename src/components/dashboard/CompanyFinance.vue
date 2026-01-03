@@ -5,6 +5,7 @@
       <aside v-if="!sidebarCollapsed"
         :class="['bg-white rounded-lg shadow overflow-hidden p-3', isRTL ? 'direction-rtl' : '', isRTL ? 'text-end' : 'text-start']"
         style="min-width: 19%; max-width: 320px;">
+        
       <!-- Sidebar header -->
       <div :class="['flex items-center justify-between mb-3']">
         <div class="flex items-center gap-2">
