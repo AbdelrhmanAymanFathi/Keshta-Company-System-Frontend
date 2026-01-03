@@ -713,6 +713,8 @@ export default {
       branches: [],
       locations: [],
       extraCategories: {},
+      // Backend-discovered categories (kept up-to-date from server responses)
+      knownCategories: [],
       loading: false,
       error: null,
       searchQuery: '',
@@ -756,11 +758,11 @@ export default {
     },
 
     categoryOptions() {
-      const categories = this.categories || {}
-      return Object.keys(categories).map(key => ({
-        value: key,
-        label: categories[key]
-      }))
+      const backend = this.knownCategories.map(c => ({ value: c, label: c }))
+      const extra = Object.keys(this.extraCategories).map(k => ({ value: k, label: k }))
+      const all = [...backend, ...extra]
+      const seen = new Set()
+      return all.filter(item => !seen.has(item.value) && seen.add(item.value))
     },
     
     filteredExpenses() {
@@ -805,6 +807,11 @@ export default {
   },
   
   async mounted() {
+    // Load persisted extra categories from localStorage (if any)
+    try {
+      const saved = localStorage.getItem('extraExpenseCategories')
+      if (saved) this.extraCategories = JSON.parse(saved)
+    } catch (e) { }
     await this.loadExpenses()
     await this.fetchBranches()
     await this.fetchLocations()
@@ -826,6 +833,16 @@ export default {
         
         const response = await getExpenses(params)
         this.expenses = response.data.items || []
+        // Extract unique categories from backend data and keep them for combobox
+        try {
+          const uniqueCats = new Set()
+          this.expenses.forEach(exp => {
+            if (exp.category && String(exp.category).trim()) uniqueCats.add(String(exp.category).trim())
+          })
+          this.knownCategories = Array.from(uniqueCats).sort()
+        } catch (e) {
+          this.knownCategories = []
+        }
         this.totalItems = response.data.total || 0
         this.totalPages = response.data.pages || 1
       } catch (error) {
@@ -980,6 +997,8 @@ export default {
             if (index !== -1) {
               this.expenses.splice(index, 1, { ...this.expenses[index], ...expenseData })
             }
+            // Refresh list to pick up any backend-side changes (including saved category)
+            await this.loadExpenses()
           } catch (updateError) {
             // If backend is not available, simulate update
             if (updateError.response?.status === 500 || updateError.code === 'ERR_NETWORK') {
@@ -1000,8 +1019,9 @@ export default {
           try {
             const response = await createExpense(expenseData)
             console.log('Expense created successfully:', response.data)
-            this.expenses.unshift(response.data)
-            this.totalItems++
+            // Refresh list to reflect newly created expense (and capture any backend-assigned category)
+            await this.loadExpenses()
+            this.totalItems = this.expenses.length
           } catch (createError) {
             // If backend is not available, simulate creation
             if (createError.response?.status === 500 || createError.code === 'ERR_NETWORK') {
@@ -1253,9 +1273,11 @@ export default {
         return
       }
       if (this.fieldModal.type === 'category') {
-        this.extraCategories = { ...this.extraCategories, [this.fieldModal.name]: this.fieldModal.name }
-        this.form.category = this.fieldModal.name
-        this.showSuccess(this.$t('expenses.success.categoryAdded') || 'Category added')
+          this.extraCategories = { ...this.extraCategories, [this.fieldModal.name]: this.fieldModal.name }
+          // Persist user-added categories locally
+          try { localStorage.setItem('extraExpenseCategories', JSON.stringify(this.extraCategories)) } catch (e) { }
+          this.form.category = this.fieldModal.name
+          this.showSuccess(this.$t('expenses.success.categoryAdded') || 'Category added')
       } else if (this.fieldModal.type === 'branch') {
         try {
           const payload = { name: this.fieldModal.name, category: this.fieldModal.category }

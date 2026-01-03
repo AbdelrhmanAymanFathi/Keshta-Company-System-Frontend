@@ -136,7 +136,7 @@
               </td>
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.classification || '-' }}</td>
               <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.description || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense.amount || expense.total || 0) }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense.amount || 0) }}</td>
               <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.notes || '-' }}</td>
             </tr>
           </tbody>
@@ -282,10 +282,11 @@ export default {
         // 5. Nested { data: { items: [...] } }
         let parsedItems = []
 
-        if (Array.isArray(data)) {
-          parsedItems = data
-        } else if (Array.isArray(data?.rows)) {
+        // Prefer backend `rows` when present (server returns { rows: [...] })
+        if (Array.isArray(data?.rows)) {
           parsedItems = data.rows
+        } else if (Array.isArray(data)) {
+          parsedItems = data
         } else if (Array.isArray(data?.items)) {
           parsedItems = data.items
         } else if (Array.isArray(data?.data)) {
@@ -294,11 +295,10 @@ export default {
           // Might be stringified JSON
           try {
             const parsed = JSON.parse(data)
-
-            if (Array.isArray(parsed)) {
-              parsedItems = parsed
-            } else if (Array.isArray(parsed?.rows)) {
+            if (Array.isArray(parsed?.rows)) {
               parsedItems = parsed.rows
+            } else if (Array.isArray(parsed)) {
+              parsedItems = parsed
             } else if (Array.isArray(parsed?.items)) {
               parsedItems = parsed.items
             } else if (Array.isArray(parsed?.data)) {

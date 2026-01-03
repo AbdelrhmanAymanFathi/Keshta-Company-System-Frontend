@@ -6,11 +6,11 @@
       style="min-width: 19%; max-width: 320px;">
       <!-- Sidebar header -->
       <div :class="['flex items-center justify-between mb-3']">
-        <h3 :class="['text-lg font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{
+          <h3 :class="['text-sm font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{
           $t('finance.wallets') }}</h3>
         <div class="flex items-center gap-2">
           <button v-if="previousOrders.length" @click="undoOrder" title="Undo"
-            class="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm">Undo</button>
+            class="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-xs">Undo</button>
           <span v-if="savingOrder" class="text-xs text-gray-400">Saving...</span>
         </div>
       </div>
@@ -34,15 +34,15 @@
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
           <button @click="sublistOpen = !sublistOpen"
-            class="text-sm text-gray-600 px-2 py-1 rounded hover:bg-gray-50">{{ sublistOpen ? '▼' : '▶' }}</button>
-          <span class="text-sm text-gray-600">{{ $t('finance.subWallets') || 'Sub-wallets' }}</span>
+            class="text-xs text-gray-600 px-2 py-1 rounded hover:bg-gray-50">{{ sublistOpen ? '▼' : '▶' }}</button>
+          <span class="text-xs text-gray-600">{{ $t('finance.subWallets') || 'Sub-wallets' }}</span>
         </div>
-        <div class="text-sm text-gray-400">{{ branches.length }}</div>
+        <div class="text-xs text-gray-400">{{ branches.length }}</div>
       </div>
 
       <transition name="fade">
         <ul v-show="sublistOpen" class="space-y-2">
-          <li v-if="branches.length === 0" class="text-sm text-gray-500 px-3 py-2">{{ $t('finance.noBranches') || 'لا توجد خزائن فرعية' }}</li>
+          <li v-if="branches.length === 0" class="text-xs text-gray-500 px-3 py-2">{{ $t('finance.noBranches') || 'لا توجد خزائن فرعية' }}</li>
           <li v-for="(branch, index) in branches" :key="branch.id" tabindex="0" draggable="true"
             @dragstart="onDragStart(index, $event)" @dragenter="onDragEnter(index, $event)" @dragover.prevent
             @drop.prevent="onDropAt(index, $event)" @dragend="onDragEnd"
@@ -55,7 +55,7 @@
                   </path>
                 </svg>
               </div>
-              <div class="flex-1 text-sm text-gray-800 truncate">
+              <div class="flex-1 text-xs text-gray-800 truncate">
                 <div class="flex items-center gap-2">
                   <span class="truncate">{{ branch.name }}</span>
                   <span v-if="branch.pinned" class="text-xs bg-yellow-100 text-yellow-800 px-1 rounded">Pinned</span>
@@ -66,11 +66,11 @@
 
             <div class="flex items-center gap-2 ml-3">
               <button @click.stop="openEditBranch(branch)" title="Edit"
-                class="px-2 py-1 rounded hover:bg-gray-50 text-sm">✏️</button>
+                class="px-2 py-1 rounded hover:bg-gray-50 text-xs">✏️</button>
               <button @click.stop="togglePin(index)" title="Pin"
-                class="px-2 py-1 rounded hover:bg-gray-50 text-sm">📌</button>
+                class="px-2 py-1 rounded hover:bg-gray-50 text-xs">📌</button>
               <button @click.stop="promoteToTop(index)" title="Promote"
-                class="px-2 py-1 rounded hover:bg-gray-50 text-sm">⬆️</button>
+                class="px-2 py-1 rounded hover:bg-gray-50 text-xs">⬆️</button>
             </div>
           </li>
         </ul>
@@ -83,8 +83,8 @@
       <!-- <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 class="text-lg font-medium text-indigo-100 mb-1">{{ $t('finance.balance') }}</h3>
-          <p class="text-3xl font-bold">{{ financeStore.formattedBalance }}</p>
+          <h3 class="text-sm font-medium text-indigo-100 mb-1">{{ $t('finance.balance') }}</h3>
+          <p class="text-xl font-bold">{{ financeStore.formattedBalance }}</p>
         </div>
         <div class="flex gap-3">
           <button
@@ -127,33 +127,39 @@
           {{ $t('expenses.addExpense') || 'Add Expense' }}
         </button>
       </div>
-      <div :class="['grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 my-4', isRTL ? 'text-end' : 'text-start']">
+      <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 my-4', isRTL ? 'text-end' : 'text-start']">
         <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
-          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
+          <p class="text-xs text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
+          <p class="text-sm font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAll }} {{ $t('labels.results') || 'records' }}</p>
         </div>
 
         <div class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalMasrouf') || 'Immediate (Masrouf)' }}</p>
-          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalMasrouf) }}</p>
+          <p class="text-xs text-gray-600">{{ $t('expenses.totalMasrouf') || 'Immediate (Masrouf)' }}</p>
+          <p class="text-sm font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalMasrouf) }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countMasrouf }} {{ $t('labels.results') || 'records' }}</p>
         </div>
 
         <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-400">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalAhd') || 'Deferred (Ahd)' }}</p>
-          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAhd) }}</p>
+          <p class="text-xs text-gray-600">{{ $t('expenses.totalAhd') || 'Deferred (Ahd)' }}</p>
+          <p class="text-sm font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAhd) }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAhd }} {{ $t('labels.results') || 'records' }}</p>
         </div>
 
         <div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-600">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalOut') || 'Total Out' }}</p>
-          <p class="text-xl font-semibold text-red-600 mt-1">{{ formatCurrency(expensesSummary.totalOut) }}</p>
+          <p class="text-xs text-gray-600">{{ $t('expenses.totalOut') || 'Total Out' }}</p>
+          <p class="text-sm font-semibold text-red-600 mt-1">{{ formatCurrency(expensesSummary.totalOut) }}</p>
         </div>
 
         <div class="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
-          <p class="text-sm text-gray-600">{{ $t('expenses.totalIn') || 'Total In' }}</p>
-          <p class="text-xl font-semibold text-green-600 mt-1">{{ formatCurrency(expensesSummary.totalIn) }}</p>
+          <p class="text-xs text-gray-600">{{ $t('expenses.totalIn') || 'Total In' }}</p>
+          <p class="text-sm font-semibold text-green-600 mt-1">{{ formatCurrency(expensesSummary.totalIn) }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-600">
+          <p class="text-xs text-gray-600">{{ $t('expenses.netBalance') || 'Net Balance' }}</p>
+          <p class="text-sm font-semibold" :class="{'text-green-600': expensesSummary.net >= 0, 'text-red-600': expensesSummary.net < 0}">
+            {{ formatCurrency(expensesSummary.net || 0) }}
+          </p>
         </div>
       </div>
 
@@ -174,7 +180,7 @@
                   @keyup.enter="expenses.value.page = 1; fetchExpenses()"
                   :placeholder="$t('labels.search') || 'Search'"
                   :disabled="loading"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                    :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
                 />
               </div>
 
@@ -185,7 +191,7 @@
                   v-model="expensesFilters.startDate"
                   type="date"
                   :disabled="loading"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
                 />
               </div>
 
@@ -196,14 +202,14 @@
                   v-model="expensesFilters.endDate"
                   type="date"
                   :disabled="loading"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
                 />
               </div>
 
               <!-- Location -->
               <div>
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.location') || 'Location' }}</label>
-                <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
+                <select v-model.number="expensesFilters.locationId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']">
                   <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
                   <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
                 </select>
@@ -221,7 +227,7 @@
                     @keydown="handleCategoryKeydown"
                     :disabled="loading"
                     :placeholder="$t('expenses.category') || 'Category'"
-                    :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right direction-rtl' : 'text-left']"
+                    :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right direction-rtl' : 'text-left']"
                   />
                   <!-- Dropdown -->
                   <div
@@ -253,7 +259,7 @@
               <!-- Branch Filter - ✅ NEW: Only shown when selectedBranch is null -->
               <div v-if="selectedBranch === null">
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.branch') || 'Branch' }}</label>
-                <select v-model.number="expensesFilters.branchId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']">
+                <select v-model.number="expensesFilters.branchId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']">
                   <option :value="null">{{ $t('expenses.branch') || 'Branch' }}</option>
                   <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                 </select>
@@ -267,7 +273,7 @@
                   type="text"
                   :placeholder="$t('expenses.classification') || 'Classification'"
                   :disabled="loading"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-sm', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
                 />
               </div>
             </div>
@@ -279,7 +285,7 @@
             <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
               <div class="p-6">
                 <div class="mb-4">
-                  <h3 class="text-lg font-semibold text-gray-900">
+                  <h3 class="text-sm font-semibold text-gray-900">
                     <span v-if="fieldModal.type === 'category'">{{ $t('expenses.addCategory') || 'Add Category' }}</span>
                     <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
                     <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
@@ -287,7 +293,7 @@
                 </div>
                 <form @submit.prevent="saveFieldModal">
                   <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">
                       <span v-if="fieldModal.type === 'category'">{{ $t('expenses.enterCategoryName') || 'Category Name' }}</span>
                       <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.enterBranchName') || 'Branch Name' }}</span>
                       <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.enterLocationName') || 'Location Name' }}</span>
@@ -295,7 +301,7 @@
                     <input v-model="fieldModal.name" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div v-if="fieldModal.type === 'branch'" class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1 ">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
+                    <label class="block text-xs font-medium text-gray-700 mb-1 ">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
                     <input v-model="fieldModal.category" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
                   </div>
                   <div class="flex gap-2 mt-6">
@@ -309,7 +315,7 @@
 
           <div class="flex gap-2 items-center">
             <button type="button" @click="clearExpensesFilters" :disabled="loading"
-              class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm">
+              class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-xs">
               {{ $t('labels.clear') || 'Clear' }}
             </button>
             <div v-if="loading" class="ml-2">
@@ -319,13 +325,13 @@
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div :class="['text-sm text-gray-600', isRTL ? 'text-end' : 'text-start']">
+          <div :class="['text-xs text-gray-600', isRTL ? 'text-end' : 'text-start']">
             {{ $t('expenses.totalExpenses') || 'Total Expenses' }}: <span class="font-semibold">{{ expenses.total }}</span>
           </div>
-          <div :class="['flex items-center gap-2 text-sm text-gray-600', isRTL ? 'justify-end' : 'justify-start']">
+          <div :class="['flex items-center gap-2 text-xs text-gray-600', isRTL ? 'justify-end' : 'justify-start']">
             <label>{{ $t('finance.pageSize') || 'Page Size' }}:</label>
             <select v-model.number="expenses.pageSize" @change="onPageSizeChange"
-              class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              class="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
               <option :value="10">10</option>
               <option :value="20">20</option>
               <option :value="50">50</option>
@@ -361,8 +367,8 @@
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
               </path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('expenses.noResults') || 'No expenses found' }}</h3>
-            <p class="mt-1 text-sm text-gray-500">
+            <h3 class="mt-2 text-xs font-medium text-gray-900">{{ $t('expenses.noResults') || 'No expenses found' }}</h3>
+            <p class="mt-1 text-xs text-gray-500">
               {{ $t('expenses.searchBy') || 'Start by adding a new expense' }}
             </p>
           </div>
@@ -383,9 +389,17 @@
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.description') || 'Description' }}
                   </th>
+                  <!-- Branch column (before Amount) -->
+                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.branch') || 'Branch' }}
+                  </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.amount') || 'Amount' }}
+                  </th>
+                  <!-- Flow column (after Amount) -->
+                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.flow') || 'Flow' }}
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
@@ -395,21 +409,32 @@
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr v-for="expense in expenses.items" :key="expense.id" class="hover:bg-gray-50">
-                  <td :class="['px-6 py-4 whitespace-nowrap text-sm text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ formatDate(expense.date) }}
                   </td>
-                  <td :class="['px-6 py-4 whitespace-nowrap text-sm', isRTL ? 'text-end' : 'text-start']">
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs', isRTL ? 'text-end' : 'text-start']">
                     <BadgeComponent variant="warning">
                       {{ expense.category || '-' }}
                     </BadgeComponent>
                   </td>
-                  <td :class="['px-6 py-4 text-sm text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                  <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.description || '-' }}
                   </td>
-                  <td :class="['px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600', isRTL ? 'text-end' : 'text-start']">
+                  <td :class="['px-6 py-4 text-xs', isRTL ? 'text-end' : 'text-start']">
+                    <span v-if="expense.branch && (expense.branch.name || expense.branch)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {{ expense.branch?.name || expense.branch }}
+                    </span>
+                    <span v-else class="text-gray-400">{{ $t('finance.companyWallet') || 'Main Treasury' }}</span>
+                  </td>
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs font-semibold text-red-600', isRTL ? 'text-end' : 'text-start']">
                     {{ formatCurrency(expense.amount) }}
                   </td>
-                  <td :class="['px-6 py-4 text-sm text-gray-500', isRTL ? 'text-end' : 'text-start']">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span :class="[{ 'bg-green-100 text-green-800': expense.flow === 'IN', 'bg-red-100 text-red-800': expense.flow !== 'IN' }, 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium']">
+                      {{ expense.flow === 'IN' ? $t('expenses.flowIn') || 'Income' : $t('expenses.flowOut') || 'Expense' }}
+                    </span>
+                  </td>
+                  <td :class="['px-6 py-4 text-xs text-gray-500', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.notes || '-' }}
                   </td>
                 </tr>
@@ -421,22 +446,22 @@
             :class="['bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6', isRTL ? 'flex-row-reverse' : '']">
             <div :class="['flex-1 flex justify-between sm:hidden', isRTL ? 'flex-row-reverse' : '']">
               <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
-                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ $t('labels.previous') }}
               </button>
-              <span :class="['text-sm text-gray-700 self-center', isRTL ? 'order-2' : '']">
+              <span :class="['text-xs text-gray-700 self-center', isRTL ? 'order-2' : '']">
                 {{ expenses.page }} / {{ expenses.totalPages }}
               </span>
               <button @click="changePage(expenses.page + 1)"
                 :disabled="expenses.page >= expenses.totalPages"
-                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ $t('labels.next') }}
               </button>
             </div>
             <div
               :class="['hidden sm:flex-1 sm:flex sm:items-center sm:justify-between', isRTL ? 'flex-row-reverse' : '']">
               <div>
-                <p :class="['text-sm text-gray-700', isRTL ? 'text-end' : 'text-start']">
+                <p :class="['text-xs text-gray-700', isRTL ? 'text-end' : 'text-start']">
                   {{ $t('labels.showing') }}
                   <span class="font-medium">{{ ((expenses.page - 1) * expenses.pageSize) + 1 }}</span>
                   {{ $t('labels.to') }}
@@ -453,7 +478,7 @@
                   <template v-if="!isRTL">
                     <!-- Previous Button (LTR: left) -->
                     <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
-                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
+                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
@@ -463,7 +488,7 @@
                     <!-- Next Button (LTR: right) -->
                     <button @click="changePage(expenses.page + 1)"
                       :disabled="expenses.page >= expenses.totalPages"
-                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
+                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -475,7 +500,7 @@
                     <!-- Next Button (RTL: left, visually first) -->
                     <button @click="changePage(expenses.page + 1)"
                       :disabled="expenses.page >= expenses.totalPages"
-                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
+                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
@@ -484,7 +509,7 @@
                     </button>
                     <!-- Previous Button (RTL: right, visually last) -->
                     <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
-                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
+                      class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -505,7 +530,7 @@
         <div :class="['bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto', isRTL ? 'direction-rtl' : '']">
           <div class="p-6">
             <div class="flex items-center justify-between mb-4">
-              <h3 :class="['text-lg font-semibold text-gray-900', isRTL ? 'text-start' : 'text-start']">
+              <h3 :class="['text-sm font-semibold text-gray-900', isRTL ? 'text-start' : 'text-start']">
                 {{ $t('expenses.addExpense') || 'Add Expense' }}
               </h3>
               <button @click="closeExpenseModal" class="text-gray-400 hover:text-gray-600">
@@ -518,7 +543,7 @@
             <form @submit.prevent="handleCreateExpense" class="grid gap-4 grid-cols-1 md:grid-cols-2">
               <!-- Date - Column 1 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.date') || 'Date' }} <span class="text-red-500">*</span>
                 </label>
                 <input 
@@ -531,7 +556,7 @@
 
               <!-- Category - Column 2 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.category') || 'Category' }} <span class="text-red-500">*</span>
                 </label>
                 <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
@@ -549,7 +574,7 @@
 
               <!-- Description - Full Width -->
               <div class="col-span-1 md:col-span-2">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.description') || 'Description' }} <span class="text-red-500">*</span>
                 </label>
                 <input 
@@ -563,7 +588,7 @@
 
               <!-- Flow Type - Column 1 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.flow') || 'Flow' }} <span class="text-red-500">*</span>
                 </label>
                 <div class="flex gap-2">
@@ -596,7 +621,7 @@
 
               <!-- Settlement Date (only for IN/Income) - Column 2 -->
               <div v-if="expenseForm.flow === 'IN'">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.settlementDate') || 'Settlement Date' }}
                 </label>
                 <input 
@@ -610,7 +635,7 @@
 
               <!-- Branch - Column 1 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.branch') || 'Branch' }}
                 </label>
                 <select 
@@ -624,7 +649,7 @@
 
               <!-- Location - Column 2 (required) -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.location') || 'Location' }} <span class="text-red-500">*</span>
                 </label>
                 <select 
@@ -639,7 +664,7 @@
 
               <!-- Classification - optional -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.classification') || 'Classification' }}
                 </label>
                 <input
@@ -652,7 +677,7 @@
 
               <!-- Amount - Column 2 -->
               <div>
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.amount') || 'Amount' }} <span class="text-red-500">*</span>
                 </label>
                 <input 
@@ -668,7 +693,7 @@
 
               <!-- Notes - Full Width -->
               <div class="col-span-1 md:col-span-2">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.notes') || 'Notes' }}
                 </label>
                 <textarea 
@@ -708,12 +733,12 @@
       <div
         :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
         <div class="mt-3">
-          <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">
+          <h3 :class="['text-sm font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">
             {{ $t('finance.editBranch') || 'Edit Branch' }}
           </h3>
           <form @submit.prevent="handleEditBranch" :class="['space-y-4', isRTL ? 'text-end' : 'text-start']">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-xs font-medium text-gray-700 mb-1">
                 {{ $t('finance.branchName') || 'Branch Name' }} *
               </label>
               <input v-model.trim="editBranchForm.name" type="text" required
@@ -745,7 +770,7 @@
     isRTL ? 'text-end' : 'text-start'
   ]" >
           <div class="mt-3">
-            <h3 :class="['text-lg font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">
+            <h3 :class="['text-sm font-medium text-gray-900 mb-4', isRTL ? 'text-end' : 'text-start']">
               <span v-if="!selectedBranch">{{ $t('finance.transferToBranch') || 'Transfer to Branch' }}</span>
               <span v-else-if="transferForm.transferType === 'toCompany'">{{ $t('finance.transferToCompany') || 'Transfer to Company' }}</span>
               <span v-else>{{ $t('finance.transferToBranch') || 'Transfer to Branch' }}</span>
@@ -753,7 +778,7 @@
             <form @submit.prevent="handleTransfer" :class="['grid gap-4 grid-cols-1 md:grid-cols-2', isRTL ? 'text-end' : 'text-start']">
               <!-- Transfer Type Selection (only when a branch is selected) - Full Width -->
               <div v-if="selectedBranch" class="col-span-1 md:col-span-2">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('finance.transferType') }} *
                 </label>
                 <div class="flex gap-2">
@@ -761,7 +786,7 @@
                     type="button"
                     @click="transferForm.transferType = 'toCompany'"
                     :class="[
-                      'flex-1 px-3 py-2 rounded-lg font-medium transition text-sm',
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition text-xs',
                       transferForm.transferType === 'toCompany' 
                         ? 'bg-indigo-600 text-white' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -773,7 +798,7 @@
                     type="button"
                     @click="transferForm.transferType = 'toBranch'"
                     :class="[
-                      'flex-1 px-3 py-2 rounded-lg font-medium transition text-sm',
+                      'flex-1 px-3 py-2 rounded-lg font-medium transition text-xs',
                       transferForm.transferType === 'toBranch' 
                         ? 'bg-indigo-600 text-white' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -786,14 +811,14 @@
 
               <!-- From Branch (read-only when branch is selected) - Full Width -->
               <div v-if="selectedBranch" class="col-span-1 md:col-span-2 p-3 bg-gray-50 rounded-md">
-                <p :class="['text-sm text-gray-700', isRTL ? 'text-right' : 'text-left']">
+                <p :class="['text-xs text-gray-700', isRTL ? 'text-right' : 'text-left']">
                   <strong>{{ $t('finance.fromBranch') }}:</strong> {{ selectedBranch.name }}
                 </p>
               </div>
 
               <!-- To Branch Selection - Column 1 -->
               <div v-if="!selectedBranch || transferForm.transferType === 'toBranch'" class="col-span-1 md:col-span-1">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('finance.selectBranch') }} *
                 </label>
                 <select 
@@ -814,14 +839,14 @@
 
               <!-- To Company (read-only when transfer type is toCompany) - Column 1 -->
               <div v-if="selectedBranch && transferForm.transferType === 'toCompany'" class="col-span-1 md:col-span-1 p-3 bg-indigo-50 rounded-md flex items-center">
-                <p :class="['text-sm text-indigo-700', isRTL ? 'text-right' : 'text-left']">
+                <p :class="['text-xs text-indigo-700', isRTL ? 'text-right' : 'text-left']">
                   <strong>{{ $t('finance.to') }}:</strong> {{ $t('finance.companyWallet') }}
                 </p>
               </div>
 
               <!-- Amount - Column 2 -->
               <div class="col-span-1 md:col-span-1">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('finance.amount') }} *
                 </label>
                 <input 
@@ -836,7 +861,7 @@
 
               <!-- Description - Full Width -->
               <div class="col-span-1 md:col-span-2">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('finance.description') }}
                 </label>
                 <input 
@@ -848,7 +873,7 @@
 
               <!-- Date - Column 1 -->
               <div class="col-span-1 md:col-span-1">
-                <label :class="['block text-sm font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('finance.date') }} *
                 </label>
                 <input 
@@ -938,6 +963,8 @@ export default {
 
     // Categories + inline add modal (mirrors ExpensesList.vue UX)
     const extraCategories = ref({})
+    // Known categories discovered from backend responses (persistent across refreshes)
+    const knownCategories = ref([])
     const fieldModal = ref({ open: false, type: '', name: '', category: '' })
     const { t, tm, locale } = useI18n()
 
@@ -952,8 +979,11 @@ export default {
     })
 
     const categoryOptions = computed(() => {
-      const cats = categories.value || {}
-      return Object.keys(cats).map(key => ({ value: key, label: cats[key] }))
+      const backend = knownCategories.value.map(c => ({ value: c, label: c }))
+      const extra = Object.keys(extraCategories.value).map(k => ({ value: k, label: k }))
+      const all = [...backend, ...extra]
+      const seen = new Set()
+      return all.filter(item => !seen.has(item.value) && seen.add(item.value))
     })
 
     // ✅ Filtered category options based on input
@@ -991,6 +1021,8 @@ export default {
         // ✅ Auto-select the newly created category in both expense form and filter
         expenseForm.value.category = fieldModal.value.name
         expensesFilters.value.category = fieldModal.value.name
+        // Persist extra categories locally so they survive refreshes
+        try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
         if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
         closeFieldModal()
         return
@@ -1049,6 +1081,8 @@ export default {
       expensesFilters.value.category = trimmed
       showCategoryDropdown.value = false
       selectedCategoryIndex.value = -1
+      // Persist extra categories locally
+      try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
       if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
     }
 
@@ -1093,7 +1127,8 @@ export default {
       totalMasrouf: '0.00',
       totalAhd: '0.00',
       totalOut: '0.00',
-      totalIn: '0.00'
+      totalIn: '0.00',
+      net: '0.00'
     })
     const showExpenseModal = ref(false)
     const expenseProcessing = ref(false)
@@ -1179,6 +1214,16 @@ export default {
           pageSize: res.data.pageSize || expenses.value.pageSize,
           totalPages: Math.ceil((res.data.total || 0) / (res.data.pageSize || expenses.value.pageSize))
         };
+        // Extract unique categories from backend data and keep for combobox
+        try {
+          const uniqueCats = new Set()
+          expenses.value.items.forEach(exp => {
+            if (exp.category?.trim()) uniqueCats.add(exp.category.trim())
+          })
+          knownCategories.value = Array.from(uniqueCats).sort()
+        } catch (e) {
+          knownCategories.value = []
+        }
         // ✅ Use summary from response if available, otherwise fetch separately
         if (res.data.summary) {
           expensesSummary.value = {
@@ -1189,7 +1234,8 @@ export default {
             totalMasrouf: res.data.summary.totalMasrouf || '0.00',
             totalAhd: res.data.summary.totalAhd || '0.00',
             totalOut: res.data.summary.totalOut || '0.00',
-            totalIn: res.data.summary.totalIn || '0.00'
+            totalIn: res.data.summary.totalIn || '0.00',
+            net: res.data.summary.net || '0.00'
           }
         } else {
           // Fallback: fetch summary separately if not included in response
@@ -1210,7 +1256,9 @@ export default {
             }
             const summaryParams = cleanParams(rawSummary)
             const s = await getExpensesSummary(summaryParams)
-            expensesSummary.value = { ...expensesSummary.value, ...(s || {}) }
+            // s may be either the summary object or an axios response; be defensive when reading net
+            const netVal = s?.net ?? s?.data?.net ?? s?.data?.summary?.net ?? '0.00'
+            expensesSummary.value = { ...expensesSummary.value, ...(s || {}), net: netVal }
           } catch (err2) {
             console.error('Error fetching expenses summary:', err2)
           }
@@ -1502,7 +1550,8 @@ export default {
           });
         }
         await fetchSummary()
-        // Note: Transfer is for wallet, expenses are separate, so we don't fetch expenses here
+        // Refresh expenses as well to reflect any related changes and update knownCategories
+        await fetchExpenses()
         closeTransferModal()
         if (window.$toast) window.$toast('Transfer successful', 'success')
       } catch (error) {
@@ -1630,6 +1679,11 @@ export default {
     }
 
     onMounted(async () => {
+      // Load persisted extra categories from localStorage
+      try {
+        const saved = localStorage.getItem('extraExpenseCategories')
+        if (saved) extraCategories.value = JSON.parse(saved)
+      } catch (e) { }
       await fetchBranches()
       await fetchSummary()
       await fetchLocations()
