@@ -1,13 +1,29 @@
 <template>
   <div class="flex space-y-0">
 
-    <aside
-      :class="['bg-white rounded-lg shadow overflow-hidden p-3', isRTL ? 'direction-rtl' : '', isRTL ? 'text-end' : 'text-start']"
-      style="min-width: 19%; max-width: 320px;">
+    <transition name="slide-fade">
+      <aside v-if="!sidebarCollapsed"
+        :class="['bg-white rounded-lg shadow overflow-hidden p-3', isRTL ? 'direction-rtl' : '', isRTL ? 'text-end' : 'text-start']"
+        style="min-width: 19%; max-width: 320px;">
       <!-- Sidebar header -->
       <div :class="['flex items-center justify-between mb-3']">
-          <h3 :class="['text-sm font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{
-          $t('finance.wallets') }}</h3>
+        <div class="flex items-center gap-2">
+          <h3 :class="['text-sm font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.wallets') }}</h3>
+          <button
+            @click="sidebarCollapsed = !sidebarCollapsed"
+            class="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded"
+            :title="sidebarCollapsed ? ($t('finance.showSidebar') || 'Show wallets') : ($t('finance.hideSidebar') || 'Hide wallets')"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path v-if="!sidebarCollapsed && !isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+              <path v-else-if="sidebarCollapsed && !isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+              <!-- RTL variants (flip directions) -->
+              <path v-if="!sidebarCollapsed && isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+              <path v-else-if="sidebarCollapsed && isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+          </button>
+        </div>
+
         <div class="flex items-center gap-2">
           <button v-if="previousOrders.length" @click="undoOrder" title="Undo"
             class="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-xs">Undo</button>
@@ -75,7 +91,21 @@
           </li>
         </ul>
       </transition>
-    </aside>
+      </aside>
+    </transition>
+
+    <!-- Floating Show Sidebar button when collapsed -->
+    <div v-if="sidebarCollapsed" :class="['fixed top-20 right-6 z-40', isRTL ? 'left-6 right-auto' : '']">
+      <button
+        @click="sidebarCollapsed = false"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-xl transition-all duration-200 flex items-center justify-center"
+        :title="$t('finance.showSidebar') || 'Show wallets'"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
     <!-- Main Content -->
     <div :class="['flex-1 p-6 space-y-6', isRTL ? 'text-end' : 'text-start']">
       <!-- Balance Card -->
@@ -937,6 +967,8 @@ export default {
     const previousOrders = ref([])
     const audioCtxRef = ref(null)
     const selectedBranch = ref(null)
+    // Sidebar collapsed state (persisted to localStorage)
+    const sidebarCollapsed = ref(false)
     const summary = ref({ balance: 0, last30dIn: 0, last30dOut: 0 })
     const expenses = ref({ items: [], total: 0, page: 1, pageSize: 10, totalPages: 1 })
     const loading = ref(false)
@@ -1684,10 +1716,20 @@ export default {
         const saved = localStorage.getItem('extraExpenseCategories')
         if (saved) extraCategories.value = JSON.parse(saved)
       } catch (e) { }
+      // Load persisted sidebar collapsed state
+      try {
+        const savedSidebar = localStorage.getItem('companyFinanceSidebarCollapsed')
+        if (savedSidebar !== null) sidebarCollapsed.value = savedSidebar === 'true'
+      } catch (e) { }
       await fetchBranches()
       await fetchSummary()
       await fetchLocations()
       await fetchExpenses()
+    })
+
+    // Persist sidebar state
+    watch(sidebarCollapsed, (val) => {
+      try { localStorage.setItem('companyFinanceSidebarCollapsed', String(val)) } catch (e) { }
     })
 
     // Add isRTL computed property
@@ -1801,6 +1843,8 @@ export default {
       addCategoryPrompt,
       saveFieldModal,
       closeFieldModal,
+      // Sidebar collapsed state
+      sidebarCollapsed,
       // ✅ Category combobox exports
       categoryInput,
       showCategoryDropdown,
@@ -1900,4 +1944,16 @@ li:focus-within {
 .overflow-auto::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* Slide + fade transition for sidebar */
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from, .slide-fade-leave-to {
+  transform: translateX(-12px);
+  opacity: 0;
+}
+
+/* Ensure floating button is visible above other elements */
+.fixed.top-20.right-6 { z-index: 40; }
 </style>

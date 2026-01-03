@@ -484,6 +484,8 @@
     "to": "To",
     "selectBranch": "Select Branch",
     "transferAmount": "Transfer Amount"
+    ,"showSidebar": "Show wallets",
+    "hideSidebar": "Hide wallets"
   },
   "company": {
     "wallet": {

@@ -484,6 +484,8 @@
     "to": "إلى",
     "selectBranch": "اختر الفرع",
     "transferAmount": "مبلغ التحويل"
+    ,"showSidebar": "إظهار المحافظ",
+    "hideSidebar": "إخفاء المحافظ"
   },
   "company": {
     "wallet": {
