@@ -436,6 +436,15 @@
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.notes') || 'Notes' }}
                   </th>
+                  <!-- New columns: Location, Signed, Classification -->
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('labels.location') || 'Location' }}
+                  </th>
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.classification') || 'Classification' }}
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -467,6 +476,18 @@
                   </td>
                   <td :class="['px-6 py-4 text-xs text-gray-500', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.notes || '-' }}
+                  </td>
+                  <!-- Location -->
+                  <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                    <span v-if="expense.location && (expense.location.name || expense.location)" class="inline-flex items-center gap-1">
+                      {{ expense.location?.name || expense.location }}
+                    </span>
+                    <span v-else class="text-gray-400">-</span>
+                  </td>
+                  <!-- Signed column removed per request -->
+                  <!-- Classification -->
+                  <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                    {{ expense.classification || '-' }}
                   </td>
                 </tr>
               </tbody>
