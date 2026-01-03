@@ -945,7 +945,7 @@
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpensesSummary, getLocations, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 
@@ -1234,10 +1234,14 @@ export default {
 
         let res
         if (!selectedBranch.value) {
-          // Main company expenses (branchId = NULL)
-          res = await getCompanyExpenses(listParams);
+          // Main Treasury view: use the generic /api/expenses endpoint so the
+          // filter's branchId is respected (users can filter company-wide
+          // expenses by a specific branch without switching to that branch view).
+          // Note: getCompanyExpenses may not honor branchId the same way.
+          res = await getExpenses(listParams);
         } else {
-          // Branch expenses
+          // Branch-specific expenses (endpoint uses branch in URL); do not
+          // include branchId in params in this mode.
           res = await getBranchExpenses(selectedBranch.value.id, listParams);
         }
         expenses.value = {
