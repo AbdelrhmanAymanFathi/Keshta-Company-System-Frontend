@@ -310,39 +310,14 @@
             </div>
           </div>
 
-          <!-- Field Modal (Add Category/Branch/Location) -->
-          <div v-if="fieldModal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="z-index:1050;">
-            <div class="fixed inset-0 bg-black bg-opacity-50 z-40" @click="closeFieldModal"></div>
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
-              <div class="p-6">
-                <div class="mb-4">
-                  <h3 class="text-sm font-semibold text-gray-900">
-                    <span v-if="fieldModal.type === 'category'">{{ $t('expenses.addCategory') || 'Add Category' }}</span>
-                    <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
-                    <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
-                  </h3>
-                </div>
-                <form @submit.prevent="saveFieldModal">
-                  <div class="mb-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-1">
-                      <span v-if="fieldModal.type === 'category'">{{ $t('expenses.enterCategoryName') || 'Category Name' }}</span>
-                      <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.enterBranchName') || 'Branch Name' }}</span>
-                      <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.enterLocationName') || 'Location Name' }}</span>
-                    </label>
-                    <input v-model="fieldModal.name" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                  </div>
-                  <div v-if="fieldModal.type === 'branch'" class="mb-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-1 ">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
-                    <input v-model="fieldModal.category" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                  </div>
-                  <div class="flex gap-2 mt-6">
-                    <button type="button" @click="closeFieldModal" class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">{{ $t('labels.save') }}</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
+          <AddFieldModal
+            :open="fieldModal.open"
+            :type="fieldModal.type"
+            :name="fieldModal.name"
+            :branch-category="fieldModal.category"
+            @close="closeFieldModal"
+            @save="handleFieldSave"
+          />
 
           <div class="flex gap-2 items-center">
             <button type="button" @click="clearExpensesFilters" :disabled="loading"
@@ -690,13 +665,16 @@
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.branch') || 'Branch' }}
                 </label>
-                <select 
-                  v-model.number="expenseForm.branchId" 
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
-                >
-                  <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
-                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
-                </select>
+                <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
+                  <select 
+                    v-model.number="expenseForm.branchId" 
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  >
+                    <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
+                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
+                  </select>
+                  <button type="button" @click="addBranchPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                </div>
               </div>
 
               <!-- Location - Column 2 (required) -->
@@ -704,14 +682,17 @@
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.location') || 'Location' }} <span class="text-red-500">*</span>
                 </label>
-                <select 
-                  v-model.number="expenseForm.locationId"
-                  required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
-                >
-                  <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
-                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
-                </select>
+                <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
+                  <select 
+                    v-model.number="expenseForm.locationId"
+                    required
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  >
+                    <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
+                    <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+                  </select>
+                  <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                </div>
               </div>
 
               <!-- Classification - optional -->
@@ -966,13 +947,14 @@
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, createExpense, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, createExpense, createBranch, createLocation, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
+import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 
 export default {
   name: 'CompanyFinance',
-  components: { BadgeComponent },
+  components: { BadgeComponent, AddFieldModal },
   setup() {
     const financeStore = useCompanyFinanceStore()
     const showTransferModal = ref(false)
@@ -1064,6 +1046,8 @@ export default {
     })
 
     const addCategoryPrompt = () => { fieldModal.value = { open: true, type: 'category', name: '', category: '' } }
+    const addBranchPrompt = () => { fieldModal.value = { open: true, type: 'branch', name: '', category: '' } }
+    const addLocationPrompt = () => { fieldModal.value = { open: true, type: 'location', name: '', category: '' } }
     const closeFieldModal = () => { fieldModal.value = { open: false, type: '', name: '', category: '' } }
     const saveFieldModal = async () => {
       if (!fieldModal.value.name) {
@@ -1081,7 +1065,54 @@ export default {
         closeFieldModal()
         return
       }
+      // Handle branch creation (calls API or simulates on failure), mirroring ExpensesList behavior
+      if (fieldModal.value.type === 'branch') {
+        try {
+          const payload = { name: fieldModal.value.name, category: fieldModal.value.category }
+          const res = await createBranch(payload)
+          const newBranch = res.data
+          branches.value.unshift(newBranch)
+          // Set the expense form to the new branch
+          expenseForm.value.branchId = newBranch.id
+          if (window.$toast) window.$toast(t('expenses.success.branchAdded') || 'Branch added', 'success')
+        } catch (error) {
+          console.error('Error creating branch, simulating:', error)
+          const newBranch = { id: Date.now(), name: fieldModal.value.name, category: fieldModal.value.category }
+          branches.value.unshift(newBranch)
+          expenseForm.value.branchId = newBranch.id
+          if (window.$toast) window.$toast('Branch added (simulated)')
+        }
+        closeFieldModal()
+        return
+      }
+
+      // Handle location creation
+      if (fieldModal.value.type === 'location') {
+        try {
+          const payload = { name: fieldModal.value.name }
+          const res = await createLocation(payload)
+          const newLocation = res.data
+          locations.value.unshift(newLocation)
+          expenseForm.value.locationId = newLocation.id
+          if (window.$toast) window.$toast(t('expenses.success.locationAdded') || 'Location added', 'success')
+        } catch (error) {
+          console.error('Error creating location, simulating:', error)
+          const newLocation = { id: Date.now(), name: fieldModal.value.name }
+          locations.value.unshift(newLocation)
+          expenseForm.value.locationId = newLocation.id
+          if (window.$toast) window.$toast('Location added (simulated)')
+        }
+        closeFieldModal()
+        return
+      }
+
       closeFieldModal()
+    }
+
+    const handleFieldSave = async (payload) => {
+      fieldModal.value.name = payload.name
+      fieldModal.value.category = payload.category || ''
+      await saveFieldModal()
     }
 
     // ✅ Category combobox methods
@@ -1867,8 +1898,11 @@ export default {
       categories,
       categoryOptions,
       addCategoryPrompt,
+      addBranchPrompt,
+      addLocationPrompt,
       saveFieldModal,
       closeFieldModal,
+      handleFieldSave,
       // Sidebar collapsed state
       sidebarCollapsed,
       // ✅ Category combobox exports

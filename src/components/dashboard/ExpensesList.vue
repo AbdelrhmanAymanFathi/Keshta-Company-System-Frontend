@@ -1,37 +1,12 @@
 <template>
-      <!-- Modal for add category/branch/location -->
-      <div v-if="fieldModal && fieldModal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="z-index:1050;">
-        <div class="fixed inset-0 bg-black bg-opacity-50 z-40" @click="closeFieldModal"></div>
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
-          <div class="p-6">
-            <div class="mb-4">
-              <h3 class="text-lg font-semibold text-gray-900">
-                <span v-if="fieldModal.type === 'category'">{{ $t('expenses.addCategory') || 'Add Category' }}</span>
-                <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
-                <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
-              </h3>
-            </div>
-            <form @submit.prevent="saveFieldModal">
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  <span v-if="fieldModal.type === 'category'">{{ $t('expenses.enterCategoryName') || 'Category Name' }}</span>
-                  <span v-else-if="fieldModal.type === 'branch'">{{ $t('expenses.enterBranchName') || 'Branch Name' }}</span>
-                  <span v-else-if="fieldModal.type === 'location'">{{ $t('expenses.enterLocationName') || 'Location Name' }}</span>
-                </label>
-                <input v-model="fieldModal.name" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-              </div>
-              <div v-if="fieldModal.type === 'branch'" class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
-                <input v-model="fieldModal.category" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-              </div>
-              <div class="flex gap-2 mt-6">
-                <button type="button" @click="closeFieldModal" class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
-                <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">{{ $t('labels.save') }}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+  <AddFieldModal
+    :open="fieldModal.open"
+    :type="fieldModal.type"
+    :name="fieldModal.name"
+    :branch-category="fieldModal.category"
+    @close="closeFieldModal"
+    @save="handleFieldSave"
+  />
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl p-6' : 'p-6'">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -703,10 +678,12 @@
 
 <script>
 import { getExpenses, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches, getLocations, createBranch, createLocation } from '../../api'
+import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
+  components: { AddFieldModal },
   data() {
     return {
       expenses: [],
@@ -1259,6 +1236,12 @@ export default {
 
     addLocationPrompt() {
       this.fieldModal = { open: true, type: 'location', name: '', category: '' }
+    },
+
+    handleFieldSave(payload) {
+      this.fieldModal.name = payload.name
+      this.fieldModal.category = payload.category || ''
+      this.saveFieldModal()
     },
 
     async saveFieldModal() {
