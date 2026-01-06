@@ -432,7 +432,7 @@
             </div>
 
             <!-- Flow Type - Column 1 -->
-            <div>
+            <!-- <div>
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.flow') }} <span class="text-red-500">*</span>
               </label>
@@ -462,7 +462,7 @@
                   {{ $t('expenses.flowIn') }}
                 </button>
               </div>
-            </div>
+            </div> -->
 
             <!-- Settlement Date - Column 2 (for all flows as status/closing date) -->
             <div class="animate-in fade-in">

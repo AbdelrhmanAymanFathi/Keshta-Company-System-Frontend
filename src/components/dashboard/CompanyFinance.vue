@@ -657,7 +657,7 @@
               </div>
 
               <!-- Flow Type - Column 1 -->
-              <div>
+              <!-- <div>
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.flow') || 'Flow' }} <span class="text-red-500">*</span>
                 </label>
@@ -687,7 +687,7 @@
                     {{ $t('expenses.flowIn') || 'Income' }}
                   </button>
                 </div>
-              </div>
+              </div> -->
 
               <!-- Settlement Date (status/closing date for any flow) - Column 2 -->
               <div>
