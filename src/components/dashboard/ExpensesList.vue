@@ -4,6 +4,7 @@
     :type="fieldModal.type"
     :name="fieldModal.name"
     :branch-category="fieldModal.category"
+    :parent-category-name="fieldModal.parentName"
     @close="closeFieldModal"
     @save="handleFieldSave"
   />
@@ -55,10 +56,21 @@
             <option :value="null">{{ $t('expenses.category') }}</option>
             <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
           </select>
-          <select v-if="selectedCategoryId" v-model.number="selectedSubcategoryId" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
-            <option :value="null">{{ $t('expenses.subcategory') }}</option>
-            <option v-for="sc in (expenseCategories.find(c=>c.id===selectedCategoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
-          </select>
+          <div v-if="selectedCategoryId" :class="['flex items-center gap-2']">
+            <select v-model.number="selectedSubcategoryId" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
+              <option :value="null">{{ $t('expenses.subcategory') }}</option>
+              <option v-for="sc in (expenseCategories.find(c=>c.id===selectedCategoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
+            </select>
+            <button
+              type="button"
+              @click="addSubcategoryPrompt(selectedCategoryId)"
+              :disabled="!selectedCategoryId"
+              class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              :title="$t('expenses.addSubcategory') || 'Add subcategory'"
+            >
+              +
+            </button>
+          </div>
           <select v-model="selectedKind" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
             <option value="">{{ $t('expenses.typeAll') || 'All Types' }}</option>
             <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
@@ -403,7 +415,7 @@
                   <option v-for="sc in (expenseCategories.find(c=>c.id===form.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
                 </select>
 
-                <button type="button" @click="addSubcategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                <button type="button" @click="addSubcategoryPrompt()" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
               </div>
             </div>
 
@@ -1317,12 +1329,16 @@ export default {
       this.fieldModal = { open: true, type: 'category', name: '', category: '', parentId: null }
     },
 
-    addSubcategoryPrompt() {
-      if (!this.form.categoryId) {
+    addSubcategoryPrompt(parentId = null) {
+      // Allow invoking from the add/edit form (uses this.form.categoryId)
+      // or from the filters (passes the selectedCategoryId)
+      const categoryId = parentId || this.form.categoryId
+      if (!categoryId) {
         this.showError(this.$t('expenses.validation.categoryRequired') || 'Select category first')
         return
       }
-      this.fieldModal = { open: true, type: 'subcategory', name: '', category: '', parentId: this.form.categoryId }
+      const parentName = (this.expenseCategories.find(c => c.id === categoryId)?.name) || ''
+      this.fieldModal = { open: true, type: 'subcategory', name: '', category: '', parentId: categoryId, parentName }
     },
 
     async refreshExpenseCategories() {
@@ -1366,8 +1382,11 @@ export default {
         const categoryId = this.fieldModal.parentId
         const res = await createExpenseSubCategory(categoryId, { name: this.fieldModal.name })
         await this.refreshExpenseCategories()
+        // Update both the add/edit form (if present) and the filter selection so the new subcategory is immediately usable
         this.form.categoryId = categoryId
         this.form.subCategoryId = res.data.id
+        this.selectedCategoryId = categoryId
+        this.selectedSubcategoryId = res.data.id
         this.showSuccess(this.$t('expenses.success.subcategoryAdded') || 'Subcategory added')
       } else if (this.fieldModal.type === 'branch') {
         try {

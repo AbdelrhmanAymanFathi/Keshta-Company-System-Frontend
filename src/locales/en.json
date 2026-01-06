@@ -602,6 +602,9 @@
     "subcategory": "Subcategory",
     "addSubcategory": "Add Subcategory",
     "enterSubcategoryName": "Subcategory Name",
+    "error": "Error",
+    "parentCategoryLabel": "Under",
+    "addSubcategoryUnder": "Add Subcategory under {parent}",
     "reportError": "Failed to download report"
   },
   "changes": {

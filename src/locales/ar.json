@@ -602,6 +602,9 @@
     "subcategory": "تصنيف فرعي",
     "addSubcategory": "إضافة تصنيف فرعي",
     "enterSubcategoryName": "اسم التصنيف الفرعي",
+    "error": "خطأ",
+    "parentCategoryLabel": "تحت",
+    "addSubcategoryUnder": "إضافة تصنيف فرعي تحت {parent}",
     "reportError": "فشل في تحميل التقرير"
   },
   "changes": {

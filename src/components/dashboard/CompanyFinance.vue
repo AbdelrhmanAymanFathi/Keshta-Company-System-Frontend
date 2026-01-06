@@ -288,12 +288,29 @@
               </div>
 
               <!-- Subcategory Filter - shows when a categoryId is selected -->
-              <div v-if="expensesFilters.categoryId">
+              <div v-if="expensesFilters.categoryId" class="relative">
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.subcategory') || 'Subcategory' }}</label>
-                <select v-model.number="expensesFilters.subCategoryId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']">
-                  <option :value="null">{{ $t('expenses.subcategory') || 'Subcategory' }}</option>
-                  <option v-for="sc in (expenseCategories.find(c=>c.id===expensesFilters.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
-                </select>
+                <div class="flex items-center gap-2">
+                  <div class="relative flex-1">
+                    <input
+                      v-model="subcategoryInput"
+                      @input="handleSubcategoryInput"
+                      @focus="handleSubcategoryInput"
+                      @blur="handleSubcategoryBlur"
+                      @keydown="handleSubcategoryKeydown"
+                      :disabled="loading"
+                      :placeholder="$t('expenses.subcategory') || 'Subcategory'"
+                      :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right direction-rtl' : 'text-left']"
+                    />
+                    <!-- Dropdown -->
+                    <div v-if="showSubcategoryDropdown && (filteredSubcategoryOptions.length > 0)" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto" :class="isRTL ? 'text-right direction-rtl' : 'text-left'">
+                      <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer hover:bg-indigo-50 transition-colors', selectedSubcategoryIndex === index ? 'bg-indigo-100' : '']">
+                        {{ option.label }}
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" @click="addSubcategoryPrompt(expensesFilters.categoryId)" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                </div>
               </div>
 
               <!-- Kind Filter (EXPENSE / ADVANCE) -->
@@ -334,6 +351,7 @@
             :type="fieldModal.type"
             :name="fieldModal.name"
             :branch-category="fieldModal.category"
+            :parent-category-name="fieldModal.parentName"
             @close="closeFieldModal"
             @save="handleFieldSave"
           />
@@ -406,10 +424,10 @@
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.date') || 'Date' }}
                   </th>
-                  <th
+                  <!-- <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.type') || 'Type' }}
-                  </th>
+                  </th> -->
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.category') || 'Category' }}
@@ -631,6 +649,7 @@
                   <option :value="null">{{ $t('expenses.subcategory') || 'Subcategory' }}</option>
                   <option v-for="sc in filteredSubcategoriesForForm" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
                 </select>
+                <button type="button" @click="addSubcategoryPrompt()" class="ml-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
               </div>
 
               <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
@@ -977,7 +996,7 @@
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpense, createBranch, createLocation, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpense, createBranch, createLocation, createExpenseSubCategory, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
@@ -1085,6 +1104,15 @@ export default {
 
     const addCategoryPrompt = () => { fieldModal.value = { open: true, type: 'category', name: '', category: '' } }
     const addBranchPrompt = () => { fieldModal.value = { open: true, type: 'branch', name: '', category: '' } }
+    const addSubcategoryPrompt = (parentId = null) => {
+      const categoryId = parentId || expenseForm.value.categoryId
+      if (!categoryId) {
+        if (window.$toast) window.$toast(t('expenses.validation.categoryRequired') || 'Select category first', 'error')
+        return
+      }
+      const parentName = (expenseCategories.value.find(c => c.id === categoryId)?.name) || ''
+      fieldModal.value = { open: true, type: 'subcategory', name: '', category: '', parentId: categoryId, parentName }
+    }
     const addLocationPrompt = () => { fieldModal.value = { open: true, type: 'location', name: '', category: '' } }
     const closeFieldModal = () => { fieldModal.value = { open: false, type: '', name: '', category: '' } }
     const saveFieldModal = async () => {
@@ -1121,6 +1149,27 @@ export default {
           branches.value.unshift(newBranch)
           expenseForm.value.branchId = newBranch.id
           if (window.$toast) window.$toast('Branch added (simulated)')
+        }
+        closeFieldModal()
+        return
+      }
+
+      // Handle subcategory creation
+      if (fieldModal.value.type === 'subcategory') {
+        try {
+          const categoryId = fieldModal.value.parentId
+          const res = await createExpenseSubCategory(categoryId, { name: fieldModal.value.name })
+          // Refresh categories tree
+          try { const r = await getExpenseCategories(); expenseCategories.value = r.data || [] } catch (e) { /* ignore */ }
+          // Select the newly created subcategory in both form and filters
+          expenseForm.value.categoryId = categoryId
+          expenseForm.value.subCategoryId = res.data.id
+          expensesFilters.value.categoryId = categoryId
+          expensesFilters.value.subCategoryId = res.data.id
+          if (window.$toast) window.$toast(t('expenses.success.subcategoryAdded') || 'Subcategory added', 'success')
+        } catch (error) {
+          console.error('Error creating subcategory:', error)
+          if (window.$toast) window.$toast(t('expenses.error') || 'Error', 'error')
         }
         closeFieldModal()
         return
@@ -1242,6 +1291,96 @@ export default {
         selectedCategoryIndex.value = -1
       }
     }
+
+    // ✅ Subcategory combobox state (for filtering)
+    const subcategoryInput = ref('')
+    const showSubcategoryDropdown = ref(false)
+    const selectedSubcategoryIndex = ref(-1)
+
+    const subcategoryOptions = computed(() => {
+      const catId = expensesFilters.value.categoryId
+      const subcats = expenseCategories.value.find(c => c.id === catId)?.subCategories || []
+      return subcats.map(sc => ({ value: sc.id, label: sc.name }))
+    })
+
+    const filteredSubcategoryOptions = computed(() => {
+      if (!subcategoryInput.value.trim()) return subcategoryOptions.value
+      const q = subcategoryInput.value.toLowerCase().trim()
+      return subcategoryOptions.value.filter(opt => opt.label.toLowerCase().includes(q))
+    })
+
+    const handleSubcategoryInput = () => {
+      showSubcategoryDropdown.value = true
+      selectedSubcategoryIndex.value = -1
+    }
+
+    const handleSubcategoryBlur = () => {
+      setTimeout(() => {
+        if (!showSubcategoryDropdown.value) return
+        showSubcategoryDropdown.value = false
+        if (expensesFilters.value.subCategoryId) {
+          const sc = subcategoryOptions.value.find(s => s.value === expensesFilters.value.subCategoryId)
+          subcategoryInput.value = sc ? sc.label : ''
+        } else {
+          subcategoryInput.value = ''
+        }
+        selectedSubcategoryIndex.value = -1
+      }, 200)
+    }
+
+    const selectSubcategory = (subcatId) => {
+      const opt = subcategoryOptions.value.find(s => s.value === subcatId)
+      if (opt) {
+        subcategoryInput.value = opt.label
+        expensesFilters.value.subCategoryId = opt.value
+        showSubcategoryDropdown.value = false
+        selectedSubcategoryIndex.value = -1
+      }
+    }
+
+    const handleSubcategoryKeydown = (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        if (filteredSubcategoryOptions.value.length > 0 && selectedSubcategoryIndex.value >= 0) {
+          const option = filteredSubcategoryOptions.value[selectedSubcategoryIndex.value]
+          selectSubcategory(option.value)
+        } else if (filteredSubcategoryOptions.value.length === 1) {
+          selectSubcategory(filteredSubcategoryOptions.value[0].value)
+        }
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        if (showSubcategoryDropdown.value) {
+          selectedSubcategoryIndex.value = Math.min(selectedSubcategoryIndex.value + 1, filteredSubcategoryOptions.value.length - 1)
+        } else {
+          showSubcategoryDropdown.value = true
+          selectedSubcategoryIndex.value = 0
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        if (showSubcategoryDropdown.value) {
+          selectedSubcategoryIndex.value = Math.max(selectedSubcategoryIndex.value - 1, -1)
+        }
+      } else if (event.key === 'Escape') {
+        showSubcategoryDropdown.value = false
+        selectedSubcategoryIndex.value = -1
+      }
+    }
+
+    // Keep subcategory input in sync when category changes
+    watch(() => expensesFilters.value.categoryId, (newVal) => {
+      expensesFilters.value.subCategoryId = null
+      subcategoryInput.value = ''
+    })
+
+    // When subCategoryId changes programmatically, reflect its name
+    watch(() => expensesFilters.value.subCategoryId, (newVal) => {
+      if (newVal) {
+        const sc = subcategoryOptions.value.find(s => s.value === newVal)
+        subcategoryInput.value = sc ? sc.label : ''
+      } else {
+        subcategoryInput.value = ''
+      }
+    })
 
     const expensesSummary = ref({
       countAll: 0,
@@ -1943,6 +2082,7 @@ export default {
       categories,
       categoryOptions,
       addCategoryPrompt,
+      addSubcategoryPrompt,
       addBranchPrompt,
       addLocationPrompt,
       saveFieldModal,
@@ -1959,6 +2099,17 @@ export default {
       handleCategoryInput,
       handleCategoryBlur,
       selectCategory,
+      // Subcategory combobox exports
+      subcategoryInput,
+      showSubcategoryDropdown,
+      selectedSubcategoryIndex,
+      filteredSubcategoryOptions,
+      subcategoryOptions,
+      handleSubcategoryInput,
+      handleSubcategoryBlur,
+      selectSubcategory,
+      handleSubcategoryKeydown,
+      filteredSubcategoriesForForm,
       addNewCategory,
       handleCategoryKeydown
     }

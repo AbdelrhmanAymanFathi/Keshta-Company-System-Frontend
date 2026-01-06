@@ -11,6 +11,10 @@
             <span v-else-if="type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
             <span v-else-if="type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
           </h3>
+          <p v-if="type === 'subcategory' && parentCategoryName" class="text-sm text-gray-500 mt-1">
+            <!-- Use a simple label: "Under {parent}" -->
+            {{ $t('expenses.parentCategoryLabel') || 'Under' }}: <strong>{{ parentCategoryName }}</strong>
+          </p>
         </div>
         <form @submit.prevent="handleSave">
           <div class="mb-4">
@@ -44,7 +48,8 @@ export default {
     // `type` may be empty when modal is closed; make it optional and allow empty string
     type: { type: String, required: false, default: '', validator: (v) => v === '' || ['category', 'subcategory', 'branch', 'location'].includes(v) },
     name: { type: String, default: '' },
-    branchCategory: { type: String, default: '' }
+    branchCategory: { type: String, default: '' },
+    parentCategoryName: { type: String, default: '' }
   },
   emits: ['close', 'save'],
   data() {
