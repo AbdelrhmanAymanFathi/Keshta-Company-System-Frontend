@@ -57,10 +57,23 @@
             <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
           </select>
           <div v-if="selectedCategoryId" :class="['flex items-center gap-2']">
-            <select v-model.number="selectedSubcategoryId" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
-              <option :value="null">{{ $t('expenses.subcategory') }}</option>
-              <option v-for="sc in (expenseCategories.find(c=>c.id===selectedCategoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
-            </select>
+            <div class="relative flex-1">
+              <input
+                v-model="subcategoryInput"
+                @input="handleSubcategoryInput"
+                @focus="handleSubcategoryInput"
+                @blur="handleSubcategoryBlur"
+                @keydown="handleSubcategoryKeydown"
+                :disabled="loading"
+                :placeholder="$t('expenses.subcategory')"
+                :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+              />
+              <div v-if="showSubcategoryDropdown && (filteredSubcategoryOptions.length > 0)" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto" :class="isRTL ? 'text-right' : 'text-left'">
+                <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer hover:bg-indigo-50 transition-colors', selectedSubcategoryIndex === index ? 'bg-indigo-100' : '']">
+                  {{ option.label }}
+                </div>
+              </div>
+            </div>
             <button
               type="button"
               @click="addSubcategoryPrompt(selectedCategoryId)"
@@ -767,6 +780,10 @@ export default {
       searchQuery: '',
       selectedCategoryId: null,
       selectedSubcategoryId: null,
+      // Subcategory combobox state
+      subcategoryInput: '',
+      showSubcategoryDropdown: false,
+      selectedSubcategoryIndex: -1,
       selectedKind: '',
       modalOpen: false,
       editing: false,
@@ -800,6 +817,18 @@ export default {
   computed: {
     isRTL() { 
       return this.$i18n && this.$i18n.locale === 'ar' 
+    },
+
+    // Subcategory options computed from selected category
+    subcategoryOptions() {
+      const subcats = this.expenseCategories.find(c => c.id === this.selectedCategoryId)?.subCategories || []
+      return subcats.map(sc => ({ value: sc.id, label: sc.name }))
+    },
+
+    filteredSubcategoryOptions() {
+      if (!this.subcategoryInput || !this.subcategoryInput.trim()) return this.subcategoryOptions
+      const q = this.subcategoryInput.toLowerCase().trim()
+      return this.subcategoryOptions.filter(opt => opt.label.toLowerCase().includes(q))
     },
 
     // Map of category keys -> localized labels (from i18n), used by getCategoryLabel/getCategoryColor
@@ -857,10 +886,18 @@ export default {
     },
     selectedCategoryId() {
       this.selectedSubcategoryId = null
+      this.subcategoryInput = ''
       this.currentPage = 1
       this.loadExpenses()
     },
     selectedSubcategoryId() {
+      // Keep input label in sync and trigger filtering
+      if (this.selectedSubcategoryId) {
+        const sc = this.subcategoryOptions.find(s => s.value === this.selectedSubcategoryId)
+        this.subcategoryInput = sc ? sc.label : ''
+      } else {
+        this.subcategoryInput = ''
+      }
       this.currentPage = 1
       this.loadExpenses()
     },
@@ -961,6 +998,65 @@ export default {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page
         await this.loadExpenses()
+      }
+    },
+    // Subcategory combobox handlers
+    handleSubcategoryInput() {
+      this.showSubcategoryDropdown = true
+      this.selectedSubcategoryIndex = -1
+    },
+
+    handleSubcategoryBlur() {
+      setTimeout(() => {
+        if (!this.showSubcategoryDropdown) return
+        this.showSubcategoryDropdown = false
+        if (this.selectedSubcategoryId) {
+          const sc = this.subcategoryOptions.find(s => s.value === this.selectedSubcategoryId)
+          this.subcategoryInput = sc ? sc.label : ''
+        } else {
+          this.subcategoryInput = ''
+        }
+        this.selectedSubcategoryIndex = -1
+      }, 200)
+    },
+
+    selectSubcategory(subcatId) {
+      const opt = this.subcategoryOptions.find(s => s.value === subcatId)
+      if (opt) {
+        this.subcategoryInput = opt.label
+        this.selectedSubcategoryId = opt.value
+        this.showSubcategoryDropdown = false
+        this.selectedSubcategoryIndex = -1
+        this.currentPage = 1
+        this.loadExpenses()
+      }
+    },
+
+    handleSubcategoryKeydown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        if (this.filteredSubcategoryOptions.length > 0 && this.selectedSubcategoryIndex >= 0) {
+          const option = this.filteredSubcategoryOptions[this.selectedSubcategoryIndex]
+          this.selectSubcategory(option.value)
+        } else if (this.filteredSubcategoryOptions.length === 1) {
+          this.selectSubcategory(this.filteredSubcategoryOptions[0].value)
+        }
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        if (this.showSubcategoryDropdown) {
+          this.selectedSubcategoryIndex = Math.min(this.selectedSubcategoryIndex + 1, this.filteredSubcategoryOptions.length - 1)
+        } else {
+          this.showSubcategoryDropdown = true
+          this.selectedSubcategoryIndex = 0
+        }
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        if (this.showSubcategoryDropdown) {
+          this.selectedSubcategoryIndex = Math.max(this.selectedSubcategoryIndex - 1, -1)
+        }
+      } else if (event.key === 'Escape') {
+        this.showSubcategoryDropdown = false
+        this.selectedSubcategoryIndex = -1
       }
     },
     

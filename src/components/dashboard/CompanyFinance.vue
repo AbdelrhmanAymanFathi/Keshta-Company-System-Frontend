@@ -1373,12 +1373,19 @@ export default {
     })
 
     // When subCategoryId changes programmatically, reflect its name
-    watch(() => expensesFilters.value.subCategoryId, (newVal) => {
+    watch(() => expensesFilters.value.subCategoryId, async (newVal) => {
       if (newVal) {
         const sc = subcategoryOptions.value.find(s => s.value === newVal)
         subcategoryInput.value = sc ? sc.label : ''
       } else {
         subcategoryInput.value = ''
+      }
+      // Reset page and fetch results when subcategory filter changes
+      try {
+        expenses.value.page = 1
+        await fetchExpenses()
+      } catch (e) {
+        // ignore
       }
     })
 
