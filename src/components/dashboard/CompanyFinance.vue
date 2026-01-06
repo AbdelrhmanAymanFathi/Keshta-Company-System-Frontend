@@ -208,7 +208,7 @@
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.search') || 'Search' }}</label>
                 <input
                   v-model="expensesFilters.q"
-                  @keyup.enter="expenses.value.page = 1; fetchExpenses()"
+                  @keyup.enter="expenses.page = 1; fetchExpenses()"
                   :placeholder="$t('labels.search') || 'Search'"
                   :disabled="loading"
                     :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
@@ -300,7 +300,7 @@
               <div>
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.kindLabel') || 'Type' }}</label>
                 <select v-model="expensesFilters.kind" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']">
-                  <option value="">{{ $t('expenses.typeAll') || 'All Types' }}</option>
+                  <option :value="null">{{ $t('expenses.typeAll') || 'All Types' }}</option>
                   <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
                   <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
                 </select>
@@ -408,6 +408,10 @@
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.type') || 'Type' }}
+                  </th>
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.category') || 'Category' }}
                   </th>
                   <th
@@ -445,6 +449,11 @@
                 <tr v-for="expense in expenses.items" :key="expense.id" class="hover:bg-gray-50">
                   <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ formatDate(expense.date) }}
+                  </td>
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'bg-indigo-100 text-indigo-800'">
+                      {{ expense.kind === 'ADVANCE' ? ($t('expenses.kind.advance') || 'عهدة') : ($t('expenses.kind.expense') || 'مصروف') }}
+                    </span>
                   </td>
                   <td :class="['px-6 py-4 whitespace-nowrap text-xs', isRTL ? 'text-end' : 'text-start']">
                     <BadgeComponent variant="warning">
@@ -1034,7 +1043,7 @@ export default {
 
     // Filters used when fetching expenses and the summary (kept simple for now)
     // ✅ Updated to support Expenses v2: categoryId, subCategoryId, kind
-    const expensesFilters = ref({ q: '', categoryId: null, subCategoryId: null, kind: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null })
+    const expensesFilters = ref({ q: '', categoryId: null, subCategoryId: null, kind: null, startDate: '', endDate: '', classification: '', locationId: null, branchId: null })
 
     // Categories + inline add modal (mirrors ExpensesList.vue UX)
     const extraCategories = ref({})
@@ -1888,7 +1897,7 @@ export default {
 
     // ✅ Updated clearExpensesFilters to include category and branchId
     const clearExpensesFilters = async () => {
-      expensesFilters.value = { q: '', categoryId: null, subCategoryId: null, kind: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null }
+      expensesFilters.value = { q: '', categoryId: null, subCategoryId: null, kind: null, startDate: '', endDate: '', classification: '', locationId: null, branchId: null }
       expenses.value.page = 1
       await fetchExpenses()
     }
