@@ -362,6 +362,9 @@ export const updateCrusher = (id, data) =>
 // Locations
 export const getLocations = () =>
   axios.get(`${BASE_URL}/api/locations`);
+// Expense Categories (hierarchical: categories with nested subCategories)
+export const getExpenseCategories = () =>
+  axios.get(`${BASE_URL}/api/expense-categories`);
 export const createLocation = (data) =>
   axios.post(`${BASE_URL}/api/locations`, data);
 export const updateLocation = (id, data) =>
@@ -641,7 +644,9 @@ export const getCompanyExpenses = (params = {}) => {
   });
   // Only append non-empty, non-null, non-undefined values
   if (q) queryParams.append('q', q);
-  if (category) queryParams.append('category', category);
+  if (params.categoryId !== undefined && params.categoryId !== null) queryParams.append('categoryId', params.categoryId.toString());
+  if (params.subCategoryId !== undefined && params.subCategoryId !== null) queryParams.append('subCategoryId', params.subCategoryId.toString());
+  if (params.kind) queryParams.append('kind', params.kind);
   if (classification) queryParams.append('classification', classification);
   if (branchId !== undefined && branchId !== null) queryParams.append('branchId', branchId.toString());
   if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
@@ -670,7 +675,9 @@ export const getBranchExpenses = (branchId, params = {}) => {
   });
   // Only append non-empty, non-null, non-undefined values
   if (q) queryParams.append('q', q);
-  if (category) queryParams.append('category', category);
+  if (categoryId !== undefined && categoryId !== null) queryParams.append('categoryId', categoryId.toString());
+  if (subCategoryId !== undefined && subCategoryId !== null) queryParams.append('subCategoryId', subCategoryId.toString());
+  if (kind) queryParams.append('kind', kind);
   if (classification) queryParams.append('classification', classification);
   if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
   if (startDate) queryParams.append('startDate', startDate);
@@ -685,8 +692,9 @@ export const getExpenses = (params = {}) => {
     page = 1, 
     pageSize = 20, 
     q, 
-    category, 
-    classification, 
+    categoryId, 
+    subCategoryId,
+    kind,
     branchId, 
     locationId, 
     startDate, 
@@ -699,8 +707,9 @@ export const getExpenses = (params = {}) => {
   });
   // Only append non-empty, non-null, non-undefined values
   if (q) queryParams.append('q', q);
-  if (category) queryParams.append('category', category);
-  if (classification) queryParams.append('classification', classification);
+  if (categoryId !== undefined && categoryId !== null) queryParams.append('categoryId', categoryId.toString());
+  if (subCategoryId !== undefined && subCategoryId !== null) queryParams.append('subCategoryId', subCategoryId.toString());
+  if (kind) queryParams.append('kind', kind);
   if (branchId !== undefined && branchId !== null) queryParams.append('branchId', branchId.toString());
   if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
   if (startDate) queryParams.append('startDate', startDate);

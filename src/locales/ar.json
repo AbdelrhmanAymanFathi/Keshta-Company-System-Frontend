@@ -557,6 +557,13 @@
     "totalOut": "الإجمالي الخارج",
     "totalIn": "الإجمالي الداخل",
     "classification": "التصنيف",
+    "type": "النوع",
+    "kindLabel": "النوع",
+    "typeAll": "كل الأنواع",
+    "kind": {
+      "expense": "مصروف",
+      "advance": "عهدة"
+    },
     "deleteConfirmation": "هل أنت متأكد من حذف هذا المصروف؟",
     "loadError": "خطأ في تحميل المصروفات",
     "saveError": "خطأ في حفظ المصروف",

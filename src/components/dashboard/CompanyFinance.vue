@@ -287,6 +287,25 @@
                 </div>
               </div>
 
+              <!-- Subcategory Filter - shows when a categoryId is selected -->
+              <div v-if="expensesFilters.categoryId">
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.subcategory') || 'Subcategory' }}</label>
+                <select v-model.number="expensesFilters.subCategoryId" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']">
+                  <option :value="null">{{ $t('expenses.subcategory') || 'Subcategory' }}</option>
+                  <option v-for="sc in (expenseCategories.find(c=>c.id===expensesFilters.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
+                </select>
+              </div>
+
+              <!-- Kind Filter (EXPENSE / ADVANCE) -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.kindLabel') || 'Type' }}</label>
+                <select v-model="expensesFilters.kind" :disabled="loading" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']">
+                  <option value="">{{ $t('expenses.typeAll') || 'All Types' }}</option>
+                  <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
+                  <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
+                </select>
+              </div>
+
               <!-- Branch Filter - ✅ NEW: Only shown when selectedBranch is null -->
               <div v-if="selectedBranch === null">
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.branch') || 'Branch' }}</label>
@@ -588,15 +607,35 @@
                 </label>
                 <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
                   <select
-                    v-model="expenseForm.category"
+                    v-model.number="expenseForm.categoryId"
                     required
                     :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
                   >
-                    <option value="">{{ $t('expenses.category') || 'Category' }}</option>
-                    <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                    <option :value="null">{{ $t('expenses.category') || 'Category' }}</option>
+                    <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                   </select>
                   <button type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
                 </div>
+              </div>
+
+              <!-- Subcategory (optional) - Column 2 -->
+              <div v-if="expenseForm.categoryId">
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
+                  {{ $t('expenses.subcategory') || 'Subcategory' }}
+                </label>
+                <select v-model.number="expenseForm.subCategoryId" :class="['w-full px-3 py-2 border border-gray-300 rounded-lg', isRTL ? 'text-start' : 'text-start']">
+                  <option :value="null">{{ $t('expenses.subcategory') || 'Subcategory' }}</option>
+                  <option v-for="sc in filteredSubcategoriesForForm" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
+                </select>
+              </div>
+
+              <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
+              <div>
+                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.kindLabel') || 'Type' }}</label>
+                <select v-model="expenseForm.kind" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                  <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
+                  <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
+                </select>
               </div>
 
               <!-- Description - Full Width -->
@@ -947,7 +986,7 @@
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, createExpense, createBranch, createLocation, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpense, createBranch, createLocation, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
@@ -994,14 +1033,23 @@ export default {
     const locations = ref([])
 
     // Filters used when fetching expenses and the summary (kept simple for now)
-    // ✅ Added category and branchId filters
-    const expensesFilters = ref({ q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null })
+    // ✅ Updated to support Expenses v2: categoryId, subCategoryId, kind
+    const expensesFilters = ref({ q: '', categoryId: null, subCategoryId: null, kind: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null })
 
     // Categories + inline add modal (mirrors ExpensesList.vue UX)
     const extraCategories = ref({})
     // Known categories discovered from backend responses (persistent across refreshes)
     const knownCategories = ref([])
     const fieldModal = ref({ open: false, type: '', name: '', category: '' })
+    // Expense categories tree (ExpenseCategory with nested subCategories)
+    const expenseCategories = ref([])
+
+    const filteredSubcategoriesForForm = computed(() => {
+      const catId = expenseForm.value.categoryId
+      if (!catId) return []
+      const cat = expenseCategories.value.find(c => c.id === catId)
+      return Array.isArray(cat?.subCategories) ? cat.subCategories : []
+    })
     const { t, tm, locale } = useI18n()
 
     // ✅ Category combobox state
@@ -1057,8 +1105,10 @@ export default {
       if (fieldModal.value.type === 'category') {
         extraCategories.value = { ...extraCategories.value, [fieldModal.value.name]: fieldModal.value.name }
         // ✅ Auto-select the newly created category in both expense form and filter
-        expenseForm.value.category = fieldModal.value.name
-        expensesFilters.value.category = fieldModal.value.name
+        // When creating a free-text category (local), we cannot resolve an ID, so keep it in extraCategories
+        // and clear any categoryId selections until the user chooses a real category from the tree.
+        expenseForm.value.categoryId = null
+        expensesFilters.value.categoryId = null
         // Persist extra categories locally so they survive refreshes
         try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
         if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
@@ -1127,15 +1177,11 @@ export default {
       setTimeout(() => {
         if (!showCategoryDropdown.value) return // Already handled by click
         showCategoryDropdown.value = false
-        // If input doesn't match any category, restore to selected value or clear
-        if (expensesFilters.value.category) {
-          const selectedOption = categoryOptions.value.find(opt => opt.value === expensesFilters.value.category)
-          if (selectedOption) {
-            categoryInput.value = selectedOption.label
-          } else {
-            // Category exists in filter but not in options (might be newly added)
-            categoryInput.value = expensesFilters.value.category
-          }
+        // If a categoryId is selected, show its name; otherwise clear the input
+        if (expensesFilters.value.categoryId) {
+          const cat = expenseCategories.value.find(c => c.id === expensesFilters.value.categoryId)
+          if (cat) categoryInput.value = cat.name
+          else categoryInput.value = ''
         } else {
           categoryInput.value = ''
         }
@@ -1147,7 +1193,9 @@ export default {
       const option = categoryOptions.value.find(opt => opt.value === categoryValue)
       if (option) {
         categoryInput.value = option.label
-        expensesFilters.value.category = option.value
+        // Try to map the chosen string category to a real categoryId (if exists)
+        const found = expenseCategories.value.find(cat => cat.name.toLowerCase() === option.label.toLowerCase())
+        expensesFilters.value.categoryId = found ? found.id : null
         showCategoryDropdown.value = false
         selectedCategoryIndex.value = -1
       }
@@ -1163,7 +1211,8 @@ export default {
       extraCategories.value = { ...extraCategories.value, [trimmed]: trimmed }
       // Select it immediately
       categoryInput.value = trimmed
-      expensesFilters.value.category = trimmed
+      // We can't resolve an ID for a locally added free-text category; clear any ID filter
+      expensesFilters.value.categoryId = null
       showCategoryDropdown.value = false
       selectedCategoryIndex.value = -1
       // Persist extra categories locally
@@ -1274,7 +1323,9 @@ export default {
           page: expenses.value.page,
           pageSize: expenses.value.pageSize,
           q: expensesFilters.value.q,
-          category: expensesFilters.value.category,
+          categoryId: expensesFilters.value.categoryId,
+          subCategoryId: expensesFilters.value.subCategoryId,
+          kind: expensesFilters.value.kind,
           startDate: expensesFilters.value.startDate,
           endDate: expensesFilters.value.endDate,
           classification: expensesFilters.value.classification,
@@ -1331,10 +1382,11 @@ export default {
           try {
             const rawSummary = {
               q: expensesFilters.value.q,
-              category: expensesFilters.value.category,
+              categoryId: expensesFilters.value.categoryId,
+              subCategoryId: expensesFilters.value.subCategoryId,
+              kind: expensesFilters.value.kind,
               startDate: expensesFilters.value.startDate,
               endDate: expensesFilters.value.endDate,
-              classification: expensesFilters.value.classification,
               locationId: expensesFilters.value.locationId
             }
             // ✅ If branch is selected, use its ID; otherwise use branchId filter (if set)
@@ -1673,15 +1725,17 @@ export default {
 
     // Expense modal handlers
     const openExpenseModal = () => {
+      // Use new fields: categoryId, subCategoryId, kind
       expenseForm.value = { 
         date: new Date().toISOString().split('T')[0], 
-        category: '', 
+        categoryId: null,
+        subCategoryId: null,
+        kind: 'EXPENSE', // default as per spec
         description: '', 
         amount: 0,
         notes: '',
         branchId: selectedBranch.value ? selectedBranch.value.id : null,
         locationId: null,
-        classification: '',
         flow: 'OUT',
         settlementDate: null
       }
@@ -1691,13 +1745,14 @@ export default {
       showExpenseModal.value = false
       expenseForm.value = {
         date: new Date().toISOString().split('T')[0],
-        category: '',
+        categoryId: null,
+        subCategoryId: null,
+        kind: 'EXPENSE',
         description: '',
         amount: 0,
         notes: '',
         branchId: null,
         locationId: null,
-        classification: '',
         flow: 'OUT',
         settlementDate: null
       }
@@ -1707,14 +1762,8 @@ export default {
         if (window.$toast) window.$toast('Please enter a valid amount', 'error')
         return
       }
-      if (!expenseForm.value.category) {
+      if (!expenseForm.value.categoryId) {
         if (window.$toast) window.$toast('Please select a category', 'error')
-        return
-      }
-      // Ensure the selected category exists in current categories (including user-added)
-      const validCats = Object.keys(categories.value || {})
-      if (!validCats.includes(expenseForm.value.category)) {
-        if (window.$toast) window.$toast('Invalid category selected', 'error')
         return
       }
       if (!expenseForm.value.description || !String(expenseForm.value.description).trim()) {
@@ -1731,9 +1780,12 @@ export default {
       }
       expenseProcessing.value = true
       try {
+        // Send new payload using IDs and kind (do NOT send old string category/classification)
         const expenseData = {
           date: expenseForm.value.date,
-          category: expenseForm.value.category,
+          kind: expenseForm.value.kind || 'EXPENSE',
+          categoryId: expenseForm.value.categoryId,
+          subCategoryId: expenseForm.value.subCategoryId || undefined,
           description: expenseForm.value.description,
           amount: expenseForm.value.amount,
           flow: expenseForm.value.flow || 'OUT',
@@ -1747,9 +1799,6 @@ export default {
         // Include locationId (required for backend)
         if (expenseForm.value.locationId !== null) {
           expenseData.locationId = expenseForm.value.locationId
-        }
-        if (expenseForm.value.classification) {
-          expenseData.classification = expenseForm.value.classification
         }
         // Include settlementDate only for IN flow and when provided
         if (expenseForm.value.flow === 'IN' && expenseForm.value.settlementDate) {
@@ -1781,6 +1830,13 @@ export default {
       await fetchBranches()
       await fetchSummary()
       await fetchLocations()
+      // Load hierarchical expense categories (ExpenseCategory + subCategories)
+      try {
+        const r = await getExpenseCategories()
+        expenseCategories.value = r.data || []
+      } catch (e) {
+        expenseCategories.value = []
+      }
       await fetchExpenses()
     })
 
@@ -1816,14 +1872,14 @@ export default {
       await fetchExpenses()
     }, { deep: true })
 
-    // ✅ Sync categoryInput with expensesFilters.category
-    watch(() => expensesFilters.value.category, (newValue) => {
+    // ✅ Sync categoryInput label with selected categoryId (if any)
+    watch(() => expensesFilters.value.categoryId, (newValue) => {
       if (newValue) {
-        const option = categoryOptions.value.find(opt => opt.value === newValue)
-        if (option) {
-          categoryInput.value = option.label
+        const cat = expenseCategories.value.find(c => c.id === newValue)
+        if (cat) {
+          categoryInput.value = cat.name
         } else {
-          categoryInput.value = newValue
+          categoryInput.value = ''
         }
       } else {
         categoryInput.value = ''
@@ -1832,7 +1888,7 @@ export default {
 
     // ✅ Updated clearExpensesFilters to include category and branchId
     const clearExpensesFilters = async () => {
-      expensesFilters.value = { q: '', category: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null }
+      expensesFilters.value = { q: '', categoryId: null, subCategoryId: null, kind: '', startDate: '', endDate: '', classification: '', locationId: null, branchId: null }
       expenses.value.page = 1
       await fetchExpenses()
     }
@@ -1895,6 +1951,7 @@ export default {
       // Category helpers and inline-add modal
       extraCategories,
       fieldModal,
+      expenseCategories,
       categories,
       categoryOptions,
       addCategoryPrompt,

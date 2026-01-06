@@ -48,16 +48,25 @@
         
         <div class="flex gap-2">
           <select 
-            v-model="selectedCategory" 
+            v-model.number="selectedCategoryId" 
             class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             :class="isRTL ? 'text-right' : 'text-left'"
           >
-            <option value="">{{ $t('expenses.category') }}</option>
-            <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+            <option :value="null">{{ $t('expenses.category') }}</option>
+            <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+          </select>
+          <select v-if="selectedCategoryId" v-model.number="selectedSubcategoryId" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
+            <option :value="null">{{ $t('expenses.subcategory') }}</option>
+            <option v-for="sc in (expenseCategories.find(c=>c.id===selectedCategoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
+          </select>
+          <select v-model="selectedKind" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
+            <option value="">{{ $t('expenses.typeAll') || 'All Types' }}</option>
+            <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
+            <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
           </select>
           
           <button 
-            v-if="searchQuery || selectedCategory"
+            v-if="searchQuery || selectedCategoryId"
             @click="clearFilters"
             class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
@@ -95,6 +104,9 @@
                 {{ $t('expenses.date') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.type') || 'Type' }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.category') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
@@ -130,6 +142,11 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatDate(expense.date) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'bg-indigo-100 text-indigo-800'">
+                  {{ expense.kind === 'ADVANCE' ? ( $t('expenses.kind.advance') || 'عهدة' ) : ( $t('expenses.kind.expense') || 'مصروف' ) }}
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="getCategoryColor(expense.category)">
@@ -189,7 +206,7 @@
               </td>
             </tr>
             <tr v-if="filteredExpenses.length === 0">
-              <td colspan="11" class="px-6 py-12 text-center text-gray-500">
+              <td colspan="12" class="px-6 py-12 text-center text-gray-500">
                 <div class="flex flex-col items-center">
                   <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -350,16 +367,34 @@
               </label>
               <div class="flex gap-2">
                 <select 
-                  v-model="form.category" 
+                  v-model.number="form.categoryId" 
                   required
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   :class="isRTL ? 'text-right' : 'text-left'"
                 >
-                  <option value="">{{ $t('expenses.category') }}</option>
-                  <option v-for="option in categoryOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+                  <option :value="null">{{ $t('expenses.category') }}</option>
+                  <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                 </select>
                 <button type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
               </div>
+            </div>
+
+            <!-- Subcategory (optional) - Column 2 -->
+            <div v-if="form.categoryId">
+              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.subcategory') }}</label>
+              <select v-model.number="form.subCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
+                <option :value="null">{{ $t('expenses.subcategory') }}</option>
+                <option v-for="sc in (expenseCategories.find(c=>c.id===form.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
+              </select>
+            </div>
+
+            <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.kindLabel') }}</label>
+              <select v-model="form.kind" class="w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
+                <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
+                <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
+              </select>
             </div>
 
             <!-- Description - Full Width -->
@@ -677,7 +712,7 @@
 </template>
 
 <script>
-import { getExpenses, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches, getLocations, createBranch, createLocation } from '../../api'
+import { getExpenses, getExpenseCategories, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches, getLocations, createBranch, createLocation } from '../../api'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 
 export default {
@@ -692,10 +727,14 @@ export default {
       extraCategories: {},
       // Backend-discovered categories (kept up-to-date from server responses)
       knownCategories: [],
+      // Hierarchical expense categories tree
+      expenseCategories: [],
       loading: false,
       error: null,
       searchQuery: '',
-      selectedCategory: '',
+      selectedCategoryId: null,
+      selectedSubcategoryId: null,
+      selectedKind: '',
       modalOpen: false,
       editing: false,
       saving: false,
@@ -754,8 +793,14 @@ export default {
         )
       }
       
-      if (this.selectedCategory) {
-        filtered = filtered.filter(expense => expense.category === this.selectedCategory)
+      if (this.selectedCategoryId) {
+        filtered = filtered.filter(expense => expense.categoryId === this.selectedCategoryId)
+      }
+      if (this.selectedSubcategoryId) {
+        filtered = filtered.filter(expense => expense.subCategoryId === this.selectedSubcategoryId)
+      }
+      if (this.selectedKind) {
+        filtered = filtered.filter(expense => expense.kind === this.selectedKind)
       }
       
       return filtered
@@ -778,8 +823,17 @@ export default {
     searchQuery() {
       this.currentPage = 1
     },
-    selectedCategory() {
+    selectedCategoryId() {
       this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedSubcategoryId() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedKind() {
+      this.currentPage = 1
+      this.loadExpenses()
     }
   },
   
@@ -789,6 +843,13 @@ export default {
       const saved = localStorage.getItem('extraExpenseCategories')
       if (saved) this.extraCategories = JSON.parse(saved)
     } catch (e) { }
+      // Load hierarchical expense categories
+      try {
+        const r = await getExpenseCategories()
+        this.expenseCategories = r.data || []
+      } catch (e) {
+        this.expenseCategories = []
+      }
     await this.loadExpenses()
     await this.fetchBranches()
     await this.fetchLocations()
@@ -806,7 +867,9 @@ export default {
           pageSize: this.pageSize
         }
         if (this.searchQuery) params.q = this.searchQuery
-        if (this.selectedCategory) params.category = this.selectedCategory
+        if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
+        if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
+        if (this.selectedKind) params.kind = this.selectedKind
         
         const response = await getExpenses(params)
         this.expenses = response.data.items || []
@@ -910,7 +973,9 @@ export default {
       this.form = {
         id: expense.id,
         date: expense.date.split('T')[0],
-        category: expense.category,
+        categoryId: expense.categoryId || null,
+        subCategoryId: expense.subCategoryId || null,
+        kind: expense.kind || 'EXPENSE',
         description: expense.description,
         amount: expense.amount,
         flow: expense.flow || 'OUT',
@@ -928,7 +993,9 @@ export default {
       this.form = {
         id: null,
         date: '',
-        category: '',
+        categoryId: null,
+        subCategoryId: null,
+        kind: 'EXPENSE',
         description: '',
         amount: '',
         flow: 'OUT',
@@ -947,14 +1014,15 @@ export default {
       try {
         const expenseData = {
           date: this.form.date,
-          category: this.form.category,
+          kind: this.form.kind || 'EXPENSE',
+          categoryId: this.form.categoryId,
+          subCategoryId: this.form.subCategoryId || undefined,
           description: this.form.description,
           amount: parseFloat(this.form.amount),
           flow: this.form.flow || 'OUT',
           branchId: this.form.branchId || null,
           // send the selected locationId (required and validated)
           locationId: this.form.locationId,
-          classification: this.form.classification || undefined,
           notes: this.form.notes || ''
         }
         
@@ -965,7 +1033,7 @@ export default {
         
         console.log('Sending expense data:', expenseData)
         console.log('Available categories:', this.categories)
-        console.log('Selected category:', this.form.category)
+        console.log('Selected categoryId:', this.form.categoryId)
         
         if (this.editing) {
           try {
@@ -1006,13 +1074,15 @@ export default {
               const newExpense = {
                 id: Date.now(), // Generate a temporary ID
                 date: expenseData.date + 'T00:00:00.000Z',
-                category: expenseData.category,
+                  category: (this.expenseCategories.find(c => c.id === expenseData.categoryId)?.name) || '',
+                  categoryId: expenseData.categoryId || null,
+                  subCategoryId: expenseData.subCategoryId || null,
                 description: expenseData.description,
                   amount: expenseData.amount.toString(),
                   notes: expenseData.notes,
                   location: this.locations.find(l => l.id === expenseData.locationId) || null,
                   locationId: expenseData.locationId,
-                  classification: expenseData.classification || '' ,
+                  classification: '',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
               }
@@ -1052,7 +1122,7 @@ export default {
         this.showError(this.$t('expenses.validation.dateRequired'))
         return false
       }
-      if (!this.form.category) {
+      if (!this.form.categoryId) {
         this.showError(this.$t('expenses.validation.categoryRequired'))
         return false
       }
@@ -1060,12 +1130,7 @@ export default {
         this.showError((this.$t('expenses.location') || 'Location') + ' ' + (this.$t('common.required') || 'is required'))
         return false
       }
-      // Check if category is valid
-      const validCategories = Object.keys(this.categories)
-      if (!validCategories.includes(this.form.category)) {
-        this.showError('Invalid category selected')
-        return false
-      }
+      // Category validity is enforced via categoryId selection; no extra check needed here
       if (!this.form.description.trim()) {
         this.showError(this.$t('expenses.validation.descriptionRequired'))
         return false
@@ -1114,7 +1179,9 @@ export default {
     
     clearFilters() {
       this.searchQuery = ''
-      this.selectedCategory = ''
+      this.selectedCategoryId = null
+      this.selectedSubcategoryId = null
+      this.selectedKind = ''
       this.currentPage = 1
       this.loadExpenses()
     },
@@ -1164,7 +1231,13 @@ export default {
     async downloadReport() {
       this.downloading = true
       try {
-        const response = await getExpensesReport()
+        const params = {}
+        if (this.searchQuery) params.q = this.searchQuery
+        if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
+        if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
+        if (this.selectedKind) params.kind = this.selectedKind
+        // (Only pass filters available in this component: query, categoryId, subCategoryId, kind)
+        const response = await getExpensesReport(params)
         // Handle both direct blob and response.data blob
         const blobData = response instanceof Blob ? response : response.data
         
@@ -1259,7 +1332,8 @@ export default {
           this.extraCategories = { ...this.extraCategories, [this.fieldModal.name]: this.fieldModal.name }
           // Persist user-added categories locally
           try { localStorage.setItem('extraExpenseCategories', JSON.stringify(this.extraCategories)) } catch (e) { }
-          this.form.category = this.fieldModal.name
+          // Can't resolve an ID for locally-added free-text categories; clear selection
+          this.form.categoryId = null
           this.showSuccess(this.$t('expenses.success.categoryAdded') || 'Category added')
       } else if (this.fieldModal.type === 'branch') {
         try {

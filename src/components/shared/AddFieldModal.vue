@@ -39,7 +39,8 @@ export default {
   name: 'AddFieldModal',
   props: {
     open: { type: Boolean, required: true },
-    type: { type: String, required: true, validator: (v) => ['category', 'branch', 'location'].includes(v) },
+    // `type` may be empty when modal is closed; make it optional and allow empty string
+    type: { type: String, required: false, default: '', validator: (v) => v === '' || ['category', 'branch', 'location'].includes(v) },
     name: { type: String, default: '' },
     branchCategory: { type: String, default: '' }
   },
