@@ -117,7 +117,6 @@
               <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.location') || 'Location' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.category') || 'Category' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.classification') || 'Classification' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.description') || 'Description' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') || 'Amount' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.notes') || 'Notes' }}</th>
@@ -132,9 +131,15 @@
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900" style="display: table-cell !important;">{{ expense.branch || '-' }}</td>
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.locationName || expense.location?.name || '-' }}</td>
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <Badge :variant="getCategoryVariant(expense.category)">{{ expense.category || '-' }}</Badge>
+                <div class="flex flex-col gap-1 items-start">
+                  <span class="font-medium text-gray-900">
+                    {{ expense.category || '-' }}
+                  </span>
+                  <span class="text-xs text-gray-600">
+                    {{ expense.classification || '-' }}
+                  </span>
+                </div>
               </td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.classification || '-' }}</td>
               <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.description || '-' }}</td>
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense.amount || 0) }}</td>
               <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.notes || '-' }}</td>

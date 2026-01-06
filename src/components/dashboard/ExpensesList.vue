@@ -106,10 +106,12 @@
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.type') || 'Type' }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.category') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.description') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
@@ -148,11 +150,21 @@
                   {{ expense.kind === 'ADVANCE' ? ( $t('expenses.kind.advance') || 'عهدة' ) : ( $t('expenses.kind.expense') || 'مصروف' ) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="getCategoryColor(expense.category)">
-                  {{ getCategoryLabel(expense.category) }}
-                </span>
+              <td class="px-6 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
+                <div class="flex flex-col gap-1" :class="isRTL ? 'items-end' : 'items-start'">
+                  <!-- Category pill -->
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        :class="getCategoryColor(expense.category)">
+                    {{ getCategoryLabel(expense.category) }}
+                  </span>
+
+                  <!-- Subcategory line -->
+                  <span class="text-xs text-gray-600">
+                    {{ getSubcategoryLabel(expense) }}
+                  </span>
+                </div>
               </td>
+
               <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.description }}
               </td>
@@ -381,11 +393,18 @@
 
             <!-- Subcategory (optional) - Column 2 -->
             <div v-if="form.categoryId">
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.subcategory') }}</label>
-              <select v-model.number="form.subCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
-                <option :value="null">{{ $t('expenses.subcategory') }}</option>
-                <option v-for="sc in (expenseCategories.find(c=>c.id===form.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
-              </select>
+              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.subcategory') }}
+              </label>
+
+              <div class="flex gap-2">
+                <select v-model.number="form.subCategoryId" class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
+                  <option :value="null">{{ $t('expenses.subcategory') }}</option>
+                  <option v-for="sc in (expenseCategories.find(c=>c.id===form.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
+                </select>
+
+                <button type="button" @click="addSubcategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+              </div>
             </div>
 
             <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
@@ -420,7 +439,7 @@
               <div class="flex gap-2">
                 <button 
                   type="button"
-                  @click="form.flow = 'OUT'; form.settlementDate = null"
+                  @click="form.flow = 'OUT'"
                   :class="[
                     'flex-1 px-3 py-2 rounded-lg font-medium transition',
                     form.flow === 'OUT' 
@@ -445,8 +464,8 @@
               </div>
             </div>
 
-            <!-- Settlement Date (only for IN/Income) - Column 2 -->
-            <div v-if="form.flow === 'IN'" class="animate-in fade-in">
+            <!-- Settlement Date - Column 2 (for all flows as status/closing date) -->
+            <div class="animate-in fade-in">
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.settlementDate') }}
               </label>
@@ -495,14 +514,6 @@
                 </select>
                 <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
               </div>
-            </div>
-
-            <!-- Classification - optional -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.classification') || 'Classification' }}
-              </label>
-              <input v-model="form.classification" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'" />
             </div>
 
             <!-- Amount - Column 2 -->
@@ -712,7 +723,20 @@
 </template>
 
 <script>
-import { getExpenses, getExpenseCategories, createExpense, updateExpense, deleteExpense, getExpensesReport, getBranches, getLocations, createBranch, createLocation } from '../../api'
+import {
+  getExpenses,
+  getExpenseCategories,
+  createExpenseCategory,
+  createExpenseSubCategory,
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  getExpensesReport,
+  getBranches,
+  getLocations,
+  createBranch,
+  createLocation
+} from '../../api'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 
 export default {
@@ -724,9 +748,6 @@ export default {
       expenses: [],
       branches: [],
       locations: [],
-      extraCategories: {},
-      // Backend-discovered categories (kept up-to-date from server responses)
-      knownCategories: [],
       // Hierarchical expense categories tree
       expenseCategories: [],
       loading: false,
@@ -742,19 +763,20 @@ export default {
       downloading: false,
       showLocationDialog: false,
       selectedLocation: 'downloads',
-      fieldModal: { open: false, type: '', name: '', category: '' },
+      fieldModal: { open: false, type: '', name: '', category: '', parentId: null },
       form: {
         id: null,
         date: '',
-        category: '',
+        categoryId: null,
+        subCategoryId: null,
+        kind: 'EXPENSE',
         description: '',
         amount: '',
         notes: '',
         flow: 'OUT',
         branchId: null,
         locationId: null,
-        settlementDate: null,
-        classification: ''
+        settlementDate: null
       },
       deleteConfirm: { open: false, item: null },
       currentPage: 1,
@@ -767,18 +789,15 @@ export default {
     isRTL() { 
       return this.$i18n && this.$i18n.locale === 'ar' 
     },
-    
-    categories() {
-      const base = this.$tm('expenses.categories') || {}
-      return { ...base, ...this.extraCategories }
-    },
 
-    categoryOptions() {
-      const backend = this.knownCategories.map(c => ({ value: c, label: c }))
-      const extra = Object.keys(this.extraCategories).map(k => ({ value: k, label: k }))
-      const all = [...backend, ...extra]
-      const seen = new Set()
-      return all.filter(item => !seen.has(item.value) && seen.add(item.value))
+    // Map of category keys -> localized labels (from i18n), used by getCategoryLabel/getCategoryColor
+    categories() {
+      try {
+        const base = this.$tm && this.$tm('expenses.categories')
+        return base || {}
+      } catch (e) {
+        return {}
+      }
     },
     
     filteredExpenses() {
@@ -787,8 +806,9 @@ export default {
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase()
         filtered = filtered.filter(expense => 
-          expense.description.toLowerCase().includes(query) ||
-          expense.category.toLowerCase().includes(query) ||
+          (expense.description || '').toLowerCase().includes(query) ||
+          (expense.category || '').toLowerCase().includes(query) ||
+          (expense.classification || '').toLowerCase().includes(query) ||
           (expense.notes && expense.notes.toLowerCase().includes(query))
         )
       }
@@ -824,6 +844,7 @@ export default {
       this.currentPage = 1
     },
     selectedCategoryId() {
+      this.selectedSubcategoryId = null
       this.currentPage = 1
       this.loadExpenses()
     },
@@ -838,18 +859,13 @@ export default {
   },
   
   async mounted() {
-    // Load persisted extra categories from localStorage (if any)
+    // Load hierarchical expense categories
     try {
-      const saved = localStorage.getItem('extraExpenseCategories')
-      if (saved) this.extraCategories = JSON.parse(saved)
-    } catch (e) { }
-      // Load hierarchical expense categories
-      try {
-        const r = await getExpenseCategories()
-        this.expenseCategories = r.data || []
-      } catch (e) {
-        this.expenseCategories = []
-      }
+      const r = await getExpenseCategories()
+      this.expenseCategories = r.data || []
+    } catch (e) {
+      this.expenseCategories = []
+    }
     await this.loadExpenses()
     await this.fetchBranches()
     await this.fetchLocations()
@@ -873,16 +889,6 @@ export default {
         
         const response = await getExpenses(params)
         this.expenses = response.data.items || []
-        // Extract unique categories from backend data and keep them for combobox
-        try {
-          const uniqueCats = new Set()
-          this.expenses.forEach(exp => {
-            if (exp.category && String(exp.category).trim()) uniqueCats.add(String(exp.category).trim())
-          })
-          this.knownCategories = Array.from(uniqueCats).sort()
-        } catch (e) {
-          this.knownCategories = []
-        }
         this.totalItems = response.data.total || 0
         this.totalPages = response.data.pages || 1
       } catch (error) {
@@ -956,12 +962,14 @@ export default {
       this.form = {
         id: null,
         date: new Date().toISOString().split('T')[0],
-        category: '',
+        categoryId: null,
+        subCategoryId: null,
+        kind: 'EXPENSE',
         description: '',
         amount: '',
         flow: 'OUT',
-        branchId: null, // Default to Main Treasury (null)
-        locationId: null,
+        branchId: null,
+        locationId: this.locations?.[0]?.id ?? null,
         notes: '',
         settlementDate: null
       }
@@ -981,7 +989,6 @@ export default {
         flow: expense.flow || 'OUT',
         branchId: expense.branchId || null,
         locationId: expense.locationId || null,
-        classification: expense.classification || '',
         notes: expense.notes || '',
         settlementDate: expense.settlementDate || null
       }
@@ -1025,15 +1032,7 @@ export default {
           locationId: this.form.locationId,
           notes: this.form.notes || ''
         }
-        
-        // Include settlementDate only for IN flow and when provided
-        if (this.form.flow === 'IN' && this.form.settlementDate) {
-          expenseData.settlementDate = this.form.settlementDate
-        }
-        
-        console.log('Sending expense data:', expenseData)
-        console.log('Available categories:', this.categories)
-        console.log('Selected categoryId:', this.form.categoryId)
+        expenseData.settlementDate = this.form.settlementDate || null
         
         if (this.editing) {
           try {
@@ -1187,14 +1186,17 @@ export default {
     },
     
     getCategoryLabel(category) {
-      // Handle both string and numeric categories
-      const categoryKey = typeof category === 'number' ? Object.keys(this.categories)[category] : category
-      return this.categories[categoryKey] || this.categories[category] || category
+      if (!category) return '-'
+      // Handle both string and numeric categories and missing categories map
+      const categories = this.categories || {}
+      const categoryKey = typeof category === 'number' ? Object.keys(categories)[category] : category
+      return categories[categoryKey] || categories[category] || category
     },
     
     getCategoryColor(category) {
-      // Handle both string and numeric categories
-      const categoryKey = typeof category === 'number' ? Object.keys(this.categories)[category] : category
+      // Handle both string and numeric categories and missing categories map
+      const categories = this.categories || {}
+      const categoryKey = typeof category === 'number' ? Object.keys(categories)[category] : category
       const actualCategory = categoryKey || category
       
       const colors = {
@@ -1208,6 +1210,18 @@ export default {
         'Other': 'bg-gray-100 text-gray-800'
       }
       return colors[actualCategory] || 'bg-gray-100 text-gray-800'
+    },
+
+    getSubcategoryLabel(expense) {
+      // Prefer resolving by IDs from hierarchical tree
+      if (expense?.subCategoryId && this.expenseCategories?.length) {
+        const cat = this.expenseCategories.find(c => c.id === expense.categoryId)
+        const sub = cat?.subCategories?.find(sc => sc.id === expense.subCategoryId)
+        if (sub?.name) return sub.name
+      }
+
+      // Fallback: legacy text field from backend
+      return expense?.classification || '-'
     },
     
     formatDate(dateString) {
@@ -1300,7 +1314,20 @@ export default {
 
 
     addCategoryPrompt() {
-      this.fieldModal = { open: true, type: 'category', name: '', category: '' }
+      this.fieldModal = { open: true, type: 'category', name: '', category: '', parentId: null }
+    },
+
+    addSubcategoryPrompt() {
+      if (!this.form.categoryId) {
+        this.showError(this.$t('expenses.validation.categoryRequired') || 'Select category first')
+        return
+      }
+      this.fieldModal = { open: true, type: 'subcategory', name: '', category: '', parentId: this.form.categoryId }
+    },
+
+    async refreshExpenseCategories() {
+      const r = await getExpenseCategories()
+      this.expenseCategories = r.data || []
     },
 
     addBranchPrompt() {
@@ -1329,12 +1356,19 @@ export default {
         return
       }
       if (this.fieldModal.type === 'category') {
-          this.extraCategories = { ...this.extraCategories, [this.fieldModal.name]: this.fieldModal.name }
-          // Persist user-added categories locally
-          try { localStorage.setItem('extraExpenseCategories', JSON.stringify(this.extraCategories)) } catch (e) { }
-          // Can't resolve an ID for locally-added free-text categories; clear selection
-          this.form.categoryId = null
-          this.showSuccess(this.$t('expenses.success.categoryAdded') || 'Category added')
+        const res = await createExpenseCategory({ name: this.fieldModal.name })
+        await this.refreshExpenseCategories()
+        this.form.categoryId = res.data.id
+        this.form.subCategoryId = null
+        this.showSuccess(this.$t('expenses.success.categoryAdded') || 'Category added')
+      }
+      else if (this.fieldModal.type === 'subcategory') {
+        const categoryId = this.fieldModal.parentId
+        const res = await createExpenseSubCategory(categoryId, { name: this.fieldModal.name })
+        await this.refreshExpenseCategories()
+        this.form.categoryId = categoryId
+        this.form.subCategoryId = res.data.id
+        this.showSuccess(this.$t('expenses.success.subcategoryAdded') || 'Subcategory added')
       } else if (this.fieldModal.type === 'branch') {
         try {
           const payload = { name: this.fieldModal.name, category: this.fieldModal.category }

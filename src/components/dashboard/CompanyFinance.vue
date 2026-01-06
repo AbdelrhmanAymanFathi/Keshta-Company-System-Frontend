@@ -435,10 +435,6 @@
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('labels.location') || 'Location' }}
                   </th>
-                  <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
-                    {{ $t('expenses.classification') || 'Classification' }}
-                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -446,10 +442,15 @@
                   <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ formatDate(expense.date) }}
                   </td>
-                  <td :class="['px-6 py-4 whitespace-nowrap text-xs', isRTL ? 'text-end' : 'text-start']">
-                    <BadgeComponent variant="warning">
-                      {{ expense.category || '-' }}
-                    </BadgeComponent>
+                  <td class="px-6 py-4 whitespace-nowrap" :class="isRTL ? 'text-end' : 'text-start'">
+                    <div class="flex flex-col gap-1" :class="isRTL ? 'items-end' : 'items-start'">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {{ expense.category || '-' }}
+                      </span>
+                      <span class="text-xs text-gray-600">
+                        {{ expense.classification || '-' }}
+                      </span>
+                    </div>
                   </td>
                   <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.description || '-' }}
@@ -479,10 +480,6 @@
                     <span v-else class="text-gray-400">-</span>
                   </td>
                   <!-- Signed column removed per request -->
-                  <!-- Classification -->
-                  <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
-                    {{ expense.classification || '-' }}
-                  </td>
                 </tr>
               </tbody>
             </table>
@@ -657,10 +654,10 @@
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.flow') || 'Flow' }} <span class="text-red-500">*</span>
                 </label>
-                <div class="flex gap-2">
-                  <button 
-                    type="button"
-                    @click="expenseForm.flow = 'OUT'; expenseForm.settlementDate = null"
+            <div class="flex gap-2">
+              <button 
+                type="button"
+                @click="expenseForm.flow = 'OUT'"
                     :class="[
                       'flex-1 px-3 py-2 rounded-lg font-medium transition',
                       expenseForm.flow === 'OUT' 
@@ -685,8 +682,8 @@
                 </div>
               </div>
 
-              <!-- Settlement Date (only for IN/Income) - Column 2 -->
-              <div v-if="expenseForm.flow === 'IN'">
+              <!-- Settlement Date (status/closing date for any flow) - Column 2 -->
+              <div>
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.settlementDate') || 'Settlement Date' }}
                 </label>
@@ -732,19 +729,6 @@
                   </select>
                   <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
                 </div>
-              </div>
-
-              <!-- Classification - optional -->
-              <div>
-                <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
-                  {{ $t('expenses.classification') || 'Classification' }}
-                </label>
-                <input
-                  v-model="expenseForm.classification"
-                  type="text"
-                  :placeholder="$t('expenses.classification') || 'Classification'"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
-                />
               </div>
 
               <!-- Amount - Column 2 -->
@@ -1025,9 +1009,8 @@ export default {
       notes: '',
       branchId: null,
       flow: 'OUT',
-      settlementDate: null,
-      locationId: null,
-      classification: ''
+        settlementDate: null,
+        locationId: null
     })
     // Locations for the location select
     const locations = ref([])
@@ -1788,8 +1771,8 @@ export default {
           subCategoryId: expenseForm.value.subCategoryId || undefined,
           description: expenseForm.value.description,
           amount: expenseForm.value.amount,
-          flow: expenseForm.value.flow || 'OUT',
-          notes: expenseForm.value.notes || undefined
+        flow: expenseForm.value.flow || 'OUT',
+        notes: expenseForm.value.notes || undefined
         }
         // Include branchId only if a branch is selected (not null)
         // If branchId is null, don't include it (will be NULL for company expenses)
@@ -1800,10 +1783,8 @@ export default {
         if (expenseForm.value.locationId !== null) {
           expenseData.locationId = expenseForm.value.locationId
         }
-        // Include settlementDate only for IN flow and when provided
-        if (expenseForm.value.flow === 'IN' && expenseForm.value.settlementDate) {
-          expenseData.settlementDate = expenseForm.value.settlementDate
-        }
+        // Always send settlementDate as status/closing date (null = pending)
+        expenseData.settlementDate = expenseForm.value.settlementDate || null
         await createExpense(expenseData)
         await fetchExpenses()
         await fetchSummary()

@@ -525,7 +525,7 @@
     "flowOut": "Expense",
     "settlementDate": "Settlement Date",
     "settlementDatePlaceholder": "Settlement date (optional)",
-    "settlementDateHint": "Date when this income will be settled",
+    "settlementDateHint": "Closing/reconciliation date (does not decide Expense vs Advance).",
     "signedAmount": "Signed Amount",
     "paid": "Paid",
     "remaining": "Remaining",
@@ -592,12 +592,16 @@
       "deleted": "Expense deleted successfully",
       "categoryAdded": "Category added successfully",
       "branchAdded": "Branch added successfully",
-      "locationAdded": "Location added successfully"
+      "locationAdded": "Location added successfully",
+      "subcategoryAdded": "Subcategory added successfully"
     },
     "enterLocationName": "Enter location name",
     "enterBranchName": "Enter branch name",
     "enterBranchCategory": "Enter branch category (optional)",
     "enterCategoryName": "Enter category name",
+    "subcategory": "Subcategory",
+    "addSubcategory": "Add Subcategory",
+    "enterSubcategoryName": "Subcategory Name",
     "reportError": "Failed to download report"
   },
   "changes": {

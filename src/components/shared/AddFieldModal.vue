@@ -7,6 +7,7 @@
         <div class="mb-4">
           <h3 class="text-lg font-semibold text-gray-900">
             <span v-if="type === 'category'">{{ $t('expenses.addCategory') || 'Add Category' }}</span>
+            <span v-else-if="type === 'subcategory'">{{ $t('expenses.addSubcategory') || 'Add Subcategory' }}</span>
             <span v-else-if="type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
             <span v-else-if="type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
           </h3>
@@ -15,6 +16,7 @@
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">
               <span v-if="type === 'category'">{{ $t('expenses.enterCategoryName') || 'Category Name' }}</span>
+              <span v-else-if="type === 'subcategory'">{{ $t('expenses.enterSubcategoryName') || 'Subcategory Name' }}</span>
               <span v-else-if="type === 'branch'">{{ $t('expenses.enterBranchName') || 'Branch Name' }}</span>
               <span v-else-if="type === 'location'">{{ $t('expenses.enterLocationName') || 'Location Name' }}</span>
             </label>
@@ -40,7 +42,7 @@ export default {
   props: {
     open: { type: Boolean, required: true },
     // `type` may be empty when modal is closed; make it optional and allow empty string
-    type: { type: String, required: false, default: '', validator: (v) => v === '' || ['category', 'branch', 'location'].includes(v) },
+    type: { type: String, required: false, default: '', validator: (v) => v === '' || ['category', 'subcategory', 'branch', 'location'].includes(v) },
     name: { type: String, default: '' },
     branchCategory: { type: String, default: '' }
   },

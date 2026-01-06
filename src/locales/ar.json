@@ -523,9 +523,9 @@
     "flow": "النوع",
     "flowIn": "إيراد",
     "flowOut": "مصروف",
-    "settlementDate": "تاريخ السداد",
-    "settlementDatePlaceholder": "تاريخ السداد (اختياري)",
-    "settlementDateHint": "التاريخ الذي سيتم تسديد هذا الإيراد فيه",
+    "settlementDate": "تاريخ التسوية",
+    "settlementDatePlaceholder": "تاريخ التسوية (اختياري)",
+    "settlementDateHint": "تاريخ إغلاق/تسوية العملية (لا يحدد مصروف/عهدة).",
     "signedAmount": "المبلغ الموقع",
     "paid": "المدفوع",
     "remaining": "المتبقي",
@@ -592,12 +592,16 @@
       "deleted": "تم حذف المصروف بنجاح",
       "categoryAdded": "تم إضافة الفئة بنجاح",
       "branchAdded": "تم إضافة الفرع بنجاح",
-      "locationAdded": "تم إضافة الموقع بنجاح"
+      "locationAdded": "تم إضافة الموقع بنجاح",
+      "subcategoryAdded": "تم إضافة التصنيف الفرعي بنجاح"
     },
     "enterLocationName": "أدخل اسم الموقع",
     "enterBranchName": "أدخل اسم الفرع",
     "enterBranchCategory": "أدخل فئة الفرع (اختياري)",
     "enterCategoryName": "أدخل اسم الفئة",
+    "subcategory": "تصنيف فرعي",
+    "addSubcategory": "إضافة تصنيف فرعي",
+    "enterSubcategoryName": "اسم التصنيف الفرعي",
     "reportError": "فشل في تحميل التقرير"
   },
   "changes": {
