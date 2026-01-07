@@ -996,7 +996,7 @@
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpense, createBranch, createLocation, createExpenseSubCategory, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpenseCategory, createExpense, createBranch, createLocation, createExpenseSubCategory, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
@@ -1121,17 +1121,40 @@ export default {
         return
       }
       if (fieldModal.value.type === 'category') {
-        extraCategories.value = { ...extraCategories.value, [fieldModal.value.name]: fieldModal.value.name }
-        // ✅ Auto-select the newly created category in both expense form and filter
-        // When creating a free-text category (local), we cannot resolve an ID, so keep it in extraCategories
-        // and clear any categoryId selections until the user chooses a real category from the tree.
-        expenseForm.value.categoryId = null
-        expensesFilters.value.categoryId = null
-        // Persist extra categories locally so they survive refreshes
-        try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
-        if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
-        closeFieldModal()
-        return
+        const name = fieldModal.value.name.trim()
+        // Try to create via API so we get a real ID and the category appears in the select immediately
+        try {
+          const res = await createExpenseCategory({ name })
+          // Refresh the hierarchical categories from server
+          try {
+            const r = await getExpenseCategories()
+            expenseCategories.value = r.data || []
+          } catch (e) {
+            // If fetching fails, at least insert the new category returned by the create call
+            const newCat = res.data
+            if (newCat) expenseCategories.value.unshift(newCat)
+          }
+          // Auto-select the newly created category in both expense form and filter
+          expenseForm.value.categoryId = res.data?.id ?? null
+          expensesFilters.value.categoryId = res.data?.id ?? null
+          if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
+          closeFieldModal()
+          return
+        } catch (err) {
+          // If API fails (e.g., offline or demo), fall back to local category behavior and ensure it's selectable
+          extraCategories.value = { ...extraCategories.value, [name]: name }
+          // Add a simulated category object so it appears in the select
+          const simulated = { id: Date.now(), name, subCategories: [] }
+          expenseCategories.value.unshift(simulated)
+          // Select the simulated category
+          expenseForm.value.categoryId = simulated.id
+          expensesFilters.value.categoryId = simulated.id
+          // Persist extra categories locally so they survive refreshes
+          try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
+          if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
+          closeFieldModal()
+          return
+        }
       }
       // Handle branch creation (calls API or simulates on failure), mirroring ExpensesList behavior
       if (fieldModal.value.type === 'branch') {
@@ -1944,7 +1967,33 @@ export default {
         closeExpenseModal()
         if (window.$toast) window.$toast('Expense created successfully', 'success')
       } catch (error) {
-        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to create expense', 'error')
+        // Developer-friendly logs
+        console.error('Error creating expense:', error)
+        console.error('Request payload:', JSON.stringify({
+          date: expenseForm.value.date,
+          kind: expenseForm.value.kind || 'EXPENSE',
+          categoryId: expenseForm.value.categoryId,
+          subCategoryId: expenseForm.value.subCategoryId || undefined,
+          description: expenseForm.value.description,
+          amount: expenseForm.value.amount,
+          flow: expenseForm.value.flow || 'OUT',
+          notes: expenseForm.value.notes || undefined,
+          branchId: expenseForm.value.branchId !== null ? expenseForm.value.branchId : undefined,
+          locationId: expenseForm.value.locationId !== null ? expenseForm.value.locationId : undefined,
+          settlementDate: expenseForm.value.settlementDate || null
+        }))
+        console.error('Response data:', error.response?.data)
+
+        // User-friendly message handling (align with ExpensesList save behaviour)
+        let errorMessage = 'Failed to create expense'
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message
+        } else if (error.response?.status === 500) {
+          errorMessage = 'Server error. Please check if the backend is running.'
+        } else if (error.response?.status === 400) {
+          errorMessage = 'Invalid data. Please check your input.'
+        }
+        if (window.$toast) window.$toast(errorMessage, 'error')
       } finally {
         expenseProcessing.value = false
       }
