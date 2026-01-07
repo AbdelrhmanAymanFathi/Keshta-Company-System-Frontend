@@ -434,6 +434,14 @@
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.subcategory') || 'Subcategory' }}
+                  </th>
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.classification') || 'Classification' }}
+                  </th>
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.description') || 'Description' }}
                   </th>
                   <!-- Branch column (before Amount) -->
@@ -448,11 +456,18 @@
                   <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.flow') || 'Flow' }}
                   </th>
+                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.kindLabel') || 'Kind' }}
+                  </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.notes') || 'Notes' }}
                   </th>
                   <!-- New columns: Location, Signed, Classification -->
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.settlementDate') || 'Settlement Date' }}
+                  </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('labels.location') || 'Location' }}
@@ -466,16 +481,23 @@
                   </td>
 
                   <td class="px-6 py-4 whitespace-nowrap" :class="isRTL ? 'text-end' : 'text-start'">
-                    <div class="flex flex-col gap-1" :class="isRTL ? 'items-end' : 'items-start'">
+                    <div class="flex items-center">
                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         {{ expense.category || '-' }}
                       </span>
-                      <span class="text-xs text-gray-600">
-                        {{ expense.classification || '-' }}
-                      </span>
                     </div>
+                  </td>
 
-               
+                  <!-- Subcategory -->
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-600', isRTL ? 'text-end' : 'text-start']">
+                    <span v-if="expense.subCategory && (expense.subCategory.name || expense.subCategory)">{{ expense.subCategory?.name || expense.subCategory }}</span>
+                    <span v-else-if="expense.subCategoryId">{{ getSubcategoryName(expense.subCategoryId) }}</span>
+                    <span v-else class="text-gray-400">-</span>
+                  </td>
+
+                  <!-- Classification -->
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-600', isRTL ? 'text-end' : 'text-start']">
+                    {{ expense.classification || '-' }}
                   </td>
                   <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.description || '-' }}
@@ -494,8 +516,18 @@
                       {{ expense.flow === 'IN' ? $t('expenses.flowIn') || 'Income' : $t('expenses.flowOut') || 'Expense' }}
                     </span>
                   </td>
+
+                  <!-- Kind -->
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-700', isRTL ? 'text-end' : 'text-start']">
+                    {{ expense.kind || '-' }}
+                  </td>
                   <td :class="['px-6 py-4 text-xs text-gray-500', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.notes || '-' }}
+                  </td>
+                  <!-- Settlement Date -->
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                    <span v-if="expense.settlementDate">{{ formatDate(expense.settlementDate) }}</span>
+                    <span v-else class="text-gray-400">-</span>
                   </td>
                   <!-- Location -->
                   <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
@@ -1572,6 +1604,18 @@ export default {
       }
     }
 
+    // Helper to resolve subcategory name from `expenseCategories` tree
+    const getSubcategoryName = (subCategoryId) => {
+      if (!subCategoryId) return '-'
+      for (const cat of expenseCategories.value || []) {
+        if (!Array.isArray(cat.subCategories)) continue
+        const sc = cat.subCategories.find(s => s.id === subCategoryId)
+        if (sc) return sc.name || String(subCategoryId)
+      }
+      // fallback: return id as string
+      return String(subCategoryId)
+    }
+
     const selectBranch = async (branch) => {
       // set the selected branch (null = main company)
       selectedBranch.value = branch
@@ -2131,6 +2175,7 @@ export default {
       editBranchProcessing,
       fetchExpenses
       ,
+      getSubcategoryName,
       // Category helpers and inline-add modal
       extraCategories,
       fieldModal,
