@@ -564,6 +564,11 @@
       "expense": "مصروف",
       "advance": "عهدة"
     },
+    "settlementStatus": {
+      "label": "الحالة",
+      "settled": "مسوى",
+      "pending": "معلق"
+    },
     "deleteConfirmation": "هل أنت متأكد من حذف هذا المصروف؟",
     "loadError": "خطأ في تحميل المصروفات",
     "saveError": "خطأ في حفظ المصروف",

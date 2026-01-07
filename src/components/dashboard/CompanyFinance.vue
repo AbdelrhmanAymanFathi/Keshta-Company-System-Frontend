@@ -470,6 +470,10 @@
                   </th>
                   <th
                     :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    {{ $t('expenses.settlementStatus.label') || 'Status' }}
+                  </th>
+                  <th
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('labels.location') || 'Location' }}
                   </th>
                 </tr>
@@ -508,8 +512,8 @@
                     </span>
                     <span v-else class="text-gray-400">{{ $t('finance.companyWallet') || 'Main Treasury' }}</span>
                   </td>
-                  <td :class="['px-6 py-4 whitespace-nowrap text-xs font-semibold text-red-600', isRTL ? 'text-end' : 'text-start']">
-                    {{ formatCurrency(expense.amount) }}
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs font-semibold', numericAmount(expense) >= 0 ? 'text-green-600' : 'text-red-600', isRTL ? 'text-end' : 'text-start']">
+                    {{ displayAmount(expense) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span :class="[{ 'bg-green-100 text-green-800': expense.flow === 'IN', 'bg-red-100 text-red-800': expense.flow !== 'IN' }, 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium']">
@@ -518,8 +522,13 @@
                   </td>
 
                   <!-- Kind -->
-                  <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-700', isRTL ? 'text-end' : 'text-start']">
-                    {{ expense.kind || '-' }}
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs', isRTL ? 'text-end' : 'text-start']">
+                    <span :class="[
+                      expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'bg-indigo-100 text-indigo-800',
+                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
+                    ]">
+                      {{ expense.kind === 'ADVANCE' ? ($t('expenses.kind.advance') || 'Advance') : ($t('expenses.kind.expense') || 'Expense') }}
+                    </span>
                   </td>
                   <td :class="['px-6 py-4 text-xs text-gray-500', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.notes || '-' }}
@@ -528,6 +537,12 @@
                   <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     <span v-if="expense.settlementDate">{{ formatDate(expense.settlementDate) }}</span>
                     <span v-else class="text-gray-400">-</span>
+                  </td>
+                  <!-- Settlement Status -->
+                  <td :class="['px-6 py-4 whitespace-nowrap text-xs', isRTL ? 'text-end' : 'text-start']">
+                    <span :class="[expense.settlementDate ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800', 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium']">
+                      {{ expense.settlementDate ? ($t('expenses.settlementStatus.settled') || 'Settled') : ($t('expenses.settlementStatus.pending') || 'Pending') }}
+                    </span>
                   </td>
                   <!-- Location -->
                   <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
@@ -1616,6 +1631,19 @@ export default {
       return String(subCategoryId)
     }
 
+    // Prefer signedAmount when available and provide numeric value helper
+    const numericAmount = (expense) => {
+      const v = expense?.signedAmount ?? expense?.amount ?? 0
+      const n = parseFloat(v)
+      if (Number.isNaN(n)) return 0
+      return n
+    }
+
+    const displayAmount = (expense) => {
+      const n = numericAmount(expense)
+      return formatCurrency(n)
+    }
+
     const selectBranch = async (branch) => {
       // set the selected branch (null = main company)
       selectedBranch.value = branch
@@ -2176,6 +2204,8 @@ export default {
       fetchExpenses
       ,
       getSubcategoryName,
+      numericAmount,
+      displayAmount,
       // Category helpers and inline-add modal
       extraCategories,
       fieldModal,
