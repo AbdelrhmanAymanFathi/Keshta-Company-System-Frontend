@@ -1140,7 +1140,19 @@ export default {
           locationId: this.form.locationId,
           notes: this.form.notes || ''
         }
-        expenseData.settlementDate = this.form.settlementDate || null
+        // Normalize settlementDate: send either null or an ISO datetime string
+        if (this.form.settlementDate) {
+          // Inputs of type=date produce YYYY-MM-DD. Make an explicit UTC ISO datetime
+          const parsed = new Date(this.form.settlementDate + 'T00:00:00Z')
+          if (isNaN(parsed.getTime())) {
+            this.showError(this.$t('expenses.validation.settlementDateInvalid') || 'Invalid settlement date')
+            this.saving = false
+            return
+          }
+          expenseData.settlementDate = parsed.toISOString()
+        } else {
+          expenseData.settlementDate = null
+        }
         
         if (this.editing) {
           try {
