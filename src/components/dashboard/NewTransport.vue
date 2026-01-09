@@ -37,6 +37,7 @@
             <select v-model="form.contractorId" @change="onContractorChange"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('transport.selectContractor') }}</option>
+              <option value="__add__">+ {{ $t('contractors.addContractor') }}</option>
               <option v-for="contractor in contractors" :key="contractor.id" :value="contractor.id">
                 {{ contractor.name }} - {{ contractor.phone }}
               </option>
@@ -61,8 +62,12 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ $t('transport.fromLocation') }} *
             </label>
-            <input v-model="form.fromLoc" type="text" required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            <select v-model="form.fromLocId" @change="onFromLocChange"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+              <option value="">{{ $t('common.select') }}</option>
+              <option value="__add__">+ {{ $t('supply.addSite') }}</option>
+              <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : '') }}</option>
+            </select>
           </div>
 
           <!-- To Location -->
@@ -70,8 +75,12 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ $t('transport.toLocation') }} *
             </label>
-            <input v-model="form.toLoc" type="text" required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            <select v-model="form.toLocId" @change="onToLocChange"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required>
+              <option value="">{{ $t('common.select') }}</option>
+              <option value="__add__">+ {{ $t('supply.addSite') }}</option>
+              <option v-for="loc in locations" :key="loc.id + '-to'" :value="loc.id">{{ loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : '') }}</option>
+            </select>
           </div>
 
           <!-- Number of Trips -->
@@ -99,7 +108,7 @@
           <!-- Pricing: First Km Price -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              First Km Price
+              {{ $t('transport.firstKmPrice') }}
             </label>
             <input v-model.number="form.firstKmPrice" type="number" step="0.01" min="0"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
@@ -108,7 +117,7 @@
           <!-- Pricing: Per Km Price -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Per Km Price
+              {{ $t('transport.perKmPrice') }}
             </label>
             <input v-model.number="form.perKmPrice" type="number" step="0.01" min="0"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
@@ -128,9 +137,10 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ $t('labels.vehicle') }} *
             </label>
-            <select v-model="form.vehicleId" required
+            <select v-model="form.vehicleId" @change="onVehicleSelectChange" required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('transport.selectVehicle') }}</option>
+              <option value="__add__">+ {{ $t('vehicles.add') }}</option>
               <option v-for="vehicle in availableVehicles" :key="vehicle.id" :value="vehicle.id">
                 {{ vehicle.name }} - {{ vehicle.company || '' }} {{ vehicle.crusherNumber ? `(${vehicle.crusherNumber})`
                   : '' }}
@@ -204,6 +214,56 @@
           </div>
         </div>
 
+        <!-- Add Contractor Dialog -->
+        <div v-if="showAddContractor" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow w-96">
+            <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
+            <label class="block text-sm mb-1">{{ $t('contractors.name') }}</label>
+            <input id="new-contractor-name" v-model="newContractorName" :placeholder="$t('contractors.name')" class="w-full border rounded px-2 py-1 mb-3" />
+            <label class="block text-sm mb-1">{{ $t('contractors.phone') }}</label>
+            <input v-model="newContractorPhone" :placeholder="$t('contractors.phone')" class="w-full border rounded px-2 py-1 mb-3" />
+            <div class="flex gap-2 justify-end">
+              <button @click="cancelAddContractor" class="px-3 py-1 rounded bg-gray-100">{{ $t('common.cancel') }}</button>
+              <button @click="addContractor" :disabled="addingContractor" class="px-3 py-1 rounded bg-indigo-600 text-white">{{ $t('contractors.add') }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Vehicle Dialog -->
+        <div v-if="showAddVehicle" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow w-96">
+            <h3 class="text-lg font-bold mb-2">{{ $t('vehicles.addVehicle') }}</h3>
+            <label class="block text-sm mb-1">{{ $t('vehicles.name') }}</label>
+            <input id="new-vehicle-name" v-model="newVehicleName" :placeholder="$t('vehicles.namePlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
+            <label class="block text-sm mb-1">{{ $t('vehicles.company') }}</label>
+            <input v-model="newVehicleCompany" :placeholder="$t('vehicles.companyPlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
+            <label class="block text-sm mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
+            <input v-model="newVehicleCubic" :placeholder="$t('vehicles.cubicCapacityPlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
+            <div class="flex gap-2 justify-end">
+              <button @click="cancelAddVehicle" class="px-3 py-1 rounded bg-gray-100">{{ $t('common.cancel') }}</button>
+              <button @click="addVehicle" :disabled="addingVehicle || !form.contractorId" class="px-3 py-1 rounded bg-indigo-600 text-white">{{ $t('vehicles.addVehicle') }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Location Dialog -->
+        <div v-if="showAddLocation" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow w-96">
+            <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
+            <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
+            <input id="new-location-name" v-model="newLocationName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
+            <label class="block text-sm mb-1">{{ $t('supply.under') }}</label>
+            <select v-model="newLocationParentId" class="w-full border rounded px-2 py-1 mb-3">
+              <option :value="null">{{ $t('common.select') }}</option>
+              <option v-for="loc in locations" :key="loc.id + '-parent'" :value="loc.id">{{ loc.name }}</option>
+            </select>
+            <div class="flex gap-2 justify-end">
+              <button @click="cancelAddLocation" class="px-3 py-1 rounded bg-gray-100">{{ $t('common.cancel') }}</button>
+              <button @click="addLocation" :disabled="addingLocation" class="px-3 py-1 rounded bg-indigo-600 text-white">{{ $t('supply.add') }}</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Modal Footer -->
         <div class="flex justify-end space-x-3 pt-4 border-t">
           <button type="button" @click="closeModal"
@@ -227,7 +287,11 @@ import {
   updateTransport,
   getContractors,
   calculateTransportFare,
-  getContractorsWithVehicles
+  getContractorsWithVehicles,
+  createContractor,
+  createVehicle,
+  getLocations,
+  createLocation
 } from '@/api'
 
 export default {
@@ -246,6 +310,8 @@ export default {
         category: '',
         fromLoc: '',
         toLoc: '',
+        fromLocId: null,
+        toLocId: null,
         numTrips: 1,
         distanceKm: 0,
         vehicleId: '',
@@ -258,6 +324,22 @@ export default {
       },
       contractors: [],
       contractorsWithVehicles: [],
+      // locations for from/to
+      locations: [],
+      showAddContractor: false,
+      newContractorName: '',
+      newContractorPhone: '',
+      addingContractor: false,
+      showAddVehicle: false,
+      newVehicleName: '',
+      newVehicleCompany: '',
+      newVehicleCubic: '',
+      newVehicleCrusherNumber: '',
+      addingVehicle: false,
+      showAddLocation: false,
+      newLocationName: '',
+      newLocationParentId: null,
+      addingLocation: false,
       loading: false,
       calculating: false,
       error: null,
@@ -314,6 +396,7 @@ export default {
   },
   async mounted() {
     await this.loadContractors()
+    await this.loadLocations()
     if (this.isEditing) {
       this.populateForm()
     } else {
@@ -351,8 +434,62 @@ export default {
       }
     },
 
+    async loadLocations() {
+      try {
+        const res = await getLocations()
+        const payload = res.data || []
+        // normalize to array of objects with id,name,parentId and attach parentName when possible
+        const list = Array.isArray(payload) ? payload : (Array.isArray(payload.items) ? payload.items : [])
+        const byId = {}
+        list.forEach(l => { if (l && l.id) byId[l.id] = l.name })
+        this.locations = list.map(l => ({ ...l, parentName: l && l.parentId ? byId[l.parentId] : null }))
+      } catch (e) {
+        console.warn('Failed to load locations', e)
+      }
+    },
+
     onContractorChange() {
+      // if user selected add marker, open add contractor dialog
+      if (this.form.contractorId === '__add__') {
+        this.form.contractorId = ''
+        this.showAddContractor = true
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#new-contractor-name')
+          if (el) el.focus()
+        })
+        return
+      }
       this.form.vehicleId = ''
+    },
+
+    // Add contractor inline
+    async addContractor() {
+      if (!this.newContractorName) return
+      this.addingContractor = true
+      try {
+        const payload = { name: String(this.newContractorName).trim(), phone: String(this.newContractorPhone || '').trim() }
+        const { data } = await createContractor(payload)
+        // reload contractors and set selected
+        await this.loadContractors()
+        const created = data && data.id ? data : (Array.isArray(data) ? data[0] : null)
+        if (created && created.id) {
+          this.form.contractorId = String(created.id)
+        }
+        this.showAddContractor = false
+        this.newContractorName = ''
+        this.newContractorPhone = ''
+      } catch (e) {
+        console.error('addContractor failed', e)
+        this.error = e.response?.data?.message || this.$t('contractors.addError')
+      } finally {
+        this.addingContractor = false
+      }
+    },
+
+    cancelAddContractor() {
+      this.showAddContractor = false
+      this.newContractorName = ''
+      this.newContractorPhone = ''
     },
 
     populateForm() {
@@ -372,6 +509,8 @@ export default {
         category: this.transport?.category || '',
         fromLoc: this.transport?.fromLoc || '',
         toLoc: this.transport?.toLoc || '',
+        fromLocId: this.transport?.fromLocId || this.transport?.fromLocationId || null,
+        toLocId: this.transport?.toLocId || this.transport?.toLocationId || null,
         numTrips: parseInt(this.transport?.numTrips) || 1,
         distanceKm: parseFloat(this.transport?.distanceKm) || 0,
         vehicleId: this.transport?.vehicleId || '',
@@ -386,8 +525,136 @@ export default {
       // Ensure firstKm is always 1 in runtime
       this.form.firstKm = 1
 
+      // If ids are not present but names are, try to resolve ids from loaded locations
+      if ((!this.form.fromLocId || !this.form.toLocId) && this.locations && this.locations.length) {
+        if (!this.form.fromLocId && this.form.fromLoc) {
+          const f = this.locations.find(l => l.name === this.form.fromLoc)
+          if (f) this.form.fromLocId = f.id
+        }
+        if (!this.form.toLocId && this.form.toLoc) {
+          const t = this.locations.find(l => l.name === this.form.toLoc)
+          if (t) this.form.toLocId = t.id
+        }
+      }
+
       this.effectiveRate = this.transport?.rate ? parseFloat(this.transport.rate) : null
       this.totalFromServer = this.transport?.total ? parseFloat(this.transport.total) : null
+    },
+
+    // Vehicle add flow
+    onVehicleSelectChange() {
+      if (this.form.vehicleId === '__add__') {
+        // open add vehicle dialog
+        this.form.vehicleId = ''
+        this.showAddVehicle = true
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#new-vehicle-name')
+          if (el) el.focus()
+        })
+      }
+    },
+
+    async addVehicle() {
+      if (!this.newVehicleName || !this.form.contractorId) return
+      this.addingVehicle = true
+      try {
+        const payload = {
+          name: String(this.newVehicleName).trim(),
+          contractorId: parseInt(this.form.contractorId),
+          company: this.newVehicleCompany || undefined,
+          crusherNumber: this.newVehicleCrusherNumber || undefined,
+          cubicCapacity: this.newVehicleCubic !== '' ? parseFloat(this.newVehicleCubic) : undefined
+        }
+        const { data } = await createVehicle(payload)
+        // refresh contractorsWithVehicles to include new vehicle
+        await this.loadContractors()
+        const created = data && data.id ? data : null
+        if (created && created.id) {
+          this.form.vehicleId = String(created.id)
+        }
+        this.showAddVehicle = false
+        this.newVehicleName = ''
+        this.newVehicleCompany = ''
+        this.newVehicleCrusherNumber = ''
+        this.newVehicleCubic = ''
+      } catch (e) {
+        console.error('addVehicle failed', e)
+        this.error = e.response?.data?.message || this.$t('vehicles.saveError')
+      } finally {
+        this.addingVehicle = false
+      }
+    },
+
+    cancelAddVehicle() {
+      this.showAddVehicle = false
+      this.newVehicleName = ''
+    },
+
+    // Location add flow
+    async onFromLocChange() {
+      if (this.form.fromLocId === '__add__') {
+        this.form.fromLocId = null
+        this.showAddLocation = true
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#new-location-name')
+          if (el) el.focus()
+        })
+        return
+      }
+      // when selecting an existing id, set the name for compatibility
+      const id = this.form.fromLocId
+      const loc = this.locations.find(l => String(l.id) === String(id))
+      this.form.fromLoc = loc ? loc.name : ''
+    },
+
+    async onToLocChange() {
+      if (this.form.toLocId === '__add__') {
+        this.form.toLocId = null
+        this.showAddLocation = true
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#new-location-name')
+          if (el) el.focus()
+        })
+        return
+      }
+      const id = this.form.toLocId
+      const loc = this.locations.find(l => String(l.id) === String(id))
+      this.form.toLoc = loc ? loc.name : ''
+    },
+
+    async addLocation() {
+      if (!this.newLocationName) return
+      this.addingLocation = true
+      try {
+        const payload = { name: String(this.newLocationName).trim(), parentId: this.newLocationParentId || null }
+        const { data } = await createLocation(payload)
+        await this.loadLocations()
+        const created = data && data.id ? data : null
+        if (created && created.id) {
+          // set current whichever field invoked dialog; user likely wants to set fromLocId or toLocId
+          if (!this.form.fromLocId) {
+            this.form.fromLocId = created.id
+            this.form.fromLoc = created.name || ''
+          } else if (!this.form.toLocId) {
+            this.form.toLocId = created.id
+            this.form.toLoc = created.name || ''
+          }
+        }
+        this.showAddLocation = false
+        this.newLocationName = ''
+        this.newLocationParentId = null
+      } catch (e) {
+        console.error('addLocation failed', e)
+        this.error = e.response?.data?.message || this.$t('supply.addError')
+      } finally {
+        this.addingLocation = false
+      }
+    },
+
+    cancelAddLocation() {
+      this.showAddLocation = false
+      this.newLocationName = ''
+      this.newLocationParentId = null
     },
 
     async calculateFare() {
@@ -440,8 +707,10 @@ export default {
           date: this.form.date,
           contractorId: this.form.contractorId ? parseInt(this.form.contractorId) : null,
           category: this.form.category ? this.form.category.trim() : null,
-          fromLoc: this.form.fromLoc.trim(),
-          toLoc: this.form.toLoc.trim(),
+          fromLoc: this.form.fromLoc ? this.form.fromLoc.trim() : null,
+          toLoc: this.form.toLoc ? this.form.toLoc.trim() : null,
+          fromLocId: this.form.fromLocId ? (parseInt(this.form.fromLocId) || null) : null,
+          toLocId: this.form.toLocId ? (parseInt(this.form.toLocId) || null) : null,
           numTrips: parseInt(this.form.numTrips),
           distanceKm: parseFloat(this.form.distanceKm),
           vehicleId: this.form.vehicleId ? parseInt(this.form.vehicleId) : null,
@@ -449,6 +718,7 @@ export default {
           discount: parseFloat(this.form.discount || 0)
         }
 
+        // if pricing fields exist include them
         if (this.form.firstKm || this.form.firstKmPrice || this.form.perKmPrice) {
           formData.pricing = {
             // send firstKm explicitly as 1
@@ -457,8 +727,11 @@ export default {
             perKmPrice: parseFloat(this.form.perKmPrice || 0)
           }
         }
+        // require either id or name for from/to
+        const hasFrom = !!(formData.fromLocId || (formData.fromLoc && String(formData.fromLoc).trim() !== ''))
+        const hasTo = !!(formData.toLocId || (formData.toLoc && String(formData.toLoc).trim() !== ''))
 
-        if (!formData.date || !formData.fromLoc || !formData.toLoc || !formData.vehicleId) {
+        if (!formData.date || !hasFrom || !hasTo || !formData.vehicleId) {
           throw new Error('Please fill in all required fields')
         }
 

@@ -46,6 +46,8 @@
     "vehicle": "Vehicle",
     "vehicleName": "Vehicle Name",
     "notes": "Notes",
+    "firstKmPrice": "First Km Price",
+    "perKmPrice": "Per Km Price",
     "total": "Total",
     "route": "Route",
     "trips": "Trips",
