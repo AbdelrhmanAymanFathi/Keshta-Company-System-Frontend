@@ -49,11 +49,11 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ $t('transport.category') }}
             </label>
-            <select v-model="form.category"
+            <select v-model="form.category" @change="onCategoryChange"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
               <option value="">{{ $t('common.select') || 'Select' }}</option>
-              <option value="تربه">تربه</option>
-              <option value="سن">سن</option>
+              <option value="__add__">+ {{ $t('transport.addCategory') }}</option>
+              <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
@@ -264,6 +264,37 @@
           </div>
         </div>
 
+        <!-- Add Location Dialog -->
+        <div v-if="showAddLocation" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow w-96">
+            <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
+            <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
+            <input id="new-location-name" v-model="newLocationName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
+            <label class="block text-sm mb-1">{{ $t('supply.under') }}</label>
+            <select v-model="newLocationParentId" class="w-full border rounded px-2 py-1 mb-3">
+              <option :value="null">{{ $t('common.select') }}</option>
+              <option v-for="loc in locations" :key="loc.id + '-parent'" :value="loc.id">{{ loc.name }}</option>
+            </select>
+            <div class="flex gap-2 justify-end">
+              <button @click="cancelAddLocation" class="px-3 py-1 rounded bg-gray-100">{{ $t('common.cancel') }}</button>
+              <button @click="addLocation" :disabled="addingLocation" class="px-3 py-1 rounded bg-indigo-600 text-white">{{ $t('supply.add') }}</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Category Dialog -->
+        <div v-if="showAddCategory" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded shadow w-96">
+            <h3 class="text-lg font-bold mb-2">{{ $t('transport.addCategory') }}</h3>
+            <label class="block text-sm mb-1">{{ $t('transport.categoryName') }}</label>
+            <input id="new-category-name" v-model="newCategoryName" :placeholder="$t('transport.categoryNamePlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
+            <div class="flex gap-2 justify-end">
+              <button @click="cancelAddCategory" class="px-3 py-1 rounded bg-gray-100">{{ $t('common.cancel') }}</button>
+              <button @click="addCategory" :disabled="addingCategory" class="px-3 py-1 rounded bg-indigo-600 text-white">{{ $t('transport.addCategory') }}</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Modal Footer -->
         <div class="flex justify-end space-x-3 pt-4 border-t">
           <button type="button" @click="closeModal"
@@ -326,6 +357,8 @@ export default {
       contractorsWithVehicles: [],
       // locations for from/to
       locations: [],
+      // transport categories
+      categories: [],
       showAddContractor: false,
       newContractorName: '',
       newContractorPhone: '',
@@ -340,6 +373,9 @@ export default {
       newLocationName: '',
       newLocationParentId: null,
       addingLocation: false,
+      showAddCategory: false,
+      newCategoryName: '',
+      addingCategory: false,
       loading: false,
       calculating: false,
       error: null,
@@ -397,6 +433,7 @@ export default {
   async mounted() {
     await this.loadContractors()
     await this.loadLocations()
+    await this.loadCategories()
     if (this.isEditing) {
       this.populateForm()
     } else {
@@ -445,6 +482,23 @@ export default {
         this.locations = list.map(l => ({ ...l, parentName: l && l.parentId ? byId[l.parentId] : null }))
       } catch (e) {
         console.warn('Failed to load locations', e)
+      }
+    },
+
+    async loadCategories() {
+      // Load categories from localStorage or use defaults
+      try {
+        const stored = localStorage.getItem('transportCategories')
+        if (stored) {
+          this.categories = JSON.parse(stored)
+        } else {
+          // Initialize with default categories if none stored
+          this.categories = ['تربه', 'سن']
+          localStorage.setItem('transportCategories', JSON.stringify(this.categories))
+        }
+      } catch (e) {
+        console.warn('Failed to load categories', e)
+        this.categories = ['تربه', 'سن']
       }
     },
 
@@ -655,6 +709,50 @@ export default {
       this.showAddLocation = false
       this.newLocationName = ''
       this.newLocationParentId = null
+    },
+
+    onCategoryChange() {
+      // if user selected add marker, open add category dialog
+      if (this.form.category === '__add__') {
+        this.form.category = ''
+        this.showAddCategory = true
+        this.$nextTick(() => {
+          const el = this.$el.querySelector('#new-category-name')
+          if (el) el.focus()
+        })
+        return
+      }
+    },
+
+    async addCategory() {
+      if (!this.newCategoryName) return
+      this.addingCategory = true
+      try {
+        const categoryName = String(this.newCategoryName).trim()
+        // Check if category already exists
+        if (this.categories.includes(categoryName)) {
+          this.error = this.$t('transport.categoryExists')
+          this.addingCategory = false
+          return
+        }
+        // Add to categories list and save to localStorage
+        this.categories.push(categoryName)
+        localStorage.setItem('transportCategories', JSON.stringify(this.categories))
+        // Set as selected
+        this.form.category = categoryName
+        this.showAddCategory = false
+        this.newCategoryName = ''
+      } catch (e) {
+        console.error('addCategory failed', e)
+        this.error = this.$t('common.saveError')
+      } finally {
+        this.addingCategory = false
+      }
+    },
+
+    cancelAddCategory() {
+      this.showAddCategory = false
+      this.newCategoryName = ''
     },
 
     async calculateFare() {
