@@ -599,8 +599,8 @@ export default {
       try {
         const payload = {
           name: this.editForm.name,
-          crusherCubic: this.editForm.crusherCubic,
-          cubicCapacity: this.editForm.cubicCapacity
+          crusherCubic: this.editForm.crusherCubic ? Number(this.editForm.crusherCubic) : null,
+          cubicCapacity: this.editForm.cubicCapacity ? Number(this.editForm.cubicCapacity) : null
         }
         await updateVehicle(this.editingVehicle.id, payload)
         await this.loadVehicles()
