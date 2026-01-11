@@ -48,6 +48,9 @@
                 {{ $t('transport.route') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('transport.category') }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.trips') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
@@ -55,6 +58,12 @@
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.vehicleCapacity') || 'Capacity' }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('transport.rate') }}
+              </th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('transport.discount') }}
               </th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.total') }}
@@ -80,12 +89,23 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 <div class="text-sm text-gray-900">{{ transport.fromLoc }} → {{ transport.toLoc }}</div>
-                <div class="text-sm text-gray-500">{{ transport.vehicleName || '-' }}</div>
+                <div class="text-sm text-gray-500">{{ getVehicleDisplay(transport) }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                {{ transport.category?.trim() || '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{{ transport.numTrips }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">{{ transport.distanceKm }} km</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
                 {{ transport.vehicleCubicCapacity != null ? transport.vehicleCubicCapacity : '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                {{ formatCurrency(transport.rate) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                <span :class="parseFloat(transport.discount) > 0 ? 'text-red-600 font-medium' : 'text-gray-500'">
+                  {{ transport.discount }}
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
                 {{ formatCurrency(transport.total) }}
@@ -291,6 +311,16 @@ export default {
         style: 'currency',
         currency: 'EGP'
       }).format(amount)
+    },
+    getVehicleDisplay(transport) {
+      // Show vehicle name if available, otherwise show capacity
+      if (transport.vehicleName) {
+        return transport.vehicleName
+      }
+      if (transport.vehicleCubicCapacity) {
+        return `${transport.vehicleCubicCapacity} م³`
+      }
+      return '-'
     },
     // Context Menu
     openContextMenu(event, item) {
