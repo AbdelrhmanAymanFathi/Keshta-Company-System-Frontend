@@ -9,35 +9,57 @@
       {{ $t('vehicles.noResults') }}
     </div>
 
-    <div class="space-y-4">
-      <div
-        v-for="v in vehicles"
-        :key="v.id"
-        class="p-4 border rounded-lg bg-white flex flex-col md:flex-row md:items-center md:justify-between gap-3"
-      >
-        <div>
-          <div class="font-semibold text-lg">{{ v.name }}</div>
-          <div class="mt-1 space-y-0.5 text-sm text-gray-600">
-            <div>{{ $t('vehicles.crusherNumber') }}: <span class="font-medium">{{ v.crusherNumber || '-' }}</span></div>
-            <div>{{ $t('vehicles.cubicCapacity') }}: <span class="font-medium">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '-' }}</span></div>
-            <div v-if="v.crusherCubic != null && v.crusherCubic !== ''">{{ $t('labels.crusherCubic') }}: <span class="font-medium">{{ v.crusherCubic }}</span></div>
-            <div v-if="v.contractor">
-              {{ $t('vehicles.contractor') }}:
-              <span class="font-medium">{{ v.contractor.name }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between md:justify-end gap-3">
-          <div class="text-xs text-gray-400">ID: {{ v.id }}</div>
-          <button
-            class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
-            @click="openVehicleDetails(v)"
+    <!-- Table view -->
+    <div class="overflow-x-auto bg-white rounded border">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.contractor') }}</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.crusherNumber') }}</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.cubicCapacity') }}</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.crusherCubic') }}</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.actions') || 'Actions' }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="v in vehicles" :key="v.id"
+              class="border-t hover:bg-gray-50"
+              @contextmenu.prevent="onRowContextMenu($event, v)"
           >
+            <td class="px-3 py-3 text-gray-700">{{ v.id }}</td>
+            <td class="px-3 py-3 font-medium text-gray-800">{{ v.name }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.contractor?.name || '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.crusherCubic != null && v.crusherCubic !== '' ? v.crusherCubic : '—' }}</td>
+            <td class="px-3 py-3">
+              <button
+                class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
+                @click="openVehicleDetails(v)">
+                {{ $t('vehicles.manageDriversAndOwnership') }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Context menu (absolute positioned) -->
+    <div v-if="contextMenu && contextMenu.visible"
+         ref="contextMenuRef"
+         :style="{ position: 'absolute', top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
+         class="w-56 bg-white border rounded shadow-lg z-50 text-sm">
+      <ul class="py-1">
+        <li>
+          <button
+            @click="onContextMenuSelectManage"
+            class="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700 text-gray-700">
             {{ $t('vehicles.manageDriversAndOwnership') }}
           </button>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
 
     <!-- Pagination -->
@@ -219,13 +241,13 @@
               <table class="min-w-full text-sm">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('vehicles.owner') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('labels.startDate') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('labels.endDate') }}
                     </th>
                   </tr>
@@ -310,16 +332,16 @@
               <table class="min-w-full text-sm">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('vehicles.driver') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('vehicles.primary') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('labels.startDate') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('labels.endDate') }}
                     </th>
                   </tr>
@@ -408,6 +430,14 @@ export default {
       page: 1,
       pageSize: 20,
       total: 0
+      ,
+      // Context menu state for right-click menu
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        vehicle: null
+      }
     }
   },
   computed: {
@@ -490,6 +520,55 @@ export default {
         this.refreshDriverHistory(),
         this.refreshAvailableDrivers()
       ])
+    },
+    // Right-click / context menu handler for rows
+    onRowContextMenu(event, vehicle) {
+      // compute absolute coordinates including scroll
+      const x = event.clientX + (window.scrollX || window.pageXOffset || 0) + 2
+      const y = event.clientY + (window.scrollY || window.pageYOffset || 0) + 2
+
+      // basic viewport adjustment to keep menu visible
+      const menuWidth = 224 // approx w-56
+      const maxX = (window.innerWidth || document.documentElement.clientWidth) + (window.scrollX || 0)
+      const adjustedX = x + menuWidth > maxX ? Math.max((maxX - menuWidth - 8), 8) : x
+
+      const menuHeightEstimate = 160
+      const maxY = (window.innerHeight || document.documentElement.clientHeight) + (window.scrollY || 0)
+      const adjustedY = y + menuHeightEstimate > maxY ? Math.max((maxY - menuHeightEstimate - 8), 8) : y
+
+      this.contextMenu.x = adjustedX
+      this.contextMenu.y = adjustedY
+      this.contextMenu.vehicle = vehicle
+      this.contextMenu.visible = true
+    },
+
+    hideContextMenu() {
+      this.contextMenu.visible = false
+      this.contextMenu.vehicle = null
+    },
+
+    // Click outside handler to hide the menu
+    onGlobalClick(e) {
+      if (!this.contextMenu.visible) return
+      const menu = this.$refs.contextMenuRef
+      if (menu && !menu.contains(e.target)) {
+        this.hideContextMenu()
+      }
+    },
+
+    // Keydown handler (Esc to close)
+    onGlobalKeydown(e) {
+      if (e.key === 'Escape' && this.contextMenu.visible) {
+        this.hideContextMenu()
+      }
+    },
+
+    // When the context menu option is clicked
+    onContextMenuSelectManage() {
+      if (this.contextMenu.vehicle) {
+        this.openVehicleDetails(this.contextMenu.vehicle)
+      }
+      this.hideContextMenu()
     },
     closeVehicleDetails() {
       this.selectedVehicle = null
@@ -609,9 +688,19 @@ export default {
     try {
       await this.loadVehicles()
       await this.loadContractors()
+      // register global listeners for hiding context menu
+      document.addEventListener('click', this.onGlobalClick)
+      document.addEventListener('keydown', this.onGlobalKeydown)
     } catch (e) {
       this.vehicles = []
     }
+  }
+
+  ,
+  beforeUnmount() {
+    // cleanup listeners
+    document.removeEventListener('click', this.onGlobalClick)
+    document.removeEventListener('keydown', this.onGlobalKeydown)
   }
 }
 </script>
