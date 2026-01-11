@@ -235,8 +235,8 @@
             <h3 class="text-lg font-bold mb-2">{{ $t('vehicles.addVehicle') }}</h3>
             <label class="block text-sm mb-1">{{ $t('vehicles.name') }}</label>
             <input id="new-vehicle-name" v-model="newVehicleName" :placeholder="$t('vehicles.namePlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
-            <label class="block text-sm mb-1">{{ $t('vehicles.company') }}</label>
-            <input v-model="newVehicleCompany" :placeholder="$t('vehicles.companyPlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
+            <label class="block text-sm mb-1">{{ $t('vehicles.crusherNumber') }}</label>
+            <input v-model="newVehicleCrusherNumber" :placeholder="$t('vehicles.crusherNumberPlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
             <label class="block text-sm mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
             <input v-model="newVehicleCubic" :placeholder="$t('vehicles.cubicCapacityPlaceholder')" class="w-full border rounded px-2 py-1 mb-3" />
             <div class="flex gap-2 justify-end">
@@ -365,9 +365,8 @@ export default {
       addingContractor: false,
       showAddVehicle: false,
       newVehicleName: '',
-      newVehicleCompany: '',
-      newVehicleCubic: '',
       newVehicleCrusherNumber: '',
+      newVehicleCubic: '',
       addingVehicle: false,
       showAddLocation: false,
       newLocationName: '',
@@ -615,8 +614,7 @@ export default {
         const payload = {
           name: String(this.newVehicleName).trim(),
           contractorId: parseInt(this.form.contractorId),
-          company: this.newVehicleCompany || undefined,
-          crusherNumber: this.newVehicleCrusherNumber || undefined,
+          crusherNumber: this.newVehicleCrusherNumber ? String(this.newVehicleCrusherNumber).trim() : undefined,
           cubicCapacity: this.newVehicleCubic !== '' ? parseFloat(this.newVehicleCubic) : undefined
         }
         const { data } = await createVehicle(payload)
@@ -628,7 +626,6 @@ export default {
         }
         this.showAddVehicle = false
         this.newVehicleName = ''
-        this.newVehicleCompany = ''
         this.newVehicleCrusherNumber = ''
         this.newVehicleCubic = ''
       } catch (e) {
@@ -642,6 +639,8 @@ export default {
     cancelAddVehicle() {
       this.showAddVehicle = false
       this.newVehicleName = ''
+      this.newVehicleCrusherNumber = ''
+      this.newVehicleCubic = ''
     },
 
     // Location add flow
