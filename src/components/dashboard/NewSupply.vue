@@ -83,6 +83,8 @@
                 <th class="px-3 py-2">{{ $t('labels.discount') }}</th>
                 <th class="px-3 py-2">{{ $t('labels.price') }}</th>
                 <th class="px-3 py-2">{{ $t('labels.cubic') }}</th>
+                <th class="px-3 py-2">{{ $t('labels.crusherCubic') }}</th>
+
                 <th class="px-3 py-2">{{ $t('labels.total') }}</th>
                 <th class="px-3 py-2">{{ $t('labels.actions') }}</th>
               </tr>
@@ -124,6 +126,8 @@
                   </select>
                 </td>
 
+
+
                 <td class="px-3 py-2">
                   <input type="text" v-model="row.crusherBon" class="w-full border rounded-md px-2 py-1"
                     @keydown.enter.prevent="focusNext(index, 4)" @keydown.tab.prevent="focusNext(index, 4)" />
@@ -150,6 +154,13 @@
                   <input type="number" step="any" inputmode="decimal" v-model.number="row.cubic"
                     class="w-full border rounded-md px-2 py-1 no-spinner" placeholder="0"
                     @keydown.enter.prevent="focusNext(index, 8)" @keydown.tab.prevent="focusNext(index, 8)" />
+                </td>
+
+
+                <td class="px-3 py-2">
+                  <input type="number" step="any" inputmode="decimal" v-model.number="row.crusherCubic"
+                    class="w-full border rounded-md px-2 py-1 no-spinner" placeholder="-"
+                    @keydown.enter.prevent="focusNext(index, 4)" @keydown.tab.prevent="focusNext(index, 4)" />
                 </td>
 
                 <td class="px-3 py-2 font-semibold">{{ formatNumber(totalPerRow(row)) }}</td>
@@ -413,6 +424,7 @@ export default {
           contractor: null,
           crusher: null,
           vehicle: null,
+          crusherCubic: '',
           crusherBon: '',
           companyBon: '',
           discount: 0,
@@ -843,6 +855,7 @@ export default {
         contractor: null,
         crusher: null,
         vehicle: null,
+        crusherCubic: '',
         crusherBon: '',
         companyBon: '',
         discount: 0,
@@ -859,7 +872,7 @@ export default {
 
     duplicateRow(index) { const src = this.rows[index]; if (!src) return; const copy = JSON.parse(JSON.stringify(src)); copy.id = Date.now() + Math.random(); this.rows.splice(index + 1, 0, copy) },
     removeRow(index) { this.rows.splice(index, 1); if (this.rows.length === 0) this.addRow() },
-    resetRows() { this.rows = [{ id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: this.vehicles }] },
+    resetRows() { this.rows = [{ id: Date.now(), date: '', contractor: null, crusher: null, vehicle: null, crusherCubic: '', crusherBon: '', companyBon: '', discount: 0, price: 0, cubic: 0, notes: '', availableVehicles: this.vehicles }] },
 
     updateVehicles(row) {
       // Get vehicles for the selected contractor
@@ -878,6 +891,7 @@ export default {
       const v = row.vehicle;
       if (!v) {
         row.cubic = 0
+        row.crusherCubic = ''
         return
       }
       // استخدم cubicCapacity لو موجود، ولو مش موجود ارجع للـ cubic القديمة كـ fallback
@@ -885,6 +899,15 @@ export default {
         ? Number(v.cubicCapacity)
         : (v.cubic != null && v.cubic !== '' ? Number(v.cubic) : 0)
       row.cubic = isNaN(capacity) ? 0 : capacity
+      // populate crusherCubic from vehicle if available (backend may provide this)
+      if (v.crusherCubic !== undefined && v.crusherCubic !== null && String(v.crusherCubic).trim() !== '') {
+        // keep as number or string — use number for calculations
+        const cc = parseFloat(String(v.crusherCubic))
+        row.crusherCubic = isNaN(cc) ? String(v.crusherCubic) : cc
+      } else {
+        // leave empty so user can input
+        row.crusherCubic = ''
+      }
     },
 
     totalPerRow(row) {
@@ -942,6 +965,7 @@ export default {
             companyTicket: r.companyBon || null,
             companyCapacity: r.cubic ? parseFloat(r.cubic) : 0,
             crusherCapacity: r.cubic ? parseFloat(r.cubic) : 0,
+            crusherCubic: (r.crusherCubic !== undefined && r.crusherCubic !== null && String(r.crusherCubic).trim() !== '') ? parseFloat(r.crusherCubic) : null,
             unitPrice: r.price ? parseFloat(r.price) : 0,
             discount: r.discount ? parseFloat(r.discount) : 0,
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null
@@ -1066,12 +1090,13 @@ export default {
 
     focusNext(rowIndex, colIndex) {
       // Move focus to next focusable cell in the same row
-      // columns order indexes: date(0), contractor(1), crusher(2), vehicle(3), crusherBon(4), companyBon(5), discount(6), price(7), cubic(8)
+      // columns order indexes: date(0), contractor(1), crusher(2), vehicle(3), crusherCubic(4), crusherBon(5), companyBon(6), discount(7), price(8), cubic(9)
       const order = [
         'input[type="date"]',
         'select',
         'select',
         'select',
+        'input[type="number"]',
         'input[type="text"]',
         'input[type="text"]',
         'input[type="number"]',
