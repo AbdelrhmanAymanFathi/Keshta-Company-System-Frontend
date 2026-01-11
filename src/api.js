@@ -445,8 +445,10 @@ export const getVehicles = (params = {}) => {
 };
 export const createVehicle = (data) =>
   axios.post(`${BASE_URL}/api/vehicles`, data);
+export const updateVehicle = (id, data) =>
+  axios.patch(`${BASE_URL}/api/vehicles/${id}`, data);
 export const deleteVehicle = (id) =>
-  axios.delete(`${BASE_URL}/api/vehicles`, { data: { id } });
+  axios.delete(`${BASE_URL}/api/vehicles/${id}`);
 
 // --- Drivers & Vehicle history ---
 // Drivers CRUD

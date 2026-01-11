@@ -14,7 +14,7 @@
       <table class="min-w-full text-sm">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th>
+            <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.contractor') }}</th>
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.crusherNumber') }}</th>
@@ -28,17 +28,27 @@
               class="border-t hover:bg-gray-50"
               @contextmenu.prevent="onRowContextMenu($event, v)"
           >
-            <td class="px-3 py-3 text-gray-700">{{ v.id }}</td>
+            <!-- <td class="px-3 py-3 text-gray-700">{{ v.id }}</td> -->
             <td class="px-3 py-3 font-medium text-gray-800">{{ v.name }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.contractor?.name || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.crusherCubic != null && v.crusherCubic !== '' ? v.crusherCubic : '—' }}</td>
-            <td class="px-3 py-3">
+            <td class="px-3 py-3 flex gap-2">
               <button
                 class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
                 @click="openVehicleDetails(v)">
                 {{ $t('vehicles.manageDriversAndOwnership') }}
+              </button>
+              <button
+                class="px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
+                @click="openEditModal(v)">
+                {{ $t('labels.edit') || 'Edit' }}
+              </button>
+              <button
+                class="px-3 py-1.5 text-sm rounded bg-red-600 text-white hover:bg-red-700"
+                @click="openDeleteConfirm(v)">
+                {{ $t('labels.delete') || 'Delete' }}
               </button>
             </td>
           </tr>
@@ -59,102 +69,76 @@
             {{ $t('vehicles.manageDriversAndOwnership') }}
           </button>
         </li>
+        <li class="border-t border-gray-200 my-1"></li>
+        <li>
+          <button
+            @click="onContextMenuSelectEdit"
+            class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 text-gray-700">
+            {{ $t('labels.edit') || 'Edit' }}
+          </button>
+        </li>
+        <li>
+          <button
+            @click="onContextMenuSelectDelete"
+            class="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 text-gray-700">
+            {{ $t('labels.delete') || 'Delete' }}
+          </button>
+        </li>
       </ul>
     </div>
 
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
-      <!-- Mobile Pagination -->
-      <div class="flex-1 flex justify-between sm:hidden">
-        <button @click="changePage(page - 1)" 
-          :disabled="page <= 1"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ $t('labels.previous') || 'Previous' }}
-        </button>
-        <span class="text-sm text-gray-700 self-center">
-          {{ page }} / {{ totalPages }}
-        </span>
-        <button @click="changePage(page + 1)" 
-          :disabled="page >= totalPages"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ $t('labels.next') || 'Next' }}
-        </button>
-      </div>
-
-      <!-- Desktop Pagination -->
-      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div class="flex items-center gap-4">
-          <p class="text-sm text-gray-700">
-            {{ $t('labels.showing') || 'Showing' }} 
-            <span class="font-medium">{{ ((page - 1) * pageSize) + 1 }}</span>
-            {{ $t('labels.to') || 'to' }}
-            <span class="font-medium">{{ Math.min(page * pageSize, total) }}</span>
-            {{ $t('labels.of') || 'of' }}
-            <span class="font-medium">{{ total }}</span>
-            {{ $t('labels.results') || 'results' }}
-          </p>
-          <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-700">{{ $t('labels.pageSize') || 'Page size' }}:</label>
-            <select v-model="pageSize" @change="onPageSizeChange" 
-              class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
+    <!-- Edit Vehicle Modal -->
+    <div v-if="editingVehicle" class="fixed inset-0 z-40 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeEditModal"></div>
+      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md z-50 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold">{{ $t('labels.edit') || 'Edit' }} {{ editingVehicle.name }}</h3>
+          <button class="text-gray-400 hover:text-gray-600" @click="closeEditModal">✕</button>
         </div>
+        <form @submit.prevent="onSaveEdit" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.truckName') || 'Truck Name' }}</label>
+            <input v-model="editForm.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
+            <input v-model="editForm.cubicCapacity" type="text" class="w-full border rounded px-3 py-2 text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCubic') }}</label>
+            <input v-model="editForm.crusherCubic" type="text" class="w-full border rounded px-3 py-2 text-sm" />
+          </div>
+          <div class="flex gap-2 justify-end pt-4">
+            <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
+            <button type="submit" :disabled="editLoading" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{{ editLoading ? $t('labels.saving') : $t('labels.save') || 'Save' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-        <!-- Page Numbers -->
-        <div>
-          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-            <button @click="changePage(1)" 
-              :disabled="page <= 1"
-              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <button @click="changePage(page - 1)" 
-              :disabled="page <= 1"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <template v-for="p in visiblePages" :key="p">
-              <button @click="changePage(p)" 
-                :class="[
-                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                  p === page 
-                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' 
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                ]">
-                {{ p }}
-              </button>
-            </template>
-
-            <button @click="changePage(page + 1)" 
-              :disabled="page >= totalPages"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <button @click="changePage(totalPages)" 
-              :disabled="page >= totalPages"
-              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </nav>
+    <!-- Delete Confirmation Modal -->
+    <div v-if="deleteConfirmVehicle" class="fixed inset-0 z-40 flex items-center justify-center">
+      <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeDeleteConfirm"></div>
+      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md z-50 p-5">
+        <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
+        <p class="text-gray-700 mb-6">{{ $t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete' }} "{{ deleteConfirmVehicle.name }}"?</p>
+        <div class="flex gap-2 justify-end">
+          <button @click="closeDeleteConfirm" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
+          <button @click="onConfirmDelete" :disabled="deleteLoading" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">{{ deleteLoading ? $t('labels.deleting') : $t('labels.delete') || 'Delete' }}</button>
         </div>
       </div>
     </div>
+
+    <!-- Pagination Component -->
+    <Pagination
+      :current-page="page"
+      :page-size="pageSize"
+      :total="total"
+      :total-pages="totalPages"
+      :page-size-options="[10, 20, 50, 100]"
+      @update:page="page = $event; loadVehicles()"
+      @update:pageSize="pageSize = $event; page = 1; loadVehicles()"
+    />
 
     <!-- Vehicle details modal (ownership + drivers) -->
     <div
@@ -399,14 +383,17 @@ import {
   changeVehicleOwner,
   getVehicleOwnershipHistory,
   assignVehicleDriver,
-  getVehicleDriverHistory
+  getVehicleDriverHistory,
+  updateVehicle,
+  deleteVehicle
 } from '../../api'
 import CreateVehicle from './CreateVehicle.vue'
+import Pagination from '../shared/Pagination.vue'
 
 export default {
   name: 'VehiclesList',
   emits: ["navigateReport", "navigateStatement"],
-  components: { CreateVehicle },
+  components: { CreateVehicle, Pagination },
   data() {
     return {
       vehicles: [],
@@ -437,7 +424,18 @@ export default {
         x: 0,
         y: 0,
         vehicle: null
-      }
+      },
+      // Edit vehicle modal
+      editingVehicle: null,
+      editForm: {
+        name: '',
+        crusherCubic: '',
+        cubicCapacity: ''
+      },
+      editLoading: false,
+      // Delete confirmation modal
+      deleteConfirmVehicle: null,
+      deleteLoading: false
     }
   },
   computed: {
@@ -569,6 +567,69 @@ export default {
         this.openVehicleDetails(this.contextMenu.vehicle)
       }
       this.hideContextMenu()
+    },
+    onContextMenuSelectEdit() {
+      if (this.contextMenu.vehicle) {
+        this.openEditModal(this.contextMenu.vehicle)
+      }
+      this.hideContextMenu()
+    },
+    onContextMenuSelectDelete() {
+      if (this.contextMenu.vehicle) {
+        this.openDeleteConfirm(this.contextMenu.vehicle)
+      }
+      this.hideContextMenu()
+    },
+    // Edit vehicle modal
+    openEditModal(vehicle) {
+      this.editingVehicle = vehicle
+      this.editForm = {
+        name: vehicle.name,
+        crusherCubic: vehicle.crusherCubic || '',
+        cubicCapacity: vehicle.cubicCapacity || ''
+      }
+    },
+    closeEditModal() {
+      this.editingVehicle = null
+      this.editForm = { name: '', crusherCubic: '', cubicCapacity: '' }
+    },
+    async onSaveEdit() {
+      if (!this.editingVehicle || !this.editForm.name) return
+      this.editLoading = true
+      try {
+        const payload = {
+          name: this.editForm.name,
+          crusherCubic: this.editForm.crusherCubic,
+          cubicCapacity: this.editForm.cubicCapacity
+        }
+        await updateVehicle(this.editingVehicle.id, payload)
+        await this.loadVehicles()
+        this.closeEditModal()
+      } catch (e) {
+        console.error('Error updating vehicle', e)
+      } finally {
+        this.editLoading = false
+      }
+    },
+    // Delete vehicle
+    openDeleteConfirm(vehicle) {
+      this.deleteConfirmVehicle = vehicle
+    },
+    closeDeleteConfirm() {
+      this.deleteConfirmVehicle = null
+    },
+    async onConfirmDelete() {
+      if (!this.deleteConfirmVehicle) return
+      this.deleteLoading = true
+      try {
+        await deleteVehicle(this.deleteConfirmVehicle.id)
+        await this.loadVehicles()
+        this.closeDeleteConfirm()
+      } catch (e) {
+        console.error('Error deleting vehicle', e)
+      } finally {
+        this.deleteLoading = false
+      }
     },
     closeVehicleDetails() {
       this.selectedVehicle = null
