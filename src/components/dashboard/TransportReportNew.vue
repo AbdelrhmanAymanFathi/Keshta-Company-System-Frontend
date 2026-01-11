@@ -98,10 +98,12 @@
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.contractor') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.fromLocation') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.toLocation') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.vehicleName') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.numTrips') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.distanceKm') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.rate') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('transport.notes') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
@@ -110,15 +112,17 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.contractor || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.from || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.to || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.vehicleName || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.numTrips || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.distance || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.rate || 0) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(transport.total || 0) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ transport.notes || '-' }}</td>
             </tr>
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="8" class="px-6 py-8 text-center text-sm text-gray-500">{{ $t('labels.noData') }}</td>
+              <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">{{ $t('labels.noData') }}</td>
             </tr>
           </tbody>
         </table>
@@ -278,20 +282,24 @@ export default {
           const contractor = raw['المقاول'] || raw.contractor || raw.contractorName || raw.name || raw.supplier || ''
           const from = raw['من'] || raw.fromLocation || raw.from || raw.fromLoc || raw.origin || ''
           const to = raw['إلى'] || raw.toLocation || raw.to || raw.toLoc || raw.destination || ''
+          const vehicleName = raw['المركبة'] || raw.vehicleName || raw.vehicle || raw.truckName || ''
           const numTrips = raw['عدد النقلات'] || raw.numTrips || raw.trips || raw.count || 0
           const distance = raw['المسافة (كم)'] || raw['المسافة'] || raw.distance || raw.distanceKm || raw.km || 0
           const rate = raw['المعدل'] || raw.rate || raw.hourlyRate || raw.price || 0
           const total = raw['الإجمالي'] || raw.total || raw.totalAmount || raw.amount || 0
+          const notes = raw['الملاحظات'] || raw.notes || raw.comment || raw.description || ''
           return {
             ...raw,
             date,
             contractor,
             from,
             to,
+            vehicleName,
             numTrips: Number(numTrips) || 0,
             distance: Number(distance) || 0,
             rate: Number(rate) || 0,
-            total: Number(total) || 0
+            total: Number(total) || 0,
+            notes
           }
         })
 
