@@ -4,6 +4,9 @@
   "noTransactions": "No transactions",
   "transfer": "Transfer",
   "#": "#",
+  "errors": {
+    "unknown": "An error occurred"
+  },
   "navbar": {
     "supplies": "Supplies",
     "transport": "Transport",
@@ -353,6 +356,9 @@
     "truckName": "Truck Name",
     "contractor": "Contractor",
     "selectContractor": "Select Contractor",
+    "addNewContractor": "Add New Contractor",
+    "newContractorNamePlaceholder": "Enter contractor name",
+    "contractorCreateError": "Error creating contractor",
     "crusherNumber": "Crusher Number",
     "crusherNumberPlaceholder": "Crusher Number",
     "company": "Company",
@@ -366,6 +372,9 @@
     "deleteConfirm": "Are you sure you want to delete vehicle",
     "validationName": "Name is required",
     "validationContractor": "Contractor is required",
+    "validationPositiveNumber": "Must be greater than 0",
+    "cubicCapacityRequired": "Cubic Capacity is required and must be greater than 0",
+    "crusherCubicRequired": "Crusher Cubic is required and must be greater than 0",
     "namePlaceholder": "Enter vehicle name",
     "saveError": "Error saving vehicle",
     "deleteError": "Error deleting vehicle",
@@ -394,7 +403,11 @@
     "selectCrusher": "Select Crusher",
     "addNewCrusher": "Add New Crusher",
     "newCrusherNamePlaceholder": "Enter crusher name",
-    "crusherCreateError": "Error creating crusher"
+    "crusherCreateError": "Error creating crusher",
+    "updateSuccess": "Vehicle updated successfully",
+    "deleteSuccess": "Vehicle deleted successfully",
+    "changeOwnerSuccess": "Owner changed successfully",
+    "assignDriverSuccess": "Driver assigned successfully"
   },
   "rental": {
     "rentalList": "Equipment Rentals",

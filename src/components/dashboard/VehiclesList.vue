@@ -108,11 +108,17 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
-            <input v-model="editForm.cubicCapacity" type="text" class="w-full border rounded px-3 py-2 text-sm" />
+            <input v-model="editForm.cubicCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
+            <p v-if="editForm.cubicCapacity && Number(editForm.cubicCapacity) <= 0" class="text-xs text-red-600 mt-1">
+              {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCubic') }}</label>
-            <input v-model="editForm.crusherCubic" type="text" class="w-full border rounded px-3 py-2 text-sm" />
+            <input v-model="editForm.crusherCubic" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
+            <p v-if="editForm.crusherCubic && Number(editForm.crusherCubic) <= 0" class="text-xs text-red-600 mt-1">
+              {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
+            </p>
           </div>
           <div class="flex gap-2 justify-end pt-4">
             <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
@@ -466,23 +472,61 @@ export default {
     }
   },
   methods: {
+    /**
+     * Extract error message from API response
+     */
+    extractErrorMessage(error) {
+      // Check for various error response formats
+      if (error.response?.data?.message) {
+        return error.response.data.message
+      }
+      if (error.response?.data?.error) {
+        return error.response.data.error
+      }
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors
+        if (Array.isArray(errors) && errors.length > 0) {
+          return errors[0].message || errors[0]
+        }
+        if (typeof errors === 'object') {
+          const firstError = Object.values(errors)[0]
+          return Array.isArray(firstError) ? firstError[0] : firstError
+        }
+      }
+      if (error.response?.statusText) {
+        return `${error.response.status} ${error.response.statusText}`
+      }
+      if (error.message) {
+        return error.message
+      }
+      return this.$t('errors.unknown') || 'An error occurred'
+    },
     async loadVehicles() {
-      const res = await getVehicles({
-        page: this.page,
-        pageSize: this.pageSize
-      });
-      const payload = res.data || {}
-      this.vehicles = Array.isArray(payload.items)
-        ? payload.items
-        : Array.isArray(payload.data)
-          ? payload.data
-          : Array.isArray(payload)
-            ? payload
-            : [];
-      const meta = payload.meta || {}
-      this.total = meta.total ?? payload.total ?? this.vehicles.length
-      this.page = meta.page ?? this.page
-      this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
+      try {
+        const res = await getVehicles({
+          page: this.page,
+          pageSize: this.pageSize
+        });
+        const payload = res.data || {}
+        this.vehicles = Array.isArray(payload.items)
+          ? payload.items
+          : Array.isArray(payload.data)
+            ? payload.data
+            : Array.isArray(payload)
+              ? payload
+              : [];
+        const meta = payload.meta || {}
+        this.total = meta.total ?? payload.total ?? this.vehicles.length
+        this.page = meta.page ?? this.page
+        this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
+      } catch (e) {
+        console.error('Error loading vehicles', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
+        this.vehicles = []
+      }
     },
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {
@@ -506,6 +550,7 @@ export default {
               ? payload
               : []
       } catch (e) {
+        console.error('Error loading contractors', e)
         this.contractors = []
       }
     },
@@ -601,18 +646,53 @@ export default {
     },
     async onSaveEdit() {
       if (!this.editingVehicle || !this.editForm.name) return
+      
+      // Validate numeric fields if provided
+      const cubicCapacityValue = this.editForm.cubicCapacity ? Number(this.editForm.cubicCapacity) : null
+      const crusherCubicValue = this.editForm.crusherCubic ? Number(this.editForm.crusherCubic) : null
+      
+      if (cubicCapacityValue !== null && cubicCapacityValue <= 0) {
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.validationPositiveNumber') || 'Cubic Capacity must be greater than 0', 'error', 5000)
+        }
+        return
+      }
+      
+      if (crusherCubicValue !== null && crusherCubicValue <= 0) {
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.validationPositiveNumber') || 'Crusher Cubic must be greater than 0', 'error', 5000)
+        }
+        return
+      }
+      
       this.editLoading = true
       try {
         const payload = {
-          name: this.editForm.name,
-          crusherCubic: this.editForm.crusherCubic ? Number(this.editForm.crusherCubic) : null,
-          cubicCapacity: this.editForm.cubicCapacity ? Number(this.editForm.cubicCapacity) : null
+          name: this.editForm.name
         }
+        
+        // Only include crusherCubic if it's a valid number > 0
+        if (crusherCubicValue !== null && crusherCubicValue > 0) {
+          payload.crusherCubic = crusherCubicValue
+        }
+        
+        // Only include cubicCapacity if it's a valid number > 0
+        if (cubicCapacityValue !== null && cubicCapacityValue > 0) {
+          payload.cubicCapacity = cubicCapacityValue
+        }
+        
         await updateVehicle(this.editingVehicle.id, payload)
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.updateSuccess') || 'Vehicle updated successfully', 'success')
+        }
         await this.loadVehicles()
         this.closeEditModal()
       } catch (e) {
         console.error('Error updating vehicle', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
       } finally {
         this.editLoading = false
       }
@@ -629,10 +709,17 @@ export default {
       this.deleteLoading = true
       try {
         await deleteVehicle(this.deleteConfirmVehicle.id)
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.deleteSuccess') || 'Vehicle deleted successfully', 'success')
+        }
         await this.loadVehicles()
         this.closeDeleteConfirm()
       } catch (e) {
         console.error('Error deleting vehicle', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
       } finally {
         this.deleteLoading = false
       }
@@ -650,6 +737,11 @@ export default {
         const res = await getVehicleOwnershipHistory(this.selectedVehicle.id)
         this.ownershipHistory = Array.isArray(res.data) ? res.data : []
       } catch (e) {
+        console.error('Error loading ownership history', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
         this.ownershipHistory = []
       } finally {
         this.ownershipLoading = false
@@ -662,6 +754,11 @@ export default {
         const res = await getVehicleDriverHistory(this.selectedVehicle.id)
         this.driverHistory = Array.isArray(res.data) ? res.data : []
       } catch (e) {
+        console.error('Error loading driver history', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
         this.driverHistory = []
       } finally {
         this.driversLoading = false
@@ -676,6 +773,11 @@ export default {
         const res = await getDrivers(params)
         this.availableDrivers = Array.isArray(res.data) ? res.data : []
       } catch (e) {
+        console.error('Error loading available drivers', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
         this.availableDrivers = []
       }
     },
@@ -696,6 +798,9 @@ export default {
           contractor,
           contractorId: contractor ? contractor.id : this.changeOwnerForm.contractorId
         })
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.changeOwnerSuccess') || 'Owner changed successfully', 'success')
+        }
         await this.loadVehicles()
         const updated = this.vehicles.find(v => v.id === this.selectedVehicle.id)
         if (updated) {
@@ -705,8 +810,17 @@ export default {
           this.refreshOwnershipHistory(),
           this.refreshAvailableDrivers()
         ])
+        // Reset form
+        this.changeOwnerForm = {
+          contractorId: '',
+          effectiveDate: ''
+        }
       } catch (e) {
         console.error('Error changing vehicle owner', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
       } finally {
         this.changeOwnerLoading = false
       }
@@ -720,6 +834,9 @@ export default {
           isPrimary: !!this.assignDriverForm.isPrimary
         }
         await assignVehicleDriver(this.selectedVehicle.id, payload)
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.assignDriverSuccess') || 'Driver assigned successfully', 'success')
+        }
         this.assignDriverForm = {
           driverId: '',
           isPrimary: false
@@ -727,6 +844,10 @@ export default {
         await this.refreshDriverHistory()
       } catch (e) {
         console.error('Error assigning driver', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
       } finally {
         this.assignDriverLoading = false
       }

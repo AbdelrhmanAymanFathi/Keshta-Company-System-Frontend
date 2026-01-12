@@ -4,6 +4,9 @@
   "noTransactions": "لا توجد معاملات",
   "transfer": "تحويل",
   "#": "#",
+  "errors": {
+    "unknown": "حدث خطأ ما"
+  },
   "navbar": {
     "supplies": "التوريدات",
     "transport": "النقل",
@@ -353,6 +356,9 @@
     "truckName": "رقم المركبة",
     "contractor": "المقاول",
     "selectContractor": "اختر المقاول",
+    "addNewContractor": "إضافة مقاول جديد",
+    "newContractorNamePlaceholder": "أدخل اسم المقاول",
+    "contractorCreateError": "خطأ في إنشاء المقاول",
     "crusherNumber": "رقم الكسارة",
     "crusherNumberPlaceholder": "رقم الكسارة",
     "company": "الشركة",
@@ -366,7 +372,10 @@
     "deleteConfirm": "هل أنت متأكد من حذف المركبة",
     "validationName": "الاسم مطلوب",
     "validationContractor": "المقاول مطلوب",
-    "namePlaceholder": "أدخل رقم المركبة",
+    "validationPositiveNumber": "يجب أن تكون القيمة أكبر من 0",
+    "cubicCapacityRequired": "السعة المكعبة مطلوبة ويجب أن تكون أكبر من 0",
+    "crusherCubicRequired": "السعة المكعبة للمحطم مطلوبة ويجب أن تكون أكبر من 0",
+    "namePlaceholder": "أدخل اسم المركبة",
     "saveError": "خطأ في حفظ المركبة",
     "deleteError": "خطأ في حذف المركبة",
     "createdSuccessfully": "تم إنشاء المركبة بنجاح",
@@ -394,7 +403,11 @@
     "selectCrusher": "اختر الكسارة",
     "addNewCrusher": "إضافة كسارة جديدة",
     "newCrusherNamePlaceholder": "أدخل اسم الكسارة",
-    "crusherCreateError": "خطأ في إنشاء الكسارة"
+    "crusherCreateError": "خطأ في إنشاء الكسارة",
+    "updateSuccess": "تم تحديث المركبة بنجاح",
+    "deleteSuccess": "تم حذف المركبة بنجاح",
+    "changeOwnerSuccess": "تم تغيير المالك بنجاح",
+    "assignDriverSuccess": "تم ربط السائق بنجاح"
   },
   "rental": {
     "rentalList": "إيجار المعدات",
