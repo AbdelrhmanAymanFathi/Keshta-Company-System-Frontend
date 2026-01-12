@@ -146,7 +146,7 @@
     "crusherName": "اسم الكسارة",
     "vehicleName": "اسم المركبة",
     "selectContractor": "اختر المقاول",
-    "cubicCapacity": "السعة المكعبة"
+    "cubicCapacity": "تكعيب الشركة"
   },
   "common": {
     "error": "خطأ",
@@ -388,8 +388,8 @@
     "validationName": "الاسم مطلوب",
     "validationContractor": "المقاول مطلوب",
     "validationPositiveNumber": "يجب أن تكون القيمة أكبر من 0",
-    "cubicCapacityRequired": "السعة المكعبة مطلوبة ويجب أن تكون أكبر من 0",
-    "crusherCubicRequired": "السعة المكعبة للمحطم مطلوبة ويجب أن تكون أكبر من 0",
+    "cubicCapacityRequired": "تكعيب الشركة مطلوبة ويجب أن تكون أكبر من 0",
+    "crusherCubicRequired": "تكعيب الكسارة للمحطم مطلوبة ويجب أن تكون أكبر من 0",
     "namePlaceholder": "أدخل اسم المركبة",
     "saveError": "خطأ في حفظ المركبة",
     "deleteError": "خطأ في حذف المركبة",
