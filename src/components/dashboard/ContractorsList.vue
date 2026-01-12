@@ -5,7 +5,7 @@
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('contractors.title') }}</h2>
       <div class="flex items-center gap-3">
         <!-- Import Excel -->
-        <label class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-flex items-center cursor-pointer transition-colors">
+        <!-- <label class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-flex items-center cursor-pointer transition-colors">
           <input ref="fileInput" type="file" accept=".xlsx,.xls" class="hidden" @change="onFileChange" />
           <svg class="w-5 h-5" :class="isRTL ? 'ml-2' : 'mr-2'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M12 3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -13,7 +13,7 @@
             <rect x="3" y="13" width="18" height="8" rx="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           {{ $t('contractors.importExcel') }}
-        </label>
+        </label> -->
         <!-- Add Button -->
         <button @click="openAdd"
           class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
