@@ -273,7 +273,12 @@ export default {
           const newDriverName = this.form.newDriverName.trim()
           if (newDriverName) {
             try {
-              const newDriverRes = await createDriver({ name: newDriverName })
+              const driverPayload = { name: newDriverName }
+              // Associate driver with the selected contractor
+              if (contractorId) {
+                driverPayload.contractorId = contractorId
+              }
+              const newDriverRes = await createDriver(driverPayload)
               driverId = newDriverRes.data.id
               // Add to local list for future use
               this.drivers.push(newDriverRes.data)

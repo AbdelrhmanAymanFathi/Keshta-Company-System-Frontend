@@ -300,7 +300,7 @@
                     {{ $t('vehicles.selectDriver') }}
                   </option>
                   <option
-                    v-for="d in availableDrivers"
+                    v-for="d in filteredAvailableDrivers"
                     :key="d.id"
                     :value="d.id"
                   >
@@ -471,6 +471,16 @@ export default {
         pages.push(i)
       }
       return pages
+    },
+    filteredAvailableDrivers() {
+      if (!this.selectedVehicle || !this.selectedVehicle.contractor) {
+        return this.availableDrivers
+      }
+      // Filter drivers by selected vehicle's contractor
+      const contractorId = this.selectedVehicle.contractor.id
+      return this.availableDrivers.filter(driver => {
+        return driver.contractorId === contractorId || !driver.contractorId
+      })
     }
   },
   methods: {
@@ -768,12 +778,16 @@ export default {
     },
     async refreshAvailableDrivers() {
       try {
-        const params = {}
-        if (this.selectedVehicle && this.selectedVehicle.contractor) {
-          params.contractorId = this.selectedVehicle.contractor.id
-        }
-        const res = await getDrivers(params)
-        this.availableDrivers = Array.isArray(res.data) ? res.data : []
+        // Load all drivers, not filtered by contractor
+        const res = await getDrivers({ pageSize: 1000 })
+        const driversPayload = res.data || {}
+        this.availableDrivers = Array.isArray(driversPayload.items)
+          ? driversPayload.items
+          : Array.isArray(driversPayload.data)
+            ? driversPayload.data
+            : Array.isArray(driversPayload)
+              ? driversPayload
+              : []
       } catch (e) {
         console.error('Error loading available drivers', e)
         const errorMsg = this.extractErrorMessage(e)
