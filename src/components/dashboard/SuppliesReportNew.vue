@@ -107,12 +107,12 @@
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.category') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.crusherTicket') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.companyTicket') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Company Capacity</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Crusher Capacity</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.companyCapacity') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.crusherCapacity') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.unitPrice') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.discount') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Row Total</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">Accumulative Total</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.rowTotal') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.accumulativeTotal') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.notes') }}</th>
             </tr>
           </thead>
@@ -150,15 +150,15 @@
             <p class="text-lg font-semibold text-gray-900">{{ mappedItems.length }}</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">Total Amount</p>
+            <p class="text-xs text-gray-600">{{ $t('labels.rowTotal') }}</p>
             <p class="text-lg font-semibold text-gray-900">{{ formatCurrency(totalAmount) }}</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">Total Quantity</p>
-            <p class="text-lg font-semibold text-indigo-600">{{ formatQuantity(totalQuantity) }} units</p>
+            <p class="text-xs text-gray-600">{{ $t('labels.companyCapacity') }}</p>
+            <p class="text-lg font-semibold text-indigo-600">{{ formatQuantity(totalQuantity) }} وحدة</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">Average Price</p>
+            <p class="text-xs text-gray-600">متوسط السعر</p>
             <p class="text-lg font-semibold text-orange-600">{{ formatCurrency(averagePrice) }}</p>
           </div>
         </div>
