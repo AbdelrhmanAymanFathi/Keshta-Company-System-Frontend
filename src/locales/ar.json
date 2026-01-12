@@ -140,7 +140,13 @@
     "clear": "مسح",
     "all": "الكل",
     "totalRecords": "إجمالي السجلات",
-    "pageSize": "حجم الصفحة"
+    "pageSize": "حجم الصفحة",
+    "addNew": "إضافة جديد",
+    "contractorName": "اسم المقاول",
+    "crusherName": "اسم الكسارة",
+    "vehicleName": "اسم المركبة",
+    "selectContractor": "اختر المقاول",
+    "cubicCapacity": "السعة المكعبة"
   },
   "common": {
     "error": "خطأ",
@@ -214,6 +220,9 @@
     "editSite": "تعديل الموقع",
     "addArea": "إضافة منطقة",
     "editArea": "تعديل المنطقة",
+    "addContractor": "إضافة مقاول",
+    "addCrusher": "إضافة كسارة",
+    "addVehicle": "إضافة مركبة",
     "duplicate": "نسخ",
     "reset": "إعادة تعيين",
     "subtotal": "المجموع الفرعي",

@@ -100,30 +100,42 @@
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.contractor" @change="onContractorChange(row)"
-                    class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)"
-                    @keydown.tab.prevent="focusNext(index, 1)">
-                    <option :value="null">{{ $t('labels.contractor') }} —</option>
-                    <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
-                  </select>
+                  <div class="flex gap-1">
+                    <select v-model="row.contractor" @change="onContractorChange(row)"
+                      class="flex-1 border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 1)"
+                      @keydown.tab.prevent="focusNext(index, 1)">
+                      <option :value="null">{{ $t('labels.contractor') }} —</option>
+                      <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
+                      <option value="__new__" style="color: green;">+ {{ $t('labels.addNew') || 'Add New' }}</option>
+                    </select>
+                    <button v-if="row.contractor === '__new__'" @click="showAddContractorDialog = true" class="bg-green-500 text-white px-2 py-1 rounded text-sm">+</button>
+                  </div>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.crusher" @change="onCrusherChange(row)"
-                    class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)"
-                    @keydown.tab.prevent="focusNext(index, 2)">
-                    <option :value="null">{{ $t('labels.crusher') }} —</option>
-                    <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
-                  </select>
+                  <div class="flex gap-1">
+                    <select v-model="row.crusher" @change="onCrusherChange(row)"
+                      class="flex-1 border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 2)"
+                      @keydown.tab.prevent="focusNext(index, 2)">
+                      <option :value="null">{{ $t('labels.crusher') }} —</option>
+                      <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
+                      <option value="__new__" style="color: green;">+ {{ $t('labels.addNew') || 'Add New' }}</option>
+                    </select>
+                    <button v-if="row.crusher === '__new__'" @click="showAddCrusherDialog = true" class="bg-green-500 text-white px-2 py-1 rounded text-sm">+</button>
+                  </div>
                 </td>
 
                 <td class="px-3 py-2">
-                  <select v-model="row.vehicle" @change="onVehicleSelect(row)"
-                    class="w-full border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)"
-                    @keydown.tab.prevent="focusNext(index, 3)">
-                    <option :value="null">{{ $t('labels.vehicle') }} —</option>
-                    <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
-                  </select>
+                  <div class="flex gap-1">
+                    <select v-model="row.vehicle" @change="onVehicleSelect(row)"
+                      class="flex-1 border rounded-md px-2 py-1" @keydown.enter.prevent="focusNext(index, 3)"
+                      @keydown.tab.prevent="focusNext(index, 3)">
+                      <option :value="null">{{ $t('labels.vehicle') }} —</option>
+                      <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
+                      <option value="__new__" style="color: green;">+ {{ $t('labels.addNew') || 'Add New' }}</option>
+                    </select>
+                    <button v-if="row.vehicle === '__new__'" @click="showAddVehicleDialog = true" class="bg-green-500 text-white px-2 py-1 rounded text-sm">+</button>
+                  </div>
                 </td>
 
 
@@ -387,6 +399,76 @@
         <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
       </div>
     </div>
+
+    <!-- Add Contractor Dialog (from table) -->
+    <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-96">
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.addContractor') || 'Add Contractor' }}</h3>
+        <label class="block text-sm mb-1">{{ $t('labels.contractorName') || 'Contractor Name' }}</label>
+        <input v-model="newContractorName" :placeholder="$t('labels.contractorName') || 'Contractor Name'"
+          class="w-full border rounded px-2 py-1 mb-3" />
+        <div class="flex gap-2 justify-end">
+          <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') || 'Cancel' }}</button>
+          <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
+            class="bg-green-500 text-white px-3 py-1 rounded">
+            {{ creatingContractor ? $t('supply.adding') : $t('supply.add') }}
+          </button>
+        </div>
+        <div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div>
+      </div>
+    </div>
+
+    <!-- Add Crusher Dialog (from table) -->
+    <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-96">
+        <h3 class="text-lg font-bold mb-2">{{ $t('supply.addCrusher') || 'Add Crusher' }}</h3>
+        <label class="block text-sm mb-1">{{ $t('labels.crusherName') || 'Crusher Name' }}</label>
+        <input v-model="newCrusherName" :placeholder="$t('labels.crusherName') || 'Crusher Name'"
+          class="w-full border rounded px-2 py-1 mb-3" />
+        <div class="flex gap-2 justify-end">
+          <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') || 'Cancel' }}</button>
+          <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
+            class="bg-green-500 text-white px-3 py-1 rounded">
+            {{ creatingCrusher ? $t('supply.adding') : $t('supply.add') }}
+          </button>
+        </div>
+        <div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div>
+      </div>
+    </div>
+
+    <!-- Add Vehicle Dialog (from table) -->
+    <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded shadow w-full max-w-md">
+        <h3 class="text-lg font-bold mb-3">{{ $t('supply.addVehicle') || 'Add Vehicle' }}</h3>
+        
+        <label class="block text-sm mb-1">{{ $t('labels.vehicleName') || 'Vehicle Name' }}</label>
+        <input v-model="newVehicleForm.name" :placeholder="$t('labels.vehicleName') || 'Vehicle Name'"
+          class="w-full border rounded px-2 py-1 mb-3" />
+
+        <label class="block text-sm mb-1">{{ $t('labels.contractor') || 'Contractor' }}</label>
+        <select v-model="newVehicleForm.contractorId" class="w-full border rounded px-2 py-1 mb-3">
+          <option value="">{{ $t('labels.selectContractor') || 'Select Contractor' }}</option>
+          <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+
+        <label class="block text-sm mb-1">{{ $t('labels.cubicCapacity') || 'Cubic Capacity' }}</label>
+        <input v-model="newVehicleForm.cubicCapacity" type="number" min="0.01" step="0.01"
+          :placeholder="$t('labels.cubicCapacity') || 'Cubic Capacity'" class="w-full border rounded px-2 py-1 mb-3" />
+
+        <label class="block text-sm mb-1">{{ $t('labels.crusherCubic') || 'Crusher Cubic' }}</label>
+        <input v-model="newVehicleForm.crusherCubic" type="number" min="0.01" step="0.01"
+          :placeholder="$t('labels.crusherCubic') || 'Crusher Cubic'" class="w-full border rounded px-2 py-1 mb-3" />
+
+        <div class="flex gap-2 justify-end">
+          <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') || 'Cancel' }}</button>
+          <button @click="createNewVehicle" :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
+            class="bg-green-500 text-white px-3 py-1 rounded">
+            {{ creatingVehicle ? $t('supply.adding') : $t('supply.add') }}
+          </button>
+        </div>
+        <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -403,7 +485,10 @@ import {
   getContractorsWithVehicles,
   createDelivery,
   getDeliveries,
-  deleteDelivery
+  deleteDelivery,
+  createContractor,
+  createCrusher,
+  createVehicle
 } from '../../api'
 
 export default {
@@ -455,6 +540,27 @@ export default {
       editAreaName: '',
       addingLocation: false,
       locationError: '',
+
+      // dialogs for creating contractor, crusher, vehicle in table
+      showAddContractorDialog: false,
+      newContractorName: '',
+      contractorDialogError: '',
+      creatingContractor: false,
+
+      showAddCrusherDialog: false,
+      newCrusherName: '',
+      crusherDialogError: '',
+      creatingCrusher: false,
+
+      showAddVehicleDialog: false,
+      newVehicleForm: {
+        name: '',
+        contractorId: '',
+        cubicCapacity: '',
+        crusherCubic: ''
+      },
+      vehicleDialogError: '',
+      creatingVehicle: false,
 
       // exports list
       exportsData: { page: 1, pageSize: 20, total: 0, items: [] },
@@ -1112,6 +1218,103 @@ export default {
         const inputs = rowEl.querySelectorAll(selector)
         if (inputs && inputs[0]) inputs[0].focus()
       })
+    },
+
+    // Create new contractor from table dialog
+    async createNewContractor() {
+      this.contractorDialogError = ''
+      if (!this.newContractorName.trim()) return
+      this.creatingContractor = true
+      try {
+        const res = await createContractor({ name: this.newContractorName.trim() })
+        const newContractor = res.data
+        this.contractors.push(newContractor)
+        // Reset form and close dialog
+        this.newContractorName = ''
+        this.showAddContractorDialog = false
+        // Optionally select the newly created contractor in the first row with __new__ selected
+        const firstNewRow = this.rows.find(r => r.contractor === '__new__')
+        if (firstNewRow) {
+          firstNewRow.contractor = newContractor
+          this.onContractorChange(firstNewRow)
+        }
+      } catch (e) {
+        console.error('createNewContractor failed', e)
+        this.contractorDialogError = e?.response?.data?.message || 'Failed to create contractor'
+      } finally {
+        this.creatingContractor = false
+      }
+    },
+
+    // Create new crusher from table dialog
+    async createNewCrusher() {
+      this.crusherDialogError = ''
+      if (!this.newCrusherName.trim()) return
+      this.creatingCrusher = true
+      try {
+        const res = await createCrusher({ name: this.newCrusherName.trim() })
+        const newCrusher = res.data
+        this.crushers.push(newCrusher)
+        // Reset form and close dialog
+        this.newCrusherName = ''
+        this.showAddCrusherDialog = false
+        // Optionally select the newly created crusher in the first row with __new__ selected
+        const firstNewRow = this.rows.find(r => r.crusher === '__new__')
+        if (firstNewRow) {
+          firstNewRow.crusher = newCrusher
+          this.onCrusherChange(firstNewRow)
+        }
+      } catch (e) {
+        console.error('createNewCrusher failed', e)
+        this.crusherDialogError = e?.response?.data?.message || 'Failed to create crusher'
+      } finally {
+        this.creatingCrusher = false
+      }
+    },
+
+    // Create new vehicle from table dialog
+    async createNewVehicle() {
+      this.vehicleDialogError = ''
+      const { name, contractorId, cubicCapacity, crusherCubic } = this.newVehicleForm
+      if (!name.trim() || !cubicCapacity || !crusherCubic) {
+        this.vehicleDialogError = 'Please fill in all required fields'
+        return
+      }
+      this.creatingVehicle = true
+      try {
+        const payload = {
+          name: name.trim(),
+          contractorId: contractorId ? parseInt(contractorId) : null,
+          cubicCapacity: parseFloat(cubicCapacity),
+          crusherCubic: parseFloat(crusherCubic)
+        }
+        const res = await createVehicle(payload)
+        const newVehicle = res.data
+        this.vehicles.push(newVehicle)
+        // Update all rows' availableVehicles
+        this.rows.forEach(row => {
+          row.availableVehicles = this.vehicles
+        })
+        // Reset form and close dialog
+        this.newVehicleForm = {
+          name: '',
+          contractorId: '',
+          cubicCapacity: '',
+          crusherCubic: ''
+        }
+        this.showAddVehicleDialog = false
+        // Optionally select the newly created vehicle in the first row with __new__ selected
+        const firstNewRow = this.rows.find(r => r.vehicle === '__new__')
+        if (firstNewRow) {
+          firstNewRow.vehicle = newVehicle
+          this.onVehicleSelect(firstNewRow)
+        }
+      } catch (e) {
+        console.error('createNewVehicle failed', e)
+        this.vehicleDialogError = e?.response?.data?.message || 'Failed to create vehicle'
+      } finally {
+        this.creatingVehicle = false
+      }
     }
   }
 }

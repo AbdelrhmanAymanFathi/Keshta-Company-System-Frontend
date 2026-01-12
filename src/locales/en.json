@@ -140,7 +140,13 @@
     "clear": "Clear",
     "all": "All",
     "totalRecords": "Total Records",
-    "pageSize": "Page size"
+    "pageSize": "Page size",
+    "addNew": "Add New",
+    "contractorName": "Contractor Name",
+    "crusherName": "Crusher Name",
+    "vehicleName": "Vehicle Name",
+    "selectContractor": "Select Contractor",
+    "cubicCapacity": "Cubic Capacity"
   },
   "common": {
     "error": "Error",
@@ -214,6 +220,9 @@
     "editSite": "Edit Site",
     "addArea": "Add Area",
     "editArea": "Edit Area",
+    "addContractor": "Add Contractor",
+    "addCrusher": "Add Crusher",
+    "addVehicle": "Add Vehicle",
     "duplicate": "Duplicate",
     "reset": "Reset",
     "subtotal": "Subtotal",
