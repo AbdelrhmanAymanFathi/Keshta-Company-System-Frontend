@@ -35,7 +35,7 @@
             <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.crusherCubic != null && v.crusherCubic !== '' ? v.crusherCubic : '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.driver?.name || v.driverName || '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ getDriverName(v) || '—' }}</td>
             <td class="px-3 py-3 flex gap-2">
               <button
                 class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
@@ -484,6 +484,20 @@ export default {
     }
   },
   methods: {
+    /**
+     * Extract driver name from vehicle's assignments array
+     */
+    getDriverName(vehicle) {
+      // Extract driver name from assignments array
+      if (vehicle.assignments && vehicle.assignments.length > 0) {
+        const primaryAssignment = vehicle.assignments.find(a => a.isPrimary) || vehicle.assignments[0]
+        if (primaryAssignment && primaryAssignment.driver) {
+          return primaryAssignment.driver.name
+        }
+      }
+      // Fallback to old properties for backward compatibility
+      return vehicle.driver?.name || vehicle.driverName || null
+    },
     /**
      * Extract error message from API response
      */
