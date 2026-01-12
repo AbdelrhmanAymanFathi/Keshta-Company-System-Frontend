@@ -3,8 +3,13 @@
 
     <transition name="slide-fade">
       <aside v-if="!sidebarCollapsed"
-        :class="['bg-white rounded-lg shadow overflow-hidden p-3', isRTL ? 'direction-rtl' : '', isRTL ? 'text-end' : 'text-start']"
-        style="min-width: 19%; max-width: 320px;">
+  :class="[
+    'bg-white rounded-lg shadow overflow-hidden p-3',
+    'w-full sm:w-[260px] md:w-[280px] lg:w-[300px]',
+    'min-w-[240px] max-w-[320px]',
+    'transition-all duration-300 ease-in-out',
+    isRTL ? 'direction-rtl text-end' : 'text-start'
+  ]">
         
       <!-- Sidebar header -->
       <div :class="['flex items-center justify-between mb-3']">
@@ -108,7 +113,7 @@
       </button>
     </div>
     <!-- Main Content -->
-    <div :class="['flex-1 p-6 space-y-6', isRTL ? 'text-end' : 'text-start']">
+    <div :class="['w-[72%] flex-1 p-4 sm:p-6 space-y-6 transition-all duration-200', isRTL ? 'text-end' : 'text-start']">
       <!-- Balance Card -->
 
       <!-- <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
@@ -158,7 +163,9 @@
           {{ $t('expenses.addExpense') || 'Add Expense' }}
         </button>
       </div>
-      <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 my-4', isRTL ? 'text-end' : 'text-start']">
+      <div :dir="isRTL ? 'rtl' : 'ltr'"
+  class="grid gap-4 my-5
+         [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
         <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
           <p class="text-xs text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
           <p class="text-sm font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
@@ -202,7 +209,7 @@
             <!-- ✅ Updated grid to accommodate new filters (Category + Branch) -->
             <!-- When Branch filter is visible (selectedBranch === null): 7 filters -->
             <!-- When Branch filter is hidden: 6 filters -->
-            <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-7 gap-3 items-end']">
+            <div :class="['grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-4 items-end']">
               <!-- Search -->
               <div>
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.search') || 'Search' }}</label>
