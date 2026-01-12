@@ -144,7 +144,7 @@
         </form>
 
         <!-- Register Link -->
-        <div class="mt-6 text-center">
+        <!-- <div class="mt-6 text-center">
           <p class="text-sm text-gray-600">
             {{ $t('auth.login.noAccount') }}
             <a href="#" @click.prevent="$emit('switch-auth', 'register')"
@@ -152,7 +152,7 @@
               {{ $t('auth.login.register') }}
             </a>
           </p>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
