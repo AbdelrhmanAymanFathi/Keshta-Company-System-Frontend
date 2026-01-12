@@ -112,6 +112,8 @@
     "companyCapacity": "سعة الشركة",
     "crusherCapacity": "سعة الكسارة",
     "unitPrice": "سعر الوحدة",
+    "category": "الفئة",
+    "notes": "ملاحظات",
     "#": "#",
     "search": "بحث",
     "refresh": "تحديث",

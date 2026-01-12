@@ -112,6 +112,8 @@
     "companyCapacity": "Company Capacity",
     "crusherCapacity": "Crusher Capacity",
     "unitPrice": "Unit Price",
+    "category": "Category",
+    "notes": "Notes",
     "#": "#",
     "search": "Search",
     "refresh": "Refresh",
