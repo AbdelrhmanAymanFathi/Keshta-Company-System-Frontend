@@ -42,6 +42,24 @@
     </div>
 
     <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.driver') || 'Driver' }}</label>
+      <div class="space-y-2">
+        <select v-model="form.driverId" @change="onDriverSelectChange" class="w-full border rounded px-3 py-2">
+          <option value="">{{ $t('vehicles.selectDriver') || 'Select Driver' }}</option>
+          <option v-for="d in drivers" :key="d.id" :value="d.id">{{ d.name }}</option>
+          <option value="__new__">{{ $t('vehicles.addNewDriver') || 'Add New Driver' }}</option>
+        </select>
+        <input 
+          v-if="form.driverId === '__new__'"
+          v-model="form.newDriverName" 
+          type="text" 
+          :placeholder="$t('vehicles.newDriverNamePlaceholder') || 'New Driver Name'" 
+          class="w-full border rounded px-3 py-2" 
+        />
+      </div>
+    </div>
+
+    <div>
       <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
       <input v-model="form.cubicCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('vehicles.cubicCapacityPlaceholder')" class="w-full border rounded px-3 py-2" />
       <p v-if="form.cubicCapacity && Number(form.cubicCapacity) <= 0" class="text-xs text-red-600 mt-1">
@@ -68,7 +86,7 @@
 </template>
 
 <script>
-import { createVehicle, getContractors, getCrushers, createCrusher, createContractor } from '../../api'
+import { createVehicle, getContractors, getCrushers, createCrusher, createContractor, getDrivers, createDriver } from '../../api'
 
 export default {
   name: 'CreateVehicle',
@@ -76,6 +94,7 @@ export default {
     return {
       contractors: [],
       crushers: [],
+      drivers: [],
       form: {
         name: '',
         contractorId: '',
@@ -83,6 +102,8 @@ export default {
         crusherId: '',
         crusherNumber: '',
         newCrusherName: '',
+        driverId: '',
+        newDriverName: '',
         cubicCapacity: '',
         crusherCubic: ''
       },
@@ -121,6 +142,20 @@ export default {
         console.error('Error loading crushers:', error)
         this.crushers = []
       }
+      try {
+        const driversRes = await getDrivers({ pageSize: 1000 })
+        const driversPayload = driversRes.data || {}
+        this.drivers = Array.isArray(driversPayload.items)
+          ? driversPayload.items
+          : Array.isArray(driversPayload.data)
+            ? driversPayload.data
+            : Array.isArray(driversPayload)
+              ? driversPayload
+              : []
+      } catch (error) {
+        console.error('Error loading drivers:', error)
+        this.drivers = []
+      }
     },
     onContractorSelectChange() {
       if (this.form.contractorId === '__new__') {
@@ -138,6 +173,13 @@ export default {
       } else {
         this.form.crusherNumber = ''
         this.form.newCrusherName = ''
+      }
+    },
+    onDriverSelectChange() {
+      if (this.form.driverId === '__new__') {
+        this.form.newDriverName = ''
+      } else {
+        this.form.newDriverName = ''
       }
     },
     async onCreate() {
@@ -186,6 +228,7 @@ export default {
       try {
         let contractorId = this.form.contractorId
         let crusherNumber = this.form.crusherNumber || null
+        let driverId = null
 
         // If user selected "add new contractor", create it first
         if (this.form.contractorId === '__new__' && this.form.newContractorName) {
@@ -225,10 +268,36 @@ export default {
           }
         }
 
+        // If user selected "add new driver", create it first
+        if (this.form.driverId === '__new__' && this.form.newDriverName) {
+          const newDriverName = this.form.newDriverName.trim()
+          if (newDriverName) {
+            try {
+              const newDriverRes = await createDriver({ name: newDriverName })
+              driverId = newDriverRes.data.id
+              // Add to local list for future use
+              this.drivers.push(newDriverRes.data)
+            } catch (e) {
+              this.error = e?.response?.data?.message || this.$t('vehicles.driverCreateError')
+              if (window.$toast) {
+                window.$toast(this.error, 'error', 5000)
+              }
+              return
+            }
+          }
+        } else if (this.form.driverId && this.form.driverId !== '__new__') {
+          driverId = this.form.driverId
+        }
+
         const payload = {
           name: this.form.name,
           contractorId: contractorId,
           crusherNumber: crusherNumber
+        }
+
+        // Include driverId if selected/created
+        if (driverId) {
+          payload.driverId = driverId
         }
         
         // Only include cubicCapacity if it's a valid number > 0
@@ -253,6 +322,8 @@ export default {
         this.form.crusherId = ''
         this.form.crusherNumber = ''
         this.form.newCrusherName = ''
+        this.form.driverId = ''
+        this.form.newDriverName = ''
         this.form.cubicCapacity = ''
         this.form.crusherCubic = ''
       } catch (e) {

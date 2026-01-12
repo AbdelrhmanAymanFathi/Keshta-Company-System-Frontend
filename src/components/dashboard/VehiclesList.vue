@@ -20,6 +20,7 @@
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.crusherNumber') }}</th>
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.cubicCapacity') }}</th>
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.crusherCubic') }}</th>
+            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.driver') || 'Driver' }}</th>
             <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.actions') || 'Actions' }}</th>
           </tr>
         </thead>
@@ -34,6 +35,7 @@
             <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.crusherCubic != null && v.crusherCubic !== '' ? v.crusherCubic : '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.driver?.name || v.driverName || '—' }}</td>
             <td class="px-3 py-3 flex gap-2">
               <button
                 class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
