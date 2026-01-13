@@ -201,6 +201,7 @@ const router = createRouter({
 
 // Before each navigation
 router.beforeEach(async (to, from, next) => {
+  console.log("before request");
   // Wait for auth to initialize (avoid race conditions)
   if (loading.value) {
     await new Promise(resolve => {
@@ -210,6 +211,7 @@ router.beforeEach(async (to, from, next) => {
           resolve()
         }
       })
+      
     })
   }
 

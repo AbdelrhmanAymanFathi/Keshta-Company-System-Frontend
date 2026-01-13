@@ -1,11 +1,12 @@
 // Vue 3 Composition API composable for authentication
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import authManager from '../auth'
+import { isAuthenticated, user, loading } from './authStore'
 
 export function useAuth() {
-  const isAuthenticated = ref(false)
-  const user = ref(null)
-  const loading = ref(true)
+  // const isAuthenticated = ref(false)
+  // const user = ref(null)
+  // const loading = ref(true)
 
   // Update local state when auth state changes
   const handleAuthStateChange = (event, data) => {
