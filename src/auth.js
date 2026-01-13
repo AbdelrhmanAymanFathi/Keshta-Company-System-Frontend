@@ -1,5 +1,6 @@
 // Authentication utilities and token management
 import { tokenManager, login as apiLogin, logout as apiLogout } from './api';
+import { user } from './composables/authStore';
 
 // Auth state management
 class AuthManager {
@@ -65,6 +66,7 @@ class AuthManager {
         // Store user data if provided
         if (data.user) {
           this.user = data.user;
+          user.value = data.user;
           localStorage.setItem('user', JSON.stringify(data.user));
         }
         

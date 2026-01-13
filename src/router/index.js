@@ -4,7 +4,7 @@ import { watch } from 'vue'
 
 // Auth Pages
 const Login = () => import('@/components/auth/Login.vue')
-const Register = () => import('@/components/auth/Register.vue')
+// const Register = () => import('@/components/auth/Register.vue')
 
 // Dashboard Layout
 const Dashboard = () => import('@/components/dashboard/Dashboard.vue')
@@ -37,12 +37,12 @@ const routes = [
     component: Login,
     meta: { requiresAuth: false, title: 'auth.login.title' }
   },
-  {
-    path: '/register',
-    name: 'register',
-    component: Register,
-    meta: { requiresAuth: false, title: 'auth.register.title' }
-  },
+  // {
+  //   path: '/register',
+  //   name: 'register',
+  //   component: Register,
+  //   meta: { requiresAuth: false, title: 'auth.register.title' }
+  // },
 
   // ==================== Dashboard Layout ====================
   {
@@ -201,7 +201,6 @@ const router = createRouter({
 
 // Before each navigation
 router.beforeEach(async (to, from, next) => {
-  console.log("before request");
   // Wait for auth to initialize (avoid race conditions)
   if (loading.value) {
     await new Promise(resolve => {
@@ -233,8 +232,11 @@ router.beforeEach(async (to, from, next) => {
 
   // Check role-based access for admin routes
   if (to.meta.roles && to.meta.roles.length > 0) {
-    const userRoles = user.value?.roles?.map(r => r.roleName || r.name) || []
-    const hasRequiredRole = to.meta.roles.some(role => userRoles.includes(role))
+    const userRoles = user.value?.roles || []
+    const hasRequiredRole = userRoles.some(role => role.roleId === 1)
+
+    // console.log(to.meta.roles);
+    // console.log(user.value.roles.some(role => role.roleId === 1));
 
     if (!hasRequiredRole) {
       // User doesn't have required role, redirect to default page
