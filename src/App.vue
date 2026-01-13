@@ -9,12 +9,7 @@
     </div>
 
     <!-- Main Content -->
-    <component
-      v-else
-      :is="isAuthenticated ? 'Dashboard' : currentAuthComponent"
-      @auth-success="onAuthSuccess"
-      @switch-auth="switchAuth"
-    />
+    <router-view v-else />
     
     <!-- Toast Notifications -->
     <Toast />
@@ -24,9 +19,6 @@
 </template>
 
 <script>
-import Dashboard from './components/dashboard/Dashboard.vue'
-import AuthLogin from './components/auth/Login.vue'
-import AuthRegister from './components/auth/Register.vue'
 import Toast from './components/shared/Toast.vue'
 import ErrorOverlay from './components/shared/ErrorOverlay.vue'
 import { useI18n } from 'vue-i18n'
@@ -34,7 +26,7 @@ import { useAuth } from './composables/useAuth'
 
 export default {
   name: 'AppRoot',
-  components: { Dashboard, AuthLogin, AuthRegister, Toast, ErrorOverlay },
+  components: { Toast, ErrorOverlay },
   setup() {
     const { locale } = useI18n()
     const { isLoggedIn, isLoading } = useAuth()
@@ -45,27 +37,8 @@ export default {
       isLoading
     }
   },
-  data() {
-    return {
-      showRegister: false
-    }
-  },
   computed: {
-    isRTL() { return this.locale === 'ar' },
-    isAuthenticated() { return this.isLoggedIn },
-    currentAuthComponent() { return this.showRegister ? 'AuthRegister' : 'AuthLogin' }
-  },
-  methods: {
-    onAuthSuccess() {
-      // Token is already handled by the auth system
-      // Just reload to refresh the app state
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
-    },
-    switchAuth(type) {
-      this.showRegister = type === 'register'
-    }
+    isRTL() { return this.locale === 'ar' }
   },
   watch: {
     locale(newVal) {

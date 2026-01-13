@@ -113,9 +113,9 @@
         <!-- Vertical Menu -->
         <ul class="space-y-1">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
-            <button @click="selectVertical(item.name)"
-              :class="['w-full px-4 py-3 rounded flex items-center gap-4 transition', selectedVertical === item.name ? 'bg-indigo-600 text-white shadow' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
-              <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, selectedVertical === item.name)"></div>
+            <button @click="selectVertical(item.routeName)"
+              :class="['w-full px-4 py-3 rounded flex items-center gap-4 transition', currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
+              <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, currentRouteName === item.routeName)"></div>
               <span v-if="!effectiveCollapsed" class="text-sm font-medium">
                 {{ $t(item.label) }}
               </span>
@@ -130,7 +130,7 @@
       <!-- Main Content -->
       <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
-        <component :is="currentComponent" @navigate-report="navigateToReport"
+        <router-view @navigate-report="navigateToReport"
           @navigate-statement="navigateToStatement" />
       </main>
     </div>
@@ -141,79 +141,51 @@
 </template>
 
 <script>
-import NewSupply from './NewSupply.vue'
-import SuppliesList from './SuppliesList.vue'
-import SuppliesReport from './SuppliesReportNew.vue'
-import ContractorsList from './ContractorsList.vue'
-import ContractorStatement from './ContractorStatement.vue'
-import DriversList from './DriversList.vue'
-import CrushersList from './CrushersList.vue'
-import VehiclesList from './VehiclesList.vue'
-import TransportList from './TransportList.vue'
-import TransportReport from './TransportReportNew.vue'
-import ExpensesReport from './ExpensesReportNew.vue'
-import RentalList from './RentalList.vue'
-import RentalReport from './RentalReport.vue'
-import ExpensesList from './ExpensesList.vue'
-import CompanyFinance from './CompanyFinance.vue'
-import CompanyTransactions from './CompanyTransactions.vue'
-import ChangesByDate from './ChangesByDate.vue'
-import UsersList from './UsersList.vue'
 import AuthLogout from '../auth/Logout.vue'
-import ComponentNotFound from '../shared/ComponentNotFound.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useRouter } from 'vue-router'
 
 export default {
-  name: 'DashboardPage',
-  components: {
-    NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
-    DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
-    RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance,
-    CompanyTransactions, ChangesByDate, UsersList, AuthLogout, ComponentNotFound
-  },
+  name: 'DashboardLayout',
+  components: { AuthLogout },
   setup() {
     const { logout: authLogout, user } = useAuth()
-    return { authLogout, user }
+    const router = useRouter()
+    return { authLogout, user, router }
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', /*expenses: 'expenses' ,*/ equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
-      selectedTop: localStorage.getItem('dashboard-selectedTop') || 'supplies',
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
       menuMap: {
         supplies: [
-          { name: 'newSupply', label: 'dashboard.newSupply', component: 'NewSupply' },
-          { name: 'suppliesList', label: 'dashboard.suppliesList', component: 'SuppliesList' },
-          { name: 'crushersList', label: 'dashboard.crushersList', component: 'CrushersList' },
-          { name: 'contractorsList', label: 'dashboard.contractorsList', component: 'ContractorsList' },
-          { name: 'contractorStatement', label: 'dashboard.contractorStatement', component: 'ContractorStatement' },
-          { name: 'driversList', label: 'drivers.title', component: 'DriversList' },
-          { name: 'vehiclesList', label: 'dashboard.vehiclesList', component: 'VehiclesList' },
-          { name: 'suppliesReport', label: 'dashboard.suppliesReport', component: 'SuppliesReport' }
+          { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
+          { name: 'suppliesList', label: 'dashboard.suppliesList', routeName: 'supplies-list' },
+          { name: 'crushersList', label: 'dashboard.crushersList', routeName: 'crushers-list' },
+          { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'contractors-list' },
+          { name: 'contractorStatement', label: 'dashboard.contractorStatement', routeName: 'contractor-statement' },
+          { name: 'driversList', label: 'drivers.title', routeName: 'drivers-list' },
+          { name: 'vehiclesList', label: 'dashboard.vehiclesList', routeName: 'vehicles-list' },
+          { name: 'suppliesReport', label: 'dashboard.suppliesReport', routeName: 'supplies-report' }
         ],
         transport: [
-          { name: 'transportList', label: 'dashboard.transportList', component: 'TransportList' },
-          { name: 'transportReport', label: 'transport.reportMenu', component: 'TransportReport' }
+          { name: 'transportList', label: 'dashboard.transportList', routeName: 'transport-list' },
+          { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' }
         ],
-        // expenses: [
-        //   { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
-        //   { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
-        // ],
         equipmentRent: [
-          { name: 'rentalList', label: 'dashboard.equipmentRent', component: 'RentalList' },
-          { name: 'rentalReport', label: 'rental.reportMenu', component: 'RentalReport' }
+          { name: 'rentalList', label: 'dashboard.equipmentRent', routeName: 'rentals-list' },
+          { name: 'rentalReport', label: 'rental.reportMenu', routeName: 'rentals-report' }
         ],
         companyWallet: [
-          { name: 'companyWallet', label: 'dashboard.companyWallet', component: 'CompanyFinance' },
-          { name: 'companyTransactions', label: 'transactions', component: 'CompanyTransactions' },
-          { name: 'expensesList', label: 'dashboard.expenses', component: 'ExpensesList' },
-          { name: 'expensesReport', label: 'expenses.report', component: 'ExpensesReport' }
+          { name: 'companyWallet', label: 'dashboard.companyWallet', routeName: 'company-wallet' },
+          { name: 'companyTransactions', label: 'transactions', routeName: 'company-transactions' },
+          { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
+          { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
         ],
         admin: [
-          { name: 'changesByDate', label: 'changes.title', component: 'ChangesByDate' },
-          { name: 'usersList', label: 'users.title', component: 'UsersList' }
+          { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
+          { name: 'usersList', label: 'users.title', routeName: 'users-list' }
         ]
       },
-      selectedVertical: localStorage.getItem('dashboard-selectedVertical') || 'newSupply',
       sidebarOpen: false,
       collapsedSidebar: JSON.parse(localStorage.getItem('sidebarCollapsed') || 'false'),
       showLogoutDialog: false,
@@ -224,41 +196,6 @@ export default {
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
     effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
-    verticalMenu() { return this.menuMap[this.selectedTop] || [] },
-    currentItem() {
-      const menu = this.filteredVerticalMenu
-      return menu.find(i => i.name === this.selectedVertical) || menu[0] || null
-    },
-    currentLabel() { return this.currentItem ? this.currentItem.label : '' },
-    currentComponent() {
-      if (!this.currentItem) return 'div'
-      const mapping = {
-        NewSupply, SuppliesList, SuppliesReport, ContractorsList, ContractorStatement,
-        DriversList, CrushersList, VehiclesList, TransportList, TransportReport,
-        RentalList, RentalReport, ExpensesList, ExpensesReport, CompanyFinance, CompanyTransactions,
-        ChangesByDate, UsersList
-      }
-      return mapping[this.currentItem.component] || ComponentNotFound
-    },
-    isAdmin() {
-      if (!this.user || !this.user.roles) return false
-      return this.user.roles.some(role => role.roleId === 1)
-    },
-    filteredTopMenus() {
-      const menus = { ...this.topMenus }
-      if (!this.isAdmin) {
-        delete menus.admin
-      }
-      return menus
-    },
-    filteredVerticalMenu() {
-      const menu = this.verticalMenu || []
-      // Filter admin menu items if user is not admin
-      if (this.selectedTop === 'admin' && !this.isAdmin) {
-        return []
-      }
-      return menu
-    },
     headerGradient() { return 'bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600' },
     userInitials() {
       if (!this.user || !this.user.name) return '??'
@@ -279,7 +216,50 @@ export default {
       }
       const width = this.effectiveCollapsed ? 'w-20' : 'w-50'
       return `${base} ${width} relative`
-    }
+    },
+    isAdmin() {
+      if (!this.user || !this.user.roles) return false
+      return this.user.roles.some(role => role.roleId === 1)
+    },
+    filteredTopMenus() {
+      const menus = { ...this.topMenus }
+      if (!this.isAdmin) {
+        delete menus.admin
+      }
+      return menus
+    },
+    filteredVerticalMenu() {
+      const menu = this.verticalMenu || []
+      if (this.selectedTop === 'admin' && !this.isAdmin) {
+        return []
+      }
+      return menu
+    },
+    currentRouteName() { return this.$route.name || '' },
+    currentItem() {
+      const routeName = this.currentRouteName
+      for (const menuItems of Object.values(this.menuMap)) {
+        const item = menuItems.find(i => i.routeName === routeName)
+        if (item) return item
+      }
+      return null
+    },
+    currentLabel() { return this.currentItem ? this.currentItem.label : '' },
+    selectedTop() {
+      const routeName = this.currentRouteName
+      const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'contractors-list', 'contractor-statement', 'drivers-list', 'crushers-list', 'vehicles-list']
+      const transportRoutes = ['transport-list', 'transport-report']
+      const rentalsRoutes = ['rentals-list', 'rentals-report']
+      const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
+      const adminRoutes = ['changes-by-date', 'users-list']
+      if (suppliesRoutes.includes(routeName)) return 'supplies'
+      if (transportRoutes.includes(routeName)) return 'transport'
+      if (rentalsRoutes.includes(routeName)) return 'equipmentRent'
+      if (walletRoutes.includes(routeName)) return 'companyWallet'
+      if (adminRoutes.includes(routeName)) return 'admin'
+      return 'supplies'
+    },
+    verticalMenu() { return this.menuMap[this.selectedTop] || [] }
   },
   watch: {
     collapsedSidebar(v) { localStorage.setItem('sidebarCollapsed', JSON.stringify(v)) },
@@ -289,35 +269,33 @@ export default {
   },
   methods: {
     selectTop(key) {
-      this.selectedTop = key
-      localStorage.setItem('dashboard-selectedTop', key)
-      const first = this.menuMap[key]?.[0]?.name
+      const first = this.menuMap[key]?.[0]
       if (first) {
-        this.selectedVertical = first
-        localStorage.setItem('dashboard-selectedVertical', first)
+        this.router.push({ name: first.routeName })
       }
       this.sidebarOpen = false
     },
-    selectVertical(name) {
-      this.selectedVertical = name
-      localStorage.setItem('dashboard-selectedVertical', name)
+    selectVertical(routeName) {
+      this.router.push({ name: routeName })
       if (this.isMobile) this.sidebarOpen = false
     },
     toggleSidebar() { this.sidebarOpen = !this.sidebarOpen },
     toggleCollapsed() { if (!this.isMobile) this.collapsedSidebar = !this.collapsedSidebar },
     toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
-    navigateToReport() { this.selectedVertical = 'rentalReport' },
+    navigateToReport() { 
+      this.router.push({ name: 'rentals-report' })
+    },
     navigateToStatement(contractorId) {
-      this.selectedTop = 'supplies'
-      localStorage.setItem('dashboard-selectedTop', 'supplies')
-      this.selectedVertical = 'contractorStatement'
-      localStorage.setItem('dashboard-selectedVertical', 'contractorStatement')
+      this.router.push({ 
+        name: 'contractor-statement',
+        params: { id: contractorId }
+      })
       if (contractorId) localStorage.setItem('contractor-statement-id', contractorId.toString())
       if (this.isMobile) this.sidebarOpen = false
     },
     handleLogoutSuccess() {
       this.showLogoutDialog = false
-      window.location.reload()
+      this.router.push({ name: 'login' })
     },
     switchLang(lang) {
       this.$i18n.locale = lang
@@ -354,14 +332,6 @@ export default {
     }
   },
   mounted() {
-    const savedTop = localStorage.getItem('dashboard-selectedTop')
-    const savedVertical = localStorage.getItem('dashboard-selectedVertical')
-    if (savedTop && this.menuMap[savedTop]) {
-      this.selectedTop = savedTop
-      if (savedVertical && this.menuMap[savedTop].some(i => i.name === savedVertical)) {
-        this.selectedVertical = savedVertical
-      }
-    }
     document.documentElement.lang = this.$i18n.locale || 'en'
     document.documentElement.dir = this.isRTL ? 'rtl' : 'ltr'
     window.addEventListener('resize', this.onResize)

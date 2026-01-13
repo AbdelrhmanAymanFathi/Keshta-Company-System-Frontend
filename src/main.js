@@ -2,6 +2,7 @@
 import { createApp, watch } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
+import router from './router'
 import './assets/main.css'
 import i18n from './i18n'
 import authManager from './auth'
@@ -14,6 +15,8 @@ const pinia = createPinia()
 app.use(pinia)
 // use i18n
 app.use(i18n)
+// use router
+app.use(router)
 
 // Provide auth manager globally
 app.provide('authManager', authManager)

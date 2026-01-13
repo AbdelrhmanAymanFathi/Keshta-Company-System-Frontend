@@ -1,0 +1,264 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import { isAuthenticated, user, loading } from '@/composables/authStore'
+import { watch } from 'vue'
+
+// Auth Pages
+const Login = () => import('@/components/auth/Login.vue')
+const Register = () => import('@/components/auth/Register.vue')
+
+// Dashboard Layout
+const Dashboard = () => import('@/components/dashboard/Dashboard.vue')
+
+// Dashboard Pages - Lazy Loading for better performance
+const NewSupply = () => import('@/components/dashboard/NewSupply.vue')
+const SuppliesList = () => import('@/components/dashboard/SuppliesList.vue')
+const SuppliesReport = () => import('@/components/dashboard/SuppliesReportNew.vue')
+const ContractorsList = () => import('@/components/dashboard/ContractorsList.vue')
+const ContractorStatement = () => import('@/components/dashboard/ContractorStatement.vue')
+const DriversList = () => import('@/components/dashboard/DriversList.vue')
+const CrushersList = () => import('@/components/dashboard/CrushersList.vue')
+const VehiclesList = () => import('@/components/dashboard/VehiclesList.vue')
+const TransportList = () => import('@/components/dashboard/TransportList.vue')
+const TransportReport = () => import('@/components/dashboard/TransportReportNew.vue')
+const RentalList = () => import('@/components/dashboard/RentalList.vue')
+const RentalReport = () => import('@/components/dashboard/RentalReport.vue')
+const CompanyFinance = () => import('@/components/dashboard/CompanyFinance.vue')
+const CompanyTransactions = () => import('@/components/dashboard/CompanyTransactions.vue')
+const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
+const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vue')
+const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
+const UsersList = () => import('@/components/dashboard/UsersList.vue')
+
+const routes = [
+  // ==================== Auth Routes ====================
+  {
+    path: '/login',
+    name: 'login',
+    component: Login,
+    meta: { requiresAuth: false, title: 'auth.login.title' }
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: Register,
+    meta: { requiresAuth: false, title: 'auth.register.title' }
+  },
+
+  // ==================== Dashboard Layout ====================
+  {
+    path: '/dashboard',
+    component: Dashboard,
+    meta: { requiresAuth: true, title: 'appName' },
+    children: [
+      // ==================== Supplies Module ====================
+      {
+        path: 'supplies/new',
+        name: 'new-supply',
+        component: NewSupply,
+        meta: { title: 'dashboard.newSupply' }
+      },
+      {
+        path: 'supplies/list',
+        name: 'supplies-list',
+        component: SuppliesList,
+        meta: { title: 'dashboard.suppliesList' }
+      },
+      {
+        path: 'supplies/report',
+        name: 'supplies-report',
+        component: SuppliesReport,
+        meta: { title: 'dashboard.suppliesReport' }
+      },
+      {
+        path: 'supplies/contractors',
+        name: 'contractors-list',
+        component: ContractorsList,
+        meta: { title: 'dashboard.contractorsList' }
+      },
+      {
+        path: 'supplies/contractor-statement/:id?',
+        name: 'contractor-statement',
+        component: ContractorStatement,
+        meta: { title: 'dashboard.contractorStatement' }
+      },
+      {
+        path: 'supplies/drivers',
+        name: 'drivers-list',
+        component: DriversList,
+        meta: { title: 'drivers.title' }
+      },
+      {
+        path: 'supplies/crushers',
+        name: 'crushers-list',
+        component: CrushersList,
+        meta: { title: 'dashboard.crushersList' }
+      },
+      {
+        path: 'supplies/vehicles',
+        name: 'vehicles-list',
+        component: VehiclesList,
+        meta: { title: 'dashboard.vehiclesList' }
+      },
+
+      // ==================== Transport Module ====================
+      {
+        path: 'transport/list',
+        name: 'transport-list',
+        component: TransportList,
+        meta: { title: 'dashboard.transportList' }
+      },
+      {
+        path: 'transport/report',
+        name: 'transport-report',
+        component: TransportReport,
+        meta: { title: 'transport.reportMenu' }
+      },
+
+      // ==================== Rentals Module ====================
+      {
+        path: 'rentals/list',
+        name: 'rentals-list',
+        component: RentalList,
+        meta: { title: 'dashboard.equipmentRent' }
+      },
+      {
+        path: 'rentals/report',
+        name: 'rentals-report',
+        component: RentalReport,
+        meta: { title: 'rental.reportMenu' }
+      },
+
+      // ==================== Company Wallet Module ====================
+      {
+        path: 'company-wallet',
+        name: 'company-wallet',
+        component: CompanyFinance,
+        meta: { title: 'dashboard.companyWallet' }
+      },
+      {
+        path: 'company-transactions',
+        name: 'company-transactions',
+        component: CompanyTransactions,
+        meta: { title: 'transactions' }
+      },
+      {
+        path: 'expenses',
+        name: 'expenses-list',
+        component: ExpensesList,
+        meta: { title: 'dashboard.expenses' }
+      },
+      {
+        path: 'expenses/report',
+        name: 'expenses-report',
+        component: ExpensesReport,
+        meta: { title: 'expenses.report' }
+      },
+
+      // ==================== Admin Module (Role Protected) ====================
+      {
+        path: 'admin/changes',
+        name: 'changes-by-date',
+        component: ChangesByDate,
+        meta: { title: 'changes.title', roles: ['admin'] }
+      },
+      {
+        path: 'admin/users',
+        name: 'users-list',
+        component: UsersList,
+        meta: { title: 'users.title', roles: ['admin'] }
+      },
+
+      // ==================== Default Redirect ====================
+      { path: '', redirect: 'supplies/new' }
+    ]
+  },
+
+  // ==================== Root Redirect ====================
+  {
+    path: '/',
+    redirect: () => {
+      return isAuthenticated.value ? '/dashboard/supplies/new' : '/login'
+    }
+  },
+
+  // ==================== 404 Catch ====================
+  { path: '/:pathMatch(.*)*', redirect: '/login' }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
+})
+
+// ==================== Navigation Guards ====================
+
+// Before each navigation
+router.beforeEach(async (to, from, next) => {
+  // Wait for auth to initialize (avoid race conditions)
+  if (loading.value) {
+    await new Promise(resolve => {
+      const stop = watch(loading, (val) => {
+        if (!val) {
+          stop()
+          resolve()
+        }
+      })
+    })
+  }
+
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth !== false)
+
+  // Check if route requires authentication
+  if (requiresAuth && !isAuthenticated.value) {
+    // Save the intended destination for redirect after login
+    localStorage.setItem('redirectPath', to.fullPath)
+    next({ name: 'login' })
+    return
+  }
+
+  // If authenticated and trying to access auth pages (login/register), redirect to dashboard
+  if (!requiresAuth && isAuthenticated.value && ['login', 'register'].includes(to.name)) {
+    next({ name: 'new-supply' })
+    return
+  }
+
+  // Check role-based access for admin routes
+  if (to.meta.roles && to.meta.roles.length > 0) {
+    const userRoles = user.value?.roles?.map(r => r.roleName || r.name) || []
+    const hasRequiredRole = to.meta.roles.some(role => userRoles.includes(role))
+
+    if (!hasRequiredRole) {
+      // User doesn't have required role, redirect to default page
+      console.warn(`Access denied: User roles [${userRoles}] don't include [${to.meta.roles}]`)
+      next({ name: 'new-supply' })
+      return
+    }
+  }
+
+  // Update document direction based on locale
+  const locale = localStorage.getItem('app-locale') || 'en'
+  document.documentElement.lang = locale
+  document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+
+  next()
+})
+
+// After each navigation
+router.afterEach((to) => {
+  // Update page title if available (can use i18n here)
+  if (to.meta.title) {
+    const appName = 'Keshta Company'
+    document.title = `${appName} - ${to.meta.title}`
+  } else {
+    document.title = 'Keshta Company'
+  }
+})
+
+export default router
