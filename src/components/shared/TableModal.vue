@@ -67,7 +67,6 @@
                       type="date"
                       v-model="row.date"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.tab.prevent="focusNext(index, 0)"
                       @keydown.enter.prevent="focusNext(index, 0)"
                     />
                   </td>
@@ -79,7 +78,6 @@
                         v-model="row.site"
                         @change="onSiteChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.tab.prevent="focusNext(index, 1)"
                         @keydown.enter.prevent="focusNext(index, 1)"
                       >
                         <option :value="null">{{ $t('labels.site') }} —</option>
@@ -103,7 +101,6 @@
                         v-model="row.area"
                         :disabled="!row.site || row.site === '__new__'"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        @keydown.tab.prevent="focusNext(index, 2)"
                         @keydown.enter.prevent="focusNext(index, 2)"
                       >
                         <option :value="null">{{ $t('labels.area') }} —</option>
@@ -129,7 +126,6 @@
                         v-model="row.contractor"
                         @change="onContractorChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.tab.prevent="focusNext(index, 3)"
                         @keydown.enter.prevent="focusNext(index, 3)"
                       >
                         <option :value="null">{{ $t('labels.contractor') }} —</option>
@@ -153,7 +149,6 @@
                         v-model="row.crusher"
                         @change="onCrusherChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.tab.prevent="focusNext(index, 4)"
                         @keydown.enter.prevent="focusNext(index, 4)"
                       >
                         <option :value="null">{{ $t('labels.crusher') }} —</option>
@@ -177,7 +172,6 @@
                         v-model="row.vehicle"
                         @change="onVehicleSelect(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.tab.prevent="focusNext(index, 5)"
                         @keydown.enter.prevent="focusNext(index, 5)"
                       >
                         <option :value="null">{{ $t('labels.vehicle') }} —</option>
@@ -200,7 +194,6 @@
                       type="text"
                       v-model="row.crusherBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.tab.prevent="focusNext(index, 6)"
                       @keydown.enter.prevent="focusNext(index, 6)"
                     />
                   </td>
@@ -211,7 +204,6 @@
                       type="text"
                       v-model="row.companyBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.tab.prevent="focusNext(index, 7)"
                       @keydown.enter.prevent="focusNext(index, 7)"
                     />
                   </td>
@@ -223,7 +215,6 @@
                       v-model.number="row.discount"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       placeholder="0"
-                      @keydown.tab.prevent="focusNext(index, 8)"
                       @keydown.enter.prevent="focusNext(index, 8)"
                     />
                   </td>
@@ -236,7 +227,6 @@
                       v-model.number="row.price"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                       placeholder="0"
-                      @keydown.tab.prevent="focusNext(index, 9)"
                       @keydown.enter.prevent="focusNext(index, 9)"
                     />
                   </td>
@@ -249,7 +239,6 @@
                       v-model.number="row.cubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                       placeholder="0"
-                      @keydown.tab.prevent="focusNext(index, 10)"
                       @keydown.enter.prevent="focusNext(index, 10)"
                     />
                   </td>
@@ -262,7 +251,6 @@
                       v-model.number="row.crusherCubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                       placeholder="-"
-                      @keydown.tab.prevent="focusNext(index, 11)"
                       @keydown.enter.prevent="handleLastFieldEnter(index)"
                     />
                   </td>
