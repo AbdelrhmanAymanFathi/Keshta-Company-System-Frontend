@@ -19,130 +19,68 @@
           <tr>
             <th class="p-3">#</th>
             <th class="p-3">{{ $t('labels.date') }}</th>
-            <th class="p-3">{{ $t('labels.location') }}</th>
-            <th class="p-3">{{ $t('labels.crusher') }}</th>
             <th class="p-3">{{ $t('labels.contractor') }}</th>
+            <th class="p-3">{{ $t('labels.crusher') }}</th>
+            <th class="p-3">{{ $t('labels.location') }}</th>
             <th class="p-3">{{ $t('labels.vehicle') }}</th>
-            <th class="p-3">{{ $t('labels.total') }}</th>
+            <th class="p-3">{{ $t('labels.crusherTicket') }}</th>
+            <th class="p-3">{{ $t('labels.companyTicket') }}</th>
+            <th class="p-3">{{ $t('labels.companyCapacity') }}</th>
+            <th class="p-3">{{ $t('labels.crusherCapacity') }}</th>
+            <th class="p-3">{{ $t('labels.unitPrice') }}</th>
+            <th class="p-3">{{ $t('labels.discount') }}</th>
+            <!-- <th class="p-3">{{ $t('labels.notes') }}</th> -->
             <th class="p-3">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50">
-            <td class="p-3">{{ idx + 1 }}</td>
+          <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50" @contextmenu.prevent="onRowContextMenu($event, s)">
+            <td class="p-3">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="p-3">{{ formatDate(s.date) }}</td>
-            <td class="p-3">{{ s.location?.name || '-' }}</td>
-            <td class="p-3">{{ s.crusher?.name || '-' }}</td>
             <td class="p-3">{{ s.contractor?.name || '-' }}</td>
+            <td class="p-3">{{ s.crusher?.name || '-' }}</td>
+            <td class="p-3">{{ s.location?.name || '-' }}</td>
             <td class="p-3">{{ s.vehicle?.name || '-' }}</td>
-            <td class="p-3">{{ formatNumber(calculateTotal(s)) }}</td>
+            <td class="p-3">{{ s.crusherTicket || '-' }}</td>
+            <td class="p-3">{{ s.companyTicket || '-' }}</td>
+            <td class="p-3">{{ s.companyCapacity || '-' }}</td>
+            <td class="p-3">{{ s.crusherCapacity || '-' }}</td>
+            <td class="p-3">{{ s.unitPrice || '-' }}</td>
+            <td class="p-3">{{ s.discount || '-' }}</td>
+            <!-- <td class="p-3">{{ s.notes || '-' }}</td> -->
             <td class="p-3">
-              <button @click="openEdit(s)" class="px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">
-                {{ $t('labels.edit') }}
+              <button @click="confirmDelete(s)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+                {{ $t('labels.delete') }}
               </button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3" colspan="8" >
-              {{ $t('dashboard.suppliesList') }}: {{ $t('contractors.noResults') }}
+            <td class="p-3" :colspan="14" >
+              {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
-      <!-- Mobile Pagination -->
-      <div class="flex-1 flex justify-between sm:hidden">
-        <button @click="changePage(page - 1)"
-          :disabled="page <= 1"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ $t('labels.previous') || 'Previous' }}
-        </button>
-        <span class="text-sm text-gray-700 self-center">
-          {{ page }} / {{ totalPages }}
-        </span>
-        <button @click="changePage(page + 1)"
-          :disabled="page >= totalPages"
-          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-          {{ $t('labels.next') || 'Next' }}
-        </button>
-      </div>
+    <Pagination
+      v-if="totalPages > 1"
+      :currentPage="page"
+      :pageSize="pageSize"
+      :total="total"
+      :totalPages="totalPages"
+      :pageSizeOptions="[10,20,50,100]"
+      @update:page="(p) => { page = p; loadSupplies() }"
+      @update:pageSize="(size) => { pageSize = size; page = 1; loadSupplies() }"
+    />
 
-      <!-- Desktop Pagination -->
-      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-        <div class="flex items-center gap-4">
-          <p class="text-sm text-gray-700">
-            {{ $t('labels.showing') || 'Showing' }}
-            <span class="font-medium">{{ ((page - 1) * pageSize) + 1 }}</span>
-            {{ $t('labels.to') || 'to' }}
-            <span class="font-medium">{{ Math.min(page * pageSize, total) }}</span>
-            {{ $t('labels.of') || 'of' }}
-            <span class="font-medium">{{ total }}</span>
-            {{ $t('labels.results') || 'results' }}
-          </p>
-          <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-700">{{ $t('labels.pageSize') || 'Page size' }}:</label>
-            <select v-model="pageSize" @change="onPageSizeChange"
-              class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Page Numbers -->
-        <div>
-          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-            <button @click="changePage(1)"
-              :disabled="page <= 1"
-              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <button @click="changePage(page - 1)"
-              :disabled="page <= 1"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <template v-for="p in visiblePages" :key="p">
-              <button @click="changePage(p)"
-                :class="[
-                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                  p === page
-                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                ]">
-                {{ p }}
-              </button>
-            </template>
-
-            <button @click="changePage(page + 1)"
-              :disabled="page >= totalPages"
-              class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <button @click="changePage(totalPages)"
-              :disabled="page >= totalPages"
-              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </nav>
-        </div>
-      </div>
+    <!-- Context menu for row actions -->
+    <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }" class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
+      <ul class="p-2">
+        <li>
+          <button @click="confirmDelete(contextMenu.item)" class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
+        </li>
+      </ul>
     </div>
 
     <!-- Edit Modal -->
@@ -182,14 +120,16 @@
 </template>
 
 <script>
-import { getDeliveries } from '../../api'
+import { getDeliveries, deleteDelivery } from '../../api'
 import TableModal from '../shared/TableModal.vue'  // تأكد من المسار الصحيح
+import Pagination from '../shared/Pagination.vue'
 
 export default {
   name: 'SuppliesList',
 
   components: {
-    TableModal
+    TableModal,
+    Pagination
   },
 
   data() {
@@ -199,7 +139,13 @@ export default {
       form: {},
       page: 1,
       pageSize: 20,
-      total: 0
+      total: 0,
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        item: null
+      }
     }
   },
 
@@ -227,6 +173,11 @@ export default {
 
   async mounted() {
     await this.loadSupplies()
+    document.addEventListener('click', this.closeContextMenu)
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', this.closeContextMenu)
   },
 
   methods: {
@@ -286,6 +237,37 @@ export default {
 
     closeModal() {
       this.modalOpen = false
+    },
+
+    onRowContextMenu(e, item) {
+      this.contextMenu.visible = true
+      // position relative to viewport
+      this.contextMenu.x = e.clientX
+      this.contextMenu.y = e.clientY
+      this.contextMenu.item = item
+    },
+
+    closeContextMenu() {
+      this.contextMenu.visible = false
+      this.contextMenu.item = null
+    },
+
+    confirmDelete(item) {
+      const confirmed = confirm(this.$t('supply.confirmDeleteExport') || 'Delete this export?')
+      if (confirmed) {
+        this.handleDelete(item.id)
+      }
+    },
+
+    async handleDelete(id) {
+      try {
+        await deleteDelivery(id)
+        // backend may return 204; just reload
+        await this.loadSupplies()
+      } catch (e) {
+        console.error('Failed to delete export', e)
+        alert(this.$t('common.deleteError') || 'Failed to delete')
+      }
     },
 
     async saveEdit() {
