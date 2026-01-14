@@ -28,19 +28,19 @@
               <thead class="bg-indigo-50 sticky top-0 z-10">
                 <tr>
                   <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.date') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.site') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.area') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.contractor') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.crusher') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.vehicle') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.crusherBon') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.companyBon') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.discount') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.price') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.cubic') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.crusherCubic') }}</th>
-                  <th class="px-3 py-3 text-right">{{ $t('labels.total') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.date') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.site') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.area') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.contractor') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.crusher') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.vehicle') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.crusherBon') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.companyBon') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.discount') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.price') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.cubic') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.crusherCubic') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.total') }}</th>
                   <th class="px-3 py-3 text-center">{{ $t('labels.actions') }}</th>
                 </tr>
               </thead>
@@ -185,7 +185,7 @@
                   </td>
 
                   <!-- Total -->
-                  <td class="px-3 py-2 font-semibold text-right">
+                  <td class="px-3 py-2 font-semibold text-start">
                     {{ formatNumber(totalPerRow(row)) }}
                   </td>
 
@@ -208,7 +208,7 @@
           </div>
 
           <!-- الإجماليات -->
-          <div class="mt-8 text-right space-y-1 text-sm">
+          <div class="mt-8 text-start space-y-1 text-sm">
             <div class="flex justify-end gap-8">
               <span class="text-gray-600">{{ $t('supply.subtotal') }}:</span>
               <span class="font-semibold text-indigo-700 w-24">{{ formatNumber(subtotal) }}</span>
