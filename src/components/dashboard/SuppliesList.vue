@@ -1,8 +1,20 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6">
-    <h2 class="text-2xl font-semibold mb-4">{{ $t('dashboard.suppliesList') }}</h2>
+    <!-- Header + زر التوريد الجديد -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-semibold">{{ $t('dashboard.suppliesList') }}</h2>
+
+      <!-- الزر اللي هيفتح الـ Modal -->
+      <TableModal
+        :showTriggerButton="true"
+        triggerButtonText="توريد جديد +"
+        modalTitle="إنشاء توريد جديد"
+      />
+    </div>
+
+    <!-- الجدول -->
     <div class="overflow-auto bg-white rounded shadow">
-      <table class="min-w-full divide-y">
+      <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-indigo-50">
           <tr>
             <th class="p-3">#</th>
@@ -25,11 +37,15 @@
             <td class="p-3">{{ s.vehicle?.name || '-' }}</td>
             <td class="p-3">{{ formatNumber(calculateTotal(s)) }}</td>
             <td class="p-3">
-              <button @click="openEdit(s)" class="px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">{{ $t('labels.edit') }}</button>
+              <button @click="openEdit(s)" class="px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700">
+                {{ $t('labels.edit') }}
+              </button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3" colspan="8">{{ $t('dashboard.suppliesList') }}: {{ $t('contractors.noResults') }}</td>
+            <td class="p-3" colspan="8" >
+              {{ $t('dashboard.suppliesList') }}: {{ $t('contractors.noResults') }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -39,7 +55,7 @@
     <div v-if="totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
       <!-- Mobile Pagination -->
       <div class="flex-1 flex justify-between sm:hidden">
-        <button @click="changePage(page - 1)" 
+        <button @click="changePage(page - 1)"
           :disabled="page <= 1"
           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
           {{ $t('labels.previous') || 'Previous' }}
@@ -47,7 +63,7 @@
         <span class="text-sm text-gray-700 self-center">
           {{ page }} / {{ totalPages }}
         </span>
-        <button @click="changePage(page + 1)" 
+        <button @click="changePage(page + 1)"
           :disabled="page >= totalPages"
           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
           {{ $t('labels.next') || 'Next' }}
@@ -58,7 +74,7 @@
       <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div class="flex items-center gap-4">
           <p class="text-sm text-gray-700">
-            {{ $t('labels.showing') || 'Showing' }} 
+            {{ $t('labels.showing') || 'Showing' }}
             <span class="font-medium">{{ ((page - 1) * pageSize) + 1 }}</span>
             {{ $t('labels.to') || 'to' }}
             <span class="font-medium">{{ Math.min(page * pageSize, total) }}</span>
@@ -68,7 +84,7 @@
           </p>
           <div class="flex items-center gap-2">
             <label class="text-sm text-gray-700">{{ $t('labels.pageSize') || 'Page size' }}:</label>
-            <select v-model="pageSize" @change="onPageSizeChange" 
+            <select v-model="pageSize" @change="onPageSizeChange"
               class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
               <option value="10">10</option>
               <option value="20">20</option>
@@ -81,7 +97,7 @@
         <!-- Page Numbers -->
         <div>
           <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-            <button @click="changePage(1)" 
+            <button @click="changePage(1)"
               :disabled="page <= 1"
               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -89,7 +105,7 @@
               </svg>
             </button>
 
-            <button @click="changePage(page - 1)" 
+            <button @click="changePage(page - 1)"
               :disabled="page <= 1"
               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -98,18 +114,18 @@
             </button>
 
             <template v-for="p in visiblePages" :key="p">
-              <button @click="changePage(p)" 
+              <button @click="changePage(p)"
                 :class="[
                   'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                  p === page 
-                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' 
+                  p === page
+                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                 ]">
                 {{ p }}
               </button>
             </template>
 
-            <button @click="changePage(page + 1)" 
+            <button @click="changePage(page + 1)"
               :disabled="page >= totalPages"
               class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -117,7 +133,7 @@
               </svg>
             </button>
 
-            <button @click="changePage(totalPages)" 
+            <button @click="changePage(totalPages)"
               :disabled="page >= totalPages"
               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -167,9 +183,15 @@
 
 <script>
 import { getDeliveries } from '../../api'
+import TableModal from '../shared/TableModal.vue'  // تأكد من المسار الصحيح
 
 export default {
   name: 'SuppliesList',
+
+  components: {
+    TableModal
+  },
+
   data() {
     return {
       supplies: [],
@@ -180,6 +202,7 @@ export default {
       total: 0
     }
   },
+
   computed: {
     totalPages() {
       return Math.ceil(this.total / this.pageSize)
@@ -196,77 +219,87 @@ export default {
         pages.push(i)
       }
       return pages
+    },
+    isRTL() {
+      return this.$i18n?.locale === 'ar'
     }
   },
-  computed: {
-    isRTL() { return this.$i18n && this.$i18n.locale === 'ar' }
-  },
+
   async mounted() {
     await this.loadSupplies()
   },
+
   methods: {
     async loadSupplies() {
       try {
         const res = await getDeliveries({
           page: this.page,
           pageSize: this.pageSize
-        });
-        // Handle the new response structure with items array
-        this.supplies = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : []);
+        })
+        this.supplies = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : [])
         this.total = res.data.total || this.supplies.length
         this.pageSize = res.data.pageSize || this.pageSize
       } catch (e) {
-        this.supplies = [];
+        console.error('Error loading supplies:', e)
+        this.supplies = []
         this.total = 0
       }
     },
+
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {
         this.page = newPage
         this.loadSupplies()
       }
     },
+
     onPageSizeChange() {
       this.page = 1
       this.loadSupplies()
     },
+
     formatNumber(v) {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
+
     formatDate(dateString) {
       if (!dateString) return '-'
       try {
         const date = new Date(dateString)
-        return date.toLocaleDateString()
-      } catch (error) {
+        return date.toLocaleDateString(this.isRTL ? 'ar-EG' : 'en-US')
+      } catch {
         return dateString
       }
     },
+
     calculateTotal(supply) {
       const capacity = parseFloat(supply.companyCapacity || supply.crusherCapacity || 0)
       const unitPrice = parseFloat(supply.unitPrice || 0)
       const discount = parseFloat(supply.discount || 0)
       return (capacity * unitPrice) - discount
     },
+
     openEdit(supply) {
-      this.form = Object.assign({}, supply)
+      this.form = { ...supply }
       this.modalOpen = true
     },
+
     closeModal() {
       this.modalOpen = false
     },
+
     async saveEdit() {
-      // You may need to call an API to update the supply, e.g. PATCH /api/exports/:id
-      // For now, just update locally
       const idx = this.supplies.findIndex(s => s.id === this.form.id)
-      if (idx !== -1) this.supplies.splice(idx, 1, Object.assign({}, this.form))
+      if (idx !== -1) {
+        this.supplies[idx] = { ...this.form }
+      }
       this.modalOpen = false
-      // TODO: call backend to persist changes if needed
+      // TODO: استدعاء API للحفظ في الـ backend
     }
   }
 }
 </script>
 
 <style scoped>
-/* ...existing code... */
+/* أي ستايل إضافي هنا إذا أردت */
 </style>
