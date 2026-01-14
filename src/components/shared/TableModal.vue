@@ -1,4 +1,4 @@
-<!-- src/shared/TableModal.vue -->
+<!-- src/components/shared/TableModal.vue -->
 <template>
   <!-- الزر اللي بيفتح الـ Modal (يمكنك إزالته أو تغيير مكانه حسب الصفحة) -->
   <button
@@ -34,7 +34,10 @@
         <div class="flex-1 overflow-y-auto p-6">
           <!-- الجدول -->
           <div class="overflow-x-auto mb-8">
-            <table class="min-w-full divide-y divide-gray-200 border">
+            <table 
+              ref="tableRef"
+              class="min-w-full divide-y divide-gray-200 border"
+            >
               <thead class="bg-indigo-50 sticky top-0 z-10">
                 <tr>
                   <th class="px-3 py-3 text-center w-10">#</th>
@@ -57,7 +60,8 @@
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="(row, index) in rows" :key="row.id">
                   <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
-
+                  
+                  <!-- 0: Date -->
                   <td class="px-3 py-2">
                     <input
                       type="date"
@@ -68,7 +72,7 @@
                     />
                   </td>
 
-                  <!-- الموقع -->
+                  <!-- 1: الموقع -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select
@@ -92,7 +96,7 @@
                     </div>
                   </td>
 
-                  <!-- المنطقة -->
+                  <!-- 2: المنطقة -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select
@@ -118,7 +122,7 @@
                     </div>
                   </td>
 
-                  <!-- المقاول -->
+                  <!-- 3: المقاول -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select
@@ -142,7 +146,7 @@
                     </div>
                   </td>
 
-                  <!-- الكسارة -->
+                  <!-- 4: الكسارة -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select
@@ -166,7 +170,7 @@
                     </div>
                   </td>
 
-                  <!-- المركبة -->
+                  <!-- 5: المركبة -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select
@@ -190,6 +194,7 @@
                     </div>
                   </td>
 
+                  <!-- 6: crusherBon -->
                   <td class="px-3 py-2">
                     <input
                       type="text"
@@ -200,6 +205,7 @@
                     />
                   </td>
 
+                  <!-- 7: companyBon -->
                   <td class="px-3 py-2">
                     <input
                       type="text"
@@ -210,6 +216,7 @@
                     />
                   </td>
 
+                  <!-- 8: discount -->
                   <td class="px-3 py-2">
                     <input
                       type="number"
@@ -221,6 +228,7 @@
                     />
                   </td>
 
+                  <!-- 9: price -->
                   <td class="px-3 py-2">
                     <input
                       type="number"
@@ -233,6 +241,7 @@
                     />
                   </td>
 
+                  <!-- 10: cubic -->
                   <td class="px-3 py-2">
                     <input
                       type="number"
@@ -245,6 +254,7 @@
                     />
                   </td>
 
+                  <!-- 11: crusherCubic (آخر حقل) -->
                   <td class="px-3 py-2">
                     <input
                       type="number"
@@ -257,10 +267,12 @@
                     />
                   </td>
 
+                  <!-- Total -->
                   <td class="px-3 py-2 font-semibold text-right">
                     {{ formatNumber(totalPerRow(row)) }}
                   </td>
 
+                  <!-- Actions -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-2 justify-center">
                       <button
@@ -310,7 +322,6 @@
               {{ isSaving ? 'جاري الحفظ...' : 'حفظ التوريد' }}
             </button>
           </div>
-
           <p v-if="saveError" class="mt-4 text-center text-red-600 font-medium text-lg">
             {{ saveError }}
           </p>
@@ -319,15 +330,22 @@
     </div>
   </teleport>
 
-  <!-- Dialogs -->
+  <!-- Dialog: إضافة موقع -->
   <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
-      <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
+      <input 
+        v-model="newSiteName" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+        :placeholder="$t('supply.siteName')" 
+      />
       <div class="flex gap-2 justify-end">
         <button @click="showAddSite = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button @click="addSite" :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+        <button 
+          @click="addSite" 
+          :disabled="!newSiteName || addingLocation"
+          class="bg-green-600 text-white px-3 py-1 rounded"
+        >
           {{ addingLocation ? 'جاري الإضافة...' : 'إضافة' }}
         </button>
       </div>
@@ -335,14 +353,22 @@
     </div>
   </div>
 
+  <!-- Dialog: إضافة منطقة -->
   <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
-      <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
+      <input 
+        v-model="newAreaName" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+        :placeholder="$t('supply.areaName')" 
+      />
       <div class="flex gap-2 justify-end">
         <button @click="showAddArea = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button @click="addArea" :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+        <button 
+          @click="addArea" 
+          :disabled="!newAreaName || addingLocation"
+          class="bg-green-600 text-white px-3 py-1 rounded"
+        >
           {{ addingLocation ? 'جاري الإضافة...' : 'إضافة' }}
         </button>
       </div>
@@ -350,14 +376,22 @@
     </div>
   </div>
 
+  <!-- Dialog: إضافة مقاول -->
   <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">إضافة مقاول</h3>
-      <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3" placeholder="اسم المقاول" />
+      <input 
+        v-model="newContractorName" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+        placeholder="اسم المقاول" 
+      />
       <div class="flex gap-2 justify-end">
         <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+        <button 
+          @click="createNewContractor" 
+          :disabled="!newContractorName || creatingContractor"
+          class="bg-green-600 text-white px-3 py-1 rounded"
+        >
           {{ creatingContractor ? 'جاري الإضافة...' : 'إضافة' }}
         </button>
       </div>
@@ -365,14 +399,22 @@
     </div>
   </div>
 
+  <!-- Dialog: إضافة كسارة -->
   <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">إضافة كسارة</h3>
-      <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" placeholder="اسم الكسارة" />
+      <input 
+        v-model="newCrusherName" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+        placeholder="اسم الكسارة" 
+      />
       <div class="flex gap-2 justify-end">
         <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+        <button 
+          @click="createNewCrusher" 
+          :disabled="!newCrusherName || creatingCrusher"
+          class="bg-green-600 text-white px-3 py-1 rounded"
+        >
           {{ creatingCrusher ? 'جاري الإضافة...' : 'إضافة' }}
         </button>
       </div>
@@ -380,20 +422,40 @@
     </div>
   </div>
 
+  <!-- Dialog: إضافة مركبة -->
   <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-full max-w-md">
       <h3 class="text-lg font-bold mb-3">إضافة مركبة</h3>
-      <input v-model="newVehicleForm.name" placeholder="اسم المركبة" class="w-full border rounded px-2 py-1 mb-3" />
+      <input 
+        v-model="newVehicleForm.name" 
+        placeholder="اسم المركبة" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+      />
       <select v-model="newVehicleForm.contractorId" class="w-full border rounded px-2 py-1 mb-3">
-        <option value="">اختر مقاول</option>
+        <option value="">{{ $t('labels.contractor') }} —</option>
         <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
-      <input v-model.number="newVehicleForm.cubicCapacity" type="number" step="0.01" placeholder="السعة المكعبة" class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newVehicleForm.crusherCubic" type="number" step="0.01" placeholder="سعة الكسارة" class="w-full border rounded px-2 py-1 mb-3" />
+      <input 
+        v-model.number="newVehicleForm.cubicCapacity" 
+        type="number" 
+        step="0.01" 
+        placeholder="السعة المكعبة" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+      />
+      <input 
+        v-model.number="newVehicleForm.crusherCubic" 
+        type="number" 
+        step="0.01" 
+        placeholder="سعة الكسارة" 
+        class="w-full border rounded px-2 py-1 mb-3" 
+      />
       <div class="flex gap-2 justify-end">
         <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button @click="createNewVehicle" :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+        <button 
+          @click="createNewVehicle" 
+          :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
+          class="bg-green-600 text-white px-3 py-1 rounded"
+        >
           {{ creatingVehicle ? 'جاري الإضافة...' : 'إضافة' }}
         </button>
       </div>
@@ -418,7 +480,6 @@ import {
 
 export default {
   name: 'TableModal',
-
   props: {
     showTriggerButton: {
       type: Boolean,
@@ -433,42 +494,33 @@ export default {
       default: 'توريد جديد'
     }
   },
-
   data() {
     return {
       isOpen: false,
       isSaving: false,
-
       sites: [],
       allLocations: [],
-      rows: [this.createEmptyRow()],
-
+      rows: [],
       contractors: [],
       contractorsWithVehicles: [],
       crushers: [],
       vehicles: [],
-
       saveError: '',
-
       showAddSite: false,
       newSiteName: '',
       showAddArea: false,
       newAreaName: '',
       addingLocation: false,
       locationError: '',
-
       pendingRow: null,
-
       showAddContractorDialog: false,
       newContractorName: '',
       contractorDialogError: '',
       creatingContractor: false,
-
       showAddCrusherDialog: false,
       newCrusherName: '',
       crusherDialogError: '',
       creatingCrusher: false,
-
       showAddVehicleDialog: false,
       newVehicleForm: {
         name: '',
@@ -477,28 +529,39 @@ export default {
         crusherCubic: ''
       },
       vehicleDialogError: '',
-      creatingVehicle: false
+      creatingVehicle: false,
+      // الإضافة الجديدة لإصلاح مشكلة this.$el
+      tableRef: null
     }
   },
-
+  computed: {
+    subtotal() {
+      return this.rows.reduce((sum, row) => sum + this.totalPerRow(row), 0)
+    },
+    totalDiscount() {
+      return this.rows.reduce((sum, row) => sum + Number(row.discount || 0), 0)
+    },
+    grandTotal() {
+      return Math.max(0, this.subtotal - this.totalDiscount)
+    },
+    isRTL() {
+      return this.$i18n.locale === 'ar'
+    }
+  },
   async mounted() {
-    if (this.isOpen) {
-      await this.loadInitialData()
-    }
+    // إنشاء الصف الأول عند التحميل
+    this.rows = [this.createEmptyRow()]
   },
-
   methods: {
     async openModal() {
       this.isOpen = true
       this.resetRows()
       await this.loadInitialData()
     },
-
     closeModal() {
       this.isOpen = false
       this.saveError = ''
     },
-
     async loadInitialData() {
       try {
         await Promise.all([
@@ -509,7 +572,6 @@ export default {
         console.error('Failed to load initial data:', err)
       }
     },
-
     createEmptyRow() {
       return {
         id: Date.now() + Math.random(),
@@ -529,7 +591,6 @@ export default {
         availableVehicles: []
       }
     },
-
     isRowEmpty(row) {
       return !row.date &&
         !row.site &&
@@ -544,19 +605,16 @@ export default {
         !row.cubic &&
         !row.crusherCubic
     },
-
     async refreshLocations() {
       try {
         const res = await getLocations()
         this.allLocations = Array.isArray(res.data) ? res.data : []
         this.sites = this.allLocations.filter(l => !l.parentId)
-
         this.rows.forEach(row => this.updateAvailableAreas(row))
       } catch (err) {
         console.warn('refreshLocations failed', err)
       }
     },
-
     updateAvailableAreas(row) {
       row.availableAreas = row.site?.id
         ? this.allLocations.filter(l => l.parentId === row.site.id)
@@ -565,7 +623,6 @@ export default {
         row.area = null
       }
     },
-
     onSiteChange(row) {
       if (row.site === '__new__') {
         this.pendingRow = row
@@ -576,7 +633,6 @@ export default {
       this.updateAvailableAreas(row)
       row.area = null
     },
-
     async addSite() {
       if (!this.newSiteName?.trim()) return
       this.addingLocation = true
@@ -597,7 +653,6 @@ export default {
         this.addingLocation = false
       }
     },
-
     async addArea() {
       if (!this.newAreaName?.trim() || !this.pendingRow?.site?.id) return
       this.addingLocation = true
@@ -620,7 +675,6 @@ export default {
         this.addingLocation = false
       }
     },
-
     async loadLookups() {
       try {
         const [cRes, cvRes, crushRes, vRes] = await Promise.all([
@@ -629,19 +683,16 @@ export default {
           getCrushers(),
           getVehicles()
         ])
-
         const extractArray = (res) => {
           const data = res?.data || res || {}
           return Array.isArray(data) ? data :
                  Array.isArray(data.items) ? data.items :
                  Array.isArray(data.data) ? data.data : []
         }
-
         this.contractors = extractArray(cRes)
         this.contractorsWithVehicles = extractArray(cvRes)
         this.crushers = extractArray(crushRes)
         this.vehicles = extractArray(vRes)
-
         this.rows.forEach(row => {
           row.availableVehicles = [...this.vehicles]
         })
@@ -649,7 +700,6 @@ export default {
         console.error('loadLookups failed:', err)
       }
     },
-
     onContractorChange(row) {
       if (!row.contractor?.id) {
         row.availableVehicles = [...this.vehicles]
@@ -660,11 +710,9 @@ export default {
       row.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === row.contractor.id)
       row.vehicle = null
     },
-
     onCrusherChange(row) {
       this.onContractorChange(row)
     },
-
     onVehicleSelect(row) {
       if (!row.vehicle) {
         row.cubic = 0
@@ -674,48 +722,71 @@ export default {
       row.cubic = Number(row.vehicle.cubicCapacity ?? row.vehicle.cubic ?? 0)
       row.crusherCubic = row.vehicle.crusherCubic ? Number(row.vehicle.crusherCubic) : ''
     },
-
     totalPerRow(row) {
       const p = Number(row.price || 0)
       const c = Number(row.cubic || 0)
       const d = Number(row.discount || 0)
       return Math.max(0, p * c - d)
     },
-
     formatNumber(v) {
       return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
 
+    // ✅ الدالة المُصححة - استخدام tableRef بدلاً من this.$el
     focusNext(rowIndex, colIndex) {
       const nextCol = colIndex + 1
-      if (nextCol > 11) return
+      if (nextCol > 11) return // آخر عمود قابل للتنقل
 
       this.$nextTick(() => {
-        const row = this.$el.querySelectorAll('tbody tr')[rowIndex]
-        if (!row) return
+        if (!this.tableRef) {
+          console.warn('tableRef غير جاهز بعد')
+          return
+        }
 
-        const allInputs = row.querySelectorAll('input, select')
-        const nextInput = allInputs[nextCol]
-        nextInput?.focus()
+        const rows = this.tableRef.querySelectorAll('tbody tr')
+        const currentRow = rows[rowIndex]
+        if (!currentRow) {
+          console.warn('الصف غير موجود:', rowIndex)
+          return
+        }
+
+        const focusable = currentRow.querySelectorAll('input, select')
+        const nextElement = focusable[nextCol]
+
+        if (nextElement) {
+          nextElement.focus()
+          // تحسين UX: فتح الـ select تلقائياً
+          if (nextElement.tagName === 'SELECT' && !nextElement.disabled) {
+            nextElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+            nextElement.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+          }
+        } else {
+          console.warn('العنصر التالي غير موجود:', nextCol)
+        }
       })
     },
 
+    // ✅ دالة آخر حقل - إضافة صف جديد وفوكس أوله
     handleLastFieldEnter(rowIndex) {
       const row = this.rows[rowIndex]
       if (!row || this.isRowEmpty(row)) return
 
       this.addRow()
+
       this.$nextTick(() => {
-        const newRowIndex = rowIndex + 1
-        const inputs = this.$el.querySelectorAll('tbody tr')[newRowIndex]?.querySelectorAll('input, select')
-        inputs?.[0]?.focus()
+        if (!this.tableRef) return
+        const allRows = this.tableRef.querySelectorAll('tbody tr')
+        const newRow = allRows[rowIndex + 1]
+        if (newRow) {
+          const firstInput = newRow.querySelector('input[type="date"]')
+          firstInput?.focus()
+        }
       })
     },
 
     addRow() {
       this.rows.push(this.createEmptyRow())
     },
-
     duplicateRow(index) {
       const src = this.rows[index]
       if (!src) return
@@ -723,28 +794,22 @@ export default {
       copy.id = Date.now() + Math.random()
       this.rows.splice(index + 1, 0, copy)
     },
-
     removeRow(index) {
       this.rows.splice(index, 1)
       if (this.rows.length === 0) this.addRow()
     },
-
     resetRows() {
       this.rows = [this.createEmptyRow()]
     },
-
     async saveData() {
       this.saveError = ''
       this.isSaving = true
-
       const toSave = this.rows.filter(r => !this.isRowEmpty(r))
-
       if (!toSave.length) {
         this.saveError = 'لا توجد بيانات لحفظها'
         this.isSaving = false
         return
       }
-
       for (const [i, r] of toSave.entries()) {
         if (!r.date || !r.site || !r.contractor || !r.crusher || !r.vehicle) {
           this.saveError = `يرجى ملء الحقول المطلوبة في الصف ${i + 1}`
@@ -752,12 +817,10 @@ export default {
           return
         }
       }
-
       try {
         for (const r of toSave) {
           const locationId = r.area?.id || r.site?.id
           if (!locationId) continue
-
           await createDelivery({
             crusherId: Number(r.crusher.id),
             contractorId: Number(r.contractor.id),
@@ -773,10 +836,10 @@ export default {
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null
           })
         }
-
-        alert('تم الحفظ بنجاح')
+        alert('تم الحفظ بنجاح ✅')
         this.resetRows()
         this.closeModal()
+        this.$emit('saved') // إشعار الصفحة الأم بالحفظ
       } catch (err) {
         console.error('saveData error:', err)
         this.saveError = err?.response?.data?.message || 'خطأ أثناء الحفظ'
@@ -784,31 +847,24 @@ export default {
         this.isSaving = false
       }
     },
-
     async createNewContractor() {
       const name = this.newContractorName.trim()
       if (!name) return
-
       this.creatingContractor = true
       this.contractorDialogError = ''
-
       try {
         const res = await createContractor({ name })
         const nc = res?.data
-
         if (!nc || !nc.id) {
           throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
         }
-
         this.contractors = [...this.contractors, nc]
         this.contractorsWithVehicles = [...this.contractorsWithVehicles, { ...nc, vehicles: [] }]
-
         const row = this.rows.find(r => r.contractor === '__new__')
         if (row) {
           row.contractor = nc
           this.onContractorChange(row)
         }
-
         this.newContractorName = ''
         this.showAddContractorDialog = false
         await this.loadLookups()
@@ -818,30 +874,23 @@ export default {
         this.creatingContractor = false
       }
     },
-
     async createNewCrusher() {
       const name = this.newCrusherName.trim()
       if (!name) return
-
       this.creatingCrusher = true
       this.crusherDialogError = ''
-
       try {
         const res = await createCrusher({ name })
         const nc = res?.data
-
         if (!nc || !nc.id) {
           throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
         }
-
         this.crushers = [...this.crushers, nc]
-
         const row = this.rows.find(r => r.crusher === '__new__')
         if (row) {
           row.crusher = nc
           this.onCrusherChange(row)
         }
-
         this.newCrusherName = ''
         this.showAddCrusherDialog = false
         await this.loadLookups()
@@ -851,17 +900,14 @@ export default {
         this.creatingCrusher = false
       }
     },
-
     async createNewVehicle() {
       const { name, contractorId, cubicCapacity, crusherCubic } = this.newVehicleForm
       if (!name.trim() || !cubicCapacity || !crusherCubic) {
         this.vehicleDialogError = 'يرجى ملء جميع الحقول'
         return
       }
-
       this.creatingVehicle = true
       this.vehicleDialogError = ''
-
       try {
         const res = await createVehicle({
           name: name.trim(),
@@ -869,25 +915,19 @@ export default {
           cubicCapacity: Number(cubicCapacity),
           crusherCubic: Number(crusherCubic)
         })
-
         const nv = res?.data
-
         if (!nv || !nv.id) {
           throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
         }
-
         this.vehicles = [...this.vehicles, nv]
-
         this.rows.forEach(r => {
           r.availableVehicles = [...this.vehicles]
         })
-
         const row = this.rows.find(r => r.vehicle === '__new__')
         if (row) {
           row.vehicle = nv
           this.onVehicleSelect(row)
         }
-
         this.newVehicleForm = { name: '', contractorId: '', cubicCapacity: '', crusherCubic: '' }
         this.showAddVehicleDialog = false
         await this.loadLookups()
@@ -909,5 +949,11 @@ export default {
 }
 .no-spinner {
   -moz-appearance: textfield;
+}
+
+
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 </style>
