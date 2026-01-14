@@ -1,18 +1,14 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6">
-    <!-- Header + زر التوريد الجديد -->
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.suppliesList') }}</h2>
 
-      <!-- الزر اللي هيفتح الـ Modal -->
-      <TableModal
-        :showTriggerButton="true"
-        :triggerButtonText="$t('dashboard.newSupply') + ' +'"
-        :modalTitle="$t('dashboard.newSupply')"
-      />
+      <!-- button open modal from shared -->
+      <TableModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newSupply') + ' +'"
+        :modalTitle="$t('dashboard.newSupply')" />
     </div>
 
-    <!-- الجدول -->
+    <!-- table -->
     <div class="overflow-auto bg-white rounded shadow">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-indigo-50">
@@ -34,7 +30,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50" @contextmenu.prevent="onRowContextMenu($event, s)">
+          <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50"
+            @contextmenu.prevent="onRowContextMenu($event, s)">
             <td class="p-3">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="p-3">{{ formatDate(s.date) }}</td>
             <td class="p-3">{{ s.contractor?.name || '-' }}</td>
@@ -55,7 +52,7 @@
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3" :colspan="14" >
+            <td class="p-3" :colspan="14">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
@@ -63,22 +60,17 @@
       </table>
     </div>
 
-    <Pagination
-      v-if="totalPages > 1"
-      :currentPage="page"
-      :pageSize="pageSize"
-      :total="total"
-      :totalPages="totalPages"
-      :pageSizeOptions="[10,20,50,100]"
-      @update:page="(p) => { page = p; loadSupplies() }"
-      @update:pageSize="(size) => { pageSize = size; page = 1; loadSupplies() }"
-    />
+    <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages"
+      :pageSizeOptions="[10, 20, 50, 100]" @update:page="(p) => { page = p; loadSupplies() }"
+      @update:pageSize="(size) => { pageSize = size; page = 1; loadSupplies() }" />
 
     <!-- Context menu for row actions -->
-    <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }" class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
+    <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
       <ul class="p-2">
         <li>
-          <button @click="confirmDelete(contextMenu.item)" class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
+          <button @click="confirmDelete(contextMenu.item)"
+            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
         </li>
       </ul>
     </div>
@@ -112,7 +104,8 @@
         </div>
         <div class="mt-4 flex gap-2 justify-end">
           <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button @click="saveEdit" class="px-4 py-2 rounded text-white bg-indigo-600 hover:bg-indigo-700">{{ $t('labels.save') }}</button>
+          <button @click="saveEdit" class="px-4 py-2 rounded text-white bg-indigo-600 hover:bg-indigo-700">{{
+            $t('labels.save') }}</button>
         </div>
       </div>
     </div>
@@ -121,7 +114,7 @@
 
 <script>
 import { getDeliveries, deleteDelivery } from '../../api'
-import TableModal from '../shared/TableModal.vue'  // تأكد من المسار الصحيح
+import TableModal from '../shared/TableModal.vue'
 import Pagination from '../shared/Pagination.vue'
 
 export default {
@@ -259,6 +252,7 @@ export default {
       }
     },
 
+
     async handleDelete(id) {
       try {
         await deleteDelivery(id)
@@ -270,18 +264,22 @@ export default {
       }
     },
 
+    /**
+     * Saves the edited supply and closes the modal.
+     * If the edited supply already exists in the list, it will be updated.
+     * Otherwise, a new supply will be added.
+     * TODO: Call the API to save the changes in the backend.
+     */
     async saveEdit() {
       const idx = this.supplies.findIndex(s => s.id === this.form.id)
       if (idx !== -1) {
         this.supplies[idx] = { ...this.form }
       }
       this.modalOpen = false
-      // TODO: استدعاء API للحفظ في الـ backend
+
     }
   }
 }
 </script>
 
-<style scoped>
-/* أي ستايل إضافي هنا إذا أردت */
-</style>
+<style scoped></style>

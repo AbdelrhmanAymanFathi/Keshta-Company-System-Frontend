@@ -1,4 +1,3 @@
-<!-- src/components/shared/TableModal.vue -->
 <template>
   <!-- الزر اللي بيفتح الـ Modal (يمكنك إزالته أو تغيير مكانه حسب الصفحة) -->
   <button v-if="showTriggerButton" @click="openModal"
