@@ -12,7 +12,7 @@
         <!-- Brand -->
         <div class="flex items-center gap-3">
           <div class="w-18 h-9 rounded-md flex items-center justify-center overflow-hidden">
-            <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-fill">
+            <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-fill">
           </div>
           <div class="text-l font-bold whitespace-nowrap">{{ $t('appName') }}</div>
         </div>
@@ -91,7 +91,7 @@
         <div v-if="isMobile" class="sm:hidden flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-md overflow-hidden">
-              <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
+              <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
             </div>
             <div class="font-semibold text-lg">{{ $t('appName') }}</div>
           </div>
@@ -141,7 +141,7 @@
 </template>
 
 <script>
-import AuthLogout from '../auth/Logout.vue'
+import AuthLogout from '@/components/auth/Logout.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 

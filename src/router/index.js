@@ -3,11 +3,11 @@ import { isAuthenticated, user, loading } from '@/composables/authStore'
 import { watch } from 'vue'
 
 // Auth Pages
-const Login = () => import('@/components/auth/Login.vue')
+const Login = () => import('@/views/Login.vue')
 // const Register = () => import('@/components/auth/Register.vue')
 
 // Dashboard Layout
-const Dashboard = () => import('@/components/dashboard/Dashboard.vue')
+const Dashboard = () => import("@/views/Dashboard.vue")
 
 // Dashboard Pages - Lazy Loading for better performance
 const NewSupply = () => import('@/components/dashboard/NewSupply.vue')
