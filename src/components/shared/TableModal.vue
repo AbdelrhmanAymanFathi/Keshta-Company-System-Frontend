@@ -208,18 +208,18 @@
           </div>
 
           <!-- الإجماليات -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 text-right">
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">{{ $t('supply.subtotal') }}</p>
-              <p class="text-2xl font-bold text-indigo-700 mt-1">{{ formatNumber(subtotal) }}</p>
+          <div class="mt-8 text-right space-y-1 text-sm">
+            <div class="flex justify-end gap-8">
+              <span class="text-gray-600">{{ $t('supply.subtotal') }}:</span>
+              <span class="font-semibold text-indigo-700 w-24">{{ formatNumber(subtotal) }}</span>
             </div>
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">{{ $t('supply.totalDiscount') }}</p>
-              <p class="text-2xl font-bold text-red-600 mt-1">-{{ formatNumber(totalDiscount) }}</p>
+            <div class="flex justify-end gap-8">
+              <span class="text-gray-600">{{ $t('supply.totalDiscount') }}:</span>
+              <span class="font-semibold text-red-600 w-24">-{{ formatNumber(totalDiscount) }}</span>
             </div>
-            <div class="bg-indigo-50 p-4 rounded-lg">
-              <p class="text-gray-700 font-medium">{{ $t('supply.grandTotal') }}</p>
-              <p class="text-3xl font-bold text-indigo-800 mt-1">{{ formatNumber(grandTotal) }}</p>
+            <div class="flex justify-end gap-8 pt-2 border-t border-gray-300">
+              <span class="text-gray-700 font-medium">{{ $t('supply.grandTotal') }}:</span>
+              <span class="font-bold text-indigo-800 w-24">{{ formatNumber(grandTotal) }}</span>
             </div>
           </div>
 
@@ -410,10 +410,20 @@ export default {
   },
   computed: {
     subtotal() {
-      return this.rows.reduce((sum, row) => sum + this.totalPerRow(row), 0)
+      // المجموع الفرعي = مجموع (السعر × التكعيب) لكل صف
+      return this.rows.reduce((sum, row) => {
+        const p = Number(row.price || 0)
+        const c = Number(row.cubic || 0)
+        return sum + (p * c)
+      }, 0)
     },
     totalDiscount() {
-      return this.rows.reduce((sum, row) => sum + Number(row.discount || 0), 0)
+      // إجمالي الخصم = مجموع (الخصم × السعر) لكل صف
+      return this.rows.reduce((sum, row) => {
+        const d = Number(row.discount || 0)
+        const p = Number(row.price || 0)
+        return sum + (d * p)
+      }, 0)
     },
     grandTotal() {
       return Math.max(0, this.subtotal - this.totalDiscount)
@@ -600,7 +610,9 @@ export default {
       const p = Number(row.price || 0)
       const c = Number(row.cubic || 0)
       const d = Number(row.discount || 0)
-      return Math.max(0, p * c - d)
+      const subtotal = p * c
+      const discountAmount = d * p // الخصم = رقم الخصم × السعر
+      return Math.max(0, subtotal - discountAmount)
     },
     formatNumber(v) {
       return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
