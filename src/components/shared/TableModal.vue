@@ -1,31 +1,21 @@
 <!-- src/components/shared/TableModal.vue -->
 <template>
   <!-- الزر اللي بيفتح الـ Modal (يمكنك إزالته أو تغيير مكانه حسب الصفحة) -->
-  <button
-    v-if="showTriggerButton"
-    @click="openModal"
-    class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition"
-  >
+  <button v-if="showTriggerButton" @click="openModal"
+    class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition">
     {{ triggerButtonText }}
   </button>
 
   <!-- الـ Modal -->
   <teleport to="body">
-    <div
-      v-if="isOpen"
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
-      @click.self="closeModal"
-    >
-      <div
-        class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden"
-      >
+    <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+      @click.self="closeModal">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle }}</h2>
-          <button
-            @click="closeModal"
-            class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none"
-          >
+          <button @click="closeModal"
+            class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">
             ×
           </button>
         </div>
@@ -34,13 +24,10 @@
         <div class="flex-1 overflow-y-auto p-6">
           <!-- الجدول -->
           <div class="overflow-x-auto mb-8">
-            <table 
-              ref="tableRef"
-              class="min-w-full divide-y divide-gray-200 border"
-            >
+            <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border">
               <thead class="bg-indigo-50 sticky top-0 z-10">
                 <tr>
-                  <th class="px-3 py-3 text-center w-10">#</th>
+                  <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
                   <th class="px-3 py-3 text-right">{{ $t('labels.date') }}</th>
                   <th class="px-3 py-3 text-right">{{ $t('labels.site') }}</th>
                   <th class="px-3 py-3 text-right">{{ $t('labels.area') }}</th>
@@ -60,35 +47,26 @@
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="(row, index) in rows" :key="row.id">
                   <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
-                  
+
                   <!-- 0: Date -->
                   <td class="px-3 py-2">
-                    <input
-                      type="date"
-                      v-model="row.date"
+                    <input type="date" v-model="row.date"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="focusNext(index, 0)"
-                    />
+                      @keydown.enter.prevent="focusNext(index, 0)" />
                   </td>
 
                   <!-- 1: الموقع -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
-                      <select
-                        v-model="row.site"
-                        @change="onSiteChange(row)"
+                      <select v-model="row.site" @change="onSiteChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 1)"
-                      >
+                        @keydown.enter.prevent="focusNext(index, 1)">
                         <option :value="null">{{ $t('labels.site') }} —</option>
                         <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
-                        <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') || 'إضافة موقع' }}</option>
+                        <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') }}</option>
                       </select>
-                      <button
-                        v-if="row.site === '__new__'"
-                        @click="showAddSite = true; pendingRow = row"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
-                      >
+                      <button v-if="row.site === '__new__'" @click="showAddSite = true; pendingRow = row"
+                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -97,23 +75,17 @@
                   <!-- 2: المنطقة -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
-                      <select
-                        v-model="row.area"
-                        :disabled="!row.site || row.site === '__new__'"
+                      <select v-model="row.area" :disabled="!row.site || row.site === '__new__'"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        @keydown.enter.prevent="focusNext(index, 2)"
-                      >
+                        @keydown.enter.prevent="focusNext(index, 2)">
                         <option :value="null">{{ $t('labels.area') }} —</option>
                         <option v-for="a in row.availableAreas" :key="a.id" :value="a">{{ a.name }}</option>
                         <option value="__new__" style="color: #10b981;" :disabled="!row.site || row.site === '__new__'">
-                          + {{ $t('supply.addNewArea') || 'إضافة منطقة' }}
+                          + {{ $t('supply.addNewArea') }}
                         </option>
                       </select>
-                      <button
-                        v-if="row.area === '__new__'"
-                        @click="showAddArea = true; pendingRow = row"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
-                      >
+                      <button v-if="row.area === '__new__'" @click="showAddArea = true; pendingRow = row"
+                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -122,21 +94,15 @@
                   <!-- 3: المقاول -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
-                      <select
-                        v-model="row.contractor"
-                        @change="onContractorChange(row)"
+                      <select v-model="row.contractor" @change="onContractorChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 3)"
-                      >
+                        @keydown.enter.prevent="focusNext(index, 3)">
                         <option :value="null">{{ $t('labels.contractor') }} —</option>
                         <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
-                      <button
-                        v-if="row.contractor === '__new__'"
-                        @click="showAddContractorDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
-                      >
+                      <button v-if="row.contractor === '__new__'" @click="showAddContractorDialog = true"
+                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -145,21 +111,15 @@
                   <!-- 4: الكسارة -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
-                      <select
-                        v-model="row.crusher"
-                        @change="onCrusherChange(row)"
+                      <select v-model="row.crusher" @change="onCrusherChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 4)"
-                      >
+                        @keydown.enter.prevent="focusNext(index, 4)">
                         <option :value="null">{{ $t('labels.crusher') }} —</option>
                         <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
-                      <button
-                        v-if="row.crusher === '__new__'"
-                        @click="showAddCrusherDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
-                      >
+                      <button v-if="row.crusher === '__new__'" @click="showAddCrusherDialog = true"
+                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -168,21 +128,15 @@
                   <!-- 5: المركبة -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
-                      <select
-                        v-model="row.vehicle"
-                        @change="onVehicleSelect(row)"
+                      <select v-model="row.vehicle" @change="onVehicleSelect(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 5)"
-                      >
+                        @keydown.enter.prevent="focusNext(index, 5)">
                         <option :value="null">{{ $t('labels.vehicle') }} —</option>
                         <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
-                      <button
-                        v-if="row.vehicle === '__new__'"
-                        @click="showAddVehicleDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
-                      >
+                      <button v-if="row.vehicle === '__new__'" @click="showAddVehicleDialog = true"
+                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -190,69 +144,44 @@
 
                   <!-- 6: crusherBon -->
                   <td class="px-3 py-2">
-                    <input
-                      type="text"
-                      v-model="row.crusherBon"
+                    <input type="text" v-model="row.crusherBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="focusNext(index, 6)"
-                    />
+                      @keydown.enter.prevent="focusNext(index, 6)" />
                   </td>
 
                   <!-- 7: companyBon -->
                   <td class="px-3 py-2">
-                    <input
-                      type="text"
-                      v-model="row.companyBon"
+                    <input type="text" v-model="row.companyBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="focusNext(index, 7)"
-                    />
+                      @keydown.enter.prevent="focusNext(index, 7)" />
                   </td>
 
                   <!-- 8: discount -->
                   <td class="px-3 py-2">
-                    <input
-                      type="number"
-                      v-model.number="row.discount"
+                    <input type="number" v-model.number="row.discount"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      placeholder="0"
-                      @keydown.enter.prevent="focusNext(index, 8)"
-                    />
+                      placeholder="0" @keydown.enter.prevent="focusNext(index, 8)" />
                   </td>
 
                   <!-- 9: price -->
                   <td class="px-3 py-2">
-                    <input
-                      type="number"
-                      step="any"
-                      v-model.number="row.price"
+                    <input type="number" step="any" v-model.number="row.price"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0"
-                      @keydown.enter.prevent="focusNext(index, 9)"
-                    />
+                      placeholder="0" @keydown.enter.prevent="focusNext(index, 9)" />
                   </td>
 
                   <!-- 10: cubic -->
                   <td class="px-3 py-2">
-                    <input
-                      type="number"
-                      step="any"
-                      v-model.number="row.cubic"
+                    <input type="number" step="any" v-model.number="row.cubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0"
-                      @keydown.enter.prevent="focusNext(index, 10)"
-                    />
+                      placeholder="0" @keydown.enter.prevent="focusNext(index, 10)" />
                   </td>
 
                   <!-- 11: crusherCubic (آخر حقل) -->
                   <td class="px-3 py-2">
-                    <input
-                      type="number"
-                      step="any"
-                      v-model.number="row.crusherCubic"
+                    <input type="number" step="any" v-model.number="row.crusherCubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="-"
-                      @keydown.enter.prevent="handleLastFieldEnter(index)"
-                    />
+                      placeholder="-" @keydown.enter.prevent="handleLastFieldEnter(index)" />
                   </td>
 
                   <!-- Total -->
@@ -263,18 +192,12 @@
                   <!-- Actions -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-2 justify-center">
-                      <button
-                        @click="duplicateRow(index)"
-                        class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm"
-                        title="نسخ الصف"
-                      >
+                      <button @click="duplicateRow(index)"
+                        class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm" title="نسخ الصف">
                         ⤷
                       </button>
-                      <button
-                        @click="removeRow(index)"
-                        class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm"
-                        title="حذف الصف"
-                      >
+                      <button @click="removeRow(index)"
+                        class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" title="حذف الصف">
                         ✕
                       </button>
                     </div>
@@ -287,27 +210,24 @@
           <!-- الإجماليات -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 text-right">
             <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">المجموع الفرعي</p>
+              <p class="text-gray-600">{{ $t('supply.subtotal') }}</p>
               <p class="text-2xl font-bold text-indigo-700 mt-1">{{ formatNumber(subtotal) }}</p>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-gray-600">إجمالي الخصم</p>
+              <p class="text-gray-600">{{ $t('supply.totalDiscount') }}</p>
               <p class="text-2xl font-bold text-red-600 mt-1">-{{ formatNumber(totalDiscount) }}</p>
             </div>
             <div class="bg-indigo-50 p-4 rounded-lg">
-              <p class="text-gray-700 font-medium">الإجمالي الكلي</p>
+              <p class="text-gray-700 font-medium">{{ $t('supply.grandTotal') }}</p>
               <p class="text-3xl font-bold text-indigo-800 mt-1">{{ formatNumber(grandTotal) }}</p>
             </div>
           </div>
 
           <!-- زر الحفظ -->
           <div class="mt-10 flex justify-end">
-            <button
-              @click="saveData"
-              :disabled="isSaving"
-              class="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl text-xl font-medium shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {{ isSaving ? 'جاري الحفظ...' : 'حفظ التوريد' }}
+            <button @click="saveData" :disabled="isSaving"
+              class="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl text-xl font-medium shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+              {{ isSaving ? $t('labels.saving') : $t('labels.saveSupply') }}
             </button>
           </div>
           <p v-if="saveError" class="mt-4 text-center text-red-600 font-medium text-lg">
@@ -322,19 +242,12 @@
   <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
-      <input 
-        v-model="newSiteName" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-        :placeholder="$t('supply.siteName')" 
-      />
+      <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddSite = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button 
-          @click="addSite" 
-          :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded"
-        >
-          {{ addingLocation ? 'جاري الإضافة...' : 'إضافة' }}
+        <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="addSite" :disabled="!newSiteName || addingLocation"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
@@ -345,19 +258,12 @@
   <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
-      <input 
-        v-model="newAreaName" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-        :placeholder="$t('supply.areaName')" 
-      />
+      <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddArea = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button 
-          @click="addArea" 
-          :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded"
-        >
-          {{ addingLocation ? 'جاري الإضافة...' : 'إضافة' }}
+        <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="addArea" :disabled="!newAreaName || addingLocation"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
@@ -367,20 +273,15 @@
   <!-- Dialog: إضافة مقاول -->
   <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">إضافة مقاول</h3>
-      <input 
-        v-model="newContractorName" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-        placeholder="اسم المقاول" 
-      />
+      <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
+      <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
+        :placeholder="$t('contractors.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button 
-          @click="createNewContractor" 
-          :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 text-white px-3 py-1 rounded"
-        >
-          {{ creatingContractor ? 'جاري الإضافة...' : 'إضافة' }}
+        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
+        <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
       <div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div>
@@ -390,20 +291,14 @@
   <!-- Dialog: إضافة كسارة -->
   <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">إضافة كسارة</h3>
-      <input 
-        v-model="newCrusherName" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-        placeholder="اسم الكسارة" 
-      />
+      <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
+      <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button 
-          @click="createNewCrusher" 
-          :disabled="!newCrusherName || creatingCrusher"
-          class="bg-green-600 text-white px-3 py-1 rounded"
-        >
-          {{ creatingCrusher ? 'جاري الإضافة...' : 'إضافة' }}
+        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
+        <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
       <div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div>
@@ -413,38 +308,25 @@
   <!-- Dialog: إضافة مركبة -->
   <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-full max-w-md">
-      <h3 class="text-lg font-bold mb-3">إضافة مركبة</h3>
-      <input 
-        v-model="newVehicleForm.name" 
-        placeholder="اسم المركبة" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-      />
+      <h3 class="text-lg font-bold mb-3">{{ $t('vehicles.addVehicle') }}</h3>
+      <input v-model="newVehicleForm.name" :placeholder="$t('vehicles.name')"
+        class="w-full border rounded px-2 py-1 mb-3" />
       <select v-model="newVehicleForm.contractorId" class="w-full border rounded px-2 py-1 mb-3">
         <option value="">{{ $t('labels.contractor') }} —</option>
         <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
-      <input 
-        v-model.number="newVehicleForm.cubicCapacity" 
-        type="number" 
-        step="0.01" 
-        placeholder="السعة المكعبة" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-      />
-      <input 
-        v-model.number="newVehicleForm.crusherCubic" 
-        type="number" 
-        step="0.01" 
-        placeholder="سعة الكسارة" 
-        class="w-full border rounded px-2 py-1 mb-3" 
-      />
+      <input v-model.number="newVehicleForm.cubicCapacity" type="number" step="0.01"
+        :placeholder="$t('vehicles.cubicCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
+      <input v-model.number="newVehicleForm.crusherCubic" type="number" step="0.01"
+        :placeholder="$t('vehicles.crusherCubic') || $t('labels.crusherCubic')"
+        class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">إلغاء</button>
-        <button 
-          @click="createNewVehicle" 
+        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
+        <button @click="createNewVehicle"
           :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
-          class="bg-green-600 text-white px-3 py-1 rounded"
-        >
-          {{ creatingVehicle ? 'جاري الإضافة...' : 'إضافة' }}
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
       <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
@@ -475,11 +357,15 @@ export default {
     },
     triggerButtonText: {
       type: String,
-      default: 'توريد جديد +'
+      default() {
+        return this.$t('dashboard.newSupply') + ' +'
+      }
     },
     modalTitle: {
       type: String,
-      default: 'توريد جديد'
+      default() {
+        return this.$t('dashboard.newSupply')
+      }
     }
   },
   data() {
@@ -674,8 +560,8 @@ export default {
         const extractArray = (res) => {
           const data = res?.data || res || {}
           return Array.isArray(data) ? data :
-                 Array.isArray(data.items) ? data.items :
-                 Array.isArray(data.data) ? data.data : []
+            Array.isArray(data.items) ? data.items :
+              Array.isArray(data.data) ? data.data : []
         }
         this.contractors = extractArray(cRes)
         this.contractorsWithVehicles = extractArray(cvRes)
@@ -794,13 +680,13 @@ export default {
       this.isSaving = true
       const toSave = this.rows.filter(r => !this.isRowEmpty(r))
       if (!toSave.length) {
-        this.saveError = 'لا توجد بيانات لحفظها'
+        this.saveError = this.$t('labels.noData') || 'No data'
         this.isSaving = false
         return
       }
       for (const [i, r] of toSave.entries()) {
         if (!r.date || !r.site || !r.contractor || !r.crusher || !r.vehicle) {
-          this.saveError = `يرجى ملء الحقول المطلوبة في الصف ${i + 1}`
+          this.saveError = `${this.$t('common.saveError') || 'Error'} ${i + 1}`
           this.isSaving = false
           return
         }
@@ -824,13 +710,13 @@ export default {
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null
           })
         }
-        alert('تم الحفظ بنجاح ✅')
+        alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.resetRows()
         this.closeModal()
         this.$emit('saved') // إشعار الصفحة الأم بالحفظ
       } catch (err) {
         console.error('saveData error:', err)
-        this.saveError = err?.response?.data?.message || 'خطأ أثناء الحفظ'
+        this.saveError = err?.response?.data?.message || this.$t('common.saveError') || 'Error saving'
       } finally {
         this.isSaving = false
       }
@@ -857,7 +743,7 @@ export default {
         this.showAddContractorDialog = false
         await this.loadLookups()
       } catch (e) {
-        this.contractorDialogError = e?.response?.data?.message || e.message || 'فشل إنشاء المقاول'
+        this.contractorDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
       } finally {
         this.creatingContractor = false
       }
@@ -883,7 +769,7 @@ export default {
         this.showAddCrusherDialog = false
         await this.loadLookups()
       } catch (e) {
-        this.crusherDialogError = e?.response?.data?.message || e.message || 'فشل إنشاء الكسارة'
+        this.crusherDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
       } finally {
         this.creatingCrusher = false
       }
@@ -891,7 +777,7 @@ export default {
     async createNewVehicle() {
       const { name, contractorId, cubicCapacity, crusherCubic } = this.newVehicleForm
       if (!name.trim() || !cubicCapacity || !crusherCubic) {
-        this.vehicleDialogError = 'يرجى ملء جميع الحقول'
+        this.vehicleDialogError = this.$t('common.saveError') || 'Error'
         return
       }
       this.creatingVehicle = true
@@ -920,7 +806,7 @@ export default {
         this.showAddVehicleDialog = false
         await this.loadLookups()
       } catch (e) {
-        this.vehicleDialogError = e?.response?.data?.message || e.message || 'فشل إنشاء المركبة'
+        this.vehicleDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
       } finally {
         this.creatingVehicle = false
       }
@@ -935,12 +821,14 @@ export default {
   -webkit-appearance: none;
   margin: 0;
 }
+
 .no-spinner {
   -moz-appearance: textfield;
 }
 
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }

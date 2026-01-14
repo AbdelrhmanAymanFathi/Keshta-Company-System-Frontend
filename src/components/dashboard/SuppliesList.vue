@@ -7,8 +7,8 @@
       <!-- الزر اللي هيفتح الـ Modal -->
       <TableModal
         :showTriggerButton="true"
-        triggerButtonText="توريد جديد +"
-        modalTitle="إنشاء توريد جديد"
+        :triggerButtonText="$t('dashboard.newSupply') + ' +'"
+        :modalTitle="$t('dashboard.newSupply')"
       />
     </div>
 
