@@ -158,7 +158,7 @@ export default {
       topMenus: { supplies: 'supplies', transport: 'transport', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
       menuMap: {
         supplies: [
-          { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
+          // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
           { name: 'suppliesList', label: 'dashboard.suppliesList', routeName: 'supplies-list' },
           { name: 'crushersList', label: 'dashboard.crushersList', routeName: 'crushers-list' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'contractors-list' },
