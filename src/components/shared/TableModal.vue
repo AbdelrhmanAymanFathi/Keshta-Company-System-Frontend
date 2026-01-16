@@ -941,6 +941,7 @@ export default {
 }
 
 .no-spinner {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 

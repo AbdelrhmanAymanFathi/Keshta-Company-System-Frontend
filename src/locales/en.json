@@ -90,7 +90,6 @@
     "deletedSuccessfully": "Transport deleted successfully"
   },
   "labels": {
-    "noDataFound": "No data found",
     "createdAt": "Created At",
     "logout": "Logout",
     "close": "Close",
@@ -451,7 +450,6 @@
     "addNewCrusher": "Add New Crusher",
     "newCrusherNamePlaceholder": "Enter crusher name",
     "crusherCreateError": "Error creating crusher",
-    "selectDriver": "Select Driver",
     "addNewDriver": "Add New Driver",
     "newDriverNamePlaceholder": "Enter driver name",
     "driverCreateError": "Error creating driver",
