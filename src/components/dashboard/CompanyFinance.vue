@@ -510,10 +510,10 @@
                   <td :class="['px-6 py-4 whitespace-nowrap text-xs text-gray-600', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.classification || '-' }}
                   </td>
-                  <td :class="['px-6 py-4 text-xs text-gray-900', isRTL ? 'text-end' : 'text-start']">
+                  <td :class="['px-6 py-4 text-xs whitespace-nowrap text-gray-900', isRTL ? 'text-end' : 'text-start']">
                     {{ expense.description || '-' }}
                   </td>
-                  <td :class="['px-6 py-4 text-xs', isRTL ? 'text-end' : 'text-start']">
+                  <td :class="['px-6 py-4 text-xs whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     <span v-if="expense.branch && (expense.branch.name || expense.branch)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {{ expense.branch?.name || expense.branch }}
                     </span>
