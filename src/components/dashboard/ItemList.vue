@@ -12,20 +12,20 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-indigo-50">
           <tr>
-            <th class="p-3 text-start">#</th>
-            <th class="p-3 text-start">{{ $t('labels.itemName') || 'Item Name' }}</th>
-            <th class="p-3 text-start">{{ $t('labels.currentPrice') || 'Current Price' }}</th>
-            <th class="p-3 text-start">{{ $t('labels.createdAt') || 'Created At' }}</th>
-            <th class="p-3 text-start">{{ $t('labels.actions') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">#</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">{{ $t('labels.itemName') || 'Item Name' }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">{{ $t('labels.currentPrice') || 'Current Price' }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">{{ $t('labels.createdAt') || 'Created At' }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-gray-50" @contextmenu.prevent="openContextMenu($event, item)">
-            <td class="p-3 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="p-3 text-start">{{ item.name }}</td>
-            <td class="p-3 text-start">{{ formatPrice(item.currentPrice) }}</td>
-            <td class="p-3 text-start">{{ formatDate(item.createdAt) }}</td>
-            <td class="p-3 text-start flex gap-2">
+            <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">{{ item.name }}</td>
+            <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">{{ formatPrice(item.currentPrice) }}</td>
+            <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">{{ formatDate(item.createdAt) }}</td>
+            <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start flex gap-2">
               <button @click="editItem(item)" class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm">
                 {{ $t('labels.edit') }}
               </button>
@@ -35,12 +35,12 @@
             </td>
           </tr>
           <tr v-if="items.length === 0 && !loading">
-            <td class="p-3 text-start" :colspan="5">
+            <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start" :colspan="5">
               {{ $t('labels.noDataFound') || 'No items found' }}
             </td>
           </tr>
           <tr v-if="loading">
-            <td class="p-3 text-start " :colspan="5">
+            <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start " :colspan="5">
               {{ $t('labels.loading') || 'Loading...' }}
             </td>
           </tr>

@@ -19,26 +19,26 @@
         <table class="min-w-full divide-y">
           <thead class="bg-indigo-50">
             <tr>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.#') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.name') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.phone') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.contractor') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.notes') }}</th>
-              <th class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.actions') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.#') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.name') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.phone') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.contractor') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('drivers.notes') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('labels.actions') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(d, idx) in filtered" :key="d.id" class="hover:bg-gray-50 cursor-pointer"
               @contextmenu.prevent="openContextMenu($event, d)">
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ idx + 1 }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.name }}</td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.phone || '-' }}</td>
+              <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ idx + 1 }}</td>
+              <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ d.name }}</td>
+              <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ d.phone || '-' }}</td>
               <!-- Fixed: Show contractor name using contractorId -->
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ getContractorName(d.contractorId) || '-' }}
               </td>
-              <td class="p-3" :class="isRTL ? 'text-right' : 'text-left'">{{ d.notes || '-' }}</td>
-              <td class="p-3">
+              <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">{{ d.notes || '-' }}</td>
+              <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap">
                 <div class="flex gap-2" :class="isRTL ? 'justify-start' : 'justify-end'">
                   <button @click.stop="openEdit(d)"
                     class="px-2 py-1 rounded bg-yellow-400 hover:bg-yellow-500 text-white text-xs sm:text-sm">
@@ -52,7 +52,7 @@
               </td>
             </tr>
             <tr v-if="filtered.length === 0">
-              <td class="p-3" colspan="6" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" colspan="6" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('drivers.noResults') }}
               </td>
             </tr>
