@@ -940,11 +940,11 @@ axios.interceptors.response.use(
       const status = error.response.status
       const method = (originalRequest && originalRequest.method) ? originalRequest.method.toLowerCase() : ''
 
-      // Many backends return 404 for DELETE when resource already removed —
-      // this is not useful noise in the console. Suppress detailed logging for
-      // DELETE+404 case to reduce clutter. Keep a concise warning instead.
+      // Suppress console noise for expected errors like 404, 409
       if (status === 404 && method === 'delete') {
-        console.warn(`API: ${method.toUpperCase()} ${originalRequest.url} -> 404 (Not Found). Resource may already be deleted.`)
+        // Resource already deleted - not an error
+      } else if (status === 409) {
+        // Conflict errors (e.g., item in use) - handled by component with toast
       } else {
         console.error('API Error Response:', {
           status: error.response.status,

@@ -191,11 +191,6 @@ export default {
         name: '',
         currentPrice: ''
       },
-      toast: {
-        show: false,
-        message: '',
-        type: 'success'
-      },
       contextMenu: {
         visible: false,
         x: 0,
@@ -228,7 +223,6 @@ export default {
           this.totalPages = response.data.totalPages || Math.ceil(this.total / this.pageSize)
         }
       } catch (error) {
-        console.error('Error loading items:', error)
         this.showToast(error.response?.data?.message || 'Failed to load items', 'error')
       } finally {
         this.loading = false
@@ -297,7 +291,6 @@ export default {
         this.closeModal()
         this.loadItems()
       } catch (error) {
-        console.error('Error submitting form:', error)
         this.showToast(error.response?.data?.message || 'Failed to save item', 'error')
       } finally {
         this.submitting = false
@@ -318,8 +311,6 @@ export default {
         this.deleteItem = null
         this.loadItems()
       } catch (error) {
-        console.error('Error deleting item:', error)
-        
         // Handle specific error codes
         if (error.response?.status === 409) {
           // Item is being used, show the specific error message
@@ -348,16 +339,12 @@ export default {
     },
 
     showToast(message, type = 'success') {
-      // Use global toast if available from provide/inject
-      if (this.$toast) {
-        this.$toast[type](message)
+      // استخدام الـ global toast function من الـ window
+      if (window.$toast) {
+        window.$toast(message, type, 3000)
       } else {
-        // Fallback to local toast
-        this.toast = {
-          show: true,
-          message,
-          type
-        }
+        // Fallback to console if toast not available
+        console.log(`[${type.toUpperCase()}] ${message}`)
       }
     },
 
