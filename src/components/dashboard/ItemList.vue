@@ -223,7 +223,7 @@ export default {
           this.totalPages = response.data.totalPages || Math.ceil(this.total / this.pageSize)
         }
       } catch (error) {
-        this.showToast(error.response?.data?.message || 'Failed to load items', 'error')
+        this.showToast(error.response?.data?.message || this.$t('labels.failedLoadItems') || 'Failed to load items', 'error')
       } finally {
         this.loading = false
       }
@@ -291,7 +291,7 @@ export default {
         this.closeModal()
         this.loadItems()
       } catch (error) {
-        this.showToast(error.response?.data?.message || 'Failed to save item', 'error')
+        this.showToast(error.response?.data?.message || this.$t('labels.failedSaveItem') || 'Failed to save item', 'error')
       } finally {
         this.submitting = false
       }
@@ -314,18 +314,24 @@ export default {
         // Handle specific error codes
         if (error.response?.status === 409) {
           // Item is being used, show the specific error message
-          const errorMessage = error.response?.data?.message || 'Cannot delete this item. It is being used in exports.'
+          const errorMessage = this.$t('messages.itemInUse') || error.response?.data?.message || 'Cannot delete this item. It is being used in exports.'
           this.showToast(errorMessage, 'error')
-          // Keep dialog open for user to try again if needed
+          // Close dialog automatically when item is in use
+          setTimeout(() => {
+            this.deleteDialogOpen = false
+            this.deleteItem = null
+          }, 500)
         } else if (error.response?.status === 404) {
-          this.showToast('Item not found', 'error')
+          this.showToast(this.$t('messages.itemNotFound') || 'Item not found', 'error')
           this.deleteDialogOpen = false
           this.deleteItem = null
           this.loadItems()
         } else {
           // Other errors
-          const errorMessage = error.response?.data?.message || 'Failed to delete item'
+          const errorMessage = this.$t('messages.failedDeleteItem') || error.response?.data?.message || 'Failed to delete item'
           this.showToast(errorMessage, 'error')
+          this.deleteDialogOpen = false
+          this.deleteItem = null
         }
       } finally {
         this.submitting = false

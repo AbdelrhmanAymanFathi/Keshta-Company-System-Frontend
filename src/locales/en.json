@@ -15,7 +15,10 @@
     "itemCreated": "Item created successfully",
     "itemUpdated": "Item updated successfully",
     "itemDeleted": "Item deleted successfully",
-    "confirmDeleteItem": "Are you sure you want to delete this item?"
+    "confirmDeleteItem": "Are you sure you want to delete this item?",
+    "itemInUse": "Cannot delete this item. It is being used in exports.",
+    "itemNotFound": "Item not found",
+    "failedDeleteItem": "Failed to delete item"
   },
   "placeholders": {
     "enterItemName": "Enter item name",
@@ -111,6 +114,8 @@
     "to": "to",
     "of": "of",
     "results": "results",
+    "failedLoadItems": "Failed to load items",
+    "failedSaveItem": "Failed to save item",
     "date": "Date",
     "contractor": "Contractor",
     "crusher": "Crusher",

@@ -15,7 +15,10 @@
     "itemCreated": "تم إنشاء الصنف بنجاح",
     "itemUpdated": "تم تحديث الصنف بنجاح",
     "itemDeleted": "تم حذف الصنف بنجاح",
-    "confirmDeleteItem": "هل أنت متأكد من حذف هذا الصنف؟"
+    "confirmDeleteItem": "هل أنت متأكد من حذف هذا الصنف؟",
+    "itemInUse": "لا يمكن حذف هذا الصنف. إنه مستخدم في التوريدات.",
+    "itemNotFound": "الصنف غير موجود",
+    "failedDeleteItem": "فشل حذف الصنف"
   },
   "placeholders": {
     "enterItemName": "أدخل اسم الصنف",
@@ -110,6 +113,8 @@
     "to": "إلى",
     "of": "من",
     "results": "النتائج",
+    "failedLoadItems": "فشل تحميل الأصناف",
+    "failedSaveItem": "فشل حفظ الصنف",
     "date": "التاريخ",
     "contractor": "المقاول",
     "crusher": "الكسارة",
