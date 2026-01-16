@@ -16,6 +16,7 @@ const SuppliesReport = () => import('@/components/dashboard/SuppliesReportNew.vu
 const ContractorsList = () => import('@/components/dashboard/ContractorsList.vue')
 const ContractorStatement = () => import('@/components/dashboard/ContractorStatement.vue')
 const DriversList = () => import('@/components/dashboard/DriversList.vue')
+const ItemList = () => import('@/components/dashboard/ItemList.vue')
 const CrushersList = () => import('@/components/dashboard/CrushersList.vue')
 const VehiclesList = () => import('@/components/dashboard/VehiclesList.vue')
 const TransportList = () => import('@/components/dashboard/TransportList.vue')
@@ -86,6 +87,12 @@ const routes = [
         name: 'drivers-list',
         component: DriversList,
         meta: { title: 'drivers.title' }
+      },
+      {
+        path: 'supplies/items',
+        name: 'items-list',
+        component: ItemList,
+        meta: { title: 'dashboard.itemsList' }
       },
       {
         path: 'supplies/crushers',

@@ -164,6 +164,7 @@ export default {
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'contractors-list' },
           { name: 'contractorStatement', label: 'dashboard.contractorStatement', routeName: 'contractor-statement' },
           { name: 'driversList', label: 'drivers.title', routeName: 'drivers-list' },
+          { name:'ItemsList', label: 'dashboard.itemsList', routeName: 'items-list' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', routeName: 'vehicles-list' },
           { name: 'suppliesReport', label: 'dashboard.suppliesReport', routeName: 'supplies-report' }
         ],

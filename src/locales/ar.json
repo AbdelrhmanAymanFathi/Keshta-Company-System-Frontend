@@ -7,6 +7,20 @@
   "errors": {
     "unknown": "حدث خطأ ما"
   },
+  "validation": {
+    "itemNameRequired": "اسم الصنف مطلوب",
+    "priceRequired": "السعر مطلوب ويجب أن يكون موجباً"
+  },
+  "messages": {
+    "itemCreated": "تم إنشاء الصنف بنجاح",
+    "itemUpdated": "تم تحديث الصنف بنجاح",
+    "itemDeleted": "تم حذف الصنف بنجاح",
+    "confirmDeleteItem": "هل أنت متأكد من حذف هذا الصنف؟"
+  },
+  "placeholders": {
+    "enterItemName": "أدخل اسم الصنف",
+    "enterPrice": "أدخل السعر"
+  },
   "navbar": {
     "supplies": "التوريدات",
     "transport": "النقل",
@@ -29,7 +43,10 @@
     "equipmentRent": "إيجار المعدات",
     "companyWallet": "الخزينة الرئيسيه",
     "expand": "توسيع",
-    "collapse": "طي"
+    "collapse": "طي",
+    "items": "الأصناف",
+    "itemsList": "قائمة الأصناف",
+    "newItem": "صنف جديد"
   },
   "transport": {
     "transportList": "قائمة النقل",
@@ -70,6 +87,7 @@
     "deletedSuccessfully": "تم حذف النقل بنجاح"
   },
   "labels": {
+    "noDataFound": "لم يتم العثور على بيانات",
     "logout": "تسجيل الخروج",
     "close": "إغلاق",
     "add": "إضافة",
@@ -111,16 +129,18 @@
     "companyTicket": "تذكرة الشركة",
     "companyCapacity": "تكعيبة الشركة",
     "crusherCapacity": "تكعيبة الكسارة",
+    "createdAt": "تاريخ الإنشاء",
     "unitPrice": "سعر الوحدة",
     "category": "الفئة",
+    "new":"انشاء",
     "notes": "ملاحظات",
     "rowTotal": "المجموع",
     "accumulativeTotal": "المجموع التراكمي",
     "#": "#",
     "search": "بحث",
     "refresh": "تحديث",
-  "componentNotFound": "المكون غير موجود",
-  "componentNotFoundDesc": "هذا المكون غير مسجّل في النظام.",
+    "componentNotFound": "المكون غير موجود",
+    "componentNotFoundDesc": "هذا المكون غير مسجّل في النظام.",
     "download": "تحميل",
     "downloading": "جاري التحميل",
     "noData": "لا توجد بيانات",
@@ -465,7 +485,7 @@
     "pageSize": "العناصر في الصفحة",
     "goToPage": "الذهاب إلى الصفحة",
     "totalRentals": "إجمالي الإيجارات",
-        "totalCount": "إجمالي الإيجارات",
+    "totalCount": "إجمالي الإيجارات",
     "totalSum": "المجموع الكلي",
     "type": "النوع",
     "filterBy": "تصفية حسب",
@@ -530,8 +550,8 @@
     "fromBranch": "من الفرع",
     "to": "إلى",
     "selectBranch": "اختر الفرع",
-    "transferAmount": "مبلغ التحويل"
-    ,"showSidebar": "إظهار المحافظ",
+    "transferAmount": "مبلغ التحويل",
+    "showSidebar": "إظهار المحافظ",
     "hideSidebar": "إخفاء المحافظ"
   },
   "company": {
@@ -578,8 +598,8 @@
     "remaining": "المتبقي",
     "notSettled": "غير مسدد",
     "report": "التقرير",
-  "reportTitle": "تقرير المصروفات",
-  "reportDescription": "قم بتنزيل تقرير إكسل لكل المصروفات.",
+    "reportTitle": "تقرير المصروفات",
+    "reportDescription": "قم بتنزيل تقرير إكسل لكل المصروفات.",
     "exportReport": "تصدير التقرير",
     "selectLocation": "اختر مكان الحفظ",
     "selectSaveLocation": "اختر مكان الحفظ",
