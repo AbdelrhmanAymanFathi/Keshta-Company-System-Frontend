@@ -1,11 +1,11 @@
 <template>
-  <!-- الزر اللي بيفتح الـ Modal (يمكنك إزالته أو تغيير مكانه حسب الصفحة) -->
+  <!-- Button to open the Modal (you can remove or change it depending on the page) -->
   <button v-if="showTriggerButton" @click="openModal"
     class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition">
     {{ triggerButtonText }}
   </button>
 
-  <!-- الـ Modal -->
+  <!-- Modal -->
   <teleport to="body">
     <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
       @click.self="closeModal">
@@ -21,7 +21,7 @@
 
         <!-- Body -->
         <div class="flex-1 overflow-y-auto p-6">
-          <!-- الجدول -->
+          <!-- Table -->
           <div class="overflow-x-auto mb-8">
             <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border">
               <thead class="bg-indigo-50 sticky top-0 z-10">
@@ -47,14 +47,14 @@
                 <tr v-for="(row, index) in rows" :key="row.id">
                   <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
-                  <!-- 0: Date -->
+                  <!-- Date -->
                   <td class="px-3 py-2">
                     <input type="date" v-model="row.date"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
-                  <!-- 1: الموقع -->
+                  <!-- Site -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.site" @change="onSiteChange(row)"
@@ -71,7 +71,7 @@
                     </div>
                   </td>
 
-                  <!-- 2: المنطقة -->
+                  <!-- Area -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.area" :disabled="!row.site || row.site === '__new__'"
@@ -90,7 +90,7 @@
                     </div>
                   </td>
 
-                  <!-- 3: المقاول -->
+                  <!-- Contractor -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.contractor" @change="onContractorChange(row)"
@@ -107,7 +107,7 @@
                     </div>
                   </td>
 
-                  <!-- 4: الكسارة -->
+                  <!-- Crusher -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.crusher" @change="onCrusherChange(row)"
@@ -124,7 +124,7 @@
                     </div>
                   </td>
 
-                  <!-- 5: المركبة -->
+                  <!-- Vehicle -->
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.vehicle" @change="onVehicleSelect(row)"
@@ -141,42 +141,42 @@
                     </div>
                   </td>
 
-                  <!-- 6: crusherBon -->
+                  <!-- Crusher Bon -->
                   <td class="px-3 py-2">
                     <input type="text" v-model="row.crusherBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
-                  <!-- 7: companyBon -->
+                  <!-- Company Bon -->
                   <td class="px-3 py-2">
                     <input type="text" v-model="row.companyBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
-                  <!-- 8: discount -->
+                  <!-- Discount -->
                   <td class="px-3 py-2">
                     <input type="number" v-model.number="row.discount"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
-                  <!-- 9: price -->
+                  <!-- Price -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.price"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                       placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
-                  <!-- 10: cubic -->
+                  <!-- Cubic -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.cubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                       placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
-                  <!-- 11: crusherCubic (آخر حقل) -->
+                  <!-- Crusher Cubic -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.crusherCubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
@@ -206,7 +206,7 @@
             </table>
           </div>
 
-          <!-- الإجماليات -->
+          <!-- Totals -->
           <div class="mt-8 text-start space-y-1 text-sm">
             <div class="flex justify-end gap-8">
               <span class="text-gray-600">{{ $t('supply.subtotal') }}:</span>
@@ -222,7 +222,7 @@
             </div>
           </div>
 
-          <!-- زر الحفظ -->
+          <!-- Save Button -->
           <div class="mt-10 flex justify-end">
             <button @click="saveData" :disabled="isSaving"
               class="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl text-xl font-medium shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
@@ -237,7 +237,7 @@
     </div>
   </teleport>
 
-  <!-- Dialog: إضافة موقع -->
+  <!-- Dialog: Add Site -->
   <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
@@ -253,7 +253,7 @@
     </div>
   </div>
 
-  <!-- Dialog: إضافة منطقة -->
+  <!-- Dialog: Add Area -->
   <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
@@ -269,7 +269,7 @@
     </div>
   </div>
 
-  <!-- Dialog: إضافة مقاول -->
+  <!-- Dialog: Add Contractor -->
   <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
@@ -287,7 +287,7 @@
     </div>
   </div>
 
-  <!-- Dialog: إضافة كسارة -->
+  <!-- Dialog: Add Crusher -->
   <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
@@ -304,7 +304,7 @@
     </div>
   </div>
 
-  <!-- Dialog: إضافة مركبة -->
+  <!-- Dialog: Add Vehicle -->
   <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
     <div class="bg-white p-6 rounded shadow w-full max-w-md">
       <h3 class="text-lg font-bold mb-3">{{ $t('vehicles.addVehicle') }}</h3>
@@ -403,13 +403,13 @@ export default {
       },
       vehicleDialogError: '',
       creatingVehicle: false,
-      // الإضافة الجديدة لإصلاح مشكلة this.$el
+      // Reference to table element
       tableRef: null
     }
   },
   computed: {
     subtotal() {
-      // المجموع الفرعي = مجموع (السعر × التكعيب) لكل صف
+      // Subtotal = sum of (price × cubic) for each row
       return this.rows.reduce((sum, row) => {
         const p = Number(row.price || 0)
         const c = Number(row.cubic || 0)
@@ -417,7 +417,7 @@ export default {
       }, 0)
     },
     totalDiscount() {
-      // إجمالي الخصم = مجموع (الخصم × السعر) لكل صف
+      // Total discount = sum of (discount × price) for each row
       return this.rows.reduce((sum, row) => {
         const d = Number(row.discount || 0)
         const p = Number(row.price || 0)
@@ -432,7 +432,7 @@ export default {
     }
   },
   async mounted() {
-    // إنشاء الصف الأول عند التحميل
+    // Create first row on load
     this.rows = [this.createEmptyRow()]
   },
   methods: {
@@ -456,6 +456,7 @@ export default {
       }
     },
     createEmptyRow() {
+      // Initialize empty row with default values
       return {
         id: Date.now() + Math.random(),
         date: '',
@@ -488,7 +489,7 @@ export default {
         !row.cubic &&
         !row.crusherCubic
     },
-    // التحقق من الحقول المطلوبة فقط
+    // Check required fields only
     getMissingRequiredFields(row) {
       const missing = []
       if (!row.date) missing.push(this.$t('labels.date'))
@@ -506,16 +507,16 @@ export default {
       if (cubic <= 0) missing.push(this.$t('labels.cubic') + ' (يجب أن تكون > 0)')
       return missing
     },
-    // فحص التحذيرات (تحذيرات - لا تمنع الحفظ)
+    // Check warnings (warnings - do not prevent saving)
     getWarnings(row) {
       const warnings = []
-      // إذا كان crusherCubic فارغ، يجب أن ننبهه
+      // If crusherCubic is empty, notify user
       if (!row.crusherCubic) {
-        warnings.push(this.$t('labels.crusherCubic') + ' (اختياري)')
+        warnings.push(this.$t('labels.crusherCubic') + ' (optional)')
       }
-      // إذا كان area فارغ
+      // If area is empty
       if (!row.area) {
-        warnings.push(this.$t('labels.area') + ' (اختياري)')
+        warnings.push(this.$t('labels.area') + ' (optional)')
       }
       return warnings
     },
@@ -526,7 +527,7 @@ export default {
         this.sites = this.allLocations.filter(l => !l.parentId)
         this.rows.forEach(row => this.updateAvailableAreas(row))
       } catch (err) {
-        console.warn('refreshLocations failed', err)
+        console.warn('Failed to refresh locations', err)
       }
     },
     updateAvailableAreas(row) {
@@ -633,6 +634,7 @@ export default {
         row.crusherCubic = ''
         return
       }
+      // Set cubic capacity from vehicle
       row.cubic = Number(row.vehicle.cubicCapacity ?? row.vehicle.cubic ?? 0)
       row.crusherCubic = row.vehicle.crusherCubic ? Number(row.vehicle.crusherCubic) : ''
     },
@@ -641,14 +643,15 @@ export default {
       const c = Number(row.cubic || 0)
       const d = Number(row.discount || 0)
       const subtotal = p * c
-      const discountAmount = d * p // الخصم = رقم الخصم × السعر
+      // Discount = discount number × price
+      const discountAmount = d * p
       return Math.max(0, subtotal - discountAmount)
     },
     formatNumber(v) {
       return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
 
-    // ✅ دالة معالجة الضغط على Enter في أي حقل - إضافة صف جديد فوراً
+    // Handle Enter key press in any field - add new row immediately
     handleEnterKey(rowIndex) {
       this.addRow()
 
@@ -689,11 +692,11 @@ export default {
         this.isSaving = false
         return
       }
-      // التحقق من الحقول المطلوبة
+      // Check required fields
       for (const [i, r] of toSave.entries()) {
         const missing = this.getMissingRequiredFields(r)
         if (missing.length > 0) {
-          this.saveError = `الصف ${i + 1}: الحقول المطلوبة (${missing.join(', ')})`
+          this.saveError = `Row ${i + 1}: Required fields (${missing.join(', ')})`
           this.isSaving = false
           return
         }
@@ -703,6 +706,7 @@ export default {
           const locationId = r.area?.id || r.site?.id
           if (!locationId) continue
           
+          // Parse numeric values
           const price = Number(r.price || 0)
           const cubic = Number(r.cubic || 0)
           const discount = Number(r.discount || 0)
@@ -725,7 +729,7 @@ export default {
         alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.resetRows()
         this.closeModal()
-        this.$emit('saved') // إشعار الصفحة الأم بالحفظ
+        this.$emit('saved') // Notify parent of save
       } catch (err) {
         console.error('saveData error:', err)
         this.saveError = err?.response?.data?.message || this.$t('common.saveError') || 'Error saving'
