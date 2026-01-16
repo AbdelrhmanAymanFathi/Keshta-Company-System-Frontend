@@ -144,7 +144,11 @@
     "crusherName": "اسم الكسارة",
     "vehicleName": "اسم المركبة",
     "selectContractor": "اختر المقاول",
-    "cubicCapacity": "تكعيب الشركة"
+    "cubicCapacity": "تكعيب الشركة",
+    "item": "الصنف",
+    "itemName": "اسم الصنف",
+    "addExportItem": "إضافة صنف",
+    "currentPrice": "السعر الحالي"
   },
   "common": {
     "requiredFields": "الحقول المطلوبة",

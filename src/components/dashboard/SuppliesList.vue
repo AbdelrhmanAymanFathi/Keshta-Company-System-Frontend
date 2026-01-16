@@ -15,6 +15,7 @@
           <tr>
             <th class="p-3 text-start">#</th>
             <th class="p-3 text-start">{{ $t('labels.date') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.item') }}</th>
             <th class="p-3 text-start">{{ $t('labels.contractor') }}</th>
             <th class="p-3 text-start">{{ $t('labels.crusher') }}</th>
             <th class="p-3 text-start">{{ $t('labels.location') }}</th>
@@ -34,6 +35,7 @@
             @contextmenu.prevent="onRowContextMenu($event, s)">
             <td class="p-3 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="p-3 text-start">{{ formatDate(s.date) }}</td>
+            <td class="p-3 text-start">{{ s.item?.name || '-' }}</td>
             <td class="p-3 text-start">{{ s.contractor?.name || '-' }}</td>
             <td class="p-3 text-start">{{ s.crusher?.name || '-' }}</td>
             <td class="p-3 text-start">{{ s.location?.name || '-' }}</td>
@@ -52,7 +54,7 @@
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3 text-start" :colspan="14">
+            <td class="p-3 text-start" :colspan="15">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>

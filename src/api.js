@@ -512,6 +512,10 @@ export const getDeliveries = (params = {}) => {
 };
 export const createDelivery = (data) =>
   axios.post(`${BASE_URL}/api/exports`, data);
+
+export const createExport = (data) =>
+  axios.post(`${BASE_URL}/api/exports`, data);
+
 export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
 
@@ -1039,3 +1043,19 @@ export const downloadTransportReport = async (params = {}) => {
 // --- Additional API helpers ---
 export const getTransportById = (id) =>
   axios.get(`${BASE_URL}/api/transports/${id}`);
+
+// --- Export Items API ---
+export const getExportItems = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/exports-items${search ? `?${search}` : ''}`;
+  return axios.get(url);
+};
+
+export const createExportItem = (data) =>
+  axios.post(`${BASE_URL}/api/exports-items`, data);
+
+export const updateExportItem = (id, data) =>
+  axios.put(`${BASE_URL}/api/exports-items/${id}`, data);
+
+export const deleteExportItem = (id) =>
+  axios.delete(`${BASE_URL}/api/exports-items/${id}`);

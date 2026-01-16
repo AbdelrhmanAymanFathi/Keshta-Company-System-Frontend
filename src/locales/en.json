@@ -144,7 +144,11 @@
     "crusherName": "Crusher Name",
     "vehicleName": "Vehicle Name",
     "selectContractor": "Select Contractor",
-    "cubicCapacity": "Cubic Capacity"
+    "cubicCapacity": "Cubic Capacity",
+    "item": "Item",
+    "itemName": "Item Name",
+    "addExportItem": "Add Item",
+    "currentPrice": "Current Price"
   },
   "common": {
     "requiredFields": "Required fields",

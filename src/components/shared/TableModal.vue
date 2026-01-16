@@ -28,6 +28,7 @@
                 <tr>
                   <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
                   <th class="px-3 py-3 text-start">{{ $t('labels.date') }}</th>
+                  <th class="px-3 py-3 text-start">{{ $t('labels.item') }}</th>
                   <th class="px-3 py-3 text-start">{{ $t('labels.site') }}</th>
                   <th class="px-3 py-3 text-start">{{ $t('labels.area') }}</th>
                   <th class="px-3 py-3 text-start">{{ $t('labels.contractor') }}</th>
@@ -52,6 +53,23 @@
                     <input type="date" v-model="row.date"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       @keydown.enter.prevent="handleEnterKey(index)" />
+                  </td>
+
+                  <!-- Item -->
+                  <td class="px-3 py-2">
+                    <div class="flex items-center gap-1">
+                      <select v-model="row.item" @change="onItemSelect(row)"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        @keydown.enter.prevent="handleEnterKey(index)">
+                        <option :value="null">{{ $t('labels.item') }} —</option>
+                        <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})</option>
+                        <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
+                      </select>
+                      <button v-if="row.item === '__new__'" @click="showAddExportItemDialog = true"
+                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        +
+                      </button>
+                    </div>
                   </td>
 
                   <!-- Site -->
@@ -331,6 +349,26 @@
       <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
     </div>
   </div>
+
+  <!-- Dialog: Add Export Item -->
+  <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div class="bg-white p-6 rounded shadow w-96">
+      <h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3>
+      <input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'"
+        class="w-full border rounded px-2 py-1 mb-3" />
+      <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01"
+        :placeholder="$t('labels.price')" class="w-full border rounded px-2 py-1 mb-3" />
+      <div class="flex gap-2 justify-end">
+        <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+        }}</button>
+        <button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
+        </button>
+      </div>
+      <div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -344,7 +382,9 @@ import {
   createDelivery,
   createContractor,
   createCrusher,
-  createVehicle
+  createVehicle,
+  getExportItems,
+  createExportItem
 } from '@/api'
 
 export default {
@@ -378,6 +418,7 @@ export default {
       contractorsWithVehicles: [],
       crushers: [],
       vehicles: [],
+      exportItems: [],
       saveError: '',
       showAddSite: false,
       newSiteName: '',
@@ -403,6 +444,13 @@ export default {
       },
       vehicleDialogError: '',
       creatingVehicle: false,
+      showAddExportItemDialog: false,
+      newExportItemForm: {
+        name: '',
+        currentPrice: ''
+      },
+      exportItemDialogError: '',
+      creatingExportItem: false,
       // Reference to table element
       tableRef: null
     }
@@ -449,7 +497,8 @@ export default {
       try {
         await Promise.all([
           this.refreshLocations(),
-          this.loadLookups()
+          this.loadLookups(),
+          this.loadExportItems()
         ])
       } catch (err) {
         console.error('Failed to load initial data:', err)
@@ -466,6 +515,7 @@ export default {
         contractor: null,
         crusher: null,
         vehicle: null,
+        item: null,
         crusherBon: '',
         companyBon: '',
         discount: 0,
@@ -482,6 +532,7 @@ export default {
         !row.contractor &&
         !row.crusher &&
         !row.vehicle &&
+        !row.item &&
         !row.crusherBon?.trim() &&
         !row.companyBon?.trim() &&
         !row.discount &&
@@ -497,6 +548,7 @@ export default {
       if (!row.contractor) missing.push(this.$t('labels.contractor'))
       if (!row.crusher) missing.push(this.$t('labels.crusher'))
       if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
+      if (!row.item) missing.push(this.$t('labels.item') || 'item')
       if (!row.crusherBon?.trim()) missing.push(this.$t('labels.crusherBon'))
       if (!row.companyBon?.trim()) missing.push(this.$t('labels.companyBon'))
       const discount = Number(row.discount || 0)
@@ -590,6 +642,14 @@ export default {
         this.addingLocation = false
       }
     },
+    async loadExportItems() {
+      try {
+        const res = await getExportItems()
+        this.exportItems = Array.isArray(res.data) ? res.data : []
+      } catch (err) {
+        console.warn('Failed to load export items', err)
+      }
+    },
     async loadLookups() {
       try {
         const [cRes, cvRes, crushRes, vRes] = await Promise.all([
@@ -637,6 +697,15 @@ export default {
       // Set cubic capacity from vehicle
       row.cubic = Number(row.vehicle.cubicCapacity ?? row.vehicle.cubic ?? 0)
       row.crusherCubic = row.vehicle.crusherCubic ? Number(row.vehicle.crusherCubic) : ''
+    },
+    onItemSelect(row) {
+      if (!row.item || row.item === '__new__') {
+        return
+      }
+      // Auto-populate price from item's currentPrice
+      if (row.item.currentPrice) {
+        row.price = Number(row.item.currentPrice)
+      }
     },
     totalPerRow(row) {
       const p = Number(row.price || 0)
@@ -723,7 +792,8 @@ export default {
             crusherCubic: r.crusherCubic ? Number(r.crusherCubic) : null,
             unitPrice: price > 0 ? price : null,
             discount: discount >= 0 ? discount : null,
-            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null
+            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
+            itemId: r.item?.id ? Number(r.item.id) : null
           })
         }
         alert(this.$t('labels.saved') || 'Saved successfully ✅')
@@ -825,6 +895,38 @@ export default {
         this.vehicleDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
       } finally {
         this.creatingVehicle = false
+      }
+    },
+    async createNewExportItem() {
+      const { name, currentPrice } = this.newExportItemForm
+      if (!name.trim() || !currentPrice) {
+        this.exportItemDialogError = this.$t('common.saveError') || 'Error'
+        return
+      }
+      this.creatingExportItem = true
+      this.exportItemDialogError = ''
+      try {
+        const res = await createExportItem({
+          name: name.trim(),
+          currentPrice: Number(currentPrice)
+        })
+        const newItem = res?.data
+        if (!newItem || !newItem.id) {
+          throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
+        }
+        this.exportItems = [...this.exportItems, newItem]
+        const row = this.rows.find(r => r.item === '__new__')
+        if (row) {
+          row.item = newItem
+          this.onItemSelect(row)
+        }
+        this.newExportItemForm = { name: '', currentPrice: '' }
+        this.showAddExportItemDialog = false
+        await this.loadExportItems()
+      } catch (e) {
+        this.exportItemDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
+      } finally {
+        this.creatingExportItem = false
       }
     }
   }
