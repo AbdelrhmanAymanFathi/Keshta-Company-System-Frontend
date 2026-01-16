@@ -428,59 +428,59 @@
               <thead class="bg-gray-50">
                 <tr>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.date') || 'Date' }}
                   </th>
                   <!-- <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.type') || 'Type' }}
                   </th> -->
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.category') || 'Category' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.subcategory') || 'Subcategory' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.classification') || 'Classification' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.description') || 'Description' }}
                   </th>
                   <!-- Branch column (before Amount) -->
-                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.branch') || 'Branch' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.amount') || 'Amount' }}
                   </th>
                   <!-- Flow column (after Amount) -->
-                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.flow') || 'Flow' }}
                   </th>
-                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                  <th :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.kindLabel') || 'Kind' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.notes') || 'Notes' }}
                   </th>
                   <!-- New columns: Location, Signed, Classification -->
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.settlementDate') || 'Settlement Date' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('expenses.settlementStatus.label') || 'Status' }}
                   </th>
                   <th
-                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                    :class="['px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
                     {{ $t('labels.location') || 'Location' }}
                   </th>
                 </tr>
