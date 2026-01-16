@@ -114,8 +114,6 @@
     "unitPrice": "Unit Price",
     "category": "Category",
     "notes": "Notes",
-    "companyCapacity": "Company Capacity",
-    "crusherCapacity": "Crusher Capacity",
     "rowTotal": "Row Total",
     "accumulativeTotal": "Accumulative Total",
     "#": "#",
@@ -150,9 +148,7 @@
   },
   "common": {
     "requiredFields": "Required fields",
-    "rowError": "Row"
-  },
-  "common": {
+    "rowError": "Row",
     "error": "Error",
     "create": "Create",
     "update": "Update",

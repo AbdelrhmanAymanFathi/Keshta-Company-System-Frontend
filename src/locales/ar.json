@@ -114,8 +114,6 @@
     "unitPrice": "سعر الوحدة",
     "category": "الفئة",
     "notes": "ملاحظات",
-    "companyCapacity": "تكعيبة الشركة",
-    "crusherCapacity": "تكعيبة الكسارة",
     "rowTotal": "المجموع",
     "accumulativeTotal": "المجموع التراكمي",
     "#": "#",
@@ -150,9 +148,7 @@
   },
   "common": {
     "requiredFields": "الحقول المطلوبة",
-    "rowError": "الصف"
-  },
-  "common": {
+    "rowError": "الصف",
     "error": "خطأ",
     "create": "إنشاء",
     "update": "تحديث",
@@ -425,7 +421,6 @@
     "addNewCrusher": "إضافة كسارة جديدة",
     "newCrusherNamePlaceholder": "أدخل اسم الكسارة",
     "crusherCreateError": "خطأ في إنشاء الكسارة",
-    "selectDriver": "اختر سائق",
     "addNewDriver": "إضافة سائق جديد",
     "newDriverNamePlaceholder": "أدخل اسم السائق",
     "driverCreateError": "خطأ في إنشاء السائق",
