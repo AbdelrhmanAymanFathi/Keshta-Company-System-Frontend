@@ -51,7 +51,7 @@
                   <td class="px-3 py-2">
                     <input type="date" v-model="row.date"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="focusNext(index, 0)" />
+                      @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- 1: الموقع -->
@@ -59,7 +59,7 @@
                     <div class="flex items-center gap-1">
                       <select v-model="row.site" @change="onSiteChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 1)">
+                        @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.site') }} —</option>
                         <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') }}</option>
@@ -76,7 +76,7 @@
                     <div class="flex items-center gap-1">
                       <select v-model="row.area" :disabled="!row.site || row.site === '__new__'"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        @keydown.enter.prevent="focusNext(index, 2)">
+                        @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.area') }} —</option>
                         <option v-for="a in row.availableAreas" :key="a.id" :value="a">{{ a.name }}</option>
                         <option value="__new__" style="color: #10b981;" :disabled="!row.site || row.site === '__new__'">
@@ -95,7 +95,7 @@
                     <div class="flex items-center gap-1">
                       <select v-model="row.contractor" @change="onContractorChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 3)">
+                        @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.contractor') }} —</option>
                         <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
@@ -112,7 +112,7 @@
                     <div class="flex items-center gap-1">
                       <select v-model="row.crusher" @change="onCrusherChange(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 4)">
+                        @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.crusher') }} —</option>
                         <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
@@ -129,7 +129,7 @@
                     <div class="flex items-center gap-1">
                       <select v-model="row.vehicle" @change="onVehicleSelect(row)"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="focusNext(index, 5)">
+                        @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.vehicle') }} —</option>
                         <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
@@ -145,42 +145,42 @@
                   <td class="px-3 py-2">
                     <input type="text" v-model="row.crusherBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="focusNext(index, 6)" />
+                      @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- 7: companyBon -->
                   <td class="px-3 py-2">
                     <input type="text" v-model="row.companyBon"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="focusNext(index, 7)" />
+                      @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- 8: discount -->
                   <td class="px-3 py-2">
                     <input type="number" v-model.number="row.discount"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      placeholder="0" @keydown.enter.prevent="focusNext(index, 8)" />
+                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- 9: price -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.price"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0" @keydown.enter.prevent="focusNext(index, 9)" />
+                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- 10: cubic -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.cubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0" @keydown.enter.prevent="focusNext(index, 10)" />
+                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- 11: crusherCubic (آخر حقل) -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.crusherCubic"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="-" @keydown.enter.prevent="handleLastFieldEnter(index)" />
+                      placeholder="-" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- Total -->
@@ -277,7 +277,7 @@
         :placeholder="$t('contractors.name')" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
@@ -294,7 +294,7 @@
       <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
@@ -321,7 +321,7 @@
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewVehicle"
           :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
           class="bg-green-600 text-white px-3 py-1 rounded">
@@ -617,45 +617,8 @@ export default {
       return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
 
-    // ✅ الدالة المُصححة - استخدام tableRef بدلاً من this.$el
-    focusNext(rowIndex, colIndex) {
-      const nextCol = colIndex + 1
-      if (nextCol > 11) return // آخر عمود قابل للتنقل
-
-      this.$nextTick(() => {
-        if (!this.tableRef) {
-          console.warn('tableRef غير جاهز بعد')
-          return
-        }
-
-        const rows = this.tableRef.querySelectorAll('tbody tr')
-        const currentRow = rows[rowIndex]
-        if (!currentRow) {
-          console.warn('الصف غير موجود:', rowIndex)
-          return
-        }
-
-        const focusable = currentRow.querySelectorAll('input, select')
-        const nextElement = focusable[nextCol]
-
-        if (nextElement) {
-          nextElement.focus()
-          // تحسين UX: فتح الـ select تلقائياً
-          if (nextElement.tagName === 'SELECT' && !nextElement.disabled) {
-            nextElement.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
-            nextElement.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-          }
-        } else {
-          console.warn('العنصر التالي غير موجود:', nextCol)
-        }
-      })
-    },
-
-    // ✅ دالة آخر حقل - إضافة صف جديد وفوكس أوله
-    handleLastFieldEnter(rowIndex) {
-      const row = this.rows[rowIndex]
-      if (!row || this.isRowEmpty(row)) return
-
+    // ✅ دالة معالجة الضغط على Enter في أي حقل - إضافة صف جديد فوراً
+    handleEnterKey(rowIndex) {
       this.addRow()
 
       this.$nextTick(() => {
@@ -836,7 +799,6 @@ export default {
 .no-spinner {
   -moz-appearance: textfield;
 }
-
 
 input:focus,
 select:focus {

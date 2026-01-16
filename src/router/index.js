@@ -51,12 +51,12 @@ const routes = [
     meta: { requiresAuth: true, title: 'appName' },
     children: [
       // ==================== Supplies Module ====================
-      // {
-      //   path: 'supplies/new',
-      //   name: 'new-supply',
-      //   component: NewSupply,
-      //   meta: { title: 'dashboard.newSupply' }
-      // },
+      {
+        path: 'supplies/new',
+        name: 'new-supply',
+        component: NewSupply,
+        meta: { title: 'dashboard.newSupply' }
+      },
       {
         path: 'supplies/list',
         name: 'supplies-list',
