@@ -10,7 +10,7 @@ const Login = () => import('@/views/Login.vue')
 const Dashboard = () => import("@/views/Dashboard.vue")
 
 // Dashboard Pages - Lazy Loading for better performance
-const NewSupply = () => import('@/components/dashboard/NewSupply.vue')
+// const NewSupply = () => import('@/components/dashboard/NewSupply.vue')
 const SuppliesList = () => import('@/components/dashboard/SuppliesList.vue')
 const SuppliesReport = () => import('@/components/dashboard/SuppliesReportNew.vue')
 const ContractorsList = () => import('@/components/dashboard/ContractorsList.vue')
@@ -52,12 +52,12 @@ const routes = [
     meta: { requiresAuth: true, title: 'appName' },
     children: [
       // ==================== Supplies Module ====================
-      {
-        path: 'supplies/new',
-        name: 'new-supply',
-        component: NewSupply,
-        meta: { title: 'dashboard.newSupply' }
-      },
+      // {
+      //   path: 'supplies/new',
+      //   name: 'new-supply',
+      //   component: NewSupply,
+      //   meta: { title: 'dashboard.newSupply' }
+      // },
       {
         path: 'supplies/list',
         name: 'supplies-list',
