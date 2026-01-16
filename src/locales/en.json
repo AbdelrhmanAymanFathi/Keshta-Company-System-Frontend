@@ -149,6 +149,10 @@
     "cubicCapacity": "Cubic Capacity"
   },
   "common": {
+    "requiredFields": "Required fields",
+    "rowError": "Row"
+  },
+  "common": {
     "error": "Error",
     "create": "Create",
     "update": "Update",

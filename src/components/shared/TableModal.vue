@@ -488,6 +488,37 @@ export default {
         !row.cubic &&
         !row.crusherCubic
     },
+    // التحقق من الحقول المطلوبة فقط
+    getMissingRequiredFields(row) {
+      const missing = []
+      if (!row.date) missing.push(this.$t('labels.date'))
+      if (!row.site) missing.push(this.$t('labels.site'))
+      if (!row.contractor) missing.push(this.$t('labels.contractor'))
+      if (!row.crusher) missing.push(this.$t('labels.crusher'))
+      if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
+      if (!row.crusherBon?.trim()) missing.push(this.$t('labels.crusherBon'))
+      if (!row.companyBon?.trim()) missing.push(this.$t('labels.companyBon'))
+      const discount = Number(row.discount || 0)
+      const price = Number(row.price || 0)
+      const cubic = Number(row.cubic || 0)
+      if (discount < 0) missing.push(this.$t('labels.discount') + ' (يجب أن تكون >= 0)')
+      if (price <= 0) missing.push(this.$t('labels.price') + ' (يجب أن تكون > 0)')
+      if (cubic <= 0) missing.push(this.$t('labels.cubic') + ' (يجب أن تكون > 0)')
+      return missing
+    },
+    // فحص التحذيرات (تحذيرات - لا تمنع الحفظ)
+    getWarnings(row) {
+      const warnings = []
+      // إذا كان crusherCubic فارغ، يجب أن ننبهه
+      if (!row.crusherCubic) {
+        warnings.push(this.$t('labels.crusherCubic') + ' (اختياري)')
+      }
+      // إذا كان area فارغ
+      if (!row.area) {
+        warnings.push(this.$t('labels.area') + ' (اختياري)')
+      }
+      return warnings
+    },
     async refreshLocations() {
       try {
         const res = await getLocations()
@@ -658,9 +689,11 @@ export default {
         this.isSaving = false
         return
       }
+      // التحقق من الحقول المطلوبة
       for (const [i, r] of toSave.entries()) {
-        if (!r.date || !r.site || !r.contractor || !r.crusher || !r.vehicle) {
-          this.saveError = `${this.$t('common.saveError') || 'Error'} ${i + 1}`
+        const missing = this.getMissingRequiredFields(r)
+        if (missing.length > 0) {
+          this.saveError = `الصف ${i + 1}: الحقول المطلوبة (${missing.join(', ')})`
           this.isSaving = false
           return
         }
@@ -669,6 +702,11 @@ export default {
         for (const r of toSave) {
           const locationId = r.area?.id || r.site?.id
           if (!locationId) continue
+          
+          const price = Number(r.price || 0)
+          const cubic = Number(r.cubic || 0)
+          const discount = Number(r.discount || 0)
+          
           await createDelivery({
             crusherId: Number(r.crusher.id),
             contractorId: Number(r.contractor.id),
@@ -676,11 +714,11 @@ export default {
             date: r.date,
             crusherTicket: r.crusherBon || null,
             companyTicket: r.companyBon || null,
-            companyCapacity: Number(r.cubic) || 0,
-            crusherCapacity: Number(r.cubic) || 0,
+            companyCapacity: cubic > 0 ? cubic : null,
+            crusherCapacity: cubic > 0 ? cubic : null,
             crusherCubic: r.crusherCubic ? Number(r.crusherCubic) : null,
-            unitPrice: Number(r.price) || 0,
-            discount: Number(r.discount) || 0,
+            unitPrice: price > 0 ? price : null,
+            discount: discount >= 0 ? discount : null,
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null
           })
         }

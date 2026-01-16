@@ -149,6 +149,10 @@
     "cubicCapacity": "تكعيب الشركة"
   },
   "common": {
+    "requiredFields": "الحقول المطلوبة",
+    "rowError": "الصف"
+  },
+  "common": {
     "error": "خطأ",
     "create": "إنشاء",
     "update": "تحديث",
