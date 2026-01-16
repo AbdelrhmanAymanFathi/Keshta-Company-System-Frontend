@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
-const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
 // const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
