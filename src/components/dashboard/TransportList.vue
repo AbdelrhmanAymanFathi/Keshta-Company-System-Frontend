@@ -38,37 +38,37 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.date') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.contractor') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.route') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.category') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.trips') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.distance') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.vehicleCapacity') || 'Capacity' }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.rate') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.discount') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('transport.total') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('common.actions') }}
               </th>
             </tr>
