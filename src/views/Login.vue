@@ -223,7 +223,7 @@ export default {
             localStorage.removeItem('rememberMe')
           }
 
-          this.$router.push({ name: 'new-supply' })
+          this.$router.push({ name: 'supplies-list' })
           
           // Emit success event
           this.$emit('auth-success', result.data.accessToken)
