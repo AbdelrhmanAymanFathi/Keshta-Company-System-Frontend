@@ -110,16 +110,16 @@
         <table class="min-w-full divide-y divide-gray-200 table-auto">
           <thead class="bg-gray-50">
             <tr>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.date') }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.type') || 'Type' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.location') || 'Location' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.category') || 'Category' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.description') || 'Description' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.total') || 'Amount' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('expenses.notes') || 'Notes' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.type') || 'Type' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') || 'Location' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.category') || 'Category' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') || 'Description' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') || 'Amount' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') || 'Notes' }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
