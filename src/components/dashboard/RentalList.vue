@@ -159,34 +159,34 @@
           <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50" :class="{ 'direction-rtl': isRTL }">
             <tr>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.date') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.equipment') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.name') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.type') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.hours') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.hourlyRate') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.total') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider" :class="{ 'text-right': isRTL }">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
                 {{ $t('rental.paid') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 {{ $t('rental.remaining') }}
               </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 {{ $t('rental.notes') }}
               </th>
               <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
