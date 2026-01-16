@@ -13,48 +13,48 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-indigo-50">
           <tr>
-            <th class="p-3 text-start">#</th>
-            <th class="p-3 text-start">{{ $t('labels.date') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.item') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.contractor') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.crusher') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.location') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.vehicle') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.crusherTicket') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.companyTicket') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.companyCapacity') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.crusherCapacity') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.unitPrice') }}</th>
-            <th class="p-3 text-start">{{ $t('labels.discount') }}</th>
-            <!-- <th class="p-3 text-start">{{ $t('labels.notes') }}</th> -->
-            <th class="p-3 text-start">{{ $t('labels.actions') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.contractor') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusher') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusherTicket') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.companyTicket') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.companyCapacity') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusherCapacity') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.unitPrice') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.discount') }}</th>
+            <!-- <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50"
             @contextmenu.prevent="onRowContextMenu($event, s)">
-            <td class="p-3 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="p-3 text-start">{{ formatDate(s.date) }}</td>
-            <td class="p-3 text-start">{{ s.item?.name || '-' }}</td>
-            <td class="p-3 text-start">{{ s.contractor?.name || '-' }}</td>
-            <td class="p-3 text-start">{{ s.crusher?.name || '-' }}</td>
-            <td class="p-3 text-start">{{ s.location?.name || '-' }}</td>
-            <td class="p-3 text-start">{{ s.vehicle?.name || '-' }}</td>
-            <td class="p-3 text-start">{{ s.crusherTicket || '-' }}</td>
-            <td class="p-3 text-start">{{ s.companyTicket || '-' }}</td>
-            <td class="p-3 text-start">{{ s.companyCapacity || '-' }}</td>
-            <td class="p-3 text-start">{{ s.crusherCapacity || '-' }}</td>
-            <td class="p-3 text-start">{{ s.unitPrice || '-' }}</td>
-            <td class="p-3 text-start">{{ s.discount || '-' }}</td>
-            <!-- <td class="p-3 text-start">{{ s.notes || '-' }}</td> -->
-            <td class="p-3 text-start">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(s.date) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ s.item?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ s.contractor?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ s.crusher?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ s.location?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ s.vehicle?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ s.crusherTicket || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ s.companyTicket || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ s.companyCapacity || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ s.crusherCapacity || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ s.unitPrice || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ s.discount || '-' }}</td>
+            <!-- <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ s.notes || '-' }}</td> -->
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               <button @click="confirmDelete(s)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
                 {{ $t('labels.delete') }}
               </button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3 text-start" :colspan="15">
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="15">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
