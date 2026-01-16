@@ -20,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-gray-50">
+          <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-gray-50" @contextmenu.prevent="openContextMenu($event, item)">
             <td class="p-3 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="p-3 text-start">{{ item.name }}</td>
             <td class="p-3 text-start">{{ formatPrice(item.currentPrice) }}</td>
@@ -35,12 +35,12 @@
             </td>
           </tr>
           <tr v-if="items.length === 0 && !loading">
-            <td class="p-3 text-start text-center" :colspan="5">
+            <td class="p-3 text-start" :colspan="5">
               {{ $t('labels.noDataFound') || 'No items found' }}
             </td>
           </tr>
           <tr v-if="loading">
-            <td class="p-3 text-start text-center" :colspan="5">
+            <td class="p-3 text-start " :colspan="5">
               {{ $t('labels.loading') || 'Loading...' }}
             </td>
           </tr>
@@ -113,20 +113,46 @@
 
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
-      v-if="deleteDialogOpen"
+      :show="deleteDialogOpen"
+      type="danger"
       :title="$t('labels.confirmDelete') || 'Confirm Delete'"
       :message="$t('messages.confirmDeleteItem') || `Are you sure you want to delete '${deleteItem?.name}'?`"
+      :loading="submitting"
+      loadingText="Deleting..."
       @confirm="performDelete"
       @cancel="deleteDialogOpen = false"
     />
 
+    <!-- Context Menu -->
+    <div v-if="contextMenu.visible" class="fixed inset-0 z-40" @click="contextMenu.visible = false"></div>
+    <div
+      v-if="contextMenu.visible"
+      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      class="fixed bg-white border border-gray-200 rounded shadow-lg z-50 py-1 min-w-[150px]"
+      @click.stop
+    >
+      <button
+        @click="() => { editItem(contextMenu.item); contextMenu.visible = false }"
+        class="w-full px-4 py-2 text-left text-sm hover:bg-blue-50 text-gray-700 flex items-center gap-2 transition"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+        </svg>
+        {{ $t('labels.edit') }}
+      </button>
+      <button
+        @click="() => { confirmDelete(contextMenu.item); contextMenu.visible = false }"
+        class="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2 transition"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        {{ $t('labels.delete') }}
+      </button>
+    </div>
+
     <!-- Toast notifications -->
-    <Toast
-      v-if="toast.show"
-      :message="toast.message"
-      :type="toast.type"
-      @close="toast.show = false"
-    />
+    <Toast />
   </div>
 </template>
 
@@ -169,6 +195,12 @@ export default {
         show: false,
         message: '',
         type: 'success'
+      },
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        item: null
       }
     }
   },
@@ -278,6 +310,7 @@ export default {
     },
 
     async performDelete() {
+      this.submitting = true
       try {
         await deleteExportItem(this.deleteItem.id)
         this.showToast(this.$t('messages.itemDeleted') || 'Item deleted successfully', 'success')
@@ -286,7 +319,25 @@ export default {
         this.loadItems()
       } catch (error) {
         console.error('Error deleting item:', error)
-        this.showToast(error.response?.data?.message || 'Failed to delete item', 'error')
+        
+        // Handle specific error codes
+        if (error.response?.status === 409) {
+          // Item is being used, show the specific error message
+          const errorMessage = error.response?.data?.message || 'Cannot delete this item. It is being used in exports.'
+          this.showToast(errorMessage, 'error')
+          // Keep dialog open for user to try again if needed
+        } else if (error.response?.status === 404) {
+          this.showToast('Item not found', 'error')
+          this.deleteDialogOpen = false
+          this.deleteItem = null
+          this.loadItems()
+        } else {
+          // Other errors
+          const errorMessage = error.response?.data?.message || 'Failed to delete item'
+          this.showToast(errorMessage, 'error')
+        }
+      } finally {
+        this.submitting = false
       }
     },
 
@@ -297,10 +348,16 @@ export default {
     },
 
     showToast(message, type = 'success') {
-      this.toast = {
-        show: true,
-        message,
-        type
+      // Use global toast if available from provide/inject
+      if (this.$toast) {
+        this.$toast[type](message)
+      } else {
+        // Fallback to local toast
+        this.toast = {
+          show: true,
+          message,
+          type
+        }
       }
     },
 
@@ -312,10 +369,27 @@ export default {
     formatPrice(price) {
       if (price === null || price === undefined) return '-'
       return parseFloat(price).toFixed(2)
+    },
+
+    openContextMenu(event, item) {
+      this.contextMenu.x = event.clientX
+      this.contextMenu.y = event.clientY
+      this.contextMenu.item = item
+      this.contextMenu.visible = true
     }
   },
   mounted() {
     this.loadItems()
+    // Close context menu when clicking anywhere
+    this.closeContextMenuHandler = () => {
+      this.contextMenu.visible = false
+    }
+    document.addEventListener('click', this.closeContextMenuHandler)
+  },
+  beforeUnmount() {
+    if (this.closeContextMenuHandler) {
+      document.removeEventListener('click', this.closeContextMenuHandler)
+    }
   }
 }
 </script>
