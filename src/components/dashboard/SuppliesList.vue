@@ -13,46 +13,46 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-indigo-50">
           <tr>
-            <th class="p-3">#</th>
-            <th class="p-3">{{ $t('labels.date') }}</th>
-            <th class="p-3">{{ $t('labels.contractor') }}</th>
-            <th class="p-3">{{ $t('labels.crusher') }}</th>
-            <th class="p-3">{{ $t('labels.location') }}</th>
-            <th class="p-3">{{ $t('labels.vehicle') }}</th>
-            <th class="p-3">{{ $t('labels.crusherTicket') }}</th>
-            <th class="p-3">{{ $t('labels.companyTicket') }}</th>
-            <th class="p-3">{{ $t('labels.companyCapacity') }}</th>
-            <th class="p-3">{{ $t('labels.crusherCapacity') }}</th>
-            <th class="p-3">{{ $t('labels.unitPrice') }}</th>
-            <th class="p-3">{{ $t('labels.discount') }}</th>
-            <!-- <th class="p-3">{{ $t('labels.notes') }}</th> -->
-            <th class="p-3">{{ $t('labels.actions') }}</th>
+            <th class="p-3 text-start">#</th>
+            <th class="p-3 text-start">{{ $t('labels.date') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.contractor') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.crusher') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.location') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.vehicle') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.crusherTicket') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.companyTicket') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.companyCapacity') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.crusherCapacity') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.unitPrice') }}</th>
+            <th class="p-3 text-start">{{ $t('labels.discount') }}</th>
+            <!-- <th class="p-3 text-start">{{ $t('labels.notes') }}</th> -->
+            <th class="p-3 text-start">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50"
             @contextmenu.prevent="onRowContextMenu($event, s)">
-            <td class="p-3">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="p-3">{{ formatDate(s.date) }}</td>
-            <td class="p-3">{{ s.contractor?.name || '-' }}</td>
-            <td class="p-3">{{ s.crusher?.name || '-' }}</td>
-            <td class="p-3">{{ s.location?.name || '-' }}</td>
-            <td class="p-3">{{ s.vehicle?.name || '-' }}</td>
-            <td class="p-3">{{ s.crusherTicket || '-' }}</td>
-            <td class="p-3">{{ s.companyTicket || '-' }}</td>
-            <td class="p-3">{{ s.companyCapacity || '-' }}</td>
-            <td class="p-3">{{ s.crusherCapacity || '-' }}</td>
-            <td class="p-3">{{ s.unitPrice || '-' }}</td>
-            <td class="p-3">{{ s.discount || '-' }}</td>
-            <!-- <td class="p-3">{{ s.notes || '-' }}</td> -->
-            <td class="p-3">
+            <td class="p-3 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="p-3 text-start">{{ formatDate(s.date) }}</td>
+            <td class="p-3 text-start">{{ s.contractor?.name || '-' }}</td>
+            <td class="p-3 text-start">{{ s.crusher?.name || '-' }}</td>
+            <td class="p-3 text-start">{{ s.location?.name || '-' }}</td>
+            <td class="p-3 text-start">{{ s.vehicle?.name || '-' }}</td>
+            <td class="p-3 text-start">{{ s.crusherTicket || '-' }}</td>
+            <td class="p-3 text-start">{{ s.companyTicket || '-' }}</td>
+            <td class="p-3 text-start">{{ s.companyCapacity || '-' }}</td>
+            <td class="p-3 text-start">{{ s.crusherCapacity || '-' }}</td>
+            <td class="p-3 text-start">{{ s.unitPrice || '-' }}</td>
+            <td class="p-3 text-start">{{ s.discount || '-' }}</td>
+            <!-- <td class="p-3 text-start">{{ s.notes || '-' }}</td> -->
+            <td class="p-3 text-start">
               <button @click="confirmDelete(s)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
                 {{ $t('labels.delete') }}
               </button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="p-3" :colspan="14">
+            <td class="p-3 text-start" :colspan="14">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
