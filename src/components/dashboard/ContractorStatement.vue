@@ -162,25 +162,25 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.date') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.type') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('contractors.refId') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.description') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
                 {{ $t('contractors.earnings') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
                 {{ $t('contractors.payments') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
                 {{ $t('contractors.balanceOwed') }}
               </th>
             </tr>

@@ -36,13 +36,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-indigo-50">
           <tr>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('labels.#') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.name') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.phone') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.bankName') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.accountNumber') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('contractors.notes') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('labels.actions') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('contractors.name') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('contractors.phone') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('contractors.bankName') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('contractors.accountNumber') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('contractors.notes') }}</th>
+            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -53,7 +53,7 @@
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ idx + 1 }}</td>
+            <td class="px-6 py-4 text-sm text-indigo-800" :class="textAlign">{{ idx + 1 }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.name }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
