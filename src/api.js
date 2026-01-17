@@ -486,6 +486,9 @@ export const getVehicleOwnershipHistory = (vehicleId) =>
 export const assignVehicleDriver = (vehicleId, data) =>
   axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/assign-driver`, data);
 
+export const unassignVehicleDriver = (vehicleId, driverId) =>
+  axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/unassign-driver`, { driverId });
+
 export const getVehicleDriverHistory = (vehicleId) =>
   axios.get(`${BASE_URL}/api/vehicles/${vehicleId}/driver-history`);
 

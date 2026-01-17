@@ -105,6 +105,7 @@
     "saving": "Saving...",
     "retry": "Retry",
     "deleting": "Deleting...",
+    "removing": "Removing...",
     "confirmDelete": "Confirm Delete",
     "processing": "Processing...",
     "actions": "Actions",
@@ -456,7 +457,10 @@
     "updateSuccess": "Vehicle updated successfully",
     "deleteSuccess": "Vehicle deleted successfully",
     "changeOwnerSuccess": "Owner changed successfully",
-    "assignDriverSuccess": "Driver assigned successfully"
+    "assignDriverSuccess": "Driver assigned successfully",
+    "unassignDriver": "Unassign Driver",
+    "unassign": "Unassign",
+    "unassignDriverSuccess": "Driver unassigned successfully"
   },
   "rental": {
     "rentalList": "Equipment Rentals",

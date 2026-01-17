@@ -342,16 +342,19 @@
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
                       {{ $t('labels.endDate') }}
                     </th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+                      {{ $t('labels.actions') || 'Actions' }}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="driversLoading">
-                    <td class="px-3 py-3 text-center text-gray-500" colspan="4">
+                    <td class="px-3 py-3 text-center text-gray-500" colspan="5">
                       {{ $t('labels.loading') }}
                     </td>
                   </tr>
                   <tr v-else-if="driverHistory.length === 0">
-                    <td class="px-3 py-3 text-center text-gray-500" colspan="4">
+                    <td class="px-3 py-3 text-center text-gray-500" colspan="5">
                       {{ $t('vehicles.noDriverHistory') }}
                     </td>
                   </tr>
@@ -378,6 +381,18 @@
                     <td class="px-3 py-2">
                       {{ row.toDate ? formatDateTime(row.toDate) : $t('vehicles.stillAssigned') }}
                     </td>
+                    <td class="px-3 py-2">
+                      <button
+                        v-if="!row.toDate"
+                        @click="onUnassignDriver(row)"
+                        :disabled="unassignDriverLoading[row.id]"
+                        class="px-2 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                        :title="$t('vehicles.unassignDriver') || 'Unassign Driver'"
+                      >
+                        {{ unassignDriverLoading[row.id] ? $t('labels.removing') || 'Removing...' : $t('vehicles.unassign') || 'Unassign' }}
+                      </button>
+                      <span v-else class="text-xs text-gray-400">-</span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -397,6 +412,7 @@ import {
   changeVehicleOwner,
   getVehicleOwnershipHistory,
   assignVehicleDriver,
+  unassignVehicleDriver,
   getVehicleDriverHistory,
   updateVehicle,
   deleteVehicle
@@ -420,6 +436,7 @@ export default {
       driversLoading: false,
       changeOwnerLoading: false,
       assignDriverLoading: false,
+      unassignDriverLoading: {},
       changeOwnerForm: {
         contractorId: '',
         effectiveDate: ''
@@ -880,6 +897,28 @@ export default {
         }
       } finally {
         this.assignDriverLoading = false
+      }
+    },
+    async onUnassignDriver(driverAssignment) {
+      if (!this.selectedVehicle || !driverAssignment) return
+      
+      // Set loading state for this specific assignment
+      this.unassignDriverLoading[driverAssignment.id] = true
+      
+      try {
+        await unassignVehicleDriver(this.selectedVehicle.id, driverAssignment.driverId)
+        if (window.$toast) {
+          window.$toast(this.$t('vehicles.unassignDriverSuccess') || 'Driver unassigned successfully', 'success')
+        }
+        await this.refreshDriverHistory()
+      } catch (e) {
+        console.error('Error unassigning driver', e)
+        const errorMsg = this.extractErrorMessage(e)
+        if (window.$toast) {
+          window.$toast(errorMsg, 'error', 5000)
+        }
+      } finally {
+        this.unassignDriverLoading[driverAssignment.id] = false
       }
     },
     formatDateTime(value) {

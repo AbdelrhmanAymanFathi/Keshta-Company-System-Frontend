@@ -105,6 +105,7 @@
     "saving": "جاري الحفظ...",
     "retry": "إعادة المحاولة",
     "deleting": "جاري الحذف...",
+    "removing": "جاري الإزالة...",
     "confirmDelete": "تأكيد الحذف",
     "processing": "جاري المعالجة...",
     "actions": "الإجراءات",
@@ -456,7 +457,10 @@
     "updateSuccess": "تم تحديث المركبة بنجاح",
     "deleteSuccess": "تم حذف المركبة بنجاح",
     "changeOwnerSuccess": "تم تغيير المالك بنجاح",
-    "assignDriverSuccess": "تم ربط السائق بنجاح"
+    "assignDriverSuccess": "تم ربط السائق بنجاح",
+    "unassignDriver": "إلغاء ربط السائق",
+    "unassign": "إلغاء الربط",
+    "unassignDriverSuccess": "تم إلغاء ربط السائق بنجاح"
   },
   "rental": {
     "rentalList": "إيجار المعدات",
