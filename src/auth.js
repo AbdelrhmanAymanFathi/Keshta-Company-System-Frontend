@@ -113,6 +113,21 @@ class AuthManager {
     }
   }
 
+  async refreshToken(){
+    try {
+      tokenManager.refreshToken()
+          .then(() => {
+            this.setAuthState(true, this.user);
+          })
+          .catch(() => {
+            this.setAuthState(false);
+          });
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+      this.setAuthState(false);
+    }
+  }
+
   // Initialize auth state from stored data
   initialize() {
     try {

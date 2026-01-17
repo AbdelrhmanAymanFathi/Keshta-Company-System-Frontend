@@ -49,7 +49,7 @@ const routes = [
   {
     path: '/dashboard',
     component: Dashboard,
-    meta: { requiresAuth: true, title: 'appName' },
+    meta: { requiresAuth: true, title: 'Dashboard' },
     children: [
       // ==================== Supplies Module ====================
       // {
@@ -233,7 +233,7 @@ router.beforeEach(async (to, from, next) => {
 
   // If authenticated and trying to access auth pages (login/register), redirect to dashboard
   if (!requiresAuth && isAuthenticated.value && ['login', 'register'].includes(to.name)) {
-    next({ name: 'new-supply' })
+    next({ name: 'supplies-list' })
     return
   }
 
@@ -248,7 +248,7 @@ router.beforeEach(async (to, from, next) => {
     if (!hasRequiredRole) {
       // User doesn't have required role, redirect to default page
       console.warn(`Access denied: User roles [${userRoles}] don't include [${to.meta.roles}]`)
-      next({ name: 'new-supply' })
+      next({ name: 'supplies-list' })
       return
     }
   }

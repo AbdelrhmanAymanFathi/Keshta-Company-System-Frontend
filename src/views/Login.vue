@@ -161,6 +161,8 @@
 <script>
 import { useAuth } from '@/composables/useAuth'
 import { useI18n } from 'vue-i18n'
+import { isAuthenticated } from '@/composables/authStore';
+import router from '@/router';
 
 export default {
   name: 'AuthLogin',
@@ -168,6 +170,10 @@ export default {
   setup() {
     const { login: authLogin, loading } = useAuth()
     const { locale } = useI18n()
+
+    if (isAuthenticated.value && !loading.value) {
+      router.replace('/dashboard');
+    }
 
     return {
       authLogin,
@@ -316,6 +322,7 @@ export default {
     if (localStorage.getItem('rememberMe') === 'true') {
       this.rememberMe = true
     }
+
   }
 }
 </script>
