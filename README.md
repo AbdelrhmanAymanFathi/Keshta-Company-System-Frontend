@@ -88,6 +88,7 @@ Go to `http://localhost:8080` / اذهب إلى `http://localhost:8080`
 ```env
 # Required / مطلوب
 VUE_APP_API_BASE_URL=http://localhost:3000
+VUE_APP_PUBLIC_IP=192.168.1.26
 VUE_APP_DEFAULT_LOCALE=en
 
 # Optional / اختياري

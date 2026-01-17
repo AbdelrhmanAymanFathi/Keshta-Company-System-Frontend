@@ -13,6 +13,8 @@
 // new code:
 const webpack = require('webpack');
 
+const BaseIP = process.env.VUE_APP_PUBLIC_IP;
+
 module.exports = {
   lintOnSave: false,
 
@@ -21,7 +23,7 @@ module.exports = {
     port: 8080,
 
     client: {
-      webSocketURL: 'ws://38.242.152.149:8080/ws'
+      webSocketURL: `ws://${BaseIP}:8080/ws`
     },
 
     proxy: {
