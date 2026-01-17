@@ -388,6 +388,7 @@ import {
 } from '@/api'
 
 export default {
+  emits: ['saved'],
   name: 'TableModal',
   props: {
     showTriggerButton: {
