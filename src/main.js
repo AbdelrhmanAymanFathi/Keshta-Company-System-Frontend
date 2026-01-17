@@ -6,7 +6,11 @@ import router from './router'
 import './assets/main.css'
 import i18n from './i18n'
 import authManager from './auth'
+import { initializeAuthStore } from './composables/authStore'
 import './api' // Initialize API with token management
+
+// Initialize auth store immediately on app load
+initializeAuthStore()
 
 const app = createApp(App)
 const pinia = createPinia()

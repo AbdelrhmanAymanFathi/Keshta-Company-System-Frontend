@@ -59,10 +59,12 @@ export function useAuth() {
 
   // Lifecycle
   onMounted(() => {
-    // Initialize auth state
+    // Initialize auth state immediately
     const authState = authManager.getAuthState()
     isAuthenticated.value = authState.isAuthenticated
     user.value = authState.user
+    // IMPORTANT: Always set loading to false immediately on mount
+    // Token refresh happens in background and doesn't block auth
     loading.value = false
 
     // Listen for auth state changes

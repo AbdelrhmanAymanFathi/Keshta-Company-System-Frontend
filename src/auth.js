@@ -140,18 +140,31 @@ class AuthManager {
       // Check if token exists and is valid
       const token = tokenManager.getToken();
       if (token && !tokenManager.isTokenExpired(token)) {
+        // Token is still valid, set auth state immediately
         this.setAuthState(true, this.user);
+        // Schedule token refresh in background (don't wait for it)
         tokenManager.scheduleTokenRefresh(token);
       } else if (token) {
-        // Token exists but is expired, try to refresh
+        // Token exists but is expired, try to refresh in background
+        // BUT: set auth state immediately with stored user to avoid logout during page load
+        if (this.user) {
+          this.setAuthState(true, this.user);
+        }
+        
+        // Try to refresh token in the background
         tokenManager.refreshToken()
           .then(() => {
+            console.log('[Auth] Token refreshed successfully during initialization');
+            // Auth state already set, just ensure it's still true
             this.setAuthState(true, this.user);
           })
-          .catch(() => {
+          .catch((error) => {
+            console.warn('[Auth] Token refresh failed during initialization:', error);
+            // Token refresh failed, clear auth state
             this.setAuthState(false);
           });
       } else {
+        // No token exists
         this.setAuthState(false);
       }
     } catch (error) {
