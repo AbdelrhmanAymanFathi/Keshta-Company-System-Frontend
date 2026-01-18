@@ -4,20 +4,15 @@
     <div class="flex justify-between items-center gap-4 flex-wrap">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('supply.exportTableTitle') }}</h2>
       <div class="flex items-center gap-2">
-        <button
-          @click="refresh"
-          :disabled="loading"
-          class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
-        >
+        <button @click="refresh" :disabled="loading"
+          class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg transition-colors disabled:opacity-50">
           {{ $t('labels.refresh') }}
         </button>
-        <button
-          @click="downloadReport"
-          :disabled="downloading"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
-        >
+        <button @click="downloadReport" :disabled="downloading"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
         </button>
@@ -31,42 +26,30 @@
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-          <input
-            v-model="filters.startDate"
-            type="date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          />
+          <input v-model="filters.startDate" type="date"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-          <input
-            v-model="filters.endDate"
-            type="date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          />
+          <input v-model="filters.endDate" type="date"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- Contractor -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.contractorSearch"
-              @focus="filters.showContractorDropdown = true"
-              @blur="closeDropdownDelayed('showContractorDropdown')"
-              type="text"
+            <input v-model="filters.contractorSearch" @focus="filters.showContractorDropdown = true"
+              @blur="closeDropdownDelayed('showContractorDropdown')" type="text"
               :placeholder="$t('placeholders.searchContractor')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showContractorDropdown && filteredContractors.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="contractor in filteredContractors"
-                :key="contractor.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showContractorDropdown && filteredContractors.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="contractor in filteredContractors" :key="contractor.id"
                 @click="filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.showContractorDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ contractor.name }}
               </div>
             </div>
@@ -77,21 +60,15 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.locationSearch"
-              @focus="filters.showLocationDropdown = true"
-              @blur="closeDropdownDelayed('showLocationDropdown')"
-              type="text"
+            <input v-model="filters.locationSearch" @focus="filters.showLocationDropdown = true"
+              @blur="closeDropdownDelayed('showLocationDropdown')" type="text"
               :placeholder="$t('placeholders.searchLocation')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showLocationDropdown && filteredLocations.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="location in filteredLocations"
-                :key="location.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showLocationDropdown && filteredLocations.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="location in filteredLocations" :key="location.id"
                 @click="filters.locationId = location.id; filters.locationSearch = location.name; filters.showLocationDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ location.name }}
               </div>
             </div>
@@ -102,21 +79,14 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.item') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.itemSearch"
-              @focus="filters.showItemDropdown = true"
-              @blur="closeDropdownDelayed('showItemDropdown')"
-              type="text"
-              :placeholder="$t('placeholders.searchItem')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showItemDropdown && filteredItems.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="item in filteredItems"
-                :key="item.id"
+            <input v-model="filters.itemSearch" @focus="filters.showItemDropdown = true"
+              @blur="closeDropdownDelayed('showItemDropdown')" type="text" :placeholder="$t('placeholders.searchItem')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showItemDropdown && filteredItems.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="item in filteredItems" :key="item.id"
                 @click="filters.itemId = item.id; filters.itemSearch = item.name; filters.showItemDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ item.name }}
               </div>
             </div>
@@ -127,21 +97,15 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.vehicle') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.vehicleSearch"
-              @focus="filters.showVehicleDropdown = true"
-              @blur="closeDropdownDelayed('showVehicleDropdown')"
-              type="text"
+            <input v-model="filters.vehicleSearch" @focus="filters.showVehicleDropdown = true"
+              @blur="closeDropdownDelayed('showVehicleDropdown')" type="text"
               :placeholder="$t('placeholders.searchVehicle')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showVehicleDropdown && filteredVehicles.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="vehicle in filteredVehicles"
-                :key="vehicle.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showVehicleDropdown && filteredVehicles.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="vehicle in filteredVehicles" :key="vehicle.id"
                 @click="filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.showVehicleDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ vehicle.plateNumber || vehicle.name }}
               </div>
             </div>
@@ -150,17 +114,12 @@
       </div>
 
       <div class="flex gap-2">
-        <button
-          @click="loadReport"
-          :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
-        >
+        <button @click="loadReport" :disabled="loading"
+          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
           {{ $t('labels.search') }}
         </button>
-        <button
-          @click="clearFilters"
-          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium"
-        >
+        <button @click="clearFilters"
+          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium">
           {{ $t('labels.clear') }}
         </button>
       </div>
@@ -170,7 +129,8 @@
     <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
       <div class="flex items-center gap-2">
         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span class="text-sm text-red-800">{{ error }}</span>
       </div>
@@ -188,19 +148,48 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.contractor') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusher') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.companyTicket') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.companyCapacity') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusherCapacity') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.unitPrice') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.discount') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.rowTotal') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.accumulativeTotal') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.date') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.contractor') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.location') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.crusher') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.item') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.vehicle') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.companyTicket') }}</th>
+                              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.crusherTicket') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.companyCapacity') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.crusherCapacity') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.unitPrice') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.discount') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.rowTotal') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('labels.accumulativeTotal') }}</th>
               <!-- <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
             </tr>
           </thead>
@@ -213,12 +202,19 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.item || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.vehicle || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.companyTicket }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatQuantity(item.companyCapacity) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatQuantity(item.crusherCapacity) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.crusherTicket }}</td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatQuantity(item.companyCapacity) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatQuantity(item.crusherCapacity) }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(item.unitPrice) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :title="`Discount: ${item.discount}`">{{ formatCurrency(item.discount) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(item.rowTotal) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600" :title="`Running total up to this row`">{{ formatCurrency(item.accumulativeTotal) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :title="`Discount: ${item.discount}`">{{
+                formatCurrency(item.discount) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{
+                formatCurrency(item.rowTotal) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600"
+                :title="`Running total up to this row`">{{ formatCurrency(item.accumulativeTotal) }}</td>
               <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.notes || '-' }}</td> -->
             </tr>
           </tbody>
@@ -267,13 +263,13 @@ export default {
     const error = ref(null)
     const loading = ref(false)
     const rawItems = ref([])
-    
+
     // Filter data
     const contractors = ref([])
     const locations = ref([])
     const items = ref([])
     const vehicles = ref([])
-    
+
     const filters = ref({
       startDate: '',
       endDate: '',
@@ -378,6 +374,7 @@ export default {
         item: rawItem.itemName || '—',
         vehicle: rawItem.vehicleName || '—',
         companyTicket: rawItem.companyTicket,
+        crusherTicket: rawItem.crusherTicket,
         companyCapacity: parseFloat(rawItem.companyCapacity) || 0,
         crusherCapacity: parseFloat(rawItem.crusherCapacity) || 0,
         unitPrice: parseFloat(rawItem.unitPrice) || 0,
@@ -667,7 +664,7 @@ export default {
 
       filters.value.endDate = endDate.toISOString().split('T')[0]
       filters.value.startDate = startDate.toISOString().split('T')[0]
-      
+
       // Load filter data
       loadFilterData()
     })
