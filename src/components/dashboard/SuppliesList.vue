@@ -160,7 +160,7 @@
 
       <div class="flex gap-2">
         <button
-          @click="loadSupplies"
+          @click="page = 1; loadSupplies()"
           :disabled="loading"
           class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
         >
@@ -226,7 +226,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(s, idx) in supplies" :key="s.id" class="hover:bg-gray-50"
+          <!-- DEBUG: Show supplies count -->
+          <tr v-if="supplies.length > 0" style="display: none;"></tr>
+          <tr v-for="(s, idx) in supplies" :key="`supply-${s.id}-${idx}`" class="hover:bg-gray-50"
             @contextmenu.prevent="onRowContextMenu($event, s)">
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ (page - 1) * pageSize + idx + 1 }}</td>
@@ -546,16 +548,52 @@ export default {
           vehicleId: this.filters.vehicleId
         }
 
-        const res = await getDeliveries(buildQueryParams(queryParams))
+        const cleanParams = buildQueryParams(queryParams)
+        console.log('🔵 Loading supplies with params:', queryParams)
+        console.log('🔵 Clean params sent to API:', cleanParams)
+        const res = await getDeliveries(cleanParams)
 
-        this.supplies = Array.isArray(res.data.items)
-          ? res.data.items
-          : (Array.isArray(res.data) ? res.data : [])
-
-        this.total = res.data.total || this.supplies.length
-        this.pageSize = res.data.pageSize || this.pageSize
+        console.log('Response received:', res)
+        console.log('Response data:', res.data)
+        
+        // Extract items from response
+        const responseData = res.data
+        if (responseData && responseData.items && Array.isArray(responseData.items)) {
+          // Explicitly create new array and use splice to trigger reactivity
+          const newItems = [...responseData.items]
+          console.log('📊 New items to load:', newItems)
+          console.log('📊 First 3 items:', newItems.slice(0, 3))
+          console.log('📊 First item details:', {
+            id: newItems[0]?.id,
+            date: newItems[0]?.date,
+            item: newItems[0]?.item?.name,
+            contractor: newItems[0]?.contractor?.name
+          })
+          
+          // Log comparison with old items
+          console.log('🔄 Old supplies count:', this.supplies.length)
+          console.log('🔄 New supplies count:', newItems.length)
+          if (this.supplies.length > 0) {
+            console.log('🔄 Old first item ID:', this.supplies[0].id)
+            console.log('🔄 New first item ID:', newItems[0]?.id)
+          }
+          
+          // In Vue 3, directly assign the array
+          this.supplies = newItems
+          
+          this.total = responseData.total || newItems.length
+          this.pageSize = responseData.pageSize || this.pageSize
+          
+          console.log('✓ Supplies updated:', this.supplies.length, 'items')
+          console.log('✓ Supplies array is now:', this.supplies)
+          console.log('✓ Component supplies data:', this.$data.supplies)
+        } else {
+          console.warn('⚠ Unexpected response format:', responseData)
+          this.supplies = []
+          this.total = 0
+        }
       } catch (e) {
-        console.error('Error loading supplies:', e)
+        console.error('✗ Error loading supplies:', e)
         this.supplies = []
         this.total = 0
       } finally {

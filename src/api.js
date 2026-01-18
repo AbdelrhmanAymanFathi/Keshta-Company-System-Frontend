@@ -503,14 +503,34 @@ export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
 
 // Exports (Deliveries)
 export const getDeliveries = (params = {}) => {
-  const { page = 1, pageSize = 20, q = '' } = params;
+  const {
+    page = 1,
+    pageSize = 20,
+    q = '',
+    startDate = '',
+    endDate = '',
+    contractorId = '',
+    locationId = '',
+    crusherId = '',
+    itemId = '',
+    vehicleId = ''
+  } = params;
+
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
-  if (q) {
-    queryParams.append('q', q);
-  }
+
+  // Add optional filters if they have values
+  if (q) queryParams.append('q', q);
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (contractorId) queryParams.append('contractorId', contractorId.toString());
+  if (locationId) queryParams.append('locationId', locationId.toString());
+  if (crusherId) queryParams.append('crusherId', crusherId.toString());
+  if (itemId) queryParams.append('itemId', itemId.toString());
+  if (vehicleId) queryParams.append('vehicleId', vehicleId.toString());
+
   return axios.get(`${BASE_URL}/api/exports?${queryParams.toString()}`);
 };
 export const createDelivery = (data) =>
