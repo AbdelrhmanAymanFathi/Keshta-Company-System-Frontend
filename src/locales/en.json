@@ -133,6 +133,7 @@
     "location": "Location",
     "crusherTicket": "Crusher Ticket",
     "companyTicket": "Company Ticket",
+    "crushersList": "Crushers List",
     "companyCapacity": "Company Capacity",
     "crusherCapacity": "Crusher Capacity",
     "unitPrice": "Unit Price",
