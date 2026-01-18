@@ -28,18 +28,6 @@
     <div class="bg-white rounded-lg shadow p-4 space-y-4">
       <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Search -->
-        <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.search') }}</label>
-          <input
-            v-model="filters.q"
-            @keyup.enter="loadReport"
-            type="text"
-            placeholder="Search..."
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          />
-        </div>
-
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
@@ -58,6 +46,106 @@
             type="date"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
           />
+        </div>
+
+        <!-- Contractor -->
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }}</label>
+          <div class="relative">
+            <input
+              v-model="filters.contractorSearch"
+              @focus="filters.showContractorDropdown = true"
+              @blur="closeDropdownDelayed('showContractorDropdown')"
+              type="text"
+              placeholder="ابحث عن مقاول..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            />
+            <div v-if="filters.showContractorDropdown && filteredContractors.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div
+                v-for="contractor in filteredContractors"
+                :key="contractor.id"
+                @click="filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.showContractorDropdown = false"
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+              >
+                {{ contractor.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
+          <div class="relative">
+            <input
+              v-model="filters.locationSearch"
+              @focus="filters.showLocationDropdown = true"
+              @blur="closeDropdownDelayed('showLocationDropdown')"
+              type="text"
+              placeholder="ابحث عن موقع..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            />
+            <div v-if="filters.showLocationDropdown && filteredLocations.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div
+                v-for="location in filteredLocations"
+                :key="location.id"
+                @click="filters.locationId = location.id; filters.locationSearch = location.name; filters.showLocationDropdown = false"
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+              >
+                {{ location.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item -->
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.item') }}</label>
+          <div class="relative">
+            <input
+              v-model="filters.itemSearch"
+              @focus="filters.showItemDropdown = true"
+              @blur="closeDropdownDelayed('showItemDropdown')"
+              type="text"
+              placeholder="ابحث عن صنف..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            />
+            <div v-if="filters.showItemDropdown && filteredItems.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div
+                v-for="item in filteredItems"
+                :key="item.id"
+                @click="filters.itemId = item.id; filters.itemSearch = item.name; filters.showItemDropdown = false"
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+              >
+                {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle -->
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.vehicle') }}</label>
+          <div class="relative">
+            <input
+              v-model="filters.vehicleSearch"
+              @focus="filters.showVehicleDropdown = true"
+              @blur="closeDropdownDelayed('showVehicleDropdown')"
+              type="text"
+              placeholder="ابحث عن سيارة..."
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            />
+            <div v-if="filters.showVehicleDropdown && filteredVehicles.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div
+                v-for="vehicle in filteredVehicles"
+                :key="vehicle.id"
+                @click="filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.showVehicleDropdown = false"
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+              >
+                {{ vehicle.plateNumber || vehicle.name }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -101,11 +189,11 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusher') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.contractor') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.category') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusherTicket') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusher') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
+              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.companyTicket') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.companyCapacity') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.crusherCapacity') }}</th>
@@ -113,7 +201,7 @@
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.discount') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.rowTotal') }}</th>
               <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.accumulativeTotal') }}</th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th>
+              <!-- <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="mappedItems.length">
@@ -122,8 +210,8 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.crusher }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.location }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.contractor }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.category || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.crusherTicket }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.item || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.vehicle || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.companyTicket }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatQuantity(item.companyCapacity) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatQuantity(item.crusherCapacity) }}</td>
@@ -131,7 +219,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :title="`Discount: ${item.discount}`">{{ formatCurrency(item.discount) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(item.rowTotal) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600" :title="`Running total up to this row`">{{ formatCurrency(item.accumulativeTotal) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.notes || '-' }}</td>
+              <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.notes || '-' }}</td> -->
             </tr>
           </tbody>
           <tbody v-else>
@@ -169,7 +257,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getSuppliesReportData, downloadSuppliesReport } from '@/api'
+import { getSuppliesReportData, downloadSuppliesReport, getContractors, getLocations, getVehicles, getExportItems } from '@/api'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 
 export default {
@@ -179,10 +267,101 @@ export default {
     const error = ref(null)
     const loading = ref(false)
     const rawItems = ref([])
+    
+    // Filter data
+    const contractors = ref([])
+    const locations = ref([])
+    const items = ref([])
+    const vehicles = ref([])
+    
     const filters = ref({
-      q: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
+      contractorId: '',
+      contractorSearch: '',
+      locationId: '',
+      locationSearch: '',
+      crusherId: '',
+      itemId: '',
+      itemSearch: '',
+      vehicleId: '',
+      vehicleSearch: '',
+      showContractorDropdown: false,
+      showLocationDropdown: false,
+      showItemDropdown: false,
+      showVehicleDropdown: false
+    })
+
+    /**
+     * Load dropdown data
+     */
+    const loadFilterData = async () => {
+      try {
+        // Load contractors
+        const contractorsRes = await getContractors({ pageSize: 1000 })
+        const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
+        contractors.value = Array.isArray(contractorsData) ? contractorsData : []
+
+        // Load locations
+        const locationsRes = await getLocations()
+        const locationsData = locationsRes.data?.data || locationsRes.data || []
+        locations.value = Array.isArray(locationsData) ? locationsData : []
+
+        // Load items
+        const itemsRes = await getExportItems()
+        const itemsData = itemsRes.data?.data || itemsRes.data || []
+        items.value = Array.isArray(itemsData) ? itemsData : []
+
+        // Load vehicles
+        const vehiclesRes = await getVehicles({ pageSize: 1000 })
+        const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
+        vehicles.value = Array.isArray(vehiclesData) ? vehiclesData : []
+
+        console.log('✓ Filter data loaded:', {
+          contractors: contractors.value.length,
+          locations: locations.value.length,
+          items: items.value.length,
+          vehicles: vehicles.value.length
+        })
+      } catch (err) {
+        console.error('✗ Error loading filter data:', err)
+      }
+    }
+
+    /**
+     * Filtered lists for dropdowns
+     */
+    const filteredContractors = computed(() => {
+      if (!filters.value.showContractorDropdown) return []
+      if (!filters.value.contractorSearch) return contractors.value
+      return contractors.value.filter(c =>
+        c.name.toLowerCase().includes(filters.value.contractorSearch.toLowerCase())
+      )
+    })
+
+    const filteredLocations = computed(() => {
+      if (!filters.value.showLocationDropdown) return []
+      if (!filters.value.locationSearch) return locations.value
+      return locations.value.filter(l =>
+        l.name.toLowerCase().includes(filters.value.locationSearch.toLowerCase())
+      )
+    })
+
+    const filteredItems = computed(() => {
+      if (!filters.value.showItemDropdown) return []
+      if (!filters.value.itemSearch) return items.value
+      return items.value.filter(i =>
+        i.name.toLowerCase().includes(filters.value.itemSearch.toLowerCase())
+      )
+    })
+
+    const filteredVehicles = computed(() => {
+      if (!filters.value.showVehicleDropdown) return []
+      if (!filters.value.vehicleSearch) return vehicles.value
+      return vehicles.value.filter(v => {
+        const displayName = v.plateNumber || v.name
+        return displayName.toLowerCase().includes(filters.value.vehicleSearch.toLowerCase())
+      })
     })
 
     /**
@@ -196,8 +375,8 @@ export default {
         crusher: rawItem.crusherName,
         location: rawItem.locationName,
         contractor: rawItem.contractorName,
-        category: rawItem.categoryName || '—',
-        crusherTicket: rawItem.crusherTicket,
+        item: rawItem.itemName || '—',
+        vehicle: rawItem.vehicleName || '—',
         companyTicket: rawItem.companyTicket,
         companyCapacity: parseFloat(rawItem.companyCapacity) || 0,
         crusherCapacity: parseFloat(rawItem.crusherCapacity) || 0,
@@ -334,6 +513,15 @@ export default {
     }
 
     /**
+     * Delayed dropdown close helper
+     */
+    const closeDropdownDelayed = (dropdownName) => {
+      setTimeout(() => {
+        filters.value[dropdownName] = false
+      }, 200)
+    }
+
+    /**
      * Load report data
      */
     const loadReport = async () => {
@@ -363,8 +551,19 @@ export default {
       error.value = null
 
       try {
+        // Prepare query params - exclude search fields
+        const queryParams = {
+          startDate: filters.value.startDate,
+          endDate: filters.value.endDate,
+          contractorId: filters.value.contractorId,
+          locationId: filters.value.locationId,
+          crusherId: filters.value.crusherId,
+          itemId: filters.value.itemId,
+          vehicleId: filters.value.vehicleId
+        }
+
         const response = await getSuppliesReportData(
-          buildQueryParams(filters.value),
+          buildQueryParams(queryParams),
           'json'
         )
 
@@ -395,9 +594,21 @@ export default {
      */
     const clearFilters = () => {
       filters.value = {
-        q: '',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        contractorId: '',
+        contractorSearch: '',
+        locationId: '',
+        locationSearch: '',
+        crusherId: '',
+        itemId: '',
+        itemSearch: '',
+        vehicleId: '',
+        vehicleSearch: '',
+        showContractorDropdown: false,
+        showLocationDropdown: false,
+        showItemDropdown: false,
+        showVehicleDropdown: false
       }
       rawItems.value = []
     }
@@ -410,8 +621,19 @@ export default {
       error.value = null
 
       try {
+        // Prepare query params - exclude search fields
+        const queryParams = {
+          startDate: filters.value.startDate,
+          endDate: filters.value.endDate,
+          contractorId: filters.value.contractorId,
+          locationId: filters.value.locationId,
+          crusherId: filters.value.crusherId,
+          itemId: filters.value.itemId,
+          vehicleId: filters.value.vehicleId
+        }
+
         const { data, headers } = await downloadSuppliesReport(
-          buildQueryParams(filters.value),
+          buildQueryParams(queryParams),
           'xlsx'
         )
 
@@ -445,7 +667,9 @@ export default {
 
       filters.value.endDate = endDate.toISOString().split('T')[0]
       filters.value.startDate = startDate.toISOString().split('T')[0]
-      // Do not auto-load: user must click Search
+      
+      // Load filter data
+      loadFilterData()
     })
 
     return {
@@ -454,6 +678,14 @@ export default {
       loading,
       mappedItems,
       filters,
+      contractors,
+      locations,
+      items,
+      vehicles,
+      filteredContractors,
+      filteredLocations,
+      filteredItems,
+      filteredVehicles,
       totalAmount,
       totalQuantity,
       averagePrice,
@@ -463,7 +695,9 @@ export default {
       loadReport,
       refresh,
       clearFilters,
-      downloadReport
+      downloadReport,
+      loadFilterData,
+      closeDropdownDelayed
     }
   }
 }
