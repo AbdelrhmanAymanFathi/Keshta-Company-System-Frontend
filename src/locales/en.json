@@ -22,7 +22,12 @@
   },
   "placeholders": {
     "enterItemName": "Enter item name",
-    "enterPrice": "Enter price"
+    "enterPrice": "Enter price",
+    "searchContractor": "Search contractor...",
+    "searchLocation": "Search location...",
+    "searchCrusher": "Search crusher...",
+    "searchItem": "Search item...",
+    "searchVehicle": "Search vehicle..."
   },
   "navbar": {
     "supplies": "Supplies",

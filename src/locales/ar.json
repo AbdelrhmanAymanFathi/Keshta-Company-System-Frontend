@@ -22,7 +22,12 @@
   },
   "placeholders": {
     "enterItemName": "أدخل اسم الصنف",
-    "enterPrice": "أدخل السعر"
+    "enterPrice": "أدخل السعر",
+    "searchContractor": "ابحث عن مقاول...",
+    "searchLocation": "ابحث عن موقع...",
+    "searchCrusher": "ابحث عن كسارة...",
+    "searchItem": "ابحث عن صنف...",
+    "searchVehicle": "ابحث عن سيارة..."
   },
   "navbar": {
     "supplies": "التوريدات",

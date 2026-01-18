@@ -41,7 +41,7 @@
               @focus="filters.showContractorDropdown = true"
               @blur="closeDropdownDelayed('showContractorDropdown')"
               type="text"
-              placeholder="ابحث عن مقاول..."
+              :placeholder="$t('placeholders.searchContractor')"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
             <div v-if="filters.showContractorDropdown && filteredContractors.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
@@ -66,7 +66,7 @@
               @focus="filters.showLocationDropdown = true"
               @blur="closeDropdownDelayed('showLocationDropdown')"
               type="text"
-              placeholder="ابحث عن موقع..."
+              :placeholder="$t('placeholders.searchLocation')"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
             <div v-if="filters.showLocationDropdown && filteredLocations.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
@@ -91,7 +91,7 @@
               @focus="filters.showCrusherDropdown = true"
               @blur="closeDropdownDelayed('showCrusherDropdown')"
               type="text"
-              placeholder="ابحث عن كسارة..."
+              :placeholder="$t('placeholders.searchCrusher')"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
             <div v-if="filters.showCrusherDropdown && filteredCrushers.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
@@ -116,7 +116,7 @@
               @focus="filters.showItemDropdown = true"
               @blur="closeDropdownDelayed('showItemDropdown')"
               type="text"
-              placeholder="ابحث عن صنف..."
+              :placeholder="$t('placeholders.searchItem')"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
             <div v-if="filters.showItemDropdown && filteredItems.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
@@ -141,7 +141,7 @@
               @focus="filters.showVehicleDropdown = true"
               @blur="closeDropdownDelayed('showVehicleDropdown')"
               type="text"
-              placeholder="ابحث عن سيارة..."
+              :placeholder="$t('placeholders.searchVehicle')"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
             <div v-if="filters.showVehicleDropdown && filteredVehicles.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
