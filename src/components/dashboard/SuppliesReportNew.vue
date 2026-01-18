@@ -207,9 +207,9 @@
           <tbody class="bg-white divide-y divide-gray-200" v-if="mappedItems.length">
             <tr v-for="item in mappedItems" :key="item.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.date) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.crusher }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.location }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.contractor }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.location }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.crusher }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.item || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.vehicle || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.companyTicket }}</td>
