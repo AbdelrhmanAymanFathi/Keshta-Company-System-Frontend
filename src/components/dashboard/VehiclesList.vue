@@ -371,10 +371,10 @@
                         v-if="row.isPrimary === true || row.isPrimary === 'true'"
                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                       >
-                        ✓ {{ $t('vehicles.primary') }}
+                         {{ $t('vehicles.primary') }}
                       </span>
                       <span v-else class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                        ✗ {{ $t('vehicles.secondary') || 'Secondary' }}
+                         {{ $t('vehicles.secondary') || 'Secondary' }}
                       </span>
                     </td>
                     <td class="px-3 py-2">
