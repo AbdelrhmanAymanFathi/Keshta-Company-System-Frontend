@@ -381,7 +381,7 @@
                       {{ formatDateTime(row.fromDate) }}
                     </td>
                     <td class="px-3 py-2">
-                      {{ row.toDate ? formatDateTime(row.toDate) : $t('vehicles.stillAssigned') }}
+                      {{ row.toDate ? formatDateTime(row.toDate) : row.isPrimary ? $t('vehicles.stillAssigned') : $t('vehicles.endDateNotSet') }}
                     </td>
                     <td class="px-3 py-2">
                       <button

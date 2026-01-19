@@ -454,6 +454,7 @@
     "secondary": "غير أساسي",
     "noDriverHistory": "لا يوجد سجل لربط السائقين",
     "stillAssigned": "مربوط حالياً",
+    "endDateNotSet": "لم يتم تحديد تاريخ الانتهاء",
     "changeOwner": "تغيير المالك",
     "selectCrusher": "اختر الكسارة",
     "addNewCrusher": "إضافة كسارة جديدة",

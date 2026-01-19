@@ -454,6 +454,7 @@
     "secondary": "Secondary",
     "noDriverHistory": "No driver assignment history found",
     "stillAssigned": "Currently assigned",
+    "endDateNotSet": "End date not set",
     "changeOwner": "Change owner",
     "selectCrusher": "Select Crusher",
     "addNewCrusher": "Add New Crusher",
