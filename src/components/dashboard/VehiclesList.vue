@@ -30,7 +30,21 @@
               @contextmenu.prevent="onRowContextMenu($event, v)"
           >
             <!-- <td class="px-3 py-3 text-gray-700">{{ v.id }}</td> -->
-            <td class="px-3 py-3 font-medium text-gray-800">{{ v.name }}</td>
+            <td class="px-3 py-3 font-medium text-gray-800">
+              <div class="inline-block mx-auto my-2">
+  <div class="w-[150px] h-[80px] rounded-md overflow-hidden border-[3px] border-black shadow-md bg-white">
+    <div class="bg-red-700 h-[24px] flex items-center justify-between px-3 text-white font-bold text-sm">
+      <span>EGYPT</span>
+      <span class="text-base">مصر</span>
+    </div>
+    <div class="h-[56px] flex items-center justify-center text-black text-m md:text-l font-bold">
+      <div class="px-4 truncate max-w-full" dir="rtl">
+        {{ v.name }}
+      </div>
+    </div>
+  </div>
+</div>
+            </td>
             <td class="px-3 py-3 text-gray-700">{{ v.contractor?.name || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '—' }}</td>
