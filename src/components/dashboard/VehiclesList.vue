@@ -368,12 +368,14 @@
                     </td>
                     <td class="px-3 py-2">
                       <span
-                        v-if="row.isPrimary"
+                        v-if="row.isPrimary === true || row.isPrimary === 'true'"
                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
                       >
-                        {{ $t('vehicles.primary') }}
+                        ✓ {{ $t('vehicles.primary') }}
                       </span>
-                      <span v-else class="text-xs text-gray-400">-</span>
+                      <span v-else class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        ✗ {{ $t('vehicles.secondary') || 'Secondary' }}
+                      </span>
                     </td>
                     <td class="px-3 py-2">
                       {{ formatDateTime(row.fromDate) }}
@@ -383,7 +385,6 @@
                     </td>
                     <td class="px-3 py-2">
                       <button
-                        v-if="!row.toDate"
                         @click="onUnassignDriver(row)"
                         :disabled="unassignDriverLoading[row.id]"
                         class="px-2 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
@@ -391,7 +392,6 @@
                       >
                         {{ unassignDriverLoading[row.id] ? $t('labels.removing') || 'Removing...' : $t('vehicles.unassign') || 'Unassign' }}
                       </button>
-                      <span v-else class="text-xs text-gray-400">-</span>
                     </td>
                   </tr>
                 </tbody>

@@ -451,6 +451,7 @@
     "assignDriver": "Assign driver",
     "driver": "Driver",
     "primary": "Primary",
+    "secondary": "Secondary",
     "noDriverHistory": "No driver assignment history found",
     "stillAssigned": "Currently assigned",
     "changeOwner": "Change owner",

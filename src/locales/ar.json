@@ -451,6 +451,7 @@
     "assignDriver": "ربط سائق",
     "driver": "السائق",
     "primary": "أساسي",
+    "secondary": "غير أساسي",
     "noDriverHistory": "لا يوجد سجل لربط السائقين",
     "stillAssigned": "مربوط حالياً",
     "changeOwner": "تغيير المالك",
