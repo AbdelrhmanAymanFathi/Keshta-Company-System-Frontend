@@ -217,10 +217,17 @@
               {{ s.companyCapacity || '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ s.crusherCapacity || '-' }}</td>
-            <td
-              class="px-6 py-3 min-w-[140px] text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
-              {{ s.unitPrice || '-' }}
+            <td class="px-6 py-3 min-w-[160px] text-start text-sm font-semibold text-indigo-900 whitespace-nowrap">
+              {{
+                s.unitPrice
+                  ? new Intl.NumberFormat(isRTL ? 'ar-EG' : 'en-US', {
+                    style: 'currency',
+                    currency: 'EGP'
+                  }).format(s.unitPrice)
+              : '-'
+              }}
             </td>
+
 
             <td
               class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">
