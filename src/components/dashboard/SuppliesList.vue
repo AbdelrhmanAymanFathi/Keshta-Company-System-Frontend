@@ -15,42 +15,30 @@
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-          <input
-            v-model="filters.startDate"
-            type="date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          />
+          <input v-model="filters.startDate" type="date"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-          <input
-            v-model="filters.endDate"
-            type="date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          />
+          <input v-model="filters.endDate" type="date"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- Contractor -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.contractorSearch"
-              @focus="filters.showContractorDropdown = true"
-              @blur="closeDropdownDelayed('showContractorDropdown')"
-              type="text"
+            <input v-model="filters.contractorSearch" @focus="filters.showContractorDropdown = true"
+              @blur="closeDropdownDelayed('showContractorDropdown')" type="text"
               :placeholder="$t('placeholders.searchContractor')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showContractorDropdown && filteredContractors.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="contractor in filteredContractors"
-                :key="contractor.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showContractorDropdown && filteredContractors.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="contractor in filteredContractors" :key="contractor.id"
                 @click="filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.showContractorDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ contractor.name }}
               </div>
             </div>
@@ -61,21 +49,15 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.locationSearch"
-              @focus="filters.showLocationDropdown = true"
-              @blur="closeDropdownDelayed('showLocationDropdown')"
-              type="text"
+            <input v-model="filters.locationSearch" @focus="filters.showLocationDropdown = true"
+              @blur="closeDropdownDelayed('showLocationDropdown')" type="text"
               :placeholder="$t('placeholders.searchLocation')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showLocationDropdown && filteredLocations.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="location in filteredLocations"
-                :key="location.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showLocationDropdown && filteredLocations.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="location in filteredLocations" :key="location.id"
                 @click="filters.locationId = location.id; filters.locationSearch = location.name; filters.showLocationDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ location.name }}
               </div>
             </div>
@@ -86,21 +68,15 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.crusher') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.crusherSearch"
-              @focus="filters.showCrusherDropdown = true"
-              @blur="closeDropdownDelayed('showCrusherDropdown')"
-              type="text"
+            <input v-model="filters.crusherSearch" @focus="filters.showCrusherDropdown = true"
+              @blur="closeDropdownDelayed('showCrusherDropdown')" type="text"
               :placeholder="$t('placeholders.searchCrusher')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showCrusherDropdown && filteredCrushers.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="crusher in filteredCrushers"
-                :key="crusher.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showCrusherDropdown && filteredCrushers.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="crusher in filteredCrushers" :key="crusher.id"
                 @click="filters.crusherId = crusher.id; filters.crusherSearch = crusher.name; filters.showCrusherDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ crusher.name }}
               </div>
             </div>
@@ -111,21 +87,14 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.item') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.itemSearch"
-              @focus="filters.showItemDropdown = true"
-              @blur="closeDropdownDelayed('showItemDropdown')"
-              type="text"
-              :placeholder="$t('placeholders.searchItem')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showItemDropdown && filteredItems.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="item in filteredItems"
-                :key="item.id"
+            <input v-model="filters.itemSearch" @focus="filters.showItemDropdown = true"
+              @blur="closeDropdownDelayed('showItemDropdown')" type="text" :placeholder="$t('placeholders.searchItem')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showItemDropdown && filteredItems.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="item in filteredItems" :key="item.id"
                 @click="filters.itemId = item.id; filters.itemSearch = item.name; filters.showItemDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ item.name }}
               </div>
             </div>
@@ -136,21 +105,15 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.vehicle') }}</label>
           <div class="relative">
-            <input
-              v-model="filters.vehicleSearch"
-              @focus="filters.showVehicleDropdown = true"
-              @blur="closeDropdownDelayed('showVehicleDropdown')"
-              type="text"
+            <input v-model="filters.vehicleSearch" @focus="filters.showVehicleDropdown = true"
+              @blur="closeDropdownDelayed('showVehicleDropdown')" type="text"
               :placeholder="$t('placeholders.searchVehicle')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
-            <div v-if="filters.showVehicleDropdown && filteredVehicles.length" class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div
-                v-for="vehicle in filteredVehicles"
-                :key="vehicle.id"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            <div v-if="filters.showVehicleDropdown && filteredVehicles.length"
+              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+              <div v-for="vehicle in filteredVehicles" :key="vehicle.id"
                 @click="filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.showVehicleDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
-              >
+                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ vehicle.plateNumber || vehicle.name }}
               </div>
             </div>
@@ -159,17 +122,12 @@
       </div>
 
       <div class="flex gap-2">
-        <button
-          @click="page = 1; loadSupplies()"
-          :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
-        >
+        <button @click="page = 1; loadSupplies()" :disabled="loading"
+          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
           {{ $t('labels.search') }}
         </button>
-        <button
-          @click="clearFilters"
-          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium"
-        >
+        <button @click="clearFilters"
+          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium">
           {{ $t('labels.clear') }}
         </button>
       </div>
@@ -214,8 +172,10 @@
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.crusherCapacity') }}</th>
             <th
-              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.unitPrice') }}</th>
+              class="px-6 py-3 min-w-[160px] text-start text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.unitPrice') }}
+            </th>
+
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.discount') }}</th>
@@ -258,8 +218,10 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ s.crusherCapacity || '-' }}</td>
             <td
-              class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
-              {{ s.unitPrice || '-' }}</td>
+              class="px-6 py-3 min-w-[140px] text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
+              {{ s.unitPrice || '-' }}
+            </td>
+
             <td
               class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">
               {{ s.discount || '-' }}</td>
@@ -535,7 +497,7 @@ export default {
     async loadSupplies() {
       try {
         this.loading = true
-        
+
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
@@ -555,7 +517,7 @@ export default {
 
         console.log('Response received:', res)
         console.log('Response data:', res.data)
-        
+
         // Extract items from response
         const responseData = res.data
         if (responseData && responseData.items && Array.isArray(responseData.items)) {
@@ -569,7 +531,7 @@ export default {
             item: newItems[0]?.item?.name,
             contractor: newItems[0]?.contractor?.name
           })
-          
+
           // Log comparison with old items
           console.log('🔄 Old supplies count:', this.supplies.length)
           console.log('🔄 New supplies count:', newItems.length)
@@ -577,13 +539,13 @@ export default {
             console.log('🔄 Old first item ID:', this.supplies[0].id)
             console.log('🔄 New first item ID:', newItems[0]?.id)
           }
-          
+
           // In Vue 3, directly assign the array
           this.supplies = newItems
-          
+
           this.total = responseData.total || newItems.length
           this.pageSize = responseData.pageSize || this.pageSize
-          
+
           console.log('✓ Supplies updated:', this.supplies.length, 'items')
           console.log('✓ Supplies array is now:', this.supplies)
           console.log('✓ Component supplies data:', this.$data.supplies)
