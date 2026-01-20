@@ -62,7 +62,8 @@
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.item') }} —</option>
-                        <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})</option>
+                        <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})
+                        </option>
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
                       <button v-if="row.item === '__new__'" @click="showAddExportItemDialog = true"
@@ -356,12 +357,13 @@
       <h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3>
       <input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'"
         class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01"
-        :placeholder="$t('labels.price')" class="w-full border rounded px-2 py-1 mb-3" />
+      <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')"
+        class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
-        <button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
+        <button @click="createNewExportItem"
+          :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -785,15 +787,27 @@ export default {
         row.crusherCubic = ''
         return
       }
-      // Convert vehicle data from server (which are strings) to numbers
-      const cubicCapacity = parseFloat(row.vehicle.cubicCapacity)
-      const crusherCubic = parseFloat(row.vehicle.crusherCubic)
-      
-      // Set cubic capacity (company capacity)
-      row.cubic = !isNaN(cubicCapacity) ? cubicCapacity : 0
-      
-      // Set crusher cubic
-      row.crusherCubic = !isNaN(crusherCubic) ? crusherCubic : ''
+
+      let vehicle = row.vehicle
+
+      if (vehicle.cubicCapacity === undefined || vehicle.crusherCubic === undefined) {
+        const fullVehicle = this.vehicles.find(v => v.id === vehicle.id)
+        if (fullVehicle) {
+          vehicle = fullVehicle
+          console.log('استخدمنا النسخة الكاملة من getVehicles:', fullVehicle)
+        }
+      }
+
+      const companyCubic = parseFloat(vehicle.cubicCapacity || 0)
+      const crusherCubicVal = parseFloat(vehicle.crusherCubic || 0)
+
+      row.cubic = isNaN(companyCubic) ? 0 : companyCubic
+      row.crusherCubic = isNaN(crusherCubicVal) ? '' : crusherCubicVal
+
+      //  test values
+      console.log('Vehicle name:', vehicle.name)
+      console.log('cubicCapacity final:', companyCubic)
+      console.log('crusherCubic final:', crusherCubicVal)
     },
     onItemSelect(row) {
       if (!row.item || row.item === '__new__') {
@@ -871,15 +885,15 @@ export default {
         for (const r of toSave) {
           const locationId = r.area?.id || r.site?.id
           if (!locationId) continue
-          
+
           // Save last entered data before sending to server
           this.saveLastEnteredData(r)
-          
+
           // Parse numeric values
           const price = Number(r.price || 0)
           const cubic = Number(r.cubic || 0)
           const discount = Number(r.discount || 0)
-          
+
           await createDelivery({
             crusherId: Number(r.crusher.id),
             contractorId: Number(r.contractor.id),
