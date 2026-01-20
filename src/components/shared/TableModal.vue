@@ -453,7 +453,15 @@ export default {
       exportItemDialogError: '',
       creatingExportItem: false,
       // Reference to table element
-      tableRef: null
+      tableRef: null,
+      // Last entered data for auto-fill
+      lastEnteredData: {
+        contractor: null,
+        area: null,
+        item: null,
+        price: 0,
+        crusher: null
+      }
     }
   },
   computed: {
@@ -483,12 +491,40 @@ export default {
   async mounted() {
     // Create first row on load
     this.rows = [this.createEmptyRow()]
+    // Load last entered data from localStorage
+    this.loadLastEnteredData()
   },
   methods: {
+    loadLastEnteredData() {
+      try {
+        const saved = localStorage.getItem('tableModalLastData')
+        if (saved) {
+          this.lastEnteredData = JSON.parse(saved)
+        }
+      } catch (err) {
+        console.warn('Failed to load last entered data:', err)
+      }
+    },
+    saveLastEnteredData(row) {
+      try {
+        const data = {
+          contractor: row.contractor ? { id: row.contractor.id, name: row.contractor.name } : null,
+          area: row.area ? { id: row.area.id, name: row.area.name, parentId: row.area.parentId } : null,
+          item: row.item ? { id: row.item.id, name: row.item.name, currentPrice: row.item.currentPrice } : null,
+          price: row.price || 0,
+          crusher: row.crusher ? { id: row.crusher.id, name: row.crusher.name } : null
+        }
+        localStorage.setItem('tableModalLastData', JSON.stringify(data))
+        this.lastEnteredData = data
+      } catch (err) {
+        console.warn('Failed to save last entered data:', err)
+      }
+    },
     async openModal() {
       this.isOpen = true
-      this.resetRows()
       await this.loadInitialData()
+      // Reset and create rows AFTER loading data
+      this.resetRows()
     },
     closeModal() {
       this.isOpen = false
@@ -507,7 +543,7 @@ export default {
     },
     createEmptyRow() {
       // Initialize empty row with default values
-      return {
+      const row = {
         id: Date.now() + Math.random(),
         date: '',
         site: null,
@@ -525,6 +561,53 @@ export default {
         crusherCubic: '',
         availableVehicles: []
       }
+
+      // Auto-fill with last entered data if available
+      // Find and set contractor from contractors list
+      if (this.lastEnteredData.contractor && this.lastEnteredData.contractor.id) {
+        const foundContractor = this.contractors.find(c => c.id === this.lastEnteredData.contractor.id)
+        if (foundContractor) {
+          row.contractor = foundContractor
+          this.onContractorChange(row)
+        }
+      }
+
+      // Find and set crusher from crushers list
+      if (this.lastEnteredData.crusher && this.lastEnteredData.crusher.id) {
+        const foundCrusher = this.crushers.find(c => c.id === this.lastEnteredData.crusher.id)
+        if (foundCrusher) {
+          row.crusher = foundCrusher
+        }
+      }
+
+      // Find and set site and area from locations
+      if (this.lastEnteredData.area && this.lastEnteredData.area.id) {
+        const foundArea = this.allLocations.find(l => l.id === this.lastEnteredData.area.id)
+        if (foundArea) {
+          row.area = foundArea
+          // Also set the site if we found the area
+          const parentSite = this.allLocations.find(l => l.id === foundArea.parentId)
+          if (parentSite) {
+            row.site = parentSite
+            this.updateAvailableAreas(row)
+          }
+        }
+      }
+
+      // Find and set item from exportItems list
+      if (this.lastEnteredData.item && this.lastEnteredData.item.id) {
+        const foundItem = this.exportItems.find(i => i.id === this.lastEnteredData.item.id)
+        if (foundItem) {
+          row.item = foundItem
+        }
+      }
+
+      // Set price
+      if (this.lastEnteredData.price) {
+        row.price = this.lastEnteredData.price
+      }
+
+      return row
     },
     isRowEmpty(row) {
       return !row.date &&
@@ -775,6 +858,9 @@ export default {
         for (const r of toSave) {
           const locationId = r.area?.id || r.site?.id
           if (!locationId) continue
+          
+          // Save last entered data before sending to server
+          this.saveLastEnteredData(r)
           
           // Parse numeric values
           const price = Number(r.price || 0)
