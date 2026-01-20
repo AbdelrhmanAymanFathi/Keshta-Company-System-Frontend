@@ -403,6 +403,7 @@
     "deleteError": "Error deleting crusher"
   },
   "vehicles": {
+    "crusherCubic":"Crusher Cubic",
     "title": "Vehicles",
     "add": "Add Vehicle",
     "searchPlaceholder": "Search vehicles...",

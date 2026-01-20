@@ -27,20 +27,20 @@
               <thead class="bg-indigo-50 sticky top-0 z-10">
                 <tr>
                   <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.date') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.item') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.site') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.area') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.contractor') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.crusher') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.vehicle') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.crusherBon') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.companyBon') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.discount') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.price') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.cubic') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.crusherCubic') }}</th>
-                  <th class="px-3 py-3 text-start">{{ $t('labels.total') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.date') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.item') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.site') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.area') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.contractor') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusher') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.discount') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.price') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.cubic') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.total') }}</th>
                   <th class="px-3 py-3 text-center">{{ $t('labels.actions') }}</th>
                 </tr>
               </thead>
@@ -95,6 +95,7 @@
                     <div class="flex items-center gap-1">
                       <select v-model="row.area" :disabled="!row.site || row.site === '__new__'"
                         class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        @change="onAreaChange(row)"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.area') }} —</option>
                         <option v-for="a in row.availableAreas" :key="a.id" :value="a">{{ a.name }}</option>
@@ -185,7 +186,7 @@
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.price"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
+                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" @input="onPriceChange(row)" @change="onPriceChange(row)" />
                   </td>
 
                   <!-- Cubic -->
@@ -462,7 +463,8 @@ export default {
         area: null,
         item: null,
         price: 0,
-        crusher: null
+        crusher: null,
+        site: null
       }
     }
   },
@@ -512,12 +514,14 @@ export default {
         const data = {
           contractor: row.contractor ? { id: row.contractor.id, name: row.contractor.name } : null,
           area: row.area ? { id: row.area.id, name: row.area.name, parentId: row.area.parentId } : null,
+          site: row.site ? { id: row.site.id, name: row.site.name } : null,
           item: row.item ? { id: row.item.id, name: row.item.name, currentPrice: row.item.currentPrice } : null,
           price: row.price || 0,
           crusher: row.crusher ? { id: row.crusher.id, name: row.crusher.name } : null
         }
         localStorage.setItem('tableModalLastData', JSON.stringify(data))
         this.lastEnteredData = data
+        console.log('Saved lastEnteredData:', data)
       } catch (err) {
         console.warn('Failed to save last entered data:', err)
       }
@@ -545,6 +549,7 @@ export default {
     },
     createEmptyRow() {
       // Initialize empty row with default values
+      console.log('Creating empty row with lastEnteredData:', this.lastEnteredData)
       const row = {
         id: Date.now() + Math.random(),
         date: '',
@@ -565,6 +570,24 @@ export default {
       }
 
       // Auto-fill with last entered data if available
+      
+      // Find and set site first (before area)
+      if (this.lastEnteredData.site && this.lastEnteredData.site.id) {
+        const foundSite = this.allLocations.find(l => l.id === this.lastEnteredData.site.id)
+        if (foundSite) {
+          row.site = foundSite
+          this.updateAvailableAreas(row)
+        }
+      }
+
+      // Find and set area from locations (after site is set)
+      if (this.lastEnteredData.area && this.lastEnteredData.area.id) {
+        const foundArea = this.allLocations.find(l => l.id === this.lastEnteredData.area.id)
+        if (foundArea) {
+          row.area = foundArea
+        }
+      }
+
       // Find and set contractor from contractors list
       if (this.lastEnteredData.contractor && this.lastEnteredData.contractor.id) {
         const foundContractor = this.contractors.find(c => c.id === this.lastEnteredData.contractor.id)
@@ -582,33 +605,23 @@ export default {
         }
       }
 
-      // Find and set site and area from locations
-      if (this.lastEnteredData.area && this.lastEnteredData.area.id) {
-        const foundArea = this.allLocations.find(l => l.id === this.lastEnteredData.area.id)
-        if (foundArea) {
-          row.area = foundArea
-          // Also set the site if we found the area
-          const parentSite = this.allLocations.find(l => l.id === foundArea.parentId)
-          if (parentSite) {
-            row.site = parentSite
-            this.updateAvailableAreas(row)
-          }
-        }
-      }
-
       // Find and set item from exportItems list
       if (this.lastEnteredData.item && this.lastEnteredData.item.id) {
         const foundItem = this.exportItems.find(i => i.id === this.lastEnteredData.item.id)
         if (foundItem) {
           row.item = foundItem
+          // Auto-populate price from item's currentPrice
+          // if (foundItem.currentPrice) {
+          //   row.price = Number(foundItem.currentPrice)
+          // }
         }
       }
 
-      // Set price
-      if (this.lastEnteredData.price) {
+      // Set price from lastEnteredData (if no item set the price)
+      if (!row.item && this.lastEnteredData.price) {
         row.price = this.lastEnteredData.price
       }
-
+row.price = this.lastEnteredData.price ?? 0
       return row
     },
     isRowEmpty(row) {
@@ -682,6 +695,11 @@ export default {
         this.showAddSite = true
         row.site = null
         return
+      }
+      if (row.site && row.site.id) {
+        // Save last entered site
+        this.saveLastEnteredData(row)
+        console.log('Site changed:', row.site)
       }
       this.updateAvailableAreas(row)
       row.area = null
@@ -769,6 +787,10 @@ export default {
       }
     },
     onContractorChange(row) {
+      if (row.contractor === '__new__') {
+        this.showAddContractorDialog = true
+        return
+      }
       if (!row.contractor?.id) {
         row.availableVehicles = [...this.vehicles]
         row.vehicle = null
@@ -777,9 +799,18 @@ export default {
       const cv = this.contractorsWithVehicles.find(c => c.id === row.contractor.id)
       row.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === row.contractor.id)
       row.vehicle = null
+      // Save last entered contractor
+      this.saveLastEnteredData(row)
     },
     onCrusherChange(row) {
-      this.onContractorChange(row)
+      // Handle __new__ crusher
+      if (row.crusher === '__new__') {
+        this.showAddCrusherDialog = true
+        return
+      }
+      // Save last entered crusher whenever it changes (even if null/deselected)
+      this.saveLastEnteredData(row)
+      console.log('Crusher changed:', row.crusher)
     },
     onVehicleSelect(row) {
       if (!row.vehicle) {
@@ -810,13 +841,34 @@ export default {
       console.log('crusherCubic final:', crusherCubicVal)
     },
     onItemSelect(row) {
-      if (!row.item || row.item === '__new__') {
+      // Handle __new__ item
+      if (row.item === '__new__') {
+        this.showAddExportItemDialog = true
         return
       }
       // Auto-populate price from item's currentPrice
-      if (row.item.currentPrice) {
+      if (row.item && row.item.currentPrice) {
         row.price = Number(row.item.currentPrice)
       }
+      // Handle deselection (item set to null)
+      if (!row.item) {
+        row.price = 0
+      }
+      // Save last entered item whenever it changes (even if null/deselected)
+      this.saveLastEnteredData(row)
+      console.log('Item selected:', row.item)
+    },
+    onAreaChange(row) {
+      // Save last entered area whenever it changes
+      if (row.area && row.area.id) {
+        this.saveLastEnteredData(row)
+        console.log('Area changed:', row.area)
+      }
+    },
+    onPriceChange(row) {
+      // Save last entered price whenever it changes
+      this.saveLastEnteredData(row)
+      console.log('Price changed:', row.price)
     },
     totalPerRow(row) {
       const p = Number(row.price || 0)
@@ -832,21 +884,63 @@ export default {
     },
 
     // Handle Enter key press in any field - add new row immediately
-    handleEnterKey(rowIndex) {
-      this.addRow()
+handleEnterKey(rowIndex) {
+  const currentRow = this.rows[rowIndex]
+  
+  // نحفظ الـ last للاستخدام المرة الجاية لما نفتح المودال
+  if (currentRow) {
+    this.saveLastEnteredData(currentRow)
+  }
 
-      this.$nextTick(() => {
-        if (!this.tableRef) return
-        const allRows = this.tableRef.querySelectorAll('tbody tr')
-        const newRow = allRows[rowIndex + 1]
-        if (newRow) {
-          const firstInput = newRow.querySelector('input[type="date"]')
-          firstInput?.focus()
-        }
-      })
-    },
+  // ننشئ صف جديد فارغ أولاً (بدون أي تعبئة تلقائية من lastEnteredData)
+  const newRow = {
+    id: Date.now() + Math.random(),
+    date: '', // أو لو عايز تاريخ اليوم تلقائي: new Date().toISOString().split('T')[0]
+    site: currentRow.site,                  // نسخ مباشر
+    area: currentRow.area,                  // نسخ مباشر
+    availableAreas: [],
+    contractor: currentRow.contractor,      // نسخ مباشر
+    crusher: currentRow.crusher,            // نسخ مباشر
+    vehicle: null,                          // نرجعه null عشان يختار عربية جديدة
+    item: currentRow.item,                  // نسخ مباشر
+    crusherBon: '',
+    companyBon: '',
+    discount: 0,
+    price: currentRow.price || 0,            // نسخ السعر الحالي (حتى لو عدلته يدوي)
+    cubic: 0,
+    crusherCubic: '',
+    availableVehicles: []
+  }
+
+  // تحديث الحقول التابعة
+  if (newRow.site) {
+    newRow.availableAreas = this.allLocations.filter(l => l.parentId === newRow.site.id)
+  }
+
+  if (newRow.contractor && newRow.contractor.id) {
+    const cv = this.contractorsWithVehicles.find(c => c.id === newRow.contractor.id)
+    newRow.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === newRow.contractor.id)
+  }
+
+  // نضيف الصف الجديد
+  this.rows.push(newRow)
+
+  // ننتقل للتركيز على حقل التاريخ في الصف الجديد
+  this.$nextTick(() => {
+    if (!this.tableRef) return
+    const allRows = this.tableRef.querySelectorAll('tbody tr')
+    const newRowEl = allRows[rowIndex + 1]
+    if (newRowEl) {
+      const firstInput = newRowEl.querySelector('input[type="date"]')
+      firstInput?.focus()
+    }
+  })
+},
 
     addRow() {
+      // Reload lastEnteredData from localStorage before creating new row
+      this.loadLastEnteredData()
+      console.log('Adding new row with lastEnteredData:', this.lastEnteredData)
       this.rows.push(this.createEmptyRow())
     },
     duplicateRow(index) {

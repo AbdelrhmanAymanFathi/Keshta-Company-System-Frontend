@@ -403,6 +403,7 @@
     "deleteError": "خطأ في حذف الكسارة"
   },
   "vehicles": {
+    "crusherCubic":"تكعيب الكسارة",
     "title": "المركبات",
     "add": "إضافة مركبة",
     "searchPlaceholder": "البحث في المركبات...",
