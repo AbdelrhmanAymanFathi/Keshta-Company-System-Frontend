@@ -707,15 +707,22 @@ export default {
     async addArea() {
       if (!this.newAreaName?.trim() || !this.pendingRow?.site?.id) return
       this.addingLocation = true
+      // Store the site before refresh to prevent it from being cleared
+      const siteId = this.pendingRow.site.id
+      const siteName = this.pendingRow.site.name
       try {
         const res = await createLocation({
           name: this.newAreaName.trim(),
-          parentId: this.pendingRow.site.id
+          parentId: siteId
         })
         await this.refreshLocations()
+        // Restore the site after refresh
+        this.pendingRow.site = this.allLocations.find(l => l.id === siteId)
         const created = res?.data
         if (created?.id && this.pendingRow) {
           this.pendingRow.area = this.allLocations.find(l => l.id === created.id)
+          // Update available areas for the pending row
+          this.updateAvailableAreas(this.pendingRow)
         }
         this.showAddArea = false
         this.newAreaName = ''
@@ -778,9 +785,15 @@ export default {
         row.crusherCubic = ''
         return
       }
-      // Set cubic capacity from vehicle
-      row.cubic = Number(row.vehicle.cubicCapacity ?? row.vehicle.cubic ?? 0)
-      row.crusherCubic = row.vehicle.crusherCubic ? Number(row.vehicle.crusherCubic) : ''
+      // Convert vehicle data from server (which are strings) to numbers
+      const cubicCapacity = parseFloat(row.vehicle.cubicCapacity)
+      const crusherCubic = parseFloat(row.vehicle.crusherCubic)
+      
+      // Set cubic capacity (company capacity)
+      row.cubic = !isNaN(cubicCapacity) ? cubicCapacity : 0
+      
+      // Set crusher cubic
+      row.crusherCubic = !isNaN(crusherCubic) ? crusherCubic : ''
     },
     onItemSelect(row) {
       if (!row.item || row.item === '__new__') {
