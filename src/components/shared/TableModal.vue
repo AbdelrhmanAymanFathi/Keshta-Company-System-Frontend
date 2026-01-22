@@ -12,7 +12,9 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle }}</h2>
+          <h2 class="text-2xl font-bold text-gray-800">
+            {{ currentStep === 1 ? modalTitle : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
+          </h2>
           <button @click="closeModal"
             class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">
             ×
@@ -21,237 +23,308 @@
 
         <!-- Body -->
         <div class="flex-1 overflow-y-auto p-6">
-          <!-- Table -->
-          <div class="overflow-x-auto mb-8">
-            <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border">
-              <thead class="bg-indigo-50 sticky top-0 z-10">
-                <tr>
-                  <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.date') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.item') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.site') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.area') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.contractor') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusher') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.discount') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.price') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.cubic') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.total') }}</th>
-                  <th class="px-3 py-3 text-center">{{ $t('labels.actions') }}</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
-                <tr v-for="(row, index) in rows" :key="row.id">
-                  <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
-                  <!-- Date -->
-                  <td class="px-3 py-2">
-                    <input type="date" v-model="row.date"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="handleEnterKey(index)" />
-                  </td>
+          <!-- ============================================ STEP 1 ============================================ -->
+          <div v-if="currentStep === 1" class="w-full">
+            <h3 class="text-xl font-bold mb-8 text-center">{{ $t('labels.step1BasicData') }}</h3>
 
-                  <!-- Item -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-1">
-                      <select v-model="row.item" @change="onItemSelect(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)">
-                        <option :value="null">{{ $t('labels.item') }} —</option>
-                        <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})
-                        </option>
-                        <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                      </select>
-                      <button v-if="row.item === '__new__'" @click="showAddExportItemDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                        +
-                      </button>
-                    </div>
-                  </td>
+            <div class="grid gap-6 auto-fit" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+              <!-- Date -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.date') }} *</label>
+                <input type="date" v-model="commonData.date"
+                  class="w-full border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+              </div>
 
-                  <!-- Site -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-1">
-                      <select v-model="row.site" @change="onSiteChange(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)">
-                        <option :value="null">{{ $t('labels.site') }} —</option>
-                        <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
-                        <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') }}</option>
-                      </select>
-                      <button v-if="row.site === '__new__'" @click="showAddSite = true; pendingRow = row"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                        +
-                      </button>
-                    </div>
-                  </td>
+              <!-- Item (صنف) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.item') }} *</label>
+                <div class="flex items-center gap-1">
+                  <select v-model="commonData.item" @change="onCommonItemSelect"
+                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                    <option :value="null">{{ $t('labels.item') }} —</option>
+                    <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})</option>
+                    <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
+                  </select>
+                  <button v-if="commonData.item === '__new__'" @click="showAddExportItemDialog = true"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
+                    +
+                  </button>
+                </div>
+              </div>
 
-                  <!-- Area -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-1">
-                      <select v-model="row.area" :disabled="!row.site || row.site === '__new__'"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        @change="onAreaChange(row)"
-                        @keydown.enter.prevent="handleEnterKey(index)">
-                        <option :value="null">{{ $t('labels.area') }} —</option>
-                        <option v-for="a in row.availableAreas" :key="a.id" :value="a">{{ a.name }}</option>
-                        <option value="__new__" style="color: #10b981;" :disabled="!row.site || row.site === '__new__'">
-                          + {{ $t('supply.addNewArea') }}
-                        </option>
-                      </select>
-                      <button v-if="row.area === '__new__'" @click="showAddArea = true; pendingRow = row"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                        +
-                      </button>
-                    </div>
-                  </td>
+              <!-- Price (السعر) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.price') }} *</label>
+                <input type="number" v-model.number="commonData.price" step="0.01"
+                  class="w-full border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+              </div>
 
-                  <!-- Contractor -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-1">
-                      <select v-model="row.contractor" @change="onContractorChange(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)">
-                        <option :value="null">{{ $t('labels.contractor') }} —</option>
-                        <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
-                        <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                      </select>
-                      <button v-if="row.contractor === '__new__'" @click="showAddContractorDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                        +
-                      </button>
-                    </div>
-                  </td>
+              <!-- Site (الموقع) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.site') }} *</label>
+                <div class="flex items-center gap-1">
+                  <select v-model="commonData.site" @change="onCommonSiteChange"
+                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                    <option :value="null">{{ $t('labels.site') }} —</option>
+                    <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
+                    <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') }}</option>
+                  </select>
+                  <button v-if="commonData.site === '__new__'" @click="showAddSite = true; pendingRow = null"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
+                    +
+                  </button>
+                </div>
+              </div>
 
-                  <!-- Crusher -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-1">
-                      <select v-model="row.crusher" @change="onCrusherChange(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)">
-                        <option :value="null">{{ $t('labels.crusher') }} —</option>
-                        <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
-                        <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                      </select>
-                      <button v-if="row.crusher === '__new__'" @click="showAddCrusherDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                        +
-                      </button>
-                    </div>
-                  </td>
+              <!-- Area (المنطقة) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
+                <div class="flex items-center gap-1">
+                  <select v-model="commonData.area" :disabled="!commonData.site || commonData.site === '__new__'"
+                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                    <option :value="null">{{ $t('labels.area') }} —</option>
+                    <option v-for="a in commonAvailableAreas" :key="a.id" :value="a">{{ a.name }}</option>
+                    <option value="__new__" v-if="commonData.site && commonData.site.id" style="color: #10b981;">+ {{ $t('supply.addNewArea') }}</option>
+                  </select>
+                  <button v-if="commonData.area === '__new__'" @click="showAddArea = true; pendingRow = null"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
+                    +
+                  </button>
+                </div>
+              </div>
 
-                  <!-- Vehicle -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-1">
-                      <select v-model="row.vehicle" @change="onVehicleSelect(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)">
-                        <option :value="null">{{ $t('labels.vehicle') }} —</option>
-                        <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
-                        <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                      </select>
-                      <button v-if="row.vehicle === '__new__'" @click="showAddVehicleDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                        +
-                      </button>
-                    </div>
-                  </td>
+              <!-- Contractor (المقاول) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }} *</label>
+                <div class="flex items-center gap-1">
+                  <select v-model="commonData.contractor" @change="onCommonContractorChange"
+                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                    <option :value="null">{{ $t('labels.contractor') }} —</option>
+                    <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
+                    <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
+                  </select>
+                  <button v-if="commonData.contractor === '__new__'" @click="showAddContractorDialog = true"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
+                    +
+                  </button>
+                </div>
+              </div>
 
-                  <!-- Crusher Bon -->
-                  <td class="px-3 py-2">
-                    <input type="text" v-model="row.crusherBon"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="handleEnterKey(index)" />
-                  </td>
-
-                  <!-- Company Bon -->
-                  <td class="px-3 py-2">
-                    <input type="text" v-model="row.companyBon"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      @keydown.enter.prevent="handleEnterKey(index)" />
-                  </td>
-
-                  <!-- Discount -->
-                  <td class="px-3 py-2">
-                    <input type="number" v-model.number="row.discount"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
-                  </td>
-
-                  <!-- Price -->
-                  <td class="px-3 py-2">
-                    <input type="number" step="any" v-model.number="row.price"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" @input="onPriceChange(row)" @change="onPriceChange(row)" />
-                  </td>
-
-                  <!-- Cubic -->
-                  <td class="px-3 py-2">
-                    <input type="number" step="any" v-model.number="row.cubic"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
-                  </td>
-
-                  <!-- Crusher Cubic -->
-                  <td class="px-3 py-2">
-                    <input type="number" step="any" v-model.number="row.crusherCubic"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                      placeholder="-" @keydown.enter.prevent="handleEnterKey(index)" />
-                  </td>
-
-                  <!-- Total -->
-                  <td class="px-3 py-2 font-semibold text-start">
-                    {{ formatNumber(totalPerRow(row)) }}
-                  </td>
-
-                  <!-- Actions -->
-                  <td class="px-3 py-2">
-                    <div class="flex items-center gap-2 justify-center">
-                      <button @click="duplicateRow(index)"
-                        class="px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded text-sm" title="نسخ الصف">
-                        ⤷
-                      </button>
-                      <button @click="removeRow(index)"
-                        class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" title="حذف الصف">
-                        ✕
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Totals -->
-          <div class="mt-8 text-start space-y-1 text-sm">
-            <div class="flex justify-end gap-8">
-              <span class="text-gray-600">{{ $t('supply.subtotal') }}:</span>
-              <span class="font-semibold text-indigo-700 w-24">{{ formatNumber(subtotal) }}</span>
+              <!-- Crusher (الكسارة) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusher') }} *</label>
+                <div class="flex items-center gap-1">
+                  <select v-model="commonData.crusher" @change="onCommonCrusherChange"
+                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                    <option :value="null">{{ $t('labels.crusher') }} —</option>
+                    <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
+                    <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
+                  </select>
+                  <button v-if="commonData.crusher === '__new__'" @click="showAddCrusherDialog = true"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
+                    +
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-end gap-8">
-              <span class="text-gray-600">{{ $t('supply.totalDiscount') }}:</span>
-              <span class="font-semibold text-red-600 w-24">-{{ formatNumber(totalDiscount) }}</span>
-            </div>
-            <div class="flex justify-end gap-8 pt-2 border-t border-gray-300">
-              <span class="text-gray-700 font-medium">{{ $t('supply.grandTotal') }}:</span>
-              <span class="font-bold text-indigo-800 w-24">{{ formatNumber(grandTotal) }}</span>
+
+            <!-- Next Button -->
+            <div class="mt-12 flex justify-center gap-4">
+              <button @click="closeModal" class="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
+                {{ $t('labels.cancel') }}
+              </button>
+              <button @click="goToStep2" :disabled="!isStep1Valid()"
+                class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium">
+                {{ $t('labels.next') }} {{ isRTL ? '←' : '→' }}
+              </button>
             </div>
           </div>
 
-          <!-- Save Button -->
-          <div class="mt-10 flex justify-end">
-            <button @click="saveData" :disabled="isSaving"
-              class="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl text-xl font-medium shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
-              {{ isSaving ? $t('labels.saving') : $t('labels.saveSupply') }}
-            </button>
+          <!-- ============================================ STEP 2 ============================================ -->
+          <div v-else class="w-full">
+            <!-- Back Button and Title -->
+            <div class="flex items-center justify-between mb-6">
+              <button @click="goBackToStep1" class="text-indigo-600 hover:underline font-medium">
+                {{ isRTL ? '→' : '←' }} {{ $t('labels.back') }}
+              </button>
+              <h3 class="text-xl font-bold">{{ $t('labels.step2Data') }}</h3>
+              <div></div>
+            </div>
+
+            <!-- Summary Card of Common Data -->
+            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
+              <h4 class="text-sm font-bold text-indigo-900 mb-3">{{ $t('labels.summary') }}</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.date') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ commonData.date || '-' }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.item') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ commonData.item?.name || '-' }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.price') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ formatNumber(commonData.price) }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.site') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ commonData.site?.name || '-' }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.area') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ commonData.area?.name || '-' }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ commonData.contractor?.name || '-' }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</span>
+                  <span class="text-gray-600 ml-2">{{ commonData.crusher?.name || '-' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table for Variable Data -->
+            <div class="overflow-x-auto mb-8">
+              <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border">
+                <thead class="bg-indigo-50 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.price') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.discount') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.cubic') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
+                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.total') }}</th>
+                    <th class="px-3 py-3 text-center">{{ $t('labels.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  <tr v-for="(row, index) in rows" :key="row.id">
+                    <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+
+                    <!-- Vehicle -->
+                    <td class="px-3 py-2">
+                      <div class="flex items-center gap-1">
+                        <select v-model="row.vehicle" @change="onVehicleSelect(row)"
+                          class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          @keydown.enter.prevent="handleEnterKey(index)">
+                          <option :value="null">{{ $t('labels.vehicle') }} —</option>
+                          <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
+                          <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
+                        </select>
+                        <button v-if="row.vehicle === '__new__'" @click="showAddVehicleDialog = true"
+                          class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                          +
+                        </button>
+                      </div>
+                    </td>
+
+                    <!-- Price (readonly - from commonData) -->
+                    <td class="px-3 py-2">
+                      <input type="number" :value="commonData.price" readonly
+                        class="w-full border border-gray-300 rounded px-2 py-1 bg-gray-100 text-gray-600" />
+                    </td>
+
+                    <!-- Crusher Bon -->
+                    <td class="px-3 py-2">
+                      <input type="text" v-model="row.crusherBon"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        @keydown.enter.prevent="handleEnterKey(index)" />
+                    </td>
+
+                    <!-- Company Bon -->
+                    <td class="px-3 py-2">
+                      <input type="text" v-model="row.companyBon"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        @keydown.enter.prevent="handleEnterKey(index)" />
+                    </td>
+
+                    <!-- Discount -->
+                    <td class="px-3 py-2">
+                      <input type="number" v-model.number="row.discount" step="0.01"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                        @keydown.enter.prevent="handleEnterKey(index)" />
+                    </td>
+
+                    <!-- Company Cubic -->
+                    <td class="px-3 py-2">
+                      <input type="number" v-model.number="row.cubic" step="0.01"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                        @keydown.enter.prevent="handleEnterKey(index)" />
+                    </td>
+
+                    <!-- Crusher Cubic -->
+                    <td class="px-3 py-2">
+                      <input type="number" v-model.number="row.crusherCubic" step="0.01"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                        @keydown.enter.prevent="handleEnterKey(index)" />
+                    </td>
+
+                    <!-- Total per Row -->
+                    <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
+                      {{ formatNumber(totalPerRow(row)) }}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="px-3 py-2 text-center">
+                      <div class="flex justify-center gap-2">
+                        <button @click="duplicateRow(index)" class="text-blue-500 hover:text-blue-700 text-lg" title="Duplicate">
+                          📋
+                        </button>
+                        <button @click="removeRow(index)" class="text-red-500 hover:text-red-700 text-lg" title="Delete">
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Add Row Button -->
+            <div class="text-center mb-8">
+              <button @click="addRow"
+                class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-medium">
+                + {{ $t('labels.addRow') }}
+              </button>
+            </div>
+
+            <!-- Totals -->
+            <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-end gap-8 text-sm font-semibold">
+              <div>
+                <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
+                <span class="ml-2">{{ formatNumber(subtotal) }}</span>
+              </div>
+              <div>
+                <span class="text-gray-700">{{ $t('labels.totalDiscount') }}:</span>
+                <span class="text-red-600 ml-2">- {{ formatNumber(totalDiscount) }}</span>
+              </div>
+              <div class="text-lg text-indigo-700 border-l-2 border-indigo-700 pl-8">
+                <span>{{ $t('labels.grandTotal') }}:</span>
+                <span class="ml-2">{{ formatNumber(grandTotal) }}</span>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-10 flex justify-end gap-4">
+              <button @click="goBackToStep1" class="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
+                {{ $t('labels.back') }}
+              </button>
+              <button @click="saveData" :disabled="isSaving"
+                class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium">
+                {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
+              </button>
+            </div>
+            <p v-if="saveError" class="mt-4 text-center text-red-600 font-medium text-lg">
+              {{ saveError }}
+            </p>
           </div>
-          <p v-if="saveError" class="mt-4 text-center text-red-600 font-medium text-lg">
-            {{ saveError }}
-          </p>
         </div>
       </div>
     </div>
@@ -296,8 +369,7 @@
       <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
         :placeholder="$t('contractors.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
+        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
@@ -313,8 +385,7 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
       <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
+        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
@@ -340,10 +411,8 @@
         :placeholder="$t('vehicles.crusherCubic') || $t('labels.crusherCubic')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewVehicle"
-          :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
+        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="createNewVehicle" :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || creatingVehicle"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -361,10 +430,8 @@
       <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewExportItem"
-          :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
+        <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -413,8 +480,25 @@ export default {
   },
   data() {
     return {
+      // Step control
+      currentStep: 1,
+      
+      // Common data (Step 1)
+      commonData: {
+        date: '',
+        item: null,
+        price: 0,
+        site: null,
+        area: null,
+        contractor: null,
+        crusher: null
+      },
+
+      // Modal state
       isOpen: false,
       isSaving: false,
+
+      // Lookups
       sites: [],
       allLocations: [],
       rows: [],
@@ -423,21 +507,27 @@ export default {
       crushers: [],
       vehicles: [],
       exportItems: [],
+
+      // Errors
       saveError: '',
+      locationError: '',
+      contractorDialogError: '',
+      crusherDialogError: '',
+      vehicleDialogError: '',
+      exportItemDialogError: '',
+
+      // Dialog states
       showAddSite: false,
       newSiteName: '',
       showAddArea: false,
       newAreaName: '',
       addingLocation: false,
-      locationError: '',
       pendingRow: null,
       showAddContractorDialog: false,
       newContractorName: '',
-      contractorDialogError: '',
       creatingContractor: false,
       showAddCrusherDialog: false,
       newCrusherName: '',
-      crusherDialogError: '',
       creatingCrusher: false,
       showAddVehicleDialog: false,
       newVehicleForm: {
@@ -446,19 +536,20 @@ export default {
         cubicCapacity: '',
         crusherCubic: ''
       },
-      vehicleDialogError: '',
       creatingVehicle: false,
       showAddExportItemDialog: false,
       newExportItemForm: {
         name: '',
         currentPrice: ''
       },
-      exportItemDialogError: '',
       creatingExportItem: false,
-      // Reference to table element
+
+      // References
       tableRef: null,
-      // Last entered data for auto-fill
+      
+      // Last entered data for localStorage
       lastEnteredData: {
+        date: '',
         contractor: null,
         area: null,
         item: null,
@@ -468,74 +559,84 @@ export default {
       }
     }
   },
+
   computed: {
+    commonAvailableAreas() {
+      return this.commonData.site?.id
+        ? this.allLocations.filter(l => l.parentId === this.commonData.site.id)
+        : []
+    },
+
     subtotal() {
-      // Subtotal = sum of (price × cubic) for each row
       return this.rows.reduce((sum, row) => {
-        const p = Number(row.price || 0)
+        const p = Number(this.commonData.price || 0)
         const c = Number(row.cubic || 0)
         return sum + (p * c)
       }, 0)
     },
+
     totalDiscount() {
-      // Total discount = sum of (discount × price) for each row
       return this.rows.reduce((sum, row) => {
         const d = Number(row.discount || 0)
-        const p = Number(row.price || 0)
+        const p = Number(this.commonData.price || 0)
         return sum + (d * p)
       }, 0)
     },
+
     grandTotal() {
       return Math.max(0, this.subtotal - this.totalDiscount)
     },
+
     isRTL() {
       return this.$i18n.locale === 'ar'
     }
   },
+
   async mounted() {
-    // Create first row on load
-    this.rows = [this.createEmptyRow()]
-    // Load last entered data from localStorage
-    this.loadLastEnteredData()
+    this.loadLastEnteredDataFromStorage()
   },
+
   methods: {
-    loadLastEnteredData() {
-      try {
-        const saved = localStorage.getItem('tableModalLastData')
-        if (saved) {
-          this.lastEnteredData = JSON.parse(saved)
-        }
-      } catch (err) {
-        console.warn('Failed to load last entered data:', err)
-      }
+    // ============ Step Control ============
+    isStep1Valid() {
+      return this.commonData.date &&
+             this.commonData.item &&
+             this.commonData.price > 0 &&
+             this.commonData.site &&
+             this.commonData.contractor &&
+             this.commonData.crusher
     },
-    saveLastEnteredData(row) {
-      try {
-        const data = {
-          contractor: row.contractor ? { id: row.contractor.id, name: row.contractor.name } : null,
-          area: row.area ? { id: row.area.id, name: row.area.name, parentId: row.area.parentId } : null,
-          site: row.site ? { id: row.site.id, name: row.site.name } : null,
-          item: row.item ? { id: row.item.id, name: row.item.name, currentPrice: row.item.currentPrice } : null,
-          price: row.price || 0,
-          crusher: row.crusher ? { id: row.crusher.id, name: row.crusher.name } : null
-        }
-        localStorage.setItem('tableModalLastData', JSON.stringify(data))
-        this.lastEnteredData = data
-        console.log('Saved lastEnteredData:', data)
-      } catch (err) {
-        console.warn('Failed to save last entered data:', err)
-      }
+
+    async goToStep2() {
+      if (!this.isStep1Valid()) return
+      this.currentStep = 2
+      this.rows = [this.createEmptyRow()]
+      this.saveCommonDataToStorage()
     },
+
+    goBackToStep1() {
+      this.currentStep = 1
+    },
+
+    // ============ Modal Management ============
     async openModal() {
       this.isOpen = true
+      this.currentStep = 1
+      this.rows = []
+      this.saveError = ''
+      console.log('🔄 Opening modal...')
       await this.loadInitialData()
-      // Reset and create rows AFTER loading data
-      this.resetRows()
+      console.log('✅ Initial data loaded')
+      this.loadCommonDataFromStorage()
+      console.log('✅ Common data restored from storage:', this.commonData)
     },
+
     closeModal() {
       this.isOpen = false
       this.saveError = ''
+      this.currentStep = 1
     },
+
     async loadInitialData() {
       try {
         await Promise.all([
@@ -547,163 +648,263 @@ export default {
         console.error('Failed to load initial data:', err)
       }
     },
+
+    // ============ Data Loading & Storage ============
+    loadLastEnteredDataFromStorage() {
+      try {
+        const saved = localStorage.getItem('tableModalLastData')
+        if (saved) {
+          this.lastEnteredData = JSON.parse(saved)
+        }
+      } catch (err) {
+        console.warn('Failed to load last entered data:', err)
+      }
+    },
+
+    loadCommonDataFromStorage() {
+      try {
+        const saved = localStorage.getItem('tableModalCommonData')
+        if (saved) {
+          const data = JSON.parse(saved)
+          console.log('📦 Loaded from storage:', data)
+          this.commonData.date = data.date || ''
+          
+          // Restore site
+          if (data.site?.id) {
+            this.commonData.site = this.allLocations.find(l => l.id === data.site.id) || null
+            console.log('✅ Restored site:', this.commonData.site)
+          }
+
+          // Restore area
+          if (data.area?.id && this.commonData.site) {
+            this.commonData.area = this.allLocations.find(l => l.id === data.area.id) || null
+            console.log('✅ Restored area:', this.commonData.area)
+          }
+
+          // Restore contractor
+          if (data.contractor?.id) {
+            this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
+            console.log('✅ Restored contractor:', this.commonData.contractor)
+          }
+
+          // Restore crusher
+          if (data.crusher?.id) {
+            this.commonData.crusher = this.crushers.find(c => c.id === data.crusher.id) || null
+            console.log('✅ Restored crusher:', this.commonData.crusher)
+          }
+
+          // Restore item
+          if (data.item?.id) {
+            this.commonData.item = this.exportItems.find(i => i.id === data.item.id) || null
+            console.log('✅ Restored item:', this.commonData.item)
+          }
+
+          this.commonData.price = data.price || 0
+          console.log('📦 Final commonData:', this.commonData)
+        }
+      } catch (err) {
+        console.warn('Failed to load common data:', err)
+      }
+    },
+
+    saveCommonDataToStorage() {
+      try {
+        const data = {
+          date: this.commonData.date,
+          site: this.commonData.site ? { id: this.commonData.site.id, name: this.commonData.site.name } : null,
+          area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
+          contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
+          crusher: this.commonData.crusher ? { id: this.commonData.crusher.id, name: this.commonData.crusher.name } : null,
+          item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
+          price: this.commonData.price
+        }
+        localStorage.setItem('tableModalCommonData', JSON.stringify(data))
+      } catch (err) {
+        console.warn('Failed to save common data:', err)
+      }
+    },
+
+    // ============ Row Management ============
     createEmptyRow() {
-      // Initialize empty row with default values
-      console.log('Creating empty row with lastEnteredData:', this.lastEnteredData)
       const row = {
         id: Date.now() + Math.random(),
-        date: '',
-        site: null,
-        area: null,
-        availableAreas: [],
-        contractor: null,
-        crusher: null,
+        date: this.commonData.date,
+        site: this.commonData.site,
+        area: this.commonData.area,
+        availableAreas: this.commonData.site ? this.allLocations.filter(l => l.parentId === this.commonData.site.id) : [],
+        contractor: this.commonData.contractor,
+        crusher: this.commonData.crusher,
         vehicle: null,
-        item: null,
+        item: this.commonData.item,
         crusherBon: '',
         companyBon: '',
         discount: 0,
-        price: 0,
+        price: this.commonData.price,
         cubic: 0,
         crusherCubic: '',
         availableVehicles: []
       }
 
-      // Auto-fill with last entered data if available
-      
-      // Find and set site first (before area)
-      if (this.lastEnteredData.site && this.lastEnteredData.site.id) {
-        const foundSite = this.allLocations.find(l => l.id === this.lastEnteredData.site.id)
-        if (foundSite) {
-          row.site = foundSite
-          this.updateAvailableAreas(row)
-        }
+      if (this.commonData.contractor?.id) {
+        const cv = this.contractorsWithVehicles.find(c => c.id === this.commonData.contractor.id)
+        row.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === this.commonData.contractor.id)
+      } else {
+        row.availableVehicles = [...this.vehicles]
       }
 
-      // Find and set area from locations (after site is set)
-      if (this.lastEnteredData.area && this.lastEnteredData.area.id) {
-        const foundArea = this.allLocations.find(l => l.id === this.lastEnteredData.area.id)
-        if (foundArea) {
-          row.area = foundArea
-        }
-      }
-
-      // Find and set contractor from contractors list
-      if (this.lastEnteredData.contractor && this.lastEnteredData.contractor.id) {
-        const foundContractor = this.contractors.find(c => c.id === this.lastEnteredData.contractor.id)
-        if (foundContractor) {
-          row.contractor = foundContractor
-          this.onContractorChange(row)
-        }
-      }
-
-      // Find and set crusher from crushers list
-      if (this.lastEnteredData.crusher && this.lastEnteredData.crusher.id) {
-        const foundCrusher = this.crushers.find(c => c.id === this.lastEnteredData.crusher.id)
-        if (foundCrusher) {
-          row.crusher = foundCrusher
-        }
-      }
-
-      // Find and set item from exportItems list
-      if (this.lastEnteredData.item && this.lastEnteredData.item.id) {
-        const foundItem = this.exportItems.find(i => i.id === this.lastEnteredData.item.id)
-        if (foundItem) {
-          row.item = foundItem
-          // Auto-populate price from item's currentPrice
-          // if (foundItem.currentPrice) {
-          //   row.price = Number(foundItem.currentPrice)
-          // }
-        }
-      }
-
-      // Set price from lastEnteredData (if no item set the price)
-      if (!row.item && this.lastEnteredData.price) {
-        row.price = this.lastEnteredData.price
-      }
-row.price = this.lastEnteredData.price ?? 0
       return row
     },
+
     isRowEmpty(row) {
-      return !row.date &&
-        !row.site &&
-        !row.area &&
-        !row.contractor &&
-        !row.crusher &&
-        !row.vehicle &&
-        !row.item &&
-        !row.crusherBon?.trim() &&
+      return !row.crusherBon?.trim() &&
         !row.companyBon?.trim() &&
         !row.discount &&
-        !row.price &&
         !row.cubic &&
-        !row.crusherCubic
+        !row.crusherCubic &&
+        !row.vehicle
     },
-    // Check required fields only
+
     getMissingRequiredFields(row) {
       const missing = []
-      if (!row.date) missing.push(this.$t('labels.date'))
-      if (!row.site) missing.push(this.$t('labels.site'))
-      if (!row.contractor) missing.push(this.$t('labels.contractor'))
-      if (!row.crusher) missing.push(this.$t('labels.crusher'))
       if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
-      if (!row.item) missing.push(this.$t('labels.item') || 'item')
       if (!row.crusherBon?.trim()) missing.push(this.$t('labels.crusherBon'))
       if (!row.companyBon?.trim()) missing.push(this.$t('labels.companyBon'))
+      
       const discount = Number(row.discount || 0)
-      const price = Number(row.price || 0)
       const cubic = Number(row.cubic || 0)
-      if (discount < 0) missing.push(this.$t('labels.discount') + ' (يجب أن تكون >= 0)')
-      if (price <= 0) missing.push(this.$t('labels.price') + ' (يجب أن تكون > 0)')
-      if (cubic <= 0) missing.push(this.$t('labels.cubic') + ' (يجب أن تكون > 0)')
+      
+      if (discount < 0) missing.push(this.$t('labels.discount') + ' (≥ 0)')
+      if (cubic <= 0) missing.push(this.$t('labels.cubic') + ' (> 0)')
+      
       return missing
     },
-    // Check warnings (warnings - do not prevent saving)
-    getWarnings(row) {
-      const warnings = []
-      // If crusherCubic is empty, notify user
-      if (!row.crusherCubic) {
-        warnings.push(this.$t('labels.crusherCubic') + ' (optional)')
-      }
-      // If area is empty
-      if (!row.area) {
-        warnings.push(this.$t('labels.area') + ' (optional)')
-      }
-      return warnings
+
+    handleEnterKey(rowIndex) {
+      const currentRow = this.rows[rowIndex]
+      if (!currentRow) return
+
+      const newRow = this.createEmptyRow()
+      this.rows.push(newRow)
+
+      this.$nextTick(() => {
+        if (!this.tableRef) return
+        const allRows = this.tableRef.querySelectorAll('tbody tr')
+        const newRowEl = allRows[rowIndex + 1]
+        if (newRowEl) {
+          const firstSelect = newRowEl.querySelector('select')
+          firstSelect?.focus()
+        }
+      })
     },
+
+    addRow() {
+      this.rows.push(this.createEmptyRow())
+    },
+
+    duplicateRow(index) {
+      const src = this.rows[index]
+      if (!src) return
+      const copy = JSON.parse(JSON.stringify(src))
+      copy.id = Date.now() + Math.random()
+      copy.vehicle = null
+      copy.crusherBon = ''
+      copy.companyBon = ''
+      copy.discount = 0
+      copy.cubic = 0
+      copy.crusherCubic = ''
+      this.rows.splice(index + 1, 0, copy)
+    },
+
+    removeRow(index) {
+      this.rows.splice(index, 1)
+      if (this.rows.length === 0) this.addRow()
+    },
+
+    // ============ Field Interactions (Step 1) ============
+    onCommonSiteChange() {
+      if (this.commonData.site === '__new__') {
+        this.showAddSite = true
+        this.commonData.site = null
+        this.commonData.area = null
+        return
+      }
+      // Only clear area if we actually selected a different real site
+      if (this.commonData.site && this.commonData.site.id) {
+        this.commonData.area = null
+      }
+    },
+
+    onCommonContractorChange() {
+      if (this.commonData.contractor === '__new__') {
+        this.showAddContractorDialog = true
+        return
+      }
+    },
+
+    onCommonCrusherChange() {
+      if (this.commonData.crusher === '__new__') {
+        this.showAddCrusherDialog = true
+        return
+      }
+    },
+
+    onCommonItemSelect() {
+      if (this.commonData.item === '__new__') {
+        // Keep it as __new__ so the dialog stays open
+        return
+      }
+      if (this.commonData.item && this.commonData.item.currentPrice) {
+        this.commonData.price = Number(this.commonData.item.currentPrice)
+        console.log('✅ Auto-filled price from item:', this.commonData.price)
+      }
+    },
+
+    // ============ Field Interactions (Step 2) ============
+    onVehicleSelect(row) {
+      if (!row.vehicle || row.vehicle === '__new__') {
+        row.cubic = 0
+        row.crusherCubic = ''
+        return
+      }
+
+      let vehicle = row.vehicle
+      if (vehicle.cubicCapacity === undefined || vehicle.crusherCubic === undefined) {
+        const fullVehicle = this.vehicles.find(v => v.id === vehicle.id)
+        if (fullVehicle) vehicle = fullVehicle
+      }
+
+      const companyCubic = parseFloat(vehicle.cubicCapacity || 0)
+      const crusherCubicVal = parseFloat(vehicle.crusherCubic || 0)
+
+      row.cubic = isNaN(companyCubic) ? 0 : companyCubic
+      row.crusherCubic = isNaN(crusherCubicVal) ? '' : crusherCubicVal
+    },
+
+    totalPerRow(row) {
+      const p = Number(this.commonData.price || 0)
+      const c = Number(row.cubic || 0)
+      const d = Number(row.discount || 0)
+      const subtotal = p * c
+      const discountAmount = d * p
+      return Math.max(0, subtotal - discountAmount)
+    },
+
+    formatNumber(v) {
+      return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
+    },
+
+    // ============ Locations Management ============
     async refreshLocations() {
       try {
         const res = await getLocations()
         this.allLocations = Array.isArray(res.data) ? res.data : []
         this.sites = this.allLocations.filter(l => !l.parentId)
-        this.rows.forEach(row => this.updateAvailableAreas(row))
+        console.log('✅ Locations refreshed. Sites:', this.sites, 'All locations:', this.allLocations)
       } catch (err) {
         console.warn('Failed to refresh locations', err)
       }
     },
-    updateAvailableAreas(row) {
-      row.availableAreas = row.site?.id
-        ? this.allLocations.filter(l => l.parentId === row.site.id)
-        : []
-      if (row.area && !row.availableAreas.some(a => a.id === row.area?.id)) {
-        row.area = null
-      }
-    },
-    onSiteChange(row) {
-      if (row.site === '__new__') {
-        this.pendingRow = row
-        this.showAddSite = true
-        row.site = null
-        return
-      }
-      if (row.site && row.site.id) {
-        // Save last entered site
-        this.saveLastEnteredData(row)
-        console.log('Site changed:', row.site)
-      }
-      this.updateAvailableAreas(row)
-      row.area = null
-    },
+
     async addSite() {
       if (!this.newSiteName?.trim()) return
       this.addingLocation = true
@@ -711,56 +912,83 @@ row.price = this.lastEnteredData.price ?? 0
         const res = await createLocation({ name: this.newSiteName.trim(), parentId: null })
         await this.refreshLocations()
         const created = res?.data
-        if (created?.id && this.pendingRow) {
-          this.pendingRow.site = this.allLocations.find(l => l.id === created.id)
-          this.updateAvailableAreas(this.pendingRow)
+        if (created?.id) {
+          const newSite = this.allLocations.find(l => l.id === created.id)
+          if (newSite) {
+            console.log('✅ Created and found site:', newSite)
+            // If called from Step 1
+            if (this.currentStep === 1 && !this.pendingRow) {
+              this.commonData.site = newSite
+              console.log('✅ Set commonData.site:', newSite)
+            }
+            // If called from Step 2 row (via pendingRow)
+            if (this.pendingRow) {
+              this.pendingRow.site = newSite
+              console.log('✅ Set pendingRow.site:', newSite)
+            }
+          }
         }
         this.showAddSite = false
         this.newSiteName = ''
         this.pendingRow = null
       } catch (err) {
         this.locationError = err?.response?.data?.message || 'فشل إضافة الموقع'
+        console.error('❌ addSite error:', err)
       } finally {
         this.addingLocation = false
       }
     },
+
     async addArea() {
-      if (!this.newAreaName?.trim() || !this.pendingRow?.site?.id) return
+      if (!this.newAreaName?.trim()) return
+      
+      const siteId = this.currentStep === 1 ? this.commonData.site?.id : this.pendingRow?.site?.id
+      if (!siteId) return
+
       this.addingLocation = true
-      // Store the site before refresh to prevent it from being cleared
-      const siteId = this.pendingRow.site.id
-      const siteName = this.pendingRow.site.name
       try {
         const res = await createLocation({
           name: this.newAreaName.trim(),
           parentId: siteId
         })
         await this.refreshLocations()
-        // Restore the site after refresh
-        this.pendingRow.site = this.allLocations.find(l => l.id === siteId)
         const created = res?.data
-        if (created?.id && this.pendingRow) {
-          this.pendingRow.area = this.allLocations.find(l => l.id === created.id)
-          // Update available areas for the pending row
-          this.updateAvailableAreas(this.pendingRow)
+        if (created?.id) {
+          const newArea = this.allLocations.find(l => l.id === created.id)
+          if (newArea) {
+            console.log('✅ Created and found area:', newArea)
+            if (this.currentStep === 1 && !this.pendingRow) {
+              this.commonData.area = newArea
+              console.log('✅ Set commonData.area:', newArea)
+            }
+            if (this.pendingRow) {
+              this.pendingRow.area = newArea
+              console.log('✅ Set pendingRow.area:', newArea)
+            }
+          }
         }
         this.showAddArea = false
         this.newAreaName = ''
         this.pendingRow = null
       } catch (err) {
         this.locationError = err?.response?.data?.message || 'فشل إضافة المنطقة'
+        console.error('❌ addArea error:', err)
       } finally {
         this.addingLocation = false
       }
     },
+
+    // ============ Lookups Management ============
     async loadExportItems() {
       try {
         const res = await getExportItems()
         this.exportItems = Array.isArray(res.data) ? res.data : []
+        console.log('✅ Export items loaded:', this.exportItems)
       } catch (err) {
         console.warn('Failed to load export items', err)
       }
     },
+
     async loadLookups() {
       try {
         const [cRes, cvRes, crushRes, vRes] = await Promise.all([
@@ -769,16 +997,32 @@ row.price = this.lastEnteredData.price ?? 0
           getCrushers(),
           getVehicles()
         ])
+
         const extractArray = (res) => {
-          const data = res?.data || res || {}
-          return Array.isArray(data) ? data :
-            Array.isArray(data.items) ? data.items :
-              Array.isArray(data.data) ? data.data : []
+          console.log('🔍 Raw response:', res)
+          // Handle different API response formats
+          if (res?.data?.items) return Array.isArray(res.data.items) ? res.data.items : []
+          if (res?.data) {
+            if (Array.isArray(res.data)) return res.data
+            if (typeof res.data === 'object' && !Array.isArray(res.data)) {
+              // If data is an object, try to extract array from it
+              const firstValue = Object.values(res.data)[0]
+              return Array.isArray(firstValue) ? firstValue : []
+            }
+          }
+          if (Array.isArray(res)) return res
+          return []
         }
+
         this.contractors = extractArray(cRes)
         this.contractorsWithVehicles = extractArray(cvRes)
         this.crushers = extractArray(crushRes)
         this.vehicles = extractArray(vRes)
+
+        console.log('✅ Loaded contractors:', this.contractors)
+        console.log('✅ Loaded crushers:', this.crushers)
+        console.log('✅ Loaded vehicles:', this.vehicles)
+
         this.rows.forEach(row => {
           row.availableVehicles = [...this.vehicles]
         })
@@ -786,235 +1030,8 @@ row.price = this.lastEnteredData.price ?? 0
         console.error('loadLookups failed:', err)
       }
     },
-    onContractorChange(row) {
-      if (row.contractor === '__new__') {
-        this.showAddContractorDialog = true
-        return
-      }
-      if (!row.contractor?.id) {
-        row.availableVehicles = [...this.vehicles]
-        row.vehicle = null
-        return
-      }
-      const cv = this.contractorsWithVehicles.find(c => c.id === row.contractor.id)
-      row.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === row.contractor.id)
-      row.vehicle = null
-      // Save last entered contractor
-      this.saveLastEnteredData(row)
-    },
-    onCrusherChange(row) {
-      // Handle __new__ crusher
-      if (row.crusher === '__new__') {
-        this.showAddCrusherDialog = true
-        return
-      }
-      // Save last entered crusher whenever it changes (even if null/deselected)
-      this.saveLastEnteredData(row)
-      console.log('Crusher changed:', row.crusher)
-    },
-    onVehicleSelect(row) {
-      if (!row.vehicle) {
-        row.cubic = 0
-        row.crusherCubic = ''
-        return
-      }
 
-      let vehicle = row.vehicle
-
-      if (vehicle.cubicCapacity === undefined || vehicle.crusherCubic === undefined) {
-        const fullVehicle = this.vehicles.find(v => v.id === vehicle.id)
-        if (fullVehicle) {
-          vehicle = fullVehicle
-          console.log('استخدمنا النسخة الكاملة من getVehicles:', fullVehicle)
-        }
-      }
-
-      const companyCubic = parseFloat(vehicle.cubicCapacity || 0)
-      const crusherCubicVal = parseFloat(vehicle.crusherCubic || 0)
-
-      row.cubic = isNaN(companyCubic) ? 0 : companyCubic
-      row.crusherCubic = isNaN(crusherCubicVal) ? '' : crusherCubicVal
-
-      //  test values
-      console.log('Vehicle name:', vehicle.name)
-      console.log('cubicCapacity final:', companyCubic)
-      console.log('crusherCubic final:', crusherCubicVal)
-    },
-    onItemSelect(row) {
-      // Handle __new__ item
-      if (row.item === '__new__') {
-        this.showAddExportItemDialog = true
-        return
-      }
-      // Auto-populate price from item's currentPrice
-      if (row.item && row.item.currentPrice) {
-        row.price = Number(row.item.currentPrice)
-      }
-      // Handle deselection (item set to null)
-      if (!row.item) {
-        row.price = 0
-      }
-      // Save last entered item whenever it changes (even if null/deselected)
-      this.saveLastEnteredData(row)
-      console.log('Item selected:', row.item)
-    },
-    onAreaChange(row) {
-      // Save last entered area whenever it changes
-      if (row.area && row.area.id) {
-        this.saveLastEnteredData(row)
-        console.log('Area changed:', row.area)
-      }
-    },
-    onPriceChange(row) {
-      // Save last entered price whenever it changes
-      this.saveLastEnteredData(row)
-      console.log('Price changed:', row.price)
-    },
-    totalPerRow(row) {
-      const p = Number(row.price || 0)
-      const c = Number(row.cubic || 0)
-      const d = Number(row.discount || 0)
-      const subtotal = p * c
-      // Discount = discount number × price
-      const discountAmount = d * p
-      return Math.max(0, subtotal - discountAmount)
-    },
-    formatNumber(v) {
-      return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
-    },
-
-    // Handle Enter key press in any field - add new row immediately
-handleEnterKey(rowIndex) {
-  const currentRow = this.rows[rowIndex]
-  
-  // نحفظ الـ last للاستخدام المرة الجاية لما نفتح المودال
-  if (currentRow) {
-    this.saveLastEnteredData(currentRow)
-  }
-
-  // ننشئ صف جديد فارغ أولاً (بدون أي تعبئة تلقائية من lastEnteredData)
-  const newRow = {
-    id: Date.now() + Math.random(),
-    date: '', // أو لو عايز تاريخ اليوم تلقائي: new Date().toISOString().split('T')[0]
-    site: currentRow.site,                  // نسخ مباشر
-    area: currentRow.area,                  // نسخ مباشر
-    availableAreas: [],
-    contractor: currentRow.contractor,      // نسخ مباشر
-    crusher: currentRow.crusher,            // نسخ مباشر
-    vehicle: null,                          // نرجعه null عشان يختار عربية جديدة
-    item: currentRow.item,                  // نسخ مباشر
-    crusherBon: '',
-    companyBon: '',
-    discount: 0,
-    price: currentRow.price || 0,            // نسخ السعر الحالي (حتى لو عدلته يدوي)
-    cubic: 0,
-    crusherCubic: '',
-    availableVehicles: []
-  }
-
-  // تحديث الحقول التابعة
-  if (newRow.site) {
-    newRow.availableAreas = this.allLocations.filter(l => l.parentId === newRow.site.id)
-  }
-
-  if (newRow.contractor && newRow.contractor.id) {
-    const cv = this.contractorsWithVehicles.find(c => c.id === newRow.contractor.id)
-    newRow.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === newRow.contractor.id)
-  }
-
-  // نضيف الصف الجديد
-  this.rows.push(newRow)
-
-  // ننتقل للتركيز على حقل التاريخ في الصف الجديد
-  this.$nextTick(() => {
-    if (!this.tableRef) return
-    const allRows = this.tableRef.querySelectorAll('tbody tr')
-    const newRowEl = allRows[rowIndex + 1]
-    if (newRowEl) {
-      const firstInput = newRowEl.querySelector('input[type="date"]')
-      firstInput?.focus()
-    }
-  })
-},
-
-    addRow() {
-      // Reload lastEnteredData from localStorage before creating new row
-      this.loadLastEnteredData()
-      console.log('Adding new row with lastEnteredData:', this.lastEnteredData)
-      this.rows.push(this.createEmptyRow())
-    },
-    duplicateRow(index) {
-      const src = this.rows[index]
-      if (!src) return
-      const copy = JSON.parse(JSON.stringify(src))
-      copy.id = Date.now() + Math.random()
-      this.rows.splice(index + 1, 0, copy)
-    },
-    removeRow(index) {
-      this.rows.splice(index, 1)
-      if (this.rows.length === 0) this.addRow()
-    },
-    resetRows() {
-      this.rows = [this.createEmptyRow()]
-    },
-    async saveData() {
-      this.saveError = ''
-      this.isSaving = true
-      const toSave = this.rows.filter(r => !this.isRowEmpty(r))
-      if (!toSave.length) {
-        this.saveError = this.$t('labels.noData') || 'No data'
-        this.isSaving = false
-        return
-      }
-      // Check required fields
-      for (const [i, r] of toSave.entries()) {
-        const missing = this.getMissingRequiredFields(r)
-        if (missing.length > 0) {
-          this.saveError = `Row ${i + 1}: Required fields (${missing.join(', ')})`
-          this.isSaving = false
-          return
-        }
-      }
-      try {
-        for (const r of toSave) {
-          const locationId = r.area?.id || r.site?.id
-          if (!locationId) continue
-
-          // Save last entered data before sending to server
-          this.saveLastEnteredData(r)
-
-          // Parse numeric values
-          const price = Number(r.price || 0)
-          const cubic = Number(r.cubic || 0)
-          const discount = Number(r.discount || 0)
-
-          await createDelivery({
-            crusherId: Number(r.crusher.id),
-            contractorId: Number(r.contractor.id),
-            locationId: Number(locationId),
-            date: r.date,
-            crusherTicket: r.crusherBon || null,
-            companyTicket: r.companyBon || null,
-            companyCapacity: cubic > 0 ? cubic : null,
-            crusherCapacity: cubic > 0 ? cubic : null,
-            crusherCubic: r.crusherCubic ? Number(r.crusherCubic) : null,
-            unitPrice: price > 0 ? price : null,
-            discount: discount >= 0 ? discount : null,
-            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
-            itemId: r.item?.id ? Number(r.item.id) : null
-          })
-        }
-        alert(this.$t('labels.saved') || 'Saved successfully ✅')
-        this.resetRows()
-        this.closeModal()
-        this.$emit('saved') // Notify parent of save
-      } catch (err) {
-        console.error('saveData error:', err)
-        this.saveError = err?.response?.data?.message || this.$t('common.saveError') || 'Error saving'
-      } finally {
-        this.isSaving = false
-      }
-    },
+    // ============ Create New Items ============
     async createNewContractor() {
       const name = this.newContractorName.trim()
       if (!name) return
@@ -1023,25 +1040,30 @@ handleEnterKey(rowIndex) {
       try {
         const res = await createContractor({ name })
         const nc = res?.data
-        if (!nc || !nc.id) {
-          throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
+        if (!nc || !nc.id) throw new Error('Invalid response')
+
+        console.log('✅ Created contractor:', nc)
+
+        // Reload all lookups to get fresh data
+        await this.loadLookups()
+        
+        // After reload, find and set the new contractor
+        const updatedContractor = this.contractors.find(c => c.id === nc.id)
+        if (updatedContractor && this.currentStep === 1) {
+          this.commonData.contractor = updatedContractor
+          console.log('✅ Set commonData.contractor:', updatedContractor)
         }
-        this.contractors = [...this.contractors, nc]
-        this.contractorsWithVehicles = [...this.contractorsWithVehicles, { ...nc, vehicles: [] }]
-        const row = this.rows.find(r => r.contractor === '__new__')
-        if (row) {
-          row.contractor = nc
-          this.onContractorChange(row)
-        }
+
         this.newContractorName = ''
         this.showAddContractorDialog = false
-        await this.loadLookups()
       } catch (e) {
-        this.contractorDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
+        this.contractorDialogError = e?.response?.data?.message || e.message || 'Error'
+        console.error('❌ createNewContractor error:', e)
       } finally {
         this.creatingContractor = false
       }
     },
+
     async createNewCrusher() {
       const name = this.newCrusherName.trim()
       if (!name) return
@@ -1050,28 +1072,34 @@ handleEnterKey(rowIndex) {
       try {
         const res = await createCrusher({ name })
         const nc = res?.data
-        if (!nc || !nc.id) {
-          throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
+        if (!nc || !nc.id) throw new Error('Invalid response')
+
+        console.log('✅ Created crusher:', nc)
+
+        // Reload all lookups to get fresh data
+        await this.loadLookups()
+        
+        // After reload, find and set the new crusher
+        const updatedCrusher = this.crushers.find(c => c.id === nc.id)
+        if (updatedCrusher && this.currentStep === 1) {
+          this.commonData.crusher = updatedCrusher
+          console.log('✅ Set commonData.crusher:', updatedCrusher)
         }
-        this.crushers = [...this.crushers, nc]
-        const row = this.rows.find(r => r.crusher === '__new__')
-        if (row) {
-          row.crusher = nc
-          this.onCrusherChange(row)
-        }
+
         this.newCrusherName = ''
         this.showAddCrusherDialog = false
-        await this.loadLookups()
       } catch (e) {
-        this.crusherDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
+        this.crusherDialogError = e?.response?.data?.message || e.message || 'Error'
+        console.error('❌ createNewCrusher error:', e)
       } finally {
         this.creatingCrusher = false
       }
     },
+
     async createNewVehicle() {
       const { name, contractorId, cubicCapacity, crusherCubic } = this.newVehicleForm
       if (!name.trim() || !cubicCapacity || !crusherCubic) {
-        this.vehicleDialogError = this.$t('common.saveError') || 'Error'
+        this.vehicleDialogError = 'All fields required'
         return
       }
       this.creatingVehicle = true
@@ -1084,31 +1112,28 @@ handleEnterKey(rowIndex) {
           crusherCubic: Number(crusherCubic)
         })
         const nv = res?.data
-        if (!nv || !nv.id) {
-          throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
-        }
-        this.vehicles = [...this.vehicles, nv]
-        this.rows.forEach(r => {
-          r.availableVehicles = [...this.vehicles]
-        })
-        const row = this.rows.find(r => r.vehicle === '__new__')
-        if (row) {
-          row.vehicle = nv
-          this.onVehicleSelect(row)
-        }
+        if (!nv || !nv.id) throw new Error('Invalid response')
+
+        console.log('✅ Created vehicle:', nv)
+
+        // Reload all lookups to get fresh data
+        await this.loadLookups()
+        console.log('✅ Vehicles after reload:', this.vehicles)
+
         this.newVehicleForm = { name: '', contractorId: '', cubicCapacity: '', crusherCubic: '' }
         this.showAddVehicleDialog = false
-        await this.loadLookups()
       } catch (e) {
-        this.vehicleDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
+        this.vehicleDialogError = e?.response?.data?.message || e.message || 'Error'
+        console.error('❌ createNewVehicle error:', e)
       } finally {
         this.creatingVehicle = false
       }
     },
+
     async createNewExportItem() {
       const { name, currentPrice } = this.newExportItemForm
       if (!name.trim() || !currentPrice) {
-        this.exportItemDialogError = this.$t('common.saveError') || 'Error'
+        this.exportItemDialogError = 'All fields required'
         return
       }
       this.creatingExportItem = true
@@ -1119,22 +1144,96 @@ handleEnterKey(rowIndex) {
           currentPrice: Number(currentPrice)
         })
         const newItem = res?.data
-        if (!newItem || !newItem.id) {
-          throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
+        if (!newItem || !newItem.id) throw new Error('Invalid response')
+
+        console.log('✅ Created export item:', newItem)
+
+        // Reload export items to get fresh data
+        await this.loadExportItems()
+        console.log('✅ Export items after reload:', this.exportItems)
+
+        // After reload, find and set the new item if in Step 1
+        if (this.currentStep === 1) {
+          const updatedItem = this.exportItems.find(i => i.id === newItem.id)
+          if (updatedItem) {
+            this.commonData.item = updatedItem
+            this.onCommonItemSelect()
+            console.log('✅ Set commonData.item:', updatedItem)
+          }
         }
-        this.exportItems = [...this.exportItems, newItem]
-        const row = this.rows.find(r => r.item === '__new__')
-        if (row) {
-          row.item = newItem
-          this.onItemSelect(row)
-        }
+
         this.newExportItemForm = { name: '', currentPrice: '' }
         this.showAddExportItemDialog = false
-        await this.loadExportItems()
       } catch (e) {
-        this.exportItemDialogError = e?.response?.data?.message || e.message || this.$t('common.saveError') || 'Error'
+        this.exportItemDialogError = e?.response?.data?.message || e.message || 'Error'
+        console.error('❌ createNewExportItem error:', e)
       } finally {
         this.creatingExportItem = false
+      }
+    },
+
+    // ============ Save Data ============
+    async saveData() {
+      this.saveError = ''
+      this.isSaving = true
+      const toSave = this.rows.filter(r => !this.isRowEmpty(r))
+      
+      if (!toSave.length) {
+        this.saveError = this.$t('labels.noData') || 'No data'
+        this.isSaving = false
+        return
+      }
+
+      // Check required fields
+      for (const [i, r] of toSave.entries()) {
+        const missing = this.getMissingRequiredFields(r)
+        if (missing.length > 0) {
+          this.saveError = `Row ${i + 1}: ${missing.join(', ')}`
+          this.isSaving = false
+          return
+        }
+      }
+
+      try {
+        for (const r of toSave) {
+          const locationId = r.area?.id || r.site?.id
+          if (!locationId) continue
+
+          const price = Number(this.commonData.price || 0)
+          const cubic = Number(r.cubic || 0)
+          const discount = Number(r.discount || 0)
+
+          await createDelivery({
+            date: this.commonData.date,
+            locationId,
+            contractorId: this.commonData.contractor?.id ? Number(this.commonData.contractor.id) : null,
+            crusherId: this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
+            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
+            crusherBon: r.crusherBon?.trim() || '',
+            companyBon: r.companyBon?.trim() || '',
+            price,
+            cubic,
+            discount,
+            crusherCubic: r.crusherCubic ? Number(r.crusherCubic) : null,
+            itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null
+          })
+        }
+
+        alert(this.$t('labels.saved') || 'Saved successfully ✅')
+        this.saveCommonDataToStorage()
+        
+        // Reset
+        this.currentStep = 1
+        this.commonData = { date: '', item: null, price: 0, site: null, area: null, contractor: null, crusher: null }
+        this.rows = []
+        
+        this.closeModal()
+        this.$emit('saved')
+      } catch (err) {
+        console.error('saveData error:', err)
+        this.saveError = err?.response?.data?.message || this.$t('common.saveError') || 'Error saving'
+      } finally {
+        this.isSaving = false
       }
     }
   }
