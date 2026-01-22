@@ -412,6 +412,7 @@
                 @click="duplicateRow(index)"
                 class="text-blue-600 hover:text-blue-800 transition"
                 title="Duplicate"
+                tabindex="-1"
               >
                 <DocumentDuplicateIcon class="w-5 h-5" />
               </button>
@@ -419,6 +420,7 @@
                 @click="removeRow(index)"
                 class="text-red-600 hover:text-red-800 transition"
                 title="Delete"
+                tabindex="-1"
               >
                 <TrashIcon class="w-5 h-5" />
               </button>
@@ -782,21 +784,29 @@ export default {
   methods: {
         // Add new row when Tab is pressed on last field
         onCrusherCubicTab(index, event) {
-          if (event.key === 'Tab') {
-            // Only add row if it's the last row
-            if (index === this.rows.length - 1) {
-              event.preventDefault();
-              this.addRow();
+          // Allow Shift+Tab for backwards navigation
+          if (event.shiftKey) return;
+          
+          // Check if Tab key and this is the last row
+          if (event.key === 'Tab' && index === this.rows.length - 1) {
+            event.preventDefault();
+            const newRowIndex = this.rows.length;
+            this.addRow();
+            
+            // Focus on vehicle select in the new row with a small timeout
+            setTimeout(() => {
               this.$nextTick(() => {
-                // Focus first input in new row
-                const allRows = this.tableRef?.querySelectorAll('tbody tr');
-                const newRowEl = allRows?.[index + 1];
-                if (newRowEl) {
-                  const firstSelect = newRowEl.querySelector('select');
-                  firstSelect?.focus();
+                if (!this.tableRef) return;
+                const allRows = this.tableRef.querySelectorAll('tbody tr');
+                const newRow = allRows[newRowIndex];
+                if (newRow) {
+                  const vehicleSelect = newRow.querySelector('select');
+                  if (vehicleSelect) {
+                    vehicleSelect.focus();
+                  }
                 }
               });
-            }
+            }, 10);
           }
         },
     // ============ Step Control ============
