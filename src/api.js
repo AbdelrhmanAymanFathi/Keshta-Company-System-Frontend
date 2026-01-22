@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as XLSX from 'xlsx';
+// import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
 const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://127.0.0.1:8080';
@@ -314,19 +314,34 @@ export const depositToContractorWallet = (contractorId, data) =>
   axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
 
 // Contractor Report/Statement
-export const getContractorReportData = async (contractorId, params = {}, format = 'json') => {
+export const getContractorReportData = async (contractorId, params = {}, format = 'json', transaction_type = null) => {
   const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
   let axiosParams = { ...params };
+  
+  // Set format
   if (format === 'json') {
     axiosParams.format = 'json';
+  } else if (format === 'xlsx') {
+    axiosParams.format = 'xlsx';
+  } else if (format === 'csv') {
+    axiosParams.format = 'csv';
+  }
+  
+  // Add transaction_type if provided (either from params or as separate parameter)
+  if (transaction_type) {
+    axiosParams.transaction_type = transaction_type;
+  } else if (params.transaction_type) {
+    axiosParams.transaction_type = params.transaction_type;
+  }
+  
+  // Make request based on format
+  if (format === 'json') {
     const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
     return { data: resp.data, headers: resp.headers };
   } else if (format === 'xlsx') {
-    axiosParams.format = 'xlsx';
     const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
     return { data: resp.data, headers: resp.headers };
   } else if (format === 'csv') {
-    axiosParams.format = 'csv';
     const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
     return { data: resp.data, headers: resp.headers };
   } else {
@@ -680,7 +695,6 @@ export const getCompanyExpenses = (params = {}) => {
     page = 1, 
     pageSize = 20, 
     q, 
-    category, 
     classification, 
     branchId, 
     locationId, 
@@ -798,55 +812,55 @@ export const getExpensesReportData = async (params = {}, format = 'json') => {
   }
 
   // If HEAD indicated an Excel/zip/binary, fetch as arraybuffer and parse
-  if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
-    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
-    const headers = resp.headers || {};
-    try {
-      const data = new Uint8Array(resp.data);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
-      return { data: { items: json }, headers };
-    } catch (e) {
-      console.error('Failed to parse Excel from expenses report:', e);
-      return { data: resp.data, headers };
-    }
-  }
+  // if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
+  //   const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+  //   const headers = resp.headers || {};
+  //   try {
+  //     const data = new Uint8Array(resp.data);
+  //     const workbook = XLSX.read(data, { type: 'array' });
+  //     const sheetName = workbook.SheetNames[0];
+  //     const sheet = workbook.Sheets[sheetName];
+  //     const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+  //     return { data: { items: json }, headers };
+  //   } catch (e) {
+  //     console.error('Failed to parse Excel from expenses report:', e);
+  //     return { data: resp.data, headers };
+  //   }
+  // }
 
-  // HEAD was inconclusive or not allowed: do a safe GET with default behaviour and fallback parsing
-  try {
-    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
-  } catch (err) {
-    // If server responded with binary or parsing failed, try fetching arraybuffer and attempt to parse JSON or Excel
-    if (err.response && err.response.data) {
-      try {
-        const resp2 = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
-        const headers = resp2.headers || {};
-        const ct = (headers['content-type'] || '').toLowerCase();
-        if (ct.includes('application/json') || ct.includes('text/')) {
-          const text = new TextDecoder('utf-8').decode(resp2.data);
-          return { data: JSON.parse(text), headers };
-        }
-        // Parse as Excel
-        try {
-          const data = new Uint8Array(resp2.data);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const sheet = workbook.Sheets[sheetName];
-          const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
-          return { data: { items: json }, headers };
-        } catch (e) {
-          console.error('Failed fallback Excel parse:', e);
-          return { data: resp2.data, headers };
-        }
-      } catch (e2) {
-        throw err; // rethrow original
-      }
-    }
-    throw err;
-  }
+  // // HEAD was inconclusive or not allowed: do a safe GET with default behaviour and fallback parsing
+  // try {
+  //   const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+  //   return { data: resp.data, headers: resp.headers };
+  // } catch (err) {
+  //   // If server responded with binary or parsing failed, try fetching arraybuffer and attempt to parse JSON or Excel
+  //   if (err.response && err.response.data) {
+  //     try {
+  //       const resp2 = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+  //       const headers = resp2.headers || {};
+  //       const ct = (headers['content-type'] || '').toLowerCase();
+  //       if (ct.includes('application/json') || ct.includes('text/')) {
+  //         const text = new TextDecoder('utf-8').decode(resp2.data);
+  //         return { data: JSON.parse(text), headers };
+  //       }
+  //       // Parse as Excel
+  //       try {
+  //         const data = new Uint8Array(resp2.data);
+  //         const workbook = XLSX.read(data, { type: 'array' });
+  //         const sheetName = workbook.SheetNames[0];
+  //         const sheet = workbook.Sheets[sheetName];
+  //         const json = XLSX.utils.sheet_to_json(sheet, { defval: null });
+  //         return { data: { items: json }, headers };
+  //       } catch (e) {
+  //         console.error('Failed fallback Excel parse:', e);
+  //         return { data: resp2.data, headers };
+  //       }
+  //     } catch (e2) {
+  //       throw err; // rethrow original
+  //     }
+  //   }
+  //   throw err;
+  // }
 };
 
 // Expenses Summary - totals for all rows matching filters (not paginated)

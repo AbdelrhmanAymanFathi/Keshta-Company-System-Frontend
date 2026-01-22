@@ -241,11 +241,13 @@ import { getContractorReportData, downloadContractorReport, getContractors } fro
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
+import { useRoute } from 'vue-router'
 
 export default {
   name: 'ContractorStatement',
   components: { Badge, Pagination },
-  setup() {
+
+  setup(props) {
     const instance = getCurrentInstance()
     const downloading = ref(false)
     const error = ref(null)
@@ -253,6 +255,7 @@ export default {
     const report = ref(null)
     const contractors = ref([])
     const selectedContractorId = ref('')
+    const forcedTransactionType = ref(undefined)
     const filters = ref({
       startDate: '',
       endDate: ''
@@ -363,10 +366,11 @@ export default {
         const params = buildQueryParams({
           startDate: filters.value.startDate,
           endDate: filters.value.endDate,
-          format: 'json'
+          format: 'json',
+          transaction_type: forcedTransactionType.value || props.transactionType || undefined
         })
         
-        const { data } = await getContractorReportData(selectedContractorId.value, params, 'json')
+        const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', props.transactionType || null)
         report.value = data
         currentPage.value = 1
       } catch (err) {
@@ -390,10 +394,11 @@ export default {
         const params = buildQueryParams({
           startDate: filters.value.startDate,
           endDate: filters.value.endDate,
-          format: format
+          format: format,
+          transaction_type: forcedTransactionType.value || props.transactionType || undefined
         })
         
-        const { data, headers } = await downloadContractorReport(selectedContractorId.value, params, format)
+        const { data } = await downloadContractorReport(selectedContractorId.value, params, format)
         
         const contractor = contractors.value.find(c => c.id === parseInt(selectedContractorId.value))
         const contractorName = contractor ? contractor.name.replace(/[^a-zA-Z0-9]/g, '_') : selectedContractorId.value
@@ -448,6 +453,7 @@ export default {
     }
 
     onMounted(async () => {
+      const route = useRoute()
       await loadContractors()
       // Set default date range to last 30 days
       const endDate = new Date()
@@ -463,7 +469,16 @@ export default {
         // Optionally auto-load the report
         // await loadReport()
       }
-    })
+
+      // Fix: use 'route' and 'forcedTransactionType' correctly and make forcedTransactionType reactive for use in template
+      const typeFromQuery = route?.query?.transaction_type
+        if (typeof typeFromQuery === 'string' && ['EXPORT', 'TRANSPORT', 'EXPENSE', 'DEPOSIT'].includes(typeFromQuery)) {
+          forcedTransactionType.value = typeFromQuery
+        }
+
+        // Then change your API calls to use forcedTransactionType.value || props.transactionType || undefined
+      }
+    )
 
     return {
       downloading,

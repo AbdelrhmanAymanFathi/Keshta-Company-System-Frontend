@@ -77,8 +77,8 @@ const routes = [
         meta: { title: 'dashboard.contractorsList' }
       },
       {
-        path: 'supplies/contractor-statement/:id?',
-        name: 'contractor-statement',
+        path: 'supplies/contractor-supply-statement/:id?',
+        name: 'contractor-supply-statement',
         component: ContractorStatement,
         meta: { title: 'dashboard.contractorStatement' }
       },

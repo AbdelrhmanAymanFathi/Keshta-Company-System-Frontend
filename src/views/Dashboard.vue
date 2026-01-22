@@ -162,7 +162,7 @@ export default {
           { name: 'suppliesList', label: 'dashboard.suppliesList', routeName: 'supplies-list' },
           { name: 'crushersList', label: 'dashboard.crushersList', routeName: 'crushers-list' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'contractors-list' },
-          { name: 'contractorStatement', label: 'dashboard.contractorStatement', routeName: 'contractor-statement' },
+          { name: 'contractorSupplyStatement', label: 'dashboard.contractorSupplyStatement', routeName: 'contractor-supply-statement' },
           { name: 'driversList', label: 'drivers.title', routeName: 'drivers-list' },
           { name:'ItemsList', label: 'dashboard.itemsList', routeName: 'items-list' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', routeName: 'vehicles-list' },
@@ -248,7 +248,7 @@ export default {
     currentLabel() { return this.currentItem ? this.currentItem.label : '' },
     selectedTop() {
       const routeName = this.currentRouteName
-      const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'contractors-list', 'contractor-statement', 'drivers-list', 'crushers-list', 'vehicles-list']
+      const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'contractors-list', 'contractor-supply-statement', 'drivers-list', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report']
       const rentalsRoutes = ['rentals-list', 'rentals-report']
       const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
@@ -277,7 +277,14 @@ export default {
       this.sidebarOpen = false
     },
     selectVertical(routeName) {
-      this.router.push({ name: routeName })
+      if (routeName === 'contractor-supply-statement') {
+        this.router.push({ 
+          name: 'contractor-supply-statement',
+          query: { transaction_type: 'EXPORT' }
+        })
+      } else {
+        this.router.push({ name: routeName })
+      }
       if (this.isMobile) this.sidebarOpen = false
     },
     toggleSidebar() { this.sidebarOpen = !this.sidebarOpen },
@@ -288,8 +295,9 @@ export default {
     },
     navigateToStatement(contractorId) {
       this.router.push({ 
-        name: 'contractor-statement',
-        params: { id: contractorId }
+        name: 'contractor-supply-statement',
+        params: { id: contractorId },
+        query: { transaction_type: 'EXPORT' }
       })
       if (contractorId) localStorage.setItem('contractor-statement-id', contractorId.toString())
       if (this.isMobile) this.sidebarOpen = false
