@@ -12,7 +12,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-gray-800">
+          <h2 class="text-2xl font-bold text-indigo-800">
             {{ currentStep === 1 ? modalTitle : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
           </h2>
           <button @click="closeModal"
@@ -25,306 +25,449 @@
         <div class="flex-1 overflow-y-auto p-6">
 
           <!-- ============================================ STEP 1 ============================================ -->
-          <div v-if="currentStep === 1" class="w-full">
-            <h3 class="text-xl font-bold mb-8 text-center">{{ $t('labels.step1BasicData') }}</h3>
+<div v-if="currentStep === 1" class="w-full">
+  <h3 class="text-lg font-bold mb-8 text-center text-gray-800">
+    {{ $t('labels.step1BasicData') }}
+  </h3>
 
-            <div class="grid gap-6 auto-fit" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-              <!-- Date -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.date') }} *</label>
-                <input type="date" v-model="commonData.date"
-                  class="w-full border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-              </div>
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <!-- Date -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.date') }} <span class="text-red-600">*</span>
+        </label>
+        <div class="relative">
+          <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <input
+            type="date"
+            v-model="commonData.date"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+          />
+        </div>
+      </div>
 
-              <!-- Item (صنف) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.item') }} *</label>
-                <div class="flex items-center gap-1">
-                  <select v-model="commonData.item" @change="onCommonItemSelect"
-                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                    <option :value="null">{{ $t('labels.item') }} —</option>
-                    <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})</option>
-                    <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                  </select>
-                  <button v-if="commonData.item === '__new__'" @click="showAddExportItemDialog = true"
-                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <!-- Price (السعر) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.price') }} *</label>
-                <input type="number" v-model.number="commonData.price" step="0.01"
-                  class="w-full border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-              </div>
-
-              <!-- Site (الموقع) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.site') }} *</label>
-                <div class="flex items-center gap-1">
-                  <select v-model="commonData.site" @change="onCommonSiteChange"
-                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                    <option :value="null">{{ $t('labels.site') }} —</option>
-                    <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
-                    <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') }}</option>
-                  </select>
-                  <button v-if="commonData.site === '__new__'" @click="showAddSite = true; pendingRow = null"
-                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <!-- Area (المنطقة) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
-                <div class="flex items-center gap-1">
-                  <select v-model="commonData.area" :disabled="!commonData.site || commonData.site === '__new__'"
-                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
-                    <option :value="null">{{ $t('labels.area') }} —</option>
-                    <option v-for="a in commonAvailableAreas" :key="a.id" :value="a">{{ a.name }}</option>
-                    <option value="__new__" v-if="commonData.site && commonData.site.id" style="color: #10b981;">+ {{ $t('supply.addNewArea') }}</option>
-                  </select>
-                  <button v-if="commonData.area === '__new__'" @click="showAddArea = true; pendingRow = null"
-                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <!-- Contractor (المقاول) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }} *</label>
-                <div class="flex items-center gap-1">
-                  <select v-model="commonData.contractor" @change="onCommonContractorChange"
-                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                    <option :value="null">{{ $t('labels.contractor') }} —</option>
-                    <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
-                    <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                  </select>
-                  <button v-if="commonData.contractor === '__new__'" @click="showAddContractorDialog = true"
-                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <!-- Crusher (الكسارة) -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusher') }} *</label>
-                <div class="flex items-center gap-1">
-                  <select v-model="commonData.crusher" @change="onCommonCrusherChange"
-                    class="flex-1 border border-gray-300 rounded px-3 py-2 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                    <option :value="null">{{ $t('labels.crusher') }} —</option>
-                    <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
-                    <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                  </select>
-                  <button v-if="commonData.crusher === '__new__'" @click="showAddCrusherDialog = true"
-                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm min-w-[40px]">
-                    +
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Next Button -->
-            <div class="mt-12 flex justify-center gap-4">
-              <button @click="closeModal" class="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
-                {{ $t('labels.cancel') }}
-              </button>
-              <button @click="goToStep2" :disabled="!isStep1Valid()"
-                class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium">
-                {{ $t('labels.next') }} {{ isRTL ? '←' : '→' }}
-              </button>
-            </div>
+      <!-- Item (صنف) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.item') }} <span class="text-red-600">*</span>
+        </label>
+        <div class="relative flex items-center gap-2">
+          <div class="flex-1 relative">
+            <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            <select
+              v-model="commonData.item"
+              @change="onCommonItemSelect"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
+            >
+              <option :value="null">{{ $t('labels.item') }} —</option>
+              <option v-for="i in exportItems" :key="i.id" :value="i">
+                {{ i.name }} ({{ i.currentPrice }})
+              </option>
+              <option value="__new__" style="color: #10b981;">
+                + {{ $t('labels.addNew') }}
+              </option>
+            </select>
           </div>
+          <button
+            v-if="commonData.item === '__new__'"
+            @click="showAddExportItemDialog = true"
+            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
+          >
+            <PlusIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
 
+      <!-- Price (السعر) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.price') }} <span class="text-red-600">*</span>
+        </label>
+        <div class="relative">
+          <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <input
+            type="number"
+            v-model.number="commonData.price"
+            step="0.01"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+          />
+        </div>
+      </div>
+
+      <!-- Site (الموقع) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.site') }} <span class="text-red-600">*</span>
+        </label>
+        <div class="relative flex items-center gap-2">
+          <div class="flex-1 relative">
+            <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            <select
+              v-model="commonData.site"
+              @change="onCommonSiteChange"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
+            >
+              <option :value="null">{{ $t('labels.site') }} —</option>
+              <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
+              <option value="__new__" style="color: #10b981;">
+                + {{ $t('supply.addNewSite') }}
+              </option>
+            </select>
+          </div>
+          <button
+            v-if="commonData.site === '__new__'"
+            @click="showAddSite = true; pendingRow = null"
+            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
+          >
+            <PlusIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Area (المنطقة) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.area') }}
+        </label>
+        <div class="relative flex items-center gap-2">
+          <div class="flex-1 relative">
+            <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            <select
+              v-model="commonData.area"
+              :disabled="!commonData.site || commonData.site === '__new__'"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none bg-white"
+            >
+              <option :value="null">{{ $t('labels.area') }} —</option>
+              <option v-for="a in commonAvailableAreas" :key="a.id" :value="a">
+                {{ a.name }}
+              </option>
+              <option
+                value="__new__"
+                v-if="commonData.site && commonData.site.id"
+                style="color: #10b981;"
+              >
+                + {{ $t('supply.addNewArea') }}
+              </option>
+            </select>
+          </div>
+          <button
+            v-if="commonData.area === '__new__'"
+            @click="showAddArea = true; pendingRow = null"
+            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
+          >
+            <PlusIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Contractor (المقاول) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.contractor') }} <span class="text-red-600">*</span>
+        </label>
+        <div class="relative flex items-center gap-2">
+          <div class="flex-1 relative">
+            <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            <select
+              v-model="commonData.contractor"
+              @change="onCommonContractorChange"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
+            >
+              <option :value="null">{{ $t('labels.contractor') }} —</option>
+              <option v-for="c in contractors" :key="c.id" :value="c">
+                {{ c.name }}
+              </option>
+              <option value="__new__" style="color: #10b981;">
+                + {{ $t('labels.addNew') }}
+              </option>
+            </select>
+          </div>
+          <button
+            v-if="commonData.contractor === '__new__'"
+            @click="showAddContractorDialog = true"
+            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
+          >
+            <PlusIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Crusher (الكسارة) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
+        </label>
+        <div class="relative flex items-center gap-2">
+          <div class="flex-1 relative">
+            <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            <select
+              v-model="commonData.crusher"
+              @change="onCommonCrusherChange"
+              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
+            >
+              <option :value="null">{{ $t('labels.crusher') }} —</option>
+              <option v-for="c in crushers" :key="c.id" :value="c">
+                {{ c.name }}
+              </option>
+              <option value="__new__" style="color: #10b981;">
+                + {{ $t('labels.addNew') }}
+              </option>
+            </select>
+          </div>
+          <button
+            v-if="commonData.crusher === '__new__'"
+            @click="showAddCrusherDialog = true"
+            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
+          >
+            <PlusIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Next / Cancel Buttons -->
+<div class="mt-10 flex justify-end gap-6">
+  <button
+    @click="closeModal"
+    class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition"
+  >
+    {{ $t('labels.cancel') }}
+  </button>
+  <button
+    @click="goToStep2"
+    :disabled="!isStep1Valid()"
+    class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
+  >
+    {{ $t('labels.next') }}
+    <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
+  </button>
+</div>
+</div>
           <!-- ============================================ STEP 2 ============================================ -->
-          <div v-else class="w-full">
-            <!-- Back Button and Title -->
-            <div class="flex items-center justify-between mb-6">
-              <button @click="goBackToStep1" class="text-indigo-600 hover:underline font-medium">
-                {{ isRTL ? '→' : '←' }} {{ $t('labels.back') }}
-              </button>
-              <h3 class="text-xl font-bold">{{ $t('labels.step2Data') }}</h3>
-              <div></div>
-            </div>
+<div v-else class="w-full">
+  <!-- Back Button and Title -->
+  <div class="flex items-center justify-between mb-8">
+    <button @click="goBackToStep1" class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition">
+      <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
+      {{ $t('labels.back') }}
+    </button>
+    <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
+    <div></div> <!-- Placeholder to balance flex -->
+  </div>
 
-            <!-- Summary Card of Common Data -->
-            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
-              <h4 class="text-sm font-bold text-indigo-900 mb-3">{{ $t('labels.summary') }}</h4>
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.date') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ commonData.date || '-' }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.item') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ commonData.item?.name || '-' }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.price') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ formatNumber(commonData.price) }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.site') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ commonData.site?.name || '-' }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.area') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ commonData.area?.name || '-' }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ commonData.contractor?.name || '-' }}</span>
-                </div>
-                <div>
-                  <span class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</span>
-                  <span class="text-gray-600 ml-2">{{ commonData.crusher?.name || '-' }}</span>
-                </div>
-              </div>
-            </div>
+  <!-- Summary Card of Common Data -->
+  <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
+    <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
+    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd>
+      </div>
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
+      </div>
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.price') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.price) }}</dd>
+      </div>
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd>
+      </div>
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
+      </div>
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
+      </div>
+      <div class="flex flex-col">
+        <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
+        <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
+      </div>
+    </dl>
+  </div>
 
-            <!-- Table for Variable Data -->
-            <div class="overflow-x-auto mb-8">
-              <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border">
-                <thead class="bg-indigo-50 sticky top-0 z-10">
-                  <tr>
-                    <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.price') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.discount') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.cubic') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
-                    <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.total') }}</th>
-                    <th class="px-3 py-3 text-center">{{ $t('labels.actions') }}</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                  <tr v-for="(row, index) in rows" :key="row.id">
-                    <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+  <!-- Table for Variable Data -->
+  <div class="overflow-x-auto mb-8">
+    <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border rounded-lg">
+      <thead class="bg-indigo-50 sticky top-0 z-10">
+        <tr>
+          <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.cubic') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
+          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
+          <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 bg-white">
+        <tr v-for="(row, index) in rows" :key="row.id">
+          <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
-                    <!-- Vehicle -->
-                    <td class="px-3 py-2">
-                      <div class="flex items-center gap-1">
-                        <select v-model="row.vehicle" @change="onVehicleSelect(row)"
-                          class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                          @keydown.enter.prevent="handleEnterKey(index)">
-                          <option :value="null">{{ $t('labels.vehicle') }} —</option>
-                          <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
-                          <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-                        </select>
-                        <button v-if="row.vehicle === '__new__'" @click="showAddVehicleDialog = true"
-                          class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
-                          +
-                        </button>
-                      </div>
-                    </td>
-
-                    <!-- Price (readonly - from commonData) -->
-                    <td class="px-3 py-2">
-                      <input type="number" :value="commonData.price" readonly
-                        class="w-full border border-gray-300 rounded px-2 py-1 bg-gray-100 text-gray-600" />
-                    </td>
-
-                    <!-- Crusher Bon -->
-                    <td class="px-3 py-2">
-                      <input type="text" v-model="row.crusherBon"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)" />
-                    </td>
-
-                    <!-- Company Bon -->
-                    <td class="px-3 py-2">
-                      <input type="text" v-model="row.companyBon"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        @keydown.enter.prevent="handleEnterKey(index)" />
-                    </td>
-
-                    <!-- Discount -->
-                    <td class="px-3 py-2">
-                      <input type="number" v-model.number="row.discount" step="0.01"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                        @keydown.enter.prevent="handleEnterKey(index)" />
-                    </td>
-
-                    <!-- Company Cubic -->
-                    <td class="px-3 py-2">
-                      <input type="number" v-model.number="row.cubic" step="0.01"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                        @keydown.enter.prevent="handleEnterKey(index)" />
-                    </td>
-
-                    <!-- Crusher Cubic -->
-                    <td class="px-3 py-2">
-                      <input type="number" v-model.number="row.crusherCubic" step="0.01"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-                        @keydown.enter.prevent="handleEnterKey(index)" />
-                    </td>
-
-                    <!-- Total per Row -->
-                    <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
-                      {{ formatNumber(totalPerRow(row)) }}
-                    </td>
-
-                    <!-- Actions -->
-                    <td class="px-3 py-2 text-center">
-                      <div class="flex justify-center gap-2">
-                        <button @click="duplicateRow(index)" class="text-blue-500 hover:text-blue-700 text-lg" title="Duplicate">
-                          📋
-                        </button>
-                        <button @click="removeRow(index)" class="text-red-500 hover:text-red-700 text-lg" title="Delete">
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Add Row Button -->
-            <div class="text-center mb-8">
-              <button @click="addRow"
-                class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-medium">
-                + {{ $t('labels.addRow') }}
+          <!-- Vehicle -->
+          <td class="px-3 py-2">
+            <div class="flex items-center gap-1">
+              <select
+                v-model="row.vehicle"
+                @change="onVehicleSelect(row)"
+                @keydown.enter.prevent="handleEnterKey(index)"
+                class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              >
+                <option :value="null">{{ $t('labels.vehicle') }} —</option>
+                <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
+                <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
+              </select>
+              <button
+                v-if="row.vehicle === '__new__'"
+                @click="showAddVehicleDialog = true"
+                class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
+              >
+                +
               </button>
             </div>
+          </td>
 
-            <!-- Totals -->
-            <div class="bg-gray-50 rounded-lg p-4 flex items-center justify-end gap-8 text-sm font-semibold">
-              <div>
-                <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
-                <span class="ml-2">{{ formatNumber(subtotal) }}</span>
-              </div>
-              <div>
-                <span class="text-gray-700">{{ $t('labels.totalDiscount') }}:</span>
-                <span class="text-red-600 ml-2">- {{ formatNumber(totalDiscount) }}</span>
-              </div>
-              <div class="text-lg text-indigo-700 border-l-2 border-indigo-700 pl-8">
-                <span>{{ $t('labels.grandTotal') }}:</span>
-                <span class="ml-2">{{ formatNumber(grandTotal) }}</span>
-              </div>
-            </div>
+          <!-- Price (readonly) -->
+          <td class="px-3 py-2">
+            <input
+              type="number"
+              :value="commonData.price"
+              readonly
+              class="w-full border border-gray-300 rounded px-2 py-1 bg-gray-100 text-gray-600"
+            />
+          </td>
 
-            <!-- Save Button -->
-            <div class="mt-10 flex justify-end gap-4">
-              <button @click="goBackToStep1" class="px-8 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
-                {{ $t('labels.back') }}
+          <!-- Crusher Bon -->
+          <td class="px-3 py-2">
+            <input
+              type="text"
+              v-model="row.crusherBon"
+              @keydown.enter.prevent="handleEnterKey(index)"
+              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            />
+          </td>
+
+          <!-- Company Bon -->
+          <td class="px-3 py-2">
+            <input
+              type="text"
+              v-model="row.companyBon"
+              @keydown.enter.prevent="handleEnterKey(index)"
+              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            />
+          </td>
+
+          <!-- Discount -->
+          <td class="px-3 py-2">
+            <input
+              type="number"
+              v-model.number="row.discount"
+              step="0.01"
+              @keydown.enter.prevent="handleEnterKey(index)"
+              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+            />
+          </td>
+
+          <!-- Company Cubic -->
+          <td class="px-3 py-2">
+            <input
+              type="number"
+              v-model.number="row.cubic"
+              step="0.01"
+              @keydown.enter.prevent="handleEnterKey(index)"
+              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+            />
+          </td>
+
+          <!-- Crusher Cubic -->
+          <td class="px-3 py-2">
+            <input
+              type="number"
+              v-model.number="row.crusherCubic"
+              step="0.01"
+              @keydown.enter.prevent="handleEnterKey(index)"
+              @keydown.tab="onCrusherCubicTab(index, $event)"
+              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+            />
+          </td>
+
+          <!-- Total per Row -->
+          <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
+            {{ formatNumber(totalPerRow(row)) }}
+          </td>
+
+          <!-- Actions -->
+          <td class="px-4 py-3 text-center">
+            <div class="flex justify-center gap-3">
+              <button
+                @click="duplicateRow(index)"
+                class="text-blue-600 hover:text-blue-800 transition"
+                title="Duplicate"
+              >
+                <DocumentDuplicateIcon class="w-5 h-5" />
               </button>
-              <button @click="saveData" :disabled="isSaving"
-                class="px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg font-medium">
-                {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
+              <button
+                @click="removeRow(index)"
+                class="text-red-600 hover:text-red-800 transition"
+                title="Delete"
+              >
+                <TrashIcon class="w-5 h-5" />
               </button>
             </div>
-            <p v-if="saveError" class="mt-4 text-center text-red-600 font-medium text-lg">
-              {{ saveError }}
-            </p>
-          </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Totals -->
+  <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
+    <div class="flex items-center justify-end gap-3">
+      <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
+      <span class="text-gray-900 min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
+    </div>
+    <div class="flex items-center justify-end gap-3">
+      <span class="text-gray-700">{{ $t('labels.totalDiscount') }}:</span>
+      <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
+    </div>
+    <div class="flex items-center justify-end gap-3 text-lg text-indigo-700 border-s-4 border-indigo-700 ps-6">
+      <span class="text-indigo-900">{{ $t('labels.grandTotal') }}:</span>
+      <span class="text-indigo-900 min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+    </div>
+  </div>
+
+  <!-- Save / Back Buttons -->
+  <div class="mt-10 flex justify-end gap-6">
+    <button
+      @click="goBackToStep1"
+      class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3"
+    >
+      <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
+      {{ $t('labels.back') }}
+    </button>
+    <button
+      @click="saveData"
+      :disabled="isSaving"
+      class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
+    >
+      {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
+      <CheckIcon class="w-6 h-6" />
+    </button>
+  </div>
+
+  <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">
+    {{ saveError }}
+  </p>
+</div>
         </div>
       </div>
     </div>
@@ -456,10 +599,50 @@ import {
   getExportItems,
   createExportItem
 } from '@/api'
+import {
+  CalendarDaysIcon,
+  ArchiveBoxIcon,
+  CurrencyDollarIcon,
+  MapPinIcon,
+  MapIcon,
+  UserGroupIcon,
+  WrenchScrewdriverIcon,
+  PlusIcon,
+  ArrowLeftIcon,
+  TruckIcon,
+  DocumentTextIcon,
+  MinusCircleIcon,
+  CubeIcon,
+  CubeTransparentIcon,
+  DocumentDuplicateIcon,
+  TrashIcon,
+  CheckIcon,
+  ArrowRightIcon
+} from '@heroicons/vue/24/outline'
 
 export default {
   emits: ['saved'],
   name: 'TableModal',
+  components: {
+    CalendarDaysIcon,
+    ArchiveBoxIcon,
+    CurrencyDollarIcon,
+    MapPinIcon,
+    MapIcon,
+    UserGroupIcon,
+    WrenchScrewdriverIcon,
+    PlusIcon,
+    ArrowLeftIcon,
+    TruckIcon,
+    DocumentTextIcon,
+    MinusCircleIcon,
+    CubeIcon,
+    CubeTransparentIcon,
+    DocumentDuplicateIcon,
+    TrashIcon,
+    CheckIcon,
+    ArrowRightIcon
+  },
   props: {
     showTriggerButton: {
       type: Boolean,
@@ -597,6 +780,25 @@ export default {
   },
 
   methods: {
+        // Add new row when Tab is pressed on last field
+        onCrusherCubicTab(index, event) {
+          if (event.key === 'Tab') {
+            // Only add row if it's the last row
+            if (index === this.rows.length - 1) {
+              event.preventDefault();
+              this.addRow();
+              this.$nextTick(() => {
+                // Focus first input in new row
+                const allRows = this.tableRef?.querySelectorAll('tbody tr');
+                const newRowEl = allRows?.[index + 1];
+                if (newRowEl) {
+                  const firstSelect = newRowEl.querySelector('select');
+                  firstSelect?.focus();
+                }
+              });
+            }
+          }
+        },
     // ============ Step Control ============
     isStep1Valid() {
       return this.commonData.date &&
@@ -890,7 +1092,8 @@ export default {
     },
 
     formatNumber(v) {
-      return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
+      // Always show numbers in English
+      return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })
     },
 
     // ============ Locations Management ============
