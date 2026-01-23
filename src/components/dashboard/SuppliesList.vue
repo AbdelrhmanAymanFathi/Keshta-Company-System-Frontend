@@ -220,7 +220,7 @@
             <td class="px-6 py-3 min-w-[160px] text-start text-sm font-semibold text-indigo-900 whitespace-nowrap">
               {{
                 s.unitPrice
-                  ? new Intl.NumberFormat(isRTL ? 'ar-EG' : 'en-US', {
+                  ? new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'EGP'
                   }).format(s.unitPrice)
