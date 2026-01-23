@@ -592,15 +592,14 @@ export default {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
 
-    formatDate(dateString) {
-      if (!dateString) return '-'
-      try {
-        const date = new Date(dateString)
-        return date.toLocaleDateString(this.isRTL ? 'ar-EG' : 'en-US')
-      } catch {
-        return dateString
-      }
-    },
+formatDate(dateString) {
+  if (!dateString) return '-'
+  try {
+    return new Intl.DateTimeFormat('en-GB').format(new Date(dateString))
+  } catch {
+    return dateString
+  }
+},
 
     calculateTotal(supply) {
       const capacity = parseFloat(supply.companyCapacity || supply.crusherCapacity || 0)
