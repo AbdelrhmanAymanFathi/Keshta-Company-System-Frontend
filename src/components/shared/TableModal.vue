@@ -299,7 +299,7 @@
         <tr>
           <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
           <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th>
+         <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
           <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
           <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
           <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
@@ -337,14 +337,14 @@
           </td>
 
           <!-- Price (readonly) -->
-          <td class="px-3 py-2">
+          <!--<td class="px-3 py-2">
             <input
               type="number"
               :value="commonData.price"
               readonly
               class="w-full border border-gray-300 rounded px-2 py-1 bg-gray-100 text-gray-600"
             />
-          </td>
+          </td> -->
 
           <!-- Crusher Bon -->
           <td class="px-3 py-2">
