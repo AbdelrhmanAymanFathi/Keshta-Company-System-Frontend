@@ -301,50 +301,39 @@
                   <tr v-for="(row, index) in rows" :key="row.id">
                     <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
+                    <!-- ======================== first column 
+                     in step 2 ================ -->
                     <!-- Vehicle -->
-<td class="px-4 py-3">
-  <div class="relative flex items-center gap-2">
-    <!-- Input with native datalist for simple search/filter -->
-    <div class="flex-1 relative">
-      <TruckIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-      <input
-        type="text"
-        :value="row.vehicle ? row.vehicle.name : ''"
-        @input="onVehicleInput($event, row)"
-        @keydown.enter.prevent="handleEnterKey(index)"
-        list="vehicle-datalist"
-        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-11 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-        :placeholder="$t('labels.vehicle') + ' —'"
-      />
-      
-      <!-- Datalist for native browser search/filter -->
-      <datalist id="vehicle-datalist">
-        <option v-for="v in row.availableVehicles" :key="v.id" :value="v.name"></option>
-        <!-- Optional: always show + add new as suggestion -->
-        <option value="+ {{ $t('labels.addNewVehicle') }}" style="color: #10b981; font-style: italic;"></option>
-      </datalist>
-    </div>
-    
-    <!-- + Button appears when user types something not in the list (new vehicle) -->
-    <button
-      v-if="row.vehicleInput && !row.availableVehicles.some(v => v.name === row.vehicleInput)"
-      @click="showAddVehicleDialog = true; newVehicleForm.name = row.vehicleInput"
-      class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
-    >
-      <PlusIcon class="w-6 h-6" />
-    </button>
-  </div>
-</td>
+                    <td class="px-3 py-2">
+                      <div class="relative">
+                        <!-- Field -->
+                        <div
+                          class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
+                          @click="row.open = true">
+                          <input v-model="row.search" type="text"
+                            :placeholder="row.vehicle?.name || $t('labels.vehicle')"
+                            class="outline-none flex-1 text-sm"
+                            @focus="row.open = true"
+                            @keydown.enter.prevent />
+                          <span class="text-gray-400">▾</span>
+                        </div>
 
-                    <!-- Price (readonly) -->
-                    <!--<td class="px-3 py-2">
-            <input
-              type="number"
-              :value="commonData.price"
-              readonly
-              class="w-full border border-gray-300 rounded px-2 py-1 bg-gray-100 text-gray-600"
-            />
-          </td> -->
+                        <!-- Dropdown -->
+                        <div v-if="row.open"
+                          class="border border-gray-200 bg-white rounded mt-1 max-h-40 overflow-y-auto">
+                          <div v-for="v in filteredVehicles(row)" :key="v.id" @click="selectVehicle(row, v)"
+                            class="px-2 py-1 hover:bg-indigo-100 cursor-pointer text-sm">
+                            {{ v.name }}
+                          </div>
+
+                          <!-- Add new -->
+                          <div @click="row.vehicle = '__new__'; showAddVehicleDialog = true"
+                            class="px-2 py-1 text-green-600 hover:bg-green-50 cursor-pointer text-sm">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
 
                     <!-- Crusher Bon -->
                     <td class="px-3 py-2">
@@ -821,16 +810,16 @@ export default {
         const newRowIndex = this.rows.length;
         this.addRow();
 
-        // Focus on vehicle select in the new row with a small timeout
+        // Focus on vehicle input in the new row with a small timeout
         setTimeout(() => {
           this.$nextTick(() => {
             if (!this.tableRef) return;
             const allRows = this.tableRef.querySelectorAll('tbody tr');
             const newRow = allRows[newRowIndex];
             if (newRow) {
-              const vehicleSelect = newRow.querySelector('select');
-              if (vehicleSelect) {
-                vehicleSelect.focus();
+              const vehicleInput = newRow.querySelector('input[type="text"]');
+              if (vehicleInput) {
+                vehicleInput.focus();
               }
             }
           });
@@ -976,24 +965,6 @@ export default {
       }, 200)
     },
 
-    onVehicleInput(event, row) {
-      const inputValue = event.target.value.trim()
-      row.vehicleInput = inputValue
-
-      // Try to match the input with available vehicles
-      const matchedVehicle = row.availableVehicles.find(v => v.name === inputValue)
-      if (matchedVehicle) {
-        row.vehicle = matchedVehicle
-        this.onVehicleSelect(row) // Update dependent fields
-      } else {
-
-        // No match found, treat as new vehicle
-        row.vehicle = null
-        row.cubic = 0
-        row.crusherCubic = ''
-      }
-    },
-
     // ============ Row Management ============
     createEmptyRow() {
       const row = {
@@ -1005,7 +976,8 @@ export default {
         contractor: this.commonData.contractor,
         crusher: this.commonData.crusher,
         vehicle: null,
-        vehicleInput: '',
+        search: '',
+        open: false,
         item: this.commonData.item,
         crusherBon: '',
         companyBon: '',
@@ -1062,8 +1034,8 @@ export default {
         const allRows = this.tableRef.querySelectorAll('tbody tr')
         const newRowEl = allRows[rowIndex + 1]
         if (newRowEl) {
-          const firstSelect = newRowEl.querySelector('select')
-          firstSelect?.focus()
+          const firstInput = newRowEl.querySelector('input[type="text"]')
+          firstInput?.focus()
         }
       })
     },
@@ -1078,7 +1050,8 @@ export default {
       const copy = JSON.parse(JSON.stringify(src))
       copy.id = Date.now() + Math.random()
       copy.vehicle = null
-      copy.vehicleInput = ''
+      copy.search = ''
+      copy.open = false
       copy.crusherBon = ''
       copy.companyBon = ''
       copy.discount = 0
@@ -1132,6 +1105,20 @@ export default {
     },
 
     // ============ Field Interactions (Step 2) ============
+    filteredVehicles(row) {
+      const q = row.search?.toLowerCase() || ''
+      return row.availableVehicles.filter(v =>
+        v.name.toLowerCase().includes(q)
+      )
+    },
+
+    selectVehicle(row, vehicle) {
+      row.vehicle = vehicle
+      row.search = vehicle.name
+      row.open = false
+      this.onVehicleSelect(row)
+    },
+
     onVehicleSelect(row) {
       if (!row.vehicle || row.vehicle === '__new__') {
         row.cubic = 0
