@@ -41,7 +41,7 @@
     "newSupply": "توريدة جديدة",
     "suppliesList": "قائمة التوريدات",
     "crushersList": "قائمة الكسارات",
-    "contractorsList": "قائمة المقاولين",
+    "contractorsList": "قائمة الموردين",
     "contractorSupplyStatement": "كشف حساب المقاول",
     "vehiclesList": "قائمة المركبات",
     "suppliesReport": "تقرير التوريدات",
@@ -316,10 +316,10 @@
     }
   },
   "contractors": {
-    "title": "المقاولين",
+    "title": "الموردين",
     "importExcel": "استيراد إكسل",
     "add": "إضافة مقاول",
-    "searchPlaceholder": "البحث في المقاولين...",
+    "searchPlaceholder": "البحث في الموردين...",
     "name": "الاسم",
     "phone": "الهاتف",
     "bankName": "اسم البنك",
@@ -725,7 +725,7 @@
     "modules": {
       "exports": "التوريدات",
       "locations": "المواقع",
-      "contractors": "المقاولين",
+      "contractors": "الموردين",
       "crushers": "الكسارات",
       "transports": "النقل",
       "rentals": "الإيجار",
