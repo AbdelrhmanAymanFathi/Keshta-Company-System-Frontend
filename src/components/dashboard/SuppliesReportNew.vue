@@ -421,34 +421,38 @@ export default {
       return totalAmount.value / mappedItems.value.length
     })
 
-    /**
-     * Formatting Functions
+    /*
+     =========== Formatting Functions =============
      */
-    const formatDate = (dateString) => {
-      if (!dateString) return '-'
-
-      // Handle DD/MM/YYYY format from API
-      if (dateString.includes('/')) {
-        const parts = dateString.split('/')
-        if (parts.length === 3) {
-          return dateString // Return as-is if already in DD/MM/YYYY
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  try {
+    // Handle DD/MM/YYYY format
+    if (dateString.includes('/')) {
+      const parts = dateString.split('/')
+      if (parts.length === 3) {
+        const [day, month, year] = parts
+        // Basic validation
+        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+          
+          return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`
         }
       }
-
-      // Handle YYYY-MM-DD and other standard formats
-      try {
-        const date = new Date(dateString)
-        if (isNaN(date)) return '-'
-        return date.toLocaleDateString('en-GB', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        })
-      } catch {
-        return '-'
-      }
     }
+    const date = new Date(dateString)
+    if (isNaN(date)) return '-'
+    // Use Intl.DateTimeFormat for consistent formatting
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date)
+  } catch {
+    return '-'
+  }
+}
 
+// Currency formatter
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(String(amount).replace(/,/g, '')) || 0
       return new Intl.NumberFormat('en-US', {
