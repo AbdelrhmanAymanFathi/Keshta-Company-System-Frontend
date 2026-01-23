@@ -318,7 +318,7 @@
   "contractors": {
     "title": "الموردين",
     "importExcel": "استيراد إكسل",
-    "add": "إضافة مقاول",
+    "add": "إضافة مورد",
     "searchPlaceholder": "البحث في الموردين...",
     "name": "الاسم",
     "phone": "الهاتف",
@@ -326,7 +326,7 @@
     "accountNumber": "رقم الحساب",
     "notes": "ملاحظات",
     "noResults": "لا توجد مقاولين",
-    "addContractor": "إضافة مقاول",
+    "addContractor": "إضافة مورد",
     "editContractor": "تعديل المقاول",
     "deleteConfirm": "هل أنت متأكد من حذف المقاول",
     "validationName": "الاسم مطلوب",
