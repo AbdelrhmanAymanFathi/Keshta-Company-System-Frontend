@@ -25,319 +25,319 @@
         <div class="flex-1 overflow-y-auto p-6">
 
           <!-- ============================================ STEP 1 ============================================ -->
-<div v-if="currentStep === 1" class="w-full">
-  <h3 class="text-lg font-bold mb-8 text-center text-gray-800">
-    {{ $t('labels.step1BasicData') }}
-  </h3>
+          <div v-if="currentStep === 1" class="w-full">
+            <h3 class="text-lg font-bold mb-8 text-center text-gray-800">
+              {{ $t('labels.step1BasicData') }}
+            </h3>
 
-  <div class="max-w-6xl mx-auto">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-      <!-- Date -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.date') }} <span class="text-red-600">*</span>
-        </label>
-        <div class="relative">
-          <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-          <input
-            type="date"
-            v-model="commonData.date"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-          />
-        </div>
-      </div>
+            <div class="max-w-6xl mx-auto">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <!-- Date -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.date') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative">
+                    <CalendarDaysIcon
+                      class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <input type="date" v-model="commonData.date"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                  </div>
+                </div>
 
-      <!-- Item (صنف) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.item') }} <span class="text-red-600">*</span>
-        </label>
-        <div class="relative flex items-center gap-2">
-          <div class="flex-1 relative">
-            <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-            <select
-              v-model="commonData.item"
-              @change="onCommonItemSelect"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
-            >
-              <option :value="null">{{ $t('labels.item') }} —</option>
-              <option v-for="i in exportItems" :key="i.id" :value="i">
-                {{ i.name }} ({{ i.currentPrice }})
-              </option>
-              <option value="__new__" style="color: #10b981;">
-                + {{ $t('labels.addNew') }}
-              </option>
-            </select>
-          </div>
-          <button
-            v-if="commonData.item === '__new__'"
-            @click="showAddExportItemDialog = true"
-            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
-          >
-            <PlusIcon class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+                <!-- Item (صنف) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.item') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <ArchiveBoxIcon
+                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <input v-model="filters.commonItemSearch" @focus="filters.showCommonItemDropdown = true"
+                        @blur="closeDropdownDelayed('showCommonItemDropdown')" type="text"
+                        :placeholder="$t('labels.item')"
+                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+                      <div v-if="filters.showCommonItemDropdown && filteredCommonItems.length"
+                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+                        <div v-for="item in filteredCommonItems" :key="item.id"
+                          @click="commonData.item = item; filters.commonItemSearch = item.name; filters.showCommonItemDropdown = false; onCommonItemSelect()"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                          {{ item.name }} ({{ item.currentPrice }})
+                        </div>
+                        <div @click="showAddExportItemDialog = true; filters.showCommonItemDropdown = false"
+                          style="color: #10b981;"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                          + {{ $t('labels.addNew') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      <!-- Price (السعر) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.price') }} <span class="text-red-600">*</span>
-        </label>
-        <div class="relative">
-          <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-          <input
-            type="number"
-            v-model.number="commonData.price"
-            step="0.01"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-          />
-        </div>
-      </div>
+                <!-- Price (السعر) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.price') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative">
+                    <CurrencyDollarIcon
+                      class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <input type="number" v-model.number="commonData.price" step="0.01"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                  </div>
+                </div>
 
-      <!-- Site (الموقع) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.site') }} <span class="text-red-600">*</span>
-        </label>
-        <div class="relative flex items-center gap-2">
-          <div class="flex-1 relative">
-            <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-            <select
-              v-model="commonData.site"
-              @change="onCommonSiteChange"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
-            >
-              <option :value="null">{{ $t('labels.site') }} —</option>
-              <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
-              <option value="__new__" style="color: #10b981;">
-                + {{ $t('supply.addNewSite') }}
-              </option>
-            </select>
-          </div>
-          <button
-            v-if="commonData.site === '__new__'"
-            @click="showAddSite = true; pendingRow = null"
-            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
-          >
-            <PlusIcon class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+                <!-- Site (الموقع) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.site') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <MapPinIcon
+                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <input v-model="filters.commonSiteSearch" @focus="filters.showCommonSiteDropdown = true"
+                        @blur="closeDropdownDelayed('showCommonSiteDropdown')" type="text"
+                        :placeholder="$t('labels.site')"
+                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+                      <div v-if="filters.showCommonSiteDropdown && filteredCommonSites.length"
+                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+                        <div v-for="site in filteredCommonSites" :key="site.id"
+                          @click="commonData.site = site; filters.commonSiteSearch = site.name; filters.showCommonSiteDropdown = false; onCommonSiteChange()"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                          {{ site.name }}
+                        </div>
+                        <div @click="showAddSite = true; pendingRow = null; filters.showCommonSiteDropdown = false"
+                          style="color: #10b981;"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                          + {{ $t('supply.addNewSite') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      <!-- Area (المنطقة) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.area') }}
-        </label>
-        <div class="relative flex items-center gap-2">
-          <div class="flex-1 relative">
-            <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-            <select
-              v-model="commonData.area"
-              :disabled="!commonData.site || commonData.site === '__new__'"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none bg-white"
-            >
-              <option :value="null">{{ $t('labels.area') }} —</option>
-              <option v-for="a in commonAvailableAreas" :key="a.id" :value="a">
-                {{ a.name }}
-              </option>
-              <option
-                value="__new__"
-                v-if="commonData.site && commonData.site.id"
-                style="color: #10b981;"
-              >
-                + {{ $t('supply.addNewArea') }}
-              </option>
-            </select>
-          </div>
-          <button
-            v-if="commonData.area === '__new__'"
-            @click="showAddArea = true; pendingRow = null"
-            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
-          >
-            <PlusIcon class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+                <!-- Area (المنطقة) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.area') }}
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <MapIcon
+                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <input v-model="filters.commonAreaSearch" @focus="filters.showCommonAreaDropdown = true"
+                        @blur="closeDropdownDelayed('showCommonAreaDropdown')" type="text"
+                        :placeholder="$t('labels.area')" :disabled="!commonData.site"
+                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed" />
+                      <div v-if="filters.showCommonAreaDropdown && filteredCommonAreas.length"
+                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+                        <div v-for="area in filteredCommonAreas" :key="area.id"
+                          @click="commonData.area = area; filters.commonAreaSearch = area.name; filters.showCommonAreaDropdown = false"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                          {{ area.name }}
+                        </div>
+                        <div v-if="commonData.site"
+                          @click="showAddArea = true; pendingRow = null; filters.showCommonAreaDropdown = false"
+                          style="color: #10b981;"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                          + {{ $t('supply.addNewArea') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      <!-- Contractor (المقاول) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.contractor') }} <span class="text-red-600">*</span>
-        </label>
-        <div class="relative flex items-center gap-2">
-          <div class="flex-1 relative">
-            <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-            <select
-              v-model="commonData.contractor"
-              @change="onCommonContractorChange"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
-            >
-              <option :value="null">{{ $t('labels.contractor') }} —</option>
-              <option v-for="c in contractors" :key="c.id" :value="c">
-                {{ c.name }}
-              </option>
-              <option value="__new__" style="color: #10b981;">
-                + {{ $t('labels.addNew') }}
-              </option>
-            </select>
-          </div>
-          <button
-            v-if="commonData.contractor === '__new__'"
-            @click="showAddContractorDialog = true"
-            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
-          >
-            <PlusIcon class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+                <!-- Contractor (المقاول) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.contractor') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <UserGroupIcon
+                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <input v-model="filters.commonContractorSearch"
+                        @focus="filters.showCommonContractorDropdown = true"
+                        @blur="closeDropdownDelayed('showCommonContractorDropdown')" type="text"
+                        :placeholder="$t('labels.contractor')"
+                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+                      <div v-if="filters.showCommonContractorDropdown && filteredCommonContractors.length"
+                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+                        <div v-for="contractor in filteredCommonContractors" :key="contractor.id"
+                          @click="commonData.contractor = contractor; filters.commonContractorSearch = contractor.name; filters.showCommonContractorDropdown = false; onCommonContractorChange()"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                          {{ contractor.name }}
+                        </div>
+                        <div @click="showAddContractorDialog = true; filters.showCommonContractorDropdown = false"
+                          style="color: #10b981;"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                          + {{ $t('labels.addNew') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      <!-- Crusher (الكسارة) -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
-        </label>
-        <div class="relative flex items-center gap-2">
-          <div class="flex-1 relative">
-            <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-            <select
-              v-model="commonData.crusher"
-              @change="onCommonCrusherChange"
-              class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white"
-            >
-              <option :value="null">{{ $t('labels.crusher') }} —</option>
-              <option v-for="c in crushers" :key="c.id" :value="c">
-                {{ c.name }}
-              </option>
-              <option value="__new__" style="color: #10b981;">
-                + {{ $t('labels.addNew') }}
-              </option>
-            </select>
-          </div>
-          <button
-            v-if="commonData.crusher === '__new__'"
-            @click="showAddCrusherDialog = true"
-            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
-          >
-            <PlusIcon class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+                <!-- Crusher (الكسارة) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <WrenchScrewdriverIcon
+                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <input v-model="filters.commonCrusherSearch" @focus="filters.showCommonCrusherDropdown = true"
+                        @blur="closeDropdownDelayed('showCommonCrusherDropdown')" type="text"
+                        :placeholder="$t('labels.crusher')"
+                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+                      <div v-if="filters.showCommonCrusherDropdown && filteredCommonCrushers.length"
+                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
+                        <div v-for="crusher in filteredCommonCrushers" :key="crusher.id"
+                          @click="commonData.crusher = crusher; filters.commonCrusherSearch = crusher.name; filters.showCommonCrusherDropdown = false; onCommonCrusherChange()"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                          {{ crusher.name }}
+                        </div>
+                        <div @click="showAddCrusherDialog = true; filters.showCommonCrusherDropdown = false"
+                          style="color: #10b981;"
+                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                          + {{ $t('labels.addNew') }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  <!-- Next / Cancel Buttons -->
-<div class="mt-10 flex justify-end gap-6">
-  <button
-    @click="closeModal"
-    class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition"
-  >
-    {{ $t('labels.cancel') }}
-  </button>
-  <button
-    @click="goToStep2"
-    :disabled="!isStep1Valid()"
-    class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
-  >
-    {{ $t('labels.next') }}
-    <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
-  </button>
-</div>
-</div>
-          <!-- ============================================ STEP 2 ============================================ -->
-<div v-else class="w-full">
-  <!-- Back Button and Title -->
-  <div class="flex items-center justify-between mb-8">
-    <button @click="goBackToStep1" class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition">
-      <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
-      {{ $t('labels.back') }}
-    </button>
-    <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
-    <div></div> <!-- Placeholder to balance flex -->
-  </div>
-
-  <!-- Summary Card of Common Data -->
-  <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
-    <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
-    <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd>
-      </div>
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
-      </div>
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.price') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.price) }}</dd>
-      </div>
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd>
-      </div>
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
-      </div>
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
-      </div>
-      <div class="flex flex-col">
-        <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
-        <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
-      </div>
-    </dl>
-  </div>
-
-  <!-- Table for Variable Data -->
-  <div class="overflow-x-auto mb-8">
-    <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border rounded-lg">
-      <thead class="bg-indigo-50 sticky top-0 z-10">
-        <tr>
-          <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.vehicle') }}</th>
-         <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.crusherBon') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.companyBon') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.cubic') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
-          <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
-          <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 bg-white">
-        <tr v-for="(row, index) in rows" :key="row.id">
-          <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
-
-          <!-- Vehicle -->
-          <td class="px-3 py-2">
-            <div class="flex items-center gap-1">
-              <select
-                v-model="row.vehicle"
-                @change="onVehicleSelect(row)"
-                @keydown.enter.prevent="handleEnterKey(index)"
-                class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-              >
-                <option :value="null">{{ $t('labels.vehicle') }} —</option>
-                <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
-                <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
-              </select>
-              <button
-                v-if="row.vehicle === '__new__'"
-                @click="showAddVehicleDialog = true"
-                class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]"
-              >
-                +
+            <!-- Next / Cancel Buttons -->
+            <div class="mt-10 flex justify-end gap-6">
+              <button @click="closeModal"
+                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition">
+                {{ $t('labels.cancel') }}
+              </button>
+              <button @click="goToStep2" :disabled="!isStep1Valid()"
+                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">
+                {{ $t('labels.next') }}
+                <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
               </button>
             </div>
-          </td>
+          </div>
+          <!-- ============================================ STEP 2 ============================================ -->
+          <div v-else class="w-full">
+            <!-- Back Button and Title -->
+            <div class="flex items-center justify-between mb-8">
+              <button @click="goBackToStep1"
+                class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition">
+                <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
+                {{ $t('labels.back') }}
+              </button>
+              <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
+              <div></div> <!-- Placeholder to balance flex -->
+            </div>
 
-          <!-- Price (readonly) -->
-          <!--<td class="px-3 py-2">
+            <!-- Summary Card of Common Data -->
+            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
+              <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
+              <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.price') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.price) }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <!-- Table for Variable Data -->
+            <div class="overflow-x-auto mb-8">
+              <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border rounded-lg">
+                <thead class="bg-indigo-50 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.vehicle') }}</th>
+                    <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.crusherBon') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.companyBon') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.discount') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.cubic') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.crusherCubic') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      $t('labels.total') }}</th>
+                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  <tr v-for="(row, index) in rows" :key="row.id">
+                    <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+
+                    <!-- Vehicle -->
+<td class="px-4 py-3">
+  <div class="relative flex items-center gap-2">
+    <!-- Input with native datalist for simple search/filter -->
+    <div class="flex-1 relative">
+      <TruckIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+      <input
+        type="text"
+        :value="row.vehicle ? row.vehicle.name : ''"
+        @input="onVehicleInput($event, row)"
+        @keydown.enter.prevent="handleEnterKey(index)"
+        list="vehicle-datalist"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-11 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+        :placeholder="$t('labels.vehicle') + ' —'"
+      />
+      
+      <!-- Datalist for native browser search/filter -->
+      <datalist id="vehicle-datalist">
+        <option v-for="v in row.availableVehicles" :key="v.id" :value="v.name"></option>
+        <!-- Optional: always show + add new as suggestion -->
+        <option value="+ {{ $t('labels.addNewVehicle') }}" style="color: #10b981; font-style: italic;"></option>
+      </datalist>
+    </div>
+    
+    <!-- + Button appears when user types something not in the list (new vehicle) -->
+    <button
+      v-if="row.vehicleInput && !row.availableVehicles.some(v => v.name === row.vehicleInput)"
+      @click="showAddVehicleDialog = true; newVehicleForm.name = row.vehicleInput"
+      class="bg-green-600 hover:bg-green-700 text-white px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center min-w-[44px]"
+    >
+      <PlusIcon class="w-6 h-6" />
+    </button>
+  </div>
+</td>
+
+                    <!-- Price (readonly) -->
+                    <!--<td class="px-3 py-2">
             <input
               type="number"
               :value="commonData.price"
@@ -346,130 +346,98 @@
             />
           </td> -->
 
-          <!-- Crusher Bon -->
-          <td class="px-3 py-2">
-            <input
-              type="text"
-              v-model="row.crusherBon"
-              @keydown.enter.prevent="handleEnterKey(index)"
-              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-            />
-          </td>
+                    <!-- Crusher Bon -->
+                    <td class="px-3 py-2">
+                      <input type="text" v-model="row.crusherBon" @keydown.enter.prevent="handleEnterKey(index)"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                    </td>
 
-          <!-- Company Bon -->
-          <td class="px-3 py-2">
-            <input
-              type="text"
-              v-model="row.companyBon"
-              @keydown.enter.prevent="handleEnterKey(index)"
-              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-            />
-          </td>
+                    <!-- Company Bon -->
+                    <td class="px-3 py-2">
+                      <input type="text" v-model="row.companyBon" @keydown.enter.prevent="handleEnterKey(index)"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                    </td>
 
-          <!-- Discount -->
-          <td class="px-3 py-2">
-            <input
-              type="number"
-              v-model.number="row.discount"
-              step="0.01"
-              @keydown.enter.prevent="handleEnterKey(index)"
-              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-            />
-          </td>
+                    <!-- Discount -->
+                    <td class="px-3 py-2">
+                      <input type="number" v-model.number="row.discount" step="0.01"
+                        @keydown.enter.prevent="handleEnterKey(index)"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                    </td>
 
-          <!-- Company Cubic -->
-          <td class="px-3 py-2">
-            <input
-              type="number"
-              v-model.number="row.cubic"
-              step="0.01"
-              @keydown.enter.prevent="handleEnterKey(index)"
-              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-            />
-          </td>
+                    <!-- Company Cubic -->
+                    <td class="px-3 py-2">
+                      <input type="number" v-model.number="row.cubic" step="0.01"
+                        @keydown.enter.prevent="handleEnterKey(index)"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                    </td>
 
-          <!-- Crusher Cubic -->
-          <td class="px-3 py-2">
-            <input
-              type="number"
-              v-model.number="row.crusherCubic"
-              step="0.01"
-              @keydown.enter.prevent="handleEnterKey(index)"
-              @keydown.tab="onCrusherCubicTab(index, $event)"
-              class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
-            />
-          </td>
+                    <!-- Crusher Cubic -->
+                    <td class="px-3 py-2">
+                      <input type="number" v-model.number="row.crusherCubic" step="0.01"
+                        @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onCrusherCubicTab(index, $event)"
+                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                    </td>
 
-          <!-- Total per Row -->
-          <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
-            {{ formatNumber(totalPerRow(row)) }}
-          </td>
+                    <!-- Total per Row -->
+                    <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
+                      {{ formatNumber(totalPerRow(row)) }}
+                    </td>
 
-          <!-- Actions -->
-          <td class="px-4 py-3 text-center">
-            <div class="flex justify-center gap-3">
-              <button
-                @click="duplicateRow(index)"
-                class="text-blue-600 hover:text-blue-800 transition"
-                title="Duplicate"
-                tabindex="-1"
-              >
-                <DocumentDuplicateIcon class="w-5 h-5" />
+                    <!-- Actions -->
+                    <td class="px-4 py-3 text-center">
+                      <div class="flex justify-center gap-3">
+                        <button @click="duplicateRow(index)" class="text-blue-600 hover:text-blue-800 transition"
+                          title="Duplicate" tabindex="-1">
+                          <DocumentDuplicateIcon class="w-5 h-5" />
+                        </button>
+                        <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
+                          title="Delete" tabindex="-1">
+                          <TrashIcon class="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Totals -->
+            <div
+              class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
+              <div class="flex items-center justify-end gap-3">
+                <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
+                <span class="text-gray-900 min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
+              </div>
+              <div class="flex items-center justify-end gap-3">
+                <span class="text-gray-700">{{ $t('labels.totalDiscount') }}:</span>
+                <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
+              </div>
+              <div
+                class="flex items-center justify-end gap-3 text-lg text-indigo-700 border-s-4 border-indigo-700 ps-6">
+                <span class="text-indigo-900">{{ $t('labels.grandTotal') }}:</span>
+                <span class="text-indigo-900 min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+              </div>
+            </div>
+
+            <!-- Save / Back Buttons -->
+            <div class="mt-10 flex justify-end gap-6">
+              <button @click="goBackToStep1"
+                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3">
+                <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
+                {{ $t('labels.back') }}
               </button>
-              <button
-                @click="removeRow(index)"
-                class="text-red-600 hover:text-red-800 transition"
-                title="Delete"
-                tabindex="-1"
-              >
-                <TrashIcon class="w-5 h-5" />
+              <button @click="saveData" :disabled="isSaving"
+                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">
+                {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
+                <CheckIcon class="w-6 h-6" />
               </button>
             </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 
-  <!-- Totals -->
-  <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
-    <div class="flex items-center justify-end gap-3">
-      <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
-      <span class="text-gray-900 min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
-    </div>
-    <div class="flex items-center justify-end gap-3">
-      <span class="text-gray-700">{{ $t('labels.totalDiscount') }}:</span>
-      <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
-    </div>
-    <div class="flex items-center justify-end gap-3 text-lg text-indigo-700 border-s-4 border-indigo-700 ps-6">
-      <span class="text-indigo-900">{{ $t('labels.grandTotal') }}:</span>
-      <span class="text-indigo-900 min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
-    </div>
-  </div>
-
-  <!-- Save / Back Buttons -->
-  <div class="mt-10 flex justify-end gap-6">
-    <button
-      @click="goBackToStep1"
-      class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3"
-    >
-      <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
-      {{ $t('labels.back') }}
-    </button>
-    <button
-      @click="saveData"
-      :disabled="isSaving"
-      class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
-    >
-      {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
-      <CheckIcon class="w-6 h-6" />
-    </button>
-  </div>
-
-  <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">
-    {{ saveError }}
-  </p>
-</div>
+            <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">
+              {{ saveError }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -514,7 +482,8 @@
       <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
         :placeholder="$t('contractors.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
         <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
@@ -530,7 +499,8 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
       <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
         <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
@@ -556,8 +526,10 @@
         :placeholder="$t('vehicles.crusherCubic') || $t('labels.crusherCubic')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="createNewVehicle" :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || creatingVehicle"
+        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
+        <button @click="createNewVehicle"
+          :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || creatingVehicle"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -575,8 +547,10 @@
       <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
+        <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+          }}</button>
+        <button @click="createNewExportItem"
+          :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -667,7 +641,7 @@ export default {
     return {
       // Step control
       currentStep: 1,
-      
+
       // Common data (Step 1)
       commonData: {
         date: '',
@@ -729,9 +703,23 @@ export default {
       },
       creatingExportItem: false,
 
+      // Search filters for Step 1
+      filters: {
+        commonItemSearch: '',
+        showCommonItemDropdown: false,
+        commonSiteSearch: '',
+        showCommonSiteDropdown: false,
+        commonAreaSearch: '',
+        showCommonAreaDropdown: false,
+        commonContractorSearch: '',
+        showCommonContractorDropdown: false,
+        commonCrusherSearch: '',
+        showCommonCrusherDropdown: false
+      },
+
       // References
       tableRef: null,
-      
+
       // Last entered data for localStorage
       lastEnteredData: {
         date: '',
@@ -750,6 +738,46 @@ export default {
       return this.commonData.site?.id
         ? this.allLocations.filter(l => l.parentId === this.commonData.site.id)
         : []
+    },
+
+    filteredCommonItems() {
+      if (!this.filters.showCommonItemDropdown) return []
+      if (!this.filters.commonItemSearch) return this.exportItems
+      return this.exportItems.filter(i =>
+        i.name.toLowerCase().includes(this.filters.commonItemSearch.toLowerCase())
+      )
+    },
+
+    filteredCommonSites() {
+      if (!this.filters.showCommonSiteDropdown) return []
+      if (!this.filters.commonSiteSearch) return this.sites
+      return this.sites.filter(s =>
+        s.name.toLowerCase().includes(this.filters.commonSiteSearch.toLowerCase())
+      )
+    },
+
+    filteredCommonAreas() {
+      if (!this.filters.showCommonAreaDropdown) return []
+      if (!this.filters.commonAreaSearch) return this.commonAvailableAreas
+      return this.commonAvailableAreas.filter(a =>
+        a.name.toLowerCase().includes(this.filters.commonAreaSearch.toLowerCase())
+      )
+    },
+
+    filteredCommonContractors() {
+      if (!this.filters.showCommonContractorDropdown) return []
+      if (!this.filters.commonContractorSearch) return this.contractors
+      return this.contractors.filter(c =>
+        c.name.toLowerCase().includes(this.filters.commonContractorSearch.toLowerCase())
+      )
+    },
+
+    filteredCommonCrushers() {
+      if (!this.filters.showCommonCrusherDropdown) return []
+      if (!this.filters.commonCrusherSearch) return this.crushers
+      return this.crushers.filter(c =>
+        c.name.toLowerCase().includes(this.filters.commonCrusherSearch.toLowerCase())
+      )
     },
 
     subtotal() {
@@ -782,41 +810,41 @@ export default {
   },
 
   methods: {
-        // Add new row when Tab is pressed on last field
-        onCrusherCubicTab(index, event) {
-          // Allow Shift+Tab for backwards navigation
-          if (event.shiftKey) return;
-          
-          // Check if Tab key and this is the last row
-          if (event.key === 'Tab' && index === this.rows.length - 1) {
-            event.preventDefault();
-            const newRowIndex = this.rows.length;
-            this.addRow();
-            
-            // Focus on vehicle select in the new row with a small timeout
-            setTimeout(() => {
-              this.$nextTick(() => {
-                if (!this.tableRef) return;
-                const allRows = this.tableRef.querySelectorAll('tbody tr');
-                const newRow = allRows[newRowIndex];
-                if (newRow) {
-                  const vehicleSelect = newRow.querySelector('select');
-                  if (vehicleSelect) {
-                    vehicleSelect.focus();
-                  }
-                }
-              });
-            }, 10);
-          }
-        },
+    // Add new row when Tab is pressed on last field
+    onCrusherCubicTab(index, event) {
+      // Allow Shift+Tab for backwards navigation
+      if (event.shiftKey) return;
+
+      // Check if Tab key and this is the last row
+      if (event.key === 'Tab' && index === this.rows.length - 1) {
+        event.preventDefault();
+        const newRowIndex = this.rows.length;
+        this.addRow();
+
+        // Focus on vehicle select in the new row with a small timeout
+        setTimeout(() => {
+          this.$nextTick(() => {
+            if (!this.tableRef) return;
+            const allRows = this.tableRef.querySelectorAll('tbody tr');
+            const newRow = allRows[newRowIndex];
+            if (newRow) {
+              const vehicleSelect = newRow.querySelector('select');
+              if (vehicleSelect) {
+                vehicleSelect.focus();
+              }
+            }
+          });
+        }, 10);
+      }
+    },
     // ============ Step Control ============
     isStep1Valid() {
       return this.commonData.date &&
-             this.commonData.item &&
-             this.commonData.price > 0 &&
-             this.commonData.site &&
-             this.commonData.contractor &&
-             this.commonData.crusher
+        this.commonData.item &&
+        this.commonData.price > 0 &&
+        this.commonData.site &&
+        this.commonData.contractor &&
+        this.commonData.crusher
     },
 
     async goToStep2() {
@@ -880,34 +908,39 @@ export default {
           const data = JSON.parse(saved)
           console.log('📦 Loaded from storage:', data)
           this.commonData.date = data.date || ''
-          
+
           // Restore site
           if (data.site?.id) {
             this.commonData.site = this.allLocations.find(l => l.id === data.site.id) || null
+            if (this.commonData.site) this.filters.commonSiteSearch = this.commonData.site.name
             console.log('✅ Restored site:', this.commonData.site)
           }
 
           // Restore area
           if (data.area?.id && this.commonData.site) {
             this.commonData.area = this.allLocations.find(l => l.id === data.area.id) || null
+            if (this.commonData.area) this.filters.commonAreaSearch = this.commonData.area.name
             console.log('✅ Restored area:', this.commonData.area)
           }
 
           // Restore contractor
           if (data.contractor?.id) {
             this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
+            if (this.commonData.contractor) this.filters.commonContractorSearch = this.commonData.contractor.name
             console.log('✅ Restored contractor:', this.commonData.contractor)
           }
 
           // Restore crusher
           if (data.crusher?.id) {
             this.commonData.crusher = this.crushers.find(c => c.id === data.crusher.id) || null
+            if (this.commonData.crusher) this.filters.commonCrusherSearch = this.commonData.crusher.name
             console.log('✅ Restored crusher:', this.commonData.crusher)
           }
 
           // Restore item
           if (data.item?.id) {
             this.commonData.item = this.exportItems.find(i => i.id === data.item.id) || null
+            if (this.commonData.item) this.filters.commonItemSearch = this.commonData.item.name
             console.log('✅ Restored item:', this.commonData.item)
           }
 
@@ -936,6 +969,31 @@ export default {
       }
     },
 
+    // ============ Dropdown Management ============
+    closeDropdownDelayed(dropdownName) {
+      setTimeout(() => {
+        this.filters[dropdownName] = false
+      }, 200)
+    },
+
+    onVehicleInput(event, row) {
+      const inputValue = event.target.value.trim()
+      row.vehicleInput = inputValue
+
+      // Try to match the input with available vehicles
+      const matchedVehicle = row.availableVehicles.find(v => v.name === inputValue)
+      if (matchedVehicle) {
+        row.vehicle = matchedVehicle
+        this.onVehicleSelect(row) // Update dependent fields
+      } else {
+
+        // No match found, treat as new vehicle
+        row.vehicle = null
+        row.cubic = 0
+        row.crusherCubic = ''
+      }
+    },
+
     // ============ Row Management ============
     createEmptyRow() {
       const row = {
@@ -947,6 +1005,7 @@ export default {
         contractor: this.commonData.contractor,
         crusher: this.commonData.crusher,
         vehicle: null,
+        vehicleInput: '',
         item: this.commonData.item,
         crusherBon: '',
         companyBon: '',
@@ -981,13 +1040,13 @@ export default {
       if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
       if (!row.crusherBon?.trim()) missing.push(this.$t('labels.crusherBon'))
       if (!row.companyBon?.trim()) missing.push(this.$t('labels.companyBon'))
-      
+
       const discount = Number(row.discount || 0)
       const cubic = Number(row.cubic || 0)
-      
+
       if (discount < 0) missing.push(this.$t('labels.discount') + ' (≥ 0)')
       if (cubic <= 0) missing.push(this.$t('labels.cubic') + ' (> 0)')
-      
+
       return missing
     },
 
@@ -1019,6 +1078,7 @@ export default {
       const copy = JSON.parse(JSON.stringify(src))
       copy.id = Date.now() + Math.random()
       copy.vehicle = null
+      copy.vehicleInput = ''
       copy.crusherBon = ''
       copy.companyBon = ''
       copy.discount = 0
@@ -1154,7 +1214,7 @@ export default {
 
     async addArea() {
       if (!this.newAreaName?.trim()) return
-      
+
       const siteId = this.currentStep === 1 ? this.commonData.site?.id : this.pendingRow?.site?.id
       if (!siteId) return
 
@@ -1259,7 +1319,7 @@ export default {
 
         // Reload all lookups to get fresh data
         await this.loadLookups()
-        
+
         // After reload, find and set the new contractor
         const updatedContractor = this.contractors.find(c => c.id === nc.id)
         if (updatedContractor && this.currentStep === 1) {
@@ -1291,7 +1351,7 @@ export default {
 
         // Reload all lookups to get fresh data
         await this.loadLookups()
-        
+
         // After reload, find and set the new crusher
         const updatedCrusher = this.crushers.find(c => c.id === nc.id)
         if (updatedCrusher && this.currentStep === 1) {
@@ -1390,7 +1450,7 @@ export default {
       this.saveError = ''
       this.isSaving = true
       const toSave = this.rows.filter(r => !this.isRowEmpty(r))
-      
+
       if (!toSave.length) {
         this.saveError = this.$t('labels.noData') || 'No data'
         this.isSaving = false
@@ -1434,12 +1494,12 @@ export default {
 
         alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.saveCommonDataToStorage()
-        
+
         // Reset
         this.currentStep = 1
         this.commonData = { date: '', item: null, price: 0, site: null, area: null, contractor: null, crusher: null }
         this.rows = []
-        
+
         this.closeModal()
         this.$emit('saved')
       } catch (err) {
