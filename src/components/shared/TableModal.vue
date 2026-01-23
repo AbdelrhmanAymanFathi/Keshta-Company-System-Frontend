@@ -274,8 +274,8 @@
             </div>
 
             <!-- Table for Variable Data -->
-            <div class="overflow-x-auto mb-8">
-              <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border rounded-lg">
+            <div class="mb-8 overflow-x-auto h-60 border border-gray-200 rounded-lg">
+              <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                 <thead class="bg-indigo-50 sticky top-0 z-10">
                   <tr>
                     <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
@@ -312,23 +312,24 @@
                           @click="row.open = true">
                           <input v-model="row.search" type="text"
                             :placeholder="row.vehicle?.name || $t('labels.vehicle')"
-                            class="outline-none flex-1 text-sm"
+                            class="outline-none flex-1 text-sm bg-transparent"
                             @focus="row.open = true"
                             @keydown.enter.prevent />
                           <span class="text-gray-400">▾</span>
                         </div>
 
-                        <!-- Dropdown -->
+                        <!-- Dropdown (Fixed) -->
                         <div v-if="row.open"
-                          class="border border-gray-200 bg-white rounded mt-1 max-h-40 overflow-y-auto">
+                          class="absolute top-full start-0 min-w-full w-max border border-gray-200 bg-white rounded-md mt-1 max-h-40 overflow-y-auto shadow-xl z-[100]">
+                          
                           <div v-for="v in filteredVehicles(row)" :key="v.id" @click="selectVehicle(row, v)"
-                            class="px-2 py-1 hover:bg-indigo-100 cursor-pointer text-sm">
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start">
                             {{ v.name }}
                           </div>
 
                           <!-- Add new -->
                           <div @click="row.vehicle = '__new__'; showAddVehicleDialog = true"
-                            class="px-2 py-1 text-green-600 hover:bg-green-50 cursor-pointer text-sm">
+                            class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
                             + {{ $t('labels.addNew') }}
                           </div>
                         </div>
