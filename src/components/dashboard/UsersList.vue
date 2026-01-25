@@ -52,11 +52,11 @@
               class="hover:bg-gray-50 transition-colors"
               @contextmenu.prevent="openContextMenu($event, user)"
             >
-              <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ user.name }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ user.email }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ user.phone || '-' }}</td>
-              <td class="px-6 py-4 text-sm" :class="textAlign">
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900" :class="textAlign">{{ user.name }}</td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900" :class="textAlign">{{ user.email }}</td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900" :class="textAlign">{{ user.phone || '-' }}</td>
+              <td class="px-6 py-4 text-sm whitespace-nowrap" :class="textAlign">
                 <span
                   :class="[
                     'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
