@@ -55,7 +55,7 @@
         </div>
 
         <!-- Equipment Type Filter -->
-        <div>
+        <!-- <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('rental.type') }}</label>
           <select 
             v-model="filters.isCompanyOwned"
@@ -65,7 +65,7 @@
             <option :value="true">{{ $t('rental.companyEquipment') }}</option>
             <option :value="false">{{ $t('rental.externalRental') }}</option>
           </select>
-        </div>
+        </div> -->
       </div>
 
       <div class="flex gap-2">
