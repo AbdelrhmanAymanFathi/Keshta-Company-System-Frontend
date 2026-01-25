@@ -9,16 +9,13 @@
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
-            <input 
-              :value="rentalsStore.filters.q" 
-              @input="onSearchInput"
-              type="text" 
+            <input :value="rentalsStore.filters.q" @input="onSearchInput" type="text"
               :placeholder="$t('rental.searchPlaceholder')"
-              class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-            >
+              class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
             <div v-if="rentalsStore.filters.q" class="absolute inset-y-0 right-0 pr-3 flex items-center">
               <button @click="clearSearch" class="text-gray-400 hover:text-gray-600" aria-label="Clear search">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,20 +26,21 @@
           </div>
           <p class="text-xs text-gray-500 mt-1">{{ $t('rental.searchBy') }}</p>
         </div>
-        
+
         <div class="flex gap-2">
-          <button @click="openAddModal" 
+          <button @click="openAddModal"
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             {{ $t('rental.addRental') }}
           </button>
-          
-          <button @click="$emit('navigate-report')" 
+
+          <button @click="$emit('navigate-report')"
             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
             </svg>
             {{ $t('rental.report') }}
           </button>
@@ -53,37 +51,28 @@
       <div class="flex flex-wrap items-center gap-3 bg-gray-50 rounded-lg p-3">
         <span class="text-sm font-medium text-gray-700">{{ $t('rental.filterBy') }}:</span>
         <div class="flex gap-2">
-          <button
-            @click="setCompanyOwnedFilter(null)"
-            :class="[
-              'px-3 py-1 rounded-md text-sm font-medium transition',
-              rentalsStore.filters.isCompanyOwned === null
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-            ]"
-          >
+          <button @click="setCompanyOwnedFilter(null)" :class="[
+            'px-3 py-1 rounded-md text-sm font-medium transition',
+            rentalsStore.filters.isCompanyOwned === null
+              ? 'bg-indigo-600 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+          ]">
             {{ $t('rental.all') }}
           </button>
-          <button
-            @click="setCompanyOwnedFilter(true)"
-            :class="[
-              'px-3 py-1 rounded-md text-sm font-medium transition',
-              rentalsStore.filters.isCompanyOwned === true
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-            ]"
-          >
+          <button @click="setCompanyOwnedFilter(true)" :class="[
+            'px-3 py-1 rounded-md text-sm font-medium transition',
+            rentalsStore.filters.isCompanyOwned === true
+              ? 'bg-green-600 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+          ]">
             {{ $t('rental.companyEquipment') }}
           </button>
-          <button
-            @click="setCompanyOwnedFilter(false)"
-            :class="[
-              'px-3 py-1 rounded-md text-sm font-medium transition',
-              rentalsStore.filters.isCompanyOwned === false
-                ? 'bg-gray-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-            ]"
-          >
+          <button @click="setCompanyOwnedFilter(false)" :class="[
+            'px-3 py-1 rounded-md text-sm font-medium transition',
+            rentalsStore.filters.isCompanyOwned === false
+              ? 'bg-gray-600 text-white'
+              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
+          ]">
             {{ $t('rental.externalRental') }}
           </button>
         </div>
@@ -103,7 +92,7 @@
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <label>{{ $t('rental.pageSize') }}:</label>
-          <select :value="rentalsStore.pageSize" @change="onPageSizeChange" 
+          <select :value="rentalsStore.pageSize" @change="onPageSizeChange"
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
             <option value="10">10</option>
             <option value="20">20</option>
@@ -123,19 +112,22 @@
     <div v-else-if="rentalsStore.error" class="bg-red-50 border border-red-200 rounded-lg p-4">
       <div class="flex items-center">
         <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         <span class="text-red-800">{{ rentalsStore.error }}</span>
       </div>
     </div>
 
     <!-- Rentals Table -->
-        <!-- Rentals Table -->
+    <!-- Rentals Table -->
     <div v-else class="bg-white rounded-lg shadow overflow-hidden">
       <!-- No Results Message -->
       <div v-if="rentalsStore.items.length === 0" class="text-center py-12">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+          </path>
         </svg>
         <p class="mt-4 text-lg text-gray-500">{{ $t('rental.noResults') }}</p>
       </div>
@@ -143,149 +135,169 @@
       <!-- Table with Scroll Controls -->
       <div v-else class="relative">
         <!-- Left Scroll Arrow - Visual indicator only -->
-        <div v-if="showLeftScroll" class="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none" :class="isRTL ? 'right-0' : 'left-0'">
-          <svg class="w-6 h-6 text-indigo-400 opacity-60 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="isRTL ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'"></path>
+        <div v-if="showLeftScroll" class="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
+          :class="isRTL ? 'right-0' : 'left-0'">
+          <svg class="w-6 h-6 text-indigo-400 opacity-60 animate-pulse" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              :d="isRTL ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'"></path>
           </svg>
         </div>
 
         <!-- Table Container with keyboard focus -->
-        <div 
-          ref="tableContainer" 
+        <div ref="tableContainer"
           class="overflow-x-auto scroll-smooth focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset rounded"
-          tabindex="0"
-          @keydown="handleTableKeydown"
-          :title="$t('rental.useArrowKeys')">
+          tabindex="0" @keydown="handleTableKeydown" :title="$t('rental.useArrowKeys')">
           <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50" :class="{ 'direction-rtl': isRTL }">
-            <tr>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.date') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.equipment') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.name') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.type') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.hours') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.hourlyRate') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.total') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="{ 'text-right': isRTL }">
-                {{ $t('rental.paid') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                {{ $t('rental.remaining') }}
-              </th>
-              <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                {{ $t('rental.notes') }}
-              </th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {{ $t('labels.actions') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr 
-              v-for="rental in filteredItems" 
-              :key="rental.id" 
-              class="hover:bg-gray-50"
-              @contextmenu.prevent="openContextMenu($event, rental)"
-            >
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatDate(rental.date) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ rental.equipment }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ rental.name }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <Badge :variant="rental.isCompanyOwned ? 'company' : 'external'">
-                  {{ rental.isCompanyOwned ? $t('rental.companyEquipment') : $t('rental.externalRental') }}
-                </Badge>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ rental.hours }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {{ formatCurrency(rental.hourlyRate) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                {{ formatCurrency(rental.total) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                {{ formatCurrency(rental.paid || 0) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
-                {{ formatCurrency(rental.remaining || 0) }}
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                {{ rental.notes || '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex gap-3 items-center">
-                  <button @click="openDetailModal(rental)" 
-                    class="text-blue-600 hover:text-blue-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
-                    {{ $t('rental.viewDetails') }}
-                  </button>
-                  <button @click="openPayoutsModal(rental)" 
-                    class="text-green-600 hover:text-green-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
-                    {{ $t('rental.payouts') }}
-                  </button>
-                  <button @click="openEditModal(rental)" 
-                    class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" 
-                    :title="$t('labels.edit')">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                  </button>
-                  <button @click="confirmDelete(rental)" 
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    :title="$t('labels.delete')">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            <thead class="bg-gray-50" :class="{ 'direction-rtl': isRTL }">
+              <tr>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.date') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.equipment') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.name') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.type') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.hours') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.hourlyRate') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.total') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('rental.paid') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  {{ $t('rental.remaining') }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  {{ $t('rental.notes') }}
+                </th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {{ $t('labels.actions') }}
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-gray-50"
+                @contextmenu.prevent="openContextMenu($event, rental)">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ formatDate(rental.date) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ rental.equipment }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ rental.name }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <Badge :variant="rental.isCompanyOwned ? 'company' : 'external'">
+                    {{ rental.isCompanyOwned ? $t('rental.companyEquipment') : $t('rental.externalRental') }}
+                  </Badge>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ rental.hours }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ formatCurrency(rental.hourlyRate) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                  {{ formatCurrency(rental.total) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                  {{ formatCurrency(rental.paid || 0) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
+                  {{ formatCurrency(rental.remaining || 0) }}
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                  {{ rental.notes || '-' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex gap-3 items-center">
+                    <button @click="openDetailModal(rental)"
+                      class="text-blue-600 hover:text-blue-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
+                      {{ $t('rental.viewDetails') }}
+                    </button>
+                    <button @click="openPayoutsModal(rental)"
+                      class="text-green-600 hover:text-green-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
+                      {{ $t('rental.payouts') }}
+                    </button>
+                    <button @click="openEditModal(rental)"
+                      class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                      :title="$t('labels.edit')">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                        </path>
+                      </svg>
+                    </button>
+                    <button @click="confirmDelete(rental)"
+                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      :title="$t('labels.delete')">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                        </path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Right Scroll Arrow - Visual indicator only -->
-        <div v-if="showRightScroll" class="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none" :class="isRTL ? 'left-0' : 'right-0'">
-          <svg class="w-6 h-6 text-indigo-400 opacity-60 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="isRTL ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'"></path>
+        <div v-if="showRightScroll" class="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
+          :class="isRTL ? 'left-0' : 'right-0'">
+          <svg class="w-6 h-6 text-indigo-400 opacity-60 animate-pulse" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              :d="isRTL ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'"></path>
           </svg>
         </div>
       </div>
 
       <!-- Enhanced Pagination -->
-      <div v-if="rentalsStore.totalPages > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <div v-if="rentalsStore.totalPages > 1"
+        class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
         <!-- Mobile Pagination -->
         <div class="flex-1 flex justify-between sm:hidden">
-          <button @click="changePage(rentalsStore.page - 1)" 
-            :disabled="rentalsStore.page <= 1"
+          <button @click="changePage(rentalsStore.page - 1)" :disabled="rentalsStore.page <= 1"
             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.previous') }}
           </button>
           <span class="text-sm text-gray-700 self-center">
             {{ rentalsStore.page }} / {{ rentalsStore.totalPages }}
           </span>
-          <button @click="changePage(rentalsStore.page + 1)" 
-            :disabled="rentalsStore.page >= rentalsStore.totalPages"
+          <button @click="changePage(rentalsStore.page + 1)" :disabled="rentalsStore.page >= rentalsStore.totalPages"
             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.next') }}
           </button>
@@ -295,10 +307,11 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div class="flex items-center gap-4">
             <p class="text-sm text-gray-700">
-              {{ $t('labels.showing') }} 
+              {{ $t('labels.showing') }}
               <span class="font-medium">{{ ((rentalsStore.page - 1) * rentalsStore.pageSize) + 1 }}</span>
               {{ $t('labels.to') }}
-              <span class="font-medium">{{ Math.min(rentalsStore.page * rentalsStore.pageSize, rentalsStore.total) }}</span>
+              <span class="font-medium">{{ Math.min(rentalsStore.page * rentalsStore.pageSize, rentalsStore.total)
+                }}</span>
               {{ $t('labels.of') }}
               <span class="font-medium">{{ rentalsStore.total }}</span>
               {{ $t('labels.results') }}
@@ -308,47 +321,52 @@
           <!-- Page Numbers -->
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              <button @click="changePage(1)" 
-                :disabled="rentalsStore.page <= 1"
+              <button @click="changePage(1)" :disabled="rentalsStore.page <= 1"
                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
+                    clip-rule="evenodd" />
                 </svg>
               </button>
 
-              <button @click="changePage(rentalsStore.page - 1)" 
-                :disabled="rentalsStore.page <= 1"
+              <button @click="changePage(rentalsStore.page - 1)" :disabled="rentalsStore.page <= 1"
                 class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
                 </svg>
               </button>
 
               <template v-for="page in visiblePages" :key="page">
-                <button @click="changePage(page)" 
-                  :class="[
-                    'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                    page === rentalsStore.page 
-                      ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' 
-                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                  ]">
+                <button @click="changePage(page)" :class="[
+                  'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                  page === rentalsStore.page
+                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                ]">
                   {{ page }}
                 </button>
               </template>
 
-              <button @click="changePage(rentalsStore.page + 1)" 
+              <button @click="changePage(rentalsStore.page + 1)"
                 :disabled="rentalsStore.page >= rentalsStore.totalPages"
                 class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clip-rule="evenodd" />
                 </svg>
               </button>
 
-              <button @click="changePage(rentalsStore.totalPages)" 
+              <button @click="changePage(rentalsStore.totalPages)"
                 :disabled="rentalsStore.page >= rentalsStore.totalPages"
                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
                 </svg>
               </button>
             </nav>
@@ -358,8 +376,12 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="triggerModalShake">
-      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto rental-modal-inner" :class="{ 'animate-shake': showModalShake }" tabindex="-1">
+    <div v-if="showModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      style="margin-top: 0%;" @click.self="triggerModalShake">
+      <div
+        class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto rental-modal-inner"
+        :class="{ 'animate-shake': showModalShake }" tabindex="-1">
         <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
           <h3 class="text-lg font-medium text-gray-900">
             {{ isEditing ? $t('rental.editRental') : $t('rental.addRental') }}
@@ -370,97 +392,85 @@
             </svg>
           </button>
         </div>
-        
+
         <div class="p-5">
-          <RentalForm
-            :model-value="form"
-            :loading="saving"
-            :is-editing="isEditing"
-            @submit="saveRental"
-            @cancel="closeModal"
-          />
+          <RentalForm :model-value="form" :loading="saving" :is-editing="isEditing" @submit="saveRental"
+            @cancel="closeModal" />
         </div>
       </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <ConfirmDialog
-      :show="showDeleteModal"
-      :title="$t('rental.deleteRental')"
-      :message="$t('rental.deleteConfirmation')"
-      :loading="deleting"
-      type="danger"
-      :prevent-backdrop-close="true"
-      @confirm="deleteRental"
-      @cancel="showDeleteModal = false"
-    />
+    <ConfirmDialog :show="showDeleteModal" :title="$t('rental.deleteRental')" :message="$t('rental.deleteConfirmation')"
+      :loading="deleting" type="danger" :prevent-backdrop-close="true" @confirm="deleteRental"
+      @cancel="showDeleteModal = false" />
 
     <!-- Rental Detail Modal -->
-    <div v-if="showDetailModal && selectedRentalForDetail" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="closeDetailModal">
+    <div v-if="showDetailModal && selectedRentalForDetail"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      style="margin-top: 0%;" @click.self="closeDetailModal">
       <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5">
-        <RentalDetail
-          :rental-id="selectedRentalForDetail.id"
-          @close="closeDetailModal"
-        />
+        <RentalDetail :rental-id="selectedRentalForDetail.id" @close="closeDetailModal" />
       </div>
     </div>
 
     <!-- Context Menu -->
-    <div 
-      v-if="contextMenu.open" 
-      ref="contextMenuElement"
+    <div v-if="contextMenu.open" ref="contextMenuElement"
       class="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]"
-      :style="{ top: contextMenu.y + 'px', [isRTL ? 'right' : 'left']: contextMenu.x + 'px' }"
-      @click.stop
-      @contextmenu.prevent
-    >
-      <button
-        @click="handleContextMenuAction('viewDetails')"
+      :style="{ top: contextMenu.y + 'px', [isRTL ? 'right' : 'left']: contextMenu.x + 'px' }" @click.stop
+      @contextmenu.prevent>
+      <button @click="handleContextMenuAction('viewDetails')"
         class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
-      >
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+          </path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+          </path>
         </svg>
         {{ $t('rental.viewDetails') }}
       </button>
-      <button
-        @click="handleContextMenuAction('payouts')"
+      <button @click="handleContextMenuAction('payouts')"
         class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
-      >
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+          </path>
         </svg>
         {{ $t('rental.payouts') }}
       </button>
-      <button
-        @click="handleContextMenuAction('edit')"
+      <button @click="handleContextMenuAction('edit')"
         class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
-      >
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+          </path>
         </svg>
         {{ $t('labels.edit') }}
       </button>
       <div class="border-t border-gray-200 my-1"></div>
-      <button
-        @click="handleContextMenuAction('delete')"
+      <button @click="handleContextMenuAction('delete')"
         class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
-      >
+        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+          </path>
         </svg>
         {{ $t('labels.delete') }}
       </button>
     </div>
 
     <!-- Payouts Modal -->
-    <div v-if="showPayoutsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto" style="margin-top: 0%;" @click.self="triggerPayoutsShake">
-      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner" :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
+    <div v-if="showPayoutsModal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      style="margin-top: 0%;" @click.self="triggerPayoutsShake">
+      <div
+        class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner"
+        :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
         <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
           <h3 class="text-lg font-medium text-gray-900">
             {{ $t('rental.payouts') }} - {{ selectedRentalForPayouts?.name }}
@@ -477,27 +487,13 @@
           <div class="pb-6 border-b">
             <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.addPayout') }}</h4>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <input 
-                v-model="payoutForm.amount" 
-                type="number" 
-                placeholder="Amount" 
-                class="border border-gray-300 rounded px-3 py-2 text-sm"
-              />
-              <input 
-                v-model="payoutForm.date" 
-                type="date" 
-                class="border border-gray-300 rounded px-3 py-2 text-sm"
-              />
-              <input 
-                v-model="payoutForm.notes" 
-                type="text" 
-                placeholder="Notes (optional)" 
-                class="border border-gray-300 rounded px-3 py-2 text-sm"
-              />
+              <input v-model="payoutForm.amount" type="number" placeholder="Amount"
+                class="border border-gray-300 rounded px-3 py-2 text-sm" />
+              <input v-model="payoutForm.date" type="date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
+              <input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)"
+                class="border border-gray-300 rounded px-3 py-2 text-sm" />
             </div>
-            <button 
-              @click="savePayout" 
-              :disabled="!payoutForm.amount || rentalsStore.payoutsLoading"
+            <button @click="savePayout" :disabled="!payoutForm.amount || rentalsStore.payoutsLoading"
               class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm">
               {{ rentalsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
             </button>
@@ -510,15 +506,14 @@
               {{ $t('rental.noPayouts') }}
             </div>
             <div v-else class="space-y-2">
-              <div v-for="payout in rentalsStore.payouts" :key="payout.id" class="flex items-center justify-between bg-gray-50 p-3 rounded border">
+              <div v-for="payout in rentalsStore.payouts" :key="payout.id"
+                class="flex items-center justify-between bg-gray-50 p-3 rounded border">
                 <div>
                   <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
                   <div class="text-xs text-gray-500">{{ formatDate(payout.date) }}</div>
                   <div v-if="payout.notes" class="text-xs text-gray-600">{{ payout.notes }}</div>
                 </div>
-                <button 
-                  @click="deletePayout(payout.id)" 
-                  :disabled="rentalsStore.payoutsLoading"
+                <button @click="deletePayout(payout.id)" :disabled="rentalsStore.payoutsLoading"
                   class="text-red-600 hover:text-red-900 text-sm">
                   {{ $t('labels.delete') }}
                 </button>
@@ -527,8 +522,7 @@
           </div>
 
           <div class="flex justify-end gap-2 border-t pt-6">
-            <button 
-              @click="closePayoutsModal" 
+            <button @click="closePayoutsModal"
               class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
               {{ $t('labels.close') }}
             </button>
@@ -599,17 +593,17 @@ export default {
       const current = rentalsStore.page
       const total = rentalsStore.totalPages
       const delta = 2
-      
+
       let start = Math.max(1, current - delta)
       let end = Math.min(total, current + delta)
-      
+
       if (current <= delta) {
         end = Math.min(total, 2 * delta + 1)
       }
       if (current >= total - delta) {
         start = Math.max(1, total - 2 * delta)
       }
-      
+
       const pages = []
       for (let i = start; i <= end; i++) {
         pages.push(i)
@@ -807,7 +801,7 @@ export default {
         showDeleteModal.value = false
         rentalToDelete.value = null
         if (window.$toast) {
-            if (result && result.alreadyDeleted) {
+          if (result && result.alreadyDeleted) {
             window.$toast(t('rental.alreadyDeleted'), 'info')
           } else {
             window.$toast(t('rental.deletedSuccessfully'), 'success')
@@ -822,15 +816,19 @@ export default {
         deleting.value = false
       }
     }
-
     const formatDate = (dateString) => {
+      if (!dateString) return '-'
+
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
+      if (isNaN(date.getTime())) return dateString
+
+      return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date)
     }
+
 
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat('en-US', {
@@ -953,23 +951,23 @@ export default {
     const openContextMenu = (event, rental) => {
       event.stopPropagation()
       contextMenu.value.rental = rental
-      
+
       // Get viewport dimensions
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
-      
+
       // Approximate menu dimensions
       const menuWidth = 180
       const menuHeight = 220
-      
+
       let x, y
-      
+
       // Calculate horizontal position
       if (isRTL.value) {
         // For RTL, we use 'right' positioning
         // event.clientX is distance from left, we need distance from right
         const rightPos = viewportWidth - event.clientX
-        
+
         // Check if menu would overflow to the left
         if (rightPos + menuWidth > viewportWidth) {
           // Menu would overflow, position it from the right edge
@@ -978,26 +976,26 @@ export default {
           // Use the click position (convert to right positioning)
           x = viewportWidth - event.clientX
         }
-        
+
         // Ensure minimum distance from edges
         if (x < 10) x = 10
         if (x > viewportWidth - menuWidth - 10) x = viewportWidth - menuWidth - 10
       } else {
         // For LTR, we use 'left' positioning
         x = event.clientX
-        
+
         // Check if menu would overflow to the right
         if (x + menuWidth > viewportWidth) {
           x = viewportWidth - menuWidth - 10
         }
-        
+
         // Ensure minimum distance from edges
         if (x < 10) x = 10
       }
-      
+
       // Calculate vertical position
       y = event.clientY
-      
+
       // Check if menu would overflow bottom
       if (y + menuHeight > viewportHeight) {
         // Show menu above the click point
@@ -1005,22 +1003,22 @@ export default {
       } else if (y < 0) {
         y = 10
       }
-      
+
       contextMenu.value.x = x
       contextMenu.value.y = y
       contextMenu.value.open = true
-      
+
       // Fine-tune position after menu is rendered using actual dimensions
       nextTick(() => {
         if (contextMenuElement.value) {
           const rect = contextMenuElement.value.getBoundingClientRect()
           const actualWidth = rect.width
           const actualHeight = rect.height
-          
+
           let newX = contextMenu.value.x
           let newY = contextMenu.value.y
           let needsAdjustment = false
-          
+
           // Horizontal adjustment
           if (isRTL.value) {
             // For RTL, check right positioning
@@ -1041,7 +1039,7 @@ export default {
               needsAdjustment = true
             }
           }
-          
+
           // Vertical adjustment
           if (newY + actualHeight > viewportHeight) {
             newY = Math.max(10, event.clientY - actualHeight - 5)
@@ -1050,7 +1048,7 @@ export default {
             newY = 10
             needsAdjustment = true
           }
-          
+
           if (needsAdjustment) {
             contextMenu.value.x = newX
             contextMenu.value.y = newY
@@ -1065,7 +1063,7 @@ export default {
 
     const handleContextMenuAction = (action) => {
       if (!contextMenu.value.rental) return
-      
+
       const rental = contextMenu.value.rental
       closeContextMenu()
 
@@ -1100,7 +1098,7 @@ export default {
       if (!tableContainer.value) return
       const container = tableContainer.value
       const hasHorizontalScroll = container.scrollWidth > container.clientWidth
-      
+
       if (isRTL.value) {
         // In RTL, scrollLeft behavior is inverted
         // When scrollLeft is 0, we're at the rightmost position (start in RTL)
@@ -1141,7 +1139,7 @@ export default {
 
     const handleTableKeydown = (event) => {
       if (!tableContainer.value) return
-      
+
       // Left arrow or A key
       if (event.key === 'ArrowLeft' || event.key === 'a' || event.key === 'A') {
         event.preventDefault()
@@ -1151,7 +1149,7 @@ export default {
         })
         setTimeout(updateTableScrollVisibility, 50)
       }
-      
+
       // Right arrow or D key
       if (event.key === 'ArrowRight' || event.key === 'd' || event.key === 'D') {
         event.preventDefault()
@@ -1248,17 +1246,53 @@ export default {
 <style scoped>
 /* shake animation (shared with Transport component) */
 @keyframes shake {
-  0% { transform: translateX(0); }
-  10% { transform: translateX(-8px); }
-  20% { transform: translateX(8px); }
-  30% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  50% { transform: translateX(-4px); }
-  60% { transform: translateX(4px); }
-  70% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-  90% { transform: translateX(-1px); }
- 100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  10% {
+    transform: translateX(-8px);
+  }
+
+  20% {
+    transform: translateX(8px);
+  }
+
+  30% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  50% {
+    transform: translateX(-4px);
+  }
+
+  60% {
+    transform: translateX(4px);
+  }
+
+  70% {
+    transform: translateX(-2px);
+  }
+
+  80% {
+    transform: translateX(2px);
+  }
+
+  90% {
+    transform: translateX(-1px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
-.animate-shake { animation: shake 0.5s ease; will-change: transform; }
+
+.animate-shake {
+  animation: shake 0.5s ease;
+  will-change: transform;
+}
 </style>

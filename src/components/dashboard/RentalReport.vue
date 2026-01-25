@@ -208,11 +208,24 @@ export default {
       return totalAmount.value - totalPaid.value
     })
 
-    const formatDate = (dateString) => {
-      // Backend already provides formatted date, just return it
-      if (!dateString) return '-'
-      return dateString
-    }
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+
+  const date = new Date(dateString)
+
+  // Check if valid date
+  if (!isNaN(date.getTime())) {
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date)
+  }
+
+  // Otherwise return original string
+  return dateString
+}
+
 
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat('en-US', {
