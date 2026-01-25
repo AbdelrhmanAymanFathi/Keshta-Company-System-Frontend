@@ -1953,9 +1953,18 @@ export default {
     }
 
     const formatDate = (dateString) => {
+      if (!dateString) return '-'
+
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+      if (isNaN(date.getTime())) return dateString
+
+      return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date)
     }
+
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(amount)
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(numAmount)
