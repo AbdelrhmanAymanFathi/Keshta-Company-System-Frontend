@@ -282,125 +282,122 @@
               <div class="overflow-x-auto w-full">
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
                   <thead class="bg-indigo-50 sticky top-0 z-10">
-                  <tr>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.vehicle') }}</th>
-                    <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.crusherBon') }}</th>
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.companyBon') }}</th>
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.discount') }}</th>
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.cubic') }}</th>
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.crusherCubic') }}</th>
-                    <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                      $t('labels.total') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                  <tr v-for="(row, index) in rows" :key="row.id">
-                    <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                    <tr>
+                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.vehicle') }}</th>
+                      <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.crusherBon') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.companyBon') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.discount') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.cubic') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.crusherCubic') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                        $t('labels.total') }}</th>
+                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200 bg-white">
+                    <tr v-for="(row, index) in rows" :key="row.id">
+                      <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
-                    <!-- ======================== first column 
+                      <!-- ======================== first column 
                      in step 2 ================ -->
-                    <!-- Vehicle -->
-                    <td class="px-3 py-2" :ref="el => row.vehicleCell = el">
-                      <div class="relative">
-                        <!-- Field -->
-                        <div
-                          class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
-                          @click="row.open = !row.open">
-                          <input v-model="row.search" type="text"
-                            :placeholder="row.vehicle?.name || $t('labels.vehicle')"
-                            class="outline-none flex-1 text-sm bg-transparent"
-                            @focus="row.open = true"
-                            @keydown.enter.prevent
-                            @blur="closeVehicleDropdown(row)" />
-                          <span class="text-gray-400">▾</span>
-                        </div>
-                      </div>
-
-                      <!-- Dropdown (Teleported to Modal) -->
-                      <teleport to=".modal-body-container" v-if="row.open">
-                        <div
-                          class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
-                          :class="getVehicleDropdownClasses(row)"
-                          :style="getVehicleDropdownStyle(row)"
-                          @click.stop>
-                          
-                          <div v-for="v in filteredVehicles(row)" :key="v.id" @click="selectVehicle(row, v)"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start">
-                            {{ v.name }}
-                          </div>
-
-                          <!-- Add new -->
-                          <div @click="row.vehicle = '__new__'; showAddVehicleDialog = true; row.open = false"
-                            class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
-                            + {{ $t('labels.addNew') }}
+                      <!-- Vehicle -->
+                      <td class="px-3 py-2" :ref="el => row.vehicleCell = el">
+                        <div class="relative">
+                          <!-- Field -->
+                          <div
+                            class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
+                            @click.stop="row.open = !row.open">
+                            <input v-model="row.search" type="text"
+                              :placeholder="row.vehicle?.name || $t('labels.vehicle')"
+                              class="outline-none flex-1 text-sm bg-transparent" @keydown.enter.prevent
+                              @keydown.escape="row.open = false" />
+                            <span class="text-gray-400">▾</span>
                           </div>
                         </div>
-                      </teleport>
-                    </td>
 
-                    <!-- Crusher Bon -->
-                    <td class="px-3 py-2">
-                      <input type="text" v-model="row.crusherBon" @keydown.enter.prevent="handleEnterKey(index)"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-                    </td>
+                        <!-- Dropdown (Teleported to Modal) -->
+                        <teleport to=".modal-body-container" v-if="row.open">
+                          <div
+                            class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
+                            :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
 
-                    <!-- Company Bon -->
-                    <td class="px-3 py-2">
-                      <input type="text" v-model="row.companyBon" @keydown.enter.prevent="handleEnterKey(index)"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-                    </td>
+                            <div v-for="v in filteredVehicles(row)" :key="v.id" @click="selectVehicle(row, v)"
+                              class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start">
+                              {{ v.name }}
+                            </div>
 
-                    <!-- Discount -->
-                    <td class="px-3 py-2">
-                      <input type="number" v-model.number="row.discount" step="0.01"
-                        @keydown.enter.prevent="handleEnterKey(index)"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
-                    </td>
+                            <!-- Add new -->
+                            <div @click="row.vehicle = '__new__'; showAddVehicleDialog = true; row.open = false"
+                              class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
+                              + {{ $t('labels.addNew') }}
+                            </div>
+                          </div>
+                        </teleport>
+                      </td>
 
-                    <!-- Company Cubic -->
-                    <td class="px-3 py-2">
-                      <input type="number" v-model.number="row.cubic" step="0.01"
-                        @keydown.enter.prevent="handleEnterKey(index)"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
-                    </td>
+                      <!-- Crusher Bon -->
+                      <td class="px-3 py-2">
+                        <input type="text" v-model="row.crusherBon" @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                      </td>
 
-                    <!-- Crusher Cubic -->
-                    <td class="px-3 py-2">
-                      <input type="number" v-model.number="row.crusherCubic" step="0.01"
-                        @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onCrusherCubicTab(index, $event)"
-                        class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
-                    </td>
+                      <!-- Company Bon -->
+                      <td class="px-3 py-2">
+                        <input type="text" v-model="row.companyBon" @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                      </td>
 
-                    <!-- Total per Row -->
-                    <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
-                      {{ formatNumber(totalPerRow(row)) }}
-                    </td>
+                      <!-- Discount -->
+                      <td class="px-3 py-2">
+                        <input type="number" v-model.number="row.discount" step="0.01"
+                          @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                      </td>
 
-                    <!-- Actions -->
-                    <td class="px-4 py-3 text-center">
-                      <div class="flex justify-center gap-3">
-                        <button @click="duplicateRow(index)" class="text-blue-600 hover:text-blue-800 transition"
-                          title="Duplicate" tabindex="-1">
-                          <DocumentDuplicateIcon class="w-5 h-5" />
-                        </button>
-                        <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
-                          title="Delete" tabindex="-1">
-                          <TrashIcon class="w-5 h-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      <!-- Company Cubic -->
+                      <td class="px-3 py-2">
+                        <input type="number" v-model.number="row.cubic" step="0.01"
+                          @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                      </td>
+
+                      <!-- Crusher Cubic -->
+                      <td class="px-3 py-2">
+                        <input type="number" v-model.number="row.crusherCubic" step="0.01"
+                          @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onCrusherCubicTab(index, $event)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                      </td>
+
+                      <!-- Total per Row -->
+                      <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
+                        {{ formatNumber(totalPerRow(row)) }}
+                      </td>
+
+                      <!-- Actions -->
+                      <td class="px-4 py-3 text-center">
+                        <div class="flex justify-center gap-3">
+                          <button @click="duplicateRow(index)" class="text-blue-600 hover:text-blue-800 transition"
+                            title="Duplicate" tabindex="-1">
+                            <DocumentDuplicateIcon class="w-5 h-5" />
+                          </button>
+                          <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
+                            title="Delete" tabindex="-1">
+                            <TrashIcon class="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -485,7 +482,7 @@
         :placeholder="$t('contractors.name')" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
@@ -502,7 +499,7 @@
       <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
@@ -529,7 +526,7 @@
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewVehicle"
           :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || creatingVehicle"
           class="bg-green-600 text-white px-3 py-1 rounded">
@@ -550,7 +547,7 @@
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-          }}</button>
+        }}</button>
         <button @click="createNewExportItem"
           :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
           class="bg-green-600 text-white px-3 py-1 rounded">
@@ -818,11 +815,12 @@ export default {
 
   methods: {
     handleGlobalClick(e) {
-      // Close all vehicle dropdowns when clicking outside table
+      // Close vehicle dropdowns when clicking outside the table area
       const isClickInTable = e.target.closest('table') || e.target.closest('thead') || e.target.closest('tbody')
-      const isClickInDropdown = e.target.closest('[class*="fixed"][class*="border-gray-200"]')
-      
-      if (!isClickInTable && !isClickInDropdown) {
+      const isClickInDropdown = e.target.closest('[class*="border-gray-200"][class*="bg-white"]')
+      const isClickInVehicleCell = e.target.closest('td')?.querySelector('input[type="text"]') === e.target
+
+      if (!isClickInTable && !isClickInDropdown && !isClickInVehicleCell) {
         this.rows.forEach(row => {
           row.open = false
         })
@@ -1144,16 +1142,16 @@ export default {
 
     getVehicleDropdownStyle(row) {
       if (!row.vehicleCell) return {}
-      
+
       const rect = row.vehicleCell.getBoundingClientRect()
       const containerRect = document.querySelector('.modal-body-container')?.getBoundingClientRect()
-      
+
       if (!containerRect) return {}
-      
+
       // Calculate position relative to the modal container
       const relativeTop = rect.top - containerRect.top
       const relativeLeft = rect.left - containerRect.left
-      
+
       return {
         top: `${relativeTop + rect.height + 4}px`,
         left: `${relativeLeft}px`,
@@ -1164,12 +1162,6 @@ export default {
 
     getVehicleDropdownClasses(row) {
       return 'z-50'
-    },
-
-    closeVehicleDropdown(row) {
-      setTimeout(() => {
-        row.open = false
-      }, 150)
     },
 
     selectVehicle(row, vehicle) {
