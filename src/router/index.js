@@ -11,16 +11,17 @@ const Dashboard = () => import("@/views/Dashboard.vue")
 
 // Dashboard Pages - Lazy Loading for better performance
 // const NewSupply = () => import('@/components/dashboard/NewSupply.vue')
-const SuppliesList = () => import('@/components/dashboard/SuppliesList.vue')
-const SuppliesReport = () => import('@/components/dashboard/SuppliesReportNew.vue')
-const ContractorsList = () => import('@/components/dashboard/ContractorsList.vue')
+const SuppliesList = () => import('@/components/dashboard/Supply/SuppliesList.vue')
+const SuppliesReport = () => import('@/components/dashboard/Supply/SuppliesReportNew.vue')
+const SuppliersList = () => import('@/components/dashboard/Supply/SuppliersList.vue')
 const ContractorStatement = () => import('@/components/dashboard/ContractorStatement.vue')
-const DriversList = () => import('@/components/dashboard/DriversList.vue')
-const ItemList = () => import('@/components/dashboard/ItemList.vue')
+const ItemList = () => import('@/components/dashboard/Items/ItemList.vue')
 const CrushersList = () => import('@/components/dashboard/CrushersList.vue')
-const VehiclesList = () => import('@/components/dashboard/VehiclesList.vue')
-const TransportList = () => import('@/components/dashboard/TransportList.vue')
-const TransportReport = () => import('@/components/dashboard/TransportReportNew.vue')
+const TransportCrushersList = () => import('@/components/dashboard/CrushersList.vue')
+const VehiclesList = () => import('@/components/dashboard/Vehicles/VehiclesList.vue')
+const TransportList = () => import('@/components/dashboard/Transport/TransportList.vue')
+const TransportersList = () => import('@/components/dashboard/Transport/TransportersList.vue')
+const TransportReport = () => import('@/components/dashboard/Transport/TransportReportNew.vue')
 const RentalList = () => import('@/components/dashboard/RentalList.vue')
 const RentalReport = () => import('@/components/dashboard/RentalReport.vue')
 const CompanyFinance = () => import('@/components/dashboard/CompanyFinance.vue')
@@ -29,6 +30,7 @@ const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
 const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vue')
 const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
 const UsersList = () => import('@/components/dashboard/UsersList.vue')
+const Locations = () => import('@/components/dashboard/Locations.vue')
 
 const routes = [
   // ==================== Auth Routes ====================
@@ -71,28 +73,25 @@ const routes = [
         meta: { title: 'dashboard.suppliesReport' }
       },
       {
-        path: 'supplies/contractors',
-        name: 'contractors-list',
-        component: ContractorsList,
-        meta: { title: 'dashboard.contractorsList' }
+        path: 'supplies/suppliers',
+        name: 'suppliers-list',
+        component: SuppliersList,
+        meta: { title: 'supply.suppliersList' }
       },
       {
         path: 'supplies/contractor-supply-statement/:id?',
         name: 'contractor-supply-statement',
         component: ContractorStatement,
-        meta: { title: 'dashboard.contractorStatement' }
+        meta: { title: 'dashboard.contractorStatement' },
+        props: { mode: 'export'}
       },
-      {
-        path: 'supplies/drivers',
-        name: 'drivers-list',
-        component: DriversList,
-        meta: { title: 'drivers.title' }
-      },
+      
       {
         path: 'supplies/items',
-        name: 'items-list',
+        name: 'supplies-items-list',
         component: ItemList,
-        meta: { title: 'dashboard.itemsList' }
+        meta: { title: 'dashboard.itemsList' },
+        props: { mode: 'export' }
       },
       {
         path: 'supplies/crushers',
@@ -104,7 +103,8 @@ const routes = [
         path: 'supplies/vehicles',
         name: 'vehicles-list',
         component: VehiclesList,
-        meta: { title: 'dashboard.vehiclesList' }
+        meta: { title: 'dashboard.vehiclesList' },
+        props: { mode: 'export' }
       },
 
       // ==================== Transport Module ====================
@@ -115,11 +115,46 @@ const routes = [
         meta: { title: 'dashboard.transportList' }
       },
       {
+        path: 'transport/contractor',
+        name: 'transport-contractors-list',
+        component: TransportersList,
+        meta: { title: 'dashboard.transportContractorsList' },
+        // props: { viewMode: 'contractors' }
+      },
+      {
+        path: 'transport/crushers',
+        name: 'transport-crushers-list',
+        component: TransportCrushersList,
+        meta: { title: 'dashboard.crushersList' }
+      },
+      {
+        path: 'transport/items',
+        name: 'transport-items-list',
+        component: ItemList,
+        meta: { title: 'dashboard.itemsList' },
+        props: { mode: 'transport' }
+      },
+      {
+        path: 'transport/vehicles',
+        name: 'transport-vehicles',
+        component: VehiclesList,
+        meta: { title: 'dashboard.vehiclesList' },
+        props: { mode: 'transport' }
+      },
+      {
+        path: 'transport/contractor-transport-statement/:id?',
+        name: 'contractor-transport-statement',
+        component: ContractorStatement,
+        meta: { title: 'dashboard.contractorStatement' },
+        props: { mode: 'transport'}
+      },
+      {
         path: 'transport/report',
         name: 'transport-report',
         component: TransportReport,
         meta: { title: 'transport.reportMenu' }
       },
+      
 
       // ==================== Rentals Module ====================
       {
@@ -173,6 +208,12 @@ const routes = [
         name: 'users-list',
         component: UsersList,
         meta: { title: 'users.title', roles: ['admin'] }
+      },
+      {
+        path: 'admin/locations',
+        name: 'locations',
+        component: Locations,
+        meta: { title: 'locations.title', roles: ['admin'] }
       },
 
       // ==================== Default Redirect ====================

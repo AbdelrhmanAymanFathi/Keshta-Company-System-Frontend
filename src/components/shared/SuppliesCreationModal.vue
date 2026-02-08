@@ -2,18 +2,19 @@
   <!-- Button to open the Modal (you can remove or change it depending on the page) -->
   <button v-if="showTriggerButton" @click="openModal"
     class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition">
-    {{ triggerButtonText }}
+    {{ triggerText }}
   </button>
 
   <!-- Modal -->
   <teleport to="body">
     <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+      :dir="isRTL ? 'rtl' : 'ltr'"
       @click.self="closeModal">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold text-indigo-800">
-            {{ currentStep === 1 ? modalTitle : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
+            {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
           </h2>
           <button @click="closeModal"
             class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">
@@ -63,7 +64,7 @@
                         <div v-for="item in filteredCommonItems" :key="item.id"
                           @click="commonData.item = item; filters.commonItemSearch = item.name; filters.showCommonItemDropdown = false; onCommonItemSelect()"
                           class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                          {{ item.name }} ({{ item.currentPrice }})
+                          {{ item.name }}
                         </div>
                         <div @click="showAddExportItemDialog = true; filters.showCommonItemDropdown = false"
                           style="color: #10b981;"
@@ -288,15 +289,15 @@
                         $t('labels.vehicle') }}</th>
                       <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                        $t('labels.crusherBon') }}</th>
+                        $t('labels.crusherTicket') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                        $t('labels.companyBon') }}</th>
+                        $t('labels.companyTicket') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
                         $t('labels.discount') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                        $t('labels.cubic') }}</th>
+                        $t('labels.companyCapacity') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
-                        $t('labels.crusherCubic') }}</th>
+                        $t('labels.crusherCapacity') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
                         $t('labels.total') }}</th>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}
@@ -315,11 +316,11 @@
                           <!-- Field -->
                           <div
                             class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
-                            @click.stop="row.open = !row.open">
+                            @mousedown.prevent="toggleVehicleDropdown(row)">
                             <input v-model="row.search" type="text"
                               :placeholder="row.vehicle?.name || $t('labels.vehicle')"
                               class="outline-none flex-1 text-sm bg-transparent" @keydown.enter.prevent
-                              @keydown.escape="row.open = false" />
+                              @keydown.escape="row.open = false" @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false"/>
                             <span class="text-gray-400">▾</span>
                           </div>
                         </div>
@@ -330,7 +331,7 @@
                             class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
                             :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
 
-                            <div v-for="v in filteredVehicles(row)" :key="v.id" @click="selectVehicle(row, v)"
+                            <div v-for="v in filteredVehicles(row)" :key="v.id" @mousedown="selectVehicle(row, v)"
                               class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start">
                               {{ v.name }}
                             </div>
@@ -344,15 +345,15 @@
                         </teleport>
                       </td>
 
-                      <!-- Crusher Bon -->
+                      <!-- Crusher Ticket -->
                       <td class="px-3 py-2">
-                        <input type="text" v-model="row.crusherBon" @keydown.enter.prevent="handleEnterKey(index)"
+                        <input type="text" v-model="row.crusherTicket" @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                       </td>
 
-                      <!-- Company Bon -->
+                      <!-- Company Ticket -->
                       <td class="px-3 py-2">
-                        <input type="text" v-model="row.companyBon" @keydown.enter.prevent="handleEnterKey(index)"
+                        <input type="text" v-model="row.companyTicket" @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                       </td>
 
@@ -365,15 +366,15 @@
 
                       <!-- Company Cubic -->
                       <td class="px-3 py-2">
-                        <input type="number" v-model.number="row.cubic" step="0.01"
+                        <input type="number" v-model.number="row.companyCapacity" step="0.01"
                           @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
 
                       <!-- Crusher Cubic -->
                       <td class="px-3 py-2">
-                        <input type="number" v-model.number="row.crusherCubic" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onCrusherCubicTab(index, $event)"
+                        <input type="number" v-model.number="row.crusherCapacity" step="0.01"
+                          @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onCrusherCapacityTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
 
@@ -519,16 +520,16 @@
         <option value="">{{ $t('labels.contractor') }} —</option>
         <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
-      <input v-model.number="newVehicleForm.cubicCapacity" type="number" step="0.01"
-        :placeholder="$t('vehicles.cubicCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newVehicleForm.crusherCubic" type="number" step="0.01"
-        :placeholder="$t('vehicles.crusherCubic') || $t('labels.crusherCubic')"
+      <input v-model.number="newVehicleForm.companyCapacity" type="number" step="0.01"
+        :placeholder="$t('vehicles.companyCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
+      <input v-model.number="newVehicleForm.crusherCapacity" type="number" step="0.01"
+        :placeholder="$t('vehicles.crusherCapacity') || $t('labels.crusherCapacity')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
         <button @click="createNewVehicle"
-          :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || creatingVehicle"
+          :disabled="!newVehicleForm.name || !newVehicleForm.companyCapacity || !newVehicleForm.crusherCapacity || creatingVehicle"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -567,7 +568,7 @@ import {
   getCrushers,
   getVehicles,
   getContractorsWithVehicles,
-  createDelivery,
+  createExport,
   createContractor,
   createCrusher,
   createVehicle,
@@ -582,13 +583,7 @@ import {
   MapIcon,
   UserGroupIcon,
   WrenchScrewdriverIcon,
-  PlusIcon,
   ArrowLeftIcon,
-  TruckIcon,
-  DocumentTextIcon,
-  MinusCircleIcon,
-  CubeIcon,
-  CubeTransparentIcon,
   DocumentDuplicateIcon,
   TrashIcon,
   CheckIcon,
@@ -606,13 +601,7 @@ export default {
     MapIcon,
     UserGroupIcon,
     WrenchScrewdriverIcon,
-    PlusIcon,
     ArrowLeftIcon,
-    TruckIcon,
-    DocumentTextIcon,
-    MinusCircleIcon,
-    CubeIcon,
-    CubeTransparentIcon,
     DocumentDuplicateIcon,
     TrashIcon,
     CheckIcon,
@@ -625,15 +614,11 @@ export default {
     },
     triggerButtonText: {
       type: String,
-      default() {
-        return this.$t('dashboard.newSupply') + ' +'
-      }
+      default: ''
     },
     modalTitle: {
       type: String,
-      default() {
-        return this.$t('dashboard.newSupply')
-      }
+      default: ''
     }
   },
   data() {
@@ -691,8 +676,8 @@ export default {
       newVehicleForm: {
         name: '',
         contractorId: '',
-        cubicCapacity: '',
-        crusherCubic: ''
+        companyCapacity: '',
+        crusherCapacity: ''
       },
       creatingVehicle: false,
       showAddExportItemDialog: false,
@@ -733,10 +718,24 @@ export default {
   },
 
   computed: {
+    // Use computed helpers for props that rely on i18n so we don't
+    // call `this.$t` during prop default evaluation (instance not ready).
+    triggerText() {
+      return this.triggerButtonText || (this.$t ? this.$t('dashboard.newSupply') + ' +' : 'New Supply +')
+    },
+
+    modalTitleComputed() {
+      return this.modalTitle || (this.$t ? this.$t('dashboard.newSupply') : 'New Supply')
+    },
     commonAvailableAreas() {
-      return this.commonData.site?.id
-        ? this.allLocations.filter(l => l.parentId === this.commonData.site.id)
-        : []
+      // Prefer the `children` attribute on the selected site when available
+      if (!this.commonData.site?.id) return []
+      // If the site object contains `children` (from the API include), use it
+      if (Array.isArray(this.commonData.site.children) && this.commonData.site.children.length) {
+        return this.commonData.site.children
+      }
+      // Fallback: filter flat `allLocations` by parentId
+      return this.allLocations.filter(l => l.parentId === this.commonData.site.id)
     },
 
     filteredCommonItems() {
@@ -782,7 +781,7 @@ export default {
     subtotal() {
       return this.rows.reduce((sum, row) => {
         const p = Number(this.commonData.price || 0)
-        const c = Number(row.cubic || 0)
+        const c = Number(row.companyCapacity || 0)
         return sum + (p * c)
       }, 0)
     },
@@ -827,8 +826,18 @@ export default {
       }
     },
 
+    toggleVehicleDropdown(row) {
+      row.open = !row.open
+      if (row.open) {
+        this.$nextTick(() => {
+          const input = row.vehicleCell.querySelector('input')
+          if (input) input.focus()
+        })
+      }
+    },
+
     // Add new row when Tab is pressed on last field
-    onCrusherCubicTab(index, event) {
+    onCrusherCapacityTab(index, event) {
       // Allow Shift+Tab for backwards navigation
       if (event.shiftKey) return;
 
@@ -909,7 +918,7 @@ export default {
     // ============ Data Loading & Storage ============
     loadLastEnteredDataFromStorage() {
       try {
-        const saved = localStorage.getItem('tableModalLastData')
+        const saved = localStorage.getItem('suppliesCreationModalLastData')
         if (saved) {
           this.lastEnteredData = JSON.parse(saved)
         }
@@ -920,7 +929,7 @@ export default {
 
     loadCommonDataFromStorage() {
       try {
-        const saved = localStorage.getItem('tableModalCommonData')
+        const saved = localStorage.getItem('suppliesCreationModalCommonData')
         if (saved) {
           const data = JSON.parse(saved)
           console.log('📦 Loaded from storage:', data)
@@ -933,9 +942,15 @@ export default {
             console.log('✅ Restored site:', this.commonData.site)
           }
 
-          // Restore area
+          // Restore area — prefer searching the site's `children` if present
           if (data.area?.id && this.commonData.site) {
-            this.commonData.area = this.allLocations.find(l => l.id === data.area.id) || null
+            let found = null
+            if (Array.isArray(this.commonData.site.children) && this.commonData.site.children.length) {
+              found = this.commonData.site.children.find(c => c.id === data.area.id) || null
+            }
+            // fallback to global lookup
+            if (!found) found = this.allLocations.find(l => l.id === data.area.id) || null
+            this.commonData.area = found
             if (this.commonData.area) this.filters.commonAreaSearch = this.commonData.area.name
             console.log('✅ Restored area:', this.commonData.area)
           }
@@ -980,7 +995,7 @@ export default {
           item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
           price: this.commonData.price
         }
-        localStorage.setItem('tableModalCommonData', JSON.stringify(data))
+        localStorage.setItem('suppliesCreationModalCommonData', JSON.stringify(data))
       } catch (err) {
         console.warn('Failed to save common data:', err)
       }
@@ -1000,19 +1015,24 @@ export default {
         date: this.commonData.date,
         site: this.commonData.site,
         area: this.commonData.area,
-        availableAreas: this.commonData.site ? this.allLocations.filter(l => l.parentId === this.commonData.site.id) : [],
+        // Prefer the site's `children` array if available, otherwise fallback to filtering allLocations
+        availableAreas: this.commonData.site
+          ? (Array.isArray(this.commonData.site.children) && this.commonData.site.children.length
+            ? [...this.commonData.site.children]
+            : this.allLocations.filter(l => l.parentId === this.commonData.site.id))
+          : [],
         contractor: this.commonData.contractor,
         crusher: this.commonData.crusher,
         vehicle: null,
         search: '',
         open: false,
         item: this.commonData.item,
-        crusherBon: '',
-        companyBon: '',
+        crusherTicket: '',
+        companyTicket: '',
         discount: 0,
         price: this.commonData.price,
-        cubic: 0,
-        crusherCubic: '',
+        companyCapacity: 0,
+        crusherCapacity: '',
         availableVehicles: []
       }
 
@@ -1027,25 +1047,25 @@ export default {
     },
 
     isRowEmpty(row) {
-      return !row.crusherBon?.trim() &&
-        !row.companyBon?.trim() &&
+      return !row.crusherTicket?.trim() &&
+        !row.companyTicket?.trim() &&
         !row.discount &&
-        !row.cubic &&
-        !row.crusherCubic &&
+        !row.companyCapacity &&
+        !row.crusherCapacity &&
         !row.vehicle
     },
 
     getMissingRequiredFields(row) {
       const missing = []
       if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
-      if (!row.crusherBon?.trim()) missing.push(this.$t('labels.crusherBon'))
-      if (!row.companyBon?.trim()) missing.push(this.$t('labels.companyBon'))
+      if (!row.crusherTicket?.trim()) missing.push(this.$t('labels.crusherTicket'))
+      if (!row.companyTicket?.trim()) missing.push(this.$t('labels.companyTicket'))
 
       const discount = Number(row.discount || 0)
-      const cubic = Number(row.cubic || 0)
+      const companyCapacity = Number(row.companyCapacity || 0)
 
       if (discount < 0) missing.push(this.$t('labels.discount') + ' (≥ 0)')
-      if (cubic <= 0) missing.push(this.$t('labels.cubic') + ' (> 0)')
+      if (companyCapacity <= 0) missing.push(this.$t('vehicles.companyCapacity') + ' (> 0)')
 
       return missing
     },
@@ -1080,11 +1100,11 @@ export default {
       copy.vehicle = null
       copy.search = ''
       copy.open = false
-      copy.crusherBon = ''
-      copy.companyBon = ''
+      copy.crusherTicket = ''
+      copy.companyTicket = ''
       copy.discount = 0
-      copy.cubic = 0
-      copy.crusherCubic = ''
+      copy.companyCapacity = 0
+      copy.crusherCapacity = ''
       this.rows.splice(index + 1, 0, copy)
     },
 
@@ -1126,8 +1146,14 @@ export default {
         // Keep it as __new__ so the dialog stays open
         return
       }
-      if (this.commonData.item && this.commonData.item.currentPrice) {
-        this.commonData.price = Number(this.commonData.item.currentPrice)
+
+      if (!this.commonData.item) return
+
+      // Support multiple possible field names returned by the API
+      const maybePrice = this.commonData.item.currentPrice ?? this.commonData.item.defaultExportPrice ?? this.commonData.item.price ?? this.commonData.item.current_price
+      const parsed = Number(maybePrice)
+      if (!Number.isNaN(parsed)) {
+        this.commonData.price = parsed
         console.log('✅ Auto-filled price from item:', this.commonData.price)
       }
     },
@@ -1160,11 +1186,12 @@ export default {
       }
     },
 
-    getVehicleDropdownClasses(row) {
+    getVehicleDropdownClasses() {
       return 'z-50'
     },
 
     selectVehicle(row, vehicle) {
+      console.log('✅ Vehicle selected:', vehicle)
       row.vehicle = vehicle
       row.search = vehicle.name
       row.open = false
@@ -1173,31 +1200,32 @@ export default {
 
     onVehicleSelect(row) {
       if (!row.vehicle || row.vehicle === '__new__') {
-        row.cubic = 0
-        row.crusherCubic = ''
+        row.companyCapacity = ''
+        row.crusherCapacity = ''
         return
       }
 
       let vehicle = row.vehicle
-      if (vehicle.cubicCapacity === undefined || vehicle.crusherCubic === undefined) {
+      if (vehicle.companyCapacity === undefined || vehicle.crusherCapacity === undefined) {
         const fullVehicle = this.vehicles.find(v => v.id === vehicle.id)
         if (fullVehicle) vehicle = fullVehicle
       }
 
-      const companyCubic = parseFloat(vehicle.cubicCapacity || 0)
-      const crusherCubicVal = parseFloat(vehicle.crusherCubic || 0)
+      const companyCapacity = parseFloat(vehicle.companyCapacity || 0)
+      const crusherCapacity = parseFloat(vehicle.crusherCapacity || 0)
 
-      row.cubic = isNaN(companyCubic) ? 0 : companyCubic
-      row.crusherCubic = isNaN(crusherCubicVal) ? '' : crusherCubicVal
+      row.companyCapacity = isNaN(companyCapacity) ? '' : companyCapacity
+      row.crusherCapacity = isNaN(crusherCapacity) ? '' : crusherCapacity
     },
 
     totalPerRow(row) {
       const p = Number(this.commonData.price || 0)
-      const c = Number(row.cubic || 0)
+      const c = Number(row.companyCapacity || 0)
       const d = Number(row.discount || 0)
       const subtotal = p * c
       const discountAmount = d * p
-      return Math.max(0, subtotal - discountAmount)
+      const total = Math.max(0, subtotal - discountAmount)
+      return total
     },
 
     formatNumber(v) {
@@ -1304,8 +1332,10 @@ export default {
     async loadLookups() {
       try {
         const [cRes, cvRes, crushRes, vRes] = await Promise.all([
-          getContractors(),
-          getContractorsWithVehicles(),
+          getContractors({ mode: 'export' }),
+          typeof getContractorsWithVehicles === 'function'
+            ? getContractorsWithVehicles({ mode: 'export' })
+            : Promise.resolve(null),
           getCrushers(),
           getVehicles()
         ])
@@ -1409,8 +1439,8 @@ export default {
     },
 
     async createNewVehicle() {
-      const { name, contractorId, cubicCapacity, crusherCubic } = this.newVehicleForm
-      if (!name.trim() || !cubicCapacity || !crusherCubic) {
+      const { name, contractorId, companyCapacity, crusherCapacity } = this.newVehicleForm
+      if (!name.trim() || !companyCapacity || !crusherCapacity) {
         this.vehicleDialogError = 'All fields required'
         return
       }
@@ -1420,8 +1450,8 @@ export default {
         const res = await createVehicle({
           name: name.trim(),
           contractorId: contractorId ? Number(contractorId) : null,
-          cubicCapacity: Number(cubicCapacity),
-          crusherCubic: Number(crusherCubic)
+          companyCapacity: Number(companyCapacity),
+          crusherCapacity: Number(crusherCapacity)
         })
         const nv = res?.data
         if (!nv || !nv.id) throw new Error('Invalid response')
@@ -1432,7 +1462,7 @@ export default {
         await this.loadLookups()
         console.log('✅ Vehicles after reload:', this.vehicles)
 
-        this.newVehicleForm = { name: '', contractorId: '', cubicCapacity: '', crusherCubic: '' }
+        this.newVehicleForm = { name: '', contractorId: '', companyCapacity: '', crusherCapacity: '' }
         this.showAddVehicleDialog = false
       } catch (e) {
         this.vehicleDialogError = e?.response?.data?.message || e.message || 'Error'
@@ -1511,27 +1541,27 @@ export default {
           const locationId = r.area?.id || r.site?.id
           if (!locationId) continue
 
-          const price = Number(this.commonData.price || 0)
-          const cubic = Number(r.cubic || 0)
+          const unitPrice = Number(this.commonData.price || 0)
+          const companyCapacity = Number(r.companyCapacity || 0)
           const discount = Number(r.discount || 0)
 
-          await createDelivery({
+          await createExport({
             date: this.commonData.date,
             locationId,
             contractorId: this.commonData.contractor?.id ? Number(this.commonData.contractor.id) : null,
             crusherId: this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
-            crusherBon: r.crusherBon?.trim() || '',
-            companyBon: r.companyBon?.trim() || '',
-            price,
-            cubic,
+            crusherTicket: r.crusherTicket?.trim() || '',
+            companyTicket: r.companyTicket?.trim() || '',
+            unitPrice,
+            companyCapacity,
             discount,
-            crusherCubic: r.crusherCubic ? Number(r.crusherCubic) : null,
+            crusherCapacity: r.crusherCapacity ? Number(r.crusherCapacity) : null,
             itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null
           })
         }
 
-        alert(this.$t('labels.saved') || 'Saved successfully ✅')
+        // alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.saveCommonDataToStorage()
 
         // Reset

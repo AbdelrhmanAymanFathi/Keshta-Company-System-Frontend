@@ -222,7 +222,7 @@ export default {
         transports: ['ID', 'Date', 'Contractor', 'From', 'To', 'Trips', 'Total', 'Created By'],
         rentals: ['ID', 'Date', 'Equipment', 'Name', 'Hours', 'Total', 'Created By'],
         expenses: ['ID', 'Date', 'Category', 'Description', 'Amount', 'Branch', 'Location', 'Created By'],
-        vehicles: ['ID', 'Name', 'Contractor', 'Cubic Capacity', 'Created By'],
+        vehicles: ['ID', 'Name', 'Contractor', 'Company Capacity', 'Crusher Capacity', 'Created By'],
         companyWallet: ['ID', 'Date', 'Type', 'Amount', 'Description', 'Created By']
       }
       return configs[moduleKey] || []
@@ -236,7 +236,7 @@ export default {
         transports: ['id', 'date', 'contractor.name', 'fromLoc', 'toLoc', 'numTrips', 'total', 'createdBy.name'],
         rentals: ['id', 'date', 'equipment', 'name', 'hours', 'total', 'createdBy.name'],
         expenses: ['id', 'date', 'category', 'description', 'amount', 'branch.name', 'location.name', 'createdBy.name'],
-        vehicles: ['id', 'name', 'contractor.name', 'cubicCapacity', 'createdBy.name'],
+        vehicles: ['id', 'name', 'contractor.name', 'companyCapacity', 'crusherCapacity', 'createdBy.name'],
         companyWallet: ['id', 'date', 'type', 'amount', 'description', 'createdBy.name']
       }
       return configs[moduleKey] || []

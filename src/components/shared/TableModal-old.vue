@@ -39,7 +39,7 @@
                   <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.discount') }}</th>
                   <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.price') }}</th>
                   <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.cubic') }}</th>
-                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherCubic') }}</th>
+                  <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.crusherCapacity') }}</th>
                   <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.total') }}</th>
                   <th class="px-3 py-3 text-center">{{ $t('labels.actions') }}</th>
                 </tr>
@@ -198,7 +198,7 @@
 
                   <!-- Crusher Cubic -->
                   <td class="px-3 py-2">
-                    <input type="number" step="any" v-model.number="row.crusherCubic"
+                    <input type="number" step="any" v-model.number="row.crusherCapacity"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                       placeholder="-" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
@@ -336,14 +336,14 @@
       </select>
       <input v-model.number="newVehicleForm.cubicCapacity" type="number" step="0.01"
         :placeholder="$t('vehicles.cubicCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newVehicleForm.crusherCubic" type="number" step="0.01"
-        :placeholder="$t('vehicles.crusherCubic') || $t('labels.crusherCubic')"
+      <input v-model.number="newVehicleForm.crusherCapacity" type="number" step="0.01"
+        :placeholder="$t('vehicles.crusherCapacity') || $t('labels.crusherCapacity')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
         <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
         <button @click="createNewVehicle"
-          :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCubic || creatingVehicle"
+          :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCapacity || creatingVehicle"
           class="bg-green-600 text-white px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
@@ -444,7 +444,7 @@ export default {
         name: '',
         contractorId: '',
         cubicCapacity: '',
-        crusherCubic: ''
+        crusherCapacity: ''
       },
       vehicleDialogError: '',
       creatingVehicle: false,
@@ -565,7 +565,7 @@ export default {
         discount: 0,
         price: 0,
         cubic: 0,
-        crusherCubic: '',
+        crusherCapacity: '',
         availableVehicles: []
       }
 
@@ -637,7 +637,7 @@ row.price = this.lastEnteredData.price ?? 0
         !row.discount &&
         !row.price &&
         !row.cubic &&
-        !row.crusherCubic
+        !row.crusherCapacity
     },
     // Check required fields only
     getMissingRequiredFields(row) {
@@ -661,9 +661,9 @@ row.price = this.lastEnteredData.price ?? 0
     // Check warnings (warnings - do not prevent saving)
     getWarnings(row) {
       const warnings = []
-      // If crusherCubic is empty, notify user
-      if (!row.crusherCubic) {
-        warnings.push(this.$t('labels.crusherCubic') + ' (optional)')
+      // If crusherCapacity is empty, notify user
+      if (!row.crusherCapacity) {
+        warnings.push(this.$t('labels.crusherCapacity') + ' (optional)')
       }
       // If area is empty
       if (!row.area) {
@@ -729,7 +729,7 @@ row.price = this.lastEnteredData.price ?? 0
       this.addingLocation = true
       // Store the site before refresh to prevent it from being cleared
       const siteId = this.pendingRow.site.id
-      const siteName = this.pendingRow.site.name
+      // const siteName = this.pendingRow.site.name
       try {
         const res = await createLocation({
           name: this.newAreaName.trim(),
@@ -815,13 +815,13 @@ row.price = this.lastEnteredData.price ?? 0
     onVehicleSelect(row) {
       if (!row.vehicle) {
         row.cubic = 0
-        row.crusherCubic = ''
+        row.crusherCapacity = ''
         return
       }
 
       let vehicle = row.vehicle
 
-      if (vehicle.cubicCapacity === undefined || vehicle.crusherCubic === undefined) {
+      if (vehicle.cubicCapacity === undefined || vehicle.crusherCapacity === undefined) {
         const fullVehicle = this.vehicles.find(v => v.id === vehicle.id)
         if (fullVehicle) {
           vehicle = fullVehicle
@@ -829,16 +829,16 @@ row.price = this.lastEnteredData.price ?? 0
         }
       }
 
-      const companyCubic = parseFloat(vehicle.cubicCapacity || 0)
-      const crusherCubicVal = parseFloat(vehicle.crusherCubic || 0)
+      const companyCapacity = parseFloat(vehicle.cubicCapacity || 0)
+      const crusherCubicVal = parseFloat(vehicle.crusherCapacity || 0)
 
-      row.cubic = isNaN(companyCubic) ? 0 : companyCubic
-      row.crusherCubic = isNaN(crusherCubicVal) ? '' : crusherCubicVal
+      row.cubic = isNaN(companyCapacity) ? 0 : companyCapacity
+      row.crusherCapacity = isNaN(crusherCubicVal) ? '' : crusherCubicVal
 
       //  test values
       console.log('Vehicle name:', vehicle.name)
-      console.log('cubicCapacity final:', companyCubic)
-      console.log('crusherCubic final:', crusherCubicVal)
+      console.log('cubicCapacity final:', companyCapacity)
+      console.log('crusherCapacity final:', crusherCubicVal)
     },
     onItemSelect(row) {
       // Handle __new__ item
@@ -908,7 +908,7 @@ handleEnterKey(rowIndex) {
     discount: 0,
     price: currentRow.price || 0,            // نسخ السعر الحالي (حتى لو عدلته يدوي)
     cubic: 0,
-    crusherCubic: '',
+    crusherCapacity: '',
     availableVehicles: []
   }
 
@@ -996,8 +996,8 @@ handleEnterKey(rowIndex) {
             crusherTicket: r.crusherBon || null,
             companyTicket: r.companyBon || null,
             companyCapacity: cubic > 0 ? cubic : null,
-            crusherCapacity: cubic > 0 ? cubic : null,
-            crusherCubic: r.crusherCubic ? Number(r.crusherCubic) : null,
+            // crusherCapacity: cubic > 0 ? cubic : null,
+            crusherCapacity: r.crusherCapacity ? Number(r.crusherCapacity) : null,
             unitPrice: price > 0 ? price : null,
             discount: discount >= 0 ? discount : null,
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
@@ -1069,8 +1069,8 @@ handleEnterKey(rowIndex) {
       }
     },
     async createNewVehicle() {
-      const { name, contractorId, cubicCapacity, crusherCubic } = this.newVehicleForm
-      if (!name.trim() || !cubicCapacity || !crusherCubic) {
+      const { name, contractorId, cubicCapacity, crusherCapacity } = this.newVehicleForm
+      if (!name.trim() || !cubicCapacity || !crusherCapacity) {
         this.vehicleDialogError = this.$t('common.saveError') || 'Error'
         return
       }
@@ -1081,7 +1081,7 @@ handleEnterKey(rowIndex) {
           name: name.trim(),
           contractorId: contractorId ? Number(contractorId) : null,
           cubicCapacity: Number(cubicCapacity),
-          crusherCubic: Number(crusherCubic)
+          crusherCapacity: Number(crusherCapacity)
         })
         const nv = res?.data
         if (!nv || !nv.id) {
@@ -1096,7 +1096,7 @@ handleEnterKey(rowIndex) {
           row.vehicle = nv
           this.onVehicleSelect(row)
         }
-        this.newVehicleForm = { name: '', contractorId: '', cubicCapacity: '', crusherCubic: '' }
+        this.newVehicleForm = { name: '', contractorId: '', cubicCapacity: '', crusherCapacity: '' }
         this.showAddVehicleDialog = false
         await this.loadLookups()
       } catch (e) {

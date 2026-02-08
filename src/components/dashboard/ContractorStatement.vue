@@ -94,11 +94,11 @@
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.contractorName') }}</p>
         <p class="text-lg font-semibold text-gray-900">{{ report.contractorName }}</p>
       </div>
-      <div v-if="forcedTransactionType !== 'TRANSPORT'" class="bg-white rounded-lg shadow p-4">
+      <div v-if="showExports" class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.exportsEarnings') }}</p>
         <p class="text-lg font-semibold text-blue-600">{{ formatCurrency(report.totals?.exportsEarnings || 0) }}</p>
       </div>
-      <div v-if="forcedTransactionType !== 'EXPORT'" class="bg-white rounded-lg shadow p-4">
+      <div v-if="showTransport" class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.transportEarnings') }}</p>
         <p class="text-lg font-semibold text-green-600">{{ formatCurrency(report.totals?.transportEarnings || 0) }}</p>
       </div>
@@ -106,7 +106,7 @@
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalEarnings') }}</p>
         <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
       </div>
-      <div v-if="forcedTransactionType !== 'EXPORT'" class="bg-white rounded-lg shadow p-4">
+      <div v-if="showDeposits" class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalDeposits') }}</p>
         <p class="text-lg font-semibold text-purple-600">{{ formatCurrency(report.totals?.deposits || 0) }}</p>
       </div>
@@ -232,11 +232,17 @@ import { getContractorReportData, downloadContractorReport, getContractors } fro
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
-import { useRoute } from 'vue-router'
+// import { useRoute } from 'vue-router'
 
 export default {
   name: 'ContractorStatement',
   components: { Badge, Pagination },
+  props: {
+    mode: {
+      type: String,
+      default: undefined
+    }
+  },
 
   setup(props) {
     const instance = getCurrentInstance()
@@ -246,7 +252,7 @@ export default {
     const report = ref(null)
     const contractors = ref([])
     const selectedContractorId = ref('')
-    const forcedTransactionType = ref(undefined)
+    const mode = ref(undefined)
     const filters = ref({
       startDate: '',
       endDate: ''
@@ -270,6 +276,27 @@ export default {
       if (!report.value || !report.value.rows || report.value.rows.length === 0) return 0
       const lastRow = report.value.rows[report.value.rows.length - 1]
       return lastRow.balanceOwed || 0
+    })
+
+    // Normalize mode (use reactive mode if set, otherwise fall back to prop)
+    const currentMode = computed(() => {
+      // normalize to string if available
+      const m = mode.value || props.mode || ''
+      return m ? String(m) : ''
+    })
+
+    const normalizedMode = computed(() => (currentMode.value || '').toUpperCase())
+
+    const showExports = computed(() => {
+      return !currentMode.value || normalizedMode.value === 'EXPORT'
+    })
+
+    const showTransport = computed(() => {
+      return !currentMode.value || normalizedMode.value === 'TRANSPORT'
+    })
+
+    const showDeposits = computed(() => {
+      return !currentMode.value || normalizedMode.value === 'DEPOSIT'
     })
 
     const paginatedRows = computed(() => {
@@ -315,7 +342,7 @@ export default {
 
     const loadContractors = async () => {
       try {
-        const res = await getContractors({ page: 1, pageSize: 1000 })
+        const res = await getContractors({ page: 1, pageSize: 1000, mode: mode.value || props.mode || undefined })
         const payload = res.data || {}
         contractors.value = Array.isArray(payload.items)
           ? payload.items
@@ -358,10 +385,10 @@ export default {
           startDate: filters.value.startDate,
           endDate: filters.value.endDate,
           format: 'json',
-          transaction_type: forcedTransactionType.value || props.transactionType || undefined
+          mode: mode.value || props.mode || undefined
         })
 
-        const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', props.transactionType || null)
+        const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', mode.value || props.mode || undefined)
         report.value = data
         currentPage.value = 1
       } catch (err) {
@@ -386,10 +413,10 @@ export default {
           startDate: filters.value.startDate,
           endDate: filters.value.endDate,
           format: format,
-          transaction_type: forcedTransactionType.value || props.transactionType || undefined
+          mode: mode.value || props.mode || undefined
         })
 
-        const { data } = await downloadContractorReport(selectedContractorId.value, params, format)
+        const { data } = await downloadContractorReport(selectedContractorId.value, params, format, mode.value || props.mode || undefined)
 
         const contractor = contractors.value.find(c => c.id === parseInt(selectedContractorId.value))
         const contractorName = contractor ? contractor.name.replace(/[^a-zA-Z0-9]/g, '_') : selectedContractorId.value
@@ -444,7 +471,7 @@ export default {
     }
 
     onMounted(async () => {
-      const route = useRoute()
+      // const route = useRoute()
       await loadContractors()
       // Set default date range to last 30 days
       const endDate = new Date()
@@ -461,13 +488,13 @@ export default {
         // await loadReport()
       }
 
-      // Fix: use 'route' and 'forcedTransactionType' correctly and make forcedTransactionType reactive for use in template
-      const typeFromQuery = route?.query?.transaction_type
-      if (typeof typeFromQuery === 'string' && ['EXPORT', 'TRANSPORT', 'EXPENSE', 'DEPOSIT'].includes(typeFromQuery)) {
-        forcedTransactionType.value = typeFromQuery
-      }
+      // Fix: use 'route' and 'mode' correctly and make mode reactive for use in template
+      // const typeFromQuery = route?.query?.transaction_type
+      // if (typeof typeFromQuery === 'string' && ['EXPORT', 'TRANSPORT', 'EXPENSE', 'DEPOSIT'].includes(typeFromQuery)) {
+      //   mode.value = typeFromQuery
+      // }
 
-      // Then change your API calls to use forcedTransactionType.value || props.transactionType || undefined
+      // Then change your API calls to use mode.value || props.mode || undefined
     }
     )
 
@@ -478,7 +505,9 @@ export default {
       report,
       contractors,
       selectedContractorId,
-      forcedTransactionType,
+      showExports,
+      showTransport,
+      showDeposits,
       filters,
       currentPage,
       pageSize,

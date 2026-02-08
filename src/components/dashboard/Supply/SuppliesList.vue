@@ -3,9 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.suppliesList') }}</h2>
 
-      <!-- button open modal from shared -->
-      <TableModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newSupply') + ' +'"
-        :modalTitle="$t('dashboard.newSupply')" @saved="onSupplySaved" />
+      <TableModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newSupply') + ' +'" @saved="onSupplySaved"/>
     </div>
 
     <!-- Filters Section -->
@@ -304,10 +302,10 @@
 </template>
 
 <script>
-import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles } from '../../api'
-import TableModal from '../shared/TableModal.vue'
-import Pagination from '../shared/Pagination.vue'
-import { buildQueryParams } from '../../utils/buildQueryParams'
+import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles } from '../../../api'
+import TableModal from '../../shared/SuppliesCreationModal.vue'
+import Pagination from '../../shared/Pagination.vue'
+import { buildQueryParams } from '../../../utils/buildQueryParams'
 
 export default {
   name: 'SuppliesList',
@@ -415,6 +413,7 @@ export default {
         return displayName.toLowerCase().includes(this.filters.vehicleSearch.toLowerCase())
       })
     }
+    ,
   },
 
   async mounted() {

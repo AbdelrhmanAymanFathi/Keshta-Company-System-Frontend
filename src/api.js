@@ -281,10 +281,11 @@ export const deleteUser = (id) =>
 
 // Contractors
 export const getContractors = (params = {}) => {
-  const { page = 1, pageSize = 20, q = '' } = params;
+  const { page = 1, pageSize = 20, q = '', mode = '' } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
-    pageSize: pageSize.toString()
+    pageSize: pageSize.toString(),
+    mode: mode
   });
   if (q) {
     queryParams.append('q', q);
@@ -300,8 +301,12 @@ export const updateContractor = (id, data) => {
 // Delete contractor by id — backend expects RESTful resource path (/api/contractors/:id)
 // Note: many backends return 204 No Content for successful deletes; axios will resolve
 // with response.status === 204 and an empty body.
-export const deleteContractor = (id) =>
-  axios.delete(`${BASE_URL}/api/contractors/${id}`);
+export const deleteContractor = (id, params = {}) => {
+  const query = new URLSearchParams();
+  if (params.mode) query.append('mode', params.mode);
+  const q = query.toString();
+  return axios.delete(`${BASE_URL}/api/contractors/${id}${q ? `?${q}` : ''}`);
+}
 
 // Contractor Wallet APIs
 export const getContractorWallet = (contractorId) =>
@@ -314,7 +319,7 @@ export const depositToContractorWallet = (contractorId, data) =>
   axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
 
 // Contractor Report/Statement
-export const getContractorReportData = async (contractorId, params = {}, format = 'json', transaction_type = null) => {
+export const getContractorReportData = async (contractorId, params = {}, format = 'json', mode = null) => {
   const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
   let axiosParams = { ...params };
   
@@ -328,10 +333,10 @@ export const getContractorReportData = async (contractorId, params = {}, format 
   }
   
   // Add transaction_type if provided (either from params or as separate parameter)
-  if (transaction_type) {
-    axiosParams.transaction_type = transaction_type;
-  } else if (params.transaction_type) {
-    axiosParams.transaction_type = params.transaction_type;
+  if (mode) {
+    axiosParams.mode = mode;
+  } else if (params.mode) {
+    axiosParams.mode = params.mode;
   }
   
   // Make request based on format
@@ -451,7 +456,8 @@ export const getVehicles = (params = {}) => {
   const { page = 1, pageSize = 20, q = '' } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
-    pageSize: pageSize.toString()
+    pageSize: pageSize.toString(),
+    mode: params.mode || 'all' // pass mode if provided (e.g., 'transport' or 'export')
   });
   if (q) {
     queryParams.append('q', q);
@@ -462,50 +468,19 @@ export const createVehicle = (data) =>
   axios.post(`${BASE_URL}/api/vehicles`, data);
 export const updateVehicle = (id, data) =>
   axios.patch(`${BASE_URL}/api/vehicles/${id}`, data);
-export const deleteVehicle = (id) =>
-  axios.delete(`${BASE_URL}/api/vehicles/${id}`);
+export const deleteVehicle = (id, params = {}) => {
+  const query = new URLSearchParams();
+  if (params.mode) query.append('mode', params.mode);
+  const q = query.toString();
+  return axios.delete(`${BASE_URL}/api/vehicles/${id}${q ? `?${q}` : ''}`);
+}
 
-// --- Drivers & Vehicle history ---
-// Drivers CRUD
-export const getDrivers = (params = {}) => {
-  const { page = 1, pageSize = 20, q = '', contractorId = null } = params;
-  const queryParams = new URLSearchParams({
-    page: page.toString(),
-    pageSize: pageSize.toString()
-  });
-  if (q) {
-    queryParams.append('q', q);
-  }
-  if (contractorId) {
-    queryParams.append('contractorId', contractorId.toString());
-  }
-  return axios.get(`${BASE_URL}/api/drivers?${queryParams.toString()}`);
-};
-
-export const createDriver = (data) =>
-  axios.post(`${BASE_URL}/api/drivers`, data);
-
-export const updateDriver = (id, data) =>
-  axios.patch(`${BASE_URL}/api/drivers/${id}`, data);
-
-export const deleteDriver = (id) =>
-  axios.delete(`${BASE_URL}/api/drivers/${id}`);
-
-// Vehicle ownership & driver assignment
+// Vehicle ownership
 export const changeVehicleOwner = (vehicleId, data) =>
   axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/change-owner`, data);
 
 export const getVehicleOwnershipHistory = (vehicleId) =>
   axios.get(`${BASE_URL}/api/vehicles/${vehicleId}/ownership-history`);
-
-export const assignVehicleDriver = (vehicleId, data) =>
-  axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/assign-driver`, data);
-
-export const unassignVehicleDriver = (vehicleId, driverId) =>
-  axios.post(`${BASE_URL}/api/vehicles/${vehicleId}/unassign-driver`, { driverId });
-
-export const getVehicleDriverHistory = (vehicleId) =>
-  axios.get(`${BASE_URL}/api/vehicles/${vehicleId}/driver-history`);
 
 // Contractors with vehicles
 export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
@@ -548,14 +523,12 @@ export const getDeliveries = (params = {}) => {
 
   return axios.get(`${BASE_URL}/api/exports?${queryParams.toString()}`);
 };
-export const createDelivery = (data) =>
-  axios.post(`${BASE_URL}/api/exports`, data);
 
 export const createExport = (data) =>
   axios.post(`${BASE_URL}/api/exports`, data);
 
 export const deleteDelivery = (id) =>
-  axios.delete(`${BASE_URL}/api/exports`, { data: { id } });
+  axios.delete(`${BASE_URL}/api/exports/${id}`);
 
 // Reports
 // Supplies/Exports Report - Get JSON data by default (same pattern as getRentalReportData)
@@ -1084,15 +1057,38 @@ export const getTransportById = (id) =>
 // --- Export Items API ---
 export const getExportItems = (params = {}) => {
   const search = new URLSearchParams(params).toString();
-  const url = `${BASE_URL}/api/exports-items${search ? `?${search}` : ''}`;
+  const url = `${BASE_URL}/api/items${search ? `?${search}` : ''}`;
   return axios.get(url);
 };
 
 export const createExportItem = (data) =>
-  axios.post(`${BASE_URL}/api/exports-items`, data);
+  axios.post(`${BASE_URL}/api/items`, data);
 
 export const updateExportItem = (id, data) =>
-  axios.put(`${BASE_URL}/api/exports-items/${id}`, data);
+  axios.put(`${BASE_URL}/api/items/${id}`, data);
 
 export const deleteExportItem = (id) =>
-  axios.delete(`${BASE_URL}/api/exports-items/${id}`);
+  axios.delete(`${BASE_URL}/api/items/${id}`);
+
+// --- Items & Units API (used by ItemList.vue) ---
+export const getItems = (params = {}) => {
+  const search = new URLSearchParams(params).toString();
+  const url = `${BASE_URL}/api/items${search ? `?${search}` : ''}`;
+  return axios.get(url);
+}
+
+export const createItem = (data) =>
+  axios.post(`${BASE_URL}/api/items`, data);
+
+export const updateItem = (id, data) =>
+  axios.put(`${BASE_URL}/api/items/${id}`, data);
+
+export const deleteItem = (id, params = {}) => {
+  const query = new URLSearchParams();
+  if (params.mode) query.append('mode', params.mode);
+  const q = query.toString();
+  return axios.delete(`${BASE_URL}/api/items/${id}${q ? `?${q}` : ''}`);
+}
+
+export const getUnits = () =>
+  axios.get(`${BASE_URL}/api/units`);

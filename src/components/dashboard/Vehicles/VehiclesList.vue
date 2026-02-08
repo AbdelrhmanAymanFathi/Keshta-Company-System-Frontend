@@ -3,11 +3,21 @@
     <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('vehicles.title') }}</h2>
   </div>
   <div class="space-y-4">
-    <CreateVehicle @created="loadVehicles" />
-
-    <div v-if="vehicles.length === 0" class="p-4 bg-white rounded border text-gray-500">
-      {{ $t('vehicles.noResults') }}
+    <div class="flex items-center justify-between">
+      <div></div>
+      <div>
+        <button
+          @click="openCreateModal"
+          class="px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+        >
+          {{ $t('vehicles.createVehicle') }}
+        </button>
+      </div>
     </div>
+
+    <!-- <div v-if="vehicles.length === 0" class="p-4 bg-white rounded border text-gray-500">
+      {{ $t('vehicles.noResults') }}
+    </div> -->
 
     <!-- Table view -->
     <div class="overflow-x-auto bg-white rounded border">
@@ -15,13 +25,12 @@
         <thead class="bg-gray-50">
           <tr>
             <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.contractor') }}</th>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.crusherNumber') }}</th>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.cubicCapacity') }}</th>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.crusherCubic') }}</th>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('vehicles.driver') || 'Driver' }}</th>
-            <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.actions') || 'Actions' }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.contractor') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.crusherNumber') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.companyCapacity') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.crusherCapacity') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.actions') || 'Actions' }}</th>
           </tr>
         </thead>
         <tbody>
@@ -33,14 +42,14 @@
             <td class="px-3 py-3 font-medium text-gray-800">{{ v.name }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.contractor?.name || '—' }}</td>
             <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.cubicCapacity != null && v.cubicCapacity !== '' ? v.cubicCapacity : '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.crusherCubic != null && v.crusherCubic !== '' ? v.crusherCubic : '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ getDriverName(v) || '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.companyCapacity != null && v.companyCapacity !== '' ? v.companyCapacity : '—' }}</td>
+            <td class="px-3 py-3 text-gray-700">{{ v.crusherCapacity != null && v.crusherCapacity !== '' ? v.crusherCapacity : '—' }}</td>
+            <!-- driver cell removed -->
             <td class="px-3 py-3 flex gap-2">
               <button
                 class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
                 @click="openVehicleDetails(v)">
-                {{ $t('vehicles.manageDriversAndOwnership') }}
+                {{ $t('vehicles.changeOwner') }}
               </button>
               <button
                 class="p-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
@@ -50,14 +59,20 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </button>
-              <!-- <button
+              <button
                 class="p-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
                 @click="openDeleteConfirm(v)"
                 :title="$t('labels.delete') || 'Delete'">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-              </button> -->
+              </button>
+            </td>
+          </tr>
+
+          <tr v-if="vehicles.length === 0">
+            <td class="px-3 py-6 text-center text-gray-500" colspan="6">
+              {{ $t('vehicles.noResults') }}
             </td>
           </tr>
         </tbody>
@@ -74,7 +89,7 @@
           <button
             @click="onContextMenuSelectManage"
             class="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700 text-gray-700">
-            {{ $t('vehicles.manageDriversAndOwnership') }}
+            {{ $t('vehicles.changeOwner') }}
           </button>
         </li>
         <li class="border-t border-gray-200 my-1"></li>
@@ -95,6 +110,22 @@
       </ul>
     </div>
 
+    <!-- Create Vehicle Modal -->
+    <div v-if="showCreateModal" class="fixed inset-0 z-40 flex items-center justify-center px-4">
+      <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeCreateModal"></div>
+      <div class="relative w-full max-w-3xl z-50 mx-auto">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
+          <div class="flex items-center justify-between px-4 py-3 border-b">
+            <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
+            <button class="text-gray-500 hover:text-gray-700" @click="closeCreateModal">✕</button>
+          </div>
+          <div class="p-4 overflow-y-auto">
+            <CreateVehicle :mode="mode" @created="onCreatedFromModal" />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Edit Vehicle Modal -->
     <div v-if="editingVehicle" class="fixed inset-0 z-40 flex items-center justify-center">
       <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeEditModal"></div>
@@ -109,16 +140,16 @@
             <input v-model="editForm.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.cubicCapacity') }}</label>
-            <input v-model="editForm.cubicCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
-            <p v-if="editForm.cubicCapacity && Number(editForm.cubicCapacity) <= 0" class="text-xs text-red-600 mt-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.companyCapacity') }}</label>
+            <input v-model="editForm.companyCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
+            <p v-if="editForm.companyCapacity && Number(editForm.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
               {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
             </p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCubic') }}</label>
-            <input v-model="editForm.crusherCubic" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
-            <p v-if="editForm.crusherCubic && Number(editForm.crusherCubic) <= 0" class="text-xs text-red-600 mt-1">
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCapacity') }}</label>
+            <input v-model="editForm.crusherCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
+            <p v-if="editForm.crusherCapacity && Number(editForm.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
               {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
             </p>
           </div>
@@ -145,6 +176,7 @@
 
     <!-- Pagination Component -->
     <Pagination
+      v-if="totalPages > 1"
       :current-page="page"
       :page-size="pageSize"
       :total="total"
@@ -239,13 +271,13 @@
               <table class="min-w-full text-sm">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {{ $t('vehicles.owner') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {{ $t('labels.startDate') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {{ $t('labels.endDate') }}
                     </th>
                   </tr>
@@ -281,123 +313,7 @@
             </div>
           </section>
 
-          <!-- Drivers -->
-          <section class="space-y-3">
-            <div class="flex items-center justify-between gap-2">
-              <h4 class="text-sm font-semibold text-gray-800">
-                {{ $t('vehicles.drivers') }}
-              </h4>
-              <form
-                class="flex flex-col md:flex-row gap-2 items-stretch md:items-center"
-                @submit.prevent="onAssignDriver"
-              >
-                <select
-                  v-model.number="assignDriverForm.driverId"
-                  class="border rounded px-2 py-1 text-sm min-w-[180px]"
-                  required
-                >
-                  <option disabled value="">
-                    {{ $t('vehicles.selectDriver') }}
-                  </option>
-                  <option
-                    v-for="d in filteredAvailableDrivers"
-                    :key="d.id"
-                    :value="d.id"
-                  >
-                    {{ d.name }} {{ d.phone ? `(${d.phone})` : '' }}
-                  </option>
-                </select>
-                <label class="inline-flex items-center text-xs md:text-sm text-gray-700">
-                  <input
-                    v-model="assignDriverForm.isPrimary"
-                    type="checkbox"
-                    class="mr-1"
-                  />
-                  {{ $t('vehicles.primaryDriver') }}
-                </label>
-                <button
-                  type="submit"
-                  class="px-3 py-1.5 text-xs md:text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
-                  :disabled="assignDriverLoading"
-                >
-                  <span v-if="assignDriverLoading">{{ $t('labels.saving') }}</span>
-                  <span v-else>{{ $t('vehicles.assignDriver') }}</span>
-                </button>
-              </form>
-            </div>
-
-            <div class="border rounded overflow-hidden bg-white">
-              <table class="min-w-full text-sm">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
-                      {{ $t('vehicles.driver') }}
-                    </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
-                      {{ $t('vehicles.primary') }}
-                    </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
-                      {{ $t('labels.startDate') }}
-                    </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
-                      {{ $t('labels.endDate') }}
-                    </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
-                      {{ $t('labels.actions') || 'Actions' }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-if="driversLoading">
-                    <td class="px-3 py-3 text-center text-gray-500" colspan="5">
-                      {{ $t('labels.loading') }}
-                    </td>
-                  </tr>
-                  <tr v-else-if="driverHistory.length === 0">
-                    <td class="px-3 py-3 text-center text-gray-500" colspan="5">
-                      {{ $t('vehicles.noDriverHistory') }}
-                    </td>
-                  </tr>
-                  <tr
-                    v-for="row in driverHistory"
-                    :key="row.id"
-                    class="border-t"
-                  >
-                    <td class="px-3 py-2">
-                      {{ row.driver?.name || row.driverId }}
-                    </td>
-                    <td class="px-3 py-2">
-                      <span
-                        v-if="row.isPrimary === true || row.isPrimary === 'true'"
-                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                      >
-                         {{ $t('vehicles.primary') }}
-                      </span>
-                      <span v-else class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                         {{ $t('vehicles.secondary') || 'Secondary' }}
-                      </span>
-                    </td>
-                    <td class="px-3 py-2">
-                      {{ formatDateTime(row.fromDate) }}
-                    </td>
-                    <td class="px-3 py-2">
-                      {{ row.toDate ? formatDateTime(row.toDate) : row.isPrimary ? $t('vehicles.stillAssigned') : $t('vehicles.endDateNotSet') }}
-                    </td>
-                    <td class="px-3 py-2">
-                      <button
-                        @click="onUnassignDriver(row)"
-                        :disabled="unassignDriverLoading[row.id]"
-                        class="px-2 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
-                        :title="$t('vehicles.unassignDriver') || 'Unassign Driver'"
-                      >
-                        {{ unassignDriverLoading[row.id] ? $t('labels.removing') || 'Removing...' : $t('vehicles.unassign') || 'Unassign' }}
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <!-- Drivers section removed -->
         </div>
       </div>
     </div>
@@ -408,20 +324,19 @@
 import {
   getVehicles,
   getContractors,
-  getDrivers,
   changeVehicleOwner,
   getVehicleOwnershipHistory,
-  assignVehicleDriver,
-  unassignVehicleDriver,
-  getVehicleDriverHistory,
   updateVehicle,
   deleteVehicle
-} from '../../api'
+} from '../../../api'
 import CreateVehicle from './CreateVehicle.vue'
-import Pagination from '../shared/Pagination.vue'
+import Pagination from '../../shared/Pagination.vue'
 
 export default {
   name: 'VehiclesList',
+  props: {
+    mode: { type: String, default: 'transport' }
+  },
   emits: ["navigateReport", "navigateStatement"],
   components: { CreateVehicle, Pagination },
   data() {
@@ -430,21 +345,13 @@ export default {
       contractors: [],
       selectedVehicle: null,
       ownershipHistory: [],
-      driverHistory: [],
-      availableDrivers: [],
       ownershipLoading: false,
-      driversLoading: false,
       changeOwnerLoading: false,
-      assignDriverLoading: false,
-      unassignDriverLoading: {},
       changeOwnerForm: {
         contractorId: '',
         effectiveDate: ''
       },
-      assignDriverForm: {
-        driverId: '',
-        isPrimary: false
-      },
+      // driver assignment removed
       page: 1,
       pageSize: 20,
       total: 0
@@ -460,13 +367,15 @@ export default {
       editingVehicle: null,
       editForm: {
         name: '',
-        crusherCubic: '',
-        cubicCapacity: ''
+        crusherCapacity: '',
+        companyCapacity: ''
       },
       editLoading: false,
       // Delete confirmation modal
       deleteConfirmVehicle: null,
       deleteLoading: false
+      ,
+      showCreateModal: false
     }
   },
   computed: {
@@ -489,32 +398,13 @@ export default {
       }
       return pages
     },
-    filteredAvailableDrivers() {
-      if (!this.selectedVehicle || !this.selectedVehicle.contractor) {
-        return this.availableDrivers
-      }
-      // Filter drivers by selected vehicle's contractor
-      const contractorId = this.selectedVehicle.contractor.id
-      return this.availableDrivers.filter(driver => {
-        return driver.contractorId === contractorId || !driver.contractorId
-      })
-    }
+    
   },
   methods: {
     /**
      * Extract driver name from vehicle's assignments array
      */
-    getDriverName(vehicle) {
-      // Extract driver name from assignments array
-      if (vehicle.assignments && vehicle.assignments.length > 0) {
-        const primaryAssignment = vehicle.assignments.find(a => a.isPrimary) || vehicle.assignments[0]
-        if (primaryAssignment && primaryAssignment.driver) {
-          return primaryAssignment.driver.name
-        }
-      }
-      // Fallback to old properties for backward compatibility
-      return vehicle.driver?.name || vehicle.driverName || null
-    },
+    // driver name helper removed
     /**
      * Extract error message from API response
      */
@@ -548,7 +438,8 @@ export default {
       try {
         const res = await getVehicles({
           page: this.page,
-          pageSize: this.pageSize
+          pageSize: this.pageSize,
+          mode: this.mode
         });
         const payload = res.data || {}
         this.vehicles = Array.isArray(payload.items)
@@ -603,15 +494,8 @@ export default {
         contractorId: vehicle.contractor ? vehicle.contractor.id : '',
         effectiveDate: ''
       }
-      this.assignDriverForm = {
-        driverId: '',
-        isPrimary: false
-      }
-      await Promise.all([
-        this.refreshOwnershipHistory(),
-        this.refreshDriverHistory(),
-        this.refreshAvailableDrivers()
-      ])
+      // driver assignment removed; only load ownership history
+      await this.refreshOwnershipHistory()
     },
     // Right-click / context menu handler for rows
     onRowContextMenu(event, vehicle) {
@@ -679,29 +563,39 @@ export default {
       this.editingVehicle = vehicle
       this.editForm = {
         name: vehicle.name,
-        crusherCubic: vehicle.crusherCubic || '',
-        cubicCapacity: vehicle.cubicCapacity || ''
+        crusherCapacity: vehicle.crusherCapacity || '',
+        companyCapacity: vehicle.companyCapacity || ''
       }
     },
     closeEditModal() {
       this.editingVehicle = null
-      this.editForm = { name: '', crusherCubic: '', cubicCapacity: '' }
+      this.editForm = { name: '', crusherCapacity: '', companyCapacity: '' }
+    },
+    openCreateModal() {
+      this.showCreateModal = true
+    },
+    closeCreateModal() {
+      this.showCreateModal = false
+    },
+    onCreatedFromModal() {
+      this.loadVehicles()
+      this.closeCreateModal()
     },
     async onSaveEdit() {
       if (!this.editingVehicle || !this.editForm.name) return
       
       // Validate numeric fields if provided
-      const cubicCapacityValue = this.editForm.cubicCapacity ? Number(this.editForm.cubicCapacity) : null
-      const crusherCubicValue = this.editForm.crusherCubic ? Number(this.editForm.crusherCubic) : null
+      const companyCapacityValue = this.editForm.companyCapacity ? Number(this.editForm.companyCapacity) : null
+      const crusherCapacityValue = this.editForm.crusherCapacity ? Number(this.editForm.crusherCapacity) : null
       
-      if (cubicCapacityValue !== null && cubicCapacityValue <= 0) {
+      if (companyCapacityValue !== null && companyCapacityValue <= 0) {
         if (window.$toast) {
           window.$toast(this.$t('vehicles.validationPositiveNumber') || 'Cubic Capacity must be greater than 0', 'error', 5000)
         }
         return
       }
       
-      if (crusherCubicValue !== null && crusherCubicValue <= 0) {
+      if (crusherCapacityValue !== null && crusherCapacityValue <= 0) {
         if (window.$toast) {
           window.$toast(this.$t('vehicles.validationPositiveNumber') || 'Crusher Cubic must be greater than 0', 'error', 5000)
         }
@@ -714,14 +608,14 @@ export default {
           name: this.editForm.name
         }
         
-        // Only include crusherCubic if it's a valid number > 0
-        if (crusherCubicValue !== null && crusherCubicValue > 0) {
-          payload.crusherCubic = crusherCubicValue
+        // Only include crusherCapacity if it's a valid number > 0
+        if (crusherCapacityValue !== null && crusherCapacityValue > 0) {
+          payload.crusherCapacity = crusherCapacityValue
         }
         
-        // Only include cubicCapacity if it's a valid number > 0
-        if (cubicCapacityValue !== null && cubicCapacityValue > 0) {
-          payload.cubicCapacity = cubicCapacityValue
+        // Only include companyCapacity if it's a valid number > 0
+        if (companyCapacityValue !== null && companyCapacityValue > 0) {
+          payload.companyCapacity = companyCapacityValue
         }
         
         await updateVehicle(this.editingVehicle.id, payload)
@@ -751,12 +645,31 @@ export default {
       if (!this.deleteConfirmVehicle) return
       this.deleteLoading = true
       try {
-        await deleteVehicle(this.deleteConfirmVehicle.id)
-        if (window.$toast) {
-          window.$toast(this.$t('vehicles.deleteSuccess') || 'Vehicle deleted successfully', 'success')
+        const params = {}
+        if (this.mode === 'export' || this.mode === 'transport') params.mode = this.mode
+
+        const res = await deleteVehicle(this.deleteConfirmVehicle.id, params)
+        const data = res?.data ?? null
+        const status = res?.status ?? null
+
+        // Detect explicit failure responses even when the request did not throw
+        const bodyIndicatesError = data && (data.error || data.success === false || (data.message && typeof data.message === 'string' && /error/i.test(data.message)))
+        const httpError = status && status >= 400
+
+        if (httpError || bodyIndicatesError) {
+          const errorMsg = (data && (data.message || data.error)) || (this.$t('errors.unknown') || 'Delete failed')
+          if (window.$toast) window.$toast(errorMsg, 'error', 5000)
+        } else {
+          if ((res && res.status === 204) || (data && data.deletedAt)) {
+            if (window.$toast) window.$toast(this.$t('vehicles.deleteSuccess') || 'Vehicle deleted successfully', 'success')
+          } else if (data && !data.deletedAt && params.mode) {
+            if (window.$toast) window.$toast(this.$t('vehicles.availabilityRemoved') || `Availability removed for ${params.mode}`, 'success')
+          } else {
+            if (window.$toast) window.$toast(this.$t('vehicles.deleteSuccess') || 'Vehicle deleted successfully', 'success')
+          }
+          await this.loadVehicles()
+          this.closeDeleteConfirm()
         }
-        await this.loadVehicles()
-        this.closeDeleteConfirm()
       } catch (e) {
         console.error('Error deleting vehicle', e)
         const errorMsg = this.extractErrorMessage(e)
@@ -770,8 +683,7 @@ export default {
     closeVehicleDetails() {
       this.selectedVehicle = null
       this.ownershipHistory = []
-      this.driverHistory = []
-      this.availableDrivers = []
+      // driver-related state removed
     },
     async refreshOwnershipHistory() {
       if (!this.selectedVehicle) return
@@ -788,44 +700,6 @@ export default {
         this.ownershipHistory = []
       } finally {
         this.ownershipLoading = false
-      }
-    },
-    async refreshDriverHistory() {
-      if (!this.selectedVehicle) return
-      this.driversLoading = true
-      try {
-        const res = await getVehicleDriverHistory(this.selectedVehicle.id)
-        this.driverHistory = Array.isArray(res.data) ? res.data : []
-      } catch (e) {
-        console.error('Error loading driver history', e)
-        const errorMsg = this.extractErrorMessage(e)
-        if (window.$toast) {
-          window.$toast(errorMsg, 'error', 5000)
-        }
-        this.driverHistory = []
-      } finally {
-        this.driversLoading = false
-      }
-    },
-    async refreshAvailableDrivers() {
-      try {
-        // Load all drivers, not filtered by contractor
-        const res = await getDrivers({ pageSize: 1000 })
-        const driversPayload = res.data || {}
-        this.availableDrivers = Array.isArray(driversPayload.items)
-          ? driversPayload.items
-          : Array.isArray(driversPayload.data)
-            ? driversPayload.data
-            : Array.isArray(driversPayload)
-              ? driversPayload
-              : []
-      } catch (e) {
-        console.error('Error loading available drivers', e)
-        const errorMsg = this.extractErrorMessage(e)
-        if (window.$toast) {
-          window.$toast(errorMsg, 'error', 5000)
-        }
-        this.availableDrivers = []
       }
     },
     async onChangeOwner() {
@@ -853,10 +727,7 @@ export default {
         if (updated) {
           this.selectedVehicle = updated
         }
-        await Promise.all([
-          this.refreshOwnershipHistory(),
-          this.refreshAvailableDrivers()
-        ])
+        await this.refreshOwnershipHistory()
         // Reset form
         this.changeOwnerForm = {
           contractorId: '',
@@ -872,55 +743,7 @@ export default {
         this.changeOwnerLoading = false
       }
     },
-    async onAssignDriver() {
-      if (!this.selectedVehicle || !this.assignDriverForm.driverId) return
-      this.assignDriverLoading = true
-      try {
-        const payload = {
-          driverId: this.assignDriverForm.driverId,
-          isPrimary: !!this.assignDriverForm.isPrimary
-        }
-        await assignVehicleDriver(this.selectedVehicle.id, payload)
-        if (window.$toast) {
-          window.$toast(this.$t('vehicles.assignDriverSuccess') || 'Driver assigned successfully', 'success')
-        }
-        this.assignDriverForm = {
-          driverId: '',
-          isPrimary: false
-        }
-        await this.refreshDriverHistory()
-      } catch (e) {
-        console.error('Error assigning driver', e)
-        const errorMsg = this.extractErrorMessage(e)
-        if (window.$toast) {
-          window.$toast(errorMsg, 'error', 5000)
-        }
-      } finally {
-        this.assignDriverLoading = false
-      }
-    },
-    async onUnassignDriver(driverAssignment) {
-      if (!this.selectedVehicle || !driverAssignment) return
-      
-      // Set loading state for this specific assignment
-      this.unassignDriverLoading[driverAssignment.id] = true
-      
-      try {
-        await unassignVehicleDriver(this.selectedVehicle.id, driverAssignment.driverId)
-        if (window.$toast) {
-          window.$toast(this.$t('vehicles.unassignDriverSuccess') || 'Driver unassigned successfully', 'success')
-        }
-        await this.refreshDriverHistory()
-      } catch (e) {
-        console.error('Error unassigning driver', e)
-        const errorMsg = this.extractErrorMessage(e)
-        if (window.$toast) {
-          window.$toast(errorMsg, 'error', 5000)
-        }
-      } finally {
-        this.unassignDriverLoading[driverAssignment.id] = false
-      }
-    },
+    
     formatDateTime(value) {
       if (!value) return '-'
       try {
