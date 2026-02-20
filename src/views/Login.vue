@@ -102,7 +102,7 @@
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" :disabled="loading"
+          <button v-if="step === 'credentials'" type="submit" :disabled="loading"
             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -112,6 +112,18 @@
             </svg>
             {{ loading ? $t('auth.login.loading') : $t('auth.login.button') }}
           </button>
+
+          <!-- TOTP submit (shown when server asks for 2FA) -->
+          <div v-if="step === 'totp'" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('auth.login.totpLabel') || 'Authenticator code' }}</label>
+              <input v-model="totpCode" type="text" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+            </div>
+            <div class="flex gap-3">
+              <button @click.prevent="restartLogin" class="flex-1 px-3 py-2 border rounded-md">{{ $t('labels.cancel') }}</button>
+              <button @click.prevent="submitTotp" :disabled="loading" class="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-md">{{ $t('auth.login.button') }}</button>
+            </div>
+          </div>
 
           <!-- Error Message -->
           <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -163,12 +175,14 @@ import { useAuth } from '@/composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { isAuthenticated } from '@/composables/authStore';
 import router from '@/router';
+import { login as apiLogin, loginWith2fa, tokenManager } from '@/api'
+import authManager from '@/auth'
 
 export default {
   name: 'AuthLogin',
   emits: ['auth-success', 'switch-auth'],
   setup() {
-    const { login: authLogin, loading } = useAuth()
+    const { loading } = useAuth()
     const { locale } = useI18n()
 
     if (isAuthenticated.value && !loading.value) {
@@ -176,7 +190,7 @@ export default {
     }
 
     return {
-      authLogin,
+      
       loading,
       locale
     }
@@ -185,6 +199,10 @@ export default {
     return {
       email: '',
       password: '',
+      // 2FA state
+      step: 'credentials', // 'credentials' or 'totp'
+      loginToken: null,
+      totpCode: '',
       rememberMe: false,
       showPassword: false,
       error: '',
@@ -211,31 +229,81 @@ export default {
       }
 
       try {
-        const credentials = {
-          email: this.email.trim().toLowerCase(),
-          password: this.password
+        const credentials = { email: this.email.trim().toLowerCase(), password: this.password }
+        const resp = await apiLogin(credentials)
+        const data = resp.data || {}
+
+        // If server indicates TOTP required, move to second step
+        if (data.totpRequired) {
+          this.step = 'totp'
+          this.loginToken = data.loginToken
+          // Optionally keep user info for display
+          this.success = ''
+          return
         }
 
-        const result = await this.authLogin(credentials)
+        // Otherwise, expect accessToken
+        if (data.accessToken) {
+          // Set token and user state via authManager/tokenManager
+          tokenManager.setToken(data.accessToken)
+          tokenManager.scheduleTokenRefresh(data.accessToken)
+          if (data.user) {
+            authManager.setAuthState(true, data.user)
+            localStorage.setItem('user', JSON.stringify(data.user))
+          } else {
+            authManager.setAuthState(true, null)
+          }
 
-        if (result.success) {
           this.success = this.$t('auth.login.success')
           if (window.$toast) window.$toast(this.success, 'success')
 
-          // Store remember me preference
-          if (this.rememberMe) {
-            localStorage.setItem('rememberMe', 'true')
-          } else {
-            localStorage.removeItem('rememberMe')
-          }
+          if (this.rememberMe) localStorage.setItem('rememberMe', 'true')
+          else localStorage.removeItem('rememberMe')
 
           this.$router.push({ name: 'supplies-list' })
-          
-          // Emit success event
-          this.$emit('auth-success', result.data.accessToken)
+        } else {
+          throw new Error('Invalid login response')
         }
       } catch (error) {
         this.handleLoginError(error)
+      }
+    },
+
+    async submitTotp() {
+      this.clearErrors()
+      if (!this.totpCode || !/^[0-9]{6}$/.test(this.totpCode)) {
+        if (window.$toast) window.$toast(this.$t('auth.login.errors.invalidTotp') || 'Enter a valid 6-digit code', 'error')
+        return
+      }
+
+      try {
+        const resp = await loginWith2fa({ loginToken: this.loginToken, token: this.totpCode })
+        const data = resp.data || {}
+        if (data.accessToken) {
+          tokenManager.setToken(data.accessToken)
+          tokenManager.scheduleTokenRefresh(data.accessToken)
+          if (data.user) {
+            authManager.setAuthState(true, data.user)
+            localStorage.setItem('user', JSON.stringify(data.user))
+          } else {
+            authManager.setAuthState(true, null)
+          }
+          if (window.$toast) window.$toast(this.$t('auth.login.success'), 'success')
+          this.$router.push({ name: 'supplies-list' })
+        } else {
+          throw new Error('Invalid 2FA response')
+        }
+      } catch (err) {
+        // Detect expired/consumed challenge and restart login flow
+        const resp = err?.response
+        const msg = (resp?.data?.message || resp?.data?.error || '').toString().toLowerCase()
+        const status = resp?.status
+        if (status === 410 || msg.includes('expired') || msg.includes('consumed') || msg.includes('challenge')) {
+          if (window.$toast) window.$toast(this.$t('auth.login.errors.challengeExpired') || 'Login challenge expired or used — please sign in again', 'error')
+          this.restartLogin()
+          return
+        }
+        this.handleLoginError(err)
       }
     },
 
@@ -263,6 +331,15 @@ export default {
       return isValid
     },
 
+    restartLogin() {
+      // Keep email so user doesn't need to retype, but clear sensitive fields
+      this.step = 'credentials'
+      this.loginToken = null
+      this.totpCode = ''
+      this.password = ''
+      // Optionally focus email or password input in UI - left to browser
+    },
+
     isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       return emailRegex.test(email)
@@ -270,28 +347,52 @@ export default {
 
     handleLoginError(error) {
       console.error('Login error:', error)
-
       if (error.response) {
         const status = error.response.status
-        const message = error.response.data?.message || error.response.data?.error
+        let message = error.response.data?.message || error.response.data?.error
 
+        // Prefer translating common English server messages to local i18n keys
+        if (message) {
+          const serverMsg = String(message).trim()
+
+          // Map fragments (case-insensitive) to i18n keys
+          const mappings = [
+            { match: 'invalid totp', key: 'auth.login.errors.invalidTotp' },
+            { match: 'invalid credentials', key: 'auth.login.errors.invalidCredentials' },
+            { match: 'challenge expired', key: 'auth.login.errors.challengeExpired' },
+            { match: 'login challenge expired', key: 'auth.login.errors.challengeExpired' }
+          ]
+
+          let translated = null
+          const lower = serverMsg.toLowerCase()
+          for (const m of mappings) {
+            if (lower.includes(m.match)) {
+              translated = this.$t(m.key)
+              break
+            }
+          }
+
+          // Show translated text when mapping exists, otherwise show server message
+          this.error = translated || serverMsg
+          if (window.$toast) window.$toast(this.error, 'error')
+          return
+        }
+
+        // Fallback to local translations when server message isn't present
         switch (status) {
           case 401:
             this.error = this.$t('auth.login.errors.invalidCredentials')
-            if (window.$toast) window.$toast(this.error, 'error')
             break
           case 400:
-            this.error = message || this.$t('auth.login.errors.invalidCredentials')
-            if (window.$toast) window.$toast(this.error, 'error')
+            this.error = this.$t('auth.login.errors.invalidCredentials')
             break
           case 500:
             this.error = this.$t('auth.login.errors.serverError')
-            if (window.$toast) window.$toast(this.error, 'error')
             break
           default:
-            this.error = message || this.$t('auth.login.errors.serverError')
-            if (window.$toast) window.$toast(this.error, 'error')
+            this.error = this.$t('auth.login.errors.serverError')
         }
+        if (window.$toast) window.$toast(this.error, 'error')
       } else if (error.request) {
         this.error = this.$t('auth.login.errors.networkError')
         if (window.$toast) window.$toast(this.error, 'error')

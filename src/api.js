@@ -250,6 +250,10 @@ axios.defaults.withCredentials = true;
 export const login = (data) =>
   axios.post(`${BASE_URL}/api/auth/login`, data);
 
+// Complete login with TOTP challenge
+export const loginWith2fa = (data) =>
+  axios.post(`${BASE_URL}/api/auth/login/2fa`, data);
+
 export const register = (data) =>
   axios.post(`${BASE_URL}/api/auth/register`, data);
 
@@ -278,6 +282,14 @@ export const createUser = (data) =>
   axios.post(`${BASE_URL}/api/users`, data);
 export const deleteUser = (id) =>
   axios.delete(`${BASE_URL}/api/users/${id}`);
+
+// Admin: reset a user's password
+export const adminResetUserPassword = (userId, data = {}) =>
+  axios.post(`${BASE_URL}/api/auth/admin/users/${userId}/reset`, data);
+
+// User: change own password
+export const changePassword = (data = {}) =>
+  axios.post(`${BASE_URL}/api/auth/password/change`, data);
 
 // Contractors
 export const getContractors = (params = {}) => {
@@ -359,6 +371,19 @@ export const getContractorReportData = async (contractorId, params = {}, format 
 export const downloadContractorReport = async (contractorId, params = {}, format = 'xlsx') => {
   return getContractorReportData(contractorId, params, format);
 };
+
+// === TOTP (2FA) ===
+export const startTotpRegister = (data = {}) =>
+  axios.post(`${BASE_URL}/api/auth/totp/register`, data);
+
+export const confirmTotpRegister = (data = {}) =>
+  axios.post(`${BASE_URL}/api/auth/totp/confirm`, data);
+
+export const listTotpDevices = () =>
+  axios.get(`${BASE_URL}/api/auth/totp/devices`);
+
+export const deleteTotpDevice = (id) =>
+  axios.delete(`${BASE_URL}/api/auth/totp/devices/${id}`);
 
 // Crushers
 export const getCrushers = (params = {}) => {
@@ -563,14 +588,33 @@ export const getSuppliesReport = (params = {}) => {
 
 // Transports
 export const getTransports = (params = {}) => {
-  const { page = 1, pageSize = 20, q = '' } = params;
+  const {
+    page = 1,
+    pageSize = 20,
+    q = '',
+    startDate = '',
+    endDate = '',
+    contractorId = '',
+    locationId = '',
+    areaId = '',
+    itemId = '',
+    vehicleId = ''
+  } = params;
+
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
-  if (q) {
-    queryParams.append('q', q);
-  }
+
+  if (q) queryParams.append('q', q);
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (contractorId !== undefined && contractorId !== null && contractorId !== '') queryParams.append('contractorId', contractorId.toString());
+  if (locationId !== undefined && locationId !== null && locationId !== '') queryParams.append('locationId', locationId.toString());
+  if (areaId !== undefined && areaId !== null && areaId !== '') queryParams.append('areaId', areaId.toString());
+  if (itemId !== undefined && itemId !== null && itemId !== '') queryParams.append('itemId', itemId.toString());
+  if (vehicleId !== undefined && vehicleId !== null && vehicleId !== '') queryParams.append('vehicleId', vehicleId.toString());
+
   return axios.get(`${BASE_URL}/api/transports?${queryParams.toString()}`);
 };
 export const getTransport = (id) =>

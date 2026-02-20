@@ -31,7 +31,7 @@
     </div>
 
     <!-- Desktop Table -->
-    <div v-else-if="!loading" class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div v-if="!loading" class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-indigo-50">
@@ -67,7 +67,7 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-sm" :class="textAlign">
-                <div class="flex flex-wrap gap-1" :class="isRTL ? 'justify-end' : 'justify-start'">
+                <div class="flex flex-wrap gap-1" :class="'justify-start'">
                   <span
                     v-for="role in user.roles"
                     :key="role.roleId || role.id"
@@ -79,12 +79,17 @@
                 </div>
               </td>
               <td class="px-6 py-4">
-                <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                  <button @click.stop="openEdit(user)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
+                <div class="flex gap-3" :class="'justify-start'">
+                    <button @click.stop="openEdit(user)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
+                    <button @click.stop="openReset(user)" class="text-blue-600 hover:text-blue-800" :title="$t('users.resetPassword')">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 10-8 0v4M5 11h14v8H5z" />
+                      </svg>
+                    </button>
                   <button @click.stop="confirmDelete(user)" class="text-red-600 hover:text-red-800" :title="$t('labels.delete')">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -104,7 +109,7 @@
     </div>
 
     <!-- Mobile Cards -->
-    <div v-else-if="!loading" class="sm:hidden space-y-4">
+    <div v-if="!loading" class="sm:hidden space-y-4">
       <div
         v-for="user in users"
         :key="user.id"
@@ -178,6 +183,35 @@
         </svg>
         {{ $t('labels.delete') }}
       </button>
+      <button @click="contextAction('reset')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-blue-600 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.657 1.343-3 3-3s3 1.343 3 3v1h1a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 012-2h1v-1c0-1.657 1.343-3 3-3s3 1.343 3 3v1h2v-1z" />
+        </svg>
+        {{ $t('users.resetPassword') }}
+      </button>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div v-if="resetModalOpen" class="fixed inset-0 z-50 flex items-center justify-center mt-0 bg-black bg-opacity-50" style="margin-top: 0 !important;">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6" :class="isRTL ? 'text-right' : 'text-left'">
+        <h3 class="text-lg font-semibold mb-4">{{ $t('users.resetModalTitle') }}</h3>
+        <p class="text-gray-600 mb-4">{{ $t('users.resetConfirmMessage', { name: resetUser?.name || '' }) }}</p>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('users.password') }}</label>
+            <input v-model="resetForm.newPassword" type="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <p class="text-sm text-gray-500 mt-1">{{ $t('users.resetHint') }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">TOTP</label>
+            <input v-model="resetForm.adminTotp" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+        </div>
+        <div class="flex gap-3 mt-6" :class="isRTL ? 'flex-row-reverse' : ''">
+          <button @click="closeResetModal" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
+          <button @click="confirmReset" :disabled="resetting" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">{{ resetting ? $t('labels.resetting') : $t('labels.reset') }}</button>
+        </div>
+      </div>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -306,7 +340,7 @@
 
 <script>
 import { useI18n } from 'vue-i18n'
-import { getUsers, createUser, deleteUser } from '@/api'
+import { getUsers, createUser, deleteUser, adminResetUserPassword } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 
 export default {
@@ -347,6 +381,14 @@ export default {
       deleteModalOpen: false,
       userToDelete: null,
       deleting: false,
+      // Reset password modal
+      resetModalOpen: false,
+      resetUser: null,
+      resetting: false,
+      resetForm: {
+        newPassword: '',
+        adminTotp: ''
+      },
       availableRoles: [
         { id: 1, name: 'ADMIN', label: 'Administrator' }
         // Add more roles as needed
@@ -488,6 +530,42 @@ export default {
       this.deleteModalOpen = true
       this.closeContextMenu()
     },
+    closeResetModal() {
+      this.resetModalOpen = false
+      this.resetUser = null
+      this.resetForm = { newPassword: '', adminTotp: '' }
+      this.resetting = false
+    },
+    openReset(user) {
+      this.resetUser = user
+      this.resetForm = { newPassword: '', adminTotp: '' }
+      this.resetModalOpen = true
+      this.closeContextMenu()
+    },
+    async confirmReset() {
+      if (!this.resetUser) return
+      const min = 8
+      const pw = (this.resetForm.newPassword || '').trim()
+      if (!pw) {
+        if (window.$toast) window.$toast(this.$t('users.passwordRequired') || 'Password required', 'error')
+        return
+      }
+      if (pw.length < min) {
+        if (window.$toast) window.$toast(this.$t('users.passwordTooShort', { min }) || `Password must be at least ${min} characters`, 'error')
+        return
+      }
+      this.resetting = true
+      try {
+        await this.$api?.adminResetUserPassword ? this.$api.adminResetUserPassword(this.resetUser.id, { newPassword: pw, adminTotp: this.resetForm.adminTotp }) : adminResetUserPassword(this.resetUser.id, { newPassword: pw, adminTotp: this.resetForm.adminTotp })
+        if (window.$toast) window.$toast(this.$t('users.resetSuccess') || 'Password reset', 'success')
+        this.closeResetModal()
+      } catch (error) {
+        console.error('Error resetting password:', error)
+        if (window.$toast) window.$toast(this.$t('users.resetError') || 'Failed to reset password', 'error')
+      } finally {
+        this.resetting = false
+      }
+    },
     async deleteUser() {
       if (!this.userToDelete) return
       this.deleting = true
@@ -524,6 +602,8 @@ export default {
         this.openEdit(this.contextMenu.user)
       } else if (action === 'delete') {
         this.confirmDelete(this.contextMenu.user)
+      } else if (action === 'reset') {
+        this.openReset(this.contextMenu.user)
       }
       this.closeContextMenu()
     }

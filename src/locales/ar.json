@@ -11,6 +11,7 @@
     "itemNameRequired": "اسم الصنف مطلوب",
     "priceRequired": "السعر مطلوب ويجب أن يكون موجباً"
   },
+    
   "messages": {
     "itemCreated": "تم إنشاء الصنف بنجاح",
     "itemUpdated": "تم تحديث الصنف بنجاح",
@@ -26,6 +27,7 @@
     "enterPrice": "أدخل السعر",
     "searchContractor": "ابحث عن مقاول...",
     "searchLocation": "ابحث عن موقع...",
+    "searchArea": "ابحث عن منطقة...",
     "searchCrusher": "ابحث عن كسارة...",
     "searchItem": "ابحث عن صنف...",
     "searchVehicle": "ابحث عن سيارة...",
@@ -130,6 +132,8 @@
     "saving": "جاري الحفظ...",
     "retry": "إعادة المحاولة",
     "deleting": "جاري الحذف...",
+    "reset": "إعادة تعيين",
+    "resetting": "جاري إعادة التعيين...",
     "removing": "جاري الإزالة...",
     "confirmDelete": "تأكيد الحذف",
     "processing": "جاري المعالجة...",
@@ -205,7 +209,31 @@
     "addExportItem": "إضافة صنف",
     "currentPrice": "السعر الحالي",
     "availableForTransports": "متاح للنقل أيضًا",
-    "availableForExports": "متاح للتصدير أيضًا"
+    "availableForExports": "متاح للتصدير أيضًا",
+    "start": "ابدأ",
+    "copy": "نسخ",
+    "confirm": "تأكيد"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "account": "الحساب",
+    "security": "الأمان",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "changePassword": "تغيير كلمة المرور",
+    "changeSuccess": "تم تغيير كلمة المرور بنجاح",
+    "changeError": "خطأ في تغيير كلمة المرور",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "passwordTooShort": "يجب أن تكون كلمة المرور {min} أحرف على الأقل",
+    "email": "البريد الإلكتروني",
+    "name": "الاسم",
+    "totpTitle": "التحقق بخطوتين",
+    "totpIntro": "أضف تطبيق المصادقة لتأمين حسابك.",
+    "deviceLabel": "اسم الجهاز",
+    "scanQr": "امسح رمز الاستجابة السريعة باستخدام تطبيق المصادقة أو انسخ السر.",
+    "devices": "أجهزة المصادقة",
+    "noDevices": "لا توجد أجهزة TOTP مسجلة"
   },
   "common": {
     "requiredFields": "الحقول المطلوبة",
@@ -234,12 +262,15 @@
       "rememberMe": "تذكرني",
       "forgotPassword": "نسيت كلمة المرور؟",
       "button": "تسجيل الدخول",
+      "totpLabel": "رمز المصادقة",
       "noAccount": "ليس لديك حساب؟",
       "register": "إنشاء حساب",
       "loading": "جاري تسجيل الدخول...",
       "success": "تم تسجيل الدخول بنجاح!",
       "errors": {
         "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "invalidTotp": "رمز المصادقة غير صالح",
+        "challengeExpired": "انتهت صلاحية طلب تسجيل الدخول أو تم استخدامه — يرجى تسجيل الدخول مرة أخرى",
         "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك",
         "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً",
         "required": "هذا الحقل مطلوب",
@@ -858,7 +889,14 @@
     "deleteSuccess": "تم حذف المستخدم بنجاح",
     "deleteError": "خطأ في حذف المستخدم",
     "deleteConfirm": "حذف المستخدم",
-    "deleteConfirmMessage": "هل أنت متأكد من حذف المستخدم {name}؟ لا يمكن التراجع عن هذا الإجراء."
+    "deleteConfirmMessage": "هل أنت متأكد من حذف المستخدم {name}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "resetModalTitle": "إعادة تعيين كلمة المرور",
+    "resetConfirmMessage": "هل أنت متأكد من إعادة تعيين كلمة المرور للمستخدم {name}؟ سيُطلب من المستخدم تعيين كلمة مرور جديدة.",
+    "resetHint": "أدخل كلمة مرور جديدة للمستخدم (اختياري).",
+    "resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح",
+    "resetError": "خطأ في إعادة تعيين كلمة المرور"
+    ,"passwordTooShort": "يجب أن تكون كلمة المرور {min} أحرف على الأقل"
   },
   "locations": {
     "title": "المواقع والمناطق",

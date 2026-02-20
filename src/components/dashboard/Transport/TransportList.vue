@@ -30,95 +30,67 @@
         <!-- Contractor -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }}</label>
-          <div class="relative">
-            <input v-model="filters.contractorSearch" @focus="filters.showContractorDropdown = true"
-              @blur="closeDropdownDelayed('showContractorDropdown')" type="text"
-              :placeholder="$t('placeholders.searchContractor')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showContractorDropdown && filteredContractors.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="contractor in filteredContractors" :key="contractor.id"
-                @click="filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.showContractorDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ contractor.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.contractorSearch"
+            :items="contractors"
+            :allItems="contractors"
+            :placeholder="$t('placeholders.searchContractor')"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            @select="(contractor) => { filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.contractorSelected = contractor }"
+          />
         </div>
 
-        <!-- From Location -->
+        <!-- Location (parent) -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('transport.fromLocation') }}</label>
-          <div class="relative">
-            <input v-model="filters.fromLocationSearch" @focus="filters.showFromLocationDropdown = true"
-              @blur="closeDropdownDelayed('showFromLocationDropdown')" type="text"
-              :placeholder="$t('placeholders.searchFromLocation')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showFromLocationDropdown && filteredFromLocations.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="location in filteredFromLocations" :key="location.id"
-                @click="filters.fromLocationId = location.id; filters.fromLocationSearch = location.name; filters.showFromLocationDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ location.name }}
-              </div>
-            </div>
-          </div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('transport.location') }}</label>
+          <SearchDropdown
+            v-model="filters.locationSearch"
+            :items="locations.filter(l => !l.parentId)"
+            :allItems="locations"
+            :placeholder="$t('placeholders.searchLocation')"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            @select="(location) => { filters.locationId = location.id; filters.locationSearch = location.name; filters.locationSelected = location }"
+          />
         </div>
 
-        <!-- To Location -->
+        <!-- Area (child of selected location) -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('transport.toLocation') }}</label>
-          <div class="relative">
-            <input v-model="filters.toLocationSearch" @focus="filters.showToLocationDropdown = true"
-              @blur="closeDropdownDelayed('showToLocationDropdown')" type="text"
-              :placeholder="$t('placeholders.searchToLocation')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showToLocationDropdown && filteredToLocations.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="location in filteredToLocations" :key="location.id"
-                @click="filters.toLocationId = location.id; filters.toLocationSearch = location.name; filters.showToLocationDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ location.name }}
-              </div>
-            </div>
-          </div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('transport.area') }}</label>
+          <SearchDropdown
+            v-model="filters.areaSearch"
+            :items="(filters.locationSelected && Array.isArray(filters.locationSelected.children) && filters.locationSelected.children.length) ? filters.locationSelected.children : (filters.locationId ? (locations.find(l => l.id === filters.locationId)?.children || []) : [])"
+            :allItems="locations"
+            :placeholder="$t('placeholders.searchArea')"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            @select="(area) => { filters.areaId = area.id; filters.areaSearch = area.name; filters.areaSelected = area }"
+          />
         </div>
 
         <!-- Item -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.item') }}</label>
-          <div class="relative">
-            <input v-model="filters.itemSearch" @focus="filters.showItemDropdown = true"
-              @blur="closeDropdownDelayed('showItemDropdown')" type="text" :placeholder="$t('placeholders.searchItem')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showItemDropdown && filteredItems.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="item in filteredItems" :key="item.id"
-                @click="filters.itemId = item.id; filters.itemSearch = item.name; filters.showItemDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ item.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.itemSearch"
+            :items="items"
+            :allItems="items"
+            :placeholder="$t('placeholders.searchItem')"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            @select="(item) => { filters.itemId = item.id; filters.itemSearch = item.name; filters.itemSelected = item }"
+          />
         </div>
 
         <!-- Vehicle -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.vehicle') }}</label>
-          <div class="relative">
-            <input v-model="filters.vehicleSearch" @focus="filters.showVehicleDropdown = true"
-              @blur="closeDropdownDelayed('showVehicleDropdown')" type="text"
-              :placeholder="$t('placeholders.searchVehicle')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showVehicleDropdown && filteredVehicles.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="vehicle in filteredVehicles" :key="vehicle.id"
-                @click="filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.showVehicleDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ vehicle.plateNumber || vehicle.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.vehicleSearch"
+            :items="vehicles"
+            :allItems="vehicles"
+            :itemLabel="(vehicle) => vehicle?.plateNumber || vehicle?.name || ''"
+            :placeholder="$t('placeholders.searchVehicle')"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            @select="(vehicle) => { filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.vehicleSelected = vehicle }"
+          />
         </div>
       </div>
 
@@ -149,7 +121,15 @@
             </th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              {{ $t('transport.route') }}
+              {{ $t('transport.location') }}
+            </th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.area') }}
+            </th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.vehicle') }}
             </th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -193,11 +173,16 @@
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
               <div class="text-sm font-medium text-gray-900">{{ transport.contractor?.name || '-' }}</div>
-              <div class="text-sm text-gray-500">{{ transport.contractor?.phone || '-' }}</div>
+              <!-- <div class="text-sm text-gray-500">{{ transport.contractor?.phone || '-' }}</div> -->
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              <div class="text-sm text-gray-900"><span class="font-bold">{{ transport.fromLoc }}</span> {{ $t('transport.to') }} <span class="font-bold">{{ transport.toLoc }}</span></div>
-              <div class="text-sm text-gray-500">{{ getVehicleDisplay(transport) }}</div>
+              <div class="text-sm text-gray-900"><span class="font-bold">{{ transport.location.name || '-' }}</span></div>
+            </td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+              <div class="text-sm text-gray-900"><span class="font-bold">{{ transport.area.name || '-' }}</span></div>
+            </td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ getVehicleDisplay(transport) }}</div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ transport.item?.name || '-' }}
@@ -244,7 +229,7 @@
           <tr v-if="transports.length === 0">
             <td
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-              :colspan="11">
+              :colspan="13">
               {{ $t('transport.noTransports') || 'No transports found' }}
             </td>
           </tr>
@@ -285,7 +270,8 @@
 <script>
 import { getTransports, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
-import TransportModal from '../../shared/TransportCreationModal.vue'
+import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import TransportModal from './TransportCreationModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 
 export default {
@@ -293,7 +279,8 @@ export default {
 
   components: {
     Pagination,
-    TransportModal
+    TransportModal,
+    SearchDropdown
   },
 
   data() {
@@ -320,19 +307,19 @@ export default {
         endDate: '',
         contractorId: '',
         contractorSearch: '',
-        fromLocationId: '',
-        fromLocationSearch: '',
-        toLocationId: '',
-        toLocationSearch: '',
+        contractorSelected: null,
+        locationId: '',
+        locationSearch: '',
+        locationSelected: null,
+        areaId: '',
+        areaSearch: '',
+        areaSelected: null,
         itemId: '',
         itemSearch: '',
+        itemSelected: null,
         vehicleId: '',
         vehicleSearch: '',
-        showContractorDropdown: false,
-        showFromLocationDropdown: false,
-        showToLocationDropdown: false,
-        showItemDropdown: false,
-        showVehicleDropdown: false
+        vehicleSelected: null
       }
     }
   },
@@ -344,42 +331,7 @@ export default {
     isRTL() {
       return this.$i18n?.locale === 'ar'
     },
-    filteredContractors() {
-      if (!this.filters.showContractorDropdown) return []
-      if (!this.filters.contractorSearch) return this.contractors
-      return this.contractors.filter(c =>
-        c.name.toLowerCase().includes(this.filters.contractorSearch.toLowerCase())
-      )
-    },
-    filteredFromLocations() {
-      if (!this.filters.showFromLocationDropdown) return []
-      if (!this.filters.fromLocationSearch) return this.locations
-      return this.locations.filter(l =>
-        l.name.toLowerCase().includes(this.filters.fromLocationSearch.toLowerCase())
-      )
-    },
-    filteredToLocations() {
-      if (!this.filters.showToLocationDropdown) return []
-      if (!this.filters.toLocationSearch) return this.locations
-      return this.locations.filter(l =>
-        l.name.toLowerCase().includes(this.filters.toLocationSearch.toLowerCase())
-      )
-    },
-    filteredItems() {
-      if (!this.filters.showItemDropdown) return []
-      if (!this.filters.itemSearch) return this.items
-      return this.items.filter(i =>
-        i.name.toLowerCase().includes(this.filters.itemSearch.toLowerCase())
-      )
-    },
-    filteredVehicles() {
-      if (!this.filters.showVehicleDropdown) return []
-      if (!this.filters.vehicleSearch) return this.vehicles
-      return this.vehicles.filter(v => {
-        const displayName = v.plateNumber || v.name
-        return displayName.toLowerCase().includes(this.filters.vehicleSearch.toLowerCase())
-      })
-    }
+    
   },
 
   async mounted() {
@@ -426,15 +378,6 @@ export default {
     },
 
     /**
-     * Close dropdown with delay
-     */
-    closeDropdownDelayed(dropdownName) {
-      setTimeout(() => {
-        this.filters[dropdownName] = false
-      }, 200)
-    },
-
-    /**
      * Clear all filters
      */
     clearFilters() {
@@ -443,19 +386,19 @@ export default {
         endDate: '',
         contractorId: '',
         contractorSearch: '',
-        fromLocationId: '',
-        fromLocationSearch: '',
-        toLocationId: '',
-        toLocationSearch: '',
+        contractorSelected: null,
+        locationId: '',
+        locationSearch: '',
+        locationSelected: null,
+        areaId: '',
+        areaSearch: '',
+        areaSelected: null,
         itemId: '',
         itemSearch: '',
+        itemSelected: null,
         vehicleId: '',
         vehicleSearch: '',
-        showContractorDropdown: false,
-        showFromLocationDropdown: false,
-        showToLocationDropdown: false,
-        showItemDropdown: false,
-        showVehicleDropdown: false
+        vehicleSelected: null
       }
       this.page = 1
       this.loadTransports()
@@ -465,14 +408,21 @@ export default {
       try {
         this.loading = true
 
+        // ensure any pending input/select updates are applied (allow emitted select/update events to propagate)
+        await this.$nextTick()
+        await new Promise((res) => setTimeout(res, 20))
+        this.syncFilterIdsFromSearch()
+
+        console.debug('Filters before request:', JSON.parse(JSON.stringify(this.filters)))
+
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
           contractorId: this.filters.contractorId,
-          fromLocationId: this.filters.fromLocationId,
-          toLocationId: this.filters.toLocationId,
+          locationId: this.filters.locationId,
+          areaId: this.filters.areaId,
           itemId: this.filters.itemId,
           vehicleId: this.filters.vehicleId
         }
@@ -507,6 +457,62 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    syncFilterIdsFromSearch() {
+      const normalize = (value) => String(value || '').trim().toLowerCase()
+      const resolveId = (list, search, getLabel) => {
+        const needle = normalize(search)
+        if (!needle) return ''
+        const items = Array.isArray(list) ? list : []
+        const exact = items.find(item => normalize(getLabel(item)) === needle)
+        if (exact) return exact.id ?? ''
+        const partial = items.filter(item => normalize(getLabel(item)).includes(needle))
+        return partial.length === 1 ? (partial[0].id ?? '') : ''
+      }
+      const useSelected = (selected, search, getLabel) => {
+        if (!selected) return ''
+        const needle = normalize(search)
+        if (!needle) return ''
+        const label = normalize(getLabel(selected))
+        return label === needle ? (selected.id ?? '') : ''
+      }
+
+      this.filters.contractorId =
+        useSelected(this.filters.contractorSelected, this.filters.contractorSearch, (c) => c?.name || '') ||
+        resolveId(this.contractors, this.filters.contractorSearch, (c) => c?.name || '')
+
+      // resolve parent location id (prefer selected top-level locations)
+      const parentLocations = this.locations.filter(l => !l.parentId)
+      this.filters.locationId =
+        useSelected(this.filters.locationSelected, this.filters.locationSearch, (l) => l?.name || '') ||
+        resolveId(parentLocations, this.filters.locationSearch, (l) => l?.name || '')
+
+      // resolve area id (child of selected location if provided)
+      // Prefer explicit children on the selected location object (if present),
+      // otherwise try to find the parent in `locations` and use its `children`,
+      // finally fall back to any locations with matching parentId.
+      let areaCandidates = []
+      if (this.filters.locationSelected && Array.isArray(this.filters.locationSelected.children) && this.filters.locationSelected.children.length) {
+        areaCandidates = this.filters.locationSelected.children
+      } else if (this.filters.locationId) {
+        const parent = this.locations.find(l => l.id === this.filters.locationId)
+        areaCandidates = parent?.children || this.locations.filter(l => l.parentId === this.filters.locationId)
+      } else {
+        areaCandidates = []
+      }
+
+      this.filters.areaId =
+        useSelected(this.filters.areaSelected, this.filters.areaSearch, (l) => l?.name || '') ||
+        resolveId(areaCandidates, this.filters.areaSearch, (l) => l?.name || '')
+
+      this.filters.itemId =
+        useSelected(this.filters.itemSelected, this.filters.itemSearch, (i) => i?.name || '') ||
+        resolveId(this.items, this.filters.itemSearch, (i) => i?.name || '')
+
+      this.filters.vehicleId =
+        useSelected(this.filters.vehicleSelected, this.filters.vehicleSearch, (v) => v?.plateNumber || v?.name || '') ||
+        resolveId(this.vehicles, this.filters.vehicleSearch, (v) => v?.plateNumber || v?.name || '')
     },
 
     async handleTransportSaved() {

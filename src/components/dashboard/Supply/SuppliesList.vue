@@ -24,98 +24,79 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
+        
+
         <!-- Contractor -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }}</label>
-          <div class="relative">
-            <input v-model="filters.contractorSearch" @focus="filters.showContractorDropdown = true"
-              @blur="closeDropdownDelayed('showContractorDropdown')" type="text"
-              :placeholder="$t('placeholders.searchContractor')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showContractorDropdown && filteredContractors.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="contractor in filteredContractors" :key="contractor.id"
-                @click="filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.showContractorDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ contractor.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.contractorSearch"
+            :items="contractors"
+            :allItems="contractors"
+            :placeholder="$t('placeholders.searchContractor')"
+            @select="(sel) => { filters.contractorId = sel.id; filters.contractorSearch = sel.name }"
+          />
         </div>
 
         <!-- Location -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
-          <div class="relative">
-            <input v-model="filters.locationSearch" @focus="filters.showLocationDropdown = true"
-              @blur="closeDropdownDelayed('showLocationDropdown')" type="text"
-              :placeholder="$t('placeholders.searchLocation')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showLocationDropdown && filteredLocations.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="location in filteredLocations" :key="location.id"
-                @click="filters.locationId = location.id; filters.locationSearch = location.name; filters.showLocationDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ location.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.locationSearch"
+            :items="locations"
+            :allItems="locations"
+            :placeholder="$t('placeholders.searchLocation')"
+            @select="(sel) => selectLocation(sel)"
+          />
+        </div>
+
+        <!-- Area -->
+        <div>
+          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
+          <SearchDropdown
+            v-model="filters.areaSearch"
+            :items="availableAreas"
+            :allItems="availableAreas"
+            :placeholder="$t('placeholders.searchArea')"
+            @select="(sel) => selectArea(sel)"
+          />
         </div>
 
         <!-- Crusher -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.crusher') }}</label>
-          <div class="relative">
-            <input v-model="filters.crusherSearch" @focus="filters.showCrusherDropdown = true"
-              @blur="closeDropdownDelayed('showCrusherDropdown')" type="text"
-              :placeholder="$t('placeholders.searchCrusher')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showCrusherDropdown && filteredCrushers.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="crusher in filteredCrushers" :key="crusher.id"
-                @click="filters.crusherId = crusher.id; filters.crusherSearch = crusher.name; filters.showCrusherDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ crusher.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.crusherSearch"
+            :items="crushers"
+            :allItems="crushers"
+            :placeholder="$t('placeholders.searchCrusher')"
+            @select="(sel) => { filters.crusherId = sel.id; filters.crusherSearch = sel.name }"
+          />
         </div>
 
         <!-- Item -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.item') }}</label>
-          <div class="relative">
-            <input v-model="filters.itemSearch" @focus="filters.showItemDropdown = true"
-              @blur="closeDropdownDelayed('showItemDropdown')" type="text" :placeholder="$t('placeholders.searchItem')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showItemDropdown && filteredItems.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="item in filteredItems" :key="item.id"
-                @click="filters.itemId = item.id; filters.itemSearch = item.name; filters.showItemDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ item.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.itemSearch"
+            :items="items"
+            :allItems="items"
+            :placeholder="$t('placeholders.searchItem')"
+            @select="(sel) => { filters.itemId = sel.id; filters.itemSearch = sel.name }"
+          />
         </div>
 
         <!-- Vehicle -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.vehicle') }}</label>
-          <div class="relative">
-            <input v-model="filters.vehicleSearch" @focus="filters.showVehicleDropdown = true"
-              @blur="closeDropdownDelayed('showVehicleDropdown')" type="text"
-              :placeholder="$t('placeholders.searchVehicle')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-            <div v-if="filters.showVehicleDropdown && filteredVehicles.length"
-              class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-              <div v-for="vehicle in filteredVehicles" :key="vehicle.id"
-                @click="filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.showVehicleDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                {{ vehicle.plateNumber || vehicle.name }}
-              </div>
-            </div>
-          </div>
+          <SearchDropdown
+            v-model="filters.vehicleSearch"
+            :items="vehicles"
+            :allItems="vehicles"
+            :placeholder="$t('placeholders.searchVehicle')"
+            :itemLabel="(v) => v.plateNumber || v.name"
+            @select="(sel) => { filters.vehicleId = sel.id; filters.vehicleSearch = sel.plateNumber || sel.name }"
+          />
         </div>
       </div>
 
@@ -154,6 +135,9 @@
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.location') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.area') }}</th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.vehicle') }}</th>
@@ -203,6 +187,9 @@
             <td
               class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
               {{ s.location?.name || '-' }}</td>
+            <td
+              class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+              {{ getAreaName(s) }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ s.vehicle?.name || '-' }}</td>
             <td
@@ -303,8 +290,9 @@
 
 <script>
 import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles } from '../../../api'
-import TableModal from '../../shared/SuppliesCreationModal.vue'
+import TableModal from './SuppliesCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
+import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 
 export default {
@@ -312,7 +300,8 @@ export default {
 
   components: {
     TableModal,
-    Pagination
+    Pagination,
+    SearchDropdown
   },
 
   data() {
@@ -338,6 +327,8 @@ export default {
       filters: {
         startDate: '',
         endDate: '',
+        areaId: '',
+        areaSearch: '',
         contractorId: '',
         contractorSearch: '',
         locationId: '',
@@ -347,12 +338,7 @@ export default {
         itemId: '',
         itemSearch: '',
         vehicleId: '',
-        vehicleSearch: '',
-        showContractorDropdown: false,
-        showLocationDropdown: false,
-        showCrusherDropdown: false,
-        showItemDropdown: false,
-        showVehicleDropdown: false
+        vehicleSearch: ''
       }
     }
   },
@@ -377,43 +363,14 @@ export default {
     isRTL() {
       return this.$i18n?.locale === 'ar'
     },
-    filteredContractors() {
-      if (!this.filters.showContractorDropdown) return []
-      if (!this.filters.contractorSearch) return this.contractors
-      return this.contractors.filter(c =>
-        c.name.toLowerCase().includes(this.filters.contractorSearch.toLowerCase())
-      )
+    availableAreas() {
+      if (!this.filters.locationId) return []
+      const selected = this.locations.find(l => l.id === this.filters.locationId)
+      if (selected && Array.isArray(selected.children) && selected.children.length) {
+        return selected.children
+      }
+      return this.locations.filter(l => l.parentId === this.filters.locationId)
     },
-    filteredLocations() {
-      if (!this.filters.showLocationDropdown) return []
-      if (!this.filters.locationSearch) return this.locations
-      return this.locations.filter(l =>
-        l.name.toLowerCase().includes(this.filters.locationSearch.toLowerCase())
-      )
-    },
-    filteredCrushers() {
-      if (!this.filters.showCrusherDropdown) return []
-      if (!this.filters.crusherSearch) return this.crushers
-      return this.crushers.filter(c =>
-        c.name.toLowerCase().includes(this.filters.crusherSearch.toLowerCase())
-      )
-    },
-    filteredItems() {
-      if (!this.filters.showItemDropdown) return []
-      if (!this.filters.itemSearch) return this.items
-      return this.items.filter(i =>
-        i.name.toLowerCase().includes(this.filters.itemSearch.toLowerCase())
-      )
-    },
-    filteredVehicles() {
-      if (!this.filters.showVehicleDropdown) return []
-      if (!this.filters.vehicleSearch) return this.vehicles
-      return this.vehicles.filter(v => {
-        const displayName = v.plateNumber || v.name
-        return displayName.toLowerCase().includes(this.filters.vehicleSearch.toLowerCase())
-      })
-    }
-    ,
   },
 
   async mounted() {
@@ -465,21 +422,14 @@ export default {
     },
 
     /**
-     * Close dropdown with delay
-     */
-    closeDropdownDelayed(dropdownName) {
-      setTimeout(() => {
-        this.filters[dropdownName] = false
-      }, 200)
-    },
-
-    /**
      * Clear all filters
      */
     clearFilters() {
       this.filters = {
         startDate: '',
         endDate: '',
+        areaId: '',
+        areaSearch: '',
         contractorId: '',
         contractorSearch: '',
         locationId: '',
@@ -489,12 +439,7 @@ export default {
         itemId: '',
         itemSearch: '',
         vehicleId: '',
-        vehicleSearch: '',
-        showContractorDropdown: false,
-        showLocationDropdown: false,
-        showCrusherDropdown: false,
-        showItemDropdown: false,
-        showVehicleDropdown: false
+        vehicleSearch: ''
       }
       this.page = 1
       this.loadSupplies()
@@ -509,6 +454,7 @@ export default {
           pageSize: this.pageSize,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
+          area: this.filters.areaId,
           contractorId: this.filters.contractorId,
           locationId: this.filters.locationId,
           crusherId: this.filters.crusherId,
@@ -589,6 +535,31 @@ export default {
 
     formatNumber(v) {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
+    },
+
+    selectLocation(location) {
+      this.filters.locationId = location.id
+      this.filters.locationSearch = location.name
+      this.filters.showLocationDropdown = false
+      this.filters.areaId = ''
+      this.filters.areaSearch = ''
+    },
+
+    selectArea(area) {
+      this.filters.areaId = area.id
+      this.filters.areaSearch = area.name
+      this.filters.showAreaDropdown = false
+    },
+
+    getAreaName(supply) {
+      if (supply?.area?.name) return supply.area.name
+      if (typeof supply?.area === 'string') return supply.area
+      const areaId = supply?.areaId || supply?.area?.id
+      if (areaId && Array.isArray(supply?.location?.children)) {
+        const match = supply.location.children.find(a => a.id === areaId)
+        if (match?.name) return match.name
+      }
+      return '-'
     },
 
 formatDate(dateString) {

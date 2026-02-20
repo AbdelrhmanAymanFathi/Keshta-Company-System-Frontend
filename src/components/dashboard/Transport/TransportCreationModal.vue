@@ -31,20 +31,7 @@
 
             <div class="max-w-6xl mx-auto">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                <!-- Date -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    {{ $t('transport.date') }} <span class="text-red-600">*</span>
-                  </label>
-                  <div class="relative">
-                    <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    <input
-                      type="date"
-                      v-model="commonData.date"
-                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                    />
-                  </div>
-                </div>
+                <!-- Date was moved to Step 2 -->
 
                 <!-- Item -->
                 <div>
@@ -58,6 +45,7 @@
                         v-model="filters.commonItemSearch"
                         @focus="filters.showCommonItemDropdown = true"
                         @blur="closeDropdownDelayed('showCommonItemDropdown')"
+                        @keydown="onDropdownKeydown($event, 'highlightedCommonItemIndex', filteredCommonItems, selectCommonItem)"
                         type="text"
                         :placeholder="$t('labels.item')"
                         class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
@@ -67,10 +55,10 @@
                         class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
                       >
                         <div
-                          v-for="item in filteredCommonItems"
+                          v-for="(item, i) in filteredCommonItems"
                           :key="item.id"
-                          @click="selectCommonItem(item)"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+                          @mousedown.prevent="selectCommonItem(item)"
+                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonItemIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
                         >
                           {{ item.name }}
                         </div>
@@ -89,8 +77,8 @@
                 <!-- From Location -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    {{ $t('transport.fromLocation') }} <span class="text-red-600">*</span>
-                  </label>
+                      {{ $t('transport.location') || $t('transport.fromLocation') }} <span class="text-red-600">*</span>
+                    </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
                       <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -98,6 +86,7 @@
                         v-model="filters.commonFromLocSearch"
                         @focus="filters.showCommonFromLocDropdown = true"
                         @blur="closeDropdownDelayed('showCommonFromLocDropdown')"
+                        @keydown="onDropdownKeydown($event, 'highlightedCommonFromLocIndex', filteredCommonFromLocs, (sel) => { commonData.location = sel; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = sel.name + (sel.parentName ? ' (' + sel.parentName + ')' : ''); filters.showCommonFromLocDropdown = false })"
                         type="text"
                         :placeholder="$t('transport.fromLocation')"
                         class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
@@ -107,15 +96,15 @@
                         class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
                       >
                         <div
-                          v-for="loc in filteredCommonFromLocs"
+                          v-for="(loc, i) in filteredCommonFromLocs"
                           :key="loc.id"
-                          @click="commonData.fromLoc = loc; filters.commonFromLocSearch = loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : ''); filters.showCommonFromLocDropdown = false"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+                          @mousedown.prevent="(function(){ commonData.location = loc; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : ''); filters.showCommonFromLocDropdown = false })()"
+                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonFromLocIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
                         >
-                          {{ loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : '') }}
+                          {{ loc.name }}
                         </div>
                         <div
-                          @click="pendingField = 'fromLoc'; showAddLocation = true; filters.showCommonFromLocDropdown = false"
+                          @click="pendingField = 'location'; showAddLocation = true; filters.showCommonFromLocDropdown = false"
                           style="color: #10b981;"
                           class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
                         >
@@ -129,8 +118,8 @@
                 <!-- To Location -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    {{ $t('transport.toLocation') }} <span class="text-red-600">*</span>
-                  </label>
+                      {{ $t('transport.area') || $t('transport.toLocation') }} <span class="text-red-600">*</span>
+                    </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
                       <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -138,6 +127,7 @@
                         v-model="filters.commonToLocSearch"
                         @focus="filters.showCommonToLocDropdown = true"
                         @blur="closeDropdownDelayed('showCommonToLocDropdown')"
+                        @keydown="onDropdownKeydown($event, 'highlightedCommonToLocIndex', filteredCommonToLocs, (sel) => { commonData.area = sel; filters.commonToLocSearch = sel.name ; filters.showCommonToLocDropdown = false; try{ saveCommonDataToStorage() }catch(e){} })"
                         type="text"
                         :placeholder="$t('transport.toLocation')"
                         class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
@@ -147,15 +137,15 @@
                         class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
                       >
                         <div
-                          v-for="loc in filteredCommonToLocs"
+                          v-for="(loc, i) in filteredCommonToLocs"
                           :key="loc.id"
-                          @click="commonData.toLoc = loc; filters.commonToLocSearch = loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : ''); filters.showCommonToLocDropdown = false"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+                          @mousedown.prevent="(function(){ commonData.area = loc; filters.commonToLocSearch = loc.name; filters.showCommonToLocDropdown = false; try{ saveCommonDataToStorage() }catch(e){} })()"
+                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonToLocIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
                         >
-                          {{ loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : '') }}
+                          {{ loc.name }}
                         </div>
                         <div
-                          @click="pendingField = 'toLoc'; showAddLocation = true; filters.showCommonToLocDropdown = false"
+                          @click="pendingField = 'area'; showAddLocation = true; filters.showCommonToLocDropdown = false"
                           style="color: #10b981;"
                           class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
                         >
@@ -178,6 +168,7 @@
                         v-model="filters.commonContractorSearch"
                         @focus="filters.showCommonContractorDropdown = true"
                         @blur="closeDropdownDelayed('showCommonContractorDropdown')"
+                        @keydown="onDropdownKeydown($event, 'highlightedCommonContractorIndex', filteredCommonContractors, (sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; filters.showCommonContractorDropdown = false })"
                         type="text"
                         :placeholder="$t('transport.contractor')"
                         class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
@@ -187,10 +178,10 @@
                         class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
                       >
                         <div
-                          v-for="contractor in filteredCommonContractors"
+                          v-for="(contractor, i) in filteredCommonContractors"
                           :key="contractor.id"
-                          @click="commonData.contractor = contractor; filters.commonContractorSearch = contractor.name; filters.showCommonContractorDropdown = false"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0"
+                          @mousedown.prevent="(function(){ commonData.contractor = contractor; filters.commonContractorSearch = contractor.name; filters.showCommonContractorDropdown = false })()"
+                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonContractorIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
                         >
                           {{ contractor.name }}
                         </div>
@@ -206,22 +197,7 @@
                   </div>
                 </div>
 
-                <!-- Distance Km -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    {{ $t('transport.distanceKm') }} <span class="text-red-600">*</span>
-                  </label>
-                  <div class="relative">
-                    <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    <input
-                      type="number"
-                      v-model.number="commonData.distanceKm"
-                      step="0.1"
-                      min="0"
-                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                    />
-                  </div>
-                </div>
+                <!-- Distance moved to per-row inputs in Step 2 -->
 
                 <!-- First Km Price -->
                 <div>
@@ -309,30 +285,24 @@
             <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
               <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') || 'ملخص' }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
-                <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.date') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd>
-                </div>
+                <!-- Date removed from summary (handled per-row) -->
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.fromLocation') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.fromLoc?.name || '-' }}</dd>
+                  <dt class="font-semibold text-gray-700">{{ $t('transport.location') || $t('transport.fromLocation') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.location?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.toLocation') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.toLoc?.name || '-' }}</dd>
+                  <dt class="font-semibold text-gray-700">{{ $t('transport.area') || $t('transport.toLocation') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('transport.contractor') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                 </div>
-                <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.distanceKm') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.distanceKm) }}</dd>
-                </div>
+                <!-- Distance is shown per-row now -->
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('transport.firstKmPrice') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.firstKmPrice) }}</dd>
@@ -356,11 +326,17 @@
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                        {{ $t('transport.date') || 'Date' }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
                         {{ $t('labels.vehicle') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
                         {{ $t('labels.discount') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
                         {{ $t('transport.vehicleCapacity') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                        {{ $t('transport.count') || 'Count' }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                        {{ $t('transport.distanceKm') || 'Distance (Km)' }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
                         {{ $t('transport.total') }}</th>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}
@@ -370,6 +346,12 @@
                   <tbody class="divide-y divide-gray-200 bg-white">
                     <tr v-for="(row, index) in rows" :key="row.id">
                       <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                      <!-- Row Date -->
+                      <td class="px-3 py-2">
+                        <input type="date" v-model="row.date"
+                          @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm" />
+                      </td>
                       <!-- Vehicle -->
                       <td class="px-3 py-2" :ref="el => row.vehicleCell = el">
                         <div class="relative">
@@ -378,8 +360,13 @@
                             @mousedown.prevent="toggleVehicleDropdown(row)">
                             <input v-model="row.search" type="text"
                               :placeholder="row.vehicle?.name || $t('labels.vehicle')"
-                              class="outline-none flex-1 text-sm bg-transparent" @keydown.enter.prevent
-                              @keydown.escape="row.open = false" @mousedown.prevent="" @focus="row.open = true" @blur="handleVehicleBlur(row)" />
+                              class="outline-none flex-1 text-sm bg-transparent"
+                              @keydown.enter.prevent
+                              @keydown.escape="row.open = false"
+                              @keydown="onDropdownKeydown($event, row, filteredVehicles(row), (sel) => selectVehicle(row, sel))"
+                              @mousedown.prevent=""
+                              @focus="row.open = true"
+                              @blur="handleVehicleBlur(row)" />
                             <span class="text-gray-400">▾</span>
                           </div>
                         </div>
@@ -388,8 +375,9 @@
                           <div
                             class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
                             :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
-                            <div v-for="v in filteredVehicles(row)" :key="v.id" @mousedown="selectVehicle(row, v)"
-                              class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start">
+                            <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id" @mousedown.prevent="selectVehicle(row, v)"
+                              @mousemove="row.highlightedVehicleIndex = vi"
+                              :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
                               {{ v.name }} {{ v.company ? `- ${v.company}` : '' }} {{ v.crusherNumber ? `(${v.crusherNumber})` : '' }}
                             </div>
                             <div @click="showAddVehicleDialog = true; row.open = false"
@@ -408,7 +396,18 @@
                       <!-- Company Capacity -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.companyCapacity" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onLastFieldTab(index, $event)"
+                          @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                      </td>
+                      <!-- Count -->
+                      <td class="px-3 py-2">
+                        <input type="number" v-model.number="row.count" min="1" step="1"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                      </td>
+                      <!-- Distance per Row -->
+                      <td class="px-3 py-2">
+                        <input type="number" v-model.number="row.distanceKm" step="0.1" min="0"
+                          @keydown.tab="onLastFieldTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
                       <!-- Total per Row -->
@@ -569,11 +568,9 @@ import {
   getItems
 } from '@/api'
 import {
-  CalendarDaysIcon,
   ArchiveBoxIcon,
   MapPinIcon,
   UserGroupIcon,
-  MapIcon,
   CurrencyDollarIcon,
   ArrowLeftIcon,
   DocumentDuplicateIcon,
@@ -585,11 +582,9 @@ import {
 export default {
   name: 'TransportModal',
   components: {
-    CalendarDaysIcon,
     ArchiveBoxIcon,
     MapPinIcon,
     UserGroupIcon,
-    MapIcon,
     CurrencyDollarIcon,
     ArrowLeftIcon,
     DocumentDuplicateIcon,
@@ -618,8 +613,8 @@ export default {
       commonData: {
         date: '',
         item: null,
-        fromLoc: null,
-        toLoc: null,
+        location: null,
+        area: null,
         contractor: null,
         distanceKm: 0,
         firstKmPrice: 0,
@@ -660,6 +655,11 @@ export default {
       },
       creatingItem: false,
       rows: [],
+      // highlighted indexes for common dropdowns
+      highlightedCommonItemIndex: -1,
+      highlightedCommonFromLocIndex: -1,
+      highlightedCommonToLocIndex: -1,
+      highlightedCommonContractorIndex: -1,
       filters: {
         commonItemSearch: '',
         showCommonItemDropdown: false,
@@ -687,14 +687,22 @@ export default {
       if (!this.filters.showCommonFromLocDropdown) return []
       if (!this.filters.commonFromLocSearch) return this.locations
       return this.locations.filter(l =>
-        (l.name + (l.parentName ? ' (' + l.parentName + ')' : '')).toLowerCase().includes(this.filters.commonFromLocSearch.toLowerCase())
+        (l.name).toLowerCase().includes(this.filters.commonFromLocSearch.toLowerCase())
       )
     },
     filteredCommonToLocs() {
       if (!this.filters.showCommonToLocDropdown) return []
-      if (!this.filters.commonToLocSearch) return this.locations
-      return this.locations.filter(l =>
-        (l.name + (l.parentName ? ' (' + l.parentName + ')' : '')).toLowerCase().includes(this.filters.commonToLocSearch.toLowerCase())
+      // Use only the `children` array from the selected location as areas.
+      // If `children` is missing or empty, return an empty list (do not fallback to parentId filtering).
+      let base = []
+      if (this.commonData.location?.children && Array.isArray(this.commonData.location.children) && this.commonData.location.children.length) {
+        base = this.commonData.location.children.map(c => ({ ...c, parentName: this.commonData.location.name }))
+      } else {
+        base = []
+      }
+      if (!this.filters.commonToLocSearch) return base
+      return base.filter(l =>
+        (l.name).toLowerCase().includes(this.filters.commonToLocSearch.toLowerCase())
       )
     },
     filteredCommonContractors() {
@@ -733,6 +741,15 @@ export default {
     transport(newVal) {
       if (newVal && this.isOpen) {
         this.populateForm()
+      }
+    }
+    ,
+    'commonData.area'() {
+      // auto-save selected area to localStorage whenever it changes
+      try {
+        this.saveCommonDataToStorage()
+      } catch (err) {
+        console.warn('Failed to auto-save area to storage', err)
       }
     }
   },
@@ -781,12 +798,10 @@ export default {
       }
     },
     isStep1Valid() {
-      return this.commonData.date &&
-        this.commonData.item &&
-        this.commonData.fromLoc &&
-        this.commonData.toLoc &&
+      return this.commonData.item &&
+        this.commonData.location &&
+        this.commonData.area &&
         this.commonData.contractor &&
-        this.commonData.distanceKm > 0 &&
         (this.commonData.firstKmPrice > 0 || this.commonData.perKmPrice > 0)
     },
     goToStep2() {
@@ -834,13 +849,13 @@ export default {
             this.commonData.item = this.items.find(i => i.id === data.item.id) || null
             if (this.commonData.item) this.filters.commonItemSearch = this.commonData.item.name
           }
-          if (data.fromLoc?.id) {
-            this.commonData.fromLoc = this.locations.find(l => l.id === data.fromLoc.id) || null
-            if (this.commonData.fromLoc) this.filters.commonFromLocSearch = this.commonData.fromLoc.name + (this.commonData.fromLoc.parentName ? ' (' + this.commonData.fromLoc.parentName + ')' : '')
+          if (data.location?.id) {
+            this.commonData.location = this.locations.find(l => l.id === data.location.id) || null
+            if (this.commonData.location) this.filters.commonFromLocSearch = this.commonData.location.name
           }
-          if (data.toLoc?.id) {
-            this.commonData.toLoc = this.locations.find(l => l.id === data.toLoc.id) || null
-            if (this.commonData.toLoc) this.filters.commonToLocSearch = this.commonData.toLoc.name + (this.commonData.toLoc.parentName ? ' (' + this.commonData.toLoc.parentName + ')' : '')
+          if (data.area?.id) {
+            this.commonData.area = this.locations.find(l => l.id === data.area.id) || null
+            if (this.commonData.area) this.filters.commonToLocSearch = this.commonData.area.name
           }
           if (data.contractor?.id) {
             this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
@@ -860,8 +875,8 @@ export default {
         const data = {
           date: this.commonData.date,
           item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
-          fromLoc: this.commonData.fromLoc ? { id: this.commonData.fromLoc.id, name: this.commonData.fromLoc.name } : null,
-          toLoc: this.commonData.toLoc ? { id: this.commonData.toLoc.id, name: this.commonData.toLoc.name } : null,
+          location: this.commonData.location ? { id: this.commonData.location.id, name: this.commonData.location.name } : null,
+          area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
           contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
           distanceKm: this.commonData.distanceKm,
           firstKmPrice: this.commonData.firstKmPrice,
@@ -886,7 +901,12 @@ export default {
         discount: 0,
         companyCapacity: 0,
         vehicle: null,
-        availableVehicles: []
+        availableVehicles: [],
+        // per-row variable fields
+        count: 1,
+        distanceKm: 0,
+        date: this.commonData.date || new Date().toISOString().split('T')[0],
+        highlightedVehicleIndex: -1
       }
       if (this.commonData.contractor?.id) {
         const cv = this.contractorsWithVehicles.find(c => c.id === this.commonData.contractor.id)
@@ -928,6 +948,50 @@ export default {
         v.name.toLowerCase().includes(q)
       )
     },
+
+    // Dropdown keyboard navigation helper
+    onDropdownKeydown(e, keyRef, list, onConfirm) {
+      // keyRef: either a string property name on this (e.g. 'highlightedCommonItemIndex')
+      // or an object representing a row which uses row.highlightedVehicleIndex
+      const getIndex = () => {
+        if (typeof keyRef === 'string') return this[keyRef] ?? -1
+        if (typeof keyRef === 'object') return keyRef.highlightedVehicleIndex ?? -1
+        return -1
+      }
+      const setIndex = (i) => {
+        if (typeof keyRef === 'string') this[keyRef] = i
+        else if (typeof keyRef === 'object') this.$set ? this.$set(keyRef, 'highlightedVehicleIndex', i) : (keyRef.highlightedVehicleIndex = i)
+      }
+
+      const listArr = Array.isArray(list) ? list : []
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        const idx = getIndex()
+        const next = (idx >= 0) ? Math.min(idx + 1, listArr.length - 1) : 0
+        setIndex(next)
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        const idx = getIndex()
+        const prev = (idx > 0) ? idx - 1 : 0
+        setIndex(prev)
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        const idx = getIndex()
+        if (idx >= 0 && idx < listArr.length) {
+          onConfirm(listArr[idx])
+        }
+        return
+      }
+      if (e.key === 'Escape') {
+        // close dropdowns
+        this.rows.forEach(r => { r.open = false })
+        return
+      }
+    },
     getVehicleDropdownStyle(row) {
       if (!row.vehicleCell) return {}
       const rect = row.vehicleCell.getBoundingClientRect()
@@ -951,10 +1015,13 @@ export default {
       row.search = vehicle.name
       row.open = false
       row.companyCapacity = parseFloat(vehicle.companyCapacity || 0)
+      row.highlightedVehicleIndex = -1
     },
     perTripBeforeDiscount(row) {
-      const base = this.commonData.firstKmPrice + Math.max(0, (this.commonData.distanceKm - 1)) * this.commonData.perKmPrice
-      return base * (row.companyCapacity || 0)
+      const distance = Number(row.distanceKm || 0)
+      const base = this.commonData.firstKmPrice + Math.max(0, (distance - 1)) * this.commonData.perKmPrice
+      // include the row count so subtotal reflects multiple trips
+      return base * (row.companyCapacity || 0) * (row.count || 1)
     },
     totalPerRow(row) {
       return Math.max(0, this.perTripBeforeDiscount(row) - (row.discount || 0))
@@ -988,8 +1055,18 @@ export default {
         if (created?.id) {
           const newLoc = this.locations.find(l => l.id === created.id)
           if (newLoc && this.pendingField) {
-            this.commonData[this.pendingField] = newLoc
-            this.filters[`common${this.pendingField.charAt(0).toUpperCase() + this.pendingField.slice(1)}Search`] = newLoc.name + (newLoc.parentName ? ' (' + newLoc.parentName + ')' : '')
+            if (this.pendingField === 'location') {
+              this.commonData.location = newLoc
+              this.commonData.area = null
+              this.filters.commonFromLocSearch = newLoc.name
+              this.filters.commonToLocSearch = ''
+            } else if (this.pendingField === 'area') {
+              this.commonData.area = newLoc
+              this.filters.commonToLocSearch = newLoc.name
+              try { this.saveCommonDataToStorage() } catch (e) {console.warn('Failed to save common data after adding area', e) }
+            } else {
+              this.commonData[this.pendingField] = newLoc
+            }
           }
         }
         this.showAddLocation = false
@@ -1119,22 +1196,43 @@ export default {
       }
       try {
         for (const r of toSave) {
+          const tripCount = Number(r.count) || 1
+          const tripDistance = Number(r.distanceKm || 0)
+
+          // Backend expects `location` and `area` as strings — send IDs as strings and validate presence
+          const locId = this.commonData.location?.id ?? null
+          const areaId = this.commonData.area?.id ?? null
+          if (!locId || !areaId) {
+            this.saveError = this.$t('common.missingLocationOrArea') || 'Location and area are required'
+            this.isSaving = false
+            return
+          }
+
           await createTransport({
-            date: this.commonData.date,
+            date: r.date || this.commonData.date,
             contractorId: this.commonData.contractor?.id || null,
             itemId: this.commonData.item?.id || null,
-            fromLoc: this.commonData.fromLoc?.name || null,
-            toLoc: this.commonData.toLoc?.name || null,
-            numTrips: 1,
-            distanceKm: this.commonData.distanceKm,
+            // include both the legacy id fields and the string fields the API expects
+            locationId: locId,
+            areaId: areaId,
+            location: String(locId),
+            area: String(areaId),
+            numTrips: tripCount,
+            distanceKm: tripDistance,
             vehicleId: r.vehicle?.id || null,
+            companyCapacity: r.companyCapacity || 0,
             notes: this.commonData.notes || '',
             pricing: {
               firstKm: 1,
               firstKmPrice: this.commonData.firstKmPrice || 0,
               perKmPrice: this.commonData.perKmPrice || 0
             },
-            discount: r.discount || 0
+            discount: r.discount || 0,
+            // variable data for the second stage
+            data: {
+              count: tripCount,
+              distanceKm: tripDistance
+            }
           })
         }
         this.saveCommonDataToStorage()
@@ -1151,22 +1249,25 @@ export default {
       if (this.transport) {
         this.commonData.date = this.transport.date?.split('T')[0] || ''
         this.commonData.item = this.items.find(i => i.id === this.transport.itemId) || null
-        this.commonData.fromLoc = this.locations.find(l => l.id === this.transport.fromLocId) || null
-        this.commonData.toLoc = this.locations.find(l => l.id === this.transport.toLocId) || null
+        this.commonData.location = this.locations.find(l => l.id === this.transport.fromLocId) || null
+        this.commonData.area = this.locations.find(l => l.id === this.transport.toLocId) || null
         this.commonData.contractor = this.contractors.find(c => c.id === this.transport.contractorId) || null
         this.commonData.distanceKm = parseFloat(this.transport.distanceKm) || 0
         this.commonData.firstKmPrice = parseFloat(this.transport.pricing?.firstKmPrice) || 0
         this.commonData.perKmPrice = parseFloat(this.transport.pricing?.perKmPrice) || 0
         this.commonData.notes = this.transport.notes || ''
-        // For rows, since edit is single, create one row with vehicle, discount, capacity
+        // For edit: populate a single row containing the transport's counts/distance
         this.currentStep = 2
         const vehicle = this.vehicles.find(v => v.id === this.transport.vehicleId)
         const row = this.createEmptyRow()
         row.vehicle = vehicle
         row.search = vehicle?.name || ''
-        row.discount = parseFloat(this.transport.discount) / this.transport.numTrips || 0 // Approximate
+        row.discount = parseFloat(this.transport.discount) / (this.transport.numTrips || 1) || 0 // approximate per-row
         row.companyCapacity = vehicle?.companyCapacity || 0
-        this.rows = Array.from({ length: this.transport.numTrips || 1 }, () => ({ ...row }))
+        row.count = Number(this.transport.numTrips) || 1
+        row.distanceKm = parseFloat(this.transport.distanceKm) || this.commonData.distanceKm || 0
+        row.date = this.transport.date?.split('T')[0] || this.commonData.date || new Date().toISOString().split('T')[0]
+        this.rows = [row]
       }
     },
     selectCommonItem(item) {

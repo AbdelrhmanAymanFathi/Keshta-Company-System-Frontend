@@ -46,6 +46,13 @@
           <!-- User Dropdown Menu -->
           <div v-if="userMenuOpen" class="absolute top-12" :class="isRTL ? 'left-0' : 'right-0'">
             <div class="bg-white rounded-lg shadow-lg py-2 min-w-[160px] border">
+              <button @click="goToProfile(); userMenuOpen = false"
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.824.645 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {{ $t('profile.title') || 'Profile' }}
+              </button>
               <button @click="showLogoutDialog = true; userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,6 +317,7 @@ export default {
       if (contractorId) localStorage.setItem('contractor-statement-id', contractorId.toString())
       if (this.isMobile) this.sidebarOpen = false
     },
+    goToProfile() { this.router.push({ name: 'profile' }) },
     handleLogoutSuccess() {
       this.showLogoutDialog = false
       this.router.push({ name: 'login' })

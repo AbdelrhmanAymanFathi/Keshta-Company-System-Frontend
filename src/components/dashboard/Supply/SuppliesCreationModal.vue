@@ -53,25 +53,26 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <ArchiveBoxIcon
-                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input v-model="filters.commonItemSearch" @focus="filters.showCommonItemDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonItemDropdown')" type="text"
+                      <SearchDropdown
+                        v-model="filters.commonItemSearch"
+                        :items="exportItems"
+                        :allItems="exportItems"
                         :placeholder="$t('labels.item')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-                      <div v-if="filters.showCommonItemDropdown && filteredCommonItems.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-                        <div v-for="item in filteredCommonItems" :key="item.id"
-                          @click="commonData.item = item; filters.commonItemSearch = item.name; filters.showCommonItemDropdown = false; onCommonItemSelect()"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                          {{ item.name }}
-                        </div>
-                        <div @click="showAddExportItemDialog = true; filters.showCommonItemDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
-                          + {{ $t('labels.addNew') }}
-                        </div>
-                      </div>
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }"
+                      >
+                        <template #prefix>
+                          <ArchiveBoxIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @click="showAddExportItemDialog = true"
+                            style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -96,25 +97,26 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <MapPinIcon
-                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input v-model="filters.commonSiteSearch" @focus="filters.showCommonSiteDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonSiteDropdown')" type="text"
+                      <SearchDropdown
+                        v-model="filters.commonSiteSearch"
+                        :items="sites"
+                        :allItems="sites"
                         :placeholder="$t('labels.site')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-                      <div v-if="filters.showCommonSiteDropdown && filteredCommonSites.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-                        <div v-for="site in filteredCommonSites" :key="site.id"
-                          @click="commonData.site = site; filters.commonSiteSearch = site.name; filters.showCommonSiteDropdown = false; onCommonSiteChange()"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                          {{ site.name }}
-                        </div>
-                        <div @click="showAddSite = true; pendingRow = null; filters.showCommonSiteDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
-                          + {{ $t('supply.addNewSite') }}
-                        </div>
-                      </div>
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }"
+                      >
+                        <template #prefix>
+                          <MapPinIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @click="showAddSite = true; pendingRow = null"
+                            style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('supply.addNewSite') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -126,26 +128,28 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <MapIcon
-                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input v-model="filters.commonAreaSearch" @focus="filters.showCommonAreaDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonAreaDropdown')" type="text"
-                        :placeholder="$t('labels.area')" :disabled="!commonData.site"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed" />
-                      <div v-if="filters.showCommonAreaDropdown && filteredCommonAreas.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-                        <div v-for="area in filteredCommonAreas" :key="area.id"
-                          @click="commonData.area = area; filters.commonAreaSearch = area.name; filters.showCommonAreaDropdown = false"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                          {{ area.name }}
-                        </div>
-                        <div v-if="commonData.site"
-                          @click="showAddArea = true; pendingRow = null; filters.showCommonAreaDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
-                          + {{ $t('supply.addNewArea') }}
-                        </div>
-                      </div>
+                      <SearchDropdown
+                        v-model="filters.commonAreaSearch"
+                        :items="commonAvailableAreas"
+                        :allItems="commonAvailableAreas"
+                        :placeholder="$t('labels.area')"
+                        :disabled="!commonData.site"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
+                        @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }"
+                      >
+                        <template #prefix>
+                          <MapIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div v-if="commonData.site"
+                            @click="showAddArea = true; pendingRow = null"
+                            style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('supply.addNewArea') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -157,26 +161,26 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <UserGroupIcon
-                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input v-model="filters.commonContractorSearch"
-                        @focus="filters.showCommonContractorDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonContractorDropdown')" type="text"
+                      <SearchDropdown
+                        v-model="filters.commonContractorSearch"
+                        :items="contractors"
+                        :allItems="contractors"
                         :placeholder="$t('labels.contractor')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-                      <div v-if="filters.showCommonContractorDropdown && filteredCommonContractors.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-                        <div v-for="contractor in filteredCommonContractors" :key="contractor.id"
-                          @click="commonData.contractor = contractor; filters.commonContractorSearch = contractor.name; filters.showCommonContractorDropdown = false; onCommonContractorChange()"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                          {{ contractor.name }}
-                        </div>
-                        <div @click="showAddContractorDialog = true; filters.showCommonContractorDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
-                          + {{ $t('labels.addNew') }}
-                        </div>
-                      </div>
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }"
+                      >
+                        <template #prefix>
+                          <UserGroupIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @click="showAddContractorDialog = true"
+                            style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -188,25 +192,26 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <WrenchScrewdriverIcon
-                        class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input v-model="filters.commonCrusherSearch" @focus="filters.showCommonCrusherDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonCrusherDropdown')" type="text"
+                      <SearchDropdown
+                        v-model="filters.commonCrusherSearch"
+                        :items="crushers"
+                        :allItems="crushers"
                         :placeholder="$t('labels.crusher')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
-                      <div v-if="filters.showCommonCrusherDropdown && filteredCommonCrushers.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
-                        <div v-for="crusher in filteredCommonCrushers" :key="crusher.id"
-                          @click="commonData.crusher = crusher; filters.commonCrusherSearch = crusher.name; filters.showCommonCrusherDropdown = false; onCommonCrusherChange()"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
-                          {{ crusher.name }}
-                        </div>
-                        <div @click="showAddCrusherDialog = true; filters.showCommonCrusherDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
-                          + {{ $t('labels.addNew') }}
-                        </div>
-                      </div>
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }"
+                      >
+                        <template #prefix>
+                          <WrenchScrewdriverIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @click="showAddCrusherDialog = true"
+                            style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -319,8 +324,11 @@
                             @mousedown.prevent="toggleVehicleDropdown(row)">
                             <input v-model="row.search" type="text"
                               :placeholder="row.vehicle?.name || $t('labels.vehicle')"
-                              class="outline-none flex-1 text-sm bg-transparent" @keydown.enter.prevent
-                              @keydown.escape="row.open = false" @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false"/>
+                              class="outline-none flex-1 text-sm bg-transparent"
+                              @keydown.enter.prevent
+                              @keydown.escape="row.open = false"
+                              @keydown="onDropdownKeydown($event, row, filteredVehicles(row), (sel) => selectVehicle(row, sel))"
+                              @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false"/>
                             <span class="text-gray-400">▾</span>
                           </div>
                         </div>
@@ -331,8 +339,9 @@
                             class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
                             :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
 
-                            <div v-for="v in filteredVehicles(row)" :key="v.id" @mousedown="selectVehicle(row, v)"
-                              class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start">
+                            <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id" @mousedown.prevent="selectVehicle(row, v)"
+                              @mousemove="row.highlightedVehicleIndex = vi"
+                              :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
                               {{ v.name }}
                             </div>
 
@@ -589,6 +598,7 @@ import {
   CheckIcon,
   ArrowRightIcon
 } from '@heroicons/vue/24/outline'
+import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 
 export default {
   emits: ['saved'],
@@ -605,7 +615,8 @@ export default {
     DocumentDuplicateIcon,
     TrashIcon,
     CheckIcon,
-    ArrowRightIcon
+    ArrowRightIcon,
+    SearchDropdown
   },
   props: {
     showTriggerButton: {
@@ -690,15 +701,10 @@ export default {
       // Search filters for Step 1
       filters: {
         commonItemSearch: '',
-        showCommonItemDropdown: false,
         commonSiteSearch: '',
-        showCommonSiteDropdown: false,
         commonAreaSearch: '',
-        showCommonAreaDropdown: false,
         commonContractorSearch: '',
-        showCommonContractorDropdown: false,
-        commonCrusherSearch: '',
-        showCommonCrusherDropdown: false
+        commonCrusherSearch: ''
       },
 
       // References
@@ -738,45 +744,6 @@ export default {
       return this.allLocations.filter(l => l.parentId === this.commonData.site.id)
     },
 
-    filteredCommonItems() {
-      if (!this.filters.showCommonItemDropdown) return []
-      if (!this.filters.commonItemSearch) return this.exportItems
-      return this.exportItems.filter(i =>
-        i.name.toLowerCase().includes(this.filters.commonItemSearch.toLowerCase())
-      )
-    },
-
-    filteredCommonSites() {
-      if (!this.filters.showCommonSiteDropdown) return []
-      if (!this.filters.commonSiteSearch) return this.sites
-      return this.sites.filter(s =>
-        s.name.toLowerCase().includes(this.filters.commonSiteSearch.toLowerCase())
-      )
-    },
-
-    filteredCommonAreas() {
-      if (!this.filters.showCommonAreaDropdown) return []
-      if (!this.filters.commonAreaSearch) return this.commonAvailableAreas
-      return this.commonAvailableAreas.filter(a =>
-        a.name.toLowerCase().includes(this.filters.commonAreaSearch.toLowerCase())
-      )
-    },
-
-    filteredCommonContractors() {
-      if (!this.filters.showCommonContractorDropdown) return []
-      if (!this.filters.commonContractorSearch) return this.contractors
-      return this.contractors.filter(c =>
-        c.name.toLowerCase().includes(this.filters.commonContractorSearch.toLowerCase())
-      )
-    },
-
-    filteredCommonCrushers() {
-      if (!this.filters.showCommonCrusherDropdown) return []
-      if (!this.filters.commonCrusherSearch) return this.crushers
-      return this.crushers.filter(c =>
-        c.name.toLowerCase().includes(this.filters.commonCrusherSearch.toLowerCase())
-      )
-    },
 
     subtotal() {
       return this.rows.reduce((sum, row) => {
@@ -1001,19 +968,13 @@ export default {
       }
     },
 
-    // ============ Dropdown Management ============
-    closeDropdownDelayed(dropdownName) {
-      setTimeout(() => {
-        this.filters[dropdownName] = false
-      }, 200)
-    },
-
     // ============ Row Management ============
     createEmptyRow() {
       const row = {
         id: Date.now() + Math.random(),
         date: this.commonData.date,
         site: this.commonData.site,
+        location: this.commonData.site,
         area: this.commonData.area,
         // Prefer the site's `children` array if available, otherwise fallback to filtering allLocations
         availableAreas: this.commonData.site
@@ -1034,6 +995,8 @@ export default {
         companyCapacity: 0,
         crusherCapacity: '',
         availableVehicles: []
+      ,
+        highlightedVehicleIndex: -1
       }
 
       if (this.commonData.contractor?.id) {
@@ -1195,7 +1158,49 @@ export default {
       row.vehicle = vehicle
       row.search = vehicle.name
       row.open = false
+      row.highlightedVehicleIndex = -1
       this.onVehicleSelect(row)
+    },
+
+    // Dropdown keyboard navigation helper
+    onDropdownKeydown(e, keyRef, list, onConfirm) {
+      const getIndex = () => {
+        if (typeof keyRef === 'string') return this[keyRef] ?? -1
+        if (typeof keyRef === 'object') return keyRef.highlightedVehicleIndex ?? -1
+        return -1
+      }
+      const setIndex = (i) => {
+        if (typeof keyRef === 'string') this[keyRef] = i
+        else if (typeof keyRef === 'object') this.$set ? this.$set(keyRef, 'highlightedVehicleIndex', i) : (keyRef.highlightedVehicleIndex = i)
+      }
+
+      const listArr = Array.isArray(list) ? list : []
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        const idx = getIndex()
+        const next = (idx >= 0) ? Math.min(idx + 1, listArr.length - 1) : 0
+        setIndex(next)
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        const idx = getIndex()
+        const prev = (idx > 0) ? idx - 1 : 0
+        setIndex(prev)
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        const idx = getIndex()
+        if (idx >= 0 && idx < listArr.length) {
+          onConfirm(listArr[idx])
+        }
+        return
+      }
+      if (e.key === 'Escape') {
+        this.rows.forEach(r => { r.open = false })
+        return
+      }
     },
 
     onVehicleSelect(row) {
@@ -1538,8 +1543,13 @@ export default {
 
       try {
         for (const r of toSave) {
-          const locationId = r.area?.id || r.site?.id
+          const locationId = r.location?.id
+          console.log('🔍 Processing row with location:', r.location)
           if (!locationId) continue
+
+          const areaId = r.area?.id
+          console.log('🔍 Processing row with area:', r.area)
+          if (!areaId) continue
 
           const unitPrice = Number(this.commonData.price || 0)
           const companyCapacity = Number(r.companyCapacity || 0)
@@ -1547,7 +1557,8 @@ export default {
 
           await createExport({
             date: this.commonData.date,
-            locationId,
+            locationId: locationId,
+            areaId: areaId,
             contractorId: this.commonData.contractor?.id ? Number(this.commonData.contractor.id) : null,
             crusherId: this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
             vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,

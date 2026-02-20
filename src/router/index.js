@@ -31,6 +31,7 @@ const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vu
 const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
 const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
+const Profile = () => import('@/views/Profile.vue')
 
 const routes = [
   // ==================== Auth Routes ====================
@@ -214,6 +215,12 @@ const routes = [
         name: 'locations',
         component: Locations,
         meta: { title: 'locations.title', roles: ['admin'] }
+      },
+      {
+        path: 'profile',
+        name: 'profile',
+        component: Profile,
+        meta: { title: 'profile.title' }
       },
 
       // ==================== Default Redirect ====================
