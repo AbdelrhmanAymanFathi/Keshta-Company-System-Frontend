@@ -40,36 +40,20 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input
-                        v-model="filters.commonItemSearch"
-                        @focus="filters.showCommonItemDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonItemDropdown')"
-                        @keydown="onDropdownKeydown($event, 'highlightedCommonItemIndex', filteredCommonItems, selectCommonItem)"
-                        type="text"
-                        :placeholder="$t('labels.item')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                      />
-                      <div
-                        v-if="filters.showCommonItemDropdown && filteredCommonItems.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
-                      >
-                        <div
-                          v-for="(item, i) in filteredCommonItems"
-                          :key="item.id"
-                          @mousedown.prevent="selectCommonItem(item)"
-                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonItemIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
-                        >
-                          {{ item.name }}
-                        </div>
-                        <div
-                          @click="showAddItemDialog = true; filters.showCommonItemDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
-                        >
-                          + {{ $t('labels.addNew') }}
-                        </div>
-                      </div>
+                      <SearchDropdown v-model:modelValue="filters.commonItemSearch" :items="items" :all-items="items"
+                        :placeholder="$t('labels.item')" :itemKey="'id'" :itemLabel="'name'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="selectCommonItem">
+                        <template #prefix>
+                          <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @mousedown.prevent="showAddItemDialog = true"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -81,36 +65,20 @@
                     </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input
-                        v-model="filters.commonFromLocSearch"
-                        @focus="filters.showCommonFromLocDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonFromLocDropdown')"
-                        @keydown="onDropdownKeydown($event, 'highlightedCommonFromLocIndex', filteredCommonFromLocs, (sel) => { commonData.location = sel; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = sel.name + (sel.parentName ? ' (' + sel.parentName + ')' : ''); filters.showCommonFromLocDropdown = false })"
-                        type="text"
-                        :placeholder="$t('transport.fromLocation')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                      />
-                      <div
-                        v-if="filters.showCommonFromLocDropdown && filteredCommonFromLocs.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
-                      >
-                        <div
-                          v-for="(loc, i) in filteredCommonFromLocs"
-                          :key="loc.id"
-                          @mousedown.prevent="(function(){ commonData.location = loc; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = loc.name + (loc.parentName ? ' (' + loc.parentName + ')' : ''); filters.showCommonFromLocDropdown = false })()"
-                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonFromLocIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
-                        >
-                          {{ loc.name }}
-                        </div>
-                        <div
-                          @click="pendingField = 'location'; showAddLocation = true; filters.showCommonFromLocDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
-                        >
-                          + {{ $t('supply.addSite') }}
-                        </div>
-                      </div>
+                      <SearchDropdown v-model:modelValue="filters.commonFromLocSearch" :items="locations"
+                        :placeholder="$t('transport.location')" :itemKey="'id'" :itemLabel="locLabel"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { commonData.location = sel; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = sel.name + (sel.parentName ? ' (' + sel.parentName + ')' : ''); }">
+                        <template #prefix>
+                          <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @mousedown.prevent="(function(){ pendingField = 'location'; showAddLocation = true })()"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
+                            + {{ $t('supply.addSite') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -122,36 +90,20 @@
                     </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input
-                        v-model="filters.commonToLocSearch"
-                        @focus="filters.showCommonToLocDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonToLocDropdown')"
-                        @keydown="onDropdownKeydown($event, 'highlightedCommonToLocIndex', filteredCommonToLocs, (sel) => { commonData.area = sel; filters.commonToLocSearch = sel.name ; filters.showCommonToLocDropdown = false; try{ saveCommonDataToStorage() }catch(e){} })"
-                        type="text"
-                        :placeholder="$t('transport.toLocation')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                      />
-                      <div
-                        v-if="filters.showCommonToLocDropdown && filteredCommonToLocs.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
-                      >
-                        <div
-                          v-for="(loc, i) in filteredCommonToLocs"
-                          :key="loc.id"
-                          @mousedown.prevent="(function(){ commonData.area = loc; filters.commonToLocSearch = loc.name; filters.showCommonToLocDropdown = false; try{ saveCommonDataToStorage() }catch(e){} })()"
-                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonToLocIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
-                        >
-                          {{ loc.name }}
-                        </div>
-                        <div
-                          @click="pendingField = 'area'; showAddLocation = true; filters.showCommonToLocDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
-                        >
-                          + {{ $t('supply.addSite') }}
-                        </div>
-                      </div>
+                      <SearchDropdown v-model:modelValue="filters.commonToLocSearch" :items="(commonData.location?.children && Array.isArray(commonData.location.children)) ? commonData.location.children : []"
+                        :placeholder="$t('transport.area')" :itemKey="'id'" :itemLabel="'name'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { commonData.area = sel; filters.commonToLocSearch = sel.name; try{ saveCommonDataToStorage() }catch(e){} }">
+                        <template #prefix>
+                          <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @mousedown.prevent="(function(){ pendingField = 'area'; showAddLocation = true })()"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
+                            + {{ $t('supply.addSite') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
                   </div>
                 </div>
@@ -163,37 +115,63 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input
-                        v-model="filters.commonContractorSearch"
-                        @focus="filters.showCommonContractorDropdown = true"
-                        @blur="closeDropdownDelayed('showCommonContractorDropdown')"
-                        @keydown="onDropdownKeydown($event, 'highlightedCommonContractorIndex', filteredCommonContractors, (sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; filters.showCommonContractorDropdown = false })"
-                        type="text"
-                        :placeholder="$t('transport.contractor')"
-                        class="w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                      />
-                      <div
-                        v-if="filters.showCommonContractorDropdown && filteredCommonContractors.length"
-                        class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
-                      >
-                        <div
-                          v-for="(contractor, i) in filteredCommonContractors"
-                          :key="contractor.id"
-                          @mousedown.prevent="(function(){ commonData.contractor = contractor; filters.commonContractorSearch = contractor.name; filters.showCommonContractorDropdown = false })()"
-                          :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0', i === highlightedCommonContractorIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']"
-                        >
-                          {{ contractor.name }}
-                        </div>
-                        <div
-                          @click="showAddContractorDialog = true; filters.showCommonContractorDropdown = false"
-                          style="color: #10b981;"
-                          class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
-                        >
-                          + {{ $t('labels.addNew') }}
-                        </div>
-                      </div>
+                      <SearchDropdown v-model:modelValue="filters.commonContractorSearch" :items="contractors"
+                        :placeholder="$t('transport.contractor')" :itemKey="'id'" :itemLabel="'name'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="selectCommonContractor">
+                        <template #prefix>
+                          <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @mousedown.prevent="showAddContractorDialog = true"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Vehicle (moved to header) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.vehicle') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <SearchDropdown v-model:modelValue="filters.commonVehicleSearch" :items="filteredCommonVehicles"
+                        :all-items="vehicles" :placeholder="$t('labels.vehicle')" :itemKey="'id'" :itemLabel="'name'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="selectCommonVehicle">
+                        <template #prefix>
+                          <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @mousedown.prevent="showAddVehicleDialog = true"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
+                            + {{ $t('labels.addNew') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Vehicle Company Capacity (header) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('transport.vehicleCapacity') }}
+                  </label>
+                  <div class="relative">
+                    <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <input
+                      type="number"
+                      v-model.number="vehicleCompanyCapacity"
+                      step="0.01"
+                      min="0"
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                    />
                   </div>
                 </div>
 
@@ -302,6 +280,14 @@
                   <dt class="font-semibold text-gray-700">{{ $t('transport.contractor') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                 </div>
+                  <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-700">{{ $t('labels.vehicle') }}:</dt>
+                    <dd class="text-gray-900 mt-1">{{ commonData.vehicle?.name || '-' }}</dd>
+                  </div>
+                  <div class="flex flex-col">
+                    <dt class="font-semibold text-gray-700">{{ $t('transport.vehicleCapacity') }}:</dt>
+                    <dd class="text-gray-900 mt-1">{{ formatNumber(vehicleCompanyCapacity || commonData.vehicle?.companyCapacity) }}</dd>
+                  </div>
                 <!-- Distance is shown per-row now -->
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('transport.firstKmPrice') }}:</dt>
@@ -327,14 +313,10 @@
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
                         {{ $t('transport.date') || 'Date' }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
-                        {{ $t('labels.vehicle') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
-                        {{ $t('labels.discount') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
-                        {{ $t('transport.vehicleCapacity') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
-                        {{ $t('transport.count') || 'Count' }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                          {{ $t('labels.discount') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                          {{ $t('transport.count') || 'Count' }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
                         {{ $t('transport.distanceKm') || 'Distance (Km)' }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
@@ -352,50 +334,9 @@
                           @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm" />
                       </td>
-                      <!-- Vehicle -->
-                      <td class="px-3 py-2" :ref="el => row.vehicleCell = el">
-                        <div class="relative">
-                          <div
-                            class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
-                            @mousedown.prevent="toggleVehicleDropdown(row)">
-                            <input v-model="row.search" type="text"
-                              :placeholder="row.vehicle?.name || $t('labels.vehicle')"
-                              class="outline-none flex-1 text-sm bg-transparent"
-                              @keydown.enter.prevent
-                              @keydown.escape="row.open = false"
-                              @keydown="onDropdownKeydown($event, row, filteredVehicles(row), (sel) => selectVehicle(row, sel))"
-                              @mousedown.prevent=""
-                              @focus="row.open = true"
-                              @blur="handleVehicleBlur(row)" />
-                            <span class="text-gray-400">▾</span>
-                          </div>
-                        </div>
-                        <!-- Dropdown (Teleported to Modal) -->
-                        <teleport to=".modal-body-container" v-if="row.open">
-                          <div
-                            class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
-                            :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
-                            <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id" @mousedown.prevent="selectVehicle(row, v)"
-                              @mousemove="row.highlightedVehicleIndex = vi"
-                              :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
-                              {{ v.name }} {{ v.company ? `- ${v.company}` : '' }} {{ v.crusherNumber ? `(${v.crusherNumber})` : '' }}
-                            </div>
-                            <div @click="showAddVehicleDialog = true; row.open = false"
-                              class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
-                              + {{ $t('labels.addNew') }}
-                            </div>
-                          </div>
-                        </teleport>
-                      </td>
                       <!-- Discount -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.discount" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
-                      </td>
-                      <!-- Company Capacity -->
-                      <td class="px-3 py-2">
-                        <input type="number" v-model.number="row.companyCapacity" step="0.01"
                           @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
@@ -559,6 +500,7 @@
 <script>
 import {
   createTransport,
+  updateTransport,
   getContractors,
   getContractorsWithVehicles,
   createContractor,
@@ -578,6 +520,7 @@ import {
   CheckIcon,
   ArrowRightIcon
 } from '@heroicons/vue/24/outline'
+import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 
 export default {
   name: 'TransportModal',
@@ -591,6 +534,7 @@ export default {
     TrashIcon,
     CheckIcon,
     ArrowRightIcon
+    ,SearchDropdown
   },
   props: {
     isOpen: {
@@ -614,6 +558,7 @@ export default {
         date: '',
         item: null,
         location: null,
+        vehicle: null,
         area: null,
         contractor: null,
         distanceKm: 0,
@@ -629,7 +574,7 @@ export default {
       vehicles: [],
       saveError: '',
       locationError: '',
-      contractorDialogError: '',
+        vehicleCompanyCapacity: 0,
       vehicleDialogError: '',
       itemDialogError: '',
       showAddLocation: false,
@@ -660,6 +605,7 @@ export default {
       highlightedCommonFromLocIndex: -1,
       highlightedCommonToLocIndex: -1,
       highlightedCommonContractorIndex: -1,
+      highlightedCommonVehicleIndex: -1,
       filters: {
         commonItemSearch: '',
         showCommonItemDropdown: false,
@@ -669,6 +615,8 @@ export default {
         showCommonToLocDropdown: false,
         commonContractorSearch: '',
         showCommonContractorDropdown: false
+        ,commonVehicleSearch: '',
+        showCommonVehicleDropdown: false
       }
     }
   },
@@ -712,6 +660,17 @@ export default {
         c.name.toLowerCase().includes(this.filters.commonContractorSearch.toLowerCase())
       )
     },
+    filteredCommonVehicles() {
+      const q = (this.filters.commonVehicleSearch || '').toLowerCase()
+      let list = []
+      if (this.commonData.contractor?.id) {
+        list = this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id))
+      } else {
+        list = [...this.vehicles]
+      }
+      if (!q) return list
+      return list.filter(v => (v.name || '').toLowerCase().includes(q))
+    },
     subtotal() {
       return this.rows.reduce((sum, row) => sum + this.perTripBeforeDiscount(row), 0)
     },
@@ -754,6 +713,10 @@ export default {
     }
   },
   methods: {
+    locLabel(loc) {
+      if (!loc) return ''
+      return loc.name + (loc.parentName ? ` (${loc.parentName})` : '')
+    },
     handleGlobalClick(e) {
       const isClickInTable = e.target.closest('table') || e.target.closest('thead') || e.target.closest('tbody')
       const isClickInDropdown = e.target.closest('.dropdown-container') // add class="dropdown-container" to your dropdown div
@@ -801,6 +764,7 @@ export default {
       return this.commonData.item &&
         this.commonData.location &&
         this.commonData.area &&
+        this.commonData.vehicle &&
         this.commonData.contractor &&
         (this.commonData.firstKmPrice > 0 || this.commonData.perKmPrice > 0)
     },
@@ -854,12 +818,31 @@ export default {
             if (this.commonData.location) this.filters.commonFromLocSearch = this.commonData.location.name
           }
           if (data.area?.id) {
-            this.commonData.area = this.locations.find(l => l.id === data.area.id) || null
+            // Prefer searching within the selected location's children, fallback to global lookup
+            let found = null
+            if (this.commonData.location) {
+              if (Array.isArray(this.commonData.location.children) && this.commonData.location.children.length) {
+                found = this.commonData.location.children.find(c => c.id === data.area.id) || null
+              }
+            }
+            if (!found) {
+              found = this.locations.find(l => l.id === data.area.id) || null
+            }
+            this.commonData.area = found
+            console.log('Loaded area from storage:', data.area, 'Matched area:', this.commonData.area)
             if (this.commonData.area) this.filters.commonToLocSearch = this.commonData.area.name
           }
           if (data.contractor?.id) {
             this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
             if (this.commonData.contractor) this.filters.commonContractorSearch = this.commonData.contractor.name
+          }
+          if (data.vehicle?.id) {
+            this.commonData.vehicle = this.vehicles.find(v => v.id === data.vehicle.id) || null
+            if (this.commonData.vehicle) this.filters.commonVehicleSearch = this.commonData.vehicle.name
+          }
+          // load persisted vehicle company capacity if present
+          if (typeof data.vehicleCompanyCapacity !== 'undefined') {
+            this.vehicleCompanyCapacity = Number(data.vehicleCompanyCapacity || 0)
           }
           this.commonData.distanceKm = data.distanceKm || 0
           this.commonData.firstKmPrice = data.firstKmPrice || 0
@@ -878,10 +861,12 @@ export default {
           location: this.commonData.location ? { id: this.commonData.location.id, name: this.commonData.location.name } : null,
           area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
           contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
+          vehicle: this.commonData.vehicle ? { id: this.commonData.vehicle.id, name: this.commonData.vehicle.name } : null,
           distanceKm: this.commonData.distanceKm,
           firstKmPrice: this.commonData.firstKmPrice,
           perKmPrice: this.commonData.perKmPrice,
-          notes: this.commonData.notes
+          notes: this.commonData.notes,
+          vehicleCompanyCapacity: this.vehicleCompanyCapacity
         }
         localStorage.setItem('transportCreationModalCommonData', JSON.stringify(data))
       } catch (err) {
@@ -908,12 +893,11 @@ export default {
         date: this.commonData.date || new Date().toISOString().split('T')[0],
         highlightedVehicleIndex: -1
       }
-      if (this.commonData.contractor?.id) {
-        const cv = this.contractorsWithVehicles.find(c => c.id === this.commonData.contractor.id)
-        row.availableVehicles = cv?.vehicles || this.vehicles.filter(v => v.contractorId === this.commonData.contractor.id)
-      } else {
-        row.availableVehicles = [...this.vehicles]
-      }
+      // rows inherit the header-selected vehicle by default
+      row.vehicle = this.commonData.vehicle || null
+      // default companyCapacity for row comes from selected header vehicle capacity
+      row.companyCapacity = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
+      row.availableVehicles = this.commonData.contractor?.id ? this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id)) : [...this.vehicles]
       return row
     },
     addRow() {
@@ -1020,8 +1004,10 @@ export default {
     perTripBeforeDiscount(row) {
       const distance = Number(row.distanceKm || 0)
       const base = this.commonData.firstKmPrice + Math.max(0, (distance - 1)) * this.commonData.perKmPrice
+      // Prefer per-row companyCapacity, otherwise fall back to header vehicleCompanyCapacity or the selected vehicle's capacity
+      const capacity = Number(row.companyCapacity || this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
       // include the row count so subtotal reflects multiple trips
-      return base * (row.companyCapacity || 0) * (row.count || 1)
+      return base * capacity * (row.count || 1)
     },
     totalPerRow(row) {
       return Math.max(0, this.perTripBeforeDiscount(row) - (row.discount || 0))
@@ -1094,13 +1080,19 @@ export default {
         const extractArray = (res) => Array.isArray(res?.data) ? res.data : (res?.data?.items || res?.data?.data || [])
         this.contractors = extractArray(cRes)
         this.contractorsWithVehicles = extractArray(cvRes)
-        // Extract vehicles from contractorsWithVehicles
+        // Extract vehicles from contractorsWithVehicles and attach contractorId
         this.vehicles = this.contractorsWithVehicles.reduce((acc, c) => {
-          if (Array.isArray(c.vehicles)) acc.push(...c.vehicles)
+          if (Array.isArray(c.vehicles)) {
+            acc.push(...c.vehicles.map(v => ({ ...v, contractorId: c.id })))
+          }
           return acc
         }, [])
         console.log('Processed contractors:', this.contractors.length)
         console.log('Processed vehicles:', this.vehicles.length)
+        // update rows' available vehicles if any
+        this.rows.forEach(r => {
+          r.availableVehicles = this.commonData.contractor?.id ? this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id)) : [...this.vehicles]
+        })
       } catch (err) {
         console.error('loadLookups failed:', err)
       }
@@ -1188,57 +1180,61 @@ export default {
     async saveData() {
       this.saveError = ''
       this.isSaving = true
-      const toSave = this.rows.filter(r => r.vehicle && r.companyCapacity > 0)
-      if (!toSave.length) {
+      const toSave = this.rows.filter(r => (Number(r.count) > 0 || Number(r.distanceKm) > 0))
+      const totalTrips = toSave.reduce((s, r) => s + (Number(r.count) || 0), 0)
+      if (!toSave.length || totalTrips <= 0) {
         this.saveError = this.$t('common.noData') || 'No data to save'
         this.isSaving = false
         return
       }
+
+      // validate parent location/area
+      const locId = this.commonData.location?.id ?? null
+      const areaId = this.commonData.area?.id ?? null
+      if (!locId || !areaId) {
+        this.saveError = this.$t('common.missingLocationOrArea') || 'Location and area are required'
+        this.isSaving = false
+        return
+      }
+
       try {
-        for (const r of toSave) {
-          const tripCount = Number(r.count) || 1
-          const tripDistance = Number(r.distanceKm || 0)
+          // Aggregate rows into single payload matching current API format
+          const totalDiscount = toSave.reduce((s, r) => s + (Number(r.discount) || 0), 0)
+          // weighted average distance per trip
+          const weightedDistSum = toSave.reduce((s, r) => s + (Number(r.distanceKm || 0) * (Number(r.count) || 1)), 0)
+          const distanceKm = totalTrips > 0 ? (weightedDistSum / totalTrips) : 0
+          const capacityForPayload = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
 
-          // Backend expects `location` and `area` as strings — send IDs as strings and validate presence
-          const locId = this.commonData.location?.id ?? null
-          const areaId = this.commonData.area?.id ?? null
-          if (!locId || !areaId) {
-            this.saveError = this.$t('common.missingLocationOrArea') || 'Location and area are required'
-            this.isSaving = false
-            return
-          }
-
-          await createTransport({
-            date: r.date || this.commonData.date,
+          const payload = {
+            date: this.commonData.date,
             contractorId: this.commonData.contractor?.id || null,
-            itemId: this.commonData.item?.id || null,
-            // include both the legacy id fields and the string fields the API expects
-            locationId: locId,
-            areaId: areaId,
-            location: String(locId),
-            area: String(areaId),
-            numTrips: tripCount,
-            distanceKm: tripDistance,
-            vehicleId: r.vehicle?.id || null,
-            companyCapacity: r.companyCapacity || 0,
-            notes: this.commonData.notes || '',
+            numTrips: totalTrips,
+            distanceKm: Number(distanceKm.toFixed(3)),
+            discount: Number(totalDiscount || 0),
             pricing: {
               firstKm: 1,
-              firstKmPrice: this.commonData.firstKmPrice || 0,
-              perKmPrice: this.commonData.perKmPrice || 0
+              firstKmPrice: Number(this.commonData.firstKmPrice || 0),
+              perKmPrice: Number(this.commonData.perKmPrice || 0)
             },
-            discount: r.discount || 0,
-            // variable data for the second stage
-            data: {
-              count: tripCount,
-              distanceKm: tripDistance
-            }
-          })
-        }
+            vehicleId: this.commonData.vehicle?.id || null,
+            locationId: locId,
+            areaId: areaId,
+            itemId: this.commonData.item?.id || null,
+            notes: this.commonData.notes || '',
+            vehicleCompanyCapacity: Number(capacityForPayload || 0)
+          }
+
+          if (this.transport && this.transport.id) {
+            await updateTransport(this.transport.id, payload)
+          } else {
+            await createTransport(payload)
+          }
+
         this.saveCommonDataToStorage()
         this.$emit('saved')
         this.closeModal()
       } catch (err) {
+        console.error('Transport save error', err)
         this.saveError = err?.response?.data?.message || this.$t('common.saveError')
       } finally {
         this.isSaving = false
@@ -1259,6 +1255,10 @@ export default {
         // For edit: populate a single row containing the transport's counts/distance
         this.currentStep = 2
         const vehicle = this.vehicles.find(v => v.id === this.transport.vehicleId)
+        this.commonData.vehicle = vehicle || null
+        this.filters.commonVehicleSearch = vehicle?.name || ''
+        // set header-level vehicle capacity for editing
+        this.vehicleCompanyCapacity = Number(vehicle?.companyCapacity || 0)
         const row = this.createEmptyRow()
         row.vehicle = vehicle
         row.search = vehicle?.name || ''
@@ -1274,6 +1274,36 @@ export default {
       this.commonData.item = item
       this.filters.commonItemSearch = item.name
       this.filters.showCommonItemDropdown = false
+    }
+    ,
+    selectCommonContractor(sel) {
+      this.commonData.contractor = sel
+      this.filters.commonContractorSearch = sel?.name || ''
+      // clear vehicle selection when contractor changes
+      this.commonData.vehicle = null
+      this.filters.commonVehicleSearch = ''
+      // clear header vehicle capacity when contractor changes
+      this.vehicleCompanyCapacity = 0
+      // update available vehicles for each row and clear row vehicle
+      this.rows.forEach(r => {
+        r.availableVehicles = this.vehicles.filter(v => Number(v.contractorId) === Number(sel.id))
+        r.vehicle = null
+      })
+      this.filters.showCommonContractorDropdown = false
+    }
+    ,
+    selectCommonVehicle(item) {
+      this.commonData.vehicle = item
+      this.filters.commonVehicleSearch = item?.name || ''
+      this.filters.showCommonVehicleDropdown = false
+      // ensure existing rows reflect the selected vehicle
+      // set header-level company capacity and propagate to rows
+      this.vehicleCompanyCapacity = Number(item?.companyCapacity || 0)
+      this.rows.forEach(r => {
+        r.vehicle = item
+        r.companyCapacity = Number(this.vehicleCompanyCapacity || item?.companyCapacity || 0)
+      })
+      try { this.saveCommonDataToStorage() } catch (e) { console.warn(e) }
     }
   },
   mounted() {

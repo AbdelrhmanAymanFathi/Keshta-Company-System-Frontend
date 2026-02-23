@@ -327,8 +327,22 @@ export const getContractorWallet = (contractorId) =>
 export const getContractorWalletHistory = (contractorId) =>
   axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/history`);
 
+// New: fetch paginated contractor wallet transactions with filters
+export const getContractorWalletTransactions = (contractorId, params = {}) => {
+  const { page = 1, pageSize = 20, start = '', end = '', type = '' } = params
+  const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
+  if (start) q.append('start', start)
+  if (end) q.append('end', end)
+  if (type) q.append('type', type)
+  return axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/transactions?${q.toString()}`)
+}
+
 export const depositToContractorWallet = (contractorId, data) =>
   axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
+
+// Record an advance (deposit or withdrawal) for a contractor's wallet
+export const advanceContractorWallet = (contractorId, data) =>
+  axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/advance`, data);
 
 // Contractor Report/Statement
 export const getContractorReportData = async (contractorId, params = {}, format = 'json', mode = null) => {
@@ -371,6 +385,28 @@ export const getContractorReportData = async (contractorId, params = {}, format 
 export const downloadContractorReport = async (contractorId, params = {}, format = 'xlsx') => {
   return getContractorReportData(contractorId, params, format);
 };
+
+// === Report Definitions (Dynamic Reports) ===
+export const getReportDefs = (params = {}) => {
+  const { page = 1, pageSize = 100, q = '' } = params
+  const query = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
+  if (q) query.append('q', q)
+  return axios.get(`${BASE_URL}/api/report-defs?${query.toString()}`)
+}
+export const getReportDef = (id) => axios.get(`${BASE_URL}/api/report-defs/${id}`)
+export const createReportDef = (data) => axios.post(`${BASE_URL}/api/report-defs`, data)
+export const updateReportDef = (id, data) => axios.put(`${BASE_URL}/api/report-defs/${id}`, data)
+export const deleteReportDef = (id) => axios.delete(`${BASE_URL}/api/report-defs/${id}`)
+// Fetch available report modules (returns { modules: [...] })
+export const getReportModules = () => axios.get(`${BASE_URL}/api/report-defs/modules`)
+
+export const getReportParamOptions = (id, paramName, q = '') => {
+  const qs = new URLSearchParams()
+  if (q) qs.append('q', q)
+  return axios.get(`${BASE_URL}/api/report-defs/${id}/params/options?param=${encodeURIComponent(paramName)}${qs.toString() ? `&${qs.toString()}` : ''}`)
+}
+
+export const executeReport = (id, body) => axios.post(`${BASE_URL}/api/report-defs/${id}/execute`, body)
 
 // === TOTP (2FA) ===
 export const startTotpRegister = (data = {}) =>
@@ -549,8 +585,6 @@ export const getDeliveries = (params = {}) => {
   return axios.get(`${BASE_URL}/api/exports?${queryParams.toString()}`);
 };
 
-export const createExport = (data) =>
-  axios.post(`${BASE_URL}/api/exports`, data);
 
 export const deleteDelivery = (id) =>
   axios.delete(`${BASE_URL}/api/exports/${id}`);
@@ -619,10 +653,25 @@ export const getTransports = (params = {}) => {
 };
 export const getTransport = (id) =>
   axios.get(`${BASE_URL}/api/transports/${id}`);
-export const createTransport = (data) =>
-  axios.post(`${BASE_URL}/api/transports`, data);
-export const updateTransport = (id, data) =>
-  axios.patch(`${BASE_URL}/api/transports/${id}`, data);
+// Sanitize transport payloads to the new flat model (remove legacy lines/flags)
+function sanitizeTransportPayload(payload = {}) {
+  const p = { ...payload };
+  delete p.transportLines;
+  delete p.paid;
+  delete p.unpaid;
+  delete p.total; // server computes total/rate
+  return p;
+}
+
+export const createTransport = (data) => {
+  const payload = sanitizeTransportPayload(data);
+  return axios.post(`${BASE_URL}/api/transports`, payload);
+}
+
+export const updateTransport = (id, data) => {
+  const payload = sanitizeTransportPayload(data);
+  return axios.patch(`${BASE_URL}/api/transports/${id}`, payload);
+}
 export const deleteTransport = (id) =>
   axios.delete(`${BASE_URL}/api/transports/${id}`);
 
@@ -1099,6 +1148,84 @@ export const getTransportById = (id) =>
   axios.get(`${BASE_URL}/api/transports/${id}`);
 
 // --- Export Items API ---
+// Exports (parent entity with lines)
+export const getExports = (params = {}) => {
+  const {
+    page = 1,
+    pageSize = 20,
+    q = '',
+    startDate = '',
+    endDate = '',
+    contractorId = '',
+    locationId = '',
+    areaId = '',
+    itemId = '',
+    vehicleId = ''
+  } = params;
+
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+
+  if (q) queryParams.append('q', q);
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (contractorId !== undefined && contractorId !== null && contractorId !== '') queryParams.append('contractorId', contractorId.toString());
+  if (locationId !== undefined && locationId !== null && locationId !== '') queryParams.append('locationId', locationId.toString());
+  if (areaId !== undefined && areaId !== null && areaId !== '') queryParams.append('areaId', areaId.toString());
+  if (itemId !== undefined && itemId !== null && itemId !== '') queryParams.append('itemId', itemId.toString());
+  if (vehicleId !== undefined && vehicleId !== null && vehicleId !== '') queryParams.append('vehicleId', vehicleId.toString());
+
+  return axios.get(`${BASE_URL}/api/exports?${queryParams.toString()}`);
+};
+
+export const getExport = (id) =>
+  axios.get(`${BASE_URL}/api/exports/${id}`);
+
+// Sanitize export payloads to the new flat shape expected by the server
+function sanitizeExportPayload(payload = {}) {
+  const p = { ...payload };
+  // Remove line-based fields and payment flags that backend no longer expects
+  delete p.exportLines;
+  delete p.paid;
+  delete p.unpaid;
+  delete p.total; // server computes total
+  return p;
+}
+
+export const createExport = (data) => {
+  const payload = sanitizeExportPayload(data);
+  return axios.post(`${BASE_URL}/api/exports`, payload);
+}
+
+export const updateExport = (id, data) => {
+  const payload = sanitizeExportPayload(data);
+  return axios.put(`${BASE_URL}/api/exports/${id}`, payload);
+}
+
+export const deleteExport = (id) =>
+  axios.delete(`${BASE_URL}/api/exports/${id}`);
+
+export const restoreExport = (id) =>
+  axios.post(`${BASE_URL}/api/exports/${id}/restore`);
+
+// Payments
+export const createPayment = (data = {}) =>
+  axios.post(`${BASE_URL}/api/payments`, data);
+
+export const getPayments = (params = {}) => {
+  const query = new URLSearchParams();
+  if (params.exportId) query.append('exportId', params.exportId);
+  if (params.transportId) query.append('transportId', params.transportId);
+  const q = query.toString();
+  return axios.get(`${BASE_URL}/api/payments${q ? `?${q}` : ''}`);
+};
+// Fetch payments for a specific export (document-level endpoint)
+export const getExportPayments = (exportId) => {
+  if (!exportId) return Promise.resolve({ data: [] });
+  return axios.get(`${BASE_URL}/api/exports/${exportId}/payments`);
+};
 export const getExportItems = (params = {}) => {
   const search = new URLSearchParams(params).toString();
   const url = `${BASE_URL}/api/items${search ? `?${search}` : ''}`;

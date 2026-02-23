@@ -130,6 +130,21 @@
             </button>
           </li>
         </ul>
+
+        <!-- Module Reports (filtered) -->
+        <div v-if="reportsForModule && reportsForModule.length" class="mt-4">
+          <h4 class="px-4 text-xs uppercase text-gray-500 tracking-wide">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
+          <ul class="mt-2 space-y-1 px-2">
+            <li v-for="r in reportsForModule" :key="r.id">
+              <button @click="openReport(r.id)" class="w-full text-left px-3 py-2 rounded text-sm hover:bg-gray-100 flex items-center gap-3">
+                <div class="w-4 h-4 text-indigo-600">
+                  <svg class="w-4 h-4 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6M9 16h6M12 8v8"/></svg>
+                </div>
+                <span class="truncate">{{ r.title }}</span>
+              </button>
+            </li>
+          </ul>
+        </div>
       </aside>
 
       <!-- Mobile Overlay -->
@@ -152,6 +167,7 @@
 import AuthLogout from '@/components/auth/Logout.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
+import { getReportDefs } from '@/api'
 
 export default {
   name: 'DashboardLayout',
@@ -199,14 +215,16 @@ export default {
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
           { name: 'usersList', label: 'users.title', routeName: 'users-list' },
-          { name: 'locations', label: 'locations.title', routeName: 'locations' }
+          { name: 'locations', label: 'locations.title', routeName: 'locations' },
+          { name: 'reportsList', label: 'Reports', routeName: 'admin-reports-list' }
         ]
       },
       sidebarOpen: false,
       collapsedSidebar: JSON.parse(localStorage.getItem('sidebarCollapsed') || 'false'),
       showLogoutDialog: false,
       userMenuOpen: false,
-      isMobile: window.innerWidth < 640
+      isMobile: window.innerWidth < 640,
+      reports: []
     }
   },
   computed: {
@@ -251,6 +269,10 @@ export default {
       }
       return menu
     },
+    reportsForModule() {
+      if (!this.reports || !this.selectedTop) return []
+      return this.reports.filter(r => String(r.module || '').toLowerCase() === String(this.selectedTop || '').toLowerCase())
+    },
     currentRouteName() { return this.$route.name || '' },
     currentItem() {
       const routeName = this.currentRouteName
@@ -267,7 +289,7 @@ export default {
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const rentalsRoutes = ['rentals-list', 'rentals-report']
       const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
-      const adminRoutes = ['changes-by-date', 'users-list', 'locations']
+      const adminRoutes = ['changes-by-date', 'users-list', 'locations', 'admin-reports-list', 'admin-reports-edit']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
       if (rentalsRoutes.includes(routeName)) return 'equipmentRent'
@@ -355,12 +377,28 @@ export default {
         this.sidebarOpen = false
       }
     }
+    ,
+    async loadReports() {
+      try {
+        const res = await getReportDefs()
+        this.reports = res?.data || []
+      } catch (err) {
+        console.error('Failed to load reports', err)
+        this.reports = []
+      }
+    },
+    openReport(reportId) {
+      // navigate to the dedicated report run page with the report id
+      this.router.push({ name: 'admin-reports-run', params: { id: reportId } })
+      if (this.isMobile) this.sidebarOpen = false
+    }
   },
   mounted() {
     document.documentElement.lang = this.$i18n.locale || 'en'
     document.documentElement.dir = this.isRTL ? 'rtl' : 'ltr'
     window.addEventListener('resize', this.onResize)
     this.onResize()
+    this.loadReports()
     document.addEventListener('click', (e) => {
       if (!this.$el.querySelector('.relative')?.contains(e.target)) this.userMenuOpen = false
     })

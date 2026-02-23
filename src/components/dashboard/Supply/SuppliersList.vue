@@ -54,7 +54,11 @@
             @contextmenu.prevent="openContextMenu($event, c)"
           >
             <td class="px-6 py-4 text-sm text-indigo-800" :class="textAlign">{{ idx + 1 }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">
+              <button @click.stop="goToDetail(c)" class="text-indigo-600 hover:underline">
+                {{ c.name }}
+              </button>
+            </td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.accountNumber || '-' }}</td>
@@ -104,7 +108,11 @@
       >
         <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
           <div :class="isRTL ? 'text-right' : 'text-left'">
-            <div class="font-semibold text-gray-900">{{ c.name }}</div>
+            <div class="font-semibold text-gray-900">
+              <button @click.stop="goToDetail(c)" class="text-indigo-600 hover:underline text-left">
+                {{ c.name }}
+              </button>
+            </div>
             <div class="text-sm text-gray-500">
               {{ c.phone || '-' }}<br>
               <span v-if="c.bankName">{{ $t('suppliers.bankName') }}: {{ c.bankName }}</span><br>
@@ -621,6 +629,13 @@ export default {
       if (action === 'wallet') this.openWallet(c)
       if (action === 'statement') this.openStatement(c)
       this.closeContextMenu()
+    }
+    ,
+    goToDetail(c) {
+      if (!c || !c.id) return
+      // Navigate to an existing contractor detail/statement route depending on the current mode
+      // Navigate to the dedicated ContractorDetail view
+      this.$router.push({ name: 'contractor-detail', params: { id: c.id } }).catch(() => {})
     }
   }
 }

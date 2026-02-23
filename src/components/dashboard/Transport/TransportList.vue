@@ -216,6 +216,12 @@
                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
+                <button @click.stop="openPaymentModal('transport', transport.id)" class="text-green-600 hover:text-green-900"
+                  :title="$t('labels.addPayment')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
+                  </svg>
+                </button>
                 <button @click.stop="confirmDelete(transport)" class="text-red-600 hover:text-red-900"
                   :title="$t('common.delete')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,6 +270,8 @@
       @close="closeModal"
       @saved="handleTransportSaved"
     />
+    <PaymentModal v-if="showPaymentModal" :visible="showPaymentModal" :parentType="paymentTarget.type"
+      :parentId="paymentTarget.id" @close="showPaymentModal = false" @saved="handlePaymentSaved" />
   </div>
 </template>
 
@@ -272,6 +280,7 @@ import { getTransports, deleteTransport, getContractors, getLocations, getItems,
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import TransportModal from './TransportCreationModal.vue'
+import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 
 export default {
@@ -280,7 +289,8 @@ export default {
   components: {
     Pagination,
     TransportModal,
-    SearchDropdown
+    SearchDropdown,
+    PaymentModal
   },
 
   data() {
@@ -302,6 +312,8 @@ export default {
       locations: [],
       items: [],
       vehicles: [],
+      showPaymentModal: false,
+      paymentTarget: { type: null, id: null },
       filters: {
         startDate: '',
         endDate: '',
@@ -587,6 +599,17 @@ export default {
         alert(this.$t('common.deleteError') || 'Failed to delete')
       }
     }
+    ,
+    openPaymentModal(type, id) {
+      this.paymentTarget = { type, id }
+      this.showPaymentModal = true
+    },
+    async handlePaymentSaved() {
+      // refresh list after payment
+      this.showPaymentModal = false
+      await this.loadTransports()
+      this.$toast?.success(this.$t('labels.paymentSaved') || 'Payment saved')
+    },
   }
 }
 </script>

@@ -48,9 +48,15 @@
     <!-- Add/Edit Modal -->
     <div v-if="showModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div class="bg-white rounded-md shadow p-6 w-full max-w-md">
-        <h3 class="text-lg font-bold mb-4">{{ editing ? ($t('labels.edit') || 'Edit') : ($t('labels.add') || 'Add') }}</h3>
+        <h3 class="text-lg font-bold mb-4">
+          {{
+            editing
+              ? (form.parentId ? ($t('locations.editArea') || 'Edit Area') : ($t('locations.editLocation') || 'Edit Location'))
+              : (form.parentId ? ($t('locations.addArea') || 'Add Area') : ($t('locations.addLocation') || 'Add Location'))
+          }}
+        </h3>
         <div class="mb-4">
-          <label class="block text-sm text-gray-700 mb-1">{{ $t('locations.locationName') || 'Name' }}</label>
+          <label class="block text-sm text-gray-700 mb-1">{{ $t(form.parentId ? 'locations.areaName' : 'locations.locationName') || (form.parentId ? 'Area' : 'Name') }}</label>
           <input v-model="form.name" class="w-full border rounded px-3 py-2" />
         </div>
         <div class="flex justify-end gap-3">

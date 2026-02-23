@@ -346,7 +346,7 @@
                             </div>
 
                             <!-- Add new -->
-                            <div @click="row.vehicle = '__new__'; showAddVehicleDialog = true; row.open = false"
+                            <div @click.prevent.stop="onAddVehicleClicked(row)"
                               class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
                               + {{ $t('labels.addNew') }}
                             </div>
@@ -519,31 +519,19 @@
     </div>
   </div>
 
-  <!-- Dialog: Add Vehicle -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-full max-w-md">
-      <h3 class="text-lg font-bold mb-3">{{ $t('vehicles.addVehicle') }}</h3>
-      <input v-model="newVehicleForm.name" :placeholder="$t('vehicles.name')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <select v-model="newVehicleForm.contractorId" class="w-full border rounded px-2 py-1 mb-3">
-        <option value="">{{ $t('labels.contractor') }} —</option>
-        <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
-      </select>
-      <input v-model.number="newVehicleForm.companyCapacity" type="number" step="0.01"
-        :placeholder="$t('vehicles.companyCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newVehicleForm.crusherCapacity" type="number" step="0.01"
-        :placeholder="$t('vehicles.crusherCapacity') || $t('labels.crusherCapacity')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <div class="flex gap-2 justify-end">
-        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewVehicle"
-          :disabled="!newVehicleForm.name || !newVehicleForm.companyCapacity || !newVehicleForm.crusherCapacity || creatingVehicle"
-          class="bg-green-600 text-white px-3 py-1 rounded">
-          {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+  <!-- Dialog: Add Vehicle (use shared CreateVehicle modal) -->
+  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-40 flex items-center justify-center px-4">
+    <div class="fixed inset-0 bg-black bg-opacity-40" @click="showAddVehicleDialog = false"></div>
+    <div class="relative w-full max-w-3xl z-50 mx-auto">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 border-b">
+          <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
+          <button class="text-gray-500 hover:text-gray-700" @click="showAddVehicleDialog = false">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto">
+          <CreateVehicle @created="onCreatedFromVehicleModal" />
+        </div>
       </div>
-      <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
     </div>
   </div>
 
@@ -599,6 +587,7 @@ import {
   ArrowRightIcon
 } from '@heroicons/vue/24/outline'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
 
 export default {
   emits: ['saved'],
@@ -617,11 +606,34 @@ export default {
     CheckIcon,
     ArrowRightIcon,
     SearchDropdown
+    ,CreateVehicle
   },
   props: {
     showTriggerButton: {
       type: Boolean,
       default: true
+    },
+
+    async onCreatedFromVehicleModal() {
+      try {
+        await this.loadLookups()
+      } catch (e) {
+        console.error('Failed to reload lookups after vehicle creation', e)
+      } finally {
+        this.showAddVehicleDialog = false
+      }
+    },
+
+    onAddVehicleClicked(row) {
+      console.log('SuppliesCreationModal: Add Vehicle clicked for row', row && row.id)
+      try {
+        // mark the row as new vehicle and open shared create vehicle modal
+        if (row) row.vehicle = '__new__'
+        this.showAddVehicleDialog = true
+        if (row) row.open = false
+      } catch (e) {
+        console.error('Error handling add vehicle click', e)
+      }
     },
     triggerButtonText: {
       type: String,
@@ -1542,37 +1554,35 @@ export default {
       }
 
       try {
+        // Create one flat Export per non-empty row (server computes `total`)
+        const createdIds = []
         for (const r of toSave) {
-          const locationId = r.location?.id
-          console.log('🔍 Processing row with location:', r.location)
-          if (!locationId) continue
-
-          const areaId = r.area?.id
-          console.log('🔍 Processing row with area:', r.area)
-          if (!areaId) continue
-
-          const unitPrice = Number(this.commonData.price || 0)
-          const companyCapacity = Number(r.companyCapacity || 0)
-          const discount = Number(r.discount || 0)
-
-          await createExport({
+          const payload = {
             date: this.commonData.date,
-            locationId: locationId,
-            areaId: areaId,
+            locationId: this.commonData.site?.id || (this.commonData.location?.id || null),
+            areaId: this.commonData.area?.id || null,
             contractorId: this.commonData.contractor?.id ? Number(this.commonData.contractor.id) : null,
             crusherId: this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
-            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
-            crusherTicket: r.crusherTicket?.trim() || '',
-            companyTicket: r.companyTicket?.trim() || '',
-            unitPrice,
-            companyCapacity,
-            discount,
-            crusherCapacity: r.crusherCapacity ? Number(r.crusherCapacity) : null,
-            itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null
-          })
+            itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null,
+            notes: this.commonData.notes || undefined,
+            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : undefined,
+            crusherTicket: r.crusherTicket?.trim() || undefined,
+            companyTicket: r.companyTicket?.trim() || undefined,
+            companyCapacity: r.companyCapacity !== undefined && r.companyCapacity !== null ? Number(r.companyCapacity) : undefined,
+            crusherCapacity: r.crusherCapacity !== undefined && r.crusherCapacity !== null ? Number(r.crusherCapacity) : undefined,
+            unitPrice: (r.unitPrice !== undefined && r.unitPrice !== null) ? Number(r.unitPrice) : (this.commonData.price !== undefined ? Number(this.commonData.price) : undefined),
+            discount: r.discount !== undefined && r.discount !== null ? Number(r.discount) : undefined
+          }
+
+          // If editing a single export (modal opened for edit), prefer update for that specific export id
+          if (this.export && this.export.id && toSave.length === 1) {
+            // await updateExport(this.export.id, payload)
+          } else {
+            const res = await createExport(payload)
+            if (res && res.data && res.data.id) createdIds.push(res.data.id)
+          }
         }
 
-        // alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.saveCommonDataToStorage()
 
         // Reset

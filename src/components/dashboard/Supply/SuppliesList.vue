@@ -157,10 +157,14 @@
               class="px-6 py-3 min-w-[160px] text-start text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.unitPrice') }}
             </th>
-
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.discount') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.total') }}</th>
+
+            
             <!-- <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -168,73 +172,48 @@
           </tr>
         </thead>
         <tbody>
-          <!-- DEBUG: Show supplies count -->
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
-          <tr v-for="(s, idx) in supplies" :key="`supply-${s.id}-${idx}`" class="hover:bg-gray-50"
-            @contextmenu.prevent="onRowContextMenu($event, s)">
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
-              {{ formatDate(s.date) }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ s.item?.name || '-' }}</td>
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              {{ s.contractor?.name || '-' }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ s.crusher?.name || '-' }}</td>
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              {{ s.location?.name || '-' }}</td>
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              {{ getAreaName(s) }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ s.vehicle?.name || '-' }}</td>
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              {{ s.crusherTicket || '-' }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ s.companyTicket || '-' }}</td>
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              {{ s.companyCapacity || '-' }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ s.crusherCapacity || '-' }}</td>
-            <td class="px-6 py-3 min-w-[160px] text-start text-sm font-semibold text-indigo-900 whitespace-nowrap">
-              {{
-                s.unitPrice
-                  ? new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'EGP'
-                  }).format(s.unitPrice)
-              : '-'
-              }}
-            </td>
+          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="hover:bg-gray-50" @contextmenu.prevent="onRowContextMenu($event, supply)">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.contractor?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ getAreaName(supply) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.vehicle?.name || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.crusherTicket || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.companyTicket || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.companyCapacity ?? '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusherCapacity ?? '-' }}</td>
+            <td class="px-6 py-3 min-w-[160px] text-start text-sm font-semibold text-indigo-900 whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
 
-
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">
-              {{ s.discount || '-' }}</td>
-            <!-- <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ s.notes || '-' }}</td> -->
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              <button @click="confirmDelete(s)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
-                {{ $t('labels.delete') }}
-              </button>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              <button @click.stop="confirmDelete(supply)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">{{ $t('labels.delete') }}</button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td
-              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-              :colspan="15">
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="16">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- Payment Modal removed -->
+    <!--
+    <PaymentModal :visible="showPaymentModal" :parentType="paymentTarget.type" :parentId="paymentTarget.id"
+      @saved="handlePaymentSaved" @close="() => { showPaymentModal = false }" />
+    -->
+
+    <!-- Supply detail modal removed -->
+    <!--
+    <SupplyDetailModal :visible="showDetailModal" :exportId="detailExportId" @close="() => { showDetailModal = false; detailExportId = null }" />
+    -->
+
 
     <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages"
       :pageSizeOptions="[10, 20, 50, 100]" @update:page="(p) => { page = p; loadSupplies() }"
@@ -293,6 +272,8 @@ import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrusher
 import TableModal from './SuppliesCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
+// import PaymentModal from '../../shared/PaymentModal.vue'
+// import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 
 export default {
@@ -301,7 +282,9 @@ export default {
   components: {
     TableModal,
     Pagination,
-    SearchDropdown
+    SearchDropdown,
+    // PaymentModal,
+    // SupplyDetailModal
   },
 
   data() {
@@ -339,8 +322,22 @@ export default {
         itemSearch: '',
         vehicleId: '',
         vehicleSearch: ''
-      }
+      },
+      /* payment modal state commented out
+      showPaymentModal: false,
+      paymentTarget: { type: null, id: null },
+      */
+      showDetailModal: false,
+      detailExportId: null
     }
+  },
+
+  watch: {
+    /* payment modal watcher commented out
+    showPaymentModal(val) {
+      // no-op: placeholder if needed
+    }
+    */
   },
 
   computed: {
@@ -371,11 +368,16 @@ export default {
       }
       return this.locations.filter(l => l.parentId === this.filters.locationId)
     },
+    
   },
 
   async mounted() {
     await this.loadFilterData()
     await this.loadSupplies()
+    // ensure payments modal data is reactive
+    /* paymentTarget watcher commented out
+    this.$watch(() => this.paymentTarget, (nv) => {}, { deep: true })
+    */
     document.addEventListener('click', this.closeContextMenu)
   },
 
@@ -454,7 +456,7 @@ export default {
           pageSize: this.pageSize,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
-          area: this.filters.areaId,
+          areaId: this.filters.areaId,
           contractorId: this.filters.contractorId,
           locationId: this.filters.locationId,
           crusherId: this.filters.crusherId,
@@ -537,6 +539,13 @@ export default {
       return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
     },
 
+    formatCurrency(v) {
+      if (v === undefined || v === null || v === '') return '-'
+      const n = Number(v)
+      if (Number.isNaN(n)) return v
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(n)
+    },
+
     selectLocation(location) {
       this.filters.locationId = location.id
       this.filters.locationSearch = location.name
@@ -566,16 +575,24 @@ formatDate(dateString) {
   if (!dateString) return '-'
   try {
     return new Intl.DateTimeFormat('en-GB').format(new Date(dateString))
-  } catch {
+  } catch (e) {
     return dateString
   }
 },
 
     calculateTotal(supply) {
-      const capacity = parseFloat(supply.companyCapacity || supply.crusherCapacity || 0)
-      const unitPrice = parseFloat(supply.unitPrice || 0)
-      const discount = parseFloat(supply.discount || 0)
-      return (capacity * unitPrice) - discount
+      // Sum totals from exportLines when available, otherwise fallback to top-level fields
+      try {
+        if (supply && Array.isArray(supply.exportLines) && supply.exportLines.length) {
+          return supply.exportLines.reduce((acc, l) => acc + (parseFloat(l.total || 0) || 0), 0)
+        }
+        const capacity = parseFloat(supply.companyCapacity || supply.crusherCapacity || 0)
+        const unitPrice = parseFloat(supply.unitPrice || supply.item?.defaultExportPrice || 0)
+        const discount = parseFloat(supply.discount || 0)
+        return (capacity * unitPrice) - discount
+      } catch (e) {
+        return 0
+      }
     },
 
     openEdit(supply) {
@@ -592,7 +609,13 @@ formatDate(dateString) {
       // position relative to viewport
       this.contextMenu.x = e.clientX
       this.contextMenu.y = e.clientY
-      this.contextMenu.item = item
+      // normalize: if an entry with { supply, line } was passed, store the supply object for actions
+      this.contextMenu.item = (item && item.supply) ? item.supply : item
+    },
+
+    openDetail(id) {
+      this.detailExportId = id
+      this.showDetailModal = true
     },
 
     closeContextMenu() {
@@ -618,6 +641,24 @@ formatDate(dateString) {
       }
     },
 
+    computeUnitPrice(supply) {
+      const p = (supply && (supply.unitPrice !== undefined && supply.unitPrice !== null)) ? Number(supply.unitPrice)
+        : (supply?.item?.defaultExportPrice !== undefined ? Number(supply.item.defaultExportPrice) : NaN)
+      return Number.isNaN(p) ? 0 : p
+    },
+
+    /* payment methods commented out
+    openPaymentModal(type, id) {
+      this.paymentTarget = { type, id }
+      this.showPaymentModal = true
+    },
+    async handlePaymentSaved(payment) {
+      this.showPaymentModal = false
+      await this.loadSupplies()
+      this.$toast?.success(this.$t('labels.paymentSaved') || 'Payment saved')
+    },
+    */
+
     /**
      * Saves the edited supply and closes the modal.
      * If the edited supply already exists in the list, it will be updated.
@@ -635,4 +676,6 @@ formatDate(dateString) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.clickable-row { cursor: pointer; }
+</style>
