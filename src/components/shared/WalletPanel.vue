@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <div class="mb-4">
+    <!-- <div class="mb-4">
       <div class="text-sm text-gray-500 mb-1">{{ $t('labels.breakdown') }}</div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <div v-for="(v, k) in (wallet && wallet.sources) || {}" :key="k" class="p-2 bg-gray-50 rounded">
@@ -27,7 +27,7 @@
           <div class="font-semibold">{{ formatCurrency(v) }}</div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- <div class="grid md:grid-cols-2 gap-4"> -->
       <div>
