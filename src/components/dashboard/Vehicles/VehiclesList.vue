@@ -71,7 +71,7 @@
           </tr>
 
           <tr v-if="vehicles.length === 0">
-            <td class="px-3 py-6 text-center text-gray-500" colspan="6">
+            <td class="px-3 py-2 text-start text-gray-500" colspan="6">
               {{ $t('vehicles.noResults') }}
             </td>
           </tr>

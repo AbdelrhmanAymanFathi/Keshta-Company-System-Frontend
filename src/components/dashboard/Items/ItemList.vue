@@ -83,7 +83,7 @@
           </tr>
           <tr v-if="items.length === 0 && !loading">
             <td
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start"
+              class="px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start"
               :colspan="columnsCount">
               {{ $t('labels.noDataFound') || 'No items found' }}
             </td>
