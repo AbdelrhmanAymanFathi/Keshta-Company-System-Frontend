@@ -592,7 +592,15 @@
     "invalidDateRange": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية",
     "reportLoadError": "خطأ في تحميل الكشف",
     "reportDownloadError": "خطأ في تحميل التقرير",
-    "noStatementData": "لا توجد بيانات للعرض"
+    "noStatementData": "لا توجد بيانات للعرض",
+    "placeholders": {
+      "name": "أدخل اسم المورد",
+      "phone": "أدخل رقم الهاتف",
+      "bankName": "أدخل اسم البنك",
+      "accountNumber": "أدخل رقم الحساب",
+      "openingBalance": "أدخل الرصيد الافتتاحي",
+      "notes": "أدخل الملاحظات (اختياري)"
+    }
   },
   "transporters": {
     "title": "مقاولين النقل",

@@ -592,7 +592,15 @@
     "invalidDateRange": "End date must be after or equal to start date",
     "reportLoadError": "Error loading statement",
     "reportDownloadError": "Error downloading report",
-    "noStatementData": "No data to display"
+    "noStatementData": "No data to display",
+    "placeholders": {
+      "name": "Enter supplier name",
+      "phone": "Enter phone number",
+      "bankName": "Enter bank name",
+      "accountNumber": "Enter account number",
+      "openingBalance": "Enter opening balance",
+      "notes": "Enter notes (optional)"
+    }
   },
   "transporters": {
     "title": "Transporters",

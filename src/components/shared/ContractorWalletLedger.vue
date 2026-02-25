@@ -46,7 +46,7 @@
       <div v-else>
         <div class="overflow-auto">
           <table class="min-w-full text-sm">
-            <thead class="bg-gray-50">
+            <thead class="bg-indigo-50">
               <tr>
                 <th class="px-3 py-2 text-left">#</th>
                 <th class="px-3 py-2 text-left">{{ $t('labels.date') }}</th>

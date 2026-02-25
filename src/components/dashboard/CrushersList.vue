@@ -172,7 +172,7 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0; ">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">

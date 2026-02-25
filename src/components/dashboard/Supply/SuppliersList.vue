@@ -179,8 +179,8 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('suppliers.editContractor') : $t('suppliers.addContractor') }}
@@ -191,32 +191,32 @@
             </svg>
           </button>
         </div>
-        <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.name') }}</div>
-            <input v-model="form.name" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.name" :placeholder="$t('suppliers.placeholders.name')" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.phone') }}</div>
-            <input v-model="form.phone" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.phone" :placeholder="$t('suppliers.placeholders.phone')" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.bankName') }}</div>
-            <input v-model="form.bankName" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.bankName" :placeholder="$t('suppliers.placeholders.bankName')" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.accountNumber') }}</div>
-            <input v-model="form.accountNumber" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.accountNumber" :placeholder="$t('suppliers.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.openingBalance') || 'Opening Balance' }}</div>
-            <input v-model.number="form.openingBalance" type="number" class="w-full px-3 py-2 border rounded" />
+            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('suppliers.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded" />
           </label>
-          <label>
+          <label class="sm:col-span-2 lg:col-span-3">
             <div class="text-sm mb-1">{{ $t('suppliers.notes') }}</div>
-            <input v-model="form.notes" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.notes" :placeholder="$t('suppliers.placeholders.notes')" class="w-full px-3 py-2 border rounded" />
           </label>
-          <label class="flex items-center gap-2">
+          <label class="flex items-center gap-2 sm:col-span-2 lg:col-span-3">
             <input type="checkbox" v-model="form.availableForTransports" class="w-4 h-4" />
             <div class="text-sm">{{ $t('suppliers.isTransporter') || 'Also a transporter' }}</div>
           </label>

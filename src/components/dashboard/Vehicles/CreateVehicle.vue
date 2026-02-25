@@ -1,114 +1,117 @@
 <template>
-  <form class="mb-6 p-4 bg-white rounded-lg space-y-4" @submit.prevent="onCreate">
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.truckName') }}</label>
-      <input v-model="form.name" type="text" :placeholder="$t('vehicles.truckName')" class="w-full border rounded px-3 py-2" required />
-    </div>
+  <form class="space-y-4" @submit.prevent="onCreate">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="sm:col-span-2 lg:col-span-3">
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.truckName') }}</label>
+        <input v-model="form.name" type="text" :placeholder="$t('vehicles.truckName')" class="w-full border rounded px-3 py-2" required />
+      </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.contractor') }}</label>
-      <div class="relative">
-        <input
-          type="text"
-          class="w-full border rounded px-3 py-2"
-          :placeholder="$t('vehicles.selectContractor')"
-          v-model="contractorSearch"
-          @focus="openContractorDropdown"
-          @input="openContractorDropdown"
-          aria-autocomplete="list"
-          aria-haspopup="true"
-          role="combobox"
-          required
-        />
+      <div class="sm:col-span-2 lg:col-span-3">
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.contractor') }}</label>
+        <div class="relative">
+          <input
+            type="text"
+            class="w-full border rounded px-3 py-2"
+            :placeholder="$t('vehicles.selectContractor')"
+            v-model="contractorSearch"
+            @focus="openContractorDropdown"
+            @input="openContractorDropdown"
+            aria-autocomplete="list"
+            aria-haspopup="true"
+            role="combobox"
+            required
+          />
 
-        <div v-if="showContractorDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
-          <button
-            v-for="c in filteredContractors"
-            :key="c.id"
-            @click.prevent="selectContractor(c)"
-            class="w-full text-left px-3 py-2 hover:bg-gray-100"
-          >
-            {{ c.name }}
-          </button>
-          <div class="border-t px-3 py-2">
-            <button @click.prevent="chooseAddNewContractor" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewContractor') }}</button>
+          <div v-if="showContractorDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
+            <button
+              v-for="c in filteredContractors"
+              :key="c.id"
+              @click.prevent="selectContractor(c)"
+              class="w-full text-left px-3 py-2 hover:bg-gray-100"
+            >
+              {{ c.name }}
+            </button>
+            <div class="border-t px-3 py-2">
+              <button @click.prevent="chooseAddNewContractor" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewContractor') }}</button>
+            </div>
           </div>
-        </div>
 
-        <input
-          v-if="form.contractorId === '__new__'"
-          ref="newContractorInput"
-          v-model="form.newContractorName"
-          type="text"
-          :placeholder="$t('vehicles.newContractorNamePlaceholder')"
-          class="w-full border rounded px-3 py-2 mt-2"
-        />
+          <input
+            v-if="form.contractorId === '__new__'"
+            ref="newContractorInput"
+            v-model="form.newContractorName"
+            type="text"
+            :placeholder="$t('vehicles.newContractorNamePlaceholder')"
+            class="w-full border rounded px-3 py-2 mt-2"
+          />
+        </div>
+      </div>
+
+      <div class="sm:col-span-2 lg:col-span-3">
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.crusherNumber') }}</label>
+        <div class="relative">
+          <input
+            type="text"
+            class="w-full border rounded px-3 py-2"
+            :placeholder="$t('vehicles.selectCrusher')"
+            v-model="crusherSearch"
+            @focus="openCrusherDropdown"
+            @input="openCrusherDropdown"
+            aria-autocomplete="list"
+            aria-haspopup="true"
+            role="combobox"
+          />
+
+          <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
+            <button
+              v-for="c in filteredCrushers"
+              :key="c.id"
+              @click.prevent="selectCrusher(c)"
+              class="w-full text-left px-3 py-2 hover:bg-gray-100"
+            >
+              {{ c.name }}
+            </button>
+            <div class="border-t px-3 py-2">
+              <button @click.prevent="chooseAddNewCrusher" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewCrusher') }}</button>
+            </div>
+          </div>
+
+          <input
+            v-if="form.crusherId === '__new__'"
+            ref="newCrusherInput"
+            v-model="form.newCrusherName"
+            type="text"
+            :placeholder="$t('vehicles.newCrusherNamePlaceholder')"
+            class="w-full border rounded px-3 py-2 mt-2"
+          />
+        </div>
+      </div>
+
+      <!-- driver field removed -->
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.companyCapacity') }}</label>
+        <input v-model="form.companyCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('vehicles.companyCapacityPlaceholder')" class="w-full border rounded px-3 py-2" />
+        <p v-if="form.companyCapacity && Number(form.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
+          {{ $t('vehicles.validationPositiveNumber') }}
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCapacity') }}</label>
+        <input v-model="form.crusherCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('labels.crusherCapacity')" class="w-full border rounded px-3 py-2" />
+        <p v-if="form.crusherCapacity && Number(form.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
+          {{ $t('vehicles.validationPositiveNumber') }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3 justify-end sm:col-span-2 lg:col-span-3">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" :disabled="creating">
+          {{ creating ? $t('labels.saving') : $t('vehicles.createVehicle') }}
+        </button>
       </div>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.crusherNumber') }}</label>
-      <div class="relative">
-        <input
-          type="text"
-          class="w-full border rounded px-3 py-2"
-          :placeholder="$t('vehicles.selectCrusher')"
-          v-model="crusherSearch"
-          @focus="openCrusherDropdown"
-          @input="openCrusherDropdown"
-          aria-autocomplete="list"
-          aria-haspopup="true"
-          role="combobox"
-        />
-
-        <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
-          <button
-            v-for="c in filteredCrushers"
-            :key="c.id"
-            @click.prevent="selectCrusher(c)"
-            class="w-full text-left px-3 py-2 hover:bg-gray-100"
-          >
-            {{ c.name }}
-          </button>
-          <div class="border-t px-3 py-2">
-            <button @click.prevent="chooseAddNewCrusher" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewCrusher') }}</button>
-          </div>
-        </div>
-
-        <input
-          v-if="form.crusherId === '__new__'"
-          ref="newCrusherInput"
-          v-model="form.newCrusherName"
-          type="text"
-          :placeholder="$t('vehicles.newCrusherNamePlaceholder')"
-          class="w-full border rounded px-3 py-2 mt-2"
-        />
-      </div>
-    </div>
-
-    <!-- driver field removed -->
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.companyCapacity') }}</label>
-      <input v-model="form.companyCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('vehicles.companyCapacityPlaceholder')" class="w-full border rounded px-3 py-2" />
-      <p v-if="form.companyCapacity && Number(form.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
-        {{ $t('vehicles.validationPositiveNumber') }}
-      </p>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCapacity') }}</label>
-      <input v-model="form.crusherCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('labels.crusherCapacity')" class="w-full border rounded px-3 py-2" />
-      <p v-if="form.crusherCapacity && Number(form.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
-        {{ $t('vehicles.validationPositiveNumber') }}
-      </p>
-    </div>
-
-    <div class="flex items-center gap-3 justify-end">
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" :disabled="creating">
-        {{ creating ? $t('labels.saving') : $t('vehicles.createVehicle') }}
-      </button>
-    </div>
     <div>
       <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
       <div v-if="success" class="text-green-600 text-sm">{{ $t('vehicles.createdSuccessfully') }}</div>
