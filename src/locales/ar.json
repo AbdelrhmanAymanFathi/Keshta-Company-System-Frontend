@@ -614,6 +614,7 @@
     "phone": "الهاتف",
     "bankName": "اسم البنك",
     "accountNumber": "رقم الحساب",
+    "openingBalance": "الرصيد الافتتاحي",
     "notes": "ملاحظات",
     "statement": "كشف حساب مقاول النقل",
     "wallet": "محفظة مقاول النقل",
@@ -646,7 +647,15 @@
     "isSupplier": "أيضًا مورد",
     "namePlaceholder": "أدخل اسم مقاول النقل",
     "saveError": "خطأ في حفظ مقاول النقل",
-    "deleteError": "خطأ في حذف مقاول النقل"
+    "deleteError": "خطأ في حذف مقاول النقل",
+    "placeholders": {
+      "name": "أدخل اسم مقاول النقل",
+      "phone": "أدخل رقم الهاتف",
+      "bankName": "أدخل اسم البنك",
+      "accountNumber": "أدخل رقم الحساب",
+      "openingBalance": "أدخل الرصيد الافتتاحي",
+      "notes": "أدخل الملاحظات (اختياري)"
+    }
   },
   "crushers": {
     "title": "الكسارات",

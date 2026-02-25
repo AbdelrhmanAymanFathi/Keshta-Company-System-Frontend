@@ -614,6 +614,7 @@
     "phone": "Phone",
     "bankName": "Bank Name",
     "accountNumber": "Account Number",
+    "openingBalance": "Opening Balance",
     "notes": "Notes",
     "statement": "Transporter Statement",
     "wallet": "Transporter Wallet",
@@ -646,7 +647,15 @@
     "namePlaceholder": "Enter transporter name",
     "saveError": "Error saving transporter",
     "isSupplier": "Also a supplier",
-    "deleteError": "Error deleting transporter"
+    "deleteError": "Error deleting transporter",
+    "placeholders": {
+      "name": "Enter transporter name",
+      "phone": "Enter phone number",
+      "bankName": "Enter bank name",
+      "accountNumber": "Enter account number",
+      "openingBalance": "Enter opening balance",
+      "notes": "Enter notes (optional)"
+    }
   },
   "crushers": {
     "title": "Crushers",

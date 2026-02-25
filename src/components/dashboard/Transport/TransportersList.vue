@@ -175,8 +175,8 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-lg lg:max-w-3xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('transporters.editTransporter') : $t('transporters.addTransporter') }}
@@ -187,37 +187,37 @@
             </svg>
           </button>
         </div>
-        <div class="grid grid-cols-1 gap-4">
-          <label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <label class="sm:col-span-2 lg:col-span-3">
             <div class="text-sm mb-1">{{ $t('transporters.name') }}</div>
-            <input v-model="form.name" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.name" :placeholder="$t('transporters.placeholders.name')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('transporters.phone') }}</div>
-            <input v-model="form.phone" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.phone" :placeholder="$t('transporters.placeholders.phone')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('transporters.bankName') }}</div>
-            <input v-model="form.bankName" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.bankName" :placeholder="$t('transporters.placeholders.bankName')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('transporters.accountNumber') }}</div>
-            <input v-model="form.accountNumber" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.accountNumber" :placeholder="$t('transporters.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('transporters.openingBalance') || 'Opening Balance' }}</div>
-            <input v-model.number="form.openingBalance" type="number" class="w-full px-3 py-2 border rounded" />
+            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('transporters.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('transporters.notes') }}</div>
-            <input v-model="form.notes" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.notes" :placeholder="$t('transporters.placeholders.notes')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
-          <label class="flex items-center gap-2">
+          <label class="flex items-center gap-2 sm:col-span-2 lg:col-span-3">
             <input type="checkbox" v-model="form.availableForExports" class="w-4 h-4" />
             <div class="text-sm">{{ $t('transporters.isSupplier') || 'Also a supplier' }}</div>
           </label>
         </div>
-        <div class="mt-6 flex justify-end gap-3">
+        <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
           <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
