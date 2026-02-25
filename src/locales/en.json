@@ -70,6 +70,7 @@
     "transportList": "Transport List",
     "enterTransports": "Enter Transports",
     "addTransport": "Add Transport",
+    "addTransportFromSupply": "Create Transport (from Supply)",
     "editTransport": "Edit Transport",
     "reportMenu": "Transport Reports",
     "reportTitle": "Transport Reports",
@@ -340,8 +341,9 @@
     "saveFirstToPreview": "Save the report first to preview options",
     "previewRows": "Preview rows (first items):",
     "previewFailed": "Preview failed",
-    "saveFailed": "Save failed",
-    "parametersHelp": "Add parameters to make your report dynamic and reusable"
+    "parametersHelp": "Add parameters to make your report dynamic and reusable",
+    "moduleReports": "Reports",
+    "saveFailed": "Save failed"
   },
   "auth": {
     "login": {
