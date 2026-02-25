@@ -222,7 +222,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
                   </svg>
                 </button>
-                <button @click.stop="confirmDelete(transport)" class="text-red-600 hover:text-red-900"
+                <button @click.stop="openDeleteConfirm(transport)" class="text-red-600 hover:text-red-900"
                   :title="$t('common.delete')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -256,10 +256,26 @@
             class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm">{{ $t('common.edit') }}</button>
         </li>
         <li>
-          <button @click="confirmDelete(contextMenu.item)"
+          <button @click="openDeleteConfirm(contextMenu.item)"
             class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
         </li>
       </ul>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+        <h3 class="text-lg font-bold mb-3 text-gray-900">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
+        <p class="text-gray-600 mb-6">{{ $t('transport.confirmDelete') || 'Are you sure you want to delete this transport?' }}</p>
+        <div class="flex justify-end gap-3">
+          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            {{ $t('labels.cancel') || 'Cancel' }}
+          </button>
+          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+            {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -314,6 +330,11 @@ export default {
       vehicles: [],
       showPaymentModal: false,
       paymentTarget: { type: null, id: null },
+      deleting: false,
+      deleteConfirmModal: {
+        show: false,
+        id: null
+      },
       filters: {
         startDate: '',
         endDate: '',
@@ -582,21 +603,32 @@ export default {
       this.contextMenu.item = null
     },
 
-    confirmDelete(item) {
-      const confirmed = confirm(this.$t('transport.confirmDelete') || 'Delete this transport?')
-      if (confirmed) {
-        this.handleDelete(item.id)
+    openDeleteConfirm(item) {
+      this.deleteConfirmModal = {
+        show: true,
+        id: item.id
+      }
+    },
+
+    closeDeleteConfirm() {
+      this.deleteConfirmModal = {
+        show: false,
+        id: null
       }
     },
 
     async handleDelete(id) {
+      this.deleting = true
       try {
         await deleteTransport(id)
         await this.loadTransports()
         this.$toast?.success(this.$t('transport.deletedSuccessfully'))
+        this.closeDeleteConfirm()
       } catch (e) {
         console.error('Failed to delete transport', e)
         alert(this.$t('common.deleteError') || 'Failed to delete')
+      } finally {
+        this.deleting = false
       }
     }
     ,
