@@ -65,7 +65,7 @@
           </div>
         </div>
         <div v-else-if="result">
-          <pre class="text-xs bg-gray-100 p-2 rounded overflow-auto">{{ JSON.stringify(result, null, 2) }}</pre>
+          <pre class="text-xs bg-gray-100 p-2 rounded overflow-auto" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;">{{ JSON.stringify(result, null, 2) }}</pre>
         </div>
         <div v-else class="text-sm text-gray-500">{{ $t('reports.noResults') || 'No results yet' }}</div>
       </div>
