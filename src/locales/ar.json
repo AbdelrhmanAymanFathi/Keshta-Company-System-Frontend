@@ -1,5 +1,6 @@
 {
   "appName": "نظام شركة قشطة",
+  "Reports": "التقارير",
   "transactions": "المعاملات",
   "noTransactions": "لا توجد معاملات",
   "transfer": "تحويل",
@@ -107,6 +108,7 @@
     "noTransportsDesc": "ابدأ بإنشاء سجل نقل جديد.",
     "confirmDelete": "هل أنت متأكد من حذف هذا النقل؟",
     "deletedSuccessfully": "تم حذف النقل بنجاح",
+    "addTransportFromSupply": "إضافة نقل",
     "subtotal": "المجموع الفرعي",
     "totalDiscount": "إجمالي الخصم",
     "grandTotal":"المجموع الكلي",
@@ -315,6 +317,7 @@
   "reports": {
     "columnKey": "المفتاح",
     "columnTitle": "العنوان",
+    "columnArTitle": "العنوان بالعربية",
     "columnModule": "الوحدة",
     "columnActive": "نشط",
     "columnActions": "الإجراءات",
@@ -339,7 +342,8 @@
     "saveFirstToPreview": "احفظ التقرير أولاً لمعاينة الخيارات",
     "previewRows": "معاينة الصفوف (أول العناصر):",
     "previewFailed": "فشلت المعاينة",
-    "saveFailed": "فشل الحفظ"
+    "saveFailed": "فشل الحفظ",
+    "parametersHelp": "أضف متغيرات لجعل تقريرك ديناميكياً وقابلاً لإعادة الاستخدام"
   },
   "auth": {
     "login": {

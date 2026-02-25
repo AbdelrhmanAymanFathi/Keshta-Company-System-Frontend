@@ -1,5 +1,6 @@
 {
   "appName": "Keshta Company System",
+  "Reports": "Reports",
   "transactions": "Transactions",
   "noTransactions": "No transactions",
   "transfer": "Transfer",
@@ -107,6 +108,7 @@
     "noTransportsDesc": "Get started by creating a new transport record.",
     "confirmDelete": "Are you sure you want to delete this transport?",
     "deletedSuccessfully": "Transport deleted successfully",
+    "addTransportFromSupply": "Add Transport",
     "subtotal":"Subtotal",
     "totalDiscount":"Total Discount",
     "grandTotal":"Grand Total"
@@ -316,6 +318,7 @@
     "columnModule": "Module",
     "columnActive": "Active",
     "columnActions": "Actions",
+    "columnArTitle": "Arabic Title",
     "confirmDelete": "Delete this report?",
     "newParameter": "Add Parameter",
     "runReport": "Run Report",
@@ -337,7 +340,8 @@
     "saveFirstToPreview": "Save the report first to preview options",
     "previewRows": "Preview rows (first items):",
     "previewFailed": "Preview failed",
-    "saveFailed": "Save failed"
+    "saveFailed": "Save failed",
+    "parametersHelp": "Add parameters to make your report dynamic and reusable"
   },
   "auth": {
     "login": {
