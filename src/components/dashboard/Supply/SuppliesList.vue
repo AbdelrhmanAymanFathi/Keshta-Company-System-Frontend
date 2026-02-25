@@ -191,7 +191,7 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
 
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              <button @click.stop="confirmDelete(supply)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">{{ $t('labels.delete') }}</button>
+              <button @click.stop="openDeleteConfirm(supply)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">{{ $t('labels.delete') }}</button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
@@ -224,10 +224,26 @@
       class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
       <ul class="p-2">
         <li>
-          <button @click="confirmDelete(contextMenu.item)"
+          <button @click="openDeleteConfirm(contextMenu.item)"
             class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
         </li>
       </ul>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+        <h3 class="text-lg font-bold mb-3 text-gray-900">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
+        <p class="text-gray-600 mb-6">{{ $t('supply.confirmDeleteExport') || 'Are you sure you want to delete this export?' }}</p>
+        <div class="flex justify-end gap-3">
+          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            {{ $t('labels.cancel') || 'Cancel' }}
+          </button>
+          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+            {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Edit Modal -->
@@ -307,6 +323,11 @@ export default {
       crushers: [],
       items: [],
       vehicles: [],
+      deleting: false,
+      deleteConfirmModal: {
+        show: false,
+        id: null
+      },
       filters: {
         startDate: '',
         endDate: '',
@@ -618,9 +639,18 @@ formatDate(dateString) {
       this.showDetailModal = true
     },
 
-    closeContextMenu() {
-      this.contextMenu.visible = false
-      this.contextMenu.item = null
+    openDeleteConfirm(item) {
+      this.deleteConfirmModal = {
+        show: true,
+        id: item.id
+      }
+    },
+
+    closeDeleteConfirm() {
+      this.deleteConfirmModal = {
+        show: false,
+        id: null
+      }
     },
 
     confirmDelete(item) {
@@ -631,13 +661,17 @@ formatDate(dateString) {
     },
 
     async handleDelete(id) {
+      this.deleting = true
       try {
         await deleteDelivery(id)
         // backend may return 204; just reload
         await this.loadSupplies()
+        this.closeDeleteConfirm()
       } catch (e) {
         console.error('Failed to delete export', e)
         alert(this.$t('common.deleteError') || 'Failed to delete')
+      } finally {
+        this.deleting = false
       }
     },
 
