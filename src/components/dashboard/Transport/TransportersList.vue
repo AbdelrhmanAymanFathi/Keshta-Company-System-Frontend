@@ -87,7 +87,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+            <td colspan="7" class="px-6 py-2 text-start text-gray-500">
                 {{ $t('transporters.noResults') }}
               </td>
           </tr>

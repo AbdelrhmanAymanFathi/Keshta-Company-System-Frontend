@@ -78,7 +78,7 @@
       <div class="px-4 py-3 text-sm text-gray-600">{{ $t('transport.reportDescription') }}</div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-indigo-50">
             <tr>
               <th
                 class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -132,7 +132,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="10" class="px-6 py-8 text-center text-sm text-gray-500">{{ $t('labels.noData') }}</td>
+              <td colspan="10" class="px-6 py-2 text-start text-sm text-gray-500">{{ $t('labels.noData') }}</td>
             </tr>
           </tbody>
         </table>
