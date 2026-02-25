@@ -71,7 +71,6 @@
     "enterTransports": "إدخال النقلات",
     "transportList": "قائمة النقل",
     "addTransport": "إضافة نقل",
-    "addTransportFromSupply": "إنشاء نقل (من التوريدة)",
     "editTransport": "تعديل النقل",
     "reportMenu": "تقارير النقل",
     "reportTitle": "تقارير النقل",
@@ -343,9 +342,8 @@
     "saveFirstToPreview": "احفظ التقرير أولاً لمعاينة الخيارات",
     "previewRows": "معاينة الصفوف (أول العناصر):",
     "previewFailed": "فشلت المعاينة",
-    "parametersHelp": "أضف متغيرات لجعل تقريرك ديناميكياً وقابلاً لإعادة الاستخدام",
-    "moduleReports": "التقارير",
-    "saveFailed": "فشل الحفظ"
+    "saveFailed": "فشل الحفظ",
+    "parametersHelp": "أضف متغيرات لجعل تقريرك ديناميكياً وقابلاً لإعادة الاستخدام"
   },
   "auth": {
     "login": {
