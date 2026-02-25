@@ -1241,18 +1241,22 @@ export default {
       }
     },
     populateForm() {
-      // Adapt for multi-row if needed; for now, assume single row edit
-      if (this.transport) {
-        this.commonData.date = this.transport.date?.split('T')[0] || ''
-        this.commonData.item = this.items.find(i => i.id === this.transport.itemId) || null
-        this.commonData.location = this.locations.find(l => l.id === this.transport.fromLocId) || null
-        this.commonData.area = this.locations.find(l => l.id === this.transport.toLocId) || null
-        this.commonData.contractor = this.contractors.find(c => c.id === this.transport.contractorId) || null
-        this.commonData.distanceKm = parseFloat(this.transport.distanceKm) || 0
-        this.commonData.firstKmPrice = parseFloat(this.transport.pricing?.firstKmPrice) || 0
-        this.commonData.perKmPrice = parseFloat(this.transport.pricing?.perKmPrice) || 0
-        this.commonData.notes = this.transport.notes || ''
-        // For edit: populate a single row containing the transport's counts/distance
+      // Adapt for multi-row if needed; for now, assume single row edit or draft
+      if (!this.transport) return
+
+      // Always populate header/common fields from the provided transport draft/object
+      this.commonData.date = this.transport.date?.split('T')[0] || ''
+      this.commonData.item = this.items.find(i => i.id === this.transport.itemId) || this.transport.item || null
+      this.commonData.location = this.locations.find(l => l.id === this.transport.fromLocId) || this.transport.location || null
+      this.commonData.area = this.locations.find(l => l.id === this.transport.toLocId) || this.transport.area || null
+      this.commonData.contractor = this.contractors.find(c => c.id === this.transport.contractorId) || this.transport.contractor || null
+      this.commonData.distanceKm = parseFloat(this.transport.distanceKm) || 0
+      this.commonData.firstKmPrice = parseFloat(this.transport.pricing?.firstKmPrice) || parseFloat(this.transport.firstKmPrice) || 0
+      this.commonData.perKmPrice = parseFloat(this.transport.pricing?.perKmPrice) || parseFloat(this.transport.perKmPrice) || 0
+      this.commonData.notes = this.transport.notes || ''
+
+      // If this is an existing transport (has id), populate the editable row and switch to Step 2
+      if (this.transport.id) {
         this.currentStep = 2
         const vehicle = this.vehicles.find(v => v.id === this.transport.vehicleId)
         this.commonData.vehicle = vehicle || null
@@ -1268,6 +1272,9 @@ export default {
         row.distanceKm = parseFloat(this.transport.distanceKm) || this.commonData.distanceKm || 0
         row.date = this.transport.date?.split('T')[0] || this.commonData.date || new Date().toISOString().split('T')[0]
         this.rows = [row]
+      } else {
+        // Draft: ensure the modal stays on Step 1 so user can confirm header data first
+        this.currentStep = 1
       }
     },
     selectCommonItem(item) {

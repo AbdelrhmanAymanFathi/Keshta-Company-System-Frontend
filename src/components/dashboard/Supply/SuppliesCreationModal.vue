@@ -555,6 +555,14 @@
       <div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div>
     </div>
   </div>
+      <!-- Transport Modal (open after successful supply save when item supports transport) -->
+      <TransportCreationModal
+        :isOpen="showTransportModal"
+        :modalTitle="$t('transport.addTransportFromSupply') || 'Create Transport'"
+        :transport="transportModalPayload"
+        @close="showTransportModal = false"
+        @saved="onTransportSaved"
+      />
 </template>
 
 <script>
@@ -588,6 +596,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
+import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'
 
 export default {
   emits: ['saved'],
@@ -607,6 +616,7 @@ export default {
     ArrowRightIcon,
     SearchDropdown
     ,CreateVehicle
+    ,TransportCreationModal
   },
   props: {
     showTriggerButton: {
@@ -702,6 +712,9 @@ export default {
         companyCapacity: '',
         crusherCapacity: ''
       },
+      // Transport modal trigger/state (open after successful supply save)
+      showTransportModal: false,
+      transportModalPayload: null,
       creatingVehicle: false,
       showAddExportItemDialog: false,
       newExportItemForm: {
@@ -1585,6 +1598,9 @@ export default {
 
         this.saveCommonDataToStorage()
 
+        // capture the step-1 data so we can pass it to transport modal if needed
+        const step1 = JSON.parse(JSON.stringify(this.commonData || {}))
+
         // Reset
         this.currentStep = 1
         this.commonData = { date: '', item: null, price: 0, site: null, area: null, contractor: null, crusher: null }
@@ -1592,13 +1608,46 @@ export default {
 
         this.closeModal()
         this.$emit('saved')
+
+        // If the saved item's config indicates it can be transported, open transport modal
+        try {
+          const itemObj = step1 && step1.item && (typeof step1.item === 'object') ? step1.item : (this.exportItems || []).find(i => i.id === step1.item)
+          const availableForTransport = itemObj && (itemObj.availableForTransport === true || itemObj.availableForTransports === true || itemObj.availableForTransports === 1 || itemObj.availableForTransport === 1)
+          if (step1 && itemObj && availableForTransport) {
+            // Map supply step-1 fields to a transport draft payload
+            this.transportModalPayload = {
+              // location/area naming in transport modal uses `location`/`area`
+              location: step1.site || step1.location || null,
+              area: step1.area || null,
+              contractor: step1.contractor || null,
+              item: itemObj || null,
+              date: step1.date || null,
+              // prefer backend field `defaultTransportPrice`, then `defaultTransferPrice`, then supply price
+              firstKmPrice: itemObj?.defaultTransportPrice ?? itemObj?.defaultTransferPrice ?? itemObj?.transferPrice ?? step1.price ?? null,
+              notes: step1.notes || ''
+            }
+            this.showTransportModal = true
+          }
+        } catch (e) {
+          console.warn('Failed to auto-open transport modal:', e)
+        }
       } catch (err) {
         console.error('saveData error:', err)
         this.saveError = err?.response?.data?.message || this.$t('common.saveError') || 'Error saving'
       } finally {
         this.isSaving = false
       }
-    }
+      },
+      onTransportSaved(payload) {
+        // Close the transport modal and re-emit if parent needs to react
+        this.showTransportModal = false
+        this.transportModalPayload = null
+        try {
+          this.$emit('transportSaved', payload)
+        } catch (e) {
+          // ignore
+        }
+      }
   }
 }
 </script>

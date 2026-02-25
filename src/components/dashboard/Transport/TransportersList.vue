@@ -205,6 +205,10 @@
             <input v-model="form.accountNumber" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
+            <div class="text-sm mb-1">{{ $t('transporters.openingBalance') || 'Opening Balance' }}</div>
+            <input v-model.number="form.openingBalance" type="number" class="w-full px-3 py-2 border rounded" />
+          </label>
+          <label>
             <div class="text-sm mb-1">{{ $t('transporters.notes') }}</div>
             <input v-model="form.notes" class="w-full px-3 py-2 border rounded" />
           </label>
@@ -341,7 +345,7 @@ export default {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', availableForExports: false },
+      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', availableForExports: false, openingBalance: '' },
       contractors: [],
       deleteConfirm: { open: false, item: null },
       contextMenu: { open: false, x: 0, y: 0, item: null },
@@ -419,12 +423,12 @@ export default {
     },
     openAdd() {
       this.editing = false
-      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', availableForExports: false }
+      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', availableForExports: false, openingBalance: '' }
       this.modalOpen = true
     },
     openEdit(c) {
       this.editing = true
-      this.form = { ...c, availableForExports: !!c.availableForExports }
+      this.form = { ...c, availableForExports: !!c.availableForExports, openingBalance: c.openingBalance ?? '' }
       this.modalOpen = true
     },
     closeModal() {
@@ -441,6 +445,7 @@ export default {
       if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
+      if (this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
       if (this.form.availableForExports) payload.availableForExports = true
       payload.availableForTransports = true
 
