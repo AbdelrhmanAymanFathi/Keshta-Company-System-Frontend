@@ -138,7 +138,7 @@
             <button 
               type="submit" 
               :disabled="changing" 
-              class="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50 transition"
+              class="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50 transition whitespace-nowrap"
             >
               {{ changing ? $t('labels.saving') : $t('profile.changePassword') }}
             </button>

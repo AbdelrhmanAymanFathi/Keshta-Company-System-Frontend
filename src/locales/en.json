@@ -1026,6 +1026,7 @@
     "loadError": "Error loading locations or areas",
     "saveError": "Error saving location or area",
     "deleteError": "Error deleting location or area",
+    "confirmDelete": "Are you sure you want to delete this location?",
     "deleteConfirmLocation": "Are you sure you want to delete this location? All its areas will be removed.",
     "deleteConfirmArea": "Are you sure you want to delete this area?",
     "addSuccess": "Added successfully",
