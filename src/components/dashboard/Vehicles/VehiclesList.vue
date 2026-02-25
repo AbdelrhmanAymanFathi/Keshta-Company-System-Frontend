@@ -8,7 +8,7 @@
       <div>
         <button
           @click="openCreateModal"
-          class="px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+          class="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-green-700"
         >
           {{ $t('vehicles.createVehicle') }}
         </button>
@@ -22,7 +22,7 @@
     <!-- Table view -->
     <div class="overflow-x-auto bg-white rounded border">
       <table class="min-w-full text-sm">
-        <thead class="bg-gray-50">
+        <thead class="bg-indigo-50">
           <tr>
             <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
             <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>

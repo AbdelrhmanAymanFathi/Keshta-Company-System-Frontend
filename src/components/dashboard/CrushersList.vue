@@ -29,7 +29,7 @@
     <!-- Desktop Table -->
     <div class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-indigo-50 to-indigo-100">
+        <thead class="bg-indigo-50">
           <tr>
             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">
               {{ $t('labels.#') }}
