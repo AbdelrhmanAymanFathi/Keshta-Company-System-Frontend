@@ -8,7 +8,7 @@
       <div>
         <button
           @click="openCreateModal"
-          class="px-3 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+          class="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-green-700"
         >
           {{ $t('vehicles.createVehicle') }}
         </button>
@@ -22,7 +22,7 @@
     <!-- Table view -->
     <div class="overflow-x-auto bg-white rounded border">
       <table class="min-w-full text-sm">
-        <thead class="bg-gray-50">
+        <thead class="bg-indigo-50">
           <tr>
             <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
             <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
@@ -71,7 +71,7 @@
           </tr>
 
           <tr v-if="vehicles.length === 0">
-            <td class="px-3 py-6 text-center text-gray-500" colspan="6">
+            <td class="px-3 py-2 text-start text-gray-500" colspan="6">
               {{ $t('vehicles.noResults') }}
             </td>
           </tr>
@@ -111,15 +111,14 @@
     </div>
 
     <!-- Create Vehicle Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 z-40 flex items-center justify-center px-4">
-      <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeCreateModal"></div>
-      <div class="relative w-full max-w-3xl z-50 mx-auto">
+    <div v-if="showCreateModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
+      <div class="relative w-full max-w-sm sm:max-w-2xl lg:max-w-3xl z-50 mx-auto">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
-          <div class="flex items-center justify-between px-4 py-3 border-b">
+          <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b">
             <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
             <button class="text-gray-500 hover:text-gray-700" @click="closeCreateModal">✕</button>
           </div>
-          <div class="p-4 overflow-y-auto">
+          <div class="p-4 sm:p-6 overflow-y-auto">
             <CreateVehicle :mode="mode" @created="onCreatedFromModal" />
           </div>
         </div>
@@ -127,15 +126,14 @@
     </div>
 
     <!-- Edit Vehicle Modal -->
-    <div v-if="editingVehicle" class="fixed inset-0 z-40 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeEditModal"></div>
-      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md z-50 p-5">
+    <div v-if="editingVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
+      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.edit') || 'Edit' }} {{ editingVehicle.name }}</h3>
           <button class="text-gray-400 hover:text-gray-600" @click="closeEditModal">✕</button>
         </div>
-        <form @submit.prevent="onSaveEdit" class="space-y-4">
-          <div>
+        <form @submit.prevent="onSaveEdit" class="grid grid-cols-1 sm:grid-cols-2 gap-4 space-y-4 sm:space-y-0">
+          <div class="sm:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.truckName') || 'Truck Name' }}</label>
             <input v-model="editForm.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
           </div>
@@ -153,7 +151,7 @@
               {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
             </p>
           </div>
-          <div class="flex gap-2 justify-end pt-4">
+          <div class="flex gap-2 justify-end pt-4 sm:col-span-2">
             <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
             <button type="submit" :disabled="editLoading" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{{ editLoading ? $t('labels.saving') : $t('labels.save') || 'Save' }}</button>
           </div>
@@ -162,9 +160,8 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="deleteConfirmVehicle" class="fixed inset-0 z-40 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeDeleteConfirm"></div>
-      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md z-50 p-5">
+    <div v-if="deleteConfirmVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
+      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-sm z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
         <p class="text-gray-700 mb-6">{{ $t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete' }} "{{ deleteConfirmVehicle.name }}"?</p>
         <div class="flex gap-2 justify-end">

@@ -1022,15 +1022,20 @@ handleEnterKey(rowIndex) {
       this.contractorDialogError = ''
       try {
         const res = await createContractor({ name })
-        const nc = res?.data
-        if (!nc || !nc.id) {
+        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
+        if (!createdList || createdList.length === 0) {
           throw new Error('لم يتم إرجاع بيانات صحيحة من السيرفر')
         }
-        this.contractors = [...this.contractors, nc]
-        this.contractorsWithVehicles = [...this.contractorsWithVehicles, { ...nc, vehicles: [] }]
+        // add all created contractors to local lists
+        createdList.forEach(nc => {
+          this.contractors = [...this.contractors, nc]
+          this.contractorsWithVehicles = [...this.contractorsWithVehicles, { ...nc, vehicles: [] }]
+        })
+        // choose the first created contractor for the row (or prefer exports)
+        const chosen = createdList.find(c => c.availableForExports) || createdList[0]
         const row = this.rows.find(r => r.contractor === '__new__')
-        if (row) {
-          row.contractor = nc
+        if (row && chosen) {
+          row.contractor = chosen
           this.onContractorChange(row)
         }
         this.newContractorName = ''

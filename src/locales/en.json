@@ -1,5 +1,6 @@
 {
   "appName": "Keshta Company System",
+  "Reports": "Reports",
   "transactions": "Transactions",
   "noTransactions": "No transactions",
   "transfer": "Transfer",
@@ -18,7 +19,8 @@
     "confirmDeleteItem": "Are you sure you want to delete this item?",
     "itemInUse": "Cannot delete this item. It is being used in exports.",
     "itemNotFound": "Item not found",
-    "failedDeleteItem": "Failed to delete item"
+    "failedDeleteItem": "Failed to delete item",
+    "availabilityRemoved": "Availability Removed"
   },
   "placeholders": {
     "enterItemName": "Enter item name",
@@ -31,7 +33,9 @@
     "searchItem": "Search item...",
     "searchVehicle": "Search vehicle...",
     "searchToLocation": "Search to location...",
-    "searchFromLocation": "Search from location..."
+    "searchFromLocation": "Search from location...",
+    "search": "Search..."
+    ,"select": "Select"
   },
   "navbar": {
     "supplies": "Supplies",
@@ -68,6 +72,7 @@
     "transportList": "Transport List",
     "enterTransports": "Enter Transports",
     "addTransport": "Add Transport",
+    "addTransportFromSupply": "Add Transport",
     "editTransport": "Edit Transport",
     "reportMenu": "Transport Reports",
     "reportTitle": "Transport Reports",
@@ -77,6 +82,7 @@
     "fromLocation": "From Location",
     "toLocation": "To Location",
     "numTrips": "Number of Trips",
+    "count": "Count",
     "distanceKm": "Distance (Km)",
     "rate": "Rate",
     "category": "Cargo Type",
@@ -91,6 +97,8 @@
     "firstKmPrice": "First Km Price",
     "perKmPrice": "Per Km Price",
     "to": "to",
+    "location": "Location",
+    "area": "Area",
     "total": "Total",
     "route": "Route",
     "trips": "Trips",
@@ -103,9 +111,10 @@
     "noTransportsDesc": "Get started by creating a new transport record.",
     "confirmDelete": "Are you sure you want to delete this transport?",
     "deletedSuccessfully": "Transport deleted successfully",
-    "subtotal":"Subtotal",
-    "totalDiscount":"Total Discount",
-    "grandTotal":"Grand Total"
+    "subtotal": "Subtotal",
+    "totalDiscount": "Total Discount",
+    "grandTotal": "Grand Total",
+    "addItem": "Add Item"
   },
   "labels": {
     "enterSupplies": "Enter Supplies",
@@ -113,9 +122,9 @@
     "step2Data": "Step 2: Enter Supplies",
     "back": "Back",
     "summary": "Summary",
-    "subtotal":"Subtotal",
-    "totalDiscount":"Total Discount",
-    "grandTotal":"Grand Total",
+    "subtotal": "Subtotal",
+    "totalDiscount": "Total Discount",
+    "grandTotal": "Grand Total",
     "createdAt": "Created At",
     "logout": "Logout",
     "close": "Close",
@@ -166,6 +175,7 @@
     "currency": "EGP",
     "crusherCapacity": "Crusher Capacity",
     "unitPrice": "Unit Price",
+    "lines": "Lines",
     "category": "Category",
     "notes": "Notes",
     "rowTotal": "Row Total",
@@ -205,14 +215,62 @@
     "itemName": "Item Name",
     "unit": "Unit",
     "defaultExportPrice": "Default Export Price",
+    "defaultSupplyPrice": "Default Supply Price",
     "defaultTransportPrice": "Default Transport Price",
     "addExportItem": "Add Item",
     "currentPrice": "Current Price",
     "availableForTransports": "Also available for transport",
     "availableForExports": "Also available for export",
+    "availableForSupplies": "Also available for supplies",
     "start": "Start",
     "copy": "Copy",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "selectItem": "Select an item",
+    "selectItemDesc": "Choose a menu item to start.",
+    "addPayment": "Pay",
+    "paymentSaved": "Payment saved",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "manualDeposit": "Manual deposit",
+    "totalDeposits": "Total deposits",
+    "balanceInfo": "negative = we owe contractor",
+    "balance": "Balance",
+    "breakdown": "Breakdown",
+    "exports": "Exports",
+    "supplies": "Supplies",
+    "transport": "Transport",
+    "expenses": "Expenses",
+    "history": "History",
+    "signedAmount": "Signed amount",
+    "balanceAfter": "Balance after",
+    "advancePayment": "Advance Payment",
+    "applyAdvance": "Apply Advance Payment",
+    "active": "Active",
+    "inactive": "Inactive",
+    "exportCsv": "Export Csv",
+    "filter": "Filter",
+    "isActive": "Is Active",
+    "manualDepositDesc": "Manual Deposit Desc",
+    "page": "Page",
+    "selectAll": "Select All"
+  },
+  "payments": {
+    "addPayment": "Pay",
+    "paymentSaved": "Payment saved",
+    "addPaymentExport": "Add Payment (Export)",
+    "addPaymentTransport": "Add Payment (Transport)",
+    "amount": "Amount",
+    "date": "Date",
+    "method": "Method",
+    "notes": "Notes",
+    "savePayment": "Save Payment",
+    "invalidAmount": "Amount must be greater than zero",
+    "confirmWithdrawal": "This will reduce contractor balance. Continue?",
+    "createFailed": "Failed to create payment",
+    "listTitle": "Payments",
+    "showPayments": "Show payments",
+    "hidePayments": "Hide payments",
+    "noPayments": "No payments found"
   },
   "profile": {
     "title": "Profile",
@@ -239,6 +297,7 @@
     "requiredFields": "Required fields",
     "rowError": "Row",
     "error": "Error",
+    "missingLocationOrArea": "Location and area are required",
     "create": "Create",
     "update": "Update",
     "edit": "Edit",
@@ -247,11 +306,111 @@
     "next": "Next",
     "back": "Previous",
     "save": "Save",
+    "saving": "Saving...",
     "actions": "Actions",
     "loadError": "Error loading data",
     "saveError": "Error saving data",
     "deleteError": "Error deleting data",
-    "select": "Select"
+    "select": "Select",
+    "selectAll": "Select All",
+    "generate": "Generate",
+    "selectAll": "Select All",
+    "noData": "No Data",
+    "required": "Required",
+    "success": "Success"
+  },
+  "admin": {
+    "reports": "Reports",
+    "newReport": "New Report",
+    "createReport": "Create Report",
+    "editReport": "Edit Report",
+    "newReportFromTable": "New Report From Table",
+    "parameters": "Parameters",
+    "previewOptions": "Preview Options",
+    "run": "Run",
+    "discardUnsaved": "Discard unsaved changes?",
+    "reportsList": "Reports List",
+    "runReport": "Run Report"
+  },
+  "reports": {
+    "columns": {
+      "date": "Date",
+      "contractor": "Contractor",
+      "contractor_name": "Contractor Name",
+      "crusher": "Crusher",
+      "crusher_name": "Crusher Name",
+      "location": "Location",
+      "location_name": "Location Name",
+      "area": "Area",
+      "area_name": "Area Name",
+      "item": "Item",
+      "item_name": "Item Name",
+      "vehicle": "Vehicle",
+      "vehicle_name": "Vehicle Name",
+      "notes": "Notes",
+      "crusherTicket": "Crusher Ticket",
+      "companyTicket": "Company Ticket",
+      "unitPrice": "Unit Price",
+      "companyCapacity": "Company Capacity",
+      "crusherCapacity": "Crusher Capacity",
+      "discount": "Discount",
+      "rate": "Rate",
+      "firstKmPrice": "First Km Price",
+      "perKmPrice": "Per Km Price",
+      "vehicleCompanyCapacity": "Vehicle Company Capacity",
+      "distanceKm": "Distance Km",
+      "numTrips": "Num Trips",
+      "total": "Total",
+      "earnings": "Earnings",
+      "payments": "Payments",
+      "balanceOwed": "Balance Owed",
+      "refId": "Reference"
+    },
+    "downloadExcel": "Download Excel",
+    "columnKey": "Key",
+    "columnTitle": "Title",
+    "columnModule": "Module",
+    "columnActive": "Active",
+    "columnActions": "Actions",
+    "columnArTitle": "Arabic Title",
+    "confirmDelete": "Delete this report?",
+    "newParameter": "Add Parameter",
+    "runReport": "Run Report",
+    "loadingOptions": "Loading options...",
+    "selected": "Selected:",
+    "description": "Description",
+    "queryText": "Query Text",
+    "queryHelp": "Use :paramName placeholders matching parameter `name` values.",
+    "parameterEditor": "Parameter Editor",
+    "paramName": "Name",
+    "paramLabel": "Label",
+    "paramType": "Type",
+    "paramRequired": "Required",
+    "dataSourceSql": "Data Source SQL (for DROPDOWN/MULTISELECT)",
+    "metaJson": "Meta (JSON)",
+    "paramArName": "Arabic name",
+    "saveParam": "Save Param",
+    "confirmRemoveParam": "Remove parameter?",
+    "saveFirstToPreview": "Save the report first to preview options",
+    "previewRows": "Preview rows (first items):",
+    "previewFailed": "Preview failed",
+    "parametersHelp": "Add parameters to make your report dynamic and reusable",
+    "moduleReports": "Reports",
+    "saveFailed": "Save failed",
+    "noResults": "No Results",
+    "selectTable": "Select Table",
+    "fieldSelectorHelp": "Select fields to include and edit labels/types.",
+    "arLabelPlaceholder": "Arabic label (appears when AR locale is selected)",
+    "preview": "Preview",
+    "sqlPreview": "SQL Preview",
+    "paramsPreview": "Parameters Preview",
+    "errorKeyRequired": "Key is required",
+    "errorTitleRequired": "Title is required",
+    "errorAtLeastOne": "Select at least one field",
+    "errorLabelTooLong": "One or more labels exceed maximum length",
+    "errorArLabelTooLong": "One or more Arabic labels exceed maximum length",
+    "createSuccess": "Report created successfully",
+    "updateSuccess": "Report updated successfully"
   },
   "auth": {
     "login": {
@@ -274,7 +433,8 @@
         "networkError": "Network error. Please check your connection",
         "serverError": "Server error. Please try again later",
         "required": "This field is required",
-        "invalidEmail": "Please enter a valid email address"
+        "invalidEmail": "Please enter a valid email address",
+        "weakPassword": "Weak Password"
       }
     },
     "register": {
@@ -298,7 +458,9 @@
         "weakPassword": "Password must be at least 8 characters",
         "invalidPhone": "Please enter a valid phone number",
         "required": "This field is required",
-        "invalidEmail": "Please enter a valid email address"
+        "invalidEmail": "Please enter a valid email address",
+        "networkError": "Network Error",
+        "serverError": "Server Error"
       }
     },
     "logout": {
@@ -367,9 +529,13 @@
       "notes": "Notes",
       "actions": "Actions"
     },
+    "exportDetails": "Export Details",
+    "noLines": "No lines found",
     "addSupplier": "Add Supplier",
     "selectSupplier": "Select Supplier",
-    "supplierName": "Supplier Name"
+    "supplierName": "Supplier Name",
+    "results": "Results",
+    "to": "To"
   },
   "contractors": {
     "title": "Contractors",
@@ -417,7 +583,7 @@
     "exportExcel": "Export Excel",
     "exportCSV": "Export CSV",
     "contractorName": "Contractor Name",
-    "exportsEarnings": "Exports Earnings",
+    "suppliesEarnings": "Supplies Earnings",
     "transportEarnings": "Transport Earnings",
     "totalEarnings": "Total Earnings",
     "openingBalance": "Opening Balance",
@@ -436,7 +602,8 @@
     "invalidDateRange": "End date must be after or equal to start date",
     "reportLoadError": "Error loading statement",
     "reportDownloadError": "Error downloading report",
-    "noStatementData": "No data to display"
+    "noStatementData": "No data to display",
+    "typeWithdrawal": "Withdrawal"
   },
   "suppliers": {
     "title": "Suppliers",
@@ -485,7 +652,7 @@
     "exportExcel": "Export Excel",
     "exportCSV": "Export CSV",
     "contractorName": "Supplier Name",
-    "exportsEarnings": "Exports Earnings",
+    "suppliesEarnings": "Supplies Earnings",
     "transportEarnings": "Transport Earnings",
     "totalEarnings": "Total Earnings",
     "openingBalance": "Opening Balance",
@@ -504,7 +671,18 @@
     "invalidDateRange": "End date must be after or equal to start date",
     "reportLoadError": "Error loading statement",
     "reportDownloadError": "Error downloading report",
-    "noStatementData": "No data to display"
+    "noStatementData": "No data to display",
+    "placeholders": {
+      "name": "Enter supplier name",
+      "phone": "Enter phone number",
+      "bankName": "Enter bank name",
+      "accountNumber": "Enter account number",
+      "openingBalance": "Enter opening balance",
+      "notes": "Enter notes (optional)"
+    },
+    "addMultipleSuccess": "Add Multiple Success",
+    "availabilityRemoved": "Availability Removed",
+    "deleteSuccess": "Delete Success"
   },
   "transporters": {
     "title": "Transporters",
@@ -514,6 +692,7 @@
     "phone": "Phone",
     "bankName": "Bank Name",
     "accountNumber": "Account Number",
+    "openingBalance": "Opening Balance",
     "notes": "Notes",
     "statement": "Transporter Statement",
     "wallet": "Transporter Wallet",
@@ -546,7 +725,19 @@
     "namePlaceholder": "Enter transporter name",
     "saveError": "Error saving transporter",
     "isSupplier": "Also a supplier",
-    "deleteError": "Error deleting transporter"
+    "deleteError": "Error deleting transporter",
+    "placeholders": {
+      "name": "Enter transporter name",
+      "phone": "Enter phone number",
+      "bankName": "Enter bank name",
+      "accountNumber": "Enter account number",
+      "openingBalance": "Enter opening balance",
+      "notes": "Enter notes (optional)"
+    },
+    "addMultipleSuccess": "Add Multiple Success",
+    "availabilityRemoved": "Availability Removed",
+    "deleteSuccess": "Delete Success",
+    "importExcel": "Import Excel"
   },
   "crushers": {
     "title": "Crushers",
@@ -564,7 +755,7 @@
     "deleteError": "Error deleting crusher"
   },
   "vehicles": {
-    "crusherCubic":"Crusher Cubic",
+    "crusherCubic": "Crusher Cubic",
     "title": "Vehicles",
     "add": "Add Vehicle",
     "searchPlaceholder": "Search vehicles...",
@@ -608,17 +799,16 @@
     "owner": "Owner",
     "stillOwner": "Current owner",
     "noOwnershipHistory": "No ownership history records found",
-    
     "changeOwner": "Change owner",
     "selectCrusher": "Select Crusher",
     "addNewCrusher": "Add New Crusher",
     "newCrusherNamePlaceholder": "Enter crusher name",
     "crusherCreateError": "Error creating crusher",
-    
     "updateSuccess": "Vehicle updated successfully",
     "deleteSuccess": "Vehicle deleted successfully",
-    "changeOwnerSuccess": "Owner changed successfully"
-    
+    "changeOwnerSuccess": "Owner changed successfully",
+    "availabilityRemoved": "Availability Removed",
+    "crusherCapacity": "Crusher Capacity"
   },
   "rental": {
     "rentalList": "Equipment Rentals",
@@ -717,8 +907,8 @@
     "fromBranch": "From Branch",
     "to": "To",
     "selectBranch": "Select Branch",
-    "transferAmount": "Transfer Amount"
-    ,"showSidebar": "Show wallets",
+    "transferAmount": "Transfer Amount",
+    "showSidebar": "Show wallets",
     "hideSidebar": "Hide wallets"
   },
   "company": {
@@ -734,7 +924,9 @@
       "type": "Type",
       "amount": "Amount",
       "description": "Description",
-      "reference": "Reference"
+      "reference": "Reference",
+      "branches": "Branches",
+      "mainCompany": "Main Company"
     }
   },
   "expenses": {
@@ -765,8 +957,8 @@
     "remaining": "Remaining",
     "notSettled": "Not settled",
     "report": "Report",
-  "reportTitle": "Expenses Report",
-  "reportDescription": "Download an Excel report of all expenses.",
+    "reportTitle": "Expenses Report",
+    "reportDescription": "Download an Excel report of all expenses.",
     "exportReport": "Export Report",
     "selectLocation": "Select save location",
     "selectSaveLocation": "Select Save Location",
@@ -823,7 +1015,8 @@
       "categoryRequired": "Category is required",
       "descriptionRequired": "Description is required",
       "amountRequired": "Amount is required",
-      "amountInvalid": "Amount must be a valid number"
+      "amountInvalid": "Amount must be a valid number",
+      "settlementDateInvalid": "Settlement Date Invalid"
     },
     "success": {
       "created": "Expense created successfully",
@@ -844,7 +1037,8 @@
     "error": "Error",
     "parentCategoryLabel": "Under",
     "addSubcategoryUnder": "Add Subcategory under {parent}",
-    "reportError": "Failed to download report"
+    "reportError": "Failed to download report",
+    "addNewCategory": "Add New Category"
   },
   "changes": {
     "title": "Changes by Date",
@@ -899,8 +1093,9 @@
     "resetConfirmMessage": "Are you sure you want to reset the password for {name}? The user will be required to set a new password.",
     "resetHint": "Enter a new password for the user (optional).",
     "resetSuccess": "Password reset successfully",
-    "resetError": "Error resetting password"
-    ,"passwordTooShort": "Password must be at least {min} characters"
+    "resetError": "Error resetting password",
+    "passwordTooShort": "Password must be at least {min} characters",
+    "passwordRequired": "Password Required"
   },
   "locations": {
     "title": "Locations & Areas",
@@ -917,11 +1112,15 @@
     "loadError": "Error loading locations or areas",
     "saveError": "Error saving location or area",
     "deleteError": "Error deleting location or area",
+    "confirmDelete": "Are you sure you want to delete this location?",
     "deleteConfirmLocation": "Are you sure you want to delete this location? All its areas will be removed.",
     "deleteConfirmArea": "Are you sure you want to delete this area?",
     "addSuccess": "Added successfully",
     "updateSuccess": "Updated successfully",
     "deleteSuccess": "Deleted successfully",
     "noData": "No data available to display"
+  },
+  "wallet": {
+    "ledger": "Ledger"
   }
 }

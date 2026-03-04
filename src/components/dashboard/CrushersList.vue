@@ -29,7 +29,7 @@
     <!-- Desktop Table -->
     <div class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-indigo-50 to-indigo-100">
+        <thead class="bg-indigo-50">
           <tr>
             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">
               {{ $t('labels.#') }}
@@ -77,7 +77,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="3" class="px-6 py-12 text-center text-gray-500">
+            <td colspan="3" class="px-6 py-2 text-start text-gray-500">
               {{ $t('crushers.noResults') }}
             </td>
           </tr>
@@ -172,7 +172,7 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0; ">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">

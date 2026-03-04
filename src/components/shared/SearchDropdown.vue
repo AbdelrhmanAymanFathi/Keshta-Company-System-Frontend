@@ -13,19 +13,22 @@
       :dir="dir"
     />
     <div
-      v-if="isOpen && filteredItems.length"
+      v-if="isOpen"
       class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
+      @mousedown.prevent
     >
-      <div
-        v-for="(item, i) in filteredItems"
-        :key="getKey(item, i)"
-        @mousedown.prevent="selectItem(item)"
-        :class="[
-          'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
-          i === highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
-        ]"
-      >
-        {{ getLabel(item) }}
+      <div v-if="filteredItems.length">
+        <div
+          v-for="(item, i) in filteredItems"
+          :key="getKey(item, i)"
+          @mousedown.prevent="selectItem(item)"
+          :class="[
+            'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
+            i === highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
+          ]"
+        >
+          {{ getLabel(item) }}
+        </div>
       </div>
       <slot name="afterOptions"></slot>
     </div>

@@ -346,7 +346,7 @@
                             </div>
 
                             <!-- Add new -->
-                            <div @click="row.vehicle = '__new__'; showAddVehicleDialog = true; row.open = false"
+                            <div @click.prevent.stop="onAddVehicleClicked(row)"
                               class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
                               + {{ $t('labels.addNew') }}
                             </div>
@@ -519,31 +519,19 @@
     </div>
   </div>
 
-  <!-- Dialog: Add Vehicle -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-full max-w-md">
-      <h3 class="text-lg font-bold mb-3">{{ $t('vehicles.addVehicle') }}</h3>
-      <input v-model="newVehicleForm.name" :placeholder="$t('vehicles.name')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <select v-model="newVehicleForm.contractorId" class="w-full border rounded px-2 py-1 mb-3">
-        <option value="">{{ $t('labels.contractor') }} —</option>
-        <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
-      </select>
-      <input v-model.number="newVehicleForm.companyCapacity" type="number" step="0.01"
-        :placeholder="$t('vehicles.companyCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newVehicleForm.crusherCapacity" type="number" step="0.01"
-        :placeholder="$t('vehicles.crusherCapacity') || $t('labels.crusherCapacity')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <div class="flex gap-2 justify-end">
-        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewVehicle"
-          :disabled="!newVehicleForm.name || !newVehicleForm.companyCapacity || !newVehicleForm.crusherCapacity || creatingVehicle"
-          class="bg-green-600 text-white px-3 py-1 rounded">
-          {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+  <!-- Dialog: Add Vehicle (use shared CreateVehicle modal) -->
+  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-40 flex items-center justify-center px-4">
+    <div class="fixed inset-0 bg-black bg-opacity-40" @click="showAddVehicleDialog = false"></div>
+    <div class="relative w-full max-w-3xl z-50 mx-auto">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 border-b">
+          <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
+          <button class="text-gray-500 hover:text-gray-700" @click="showAddVehicleDialog = false">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto">
+          <CreateVehicle @created="onCreatedFromVehicleModal" />
+        </div>
       </div>
-      <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
     </div>
   </div>
 
@@ -567,6 +555,14 @@
       <div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div>
     </div>
   </div>
+      <!-- Transport Modal (open after successful supply save when item supports transport) -->
+      <TransportCreationModal
+        :isOpen="showTransportModal"
+        :modalTitle="$t('transport.addTransportFromSupply') || 'Create Transport'"
+        :transport="transportModalPayload"
+        @close="showTransportModal = false"
+        @saved="onTransportSaved"
+      />
 </template>
 
 <script>
@@ -599,6 +595,8 @@ import {
   ArrowRightIcon
 } from '@heroicons/vue/24/outline'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
+import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'
 
 export default {
   emits: ['saved'],
@@ -617,11 +615,35 @@ export default {
     CheckIcon,
     ArrowRightIcon,
     SearchDropdown
+    ,CreateVehicle
+    ,TransportCreationModal
   },
   props: {
     showTriggerButton: {
       type: Boolean,
       default: true
+    },
+
+    async onCreatedFromVehicleModal() {
+      try {
+        await this.loadLookups()
+      } catch (e) {
+        console.error('Failed to reload lookups after vehicle creation', e)
+      } finally {
+        this.showAddVehicleDialog = false
+      }
+    },
+
+    onAddVehicleClicked(row) {
+      console.log('SuppliesCreationModal: Add Vehicle clicked for row', row && row.id)
+      try {
+        // mark the row as new vehicle and open shared create vehicle modal
+        if (row) row.vehicle = '__new__'
+        this.showAddVehicleDialog = true
+        if (row) row.open = false
+      } catch (e) {
+        console.error('Error handling add vehicle click', e)
+      }
     },
     triggerButtonText: {
       type: String,
@@ -690,6 +712,9 @@ export default {
         companyCapacity: '',
         crusherCapacity: ''
       },
+      // Transport modal trigger/state (open after successful supply save)
+      showTransportModal: false,
+      transportModalPayload: null,
       creatingVehicle: false,
       showAddExportItemDialog: false,
       newExportItemForm: {
@@ -1113,7 +1138,7 @@ export default {
       if (!this.commonData.item) return
 
       // Support multiple possible field names returned by the API
-      const maybePrice = this.commonData.item.currentPrice ?? this.commonData.item.defaultExportPrice ?? this.commonData.item.price ?? this.commonData.item.current_price
+      const maybePrice = this.commonData.item.currentPrice ?? this.commonData.item.defaultSupplyPrice ?? this.commonData.item.defaultExportPrice ?? this.commonData.item.price ?? this.commonData.item.current_price
       const parsed = Number(maybePrice)
       if (!Number.isNaN(parsed)) {
         this.commonData.price = parsed
@@ -1386,16 +1411,17 @@ export default {
       this.contractorDialogError = ''
       try {
         const res = await createContractor({ name })
-        const nc = res?.data
-        if (!nc || !nc.id) throw new Error('Invalid response')
+        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
+        if (!createdList || createdList.length === 0) throw new Error('Invalid response')
 
-        console.log('✅ Created contractor:', nc)
+        console.log('✅ Created contractor(s):', createdList)
 
         // Reload all lookups to get fresh data
         await this.loadLookups()
 
-        // After reload, find and set the new contractor
-        const updatedContractor = this.contractors.find(c => c.id === nc.id)
+        // Choose exporter-capable contractor when available
+        const chosen = createdList.find(c => c.availableForSupplies) || createdList.find(c => c.availableForExports) || createdList[0]
+        const updatedContractor = this.contractors.find(c => c.id === chosen.id)
         if (updatedContractor && this.currentStep === 1) {
           this.commonData.contractor = updatedContractor
           console.log('✅ Set commonData.contractor:', updatedContractor)
@@ -1542,38 +1568,42 @@ export default {
       }
 
       try {
+        // Create one flat Export per non-empty row (server computes `total`)
+        const createdIds = []
         for (const r of toSave) {
-          const locationId = r.location?.id
-          console.log('🔍 Processing row with location:', r.location)
-          if (!locationId) continue
-
-          const areaId = r.area?.id
-          console.log('🔍 Processing row with area:', r.area)
-          if (!areaId) continue
-
-          const unitPrice = Number(this.commonData.price || 0)
-          const companyCapacity = Number(r.companyCapacity || 0)
-          const discount = Number(r.discount || 0)
-
-          await createExport({
+          const payload = {
             date: this.commonData.date,
-            locationId: locationId,
-            areaId: areaId,
+            locationId: this.commonData.site?.id || (this.commonData.location?.id || null),
+            areaId: this.commonData.area?.id || null,
             contractorId: this.commonData.contractor?.id ? Number(this.commonData.contractor.id) : null,
             crusherId: this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
-            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : null,
-            crusherTicket: r.crusherTicket?.trim() || '',
-            companyTicket: r.companyTicket?.trim() || '',
-            unitPrice,
-            companyCapacity,
-            discount,
-            crusherCapacity: r.crusherCapacity ? Number(r.crusherCapacity) : null,
-            itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null
-          })
+            itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null,
+            notes: this.commonData.notes || undefined,
+            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : undefined,
+            crusherTicket: r.crusherTicket?.trim() || undefined,
+            companyTicket: r.companyTicket?.trim() || undefined,
+            companyCapacity: r.companyCapacity !== undefined && r.companyCapacity !== null ? Number(r.companyCapacity) : undefined,
+            crusherCapacity: r.crusherCapacity !== undefined && r.crusherCapacity !== null ? Number(r.crusherCapacity) : undefined,
+            unitPrice: (r.unitPrice !== undefined && r.unitPrice !== null) ? Number(r.unitPrice) : (this.commonData.price !== undefined ? Number(this.commonData.price) : undefined),
+            discount: r.discount !== undefined && r.discount !== null ? Number(r.discount) : undefined
+          }
+
+          // If editing a single export (modal opened for edit), prefer update for that specific export id
+          if (this.export && this.export.id && toSave.length === 1) {
+            // await updateExport(this.export.id, payload)
+          } else {
+            // mark record for supplies and keep legacy exports flag for compatibility
+            payload.availableForSupplies = true
+            payload.availableForExports = true
+            const res = await createExport(payload)
+            if (res && res.data && res.data.id) createdIds.push(res.data.id)
+          }
         }
 
-        // alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.saveCommonDataToStorage()
+
+        // capture the step-1 data so we can pass it to transport modal if needed
+        const step1 = JSON.parse(JSON.stringify(this.commonData || {}))
 
         // Reset
         this.currentStep = 1
@@ -1582,13 +1612,46 @@ export default {
 
         this.closeModal()
         this.$emit('saved')
+
+        // If the saved item's config indicates it can be transported, open transport modal
+        try {
+          const itemObj = step1 && step1.item && (typeof step1.item === 'object') ? step1.item : (this.exportItems || []).find(i => i.id === step1.item)
+          const availableForTransport = itemObj && (itemObj.availableForTransport === true || itemObj.availableForTransports === true || itemObj.availableForTransports === 1 || itemObj.availableForTransport === 1)
+          if (step1 && itemObj && availableForTransport) {
+            // Map supply step-1 fields to a transport draft payload
+            this.transportModalPayload = {
+              // location/area naming in transport modal uses `location`/`area`
+              location: step1.site || step1.location || null,
+              area: step1.area || null,
+              contractor: step1.contractor || null,
+              item: itemObj || null,
+              date: step1.date || null,
+              // prefer backend field `defaultTransportPrice`, then `defaultTransferPrice`, then supply price
+              firstKmPrice: itemObj?.defaultTransportPrice ?? itemObj?.defaultTransferPrice ?? itemObj?.transferPrice ?? step1.price ?? null,
+              notes: step1.notes || ''
+            }
+            this.showTransportModal = true
+          }
+        } catch (e) {
+          console.warn('Failed to auto-open transport modal:', e)
+        }
       } catch (err) {
         console.error('saveData error:', err)
         this.saveError = err?.response?.data?.message || this.$t('common.saveError') || 'Error saving'
       } finally {
         this.isSaving = false
       }
-    }
+      },
+      onTransportSaved(payload) {
+        // Close the transport modal and re-emit if parent needs to react
+        this.showTransportModal = false
+        this.transportModalPayload = null
+        try {
+          this.$emit('transportSaved', payload)
+        } catch (e) {
+          // ignore
+        }
+      }
   }
 }
 </script>

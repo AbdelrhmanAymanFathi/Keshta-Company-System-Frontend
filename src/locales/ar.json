@@ -1,5 +1,6 @@
 {
   "appName": "نظام شركة قشطة",
+  "Reports": "التقارير",
   "transactions": "المعاملات",
   "noTransactions": "لا توجد معاملات",
   "transfer": "تحويل",
@@ -11,7 +12,6 @@
     "itemNameRequired": "اسم الصنف مطلوب",
     "priceRequired": "السعر مطلوب ويجب أن يكون موجباً"
   },
-    
   "messages": {
     "itemCreated": "تم إنشاء الصنف بنجاح",
     "itemUpdated": "تم تحديث الصنف بنجاح",
@@ -19,7 +19,8 @@
     "confirmDeleteItem": "هل أنت متأكد من حذف هذا الصنف؟",
     "itemInUse": "لا يمكن حذف هذا الصنف. إنه مستخدم في التوريدات.",
     "itemNotFound": "الصنف غير موجود",
-    "failedDeleteItem": "فشل حذف الصنف"
+    "failedDeleteItem": "فشل حذف الصنف",
+    "availabilityRemoved": "تمت إزالة التوافر"
   },
   "placeholders": {
     "enterItemName": "أدخل اسم الصنف",
@@ -32,7 +33,9 @@
     "searchItem": "ابحث عن صنف...",
     "searchVehicle": "ابحث عن سيارة...",
     "searchToLocation": "ابحث عن موقع الوصول...",
-    "searchFromLocation": "ابحث عن موقع الانطلاق..."
+    "searchFromLocation": "ابحث عن موقع الانطلاق...",
+    "search": "بحث..."
+    ,"select": "اختر"
   },
   "navbar": {
     "supplies": "التوريدات",
@@ -69,6 +72,7 @@
     "enterTransports": "إدخال النقلات",
     "transportList": "قائمة النقل",
     "addTransport": "إضافة نقل",
+    "addTransportFromSupply": "إضافة نقل",
     "editTransport": "تعديل النقل",
     "reportMenu": "تقارير النقل",
     "reportTitle": "تقارير النقل",
@@ -77,7 +81,10 @@
     "contractor": "المقاول",
     "fromLocation": "من الموقع",
     "toLocation": "إلى الموقع",
+    "location": "الموقع",
+    "area": "المنطقة",
     "numTrips": "عدد النقلات",
+    "count": "العدد",
     "firstKmPrice": "السعر لأول كيلومتر",
     "perKmPrice": "السعر لكل كيلو",
     "distanceKm": "المسافة (كم)",
@@ -105,13 +112,14 @@
     "deletedSuccessfully": "تم حذف النقل بنجاح",
     "subtotal": "المجموع الفرعي",
     "totalDiscount": "إجمالي الخصم",
-    "grandTotal":"المجموع الكلي",
-    "to": "إلى"
+    "grandTotal": "المجموع الكلي",
+    "to": "إلى",
+    "addItem": "إضافة بند"
   },
   "labels": {
-    "subtotal":"المجموع الفرعي",
-    "totalDiscount":"إجمالي الخصم",
-    "grandTotal":"الإجمالي النهائي",
+    "subtotal": "المجموع الفرعي",
+    "totalDiscount": "إجمالي الخصم",
+    "grandTotal": "الإجمالي النهائي",
     "enterSupplies": "أدخل التوريدة",
     "step1BasicData": "الخطوة 1: البيانات الأساسية",
     "back": "رجوع",
@@ -168,8 +176,9 @@
     "crusherCapacity": "تكعيبة الكسارة",
     "createdAt": "تاريخ الإنشاء",
     "unitPrice": "سعر الوحدة",
+    "lines": "الأسطر",
     "category": "الفئة",
-    "new":"انشاء",
+    "new": "انشاء",
     "notes": "ملاحظات",
     "rowTotal": "المجموع",
     "accumulativeTotal": "المجموع التراكمي",
@@ -204,15 +213,65 @@
     "item": "الصنف",
     "itemName": "اسم الصنف",
     "unit": "الوحدة",
-    "defaultExportPrice": "سعر التصدير الافتراضي",
+    "defaultExportPrice": "سعر التوريد الافتراضي",
+    "defaultSupplyPrice": "سعر التوريد الافتراضي",
     "defaultTransportPrice": "سعر النقل الافتراضي",
     "addExportItem": "إضافة صنف",
     "currentPrice": "السعر الحالي",
     "availableForTransports": "متاح للنقل أيضًا",
     "availableForExports": "متاح للتصدير أيضًا",
+    "availableForSupplies": "متاح للتوريد أيضًا",
     "start": "ابدأ",
     "copy": "نسخ",
-    "confirm": "تأكيد"
+    "confirm": "تأكيد",
+    "selectItem": "اختر صنفًا",
+    "selectItemDesc": "اختر بند من القائمة للبدء.",
+    "addPayment": "دفع",
+    "paymentSaved": "تم حفظ الدفعة",
+    "paid": "مدفوع",
+    "unpaid": "غير مدفوع",
+    "manualDeposit": "إيداع يدوي",
+    "totalDeposits": "إجمالي الإيداعات",
+    "balanceInfo": "السالب = ندين للمقاول",
+    "balance": "الرصيد",
+    "breakdown": "تفصيل",
+    "exports": "الصادرات",
+    "supplies": "التوريدات",
+    "transport": "النقل",
+    "expenses": "المصروفات",
+    "history": "السجل",
+    "signedAmount": "المبلغ",
+    "balanceAfter": "الرصيد بعد",
+    "advancePayment": "دفع مسبق",
+    "applyAdvance": "تطبيق الدفع المسبق",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "exportCsv": "تصدير CSV",
+    "filter": "تصفية",
+    "isActive": "نشط",
+    "manualDepositDesc": "وصف الإيداع اليدوي",
+    "page": "الصفحة",
+    "selectAll": "تحديد الكل"
+  },
+  "payments": {
+    "addPayment": "دفع",
+    "paymentSaved": "تم حفظ الدفعة",
+    "paid": "مدفوع",
+    "unpaid": "غير مدفوع",
+    "addPaymentExport": "إضافة دفعة (تصدير)",
+    "addPaymentTransport": "إضافة دفعة (نقل)",
+    "amount": "المبلغ",
+    "date": "التاريخ",
+    "method": "الطريقة",
+    "notes": "ملاحظات",
+    "savePayment": "حفظ الدفعة",
+    "invalidAmount": "يجب أن يكون المبلغ أكبر من صفر",
+    "confirmWithdrawal": "سيؤدي ذلك إلى تخفيض رصيد المقاول. هل تود المتابعة؟",
+    "createFailed": "فشل في إنشاء الدفعة",
+    "listTitle": "الدفعات",
+    "showPayments": "عرض الدفعات",
+    "hidePayments": "إخفاء الدفعات",
+    "noPayments": "لا توجد دفعات"
   },
   "profile": {
     "title": "الملف الشخصي",
@@ -233,12 +292,13 @@
     "deviceLabel": "اسم الجهاز",
     "scanQr": "امسح رمز الاستجابة السريعة باستخدام تطبيق المصادقة أو انسخ السر.",
     "devices": "أجهزة المصادقة",
-    "noDevices": "لا توجد أجهزة TOTP مسجلة"
+    "noDevices": "لا توجد أجهزة المصادقة المسجلة"
   },
   "common": {
     "requiredFields": "الحقول المطلوبة",
     "rowError": "الصف",
     "error": "خطأ",
+    "missingLocationOrArea": "الموقع والمنطقة مطلوبان",
     "create": "إنشاء",
     "update": "تحديث",
     "edit": "تعديل",
@@ -247,11 +307,110 @@
     "next": "التالي",
     "back": "السابق",
     "save": "حفظ",
+    "saving": "جاري الحفظ...",
     "actions": "الإجراءات",
     "loadError": "خطأ في تحميل البيانات",
     "saveError": "خطأ في حفظ البيانات",
     "deleteError": "خطأ في حذف البيانات",
-    "select": "اختر"
+    "select": "اختر",
+    "selectAll": "تحديد الكل",
+    "generate": "إنشاء",
+    "noData": "لا توجد بيانات",
+    "required": "مطلوب",
+    "success": "نجاح"
+  },
+  "admin": {
+    "reports": "التقارير",
+    "newReport": "تقرير جديد",
+    "createReport": "إنشاء تقرير",
+    "editReport": "تعديل التقرير",
+    "newReportFromTable": "تقرير جديد من جدول",
+    "parameters": "متغيرات",
+    "previewOptions": "معاينة الخيارات",
+    "run": "تشغيل",
+    "discardUnsaved": "هل تريد تجاهل التغييرات غير المحفوظة؟",
+    "reportsList": "قائمة التقارير",
+    "runReport": "تشغيل التقرير"
+  },
+  "reports": {
+    "columns": {
+      "date": "التاريخ",
+      "contractor": "المقاول",
+      "contractor_name": "اسم المقاول",
+      "crusher": "الكسارة",
+      "crusher_name": "اسم الكسارة",
+      "location": "الموقع",
+      "location_name": "اسم الموقع",
+      "area": "المنطقة",
+      "area_name": "اسم المنطقة",
+      "item": "الصنف",
+      "item_name": "اسم الصنف",
+      "vehicle": "المركبة",
+      "vehicle_name": "اسم المركبة",
+      "notes": "ملاحظات",
+      "crusherTicket": "تذكرة الكسارة",
+      "companyTicket": "تذكرة الشركة",
+      "unitPrice": "سعر الوحدة",
+      "companyCapacity": "تكعيبة الشركة",
+      "crusherCapacity": "تكعيبة الكسارة",
+      "discount": "الخصم",
+      "rate": "السعر",
+      "firstKmPrice": "السعر لأول كيلومتر",
+      "perKmPrice": "السعر لكل كيلو",
+      "vehicleCompanyCapacity": "سعة المركبة/الشركة",
+      "distanceKm": "المسافة (كم)",
+      "numTrips": "عدد الرحلات",
+      "total": "المجموع",
+      "earnings": "الأرباح",
+      "payments": "المدفوعات",
+      "balanceOwed": "الرصيد المستحق",
+      "refId": "المرجع"
+    },
+    "downloadExcel": "تحميل إكسل",
+    "columnKey": "المفتاح",
+    "columnTitle": "العنوان",
+    "columnArTitle": "العنوان بالعربية",
+    "columnModule": "الوحدة",
+    "columnActive": "نشط",
+    "columnActions": "الإجراءات",
+    "confirmDelete": "حذف هذا التقرير؟",
+    "newParameter": "إضافة متغير",
+    "runReport": "تشغيل التقرير",
+    "loadingOptions": "جارٍ تحميل الخيارات...",
+    "selected": "المحدد:",
+    "description": "الوصف",
+    "queryText": "نص الاستعلام",
+    "queryHelp": "استخدم :paramName كعنصر نائب يطابق قيمة الحقل `name` للمعامل.",
+    "parameterEditor": "محرر المتغيرات",
+    "paramName": "الاسم",
+    "paramLabel": "التسمية",
+    "paramType": "النوع",
+    "paramRequired": "مطلوب",
+    "dataSourceSql": "مصدر بيانات SQL (للقوائم المنسدلة/الاختيار المتعدد)",
+    "metaJson": "البيانات الوصفية (JSON)",
+    "paramArName": "الاسم بالعربية",
+    "saveParam": "حفظ المتغير",
+    "confirmRemoveParam": "حذف المتغير؟",
+    "saveFirstToPreview": "احفظ التقرير أولاً لمعاينة الخيارات",
+    "previewRows": "معاينة الصفوف (أول العناصر):",
+    "previewFailed": "فشلت المعاينة",
+    "parametersHelp": "أضف متغيرات لجعل تقريرك ديناميكياً وقابلاً لإعادة الاستخدام",
+    "moduleReports": "التقارير",
+    "saveFailed": "فشل الحفظ",
+    "noResults": "لا توجد نتائج",
+    "selectTable": "اختر الجدول",
+    "fieldSelectorHelp": "حدد الحقول المراد تضمينها وقم بتعديل التسميات/النوع.",
+    "arLabelPlaceholder": "التسمية بالعربية (تظهر عند اختيار العربية)",
+    "preview": "المعاينة",
+    "sqlPreview": "معاينة SQL",
+    "paramsPreview": "معاينة المعاملات",
+    "errorKeyRequired": "المفتاح مطلوب",
+    "errorTitleRequired": "العنوان مطلوب",
+    "errorAtLeastOne": "اختر حقلًا واحدًا على الأقل",
+    "errorLabelTooLong": "إحدى التسميات أو أكثر تتجاوز الحد المسموح",
+    "errorArLabelTooLong": "إحدى التسميات العربية أو أكثر تتجاوز الحد المسموح",
+    "createSuccess": "تم إنشاء التقرير بنجاح",
+    "updateSuccess": "تم تحديث التقرير بنجاح"
   },
   "auth": {
     "login": {
@@ -274,7 +433,8 @@
         "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك",
         "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً",
         "required": "هذا الحقل مطلوب",
-        "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح"
+        "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+        "weakPassword": "كلمة المرور ضعيفة"
       }
     },
     "register": {
@@ -298,7 +458,9 @@
         "weakPassword": "كلمة المرور يجب أن تكون 8 أحرف على الأقل",
         "invalidPhone": "يرجى إدخال رقم هاتف صالح",
         "required": "هذا الحقل مطلوب",
-        "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح"
+        "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+        "networkError": "خطأ في الشبكة",
+        "serverError": "خطأ في الخادم"
       }
     },
     "logout": {
@@ -343,7 +505,7 @@
     "itemsPerPage": "عناصر في الصفحة",
     "previous": "السابق",
     "next": "التالي",
-    "confirmDeleteExport": "حذف هذا التصدير؟",
+    "confirmDeleteExport": "حذف هذا التوريدة؟",
     "name": "الاسم",
     "siteName": "اسم الموقع",
     "areaName": "اسم المنطقة",
@@ -365,9 +527,13 @@
       "notes": "ملاحظات",
       "actions": "الإجراءات"
     },
+    "exportDetails": "تفاصيل التوريدة",
+    "noLines": "لا توجد أسطر",
     "addSupplier": "إضافة مورد",
     "selectSupplier": "اختر المورد",
-    "supplierName": "اسم المورد"
+    "supplierName": "اسم المورد",
+    "results": "النتائج",
+    "to": "إلى"
   },
   "contractors": {
     "title": "الموردين",
@@ -390,6 +556,7 @@
     "totalDeposits": "إجمالي الإيداعات",
     "sources": "المصادر",
     "exports": "الصادرات",
+    "supplies": "التوريدات",
     "transport": "النقل",
     "expenses": "المصروفات",
     "transactions": "المعاملات",
@@ -412,17 +579,17 @@
     "selectContractor": "اختر المقاول",
     "selectContractorFirst": "يرجى اختيار مقاول أولاً",
     "loadStatement": "عرض الكشف",
-    "exportExcel": "تصدير Excel",
+    "exportExcel": "تصدير إكسل",
     "exportCSV": "تصدير CSV",
     "contractorName": "اسم المقاول",
-    "exportsEarnings": "مستحقات التوريدات",
+    "suppliesEarnings": "مستحقات التوريدات",
     "transportEarnings": "مستحقات النقل",
     "totalEarnings": "إجمالي المستحقات",
     "openingBalance": "رصيد أول المدة",
     "closingBalance": "رصيد آخر المدة",
     "balanceOwed": "الرصيد المستحق على الشركة",
-    "owedByCompany": "مستحق على الشركة",
-    "owedToCompany": "مستحق للمقاول",
+    "owedByCompany": "موجب = مستحق على الشركة",
+    "owedToCompany": "سالب = مستحق للشركة",
     "dateRange": "الفترة",
     "startOfTime": "بداية التاريخ",
     "endOfTime": "نهاية التاريخ",
@@ -434,7 +601,8 @@
     "invalidDateRange": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية",
     "reportLoadError": "خطأ في تحميل الكشف",
     "reportDownloadError": "خطأ في تحميل التقرير",
-    "noStatementData": "لا توجد بيانات للعرض"
+    "noStatementData": "لا توجد بيانات للعرض",
+    "typeWithdrawal": "سحب"
   },
   "suppliers": {
     "title": "الموردين",
@@ -480,16 +648,16 @@
     "selectContractor": "اختر المورد",
     "selectContractorFirst": "يرجى اختيار مورد أولاً",
     "loadStatement": "عرض الكشف",
-    "exportExcel": "تصدير Excel",
+    "exportExcel": "تصدير إكسل",
     "exportCSV": "تصدير CSV",
     "contractorName": "اسم المورد",
-    "exportsEarnings": "مستحقات التوريدات",
+    "suppliesEarnings": "مستحقات التوريدات",
     "transportEarnings": "مستحقات النقل",
     "totalEarnings": "إجمالي المستحقات",
     "openingBalance": "رصيد أول المدة",
     "closingBalance": "رصيد آخر المدة",
     "balanceOwed": "الرصيد المستحق على الشركة",
-    "owedByCompany": "مستحق على الشركة",
+    "owedByCompany": "موجب = مستحق على الشركة",
     "owedToCompany": "مستحق للمورد",
     "dateRange": "الفترة",
     "startOfTime": "بداية التاريخ",
@@ -502,7 +670,18 @@
     "invalidDateRange": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية",
     "reportLoadError": "خطأ في تحميل الكشف",
     "reportDownloadError": "خطأ في تحميل التقرير",
-    "noStatementData": "لا توجد بيانات للعرض"
+    "noStatementData": "لا توجد بيانات للعرض",
+    "placeholders": {
+      "name": "أدخل اسم المورد",
+      "phone": "أدخل رقم الهاتف",
+      "bankName": "أدخل اسم البنك",
+      "accountNumber": "أدخل رقم الحساب",
+      "openingBalance": "أدخل الرصيد الافتتاحي",
+      "notes": "أدخل الملاحظات (اختياري)"
+    },
+    "addMultipleSuccess": "تمت إضافة عدة موردين بنجاح",
+    "availabilityRemoved": "تمت إزالة التوافر",
+    "deleteSuccess": "تم حذف المورد بنجاح"
   },
   "transporters": {
     "title": "مقاولين النقل",
@@ -512,6 +691,7 @@
     "phone": "الهاتف",
     "bankName": "اسم البنك",
     "accountNumber": "رقم الحساب",
+    "openingBalance": "الرصيد الافتتاحي",
     "notes": "ملاحظات",
     "statement": "كشف حساب مقاول النقل",
     "wallet": "محفظة مقاول النقل",
@@ -544,7 +724,19 @@
     "isSupplier": "أيضًا مورد",
     "namePlaceholder": "أدخل اسم مقاول النقل",
     "saveError": "خطأ في حفظ مقاول النقل",
-    "deleteError": "خطأ في حذف مقاول النقل"
+    "deleteError": "خطأ في حذف مقاول النقل",
+    "placeholders": {
+      "name": "أدخل اسم مقاول النقل",
+      "phone": "أدخل رقم الهاتف",
+      "bankName": "أدخل اسم البنك",
+      "accountNumber": "أدخل رقم الحساب",
+      "openingBalance": "أدخل الرصيد الافتتاحي",
+      "notes": "أدخل الملاحظات (اختياري)"
+    },
+    "addMultipleSuccess": "تمت إضافة عدة مقاولين نقل بنجاح",
+    "availabilityRemoved": "تمت إزالة التوافر",
+    "deleteSuccess": "تم حذف مقاول النقل بنجاح",
+    "importExcel": "استيراد إكسل"
   },
   "crushers": {
     "title": "الكسارات",
@@ -562,7 +754,7 @@
     "deleteError": "خطأ في حذف الكسارة"
   },
   "vehicles": {
-    "crusherCubic":"تكعيب الكسارة",
+    "crusherCubic": "تكعيب الكسارة",
     "title": "المركبات",
     "add": "إضافة مركبة",
     "searchPlaceholder": "البحث في المركبات...",
@@ -604,17 +796,17 @@
     "owner": "المالك",
     "stillOwner": "مالك حالي",
     "noOwnershipHistory": "لا يوجد سجل لتاريخ الملكية",
-    
     "changeOwner": "تغيير المالك",
     "selectCrusher": "اختر الكسارة",
     "addNewCrusher": "إضافة كسارة جديدة",
     "newCrusherNamePlaceholder": "أدخل اسم الكسارة",
     "crusherCreateError": "خطأ في إنشاء الكسارة",
-    
     "updateSuccess": "تم تحديث المركبة بنجاح",
     "deleteSuccess": "تم حذف المركبة بنجاح",
-    "changeOwnerSuccess": "تم تغيير المالك بنجاح"
-    
+    "changeOwnerSuccess": "تم تغيير المالك بنجاح",
+    "availabilityRemoved": "تمت إزالة التوافر",
+    "crusherCapacity": "سعة الكسارة",
+    "cubicCapacity": "سعة التكعيب"
   },
   "rental": {
     "rentalList": "إيجار المعدات",
@@ -660,7 +852,7 @@
     "isCompanyOwned": "معدات مملوكة للشركة",
     "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
     "totalCanOverride": "يمكن تعديل المجموع يدوياً",
-    "useArrowKeys": "استخدم أسهم لوحة المفاتيح (← →) أو A/D للتمرير أفقياً",
+    "useArrowKeys": "استخدم مفاتيح السهم (يسار/يمين) للتمرير أفقياً",
     "report": "تقرير الإيجار",
     "reportTitle": "تقارير إيجار المعدات",
     "reportDescription": "قم بتنزيل تقرير إكسل لكل معدات الإيجار مع الفلاتر",
@@ -730,7 +922,9 @@
       "type": "النوع",
       "amount": "المبلغ",
       "description": "الوصف",
-      "reference": "المرجع"
+      "reference": "المرجع",
+      "branches": "الفروع",
+      "mainCompany": "الخزينة الرئيسية"
     }
   },
   "expenses": {
@@ -819,7 +1013,8 @@
       "categoryRequired": "الفئة مطلوبة",
       "descriptionRequired": "الوصف مطلوب",
       "amountRequired": "المبلغ مطلوب",
-      "amountInvalid": "المبلغ يجب أن يكون رقماً صحيحاً"
+      "amountInvalid": "المبلغ يجب أن يكون رقماً صحيحاً",
+      "settlementDateInvalid": "تاريخ التسوية غير صالح"
     },
     "success": {
       "created": "تم إنشاء المصروف بنجاح",
@@ -840,7 +1035,8 @@
     "error": "خطأ",
     "parentCategoryLabel": "تحت",
     "addSubcategoryUnder": "إضافة تصنيف فرعي تحت {parent}",
-    "reportError": "فشل في تحميل التقرير"
+    "reportError": "فشل في تحميل التقرير",
+    "addNewCategory": "إضافة فئة جديدة"
   },
   "changes": {
     "title": "التغييرات حسب التاريخ",
@@ -895,8 +1091,9 @@
     "resetConfirmMessage": "هل أنت متأكد من إعادة تعيين كلمة المرور للمستخدم {name}؟ سيُطلب من المستخدم تعيين كلمة مرور جديدة.",
     "resetHint": "أدخل كلمة مرور جديدة للمستخدم (اختياري).",
     "resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح",
-    "resetError": "خطأ في إعادة تعيين كلمة المرور"
-    ,"passwordTooShort": "يجب أن تكون كلمة المرور {min} أحرف على الأقل"
+    "resetError": "خطأ في إعادة تعيين كلمة المرور",
+    "passwordTooShort": "يجب أن تكون كلمة المرور {min} أحرف على الأقل",
+    "passwordRequired": "كلمة المرور مطلوبة"
   },
   "locations": {
     "title": "المواقع والمناطق",
@@ -913,11 +1110,15 @@
     "loadError": "خطأ في تحميل المواقع أو المناطق",
     "saveError": "خطأ في حفظ الموقع أو المنطقة",
     "deleteError": "خطأ في حذف الموقع أو المنطقة",
+    "confirmDelete": "هل أنت متأكد من حذف هذا الموقع؟",
     "deleteConfirmLocation": "هل أنت متأكد من حذف هذا الموقع؟ سيتم حذف جميع المناطق المرتبطة به.",
     "deleteConfirmArea": "هل أنت متأكد من حذف هذه المنطقة؟",
     "addSuccess": "تمت الإضافة بنجاح",
     "updateSuccess": "تم التحديث بنجاح",
     "deleteSuccess": "تم الحذف بنجاح",
     "noData": "لا توجد بيانات للعرض"
+  },
+  "wallet": {
+    "ledger": "دفتر الأستاذ"
   }
 }

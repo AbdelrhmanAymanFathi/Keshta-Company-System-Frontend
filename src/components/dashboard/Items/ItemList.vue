@@ -22,9 +22,9 @@
             <th
               class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ $t('labels.unit') || 'Unit' }}</th>
-            <th v-if="mode === 'export' || mode === 'all'"
+            <th v-if="mode === 'supply' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
-              {{ $t('labels.defaultExportPrice') || 'Export Price' }}</th>
+              {{ $t('labels.defaultSupplyPrice') || 'Supply Price' }}</th>
             <th v-if="mode === 'transport' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ $t('labels.defaultTransportPrice') || 'Transport Price' }}</th>
@@ -55,14 +55,14 @@
               {{ item.name }}</td>
             <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ getUnitName(item.unitId) || '-' }}</td>
-            <td v-if="mode === 'export' || mode === 'all'"
+            <td v-if="mode === 'supply' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
-              {{ formatPrice(item.defaultExportPrice) }}</td>
+              {{ formatPrice(item.defaultSupplyPrice) }}</td>
             <td v-if="mode === 'transport' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ formatPrice(item.defaultTransportPrice) }}</td>
             <!-- <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
-              <span v-if="item.availableForExports">✓</span><span v-else>-</span></td>
+              <span v-if="item.availableForSupplies">✓</span><span v-else>-</span></td>
             <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
               <span v-if="item.availableForTransports">✓</span><span v-else>-</span></td>
             <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
@@ -83,7 +83,7 @@
           </tr>
           <tr v-if="items.length === 0 && !loading">
             <td
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start"
+              class="px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start"
               :colspan="columnsCount">
               {{ $t('labels.noDataFound') || 'No items found' }}
             </td>
@@ -134,14 +134,14 @@
           </label>
 
           <!-- Prices (mode-specific) -->
-          <label class="block" v-if="mode === 'export' || mode === 'all'">
-            <div class="text-sm font-medium mb-1">{{ $t('labels.defaultExportPrice') || 'Default Export Price' }} {{ mode === 'export' ? '*' : '' }}</div>
-            <input v-model.number="form.defaultExportPrice" :required="mode === 'export'" type="number" step="0.01" min="0"
+          <label class="block" v-if="mode === 'supply' || mode === 'all'">
+            <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</div>
+            <input v-model.number="form.defaultSupplyPrice" :required="mode === 'supply'" type="number" step="0.01" min="0"
               class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
               :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
 
-            <!-- When in export mode allow marking also available for transport -->
-            <div v-if="mode === 'export'" class="mt-2 flex items-center gap-2">
+            <!-- When in supply mode allow marking also available for transport -->
+            <div v-if="mode === 'supply'" class="mt-2 flex items-center gap-2">
               <input id="availTransport" type="checkbox" v-model="form.availableForTransports" class="w-4 h-4" />
               <label for="availTransport" class="text-sm">{{ $t('labels.availableForTransports') || 'Also available for transport' }}</label>
             </div>
@@ -161,16 +161,16 @@
               class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
               :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
 
-            <!-- When in transport mode allow marking also available for export -->
+            <!-- When in transport mode allow marking also available for supply -->
             <div v-if="mode === 'transport'" class="mt-2 flex items-center gap-2">
-              <input id="availExport" type="checkbox" v-model="form.availableForExports" class="w-4 h-4" />
-              <label for="availExport" class="text-sm">{{ $t('labels.availableForExports') || 'Also available for export' }}</label>
+              <input id="availSupply" type="checkbox" v-model="form.availableForSupplies" class="w-4 h-4" />
+              <label for="availSupply" class="text-sm">{{ $t('labels.availableForSupplies') || 'Also available for supply' }}</label>
             </div>
 
-            <!-- If checkbox set, show export price field -->
-            <label class="block mt-2" v-if="form.availableForExports">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultExportPrice') || 'Default Export Price' }}</div>
-              <input v-model.number="form.defaultExportPrice" :required="form.availableForExports" type="number" step="0.01" min="0"
+            <!-- If checkbox set, show supply price field -->
+            <label class="block mt-2" v-if="form.availableForSupplies">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }}</div>
+              <input v-model.number="form.defaultSupplyPrice" :required="form.availableForSupplies" type="number" step="0.01" min="0"
                 class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
             </label>
@@ -237,7 +237,7 @@ export default {
   name: 'ItemList',
   components: { Pagination, ConfirmDialog, Toast },
   props: {
-    mode: { type: String, default: 'export' } // 'export' | 'transport' | 'all'
+    mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'all'
   },
   data() {
     return {
@@ -256,12 +256,12 @@ export default {
       form: {
         name: '',
         currentPrice: null,
-        defaultExportPrice: null,
+        defaultSupplyPrice: null,
         defaultTransportPrice: null,
         unitId: null,
         notes: '',
         isActive: true,
-        availableForExports: false,
+        availableForSupplies: false,
         availableForTransports: false
       },
       errors: {
@@ -281,9 +281,9 @@ export default {
       return this.$i18n?.locale === 'ar'
     }
     ,columnsCount() {
-      // base columns: index, name, unit, exportsFlag, transportFlag, isActive, createdAt, actions = 8
+      // base columns: index, name, unit, suppliesFlag, transportFlag, isActive, createdAt, actions = 8
       let base = 8
-      if (this.mode === 'export' || this.mode === 'all') base += 1
+      if (this.mode === 'supply' || this.mode === 'all') base += 1
       if (this.mode === 'transport' || this.mode === 'all') base += 1
       return base
     }
@@ -319,14 +319,14 @@ export default {
       this.editingItem = null
       this.resetForm()
       // Set availability flags based on incoming mode
-      if (this.mode === 'export') {
-        this.form.availableForExports = true
+      if (this.mode === 'supply') {
+        this.form.availableForSupplies = true
         this.form.availableForTransports = false
       } else if (this.mode === 'transport') {
-        this.form.availableForExports = false
+        this.form.availableForSupplies = false
         this.form.availableForTransports = true
       } else {
-        this.form.availableForExports = true
+        this.form.availableForSupplies = true
         this.form.availableForTransports = true
       }
       this.modalOpen = true
@@ -337,12 +337,12 @@ export default {
       this.form.name = item.name
       // support older payloads
       this.form.currentPrice = item.currentPrice !== undefined ? parseFloat(item.currentPrice) : null
-      this.form.defaultExportPrice = item.defaultExportPrice !== undefined ? parseFloat(item.defaultExportPrice) : null
+      this.form.defaultSupplyPrice = item.defaultSupplyPrice !== undefined ? parseFloat(item.defaultSupplyPrice) : null
       this.form.defaultTransportPrice = item.defaultTransportPrice !== undefined ? parseFloat(item.defaultTransportPrice) : null
       this.form.unitId = item.unitId || null
       this.form.notes = item.notes || ''
       this.form.isActive = item.isActive !== undefined ? !!item.isActive : true
-      this.form.availableForExports = !!item.availableForExports
+      this.form.availableForSupplies = !!item.availableForSupplies
       this.form.availableForTransports = !!item.availableForTransports
       this.modalOpen = true
     },
@@ -351,12 +351,12 @@ export default {
       this.form = {
         name: '',
         currentPrice: null,
-        defaultExportPrice: null,
+        defaultSupplyPrice: null,
         defaultTransportPrice: null,
         unitId: null,
         notes: '',
         isActive: true,
-        availableForExports: false,
+        availableForSupplies: false,
         availableForTransports: false
       }
       this.errors = {
@@ -376,8 +376,8 @@ export default {
       }
 
       // Validate prices depending on mode and availability checkboxes
-      if (this.mode === 'export') {
-        if (this.form.defaultExportPrice === null || this.form.defaultExportPrice === '' || this.form.defaultExportPrice < 0) {
+      if (this.mode === 'supply') {
+        if (this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0) {
           this.errors.currentPrice = this.$t('validation.priceRequired') || 'Price is required and must be positive'
         }
         if (this.form.availableForTransports) {
@@ -389,23 +389,23 @@ export default {
         if (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0) {
           this.errors.currentPrice = this.$t('validation.priceRequired') || 'Price is required and must be positive'
         }
-        if (this.form.availableForExports) {
-          if (this.form.defaultExportPrice === null || this.form.defaultExportPrice === '' || this.form.defaultExportPrice < 0) {
-            this.errors.currentPrice = this.$t('validation.priceRequired') || 'Export price is required and must be positive'
+        if (this.form.availableForSupplies) {
+          if (this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0) {
+            this.errors.currentPrice = this.$t('validation.priceRequired') || 'Supply price is required and must be positive'
           }
         }
       } else {
         // mode === 'all'
         // If availability flags are used, require the corresponding prices; otherwise require at least one price
-        if (this.form.availableForExports && (this.form.defaultExportPrice === null || this.form.defaultExportPrice === '' || this.form.defaultExportPrice < 0)) {
-          this.errors.currentPrice = this.$t('validation.priceRequired') || 'Export price is required and must be positive'
+        if (this.form.availableForSupplies && (this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0)) {
+          this.errors.currentPrice = this.$t('validation.priceRequired') || 'Supply price is required and must be positive'
         }
         if (this.form.availableForTransports && (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0)) {
           this.errors.currentPrice = this.$t('validation.priceRequired') || 'Transport price is required and must be positive'
         }
-        if (!this.form.availableForExports && !this.form.availableForTransports) {
+        if (!this.form.availableForSupplies && !this.form.availableForTransports) {
           // no flags set — require at least one price
-          if ((this.form.defaultExportPrice === null || this.form.defaultExportPrice === '' || this.form.defaultExportPrice < 0) &&
+          if ((this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0) &&
             (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0)) {
             this.errors.currentPrice = this.$t('validation.priceRequired') || 'At least one price is required and must be positive'
           }
@@ -428,9 +428,9 @@ export default {
         }
 
         // Only include price fields when the corresponding availability flag is set
-        if (this.form.availableForExports) {
-          payload.defaultExportPrice = this.form.defaultExportPrice
-          payload.availableForExports = true
+        if (this.form.availableForSupplies) {
+          payload.defaultSupplyPrice = this.form.defaultSupplyPrice
+          payload.availableForSupplies = true
         }
         if (this.form.availableForTransports) {
           payload.defaultTransportPrice = this.form.defaultTransportPrice
@@ -475,7 +475,7 @@ export default {
       this.submitting = true
       try {
         // Decide mode from component prop if not explicitly provided
-        const mode = modeArg || ((this.mode === 'export' || this.mode === 'transport') ? this.mode : 'all')
+        const mode = modeArg || ((this.mode === 'supply' || this.mode === 'transport') ? this.mode : 'all')
         const params = {}
         if (mode && mode !== 'all') params.mode = mode
         const res = await deleteItem(this.deleteItem.id, params)
@@ -484,7 +484,7 @@ export default {
         const data = res?.data ?? null
         if ((res && res.status === 204) || (data && data.deletedAt)) {
           this.showToast(this.$t('messages.itemDeleted') || 'Item deleted successfully', 'success')
-        } else if (data && !data.deletedAt && (mode === 'export' || mode === 'transport')) {
+        } else if (data && !data.deletedAt && (mode === 'supply' || mode === 'transport')) {
           this.showToast(this.$t('messages.availabilityRemoved') || `Availability removed for ${mode}`, 'success')
         } else {
           // Generic fallback

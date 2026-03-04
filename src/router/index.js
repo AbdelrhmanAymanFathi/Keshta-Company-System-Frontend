@@ -22,6 +22,7 @@ const VehiclesList = () => import('@/components/dashboard/Vehicles/VehiclesList.
 const TransportList = () => import('@/components/dashboard/Transport/TransportList.vue')
 const TransportersList = () => import('@/components/dashboard/Transport/TransportersList.vue')
 const TransportReport = () => import('@/components/dashboard/Transport/TransportReportNew.vue')
+const ContractorDetail = () => import('@/views/ContractorDetail.vue')
 const RentalList = () => import('@/components/dashboard/RentalList.vue')
 const RentalReport = () => import('@/components/dashboard/RentalReport.vue')
 const CompanyFinance = () => import('@/components/dashboard/CompanyFinance.vue')
@@ -84,7 +85,13 @@ const routes = [
         name: 'contractor-supply-statement',
         component: ContractorStatement,
         meta: { title: 'dashboard.contractorStatement' },
-        props: { mode: 'export'}
+        props: { mode: 'supply'}
+      },
+      {
+        path: 'contractors/:id',
+        name: 'contractor-detail',
+        component: ContractorDetail,
+        meta: { title: 'contractors.title' }
       },
       
       {
@@ -92,7 +99,7 @@ const routes = [
         name: 'supplies-items-list',
         component: ItemList,
         meta: { title: 'dashboard.itemsList' },
-        props: { mode: 'export' }
+        props: { mode: 'supply' }
       },
       {
         path: 'supplies/crushers',
@@ -105,7 +112,7 @@ const routes = [
         name: 'vehicles-list',
         component: VehiclesList,
         meta: { title: 'dashboard.vehiclesList' },
-        props: { mode: 'export' }
+        props: { mode: 'supply' }
       },
 
       // ==================== Transport Module ====================
@@ -215,6 +222,33 @@ const routes = [
         name: 'locations',
         component: Locations,
         meta: { title: 'locations.title', roles: ['admin'] }
+      },
+      {
+        path: 'admin/reports',
+        name: 'admin-reports-list',
+        component: () => import('@/components/admin/ReportsList.vue'),
+        meta: { title: 'Reports', roles: ['admin'] }
+      },
+      {
+        path: 'admin/reports/from-table/:id?',
+        name: 'admin-reports-from-table',
+        component: () => import('@/components/admin/DynamicReportFromTable.vue'),
+        meta: { title: 'Create Report From Table', roles: ['admin'] },
+        props: route => ({ reportId: route.params.id })
+      },
+      {
+        path: 'admin/reports/:id/edit',
+        name: 'admin-reports-edit',
+        component: () => import('@/components/admin/ReportEditor.vue'),
+        meta: { title: 'Edit Report', roles: ['admin'] },
+        props: true
+      },
+      {
+        path: 'admin/reports/run/:id',
+        name: 'admin-reports-run',
+        component: () => import('@/components/admin/ReportPage.vue'),
+        meta: { title: 'Run Report', roles: ['admin'] },
+        props: route => ({ reportId: route.params.id })
       },
       {
         path: 'profile',
