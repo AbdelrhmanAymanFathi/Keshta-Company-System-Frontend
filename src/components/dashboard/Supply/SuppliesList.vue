@@ -608,7 +608,7 @@ formatDate(dateString) {
           return supply.exportLines.reduce((acc, l) => acc + (parseFloat(l.total || 0) || 0), 0)
         }
         const capacity = parseFloat(supply.companyCapacity || supply.crusherCapacity || 0)
-        const unitPrice = parseFloat(supply.unitPrice || supply.item?.defaultExportPrice || 0)
+        const unitPrice = parseFloat(supply.unitPrice || supply.item?.defaultSupplyPrice || supply.item?.defaultExportPrice || 0)
         const discount = parseFloat(supply.discount || 0)
         return (capacity * unitPrice) - discount
       } catch (e) {
@@ -677,7 +677,7 @@ formatDate(dateString) {
 
     computeUnitPrice(supply) {
       const p = (supply && (supply.unitPrice !== undefined && supply.unitPrice !== null)) ? Number(supply.unitPrice)
-        : (supply?.item?.defaultExportPrice !== undefined ? Number(supply.item.defaultExportPrice) : NaN)
+        : (supply?.item?.defaultSupplyPrice !== undefined ? Number(supply.item.defaultSupplyPrice) : (supply?.item?.defaultExportPrice !== undefined ? Number(supply.item.defaultExportPrice) : NaN))
       return Number.isNaN(p) ? 0 : p
     },
 

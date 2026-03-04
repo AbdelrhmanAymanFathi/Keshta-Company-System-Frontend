@@ -103,7 +103,10 @@
                 {{ $t('transport.distanceKm') }}</th>
               <th
                 class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.rate') }}</th>
+                {{ $t('transport.firstKmPrice') }}</th>
+              <th
+                class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                {{ $t('transport.perKmPrice') }}</th>
               <th
                 class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
                 {{ $t('labels.total') }}</th>
@@ -123,7 +126,9 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.vehicleName || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.numTrips || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transport.distance || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.rate || 0) }}
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.firstKmPrice || 0) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(transport.perKmPrice || 0) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{
                 formatCurrency(transport.total || 0) }}</td>
@@ -132,7 +137,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="10" class="px-6 py-2 text-start text-sm text-gray-500">{{ $t('labels.noData') }}</td>
+              <td colspan="11" class="px-6 py-2 text-start text-sm text-gray-500">{{ $t('labels.noData') }}</td>
             </tr>
           </tbody>
         </table>
@@ -150,8 +155,12 @@
             <p class="text-lg font-semibold text-gray-900">{{ formatCurrency(totalAmount) }}</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">Average Rate</p>
-            <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(averageRate) }}</p>
+            <p class="text-xs text-gray-600">Average First Km Price</p>
+            <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(avgFirstKmPrice) }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-600">Average Per Km Price</p>
+            <p class="text-lg font-semibold text-teal-600">{{ formatCurrency(avgPerKmPrice) }}</p>
           </div>
           <div>
             <p class="text-xs text-gray-600">Total Distance</p>
@@ -195,9 +204,14 @@ export default {
       }, 0)
     })
 
-    const averageRate = computed(() => {
+    const avgFirstKmPrice = computed(() => {
       if (items.value.length === 0) return 0
-      return items.value.reduce((s, it) => s + (parseFloat(String(it.rate || 0)) || 0), 0) / items.value.length
+      return items.value.reduce((s, it) => s + (parseFloat(String(it.firstKmPrice || 0)) || 0), 0) / items.value.length
+    })
+
+    const avgPerKmPrice = computed(() => {
+      if (items.value.length === 0) return 0
+      return items.value.reduce((s, it) => s + (parseFloat(String(it.perKmPrice || 0)) || 0), 0) / items.value.length
     })
 
     const formatDate = (dateString) => {
@@ -301,7 +315,8 @@ export default {
           const vehicleName = raw['المركبة'] || raw.vehicleName || raw.vehicle || raw.truckName || ''
           const numTrips = raw['عدد النقلات'] || raw.numTrips || raw.trips || raw.count || 0
           const distance = raw['المسافة (كم)'] || raw['المسافة'] || raw.distance || raw.distanceKm || raw.km || 0
-          const rate = raw['المعدل'] || raw.rate || raw.hourlyRate || raw.price || 0
+          const firstKmPrice = raw['سعر أول كم'] || raw['سعر أول كيلومتر'] || raw.firstKmPrice || raw.pricing?.firstKmPrice || 0
+          const perKmPrice = raw['سعر كل كم'] || raw['سعر كل كيلومتر'] || raw.perKmPrice || raw.pricing?.perKmPrice || 0
           const total = raw['الإجمالي'] || raw.total || raw.totalAmount || raw.amount || 0
           const notes = raw['الملاحظات'] || raw.notes || raw.comment || raw.description || ''
           return {
@@ -313,7 +328,8 @@ export default {
             vehicleName,
             numTrips: Number(numTrips) || 0,
             distance: Number(distance) || 0,
-            rate: Number(rate) || 0,
+            firstKmPrice: Number(firstKmPrice) || 0,
+            perKmPrice: Number(perKmPrice) || 0,
             total: Number(total) || 0,
             notes
           }
@@ -387,7 +403,8 @@ export default {
       filters,
       totalAmount,
       totalDistance,
-      averageRate,
+      avgFirstKmPrice,
+      avgPerKmPrice,
       formatDate,
       formatCurrency,
       loadReport,

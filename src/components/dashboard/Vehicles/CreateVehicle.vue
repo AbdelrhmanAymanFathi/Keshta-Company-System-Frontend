@@ -29,7 +29,23 @@
               @click.prevent="selectContractor(c)"
               class="w-full text-left px-3 py-2 hover:bg-gray-100"
             >
-              {{ c.name }}
+              <div class="flex items-center justify-between">
+                <div class="truncate">{{ c.name }}</div>
+                <div class="flex items-center gap-2 ml-4">
+                  <span
+                    v-if="c.availableForSupplies || c.availableForExports || c.isSupplier"
+                    class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded"
+                  >
+                    {{ $t('labels.supplies') }}
+                  </span>
+                  <span
+                    v-if="c.availableForTransports || c.isTransporter"
+                    class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded"
+                  >
+                    {{ $t('labels.transport') }}
+                  </span>
+                </div>
+              </div>
             </button>
             <div class="border-t px-3 py-2">
               <button @click.prevent="chooseAddNewContractor" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewContractor') }}</button>
@@ -309,9 +325,13 @@ export default {
           if (newContractorName) {
             try {
               const newContractorRes = await createContractor({ name: newContractorName })
-              contractorId = newContractorRes.data.id
-              // Add to local list for future use
-              this.contractors.push(newContractorRes.data)
+              const createdList = newContractorRes.normalized || (Array.isArray(newContractorRes.data) ? newContractorRes.data : [newContractorRes.data])
+              const chosen = createdList.find(c => c.availableForTransports) || createdList[0]
+              if (chosen) {
+                contractorId = chosen.id
+                // Add all created to local list for future use
+                createdList.forEach(c => this.contractors.push(c))
+              }
             } catch (e) {
               this.error = e?.response?.data?.message || this.$t('vehicles.contractorCreateError')
               if (window.$toast) {

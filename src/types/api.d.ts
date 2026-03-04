@@ -29,7 +29,9 @@ export interface Transport {
   distanceKm: number;
   numTrips: number;
   discount?: number | null;
-  rate?: number | null;
+  firstKmPrice?: number | null;
+  perKmPrice?: number | null;
+  pricing?: { firstKm?: number; firstKmPrice?: number | null; perKmPrice?: number | null };
   total: number;
   vehicleCompanyCapacity?: number | null;
   notes?: string | null;
@@ -46,20 +48,42 @@ export interface Payment {
   method?: string;
   notes?: string;
   exportId?: string | number;
+  // New field after migration: supplyId (backwards-compatible with exportId)
+  supplyId?: string | number;
   transportId?: string | number;
 }
 
-export interface ContractorWallet {
-  contractorId: number;
+export type ContractorAccountType = 'EXPORT' | 'SUPPLY' | 'TRANSPORT' | 'GENERAL' | 'EXPENSE' | 'OTHER';
+
+export interface ContractorAccount {
+  id: string;
+  contractorId: string;
+  accountType: ContractorAccountType;
   balance: number;
+  createdAt: string;
+  updatedAt?: string | null;
 }
 
-export interface ContractorWalletTransaction {
+export interface Contractor {
   id: string;
-  contractorId: number;
-  type: string;
-  amount: number; // raw amount (positive)
-  signedAmount: number; // positive for deposits, negative for withdrawals
+  name: string;
+  phone?: string;
+  availableForExports?: boolean;
+  // New flag indicating contractor can be used for supplies
+  availableForSupplies?: boolean;
+  availableForTransports?: boolean;
+  accounts: ContractorAccount[];
+  createdAt: string;
+  updatedAt?: string | null;
+}
+
+export interface ContractorAccountTransaction {
+  id: string;
+  accountId: string;
+  contractorId: string;
+  amount: number;
+  type: 'CREDIT' | 'DEBIT';
+  transactionType?: string;
   description?: string | null;
   createdAt: string;
 }

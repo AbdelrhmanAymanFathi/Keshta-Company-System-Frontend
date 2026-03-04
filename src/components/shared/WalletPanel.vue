@@ -1,20 +1,25 @@
 <template>
   <div v-if="isVisible" :dir="isRTL ? 'rtl' : 'ltr'" class="bg-white rounded shadow p-4">
-    <div class="flex items-center mb-4">
-      <div class="flex w-full items-center">
-        <div class="w-1/3 text-start">
-          <div class="text-sm text-gray-500">{{ $t('labels.balance') }}</div>
-          <div class="text-2xl font-semibold" :class="(wallet && wallet.balance) < 0 ? 'text-red-600' : 'text-green-600'">{{ formatCurrency(wallet && wallet.balance) }}</div>
+    <div class="mb-4">
+      <div v-if="wallet && Array.isArray(wallet.accounts)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+        <div v-for="acct in wallet.accounts" :key="acct.id" @click="selectAccount(acct)" :class="['p-3 rounded cursor-pointer', selectedAccount && String(selectedAccount.id) === String(acct.id) ? 'ring-2 ring-indigo-300' : 'bg-gray-50']">
+          <div class="text-xs text-gray-500">{{ acct.accountType }}</div>
+          <div class="font-semibold text-lg">{{ formatCurrency(acct.balance) }}</div>
         </div>
+      </div>
 
-        <div class="w-1/3 text-start">
+      <div class="flex items-center">
+        <div class="mr-4">
+          <div class="text-sm text-gray-500">{{ $t('labels.balance') }}</div>
+          <div class="text-2xl font-semibold" :class="(displayBalance) < 0 ? 'text-red-600' : 'text-green-600'">{{ formatCurrency(displayBalance) }}</div>
+        </div>
+        <div class="mr-6">
           <div class="text-sm text-gray-500">{{ $t('labels.totalDeposits') }}</div>
           <div class="text-2xl font-semibold text-blue-600">{{ formatCurrency(wallet && wallet.totalDeposits) }}</div>
         </div>
-
-        <div class="w-1/3 text-start flex items-center justify-start">
+        <div class="ml-auto flex items-center gap-2 px-4">
           <button @click="openDepositModal" class="px-3 py-1 bg-indigo-600 text-white rounded text-sm">{{ $t('labels.manualDeposit') }}</button>
-          <button @click="openAdvanceModal" class="ml-2 px-3 py-1 border rounded text-sm">{{ $t('labels.advancePayment') || 'Advance/Payment' }}</button>
+          <button @click="openAdvanceModal" class="px-3 py-1 border rounded text-sm">{{ $t('labels.advancePayment') || 'Advance/Payment' }}</button>
         </div>
       </div>
     </div>
@@ -128,7 +133,7 @@
 <script>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, advanceContractorWallet } from '@/api'
+import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, advanceContractorWallet, getAccountTransactions } from '@/api'
 
 export default {
   name: 'WalletPanel',
@@ -150,6 +155,7 @@ export default {
     const loading = ref(false)
     const loadingHistory = ref(false)
     const deposit = ref({ amount: '', description: '', date: '' })
+    const selectedAccount = ref(null)
     const depositModalOpen = ref(false)
     // Advance payment state
     const advance = ref({ amount: '', description: '', date: '' })
@@ -163,17 +169,31 @@ export default {
       try {
         const res = await getContractorWallet(props.contractorId)
         wallet.value = res?.data || null
+        // if accounts available, pick first as selected by default
+        if (wallet.value && Array.isArray(wallet.value.accounts) && wallet.value.accounts.length > 0) {
+          selectedAccount.value = wallet.value.accounts[0]
+        } else {
+          selectedAccount.value = null
+        }
       } catch (e) {
         console.error('Failed to load wallet summary', e)
       } finally { loading.value = false }
     }
 
     const loadHistory = async () => {
-      if (!props.contractorId) return
+      // If an account is selected, fetch account transactions; otherwise fetch contractor-wide history
+      if (!props.contractorId && !selectedAccount.value) return
       loadingHistory.value = true
       try {
-        const res = await getContractorWalletHistory(props.contractorId)
-        history.value = res?.data?.entries || res?.data || []
+        if (selectedAccount.value && selectedAccount.value.id) {
+          // lazy-load account transactions
+          const res = await getAccountTransactions(selectedAccount.value.id, { pageSize: 50 })
+          const data = res?.data || {}
+          history.value = data.items || data || []
+        } else {
+          const res = await getContractorWalletHistory(props.contractorId)
+          history.value = res?.data?.entries || res?.data || []
+        }
       } catch (e) {
         console.error('Failed to load wallet history', e)
       } finally { loadingHistory.value = false }
@@ -248,6 +268,11 @@ export default {
       }
     }
 
+    const selectAccount = (acct) => {
+      selectedAccount.value = acct
+      loadHistory()
+    }
+
     const onExternalUpdate = (e) => {
       const id = e?.detail?.contractorId
       if (!id || String(id) === String(props.contractorId)) {
@@ -266,6 +291,13 @@ export default {
       loadSummary(); loadHistory()
     })
 
+    const displayBalance = computed(() => {
+      if (!wallet.value) return 0
+      if (selectedAccount.value && selectedAccount.value.balance !== undefined) return Number(selectedAccount.value.balance)
+      if (Array.isArray(wallet.value.accounts)) return wallet.value.accounts.reduce((s, a) => s + (Number(a.balance) || 0), 0)
+      return Number(wallet.value.balance || 0)
+    })
+
     const formatDate = (d) => {
       if (!d) return ''
       const dt = new Date(d)
@@ -279,7 +311,8 @@ export default {
 
     return { wallet, history, loading, loadingHistory, deposit, loadSummary, loadHistory, doDeposit, clearDeposit, formatCurrency, formatDate, depositModalOpen, openDepositModal, closeDepositModal, confirmDeposit, isVisible, isRTL,
       // advance
-      advance, advanceModalOpen, openAdvanceModal, closeAdvanceModal, submitAdvance, advanceSubmitting, advanceError }
+      advance, advanceModalOpen, openAdvanceModal, closeAdvanceModal, submitAdvance, advanceSubmitting, advanceError,
+      selectedAccount, selectAccount, displayBalance }
   }
 }
 </script>

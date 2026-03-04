@@ -37,7 +37,7 @@
           <select v-model="selectedContractorId" @change="onContractorChange"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
             <option value="">{{ $t('contractors.selectContractor') }}</option>
-            <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
+            <option v-for="c in contractors" :key="c.id" :value="c.id">{{ (isRTL && c.arName) ? c.arName : c.name }}</option>
           </select>
         </div>
 
@@ -92,24 +92,29 @@
     <div v-else-if="report && report.contractorName" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.contractorName') }}</p>
-        <p class="text-lg font-semibold text-gray-900">{{ report.contractorName }}</p>
+        <p class="text-lg font-semibold text-gray-900">{{ getContractorDisplayName(report) }}</p>
       </div>
-      <div v-if="showExports" class="bg-white rounded-lg shadow p-4">
-        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.exportsEarnings') }}</p>
-        <p class="text-lg font-semibold text-blue-600">{{ formatCurrency(report.totals?.exportsEarnings || 0) }}</p>
+      <div v-if="showSupply" class="bg-white rounded-lg shadow p-4">
+        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.suppliesEarnings') }}</p>
+        <p class="text-lg font-semibold text-blue-600">{{ formatCurrency(report.closingBalance ?? report.totals?.closingBalance ?? 0) }}</p>
       </div>
       <div v-if="showTransport" class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.transportEarnings') }}</p>
         <p class="text-lg font-semibold text-green-600">{{ formatCurrency(report.totals?.transportEarnings || 0) }}</p>
       </div>
-      <div class="bg-white rounded-lg shadow p-4">
+      <!-- <div class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalEarnings') }}</p>
         <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
+      </div> -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.depositedThisPeriod', 'contractors.totalDeposits') }}</p>
+        <p class="text-lg font-semibold text-teal-600">{{ formatCurrency(report.totals?.deposits || 0) }}</p>
       </div>
       <div v-if="showDeposits" class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalDeposits') }}</p>
         <p class="text-lg font-semibold text-purple-600">{{ formatCurrency(report.totals?.deposits || 0) }}</p>
       </div>
+      
     </div>
 
     <!-- Balance Owed Card -->
@@ -184,10 +189,10 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
+              <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
               'hover:bg-gray-50',
               row.type === 'DEPOSIT' ? 'bg-green-50' : '',
-              row.type === 'TRANSPORT' || row.type === 'EXPORT' ? 'bg-blue-50' : '',
+              row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'bg-blue-50' : '',
               row.type === 'OPENING' ? 'bg-gray-100' : ''
             ]">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.date }}</td>
@@ -272,6 +277,27 @@ export default {
       }
     }
 
+    const parseModeInput = (input) => {
+      if (!input) return ''
+      const s = String(input).trim()
+      if (!s) return ''
+      const low = s.toLowerCase()
+      if (low === 'export') return 'SUPPLY'
+      if (low === 'supply') return 'SUPPLY'
+      if (low === 'transport') return 'TRANSPORT'
+      if (low === 'expense') return 'EXPENSE'
+      if (low === 'deposit') return 'DEPOSIT'
+      if (low === 'withdrawal') return 'WITHDRAWAL'
+      return s.toUpperCase()
+    }
+
+    // statementMode: uppercase mode for report APIs (e.g. SUPPLY, TRANSPORT)
+    const statementMode = computed(() => parseModeInput(mode.value || props.mode || ''))
+    // contractorsListMode: lowercase mode for contractor list filtering (e.g. supply, transport)
+    const contractorsListMode = computed(() => {
+      return statementMode.value ? statementMode.value.toLowerCase() : undefined
+    })
+
     const lastBalanceOwed = computed(() => {
       if (!report.value || !report.value.rows || report.value.rows.length === 0) return 0
       const lastRow = report.value.rows[report.value.rows.length - 1]
@@ -287,16 +313,16 @@ export default {
 
     const normalizedMode = computed(() => (currentMode.value || '').toUpperCase())
 
-    const showExports = computed(() => {
-      return !currentMode.value || normalizedMode.value === 'EXPORT'
+    const showSupply = computed(() => {
+      return !statementMode.value || statementMode.value === 'SUPPLY'
     })
 
     const showTransport = computed(() => {
-      return !currentMode.value || normalizedMode.value === 'TRANSPORT'
+      return !statementMode.value || statementMode.value === 'TRANSPORT'
     })
 
     const showDeposits = computed(() => {
-      return !currentMode.value || normalizedMode.value === 'DEPOSIT'
+      return !statementMode.value || statementMode.value === 'DEPOSIT'
     })
 
     const paginatedRows = computed(() => {
@@ -322,27 +348,55 @@ export default {
 
     const getTypeVariant = (type) => {
       const variants = {
-        'EXPORT': 'info',
+        'SUPPLY': 'info',
         'TRANSPORT': 'info',
+        'EXPENSE': 'danger',
         'DEPOSIT': 'success',
+        'WITHDRAWAL': 'warning',
         'OPENING': 'default'
       }
       return variants[type] || 'default'
     }
 
+    const translateWithFallback = (primaryKey, fallbackKey) => {
+      const primary = t(primaryKey)
+      if (primary && primary !== primaryKey) return primary
+      const fallback = t(fallbackKey)
+      return (fallback && fallback !== fallbackKey) ? fallback : primaryKey
+    }
+
     const getTypeLabel = (type) => {
       const labels = {
-        'EXPORT': t('contractors.typeExport'),
-        'TRANSPORT': t('contractors.typeTransport'),
+        'SUPPLY': translateWithFallback('contractors.typeSupply', 'contractors.typeExport'),
+        'TRANSPORT': translateWithFallback('contractors.typeTransport', 'contractors.typeTransport'),
+        'EXPENSE': translateWithFallback('contractors.typeExpense', 'contractors.typeExpense'),
         'DEPOSIT': t('labels.deposit'),
+        'WITHDRAWAL': translateWithFallback('contractors.typeWithdrawal', 'contractors.typeWithdrawal'),
         'OPENING': t('contractors.openingBalance')
       }
       return labels[type] || type
     }
 
+    const getContractorDisplayName = (rep) => {
+      if (!rep) return '-'
+      const ar = rep.contractorArName || (rep.contractor && (rep.contractor.arName || rep.contractor.ar_name))
+      const en = rep.contractorName || (rep.contractor && (rep.contractor.name || rep.contractor.en_name))
+      if (isRTL.value) return ar || en || '-'
+      return en || ar || '-'
+    }
+
+    const depositedThisPeriod = computed(() => {
+      if (!report.value || !report.value.rows) return 0
+      return report.value.rows.reduce((sum, row) => {
+        if (!row || String(row.type || '').toUpperCase() !== 'DEPOSIT') return sum
+        const amount = Number(row.payments ?? row.earnings ?? 0) || 0
+        return sum + amount
+      }, 0)
+    })
+
     const loadContractors = async () => {
       try {
-        const res = await getContractors({ page: 1, pageSize: 1000, mode: mode.value || props.mode || undefined })
+        const res = await getContractors({ page: 1, pageSize: 1000, mode: contractorsListMode.value || undefined })
         const payload = res.data || {}
         contractors.value = Array.isArray(payload.items)
           ? payload.items
@@ -381,14 +435,16 @@ export default {
 
       loading.value = true
       try {
-        const params = buildQueryParams({
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate,
-          format: 'json',
-          mode: mode.value || props.mode || undefined
-        })
+        // build params only with provided values
+        const p = {}
+        if (filters.value.startDate) p.startDate = filters.value.startDate
+        if (filters.value.endDate) p.endDate = filters.value.endDate
+        p.format = 'json'
+        if (statementMode.value) p.mode = statementMode.value
 
-        const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', mode.value || props.mode || undefined)
+        const params = buildQueryParams(p)
+
+        const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', statementMode.value || undefined)
         report.value = data
         currentPage.value = 1
       } catch (err) {
@@ -409,17 +465,19 @@ export default {
       downloading.value = true
       error.value = null
       try {
-        const params = buildQueryParams({
-          startDate: filters.value.startDate,
-          endDate: filters.value.endDate,
-          format: format,
-          mode: mode.value || props.mode || undefined
-        })
+        const p = {}
+        if (filters.value.startDate) p.startDate = filters.value.startDate
+        if (filters.value.endDate) p.endDate = filters.value.endDate
+        p.format = format
+        if (statementMode.value) p.mode = statementMode.value
 
-        const { data } = await downloadContractorReport(selectedContractorId.value, params, format, mode.value || props.mode || undefined)
+        const params = buildQueryParams(p)
 
-        const contractor = contractors.value.find(c => c.id === parseInt(selectedContractorId.value))
-        const contractorName = contractor ? contractor.name.replace(/[^a-zA-Z0-9]/g, '_') : selectedContractorId.value
+        const { data } = await downloadContractorReport(selectedContractorId.value, params, format, statementMode.value || undefined)
+
+        const contractor = contractors.value.find(c => String(c.id) === String(selectedContractorId.value) || c.id === parseInt(selectedContractorId.value))
+        const rawName = contractor ? ((isRTL.value && contractor.arName) ? contractor.arName : contractor.name) : String(selectedContractorId.value)
+        const contractorName = String(rawName || selectedContractorId.value).replace(/[^a-zA-Z0-9]/g, '_')
         const dateRange = filters.value.startDate && filters.value.endDate
           ? `${filters.value.startDate}_${filters.value.endDate}`
           : 'all'
@@ -505,9 +563,11 @@ export default {
       report,
       contractors,
       selectedContractorId,
-      showExports,
+      showSupply,
       showTransport,
       showDeposits,
+      depositedThisPeriod,
+      translateWithFallback,
       filters,
       currentPage,
       pageSize,
@@ -518,6 +578,7 @@ export default {
       formatCurrency,
       getTypeVariant,
       getTypeLabel,
+      getContractorDisplayName,
       loadReport,
       downloadReport,
       refresh,

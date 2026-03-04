@@ -3,9 +3,12 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold">{{ $t('admin.reports') }}</h2>
       <div class="flex gap-2">
-        <button @click="showEditor = true" class="px-3 py-2 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition">
+        <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition">
           <span>{{ $t('admin.newReport') }}</span>
-        </button>
+        </router-link>
+        <!-- <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition">
+          <span>{{ $t('admin.newReportFromTable') || 'From Table' }}</span>
+        </router-link> -->
       </div>
     </div>
 
@@ -17,7 +20,7 @@
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnModule') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActive') }}</th>
-            <th :class="isRTL ? 'text-left p-2' : 'text-right p-2'">{{ $t('reports.columnActions') }}</th>
+            <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -27,15 +30,17 @@
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.module }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.active ? $t('labels.active') : $t('labels.inactive') }}</td>
             <td :class="isRTL ? 'text-left p-2' : 'text-right p-2'">
-              <button @click="runReport(r.id)" class="px-2 py-1 bg-indigo-600 text-white rounded mr-2 flex items-center gap-2 hover:bg-indigo-500 transition">
-                <span> {{ $t('admin.run') }}</span>
-              </button>
-              <router-link :to="{ name: 'admin-reports-edit', params: { id: r.id } }" class="px-2 py-1 bg-amber-500 text-white rounded mr-2 flex items-center gap-2 hover:bg-amber-400 transition">
-                <span>{{ $t('labels.edit') }}</span>
-              </router-link>
-              <button @click="remove(r.id)" class="px-2 py-1 bg-red-600 text-white rounded flex items-center gap-2 hover:bg-red-500 transition">
-                <span>{{ $t('labels.delete') }}</span>
-              </button>
+              <div :class="isRTL ? 'flex items-center justify-start gap-2' : 'flex items-center justify-end gap-2'">
+                <button @click="runReport(r.id)" class="px-2 py-1 bg-indigo-600 text-white rounded inline-flex items-center gap-2 hover:bg-indigo-500 transition">
+                  <span> {{ $t('admin.run') }}</span>
+                </button>
+                <router-link :to="{ name: 'admin-reports-from-table', params: { id: r.id } }" class="px-2 py-1 bg-amber-500 text-white rounded inline-flex items-center gap-2 hover:bg-amber-400 transition">
+                  <span>{{ $t('labels.edit') }}</span>
+                </router-link>
+                <button @click="remove(r.id)" class="px-2 py-1 bg-red-600 text-white rounded inline-flex items-center gap-2 hover:bg-red-500 transition">
+                  <span>{{ $t('labels.delete') }}</span>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -43,9 +48,7 @@
     </div>
       <ReportRunModal v-if="showRun" :reportId="runReportId" @close="showRun=false" />
 
-      <Modal :visible="showEditor" title="New Report" :closeOnBackdrop="false" @update:visible="onModalVisibleChange">
-        <report-editor modal @saved="onEditorSaved" @dirty-changed="onEditorDirty" />
-      </Modal>
+      <!-- Report creation/editing now handled by DynamicReportFromTable route -->
   </div>
 </template>
 
@@ -54,11 +57,9 @@ import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportDefs, deleteReportDef } from '@/api'
 import ReportRunModal from './ReportRunModal.vue'
-import ReportEditor from './ReportEditor.vue'
-import Modal from '@/components/shared/Modal.vue'
 
 export default {
-  components: { ReportRunModal, ReportEditor, Modal },
+  components: { ReportRunModal },
   setup() {
     const { locale, t } = useI18n()
     const isRTL = computed(() => locale.value === 'ar')
@@ -66,7 +67,7 @@ export default {
     const showRun = ref(false)
     const runReportId = ref(null)
 
-    const showEditor = ref(false)
+    // Using DynamicReportFromTable route for create/edit
 
     const load = async () => {
       try {
@@ -92,35 +93,10 @@ export default {
       showRun.value = true
     }
 
-    const editorDirty = ref(false)
-
-    function onEditorDirty(dirty) {
-      editorDirty.value = !!dirty
-    }
-
-    function tryCloseEditor() {
-      if (editorDirty.value) {
-        if (!confirm('Discard unsaved changes?')) return
-      }
-      showEditor.value = false
-      editorDirty.value = false
-    }
-
-    function onModalVisibleChange(val) {
-      if (!val) {
-        tryCloseEditor()
-      } else {
-        showEditor.value = true
-      }
-    }
-
-    const onEditorSaved = async () => {
-      showEditor.value = false
-      await load()
-    }
+    // legacy modal handlers removed; route-based editor used instead
 
     onMounted(load)
-    return { reports, showRun, runReportId, remove, runReport, showEditor, onEditorSaved, onEditorDirty, tryCloseEditor, onModalVisibleChange, isRTL, locale }
+    return { reports, showRun, runReportId, remove, runReport, isRTL, locale }
   }
 }
 </script>

@@ -85,7 +85,7 @@ const routes = [
         name: 'contractor-supply-statement',
         component: ContractorStatement,
         meta: { title: 'dashboard.contractorStatement' },
-        props: { mode: 'export'}
+        props: { mode: 'supply'}
       },
       {
         path: 'contractors/:id',
@@ -99,7 +99,7 @@ const routes = [
         name: 'supplies-items-list',
         component: ItemList,
         meta: { title: 'dashboard.itemsList' },
-        props: { mode: 'export' }
+        props: { mode: 'supply' }
       },
       {
         path: 'supplies/crushers',
@@ -112,7 +112,7 @@ const routes = [
         name: 'vehicles-list',
         component: VehiclesList,
         meta: { title: 'dashboard.vehiclesList' },
-        props: { mode: 'export' }
+        props: { mode: 'supply' }
       },
 
       // ==================== Transport Module ====================
@@ -228,6 +228,13 @@ const routes = [
         name: 'admin-reports-list',
         component: () => import('@/components/admin/ReportsList.vue'),
         meta: { title: 'Reports', roles: ['admin'] }
+      },
+      {
+        path: 'admin/reports/from-table/:id?',
+        name: 'admin-reports-from-table',
+        component: () => import('@/components/admin/DynamicReportFromTable.vue'),
+        meta: { title: 'Create Report From Table', roles: ['admin'] },
+        props: route => ({ reportId: route.params.id })
       },
       {
         path: 'admin/reports/:id/edit',

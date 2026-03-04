@@ -149,7 +149,11 @@
             </th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              {{ $t('transport.rate') }}
+              {{ $t('transport.firstKmPrice') }}
+            </th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.perKmPrice') }}
             </th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -197,7 +201,10 @@
               {{ transport.vehicleCompanyCapacity != null ? transport.vehicleCompanyCapacity : '-' }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              {{ formatCurrency(transport.rate) }}
+              {{ formatCurrency(getTransportFirstKmPrice(transport)) }}
+            </td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+              {{ formatCurrency(getTransportPerKmPrice(transport)) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">
               <span :class="parseFloat(transport.discount) > 0 ? 'text-red-600 font-medium' : 'text-gray-500'">
@@ -209,7 +216,7 @@
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="editTransport(transport)" class="text-indigo-600 hover:text-indigo-900"
+                <!-- <button @click.stop="editTransport(transport)" class="text-indigo-600 hover:text-indigo-900"
                   :title="$t('common.edit')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -221,7 +228,7 @@
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
                   </svg>
-                </button>
+                </button> -->
                 <button @click.stop="openDeleteConfirm(transport)" class="text-red-600 hover:text-red-900"
                   :title="$t('common.delete')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +242,7 @@
           <tr v-if="transports.length === 0">
             <td
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-              :colspan="13">
+              :colspan="14">
               {{ $t('transport.noTransports') || 'No transports found' }}
             </td>
           </tr>
@@ -568,6 +575,14 @@ export default {
         style: 'currency',
         currency: 'EGP'
       }).format(amount)
+    },
+
+    getTransportFirstKmPrice(transport) {
+      return Number(transport?.pricing?.firstKmPrice ?? transport?.firstKmPrice ?? 0)
+    },
+
+    getTransportPerKmPrice(transport) {
+      return Number(transport?.pricing?.perKmPrice ?? transport?.perKmPrice ?? 0)
     },
 
     getVehicleDisplay(transport) {

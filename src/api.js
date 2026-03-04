@@ -305,7 +305,15 @@ export const getContractors = (params = {}) => {
   return axios.get(`${BASE_URL}/api/contractors?${queryParams.toString()}`);
 };
 export const createContractor = (data) =>
-  axios.post(`${BASE_URL}/api/contractors`, data);
+  axios.post(`${BASE_URL}/api/contractors`, data).then(res => {
+    // Normalize returned data: backend may return single object or array
+    try {
+      res.normalized = Array.isArray(res.data) ? res.data : [res.data];
+    } catch (e) {
+      res.normalized = [res.data];
+    }
+    return res;
+  });
 export const updateContractor = (id, data) => {
   console.log('[API] Updating contractor:', id, 'Data:', data, 'URL:', `${BASE_URL}/api/contractors/${id}`);
   return axios.patch(`${BASE_URL}/api/contractors/${id}`, data);
@@ -320,29 +328,180 @@ export const deleteContractor = (id, params = {}) => {
   return axios.delete(`${BASE_URL}/api/contractors/${id}${q ? `?${q}` : ''}`);
 }
 
-// Contractor Wallet APIs
-export const getContractorWallet = (contractorId) =>
-  axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet`);
+// --- Contractor Accounts / Compatibility ---
+// New endpoints use `accounts`. Keep compatibility wrappers for older UI code.
 
-export const getContractorWalletHistory = (contractorId) =>
-  axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/history`);
+export const getContractorAccounts = (contractorId) =>
+  axios.get(`${BASE_URL}/api/contractors/${contractorId}/accounts`);
 
-// New: fetch paginated contractor wallet transactions with filters
-export const getContractorWalletTransactions = (contractorId, params = {}) => {
-  const { page = 1, pageSize = 20, start = '', end = '', type = '' } = params
-  const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
-  if (start) q.append('start', start)
-  if (end) q.append('end', end)
-  if (type) q.append('type', type)
-  return axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/transactions?${q.toString()}`)
+export const getAccountTransactions = (accountId, params = {}) => {
+  const { page = 1, pageSize = 20, start = '', end = '', type = '' } = params;
+  const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+  if (start) q.append('start', start);
+  if (end) q.append('end', end);
+  if (type) q.append('type', type);
+  return axios.get(`${BASE_URL}/api/accounts/${accountId}/transactions?${q.toString()}`);
+};
+
+export const postAccountTransaction = (accountId, payload) =>
+  axios.post(`${BASE_URL}/api/accounts/${accountId}/transactions`, payload);
+
+// Compatibility: old wallet-style helpers. These try to use `accounts` responses when available,
+// but fall back to legacy `wallet` endpoints if the server hasn't migrated yet.
+export const getContractorWallet = async (contractorId, opts = {}) => {
+  // opts: { accountType?: 'EXPORT'|'TRANSPORT'|..., accountId?: string }
+  const { accountType, accountId } = opts || {}
+
+  // If specific accountId requested, fetch that account directly
+  if (accountId) {
+    try {
+      const resp = await axios.get(`${BASE_URL}/api/accounts/${accountId}`)
+      const acct = resp.data
+      return { data: { contractorId: contractorId, balance: Number(acct.balance || 0), accounts: [acct] } }
+    } catch (e) {
+      // fallthrough to other methods
+    }
+  }
+
+  // If accountType provided, try to fetch contractor accounts filtered by type
+  if (accountType) {
+    try {
+      // Some backends may return a single account or array
+      const res = await axios.get(`${BASE_URL}/api/contractors/${contractorId}/accounts?type=${encodeURIComponent(accountType)}`)
+      const data = res.data
+      const accounts = Array.isArray(data) ? data : (data && data.accounts ? data.accounts : (data ? [data] : []))
+      if (accounts && accounts.length > 0) {
+        const total = accounts.reduce((s, a) => s + (Number(a.balance) || 0), 0)
+        return { data: { contractorId: contractorId, balance: total, accounts } }
+      }
+    } catch (e) {
+      // fallthrough
+    }
+  }
+
+  // Try to fetch full contractor resource which may include `accounts`
+  try {
+    const cRes = await axios.get(`${BASE_URL}/api/contractors/${contractorId}`)
+    const contractor = cRes.data
+    if (contractor && Array.isArray(contractor.accounts)) {
+      const total = contractor.accounts.reduce((s, a) => s + (Number(a.balance) || 0), 0)
+      return { data: { contractorId: contractor.id, balance: total, accounts: contractor.accounts } }
+    }
+  } catch (e) {
+    // ignore and try legacy route
+  }
+
+  // Fallback to legacy wallet endpoint
+  return axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet`)
 }
 
-export const depositToContractorWallet = (contractorId, data) =>
-  axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
+export const getContractorWalletHistory = async (contractorId, opts = {}) => {
+  // opts: { accountType?, accountId?, params? }
+  const { accountType, accountId } = opts || {}
 
-// Record an advance (deposit or withdrawal) for a contractor's wallet
-export const advanceContractorWallet = (contractorId, data) =>
-  axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/advance`, data);
+  // If accountId provided, fetch account transactions
+  if (accountId) {
+    return getAccountTransactions(accountId, opts.params || {})
+  }
+
+  // If accountType provided, find the account and fetch its transactions
+  if (accountType) {
+    try {
+      const accRes = await axios.get(`${BASE_URL}/api/contractors/${contractorId}/accounts?type=${encodeURIComponent(accountType)}`)
+      const accounts = Array.isArray(accRes.data) ? accRes.data : (accRes.data && accRes.data.accounts ? accRes.data.accounts : (accRes.data ? [accRes.data] : []))
+      const acct = accounts && accounts.length > 0 ? accounts[0] : null
+      if (acct && acct.id) {
+        return getAccountTransactions(acct.id, opts.params || {})
+      }
+    } catch (e) {
+      // fallthrough
+    }
+  }
+
+  // Attempt contractor-level accounts history if provided
+  try {
+    const res = await axios.get(`${BASE_URL}/api/contractors/${contractorId}/accounts/history`)
+    return res
+  } catch (e) {
+    // fallback
+  }
+  return axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/history`)
+}
+
+// Fetch transactions across all accounts for a contractor (merge results)
+export const getContractorWalletTransactions = async (contractorId, params = {}) => {
+  try {
+    const accRes = await getContractorAccounts(contractorId);
+    const accounts = accRes.data || [];
+    // fetch transactions for each account in parallel
+    const promises = accounts.map(a => getAccountTransactions(a.id, params).then(r => ({ account: a, data: r.data })).catch(() => ({ account: a, data: null })));
+    const results = await Promise.all(promises);
+    // Flatten into a combined structure { items: [...], accounts: [...] }
+    const entries = [];
+    for (const r of results) {
+      if (r.data && Array.isArray(r.data.items)) {
+        // include accountId on each entry if missing
+        r.data.items.forEach(it => { if (!it.accountId) it.accountId = r.account.id; entries.push(it); });
+      } else if (r.data && Array.isArray(r.data)) {
+        r.data.forEach(it => { if (!it.accountId) it.accountId = r.account.id; entries.push(it); });
+      }
+    }
+    return { data: { items: entries, accounts } };
+  } catch (e) {
+    // fallback to legacy contractor wallet transactions endpoint
+    const { page = 1, pageSize = 20, start = '', end = '', type = '' } = params;
+    const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+    if (start) q.append('start', start);
+    if (end) q.append('end', end);
+    if (type) q.append('type', type);
+    return axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/transactions?${q.toString()}`);
+  }
+};
+
+export const depositToContractorWallet = async (contractorId, data) => {
+  // If caller provided accountId, use it
+  if (data && data.accountId) {
+    const payload = { amount: data.amount, type: 'CREDIT', description: data.description };
+    return postAccountTransaction(data.accountId, payload);
+  }
+
+  // If caller provided accountType, try to find account
+  if (data && data.accountType) {
+    try {
+      const accRes = await getContractorAccounts(contractorId);
+      const accounts = accRes.data || [];
+      const acct = accounts.find(a => a.accountType === data.accountType) || accounts[0];
+      if (acct) return postAccountTransaction(acct.id, { amount: data.amount, type: 'CREDIT', description: data.description });
+    } catch (e) {
+      // fallthrough
+    }
+  }
+
+  // Fallback: try legacy deposit route
+  // try {
+  //   return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
+  // } catch (e) {
+  //   throw e;
+  // }
+};
+
+export const advanceContractorWallet = async (contractorId, data) => {
+  // data: { amount, accountId?, accountType?, mode: 'DEBIT'|'CREDIT', description }
+  if (data && data.accountId) {
+    const payload = { amount: data.amount, type: data.mode || 'DEBIT', description: data.description };
+    return postAccountTransaction(data.accountId, payload);
+  }
+  if (data && data.accountType) {
+    try {
+      const accRes = await getContractorAccounts(contractorId);
+      const accounts = accRes.data || [];
+      const acct = accounts.find(a => a.accountType === data.accountType) || accounts[0];
+      if (acct) return postAccountTransaction(acct.id, { amount: data.amount, type: data.mode || 'DEBIT', description: data.description });
+    } catch (e) {console.error('Error advancing contractor wallet with accountType:', e)}
+  }
+  // fallback
+  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/advance`, data);
+};
 
 // Contractor Report/Statement
 export const getContractorReportData = async (contractorId, params = {}, format = 'json', mode = null) => {
@@ -400,13 +559,31 @@ export const deleteReportDef = (id) => axios.delete(`${BASE_URL}/api/report-defs
 // Fetch available report modules (returns { modules: [...] })
 export const getReportModules = () => axios.get(`${BASE_URL}/api/report-defs/modules`)
 
-export const getReportParamOptions = (id, paramName, q = '') => {
+export const getReportParamOptions = (id, paramName, paramsObj = {}) => {
   const qs = new URLSearchParams()
-  if (q) qs.append('q', q)
+  
+  // Handle legacy string parameter (q) or new object format
+  if (typeof paramsObj === 'string') {
+    if (paramsObj) qs.append('q', paramsObj)
+  } else if (typeof paramsObj === 'object' && paramsObj !== null) {
+    // Add all parameters from the object (including q, contractorId, etc.)
+    Object.entries(paramsObj).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        qs.append(key, String(value))
+      }
+    })
+  }
+  
   return axios.get(`${BASE_URL}/api/report-defs/${id}/params/options?param=${encodeURIComponent(paramName)}${qs.toString() ? `&${qs.toString()}` : ''}`)
 }
 
 export const executeReport = (id, body) => axios.post(`${BASE_URL}/api/report-defs/${id}/execute`, body)
+
+// --- Helpers for creating reports from database tables ---
+export const getReportTables = () => axios.get(`${BASE_URL}/api/report-defs/tables`)
+export const getTableFields = (tableName) => axios.get(`${BASE_URL}/api/report-defs/tables/${encodeURIComponent(tableName)}/fields`)
+export const createReportFromTable = (data) => axios.post(`${BASE_URL}/api/report-defs/generate`, data)
+export const updateReportFromTable = (id, data) => axios.put(`${BASE_URL}/api/report-defs/${id}/`, data)
 
 // === TOTP (2FA) ===
 export const startTotpRegister = (data = {}) =>
@@ -582,17 +759,17 @@ export const getDeliveries = (params = {}) => {
   if (itemId) queryParams.append('itemId', itemId.toString());
   if (vehicleId) queryParams.append('vehicleId', vehicleId.toString());
 
-  return axios.get(`${BASE_URL}/api/exports?${queryParams.toString()}`);
+  return axios.get(`${BASE_URL}/api/supplies?${queryParams.toString()}`);
 };
 
 
 export const deleteDelivery = (id) =>
-  axios.delete(`${BASE_URL}/api/exports/${id}`);
+  axios.delete(`${BASE_URL}/api/supplies/${id}`);
 
 // Reports
 // Supplies/Exports Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getSuppliesReportData = async (params = {}, format = 'json') => {
-  const url = `${BASE_URL}/api/exports/report`;
+  const url = `${BASE_URL}/api/supplies/report`;
   let axiosParams = { ...params };
   if (format === 'json') {
     axiosParams.format = 'json';
@@ -616,7 +793,7 @@ export const downloadSuppliesReport = async (params = {}) => {
 // Deprecated: use getSuppliesReportData instead
 export const getSuppliesReport = (params = {}) => {
   const search = new URLSearchParams(params).toString();
-  const url = `${BASE_URL}/api/exports/report${search ? `?${search}` : ''}`;
+  const url = `${BASE_URL}/api/supplies/report${search ? `?${search}` : ''}`;
   return axios.get(url, { responseType: 'blob' });
 };
 
@@ -659,12 +836,14 @@ function sanitizeTransportPayload(payload = {}) {
   delete p.transportLines;
   delete p.paid;
   delete p.unpaid;
-  delete p.total; // server computes total/rate
+  delete p.total; // server computes total
   return p;
 }
 
 export const createTransport = (data) => {
   const payload = sanitizeTransportPayload(data);
+  // ensure accountType is provided so backend can record transaction against correct account
+  if (!payload.accountType) payload.accountType = 'TRANSPORT';
   return axios.post(`${BASE_URL}/api/transports`, payload);
 }
 
@@ -942,7 +1121,7 @@ export const downloadExpensesReport = async (params = {}) => {
 // Changes by Date (Admin-only endpoints)
 export const getExportsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
-  return axios.get(`${BASE_URL}/api/exports/changes?${queryParams.toString()}`);
+  return axios.get(`${BASE_URL}/api/supplies/changes?${queryParams.toString()}`);
 };
 
 export const getLocationsChanges = (date) => {
@@ -1177,11 +1356,11 @@ export const getExports = (params = {}) => {
   if (itemId !== undefined && itemId !== null && itemId !== '') queryParams.append('itemId', itemId.toString());
   if (vehicleId !== undefined && vehicleId !== null && vehicleId !== '') queryParams.append('vehicleId', vehicleId.toString());
 
-  return axios.get(`${BASE_URL}/api/exports?${queryParams.toString()}`);
+  return axios.get(`${BASE_URL}/api/supplies?${queryParams.toString()}`);
 };
 
 export const getExport = (id) =>
-  axios.get(`${BASE_URL}/api/exports/${id}`);
+  axios.get(`${BASE_URL}/api/supplies/${id}`);
 
 // Sanitize export payloads to the new flat shape expected by the server
 function sanitizeExportPayload(payload = {}) {
@@ -1196,27 +1375,37 @@ function sanitizeExportPayload(payload = {}) {
 
 export const createExport = (data) => {
   const payload = sanitizeExportPayload(data);
-  return axios.post(`${BASE_URL}/api/exports`, payload);
+  if (!payload.accountType) payload.accountType = 'EXPORT';
+  return axios.post(`${BASE_URL}/api/supplies`, payload);
 }
 
 export const updateExport = (id, data) => {
   const payload = sanitizeExportPayload(data);
-  return axios.put(`${BASE_URL}/api/exports/${id}`, payload);
+  return axios.put(`${BASE_URL}/api/supplies/${id}`, payload);
 }
 
 export const deleteExport = (id) =>
-  axios.delete(`${BASE_URL}/api/exports/${id}`);
+  axios.delete(`${BASE_URL}/api/supplies/${id}`);
 
 export const restoreExport = (id) =>
-  axios.post(`${BASE_URL}/api/exports/${id}/restore`);
+  axios.post(`${BASE_URL}/api/supplies/${id}/restore`);
 
 // Payments
-export const createPayment = (data = {}) =>
-  axios.post(`${BASE_URL}/api/payments`, data);
+export const createPayment = (data = {}) => {
+  const payload = { ...data };
+  // migrate exportId -> supplyId for backend compatibility
+  if (payload.exportId && !payload.supplyId) {
+    payload.supplyId = payload.exportId;
+    delete payload.exportId;
+  }
+  return axios.post(`${BASE_URL}/api/payments`, payload);
+}
 
 export const getPayments = (params = {}) => {
   const query = new URLSearchParams();
-  if (params.exportId) query.append('exportId', params.exportId);
+  // prefer supplyId, but accept exportId for backward compatibility
+  if (params.supplyId) query.append('supplyId', params.supplyId);
+  else if (params.exportId) query.append('exportId', params.exportId);
   if (params.transportId) query.append('transportId', params.transportId);
   const q = query.toString();
   return axios.get(`${BASE_URL}/api/payments${q ? `?${q}` : ''}`);
@@ -1224,7 +1413,7 @@ export const getPayments = (params = {}) => {
 // Fetch payments for a specific export (document-level endpoint)
 export const getExportPayments = (exportId) => {
   if (!exportId) return Promise.resolve({ data: [] });
-  return axios.get(`${BASE_URL}/api/exports/${exportId}/payments`);
+  return axios.get(`${BASE_URL}/api/supplies/${exportId}/payments`);
 };
 export const getExportItems = (params = {}) => {
   const search = new URLSearchParams(params).toString();
@@ -1240,6 +1429,21 @@ export const updateExportItem = (id, data) =>
 
 export const deleteExportItem = (id) =>
   axios.delete(`${BASE_URL}/api/items/${id}`);
+
+// --- Supply aliases (new names mapping to existing Export functions) ---
+// These provide a migration path: prefer `getSupplies/createSupply/etc` going forward.
+export const getSupplies = getExports;
+export const getSupply = getExport;
+export const createSupply = createExport;
+export const updateSupply = updateExport;
+export const deleteSupply = deleteExport;
+export const restoreSupply = restoreExport;
+export const createSupplyItem = createExportItem;
+export const updateSupplyItem = updateExportItem;
+export const deleteSupplyItem = deleteExportItem;
+export const getSupplyPayments = getExportPayments;
+export const getSuppliesChanges = getExportsChanges;
+
 
 // --- Items & Units API (used by ItemList.vue) ---
 export const getItems = (params = {}) => {

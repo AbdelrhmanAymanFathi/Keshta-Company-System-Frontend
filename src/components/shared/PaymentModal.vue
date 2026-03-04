@@ -66,6 +66,8 @@ export default {
       }
       if (this.parentType === 'export') payload.exportId = Number(this.parentId)
       else payload.transportId = Number(this.parentId)
+      // Include accountType to tell backend which contractor account to credit
+      payload.accountType = this.parentType === 'export' ? 'EXPORT' : 'TRANSPORT'
 
       this.submitting = true
       try {

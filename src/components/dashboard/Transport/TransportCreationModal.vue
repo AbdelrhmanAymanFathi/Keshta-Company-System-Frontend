@@ -141,7 +141,7 @@
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
                       <SearchDropdown v-model:modelValue="filters.commonVehicleSearch" :items="filteredCommonVehicles"
-                        :all-items="vehicles" :placeholder="$t('labels.vehicle')" :itemKey="'id'" :itemLabel="'name'"
+                        :all-items="filteredCommonVehicles" :placeholder="$t('labels.vehicle')" :itemKey="'id'" :itemLabel="'name'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
                         @select="selectCommonVehicle">
                         <template #prefix>
@@ -662,12 +662,8 @@ export default {
     },
     filteredCommonVehicles() {
       const q = (this.filters.commonVehicleSearch || '').toLowerCase()
-      let list = []
-      if (this.commonData.contractor?.id) {
-        list = this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id))
-      } else {
-        list = [...this.vehicles]
-      }
+      if (!this.commonData.contractor?.id) return []
+      let list = this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id))
       if (!q) return list
       return list.filter(v => (v.name || '').toLowerCase().includes(q))
     },
@@ -675,7 +671,18 @@ export default {
       return this.rows.reduce((sum, row) => sum + this.perTripBeforeDiscount(row), 0)
     },
     totalDiscount() {
-      return this.rows.reduce((sum, row) => sum + (Number(row.discount) || 0), 0)
+      // `discount` is measured in meters (reduces vehicle capacity).
+      // Compute monetary discount by removing `appliedMeters` from capacity,
+      // so it affects the whole base (firstKmPrice + perKmPrice*(distance-1)).
+      return this.rows.reduce((sum, row) => {
+        const distance = Number(row.distanceKm || 0)
+        const base = this.commonData.firstKmPrice + Math.max(0, (distance - 1)) * this.commonData.perKmPrice
+        const discountMeters = Number(row.discount) || 0
+        const capacity = Number(row.companyCapacity || this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
+        const appliedMeters = Math.min(discountMeters, Math.max(0, capacity))
+        const count = Number(row.count || 1)
+        return sum + base * appliedMeters * count
+      }, 0)
     },
     grandTotal() {
       return Math.max(0, this.subtotal - this.totalDiscount)
@@ -1010,7 +1017,15 @@ export default {
       return base * capacity * (row.count || 1)
     },
     totalPerRow(row) {
-      return Math.max(0, this.perTripBeforeDiscount(row) - (row.discount || 0))
+      // Calculate total after reducing vehicle capacity by discount meters.
+      const distance = Number(row.distanceKm || 0)
+      const base = this.commonData.firstKmPrice + Math.max(0, (distance - 1)) * this.commonData.perKmPrice
+      const capacity = Number(row.companyCapacity || this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
+      const discountMeters = Number(row.discount) || 0
+      const appliedMeters = Math.min(discountMeters, Math.max(0, capacity))
+      const effectiveCapacity = Math.max(0, capacity - appliedMeters)
+      const count = Number(row.count || 1)
+      return Math.max(0, base * effectiveCapacity * count)
     },
     formatNumber(v) {
       return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -1115,9 +1130,11 @@ export default {
         const payload = { name: this.newContractorName.trim(), phone: this.newContractorPhone?.trim() || '' }
         const res = await createContractor(payload)
         await this.loadLookups()
-        const created = res?.data
-        if (created?.id) {
-          const newContractor = this.contractors.find(c => c.id === created.id)
+        // backend may return single or multiple contractors; pick the one appropriate for transport
+        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
+        let chosen = createdList.find(c => c.availableForTransports) || createdList[0]
+        if (chosen && chosen.id) {
+          const newContractor = this.contractors.find(c => c.id === chosen.id)
           if (newContractor) {
             this.commonData.contractor = newContractor
             this.filters.commonContractorSearch = newContractor.name
@@ -1203,6 +1220,7 @@ export default {
           // weighted average distance per trip
           const weightedDistSum = toSave.reduce((s, r) => s + (Number(r.distanceKm || 0) * (Number(r.count) || 1)), 0)
           const distanceKm = totalTrips > 0 ? (weightedDistSum / totalTrips) : 0
+          // const computedRate = Number((Number(this.commonData.firstKmPrice || 0) + Math.max(0, Number(distanceKm || 0) - 1) * Number(this.commonData.perKmPrice || 0)).toFixed(3))
           const capacityForPayload = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
 
           const payload = {
@@ -1211,6 +1229,9 @@ export default {
             numTrips: totalTrips,
             distanceKm: Number(distanceKm.toFixed(3)),
             discount: Number(totalDiscount || 0),
+            // Backward compatibility for backend schemas that still require `rate`.
+            // UI/business logic uses firstKmPrice + perKmPrice as the source of truth.
+            // rate: computedRate,
             pricing: {
               firstKm: 1,
               firstKmPrice: Number(this.commonData.firstKmPrice || 0),

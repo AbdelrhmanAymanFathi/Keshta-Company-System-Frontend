@@ -94,10 +94,10 @@
 </template>
 
 <script>
-import { getContractorWalletTransactions } from '@/api'
+import { getContractorWalletTransactions, getAccountTransactions } from '@/api'
 export default {
   name: 'ContractorWalletLedger',
-  props: { contractorId: { type: [String, Number], required: true }, visible: { type: Boolean, default: false } },
+  props: { contractorId: { type: [String, Number], required: false }, accountId: { type: [String, Number], required: false }, visible: { type: Boolean, default: false } },
   data() {
     return {
       items: [],
@@ -117,14 +117,23 @@ export default {
   },
   methods: {
     async load() {
-      if (!this.contractorId) return
+      // If accountId is provided, fetch transactions for that account
+      if (!this.contractorId && !this.accountId) return
       this.loading = true
       try {
         const params = { page: this.page, pageSize: this.pageSize, start: this.filters.start, end: this.filters.end, type: this.filters.type }
-        const res = await getContractorWalletTransactions(this.contractorId, params)
-        const data = res?.data || {}
-        this.items = data.items || data || []
-        this.total = (data.meta && data.meta.total) || data.total || (Array.isArray(data) ? data.length : 0)
+        let res, data
+        if (this.accountId) {
+          res = await getAccountTransactions(this.accountId, params)
+          data = res?.data || {}
+          this.items = data.items || data || []
+          this.total = (data.meta && data.meta.total) || data.total || (Array.isArray(data) ? data.length : 0)
+        } else {
+          res = await getContractorWalletTransactions(this.contractorId, params)
+          data = res?.data || {}
+          this.items = data.items || data || []
+          this.total = (data.meta && data.meta.total) || data.total || (Array.isArray(data) ? data.length : 0)
+        }
       } catch (e) {
         console.error('Failed to load wallet transactions', e)
         this.items = []

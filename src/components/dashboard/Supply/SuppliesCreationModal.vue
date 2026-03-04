@@ -1138,7 +1138,7 @@ export default {
       if (!this.commonData.item) return
 
       // Support multiple possible field names returned by the API
-      const maybePrice = this.commonData.item.currentPrice ?? this.commonData.item.defaultExportPrice ?? this.commonData.item.price ?? this.commonData.item.current_price
+      const maybePrice = this.commonData.item.currentPrice ?? this.commonData.item.defaultSupplyPrice ?? this.commonData.item.defaultExportPrice ?? this.commonData.item.price ?? this.commonData.item.current_price
       const parsed = Number(maybePrice)
       if (!Number.isNaN(parsed)) {
         this.commonData.price = parsed
@@ -1411,16 +1411,17 @@ export default {
       this.contractorDialogError = ''
       try {
         const res = await createContractor({ name })
-        const nc = res?.data
-        if (!nc || !nc.id) throw new Error('Invalid response')
+        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
+        if (!createdList || createdList.length === 0) throw new Error('Invalid response')
 
-        console.log('✅ Created contractor:', nc)
+        console.log('✅ Created contractor(s):', createdList)
 
         // Reload all lookups to get fresh data
         await this.loadLookups()
 
-        // After reload, find and set the new contractor
-        const updatedContractor = this.contractors.find(c => c.id === nc.id)
+        // Choose exporter-capable contractor when available
+        const chosen = createdList.find(c => c.availableForSupplies) || createdList.find(c => c.availableForExports) || createdList[0]
+        const updatedContractor = this.contractors.find(c => c.id === chosen.id)
         if (updatedContractor && this.currentStep === 1) {
           this.commonData.contractor = updatedContractor
           console.log('✅ Set commonData.contractor:', updatedContractor)
@@ -1591,6 +1592,9 @@ export default {
           if (this.export && this.export.id && toSave.length === 1) {
             // await updateExport(this.export.id, payload)
           } else {
+            // mark record for supplies and keep legacy exports flag for compatibility
+            payload.availableForSupplies = true
+            payload.availableForExports = true
             const res = await createExport(payload)
             if (res && res.data && res.data.id) createdIds.push(res.data.id)
           }

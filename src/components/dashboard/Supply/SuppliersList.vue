@@ -180,7 +180,7 @@
 
     <!-- Add/Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-lg p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm sm:max-w-lg lg:max-w-3xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('suppliers.editContractor') : $t('suppliers.addContractor') }}
@@ -192,36 +192,33 @@
           </button>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <label>
+          <label class="sm:col-span-2 lg:col-span-3">
             <div class="text-sm mb-1">{{ $t('suppliers.name') }}</div>
-            <input v-model="form.name" :placeholder="$t('suppliers.placeholders.name')" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.name" :placeholder="$t('suppliers.placeholders.name')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.phone') }}</div>
-            <input v-model="form.phone" :placeholder="$t('suppliers.placeholders.phone')" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.phone" :placeholder="$t('suppliers.placeholders.phone')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.bankName') }}</div>
-            <input v-model="form.bankName" :placeholder="$t('suppliers.placeholders.bankName')" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.bankName" :placeholder="$t('suppliers.placeholders.bankName')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.accountNumber') }}</div>
-            <input v-model="form.accountNumber" :placeholder="$t('suppliers.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.accountNumber" :placeholder="$t('suppliers.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.openingBalance') || 'Opening Balance' }}</div>
-            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('suppliers.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded" />
+            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('suppliers.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
-          <label class="sm:col-span-2 lg:col-span-3">
+          <label>
             <div class="text-sm mb-1">{{ $t('suppliers.notes') }}</div>
-            <input v-model="form.notes" :placeholder="$t('suppliers.placeholders.notes')" class="w-full px-3 py-2 border rounded" />
+            <input v-model="form.notes" :placeholder="$t('suppliers.placeholders.notes')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
-          <label class="flex items-center gap-2 sm:col-span-2 lg:col-span-3">
-            <input type="checkbox" v-model="form.availableForTransports" class="w-4 h-4" />
-            <div class="text-sm">{{ $t('suppliers.isTransporter') || 'Also a transporter' }}</div>
-          </label>
+          
         </div>
-        <div class="mt-6 flex justify-end gap-3">
+        <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
           <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
@@ -349,7 +346,7 @@ export default {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', availableForTransports: false, openingBalance: '' },
+      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '' },
       contractors: [],
       deleteConfirm: { open: false, item: null },
       contextMenu: { open: false, x: 0, y: 0, item: null },
@@ -395,7 +392,7 @@ export default {
   methods: {
     async loadContractors() {
       try {
-        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: 'export' })
+        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: 'supply' })
         const payload = res.data || {}
         this.contractors = Array.isArray(payload.items) ? payload.items :
                          Array.isArray(payload.data) ? payload.data :
@@ -427,12 +424,12 @@ export default {
     },
     openAdd() {
       this.editing = false
-      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', availableForTransports: false, openingBalance: '' }
+      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '' }
       this.modalOpen = true
     },
     openEdit(c) {
       this.editing = true
-      this.form = { ...c, availableForTransports: !!c.availableForTransports, openingBalance: c.openingBalance ?? '' }
+      this.form = { ...c, openingBalance: c.openingBalance ?? '' }
       this.modalOpen = true
     },
     closeModal() {
@@ -450,10 +447,8 @@ export default {
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
       if (this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
-      // include transporter flag only when checked
-      if (this.form.availableForTransports) payload.availableForTransports = true
-      // when saving from the suppliers (export) view, ensure exports flag is set so it appears in the list
-      payload.availableForExports = true
+      // when saving from the suppliers (supply/export) view, ensure supplies flag is set so it appears in the list
+      payload.availableForSupplies = true
 
       try {
         if (this.editing && this.form.id) {
@@ -461,9 +456,15 @@ export default {
           if (window.$toast) window.$toast(this.$t('suppliers.updateSuccess') || 'Supplier updated successfully', 'success')
         } else {
           const res = await createContractor(payload)
-          this.contractors.push(res.data)
-          this.total++
-          if (window.$toast) window.$toast(this.$t('suppliers.addSuccess') || 'Supplier added successfully', 'success')
+          // backend may return single object or array of contractors
+          const created = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
+          created.forEach(c => this.contractors.push(c))
+          this.total += created.length
+          if (created.length > 1) {
+            if (window.$toast) window.$toast(this.$t('suppliers.addMultipleSuccess') || 'Created separate contractor records for Export and Transport', 'info')
+          } else {
+            if (window.$toast) window.$toast(this.$t('suppliers.addSuccess') || 'Supplier added successfully', 'success')
+          }
         }
         this.closeModal()
         await this.loadContractors()
@@ -515,9 +516,11 @@ export default {
           getContractorWalletHistory(contractorId)
         ])
         this.wallet = wRes.data || null
-        if (hRes?.data?.entries) {
-          this.wallet.entries = hRes.data.entries
-        }
+        // history response for accounts APIs may return items or data structure
+        const historyData = hRes?.data || hRes
+        if (historyData?.items) this.wallet.entries = historyData.items
+        else if (historyData?.entries) this.wallet.entries = historyData.entries
+        else if (Array.isArray(historyData)) this.wallet.entries = historyData
       } catch (err) {
         console.error('Error fetching wallet', err)
         if (window.$toast) window.$toast(this.$t('suppliers.walletFetchError') || 'Error fetching wallet', 'error')
@@ -603,9 +606,10 @@ export default {
         if (!existingNames.has(n.name)) {
           try {
             const res = await createContractor(n)
-            this.contractors.push(res.data)
+            const created = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
+            created.forEach(c => this.contractors.push(c))
             existingNames.add(n.name)
-            added++
+            added += created.length
           } catch (e) {
             console.error('Failed to import:', n.name, e)
           }
@@ -640,7 +644,7 @@ export default {
       if (!c || !c.id) return
       // Navigate to an existing contractor detail/statement route depending on the current mode
       // Navigate to the dedicated ContractorDetail view
-      this.$router.push({ name: 'contractor-detail', params: { id: c.id } }).catch(() => {})
+      this.$router.push({ name: 'contractor-detail', params: { id: c.id }, query: { from: 'supplies' } }).catch(() => {})
     }
   }
 }
