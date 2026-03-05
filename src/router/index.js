@@ -247,7 +247,7 @@ const routes = [
         path: 'admin/reports/run/:id',
         name: 'admin-reports-run',
         component: () => import('@/components/admin/ReportPage.vue'),
-        meta: { title: 'Run Report', roles: ['admin'] },
+        meta: { title: 'Run Report' },
         props: route => ({ reportId: route.params.id })
       },
       {
