@@ -305,13 +305,13 @@ export default {
     })
 
     // Normalize mode (use reactive mode if set, otherwise fall back to prop)
-    const currentMode = computed(() => {
-      // normalize to string if available
-      const m = mode.value || props.mode || ''
-      return m ? String(m) : ''
-    })
+    // const currentMode = computed(() => {
+    //   // normalize to string if available
+    //   const m = mode.value || props.mode || ''
+    //   return m ? String(m) : ''
+    // })
 
-    const normalizedMode = computed(() => (currentMode.value || '').toUpperCase())
+    // const normalizedMode = computed(() => (currentMode.value || '').toUpperCase())
 
     const showSupply = computed(() => {
       return !statementMode.value || statementMode.value === 'SUPPLY'

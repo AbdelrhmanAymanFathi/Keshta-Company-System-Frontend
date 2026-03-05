@@ -1,3 +1,4 @@
+<!-- eslint-disable no-useless-escape -->
 <template>
   <div class="p-6">
     <div class="flex items-center justify-between mb-4">
@@ -238,23 +239,23 @@ export default {
       return row[col]
     }
 
-    const formatDateYMD = (d) => {
-      if (!(d instanceof Date)) d = new Date(d)
-      if (isNaN(d.getTime())) return ''
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const day = String(d.getDate()).padStart(2, '0')
-      return `${y}/${m}/${day}`
-    }
+    // const formatDateYMD = (d) => {
+    //   if (!(d instanceof Date)) d = new Date(d)
+    //   if (isNaN(d.getTime())) return ''
+    //   const y = d.getFullYear()
+    //   const m = String(d.getMonth() + 1).padStart(2, '0')
+    //   const day = String(d.getDate()).padStart(2, '0')
+    //   return `${y}/${m}/${day}`
+    // }
 
-    const formatDateTimeYMDHMS = (d) => {
-      if (!(d instanceof Date)) d = new Date(d)
-      if (isNaN(d.getTime())) return ''
-      const y = d.getFullYear()
-      const m = String(d.getMonth() + 1).padStart(2, '0')
-      const day = String(d.getDate()).padStart(2, '0')
-      return `${y}/${m}/${day}`
-    }
+    // const formatDateTimeYMDHMS = (d) => {
+    //   if (!(d instanceof Date)) d = new Date(d)
+    //   if (isNaN(d.getTime())) return ''
+    //   const y = d.getFullYear()
+    //   const m = String(d.getMonth() + 1).padStart(2, '0')
+    //   const day = String(d.getDate()).padStart(2, '0')
+    //   return `${y}/${m}/${day}`
+    // }
 
     const parseIsoUtcString = (s) => {
       // Match strict UTC ISO like 2026-02-02T00:00:00.000Z or without milliseconds
@@ -305,7 +306,7 @@ export default {
       const last = String(key).split('.').pop()
       const withSpaces = last
         .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-        .replace(/[_\.\-]+/g, ' ')
+        .replace(/[_.-]+/g, ' ')
       return withSpaces.split(' ').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')
     }
 
@@ -389,7 +390,7 @@ export default {
         a.href = url
         const title = report.value && (locale.value === 'ar' ? (report.value.arTitle || report.value.title) : report.value.title) || 'report'
         // keep unicode letters/numbers; replace spaces with underscores
-        const safe = String(title).replace(/[^^\p{L}\p{N}\- _\.]/gu, '').replace(/\s+/g, '_') || 'report'
+        const safe = String(title).replace(/[^^\p{L}\p{N}\- _.]/gu, '').replace(/\s+/g, '_') || 'report'
         const dateStr = new Date().toISOString().slice(0, 10)
         a.download = `${safe}_${dateStr}.csv`
         document.body.appendChild(a)
@@ -438,7 +439,7 @@ export default {
         a.href = url
         const title = report.value && (locale.value === 'ar' ? (report.value.arTitle || report.value.title) : report.value.title) || 'report'
         // keep unicode letters/numbers; replace spaces with underscores
-        const safe = String(title).replace(/[^^\p{L}\p{N}\- _\.]/gu, '').replace(/\s+/g, '_') || 'report'
+        const safe = String(title).replace(/[^^\p{L}\p{N}\- _.]/gu, '').replace(/\s+/g, '_') || 'report'
         const dateStr = new Date().toISOString().slice(0, 10)
         a.download = `${safe}_${dateStr}.xlsx`
         document.body.appendChild(a)

@@ -70,11 +70,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </button>
-                <button @click.stop="openWallet(c)" class="text-blue-600 hover:text-blue-800" :title="$t('suppliers.wallet')">
+                <!-- <button @click.stop="openWallet(c)" class="text-blue-600 hover:text-blue-800" :title="$t('suppliers.wallet')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z" />
                   </svg>
-                </button>
+                </button> -->
                 <button @click.stop="openEdit(c)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -164,12 +164,12 @@
         </svg>
         {{ $t('labels.delete') }}
       </button>
-      <button @click="contextAction('wallet')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      <!-- <button @click="contextAction('wallet')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z" />
         </svg>
         {{ $t('suppliers.wallet') }}
-      </button>
+      </button> -->
       <button @click="contextAction('statement')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -230,7 +230,7 @@
     </div>
 
     <!-- Contractor Wallet Modal -->
-    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
+    <!-- <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 z-10">
         <div class="flex items-start justify-between mb-4">
           <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">
@@ -252,7 +252,7 @@
             <div class="p-4 bg-gray-50 rounded">
               <div class="text-sm text-gray-500">{{ $t('suppliers.sources') || 'Sources' }}</div>
               <div class="text-sm">
-                <div>{{ $t('suppliers.exports') || 'Exports' }}: {{ wallet && wallet.sources ? wallet.sources.exports : 0 }}</div>
+                <div>{{ $t('suppliers.supply') || 'Supply' }}: {{ wallet && wallet.sources ? wallet.sources.supply : 0 }}</div>
                 <div>{{ $t('suppliers.transport') || 'Transport' }}: {{ wallet && wallet.sources ? wallet.sources.transport : 0 }}</div>
                 <div>{{ $t('suppliers.expenses') || 'Expenses' }}: {{ wallet && wallet.sources ? wallet.sources.expenses : 0 }}</div>
               </div>
@@ -309,7 +309,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Confirm delete modal -->
     <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
@@ -338,7 +338,7 @@ import Pagination from '@/components/shared/Pagination.vue'
 export default {
   name: 'SuppliersList',
   props: {
-    mode: { type: String, default: 'export' }
+    mode: { type: String, default: 'supply' }
   },
   components: { Pagination },
   data() {
@@ -461,7 +461,7 @@ export default {
           created.forEach(c => this.contractors.push(c))
           this.total += created.length
           if (created.length > 1) {
-            if (window.$toast) window.$toast(this.$t('suppliers.addMultipleSuccess') || 'Created separate contractor records for Export and Transport', 'info')
+            if (window.$toast) window.$toast(this.$t('suppliers.addMultipleSuccess') || 'Created separate contractor records for Supply and Transport', 'info')
           } else {
             if (window.$toast) window.$toast(this.$t('suppliers.addSuccess') || 'Supplier added successfully', 'success')
           }
@@ -479,7 +479,7 @@ export default {
     async doDelete() {
       try {
         const params = {}
-        if (this.mode === 'export' || this.mode === 'transport') params.mode = this.mode
+        if (this.mode === 'supply' || this.mode === 'transport') params.mode = this.mode
         const res = await deleteContractor(this.deleteConfirm.item.id, params)
         const data = res?.data ?? null
         if ((res && res.status === 204) || (data && data.deletedAt)) {
