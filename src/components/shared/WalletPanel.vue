@@ -19,7 +19,7 @@
         </div>
         <div class="ml-auto flex items-center gap-2 px-4">
           <button @click="openDepositModal" class="px-3 py-1 bg-indigo-600 text-white rounded text-sm">{{ $t('labels.manualDeposit') }}</button>
-          <button @click="openAdvanceModal" class="px-3 py-1 border rounded text-sm">{{ $t('labels.advancePayment') || 'Advance/Payment' }}</button>
+          <button @click="openWithdrawModal" class="px-3 py-1 border rounded text-sm">{{ $t('labels.pay') || 'Pay' }}</button>
         </div>
       </div>
     </div>
@@ -71,31 +71,31 @@
       </div> -->
     <!-- </div> -->
 
-    <!-- Advance Payment Modal -->
-    <div v-if="advanceModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <!-- Withdraw Modal -->
+    <div v-if="withdrawModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold">{{ $t('labels.advancePayment') || 'Advance / Payment' }}</h3>
-          <button @click="closeAdvanceModal" class="text-gray-400 hover:text-gray-600">✕</button>
+          <h3 class="text-lg font-semibold">{{ $t('labels.withdraw') || 'Withdraw' }}</h3>
+          <button @click="closeWithdrawModal" class="text-gray-400 hover:text-gray-600">✕</button>
         </div>
         <div class="grid gap-3">
           <label>
             <div class="text-sm mb-1">{{ $t('labels.amount') }}</div>
-            <input v-model="advance.amount" type="number" step="0.01" class="w-full px-3 py-2 border rounded" />
+            <input v-model="withdrawal.amount" type="number" min="0" step="0.01" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('labels.description') }}</div>
-            <input v-model="advance.description" class="w-full px-3 py-2 border rounded" />
+            <input v-model="withdrawal.description" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('labels.date') }}</div>
-            <input v-model="advance.date" type="datetime-local" class="w-full px-3 py-2 border rounded" />
+            <input v-model="withdrawal.date" type="datetime-local" class="w-full px-3 py-2 border rounded" />
           </label>
-          <div v-if="advanceError" class="text-red-600">{{ advanceError }}</div>
+          <div v-if="withdrawalError" class="text-red-600">{{ withdrawalError }}</div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button @click="closeAdvanceModal" class="px-3 py-1 border rounded text-gray-700">{{ $t('labels.cancel') }}</button>
-          <button @click="submitAdvance" :disabled="advanceSubmitting" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">{{ advanceSubmitting ? $t('labels.saving') : ($t('labels.applyAdvance') || 'Apply Advance') }}</button>
+          <button @click="closeWithdrawModal" class="px-3 py-1 border rounded text-gray-700">{{ $t('labels.cancel') }}</button>
+          <button @click="submitWithdrawal" :disabled="withdrawalSubmitting" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">{{ withdrawalSubmitting ? $t('labels.saving') : ($t('labels.pay') || 'Pay') }}</button>
         </div>
       </div>
     </div>
@@ -133,7 +133,7 @@
 <script>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, advanceContractorWallet, getAccountTransactions } from '@/api'
+import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions } from '@/api'
 
 export default {
   name: 'WalletPanel',
@@ -157,11 +157,10 @@ export default {
     const deposit = ref({ amount: '', description: '', date: '' })
     const selectedAccount = ref(null)
     const depositModalOpen = ref(false)
-    // Advance payment state
-    const advance = ref({ amount: '', description: '', date: '' })
-    const advanceModalOpen = ref(false)
-    const advanceSubmitting = ref(false)
-    const advanceError = ref('')
+    const withdrawal = ref({ amount: '', description: '', date: '' })
+    const withdrawModalOpen = ref(false)
+    const withdrawalSubmitting = ref(false)
+    const withdrawalError = ref('')
 
     const loadSummary = async () => {
       if (!props.contractorId) return
@@ -199,21 +198,22 @@ export default {
       } finally { loadingHistory.value = false }
     }
 
-    const getLocalDateTime = () => {
+    const getLocalDate = () => {
       const d = new Date()
       d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-      return d.toISOString().slice(0,16)
+      return d.toISOString().slice(0, 16)
     }
 
     const doDeposit = async () => {
       const amount = Number(deposit.value.amount || 0)
       if (!amount || amount <= 0) {
         if (window.$toast) window.$toast('Enter a valid amount', 'warning')
-        return
+        return false
       }
       try {
         const payload = { amount, description: deposit.value.description || undefined, date: deposit.value.date || undefined }
         const res = await depositToContractorWallet(props.contractorId, payload)
+        if (!res) throw new Error('No response from deposit request')
         if (res?.data) {
           wallet.value = res.data
         }
@@ -221,50 +221,49 @@ export default {
         if (window.$toast) window.$toast('Deposit successful', 'success')
         window.dispatchEvent(new CustomEvent('contractor:wallet-updated', { detail: { contractorId: props.contractorId } }))
         deposit.value = { amount: '', description: '', date: '' }
+        return true
       } catch (e) {
         console.error('Deposit failed', e)
         if (window.$toast) window.$toast('Deposit failed', 'error')
+        return false
       }
     }
 
     const clearDeposit = () => { deposit.value = { amount: '', description: '', date: '' } }
-    const openDepositModal = () => { deposit.value.date = getLocalDateTime(); depositModalOpen.value = true }
+    const openDepositModal = () => { deposit.value.date = getLocalDate(); depositModalOpen.value = true }
     const closeDepositModal = () => { depositModalOpen.value = false }
-    const confirmDeposit = async () => { await doDeposit(); closeDepositModal() }
+    const confirmDeposit = async () => {
+      const ok = await doDeposit()
+      if (ok) closeDepositModal()
+    }
 
-    const openAdvanceModal = () => { advance.value.date = getLocalDateTime(); advanceModalOpen.value = true }
-    const closeAdvanceModal = () => { advanceModalOpen.value = false; advanceError.value = ''; advanceSubmitting.value = false }
+    const openWithdrawModal = () => { withdrawal.value.date = getLocalDate(); withdrawModalOpen.value = true }
+    const closeWithdrawModal = () => { withdrawModalOpen.value = false; withdrawalError.value = ''; withdrawalSubmitting.value = false }
 
-    const submitAdvance = async () => {
-      advanceError.value = ''
-      const amt = Number(advance.value.amount || 0)
-      if (!amt || Number.isNaN(amt)) {
-        advanceError.value = (typeof t === 'function' ? t('payments.invalidAmount') : null) || 'Amount must be non-zero'
+    const submitWithdrawal = async () => {
+      withdrawalError.value = ''
+      const amount = Math.abs(Number(withdrawal.value.amount || 0))
+      if (!amount || Number.isNaN(amount)) {
+        withdrawalError.value = (typeof t === 'function' ? t('payments.invalidAmount') : null) || 'Amount must be greater than zero'
         return
       }
 
-      // If negative (withdrawal), confirm with user
-      if (amt < 0) {
-        const ok = window.confirm((typeof t === 'function' ? t('payments.confirmWithdrawal') : null) || 'This will reduce contractor balance. Continue?')
-        if (!ok) return
-      }
-
-      advanceSubmitting.value = true
+      withdrawalSubmitting.value = true
       try {
-        const payload = { amount: amt, description: advance.value.description || undefined, date: advance.value.date || undefined }
-        const res = await advanceContractorWallet(props.contractorId, payload)
+        const payload = { amount, description: withdrawal.value.description || undefined, date: withdrawal.value.date || undefined }
+        const res = await withdrawFromContractorWallet(props.contractorId, payload)
         if (res && res.data) {
           wallet.value = res.data
         }
         await loadHistory()
         window.dispatchEvent(new CustomEvent('contractor:wallet-updated', { detail: { contractorId: props.contractorId } }))
-        advance.value = { amount: '', description: '', date: '' }
-        closeAdvanceModal()
+        withdrawal.value = { amount: '', description: '', date: '' }
+        closeWithdrawModal()
       } catch (e) {
-        console.error('Advance failed', e)
-        advanceError.value = e?.response?.data?.message || e?.message || 'Failed to record advance'
+        console.error('Withdrawal failed', e)
+        withdrawalError.value = e?.response?.data?.message || e?.message || 'Failed to withdraw'
       } finally {
-        advanceSubmitting.value = false
+        withdrawalSubmitting.value = false
       }
     }
 
@@ -310,8 +309,7 @@ export default {
     }
 
     return { wallet, history, loading, loadingHistory, deposit, loadSummary, loadHistory, doDeposit, clearDeposit, formatCurrency, formatDate, depositModalOpen, openDepositModal, closeDepositModal, confirmDeposit, isVisible, isRTL,
-      // advance
-      advance, advanceModalOpen, openAdvanceModal, closeAdvanceModal, submitAdvance, advanceSubmitting, advanceError,
+      withdrawal, withdrawModalOpen, openWithdrawModal, closeWithdrawModal, submitWithdrawal, withdrawalSubmitting, withdrawalError,
       selectedAccount, selectAccount, displayBalance }
   }
 }

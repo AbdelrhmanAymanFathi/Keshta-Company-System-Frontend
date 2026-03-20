@@ -94,25 +94,25 @@
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.contractorName') }}</p>
         <p class="text-lg font-semibold text-gray-900">{{ getContractorDisplayName(report) }}</p>
       </div>
-      <div v-if="showSupply" class="bg-white rounded-lg shadow p-4">
-        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.suppliesEarnings') }}</p>
-        <p class="text-lg font-semibold text-blue-600">{{ formatCurrency(report.closingBalance ?? report.totals?.closingBalance ?? 0) }}</p>
+      <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(totalDebits, 'text-green-600')">{{ formatCurrency(totalDebits) }}</p>
       </div>
-      <div v-if="showTransport" class="bg-white rounded-lg shadow p-4">
-        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.transportEarnings') }}</p>
-        <p class="text-lg font-semibold text-green-600">{{ formatCurrency(report.totals?.transportEarnings || 0) }}</p>
+      <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'text-blue-600')">{{ formatCurrency(totalCredits) }}</p>
       </div>
       <!-- <div class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalEarnings') }}</p>
         <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
       </div> -->
       <div class="bg-white rounded-lg shadow p-4">
-        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.depositedThisPeriod', 'contractors.totalDeposits') }}</p>
-        <p class="text-lg font-semibold text-teal-600">{{ formatCurrency(report.totals?.deposits || 0) }}</p>
+        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.paidToContractor', 'contractors.payments') }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(paidToContractor, 'text-teal-600')">{{ formatCurrency(paidToContractor) }}</p>
       </div>
-      <div v-if="showDeposits" class="bg-white rounded-lg shadow p-4">
-        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalDeposits') }}</p>
-        <p class="text-lg font-semibold text-purple-600">{{ formatCurrency(report.totals?.deposits || 0) }}</p>
+      <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.owedToContractor', 'contractors.owedToCompany') }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(owedToContractor, 'text-purple-600')">{{ formatCurrency(owedToContractor) }}</p>
       </div>
       
     </div>
@@ -137,9 +137,9 @@
           </p>
         </div>
         <div>
-          <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.balanceOwed') }}</p>
-          <p class="text-lg font-semibold text-red-600">
-            {{ formatCurrency(lastBalanceOwed) }}
+          <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}</p>
+          <p class="text-lg font-semibold" :class="getAmountClass(lastBalance, 'text-indigo-600')">
+            {{ formatCurrency(lastBalance) }}
           </p>
         </div>
       </div>
@@ -176,15 +176,15 @@
               </th>
               <th
                 class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
-                {{ $t('contractors.earnings') }}
+                {{ translateWithFallback('contractors.debit', 'contractors.earnings') }}
               </th>
               <th
                 class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
-                {{ $t('contractors.payments') }}
+                {{ translateWithFallback('contractors.credit', 'contractors.payments') }}
               </th>
               <th
                 class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
-                {{ $t('contractors.balanceOwed') }}
+                {{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}
               </th>
             </tr>
           </thead>
@@ -203,14 +203,14 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.refId || '-' }}</td>
               <td class="px-6 py-4 text-sm text-gray-900">{{ row.description || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right text-green-600">
-                {{ formatCurrency(row.earnings || 0) }}
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
+                {{ formatCurrency(getRowDebit(row)) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right text-red-600">
-                {{ formatCurrency(row.payments || 0) }}
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'text-blue-600')">
+                {{ formatCurrency(getRowCredit(row)) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right text-indigo-600">
-                {{ formatCurrency(row.balanceOwed || 0) }}
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'text-indigo-600')">
+                {{ formatCurrency(getRowBalance(row)) }}
               </td>
             </tr>
           </tbody>
@@ -233,10 +233,11 @@
 
 <script>
 import { ref, computed, onMounted, getCurrentInstance } from 'vue'
-import { getContractorReportData, downloadContractorReport, getContractors } from '@/api'
+import { getContractorReportData, getContractors } from '@/api'
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
+import * as XLSX from 'xlsx'
 // import { useRoute } from 'vue-router'
 
 export default {
@@ -298,10 +299,14 @@ export default {
       return statementMode.value ? statementMode.value.toLowerCase() : undefined
     })
 
-    const lastBalanceOwed = computed(() => {
+    const getRowDebit = (row) => Number(row?.debit ?? row?.earnings ?? 0) || 0
+    const getRowCredit = (row) => Number(row?.credit ?? row?.payments ?? 0) || 0
+    const getRowBalance = (row) => Number(row?.balance ?? row?.balanceOwed ?? 0) || 0
+
+    const lastBalance = computed(() => {
       if (!report.value || !report.value.rows || report.value.rows.length === 0) return 0
       const lastRow = report.value.rows[report.value.rows.length - 1]
-      return lastRow.balanceOwed || 0
+      return getRowBalance(lastRow)
     })
 
     // Normalize mode (use reactive mode if set, otherwise fall back to prop)
@@ -313,16 +318,31 @@ export default {
 
     // const normalizedMode = computed(() => (currentMode.value || '').toUpperCase())
 
-    const showSupply = computed(() => {
-      return !statementMode.value || statementMode.value === 'SUPPLY'
+    const totalDebits = computed(() => {
+      const v = report.value?.totals?.debits
+      if (v !== undefined && v !== null) return Number(v) || 0
+      const rows = report.value?.rows || []
+      return rows.reduce((sum, row) => sum + getRowDebit(row), 0)
     })
 
-    const showTransport = computed(() => {
-      return !statementMode.value || statementMode.value === 'TRANSPORT'
+    const totalCredits = computed(() => {
+      const v = report.value?.totals?.credits
+      if (v !== undefined && v !== null) return Number(v) || 0
+      const rows = report.value?.rows || []
+      return rows.reduce((sum, row) => sum + getRowCredit(row), 0)
     })
 
-    const showDeposits = computed(() => {
-      return !statementMode.value || statementMode.value === 'DEPOSIT'
+    const paidToContractor = computed(() => {
+      const v = report.value?.totals?.paidToContractor
+      if (v !== undefined && v !== null) return Number(v) || 0
+      return totalCredits.value
+    })
+
+    const owedToContractor = computed(() => {
+      const v = report.value?.totals?.owedToContractor
+      if (v !== undefined && v !== null) return Number(v) || 0
+      const closing = Number(report.value?.closingBalance ?? lastBalance.value ?? 0) || 0
+      return closing > 0 ? closing : 0
     })
 
     const paginatedRows = computed(() => {
@@ -385,14 +405,9 @@ export default {
       return en || ar || '-'
     }
 
-    const depositedThisPeriod = computed(() => {
-      if (!report.value || !report.value.rows) return 0
-      return report.value.rows.reduce((sum, row) => {
-        if (!row || String(row.type || '').toUpperCase() !== 'DEPOSIT') return sum
-        const amount = Number(row.payments ?? row.earnings ?? 0) || 0
-        return sum + amount
-      }, 0)
-    })
+    const getAmountClass = (value, positiveClass = 'text-gray-900') => {
+      return Number(value || 0) < 0 ? 'text-red-600' : positiveClass
+    }
 
     const loadContractors = async () => {
       try {
@@ -456,6 +471,18 @@ export default {
       }
     }
 
+    const buildExportRows = (rows = []) => {
+      return rows.map((row) => ({
+        date: row?.date || '-',
+        type: (row?.type || '').toString().toUpperCase() || '-',
+        refId: row?.refId || '-',
+        description: row?.description || '-',
+        debit: getRowDebit(row),
+        credit: getRowCredit(row),
+        balance: getRowBalance(row)
+      }))
+    }
+
     const downloadReport = async (format) => {
       if (!selectedContractorId.value) {
         error.value = t('contractors.selectContractorFirst')
@@ -473,7 +500,13 @@ export default {
 
         const params = buildQueryParams(p)
 
-        const { data } = await downloadContractorReport(selectedContractorId.value, params, format, statementMode.value || undefined)
+        let sourceReport = report.value
+        if (!sourceReport || !Array.isArray(sourceReport.rows)) {
+          const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', statementMode.value || undefined)
+          sourceReport = data
+        }
+
+        const exportRows = buildExportRows(sourceReport?.rows || [])
 
         const contractor = contractors.value.find(c => String(c.id) === String(selectedContractorId.value) || c.id === parseInt(selectedContractorId.value))
         const rawName = contractor ? ((isRTL.value && contractor.arName) ? contractor.arName : contractor.name) : String(selectedContractorId.value)
@@ -484,11 +517,19 @@ export default {
         const extension = format === 'csv' ? 'csv' : 'xlsx'
         const filename = `contractor-${contractorName}-statement-${dateRange}.${extension}`
 
-        const contentType = format === 'csv'
-          ? 'text/csv'
-          : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        let blob
+        if (format === 'csv') {
+          const sheet = XLSX.utils.json_to_sheet(exportRows, { header: ['date', 'type', 'refId', 'description', 'debit', 'credit', 'balance'] })
+          const csv = XLSX.utils.sheet_to_csv(sheet)
+          blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        } else {
+          const wb = XLSX.utils.book_new()
+          const sheet = XLSX.utils.json_to_sheet(exportRows, { header: ['date', 'type', 'refId', 'description', 'debit', 'credit', 'balance'] })
+          XLSX.utils.book_append_sheet(wb, sheet, 'Statement')
+          const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+          blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+        }
 
-        const blob = new Blob([data], { type: contentType })
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
@@ -563,19 +604,23 @@ export default {
       report,
       contractors,
       selectedContractorId,
-      showSupply,
-      showTransport,
-      showDeposits,
-      depositedThisPeriod,
+      totalDebits,
+      totalCredits,
+      paidToContractor,
+      owedToContractor,
       translateWithFallback,
       filters,
       currentPage,
       pageSize,
       isRTL,
-      lastBalanceOwed,
+      lastBalance,
       paginatedRows,
       totalPages,
       formatCurrency,
+      getAmountClass,
+      getRowDebit,
+      getRowCredit,
+      getRowBalance,
       getTypeVariant,
       getTypeLabel,
       getContractorDisplayName,
