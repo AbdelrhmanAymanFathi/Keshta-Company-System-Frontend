@@ -461,7 +461,7 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
 export const depositToContractorWallet = async (contractorId, data) => {
   // If caller provided accountId, use it
   if (data && data.accountId) {
-    const payload = { amount: data.amount, type: 'CREDIT', description: data.description };
+    const payload = { amount: data.amount, type: 'CREDIT', description: data.description, date: data.date };
     return postAccountTransaction(data.accountId, payload);
   }
 
@@ -471,36 +471,33 @@ export const depositToContractorWallet = async (contractorId, data) => {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
       const acct = accounts.find(a => a.accountType === data.accountType) || accounts[0];
-      if (acct) return postAccountTransaction(acct.id, { amount: data.amount, type: 'CREDIT', description: data.description });
+      if (acct) return postAccountTransaction(acct.id, { amount: data.amount, type: 'CREDIT', description: data.description, date: data.date });
     } catch (e) {
       // fallthrough
     }
   }
 
-  // Fallback: try legacy deposit route
-  // try {
-  //   return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
-  // } catch (e) {
-  //   throw e;
-  // }
+  // Fallback: wallet deposit endpoint
+  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
 };
 
-export const advanceContractorWallet = async (contractorId, data) => {
-  // data: { amount, accountId?, accountType?, mode: 'DEBIT'|'CREDIT', description }
+export const withdrawFromContractorWallet = async (contractorId, data) => {
+  const amount = Math.abs(Number(data?.amount || 0));
+  const payload = { ...data, amount };
+
   if (data && data.accountId) {
-    const payload = { amount: data.amount, type: data.mode || 'DEBIT', description: data.description };
-    return postAccountTransaction(data.accountId, payload);
+    return postAccountTransaction(data.accountId, { amount, type: 'DEBIT', description: data.description, date: data.date });
   }
   if (data && data.accountType) {
     try {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
       const acct = accounts.find(a => a.accountType === data.accountType) || accounts[0];
-      if (acct) return postAccountTransaction(acct.id, { amount: data.amount, type: data.mode || 'DEBIT', description: data.description });
-    } catch (e) {console.error('Error advancing contractor wallet with accountType:', e)}
+      if (acct) return postAccountTransaction(acct.id, { amount, type: 'DEBIT', description: data.description, date: data.date });
+    } catch (e) {console.error('Error withdrawing contractor wallet with accountType:', e)}
   }
-  // fallback
-  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/advance`, data);
+
+  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/withdraw`, payload);
 };
 
 // Contractor Report/Statement
