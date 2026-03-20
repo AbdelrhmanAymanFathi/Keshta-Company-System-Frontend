@@ -73,11 +73,11 @@
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start flex gap-2">
               <button @click="editItem(item)"
                 class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm">
-                {{ $t('labels.edit') }}
+                <PencilIcon class="w-5 h-5" />
               </button>
               <button @click="confirmDelete(item)"
                 class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 text-sm">
-                {{ $t('labels.delete') }}
+                <TrashIcon class="w-5 h-5" />
               </button>
             </td>
           </tr>
@@ -232,10 +232,11 @@ import { getItems, createItem, updateItem, deleteItem, getUnits } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
+import { TrashIcon, PencilIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'ItemList',
-  components: { Pagination, ConfirmDialog, Toast },
+  components: { Pagination, ConfirmDialog, Toast, TrashIcon, PencilIcon },
   props: {
     mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'all'
   },

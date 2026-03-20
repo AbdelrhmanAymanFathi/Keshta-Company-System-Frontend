@@ -191,7 +191,9 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
 
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              <button @click.stop="openDeleteConfirm(supply)" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">{{ $t('labels.delete') }}</button>
+              <button @click.stop="openDeleteConfirm(supply)" :title="$t('labels.delete')" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+                <TrashIcon class="w-4 h-4" />
+              </button>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
@@ -291,6 +293,7 @@ import SearchDropdown from '../../shared/SearchDropdown.vue'
 // import PaymentModal from '../../shared/PaymentModal.vue'
 // import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'SuppliesList',
@@ -299,6 +302,7 @@ export default {
     TableModal,
     Pagination,
     SearchDropdown,
+    TrashIcon
     // PaymentModal,
     // SupplyDetailModal
   },
