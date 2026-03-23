@@ -340,6 +340,18 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+          <div class="flex items-center gap-2">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                v-model="jobForm.isRental"
+                type="checkbox"
+                class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              />
+              <span class="text-sm font-medium text-gray-700">
+                {{ $t('rental.isRental') }}
+              </span>
+            </label>
+          </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
               {{ $t('rental.notes') }}
@@ -379,6 +391,15 @@
       @confirm="deleteJob"
       @cancel="showDeleteJobModal = false"
     />
+    <ConfirmDialog
+      :show="showBillingConfirm"
+      :title="$t('rental.billingConfirmTitle')"
+      :message="billingConfirmMessage"
+      :loading="savingJob"
+      type="warning"
+      @confirm="proceedWithBillingConfirm"
+      @cancel="showBillingConfirm = false"
+    />
   </div>
 </template>
 
@@ -409,6 +430,9 @@ export default {
   emits: ['close'],
   setup(props) {
     const rental = ref(null)
+    const showBillingConfirm = ref(false)
+    const billingConfirmMessage = ref('')
+    const billingConfirmPayload = ref(null)
     const activeTab = ref('jobs')
     const jobs = ref([])
     const jobsLoading = ref(false)
@@ -427,6 +451,7 @@ export default {
       date: new Date().toISOString().split('T')[0],
       job: '',
       hours: 0,
+      isRental: false,
       notes: ''
     })
 
@@ -508,6 +533,7 @@ export default {
         date: new Date().toISOString().split('T')[0],
         job: '',
         hours: 0,
+        isRental: false,
         notes: ''
       }
       showJobModal.value = true
@@ -519,6 +545,7 @@ export default {
         date: job.date ? job.date.split('T')[0] : new Date().toISOString().split('T')[0],
         job: job.job || '',
         hours: job.hours || 0,
+        isRental: job.isRental || false,
         notes: job.notes || ''
       }
       showJobModal.value = true
@@ -542,7 +569,24 @@ export default {
           date: new Date(jobForm.value.date).toISOString(),
           job: jobForm.value.job,
           hours: parseFloat(jobForm.value.hours),
+          isRental: !!jobForm.value.isRental,
           notes: jobForm.value.notes || ''
+        }
+
+        // Determine if billing confirmation is required
+        const rentalBillingEnabled = (window.__APP_CONFIG__ && window.__APP_CONFIG__.RENTAL_BILLING_ENABLED) || (process.env && process.env.VUE_APP_RENTAL_BILLING_ENABLED === 'true')
+        const willBill = payload.isRental && rental.value && (rental.value.contractorId || rental.value.contractor_id)
+        if (!editingJob.value && willBill && rentalBillingEnabled) {
+          const hours = Number(payload.hours) || 0
+          const rate = Number(rental.value.hourlyRate || 0)
+          const estimated = (hours * rate)
+          const confirmMsg = (typeof t === 'function' ? t('rental.billingConfirmMessage', { hours, rate: rate.toFixed(2), estimated: estimated.toFixed(2) }) : `This job will bill the contractor. Hours: ${hours}, Rate: ${rate.toFixed(2)}, Estimated charge: ${estimated.toFixed(2)}. Proceed?`)
+          // show app-styled confirm dialog instead of window.confirm
+          billingConfirmMessage.value = confirmMsg
+          billingConfirmPayload.value = payload
+          showBillingConfirm.value = true
+          savingJob.value = false
+          return
         }
 
         if (editingJob.value) {
@@ -564,6 +608,27 @@ export default {
         if (window.$toast) {
           window.$toast(error.response?.data?.message || 'Failed to save job', 'error')
         }
+      } finally {
+        savingJob.value = false
+      }
+    }
+
+    const proceedWithBillingConfirm = async () => {
+      if (!billingConfirmPayload.value) {
+        showBillingConfirm.value = false
+        return
+      }
+      savingJob.value = true
+      try {
+        await createRentalJob(props.rentalId, billingConfirmPayload.value)
+        if (window.$toast) window.$toast('Job created successfully', 'success')
+        showBillingConfirm.value = false
+        billingConfirmPayload.value = null
+        closeJobModal()
+        await refreshAll()
+      } catch (error) {
+        console.error('Error creating job after confirmation:', error)
+        if (window.$toast) window.$toast(error.response?.data?.message || 'Failed to save job', 'error')
       } finally {
         savingJob.value = false
       }
@@ -711,6 +776,10 @@ export default {
       formatDate,
       formatCurrency,
       formatHours
+      ,
+      showBillingConfirm,
+      billingConfirmMessage,
+      proceedWithBillingConfirm
     }
   }
 }

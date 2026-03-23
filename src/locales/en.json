@@ -684,6 +684,8 @@
       "openingBalance": "Enter opening balance",
       "notes": "Enter notes (optional)"
     },
+    "availableForEquipmentRental": "Available for Equipment Rental",
+    "availableForEquipmentRentalDesc": "Make this contractor available to receive equipment rental logs and billing",
     "addMultipleSuccess": "Add Multiple Success",
     "availabilityRemoved": "Availability Removed",
     "deleteSuccess": "Delete Success"
@@ -881,6 +883,21 @@
     "amount": "Amount",
     "payoutDeletedSuccessfully": "Payout deleted successfully",
     "payoutAlreadyDeleted": "Payout already deleted"
+    ,
+    "billingConfirmTitle": "Confirm Billing",
+    "billingConfirmMessage": "This job will bill the contractor. Hours: {hours}, Rate: {rate}, Estimated charge: {estimated}. Proceed?"
+  },
+  "equipment": {
+    "title": "Equipment",
+    "add": "Add Equipment",
+    "edit": "Edit Equipment",
+    "name": "Name",
+    "searchPlaceholder": "Search equipment...",
+    "noResults": "No equipment found",
+    "createSuccess": "Equipment created successfully",
+    "updateSuccess": "Equipment updated successfully",
+    "deleteSuccess": "Equipment deleted successfully"
+    ,"deleteConfirm": "Are you sure you want to delete this equipment?"
   },
   "finance": {
     "wallets": "Wallets",

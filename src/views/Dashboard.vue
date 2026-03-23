@@ -204,6 +204,7 @@ export default {
 
         ],
         equipmentRent: [
+          { name: 'equipmentList', label: 'equipment.title', routeName: 'rentals-equipment-list' },
           { name: 'rentalList', label: 'dashboard.equipmentRent', routeName: 'rentals-list' },
           { name: 'rentalReport', label: 'rental.reportMenu', routeName: 'rentals-report' }
         ],
@@ -317,7 +318,7 @@ export default {
       }
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
-      const rentalsRoutes = ['rentals-list', 'rentals-report']
+      const rentalsRoutes = ['rentals-list', 'rentals-report', 'rentals-equipment-list', 'equipment-list']
       const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
       const adminRoutes = ['changes-by-date', 'users-list', 'locations', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'

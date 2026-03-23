@@ -216,7 +216,15 @@
             <div class="text-sm mb-1">{{ $t('suppliers.notes') }}</div>
             <input v-model="form.notes" :placeholder="$t('suppliers.placeholders.notes')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
-          
+          <label class="sm:col-span-2 lg:col-span-3">
+            <div class="flex items-center gap-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input v-model="form.isAvailableForEquipmentRental" type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                <span class="text-sm font-medium text-gray-700">{{ $t('suppliers.availableForEquipmentRental') }}</span>
+              </label>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">{{ $t('suppliers.availableForEquipmentRentalDesc') }}</p>
+          </label>
         </div>
         <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
           <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
@@ -346,7 +354,7 @@ export default {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '' },
+      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '', isAvailableForEquipmentRental: false },
       contractors: [],
       deleteConfirm: { open: false, item: null },
       contextMenu: { open: false, x: 0, y: 0, item: null },
@@ -449,6 +457,8 @@ export default {
       if (this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
       // when saving from the suppliers (supply/export) view, ensure supplies flag is set so it appears in the list
       payload.availableForSupplies = true
+      // equipment rental availability toggle
+      if (this.form.isAvailableForEquipmentRental !== undefined) payload.isAvailableForEquipmentRental = !!this.form.isAvailableForEquipmentRental
 
       try {
         if (this.editing && this.form.id) {

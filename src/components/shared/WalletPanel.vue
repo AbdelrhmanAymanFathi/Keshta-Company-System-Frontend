@@ -133,7 +133,7 @@
 <script>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions } from '@/api'
+import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions, getContractorAccounts } from '@/api'
 
 export default {
   name: 'WalletPanel',
@@ -168,6 +168,22 @@ export default {
       try {
         const res = await getContractorWallet(props.contractorId)
         wallet.value = res?.data || null
+        // If rental billing feature is enabled, try to fetch accounts and ensure RENTAL account is visible
+        const rentalBillingEnabled = (window.__APP_CONFIG__ && window.__APP_CONFIG__.RENTAL_BILLING_ENABLED) || (process.env && process.env.VUE_APP_RENTAL_BILLING_ENABLED === 'true')
+        if (rentalBillingEnabled) {
+          try {
+            const accRes = await getContractorAccounts(props.contractorId)
+            const accounts = accRes?.data || []
+            // normalize accounts array
+            const acctArr = Array.isArray(accounts) ? accounts : (accounts.accounts || (accounts.data || []))
+            if (acctArr && acctArr.length > 0) {
+              wallet.value = wallet.value || {}
+              wallet.value.accounts = acctArr
+            }
+          } catch (e) {
+            // ignore account fetch failures and keep fallback wallet
+          }
+        }
         // if accounts available, pick first as selected by default
         if (wallet.value && Array.isArray(wallet.value.accounts) && wallet.value.accounts.length > 0) {
           selectedAccount.value = wallet.value.accounts[0]

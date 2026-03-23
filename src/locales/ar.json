@@ -684,6 +684,8 @@
       "openingBalance": "أدخل الرصيد الافتتاحي",
       "notes": "أدخل الملاحظات (اختياري)"
     },
+    "availableForEquipmentRental": "متاح لتأجير المعدات",
+    "availableForEquipmentRentalDesc": "اجعل هذا المقاول متاحًا لتلقي سجلات تأجير المعدات والفوترة",
     "addMultipleSuccess": "تمت إضافة عدة موردين بنجاح",
     "availabilityRemoved": "تمت إزالة التوافر",
     "deleteSuccess": "تم حذف المورد بنجاح"
@@ -854,7 +856,7 @@
     "companyEquipment": "معدات مملوكة للشركة",
     "companyWallet": "الخزينة الرئيسيه",
     "externalRental": "إيجار خارجي",
-    "isCompanyOwned": "معدات مملوكة للشركة",
+    "isCompanyOwned": "معدة مملوكة للشركة",
     "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
     "totalCanOverride": "يمكن تعديل المجموع يدوياً",
     "useArrowKeys": "استخدم مفاتيح السهم (يسار/يمين) للتمرير أفقياً",
@@ -880,6 +882,21 @@
     "amount": "المبلغ",
     "payoutDeletedSuccessfully": "تم حذف الدفعة بنجاح",
     "payoutAlreadyDeleted": "هذه الدفعة تم حذفها بالفعل"
+    ,
+    "billingConfirmTitle": "تأكيد الفوترة",
+    "billingConfirmMessage": "سيتم إصدار فاتورة للمقاول. الساعات: {hours}, السعر: {rate}, المبلغ المقدر: {estimated}. هل تتابع؟"
+  },
+  "equipment": {
+    "title": "المعدات",
+    "add": "إضافة معدة",
+    "edit": "تعديل المعدة",
+    "name": "الاسم",
+    "searchPlaceholder": "ابحث في المعدات...",
+    "noResults": "لا توجد معدات",
+    "createSuccess": "تم إنشاء المعدة بنجاح",
+    "updateSuccess": "تم تحديث المعدة بنجاح",
+    "deleteSuccess": "تم حذف المعدة بنجاح"
+    ,"deleteConfirm": "هل أنت متأكد من حذف هذه المعدة؟"
   },
   "finance": {
     "wallets": "المحافظ",

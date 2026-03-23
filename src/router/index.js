@@ -25,6 +25,7 @@ const TransportReport = () => import('@/components/dashboard/Transport/Transport
 const ContractorDetail = () => import('@/views/ContractorDetail.vue')
 const RentalList = () => import('@/components/dashboard/RentalList.vue')
 const RentalReport = () => import('@/components/dashboard/RentalReport.vue')
+const EquipmentList = () => import('@/components/dashboard/Equipment/EquipmentList.vue')
 const CompanyFinance = () => import('@/components/dashboard/CompanyFinance.vue')
 const CompanyTransactions = () => import('@/components/dashboard/CompanyTransactions.vue')
 const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
@@ -176,6 +177,12 @@ const routes = [
         name: 'rentals-report',
         component: RentalReport,
         meta: { title: 'rental.reportMenu' }
+      },
+      {
+        path: 'rentals/equipment/list',
+        name: 'rentals-equipment-list',
+        component: EquipmentList,
+        meta: { title: 'equipment.title' }
       },
 
       // ==================== Company Wallet Module ====================

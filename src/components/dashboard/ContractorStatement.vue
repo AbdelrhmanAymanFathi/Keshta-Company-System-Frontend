@@ -237,7 +237,6 @@ import { getContractorReportData, getContractors } from '@/api'
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
-import * as XLSX from 'xlsx'
 // import { useRoute } from 'vue-router'
 
 export default {
@@ -268,6 +267,10 @@ export default {
 
     const isRTL = computed(() => {
       return instance && instance.proxy && instance.proxy.$i18n && instance.proxy.$i18n.locale === 'ar'
+    })
+
+    const currentLang = computed(() => {
+      return instance && instance.proxy && instance.proxy.$i18n && instance.proxy.$i18n.locale === 'ar' ? 'ar' : 'en'
     })
 
     const t = (key, ...args) => {
@@ -455,6 +458,7 @@ export default {
         if (filters.value.startDate) p.startDate = filters.value.startDate
         if (filters.value.endDate) p.endDate = filters.value.endDate
         p.format = 'json'
+        if (currentLang.value) p.lang = currentLang.value
         if (statementMode.value) p.mode = statementMode.value
 
         const params = buildQueryParams(p)
@@ -496,38 +500,39 @@ export default {
         if (filters.value.startDate) p.startDate = filters.value.startDate
         if (filters.value.endDate) p.endDate = filters.value.endDate
         p.format = format
+        if (currentLang.value) p.lang = currentLang.value
         if (statementMode.value) p.mode = statementMode.value
 
         const params = buildQueryParams(p)
 
-        let sourceReport = report.value
-        if (!sourceReport || !Array.isArray(sourceReport.rows)) {
-          const { data } = await getContractorReportData(selectedContractorId.value, params, 'json', statementMode.value || undefined)
-          sourceReport = data
-        }
+        // Request binary report from backend (xlsx or csv)
+        const { data, headers } = await getContractorReportData(selectedContractorId.value, params, format, statementMode.value || undefined)
 
-        const exportRows = buildExportRows(sourceReport?.rows || [])
-
+        // Determine filename (fall back to contractor id if name not available)
         const contractor = contractors.value.find(c => String(c.id) === String(selectedContractorId.value) || c.id === parseInt(selectedContractorId.value))
         const rawName = contractor ? ((isRTL.value && contractor.arName) ? contractor.arName : contractor.name) : String(selectedContractorId.value)
         const contractorName = String(rawName || selectedContractorId.value).replace(/[^a-zA-Z0-9]/g, '_')
         const dateRange = filters.value.startDate && filters.value.endDate
           ? `${filters.value.startDate}_${filters.value.endDate}`
           : 'all'
-        const extension = format === 'csv' ? 'csv' : 'xlsx'
-        const filename = `contractor-${contractorName}-statement-${dateRange}.${extension}`
+
+        // Try to extract filename from Content-Disposition header if provided by server
+        let filename = null
+        const cd = headers && (headers['content-disposition'] || headers['Content-Disposition'])
+        if (cd) {
+          const m = cd.match(/filename\*=UTF-8''([^;\n]+)/) || cd.match(/filename=\"?([^\";\n]+)\"?/) || cd.match(/filename=([^;\n]+)/)
+          if (m && m[1]) filename = decodeURIComponent(m[1])
+        }
+        if (!filename) {
+          const extension = format === 'csv' ? 'csv' : 'xlsx'
+          filename = `contractor-${contractorName}-statement-${dateRange}.${extension}`
+        }
 
         let blob
         if (format === 'csv') {
-          const sheet = XLSX.utils.json_to_sheet(exportRows, { header: ['date', 'type', 'refId', 'description', 'debit', 'credit', 'balance'] })
-          const csv = XLSX.utils.sheet_to_csv(sheet)
-          blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+          blob = new Blob([data], { type: headers['content-type'] || 'text/csv;charset=utf-8;' })
         } else {
-          const wb = XLSX.utils.book_new()
-          const sheet = XLSX.utils.json_to_sheet(exportRows, { header: ['date', 'type', 'refId', 'description', 'debit', 'credit', 'balance'] })
-          XLSX.utils.book_append_sheet(wb, sheet, 'Statement')
-          const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-          blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+          blob = new Blob([data], { type: headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
         }
 
         const url = window.URL.createObjectURL(blob)
