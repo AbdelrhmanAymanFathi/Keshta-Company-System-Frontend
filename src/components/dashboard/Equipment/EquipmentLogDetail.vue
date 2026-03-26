@@ -1,0 +1,227 @@
+<template>
+  <div class="space-y-6 p-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold">{{ $t('equipmentLog.detail') }}</h3>
+      <div class="flex items-center gap-2">
+        <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div v-if="loading" class="flex justify-center py-6">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+    </div>
+
+    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+      {{ error }}
+    </div>
+
+    <div v-else>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('equipmentLog.date') }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ formatDate(rental.date) }}</div>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('equipmentLog.equipment') }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ rental.equipment || rental.equipmentLog || '-' }}</div>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('equipmentLog.total') }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ formatCurrency(rental.total || 0) }}</div>
+        </div>
+      </div>
+
+      <div class="mt-4 bg-white rounded-lg p-4 border">
+        <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.jobEntries') }}</h4>
+        <div v-if="jobs.length === 0" class="text-gray-500 py-6 text-center">
+          {{ $t('equipmentLog.noJobs') }}
+        </div>
+        <div v-else class="space-y-3">
+          <div v-for="job in jobs" :key="job.id" class="flex items-center justify-between p-3 border rounded">
+            <div>
+              <div class="text-sm font-medium">{{ job.name || job.note || '-' }}</div>
+              <div class="text-xs text-gray-500">{{ formatDate(job.date) }} • {{ job.hours }} {{ $t('equipmentLog.hours') }}</div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="text-sm font-semibold">{{ formatCurrency(job.hourlyRate || rental.hourlyRate || 0) }}</div>
+              <button @click="editJob(job)" class="text-indigo-600 hover:text-indigo-900 text-sm">{{ $t('labels.edit') }}</button>
+              <button @click="deleteJob(job)" class="text-red-600 hover:text-red-900 text-sm">{{ $t('labels.delete') }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 border">
+        <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.addJob') }}</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <input v-model="jobForm.date" type="date" class="border rounded px-3 py-2 text-sm" />
+          <input v-model.number="jobForm.hours" type="number" min="0" step="0.1" placeholder="Hours"
+            class="border rounded px-3 py-2 text-sm" />
+          <input v-model.number="jobForm.hourlyRate" type="number" min="0" step="0.01" placeholder="Hourly Rate"
+            class="border rounded px-3 py-2 text-sm" />
+          <input v-model="jobForm.note" type="text" placeholder="Note"
+            class="border rounded px-3 py-2 text-sm col-span-1 sm:col-span-4" />
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button @click="saveJob" :disabled="savingJob"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">{{ savingJob ? $t('labels.saving') : $t('labels.save') }}</button>
+          <button @click="resetJobForm" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg p-4 border">
+        <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.notes') }}</h4>
+        <textarea v-model="rental.notes" rows="4" class="w-full border rounded px-3 py-2 text-sm"></textarea>
+        <div class="mt-3 flex justify-end">
+          <button @click="saveNotes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">{{ $t('labels.save') }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref, onMounted } from 'vue'
+import { getRental, getRentalJobs, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog } from '@/api'
+
+export default {
+  name: 'EquipmentLogDetail',
+  props: {
+    rentalId: {
+      type: [String, Number],
+      required: true
+    }
+  },
+  emits: ['close'],
+  setup(props, { emit }) {
+    const loading = ref(true)
+    const error = ref(null)
+    const rental = ref({})
+    const jobs = ref([])
+    const savingJob = ref(false)
+    const jobForm = ref({ id: null, date: new Date().toISOString().split('T')[0], hours: 0, hourlyRate: 0, note: '' })
+
+    const fetchRental = async () => {
+      loading.value = true
+      error.value = null
+      try {
+        const res = await getEquipmentLog(props.rentalId)
+        rental.value = res.data || res
+        await fetchJobs()
+      } catch (e) {
+        error.value = e.response?.data?.message || 'Failed to load'
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const fetchJobs = async () => {
+      try {
+        const res = await getEquipmentLogJobs(props.rentalId)
+        jobs.value = Array.isArray(res.data) ? res.data : (res.data?.items || [])
+      } catch (e) {
+        jobs.value = []
+      }
+    }
+
+    const saveJob = async () => {
+      savingJob.value = true
+      try {
+        // normalize numeric fields to avoid Zod validation errors
+        const equipmentIdCandidate = rental.value.equipmentId ?? rental.value.equipment ?? null
+        const equipmentIdNumeric = equipmentIdCandidate != null ? Number(equipmentIdCandidate) : NaN
+        if (isNaN(equipmentIdNumeric)) {
+          if (window.$toast) window.$toast('Please ensure the rental has a valid equipment selected', 'error')
+          savingJob.value = false
+          return
+        }
+
+        let hoursNum = Number(jobForm.value.hours)
+        if (isNaN(hoursNum) || hoursNum <= 0) hoursNum = 1
+
+        const hourlyRateNum = Number(jobForm.value.hourlyRate || rental.value.hourlyRate || 0)
+
+        const payload = {
+          date: new Date(jobForm.value.date).toISOString(),
+          hours: hoursNum,
+          hourlyRate: hourlyRateNum,
+          note: jobForm.value.note,
+          isRental: true,
+          equipmentId: equipmentIdNumeric
+        }
+
+        if (jobForm.value.id) {
+          await updateEquipmentLog(jobForm.value.id, payload)
+        } else {
+          await createEquipmentLog(payload)
+        }
+        await fetchJobs()
+        resetJobForm()
+      } catch (e) {
+        console.error(e)
+        if (window.$toast) window.$toast(e.response?.data?.message || 'Failed to save job', 'error')
+      } finally {
+        savingJob.value = false
+      }
+    }
+
+    const editJob = (job) => {
+      jobForm.value = {
+        id: job.id,
+        date: job.date ? job.date.split('T')[0] : new Date().toISOString().split('T')[0],
+        hours: job.hours || 0,
+        hourlyRate: job.hourlyRate || 0,
+        note: job.note || job.notes || ''
+      }
+    }
+
+    const deleteJob = async (job) => {
+      try {
+        await deleteEquipmentLog(job.id)
+        await fetchJobs()
+        if (window.$toast) window.$toast('Job deleted', 'success')
+      } catch (e) {
+        console.error(e)
+        if (window.$toast) window.$toast('Failed to delete job', 'error')
+      }
+    }
+
+    const resetJobForm = () => {
+      jobForm.value = { id: null, date: new Date().toISOString().split('T')[0], hours: 0, hourlyRate: 0, note: '' }
+    }
+
+    const saveNotes = async () => {
+      try {
+        await updateEquipmentLog(props.rentalId, { notes: rental.value.notes })
+        if (window.$toast) window.$toast('Notes saved', 'success')
+      } catch (e) {
+        console.error(e)
+        if (window.$toast) window.$toast('Failed to save notes', 'error')
+      }
+    }
+
+    const formatDate = (d) => {
+      if (!d) return '-'
+      const date = new Date(d)
+      if (isNaN(date.getTime())) return d
+      return new Intl.DateTimeFormat('en-GB').format(date)
+    }
+
+    const formatCurrency = (amount) => {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount || 0)
+    }
+
+    onMounted(fetchRental)
+
+    return { loading, error, rental, jobs, jobForm, savingJob, fetchJobs, saveJob, editJob, deleteJob, resetJobForm, saveNotes, formatDate, formatCurrency }
+  }
+}
+</script>
+
+<style scoped>
+.text-small { font-size: 0.875rem }
+</style>

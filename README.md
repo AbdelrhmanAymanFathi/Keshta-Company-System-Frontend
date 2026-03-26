@@ -108,8 +108,8 @@ VUE_APP_DEBUG=false
 
 ### Delete semantics / سلوك الحذف
 
-- EN: The frontend expects the backend to support RESTful deletes under `/api/rentals/:id` and `/api/rentals/:rentalId/payouts/:payoutId`. Backends commonly return 204 No Content for successful deletes or 404 Not Found if the resource was already removed. The frontend treats 404 on DELETE as a safe/idempotent outcome and will refresh the list instead of showing a hard error.
-- AR: الواجهة الأمامية تتوقع وجود نقاط نهاية حذف RESTful تحت `/api/rentals/:id` و `/api/rentals/:rentalId/payouts/:payoutId`. عادةً ما يعيد الخادم 204 No Content عند حذف ناجح أو 404 Not Found إذا كان المورد محذوفًا بالفعل. الواجهة الآن تتعامل مع 404 في عمليات الحذف باعتبارها نتيجة آمنة (محوِّلة)، وتقوم بتحديث القائمة بدلاً من إظهار خطأ صريح.
+- EN: The frontend expects the backend to support RESTful deletes under `/api/equipment-logs/:id` for equipment logs and `/api/equipment-logs/:equipmentLogId/payouts/:payoutId` for legacy payout endpoints. Backends commonly return 204 No Content for successful deletes or 404 Not Found if the resource was already removed. The frontend treats 404 on DELETE as a safe/idempotent outcome and will refresh the list instead of showing a hard error.
+- AR: الواجهة الأمامية تتوقع وجود نقاط نهاية حذف RESTful تحت `/api/equipment-logs/:id` لسجلات المعدات و `/api/equipment-logs/:equipmentLogId/payouts/:payoutId` لعمليات الدفع القديمة. عادةً ما يعيد الخادم 204 No Content عند حذف ناجح أو 404 Not Found إذا كان المورد محذوفًا بالفعل. الواجهة الآن تتعامل مع 404 في عمليات الحذف باعتبارها نتيجة آمنة (محوِّلة)، وتقوم بتحديث القائمة بدلاً من إظهار خطأ صريح.
 
 ## 502 Bad Gateway — Static page + in-app overlay
 

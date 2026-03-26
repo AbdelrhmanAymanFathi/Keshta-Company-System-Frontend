@@ -204,7 +204,7 @@
             <div class="text-sm mb-1">{{ $t('transporters.accountNumber') }}</div>
             <input v-model="form.accountNumber" :placeholder="$t('transporters.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
-          <label>
+          <label v-if="!editing">
             <div class="text-sm mb-1">{{ $t('transporters.openingBalance') || 'Opening Balance' }}</div>
             <input v-model.number="form.openingBalance" type="number" :placeholder="$t('transporters.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
           </label>
@@ -425,7 +425,8 @@ export default {
     },
     openEdit(c) {
       this.editing = true
-      this.form = { ...c, openingBalance: c.openingBalance ?? '' }
+      const { openingBalance, ...rest } = c || {}
+      this.form = { ...rest }
       this.modalOpen = true
     },
     closeModal() {
@@ -442,7 +443,7 @@ export default {
       if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
-      if (this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
+      if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
       // mark contractor available only for transports
       payload.availableForTransports = true
 

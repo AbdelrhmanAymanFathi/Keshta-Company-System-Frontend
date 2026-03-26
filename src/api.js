@@ -726,6 +726,23 @@ export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
   return axios.get(`${BASE_URL}/api/contractors/with-vehicles?${params.toString()}`);
 };
 
+// --- Drivers ---
+export const getDrivers = (params = {}) => {
+  const { page = 1, pageSize = 20, q = '' } = params;
+  const queryParams = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+  if (q) queryParams.append('q', q);
+  return axios.get(`${BASE_URL}/api/drivers?${queryParams.toString()}`);
+};
+
+export const createDriver = (data) =>
+  axios.post(`${BASE_URL}/api/drivers`, data);
+
+export const updateDriver = (id, data) =>
+  axios.patch(`${BASE_URL}/api/drivers/${id}`, data);
+
+export const deleteDriver = (id) =>
+  axios.delete(`${BASE_URL}/api/drivers/${id}`);
+
 // === Equipment ===
 // Manage company-owned and rented equipment
 export const getEquipments = (params = {}) => {
@@ -880,7 +897,9 @@ export const updateTransport = (id, data) => {
 export const deleteTransport = (id) =>
   axios.delete(`${BASE_URL}/api/transports/${id}`);
 
-// Rentals
+// Rentals (mapped to Equipment Logs)
+// NOTE: This frontend has migrated rental resources to the equipment-logs API.
+// These helpers keep the old function names but call the equipment-logs endpoints.
 export const getRentals = (params = {}) => {
   const { page = 1, pageSize = 20, q = '', isCompanyOwned = null } = params;
   const queryParams = new URLSearchParams({
@@ -891,39 +910,85 @@ export const getRentals = (params = {}) => {
     queryParams.append('q', q);
   }
   if (isCompanyOwned !== null && isCompanyOwned !== undefined) {
+    // Map legacy isCompanyOwned -> isRental false/true if possible; keep param name
     queryParams.append('isCompanyOwned', isCompanyOwned.toString());
   }
-  return axios.get(`${BASE_URL}/api/rentals?${queryParams.toString()}`);
+  // Route to equipment-logs listing endpoint
+  return axios.get(`${BASE_URL}/api/equipment-logs?${queryParams.toString()}`);
 };
 export const getRental = (id) =>
-  axios.get(`${BASE_URL}/api/rentals/${id}`);
+  axios.get(`${BASE_URL}/api/equipment-logs/${id}`);
 export const createRental = (data) =>
-  axios.post(`${BASE_URL}/api/rentals`, data);
+  axios.post(`${BASE_URL}/api/equipment-logs`, data);
 export const updateRental = (id, data) =>
-  axios.patch(`${BASE_URL}/api/rentals/${id}`, data);
+  axios.patch(`${BASE_URL}/api/equipment-logs/${id}`, data);
 export const deleteRental = (id) =>
-  axios.delete(`${BASE_URL}/api/rentals/${id}`);
+  axios.delete(`${BASE_URL}/api/equipment-logs/${id}`);
 export const getRentalPayouts = (rentalId) =>
-  axios.get(`${BASE_URL}/api/rentals/${rentalId}/payouts`);
+  axios.get(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts`);
 export const createRentalPayout = (rentalId, data) =>
-  axios.post(`${BASE_URL}/api/rentals/${rentalId}/payouts`, data);
+  axios.post(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts`, data);
 export const deleteRentalPayout = (rentalId, payoutId) =>
-  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/payouts/${payoutId}`);
+  axios.delete(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts/${payoutId}`);
 
 // Rental Jobs
-export const getRentalJobs = (rentalId) =>
-  axios.get(`${BASE_URL}/api/rentals/${rentalId}/jobs`);
-export const createRentalJob = (rentalId, data) =>
-  axios.post(`${BASE_URL}/api/rentals/${rentalId}/jobs`, data);
-export const updateRentalJob = (rentalId, jobId, data) =>
-  axios.put(`${BASE_URL}/api/rentals/${rentalId}/jobs/${jobId}`, data);
-export const deleteRentalJob = (rentalId, jobId) =>
-  axios.delete(`${BASE_URL}/api/rentals/${rentalId}/jobs/${jobId}`);
-export const getRentalJobsSummary = (rentalId) =>
-  axios.get(`${BASE_URL}/api/rentals/${rentalId}/jobs/summary`);
+export const getRentalJobs = (rentalId) => {
+  // Compatibility wrapper: fetch equipment logs by equipmentId
+  return getEquipmentLogs({ equipmentId: rentalId })
+}
+export const createRentalJob = (rentalId, data) => {
+  // Ensure payload contains equipmentId for new equipment-log
+  const payload = { ...data, equipmentId: data.equipmentId || rentalId }
+  return createEquipmentLog(payload)
+}
+export const updateRentalJob = (rentalId, jobId, data) => {
+  // jobId is the equipment-log id now
+  return updateEquipmentLog(jobId, data)
+}
+export const deleteRentalJob = (rentalId, jobId) => {
+  // jobId is the equipment-log id
+  return deleteEquipmentLog(jobId)
+}
+export const getRentalJobsSummary = (rentalId) => {
+  return getEquipmentLogsSummary({ equipmentId: rentalId })
+}
+
+// Equipment Logs (new API surface replacing rental jobs)
+// List: /api/equipment-logs?q=&equipmentId=&startDate=&endDate=&isRental=&page=&pageSize=
+export const getEquipmentLogs = (params = {}) => {
+  const { page = 1, pageSize = 100, q = '', equipmentId, startDate, endDate, isRental } = params
+  const query = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
+  if (q) query.append('q', q)
+  if (equipmentId !== undefined && equipmentId !== null) query.append('equipmentId', equipmentId)
+  if (startDate) query.append('startDate', startDate)
+  if (endDate) query.append('endDate', endDate)
+  if (typeof isRental !== 'undefined' && isRental !== null) query.append('isRental', isRental ? 'true' : 'false')
+  return axios.get(`${BASE_URL}/api/equipment-logs?${query.toString()}`)
+}
+
+// Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, note, isRental })
+export const createEquipmentLog = (data) =>
+  axios.post(`${BASE_URL}/api/equipment-logs`, data)
+
+// Update equipment log by id
+export const updateEquipmentLog = (id, data) =>
+  axios.patch(`${BASE_URL}/api/equipment-logs/${id}`, data)
+
+// Delete equipment log by id
+export const deleteEquipmentLog = (id) =>
+  axios.delete(`${BASE_URL}/api/equipment-logs/${id}`)
+
+// Equipment logs summary (generic query params)
+export const getEquipmentLogsSummary = (params = {}) => {
+  const q = new URLSearchParams()
+  Object.entries(params || {}).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') q.append(k, String(v))
+  })
+  return axios.get(`${BASE_URL}/api/equipment-logs/summary?${q.toString()}`)
+}
 
 export const getRentalReportData = async (params = {}, format = 'json') => {
-  const url = `${BASE_URL}/api/rentals/report`;
+  const url = `${BASE_URL}/api/equipment-logs/report`;
   let axiosParams = { ...params };
   if (format === 'xlsx') {
     axiosParams.format = 'xlsx';
@@ -1172,7 +1237,7 @@ export const getTransportsChanges = (date) => {
 
 export const getRentalsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
-  return axios.get(`${BASE_URL}/api/rentals/changes?${queryParams.toString()}`);
+  return axios.get(`${BASE_URL}/api/equipment-logs/changes?${queryParams.toString()}`);
 };
 
 export const getExpensesChanges = (date) => {

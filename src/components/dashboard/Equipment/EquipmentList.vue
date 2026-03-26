@@ -165,7 +165,7 @@ export default {
     },
     async loadContractors() {
       try {
-        const res = await getContractors()
+        const res = await getContractors({ mode: 'rentals' })
         const payload = res.data || {}
         this.contractors = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
       } catch (e) { this.contractors = [] }

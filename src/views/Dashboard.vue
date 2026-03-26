@@ -180,7 +180,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentRent: 'equipmentRent', companyWallet: 'companyWallet', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', companyWallet: 'companyWallet', admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
@@ -203,10 +203,13 @@ export default {
           // { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' },
 
         ],
-        equipmentRent: [
-          { name: 'equipmentList', label: 'equipment.title', routeName: 'rentals-equipment-list' },
-          { name: 'rentalList', label: 'dashboard.equipmentRent', routeName: 'rentals-list' },
-          { name: 'rentalReport', label: 'rental.reportMenu', routeName: 'rentals-report' }
+        equipmentLog: [
+          { name: 'equipmentLogList', label: 'dashboard.equipmentLog', routeName: 'equipment-log-list' },
+          { name: 'equipmentList', label: 'equipment.title', routeName: 'equipment-list' },
+          // { name: 'equipmentReport', label: 'equipment.reportMenu', routeName: 'equipment-report' },
+          { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'equipment-contractors-list' },
+          { name: 'driversList', label: 'dashboard.driversList', routeName: 'equipment-drivers-list' },
+          { name: 'contractorRentals', label: 'dashboard.contractorStatement', routeName: 'equipment-contractor-statement' }
         ],
         companyWallet: [
           { name: 'companyWallet', label: 'dashboard.companyWallet', routeName: 'company-wallet' },
@@ -296,6 +299,9 @@ export default {
     currentLabel() { return this.currentItem ? this.currentItem.label : '' },
     selectedTop() {
       const routeName = this.currentRouteName
+      // If route has explicit mode (params/query/meta) prefer it to determine the top menu
+      const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''
+      if (String(routeMode).toLowerCase() === 'equipment') return 'equipmentLog'
       // If we're opening a report, look up the report and use its module
       if (routeName === 'admin-reports-run') {
         const reportId = this.$route?.params?.id
@@ -305,7 +311,7 @@ export default {
             const mod = String(report.module).toLowerCase()
             if (mod.includes('supplies')) return 'supplies'
             if (mod.includes('transport')) return 'transport'
-            if (mod.includes('equipment') || mod.includes('rent')) return 'equipmentRent'
+            if (mod.includes('equipment') || mod.includes('rent')) return 'equipmentLog'
             if (mod.includes('wallet') || mod.includes('expense')) return 'companyWallet'
           }
         }
@@ -315,15 +321,16 @@ export default {
       if (routeName === 'contractor-detail' && from) {
         if (String(from).toLowerCase() === 'transport') return 'transport'
         if (String(from).toLowerCase() === 'supplies' || String(from).toLowerCase() === 'export') return 'supplies'
+        if (String(from).toLowerCase() === 'equipment' || String(from).toLowerCase() === 'rental') return 'equipmentLog'
       }
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
-      const rentalsRoutes = ['rentals-list', 'rentals-report', 'rentals-equipment-list', 'equipment-list']
+      const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
       const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
       const adminRoutes = ['changes-by-date', 'users-list', 'locations', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
-      if (rentalsRoutes.includes(routeName)) return 'equipmentRent'
+      if (equipmentRoutes.includes(routeName)) return 'equipmentLog'
       if (walletRoutes.includes(routeName)) return 'companyWallet'
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'
@@ -359,7 +366,7 @@ export default {
     toggleCollapsed() { if (!this.isMobile) this.collapsedSidebar = !this.collapsedSidebar },
     toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
     navigateToReport() { 
-      this.router.push({ name: 'rentals-report' })
+      this.router.push({ name: 'equipment-report' })
     },
     navigateToStatement(contractorId) {
       this.router.push({ 
@@ -393,7 +400,7 @@ export default {
         vehiclesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-8-4h8M3 8h18M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
         transportList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2m0 0V5a2 2 0 012-2h8a2 2 0 012 2v2m-12 0h4"/></svg>`,
         expensesList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-        rentalList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
+        equipmentLogList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
         companyWallet: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
         changesByDate: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
         usersList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,

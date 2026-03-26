@@ -22,9 +22,11 @@ const VehiclesList = () => import('@/components/dashboard/Vehicles/VehiclesList.
 const TransportList = () => import('@/components/dashboard/Transport/TransportList.vue')
 const TransportersList = () => import('@/components/dashboard/Transport/TransportersList.vue')
 const TransportReport = () => import('@/components/dashboard/Transport/TransportReportNew.vue')
+const DriversList = () => import('@/components/dashboard/DriversList.vue')
+const EquipmentContractorsList = () => import('@/components/dashboard/Equipment/EquipmentContractorsList.vue')
 const ContractorDetail = () => import('@/views/ContractorDetail.vue')
-const RentalList = () => import('@/components/dashboard/RentalList.vue')
-const RentalReport = () => import('@/components/dashboard/RentalReport.vue')
+const EquipmentLogList = () => import('@/components/dashboard/Equipment/EquipmentLogList.vue')
+const EquipmentReport = () => import('@/components/dashboard/Equipment/EquipmentLogReport.vue')
 const EquipmentList = () => import('@/components/dashboard/Equipment/EquipmentList.vue')
 const CompanyFinance = () => import('@/components/dashboard/CompanyFinance.vue')
 const CompanyTransactions = () => import('@/components/dashboard/CompanyTransactions.vue')
@@ -165,24 +167,45 @@ const routes = [
       },
       
 
-      // ==================== Rentals Module ====================
+      // ==================== Equipment Module ====================
       {
-        path: 'rentals/list',
-        name: 'rentals-list',
-        component: RentalList,
-        meta: { title: 'dashboard.equipmentRent' }
+        path: 'equipment/logs/list',
+        name: 'equipment-log-list',
+        component: EquipmentLogList,
+        meta: { title: 'dashboard.equipmentLog' }
       },
       {
-        path: 'rentals/report',
-        name: 'rentals-report',
-        component: RentalReport,
-        meta: { title: 'rental.reportMenu' }
+        path: 'equipment/report',
+        name: 'equipment-report',
+        component: EquipmentReport,
+        meta: { title: 'equipment.reportMenu' }
       },
       {
-        path: 'rentals/equipment/list',
-        name: 'rentals-equipment-list',
+        path: 'equipment/list',
+        name: 'equipment-list',
         component: EquipmentList,
         meta: { title: 'equipment.title' }
+      },
+      {
+        path: 'equipment/drivers',
+        name: 'equipment-drivers-list',
+        component: DriversList,
+        meta: { title: 'dashboard.driversList' },
+        // props: route => ({ mode: route.params.mode || route.query.mode || (route.meta && route.meta.mode) || '' })
+      },
+      {
+        path: 'equipment/contractors',
+        name: 'equipment-contractors-list',
+        component: EquipmentContractorsList,
+        meta: { title: 'dashboard.contractorsList' },
+        // props: route => ({ mode: route.params.mode || route.query.mode || (route.meta && route.meta.mode) || '' })
+      },
+      {
+        path: 'equipment/contractor-statement/:id?',
+        name: 'equipment-contractor-statement',
+        component: ContractorStatement,
+        meta: { title: 'dashboard.contractorStatement' },
+        props: { mode: 'rentals'}
       },
 
       // ==================== Company Wallet Module ====================

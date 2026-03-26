@@ -4,7 +4,7 @@
     <div class="flex flex-col gap-4">
       <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div class="flex-1 w-full sm:w-auto">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('rental.rentalList') }}</h2>
+          <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('equipmentLog.list') }}</h2>
           <!-- Search Bar -->
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -14,7 +14,7 @@
               </svg>
             </div>
             <input :value="rentalsStore.filters.q" @input="onSearchInput" type="text"
-              :placeholder="$t('rental.searchPlaceholder')"
+              :placeholder="$t('equipmentLog.searchPlaceholder')"
               class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
             <div v-if="rentalsStore.filters.q" class="absolute inset-y-0 right-0 pr-3 flex items-center">
               <button @click="clearSearch" class="text-gray-400 hover:text-gray-600" aria-label="Clear search">
@@ -24,7 +24,7 @@
               </button>
             </div>
           </div>
-          <p class="text-xs text-gray-500 mt-1">{{ $t('rental.searchBy') }}</p>
+          <p class="text-xs text-gray-500 mt-1">{{ $t('equipmentLog.searchBy') }}</p>
         </div>
 
         <div class="flex gap-2">
@@ -33,7 +33,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            {{ $t('rental.addRental') }}
+            {{ $t('equipmentLog.addEntry') }}
           </button>
 
           <button @click="$emit('navigate-report')"
@@ -42,14 +42,14 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
             </svg>
-            {{ $t('rental.report') }}
+            {{ $t('equipmentLog.report') }}
           </button>
         </div>
       </div>
 
       <!-- Filter Bar -->
       <div class="flex flex-wrap items-center gap-3 bg-gray-50 rounded-lg p-3">
-        <span class="text-sm font-medium text-gray-700">{{ $t('rental.filterBy') }}:</span>
+        <span class="text-sm font-medium text-gray-700">{{ $t('equipmentLog.filterBy') }}:</span>
         <div class="flex gap-2">
           <button @click="setCompanyOwnedFilter(null)" :class="[
             'px-3 py-1 rounded-md text-sm font-medium transition',
@@ -57,7 +57,7 @@
               ? 'bg-indigo-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
           ]">
-            {{ $t('rental.all') }}
+            {{ $t('equipmentLog.all') }}
           </button>
           <button @click="setCompanyOwnedFilter(true)" :class="[
             'px-3 py-1 rounded-md text-sm font-medium transition',
@@ -65,7 +65,7 @@
               ? 'bg-green-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
           ]">
-            {{ $t('rental.companyEquipment') }}
+            {{ $t('equipmentLog.companyOwned') }}
           </button>
           <button @click="setCompanyOwnedFilter(false)" :class="[
             'px-3 py-1 rounded-md text-sm font-medium transition',
@@ -73,7 +73,7 @@
               ? 'bg-gray-600 text-white'
               : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
           ]">
-            {{ $t('rental.externalRental') }}
+            {{ $t('equipmentLog.external') }}
           </button>
         </div>
       </div>
@@ -84,14 +84,14 @@
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="flex flex-col gap-2 text-sm text-gray-600">
           <div>
-            {{ $t('rental.totalCount') }}: <span class="font-semibold">{{ filteredItems.length }}</span>
+            {{ $t('equipmentLog.totalCount') }}: <span class="font-semibold">{{ filteredItems.length }}</span>
           </div>
           <div>
-            {{ $t('rental.totalSum') }}: <span class="font-semibold">{{ formatCurrency(totalSum) }}</span>
+            {{ $t('equipmentLog.totalSum') }}: <span class="font-semibold">{{ formatCurrency(totalSum) }}</span>
           </div>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
-          <label>{{ $t('rental.pageSize') }}:</label>
+          <label>{{ $t('equipmentLog.pageSize') }}:</label>
           <select :value="rentalsStore.pageSize" @change="onPageSizeChange"
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
             <option value="10">10</option>
@@ -129,7 +129,7 @@
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
           </path>
         </svg>
-        <p class="mt-4 text-lg text-gray-500">{{ $t('rental.noResults') }}</p>
+        <p class="mt-4 text-lg text-gray-500">{{ $t('equipmentLog.noResults') }}</p>
       </div>
 
       <!-- Table with Scroll Controls -->
@@ -147,57 +147,43 @@
         <!-- Table Container with keyboard focus -->
         <div ref="tableContainer"
           class="overflow-x-auto scroll-smooth focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset rounded"
-          tabindex="0" @keydown="handleTableKeydown" :title="$t('rental.useArrowKeys')">
+          tabindex="0" @keydown="handleTableKeydown" :title="$t('equipmentLog.useArrowKeys')">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50" :class="{ 'direction-rtl': isRTL }">
               <tr>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.date') }}
+                  {{ $t('equipmentLog.date') }}
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.equipment') }}
+                  {{ $t('equipmentLog.equipment') }}
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.name') }}
+                  {{ $t('equipmentLog.type') }}
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.type') }}
+                  {{ $t('equipmentLog.hours') }}
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.hours') }}
+                  {{ $t('equipmentLog.hourlyRate') }}
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.hourlyRate') }}
-                </th>
-                <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-                  :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.total') }}
-                </th>
-                <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-                  :class="{ 'text-right': isRTL }">
-                  {{ $t('rental.paid') }}
+                  {{ $t('equipmentLog.total') }}
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  {{ $t('rental.remaining') }}
-                </th>
-                <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                  {{ $t('rental.notes') }}
+                  {{ $t('equipmentLog.notes') }}
                 </th>
                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {{ $t('labels.actions') }}
@@ -211,14 +197,11 @@
                   {{ formatDate(rental.date) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ rental.equipment }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ rental.name }}
+                  {{ rental.equipment.name }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <Badge :variant="rental.isCompanyOwned ? 'company' : 'external'">
-                    {{ rental.isCompanyOwned ? $t('rental.companyEquipment') : $t('rental.externalRental') }}
+                  <Badge :variant="!rental.isRental ? 'company' : 'external'">
+                    {{ !rental.isRental ? $t('equipmentLog.companyOwned') : $t('equipmentLog.external') }}
                   </Badge>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -230,26 +213,20 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                   {{ formatCurrency(rental.total) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                  {{ formatCurrency(rental.paid || 0) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
-                  {{ formatCurrency(rental.remaining || 0) }}
-                </td>
                 <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                  {{ rental.notes || '-' }}
+                  {{ rental.note || '-' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex gap-3 items-center">
-                    <button @click="openDetailModal(rental)"
+                    <!-- <button @click="openDetailModal(rental)"
                       class="text-blue-600 hover:text-blue-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
-                      {{ $t('rental.viewDetails') }}
+                      {{ $t('equipmentLog.viewDetails') }}
                     </button>
                     <button @click="openPayoutsModal(rental)"
                       class="text-green-600 hover:text-green-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
-                      {{ $t('rental.payouts') }}
-                    </button>
-                    <button @click="openEditModal(rental)"
+                      {{ $t('equipmentLog.payouts') }}
+                    </button> -->
+                    <!-- <button @click="openEditModal(rental)"
                       class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                       :title="$t('labels.edit')">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,7 +234,7 @@
                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                         </path>
                       </svg>
-                    </button>
+                    </button> -->
                     <button @click="confirmDelete(rental)"
                       class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       :title="$t('labels.delete')">
@@ -373,159 +350,147 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Add/Edit Modal -->
-    <div v-if="showModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
-      style="margin-top: 0%;" @click.self="triggerModalShake">
-      <div
-        class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto rental-modal-inner"
-        :class="{ 'animate-shake': showModalShake }" tabindex="-1">
-        <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
-          <h3 class="text-lg font-medium text-gray-900">
-            {{ isEditing ? $t('rental.editRental') : $t('rental.addRental') }}
-          </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
+      <!-- Add/Edit Modal (uses EquipmentLogCreationModal) -->
+      <EquipmentLogCreationModal
+        :isOpen="showModal"
+        :modalTitle="isEditing ? $t('equipmentLog.editEntry') : $t('equipmentLog.addEntry')"
+        :equipments="equipments"
+        :drivers="drivers"
+        :modelValue="form"
+        :loading="saving"
+        :isEditing="isEditing"
+        @close="closeModal"
+        @saved="saveRental"
+      />
 
-        <div class="p-5">
-          <RentalForm :model-value="form" :loading="saving" :is-editing="isEditing" @submit="saveRental"
-            @cancel="closeModal" />
+      <!-- Delete Confirmation Modal -->
+      <ConfirmDialog :show="showDeleteModal" :title="$t('equipmentLog.deleteEntry')" :message="$t('equipmentLog.deleteConfirmation')"
+        :loading="deleting" type="danger" :prevent-backdrop-close="true" @confirm="deleteRental"
+        @cancel="showDeleteModal = false" />
+
+      <!-- Rental Detail Modal -->
+      <div v-if="showDetailModal && selectedRentalForDetail"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+        style="margin-top: 0%;" @click.self="closeDetailModal">
+        <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5">
+          <EquipmentLogDetail :rental-id="selectedRentalForDetail.id" @close="closeDetailModal" />
         </div>
       </div>
-    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <ConfirmDialog :show="showDeleteModal" :title="$t('rental.deleteRental')" :message="$t('rental.deleteConfirmation')"
-      :loading="deleting" type="danger" :prevent-backdrop-close="true" @confirm="deleteRental"
-      @cancel="showDeleteModal = false" />
-
-    <!-- Rental Detail Modal -->
-    <div v-if="showDetailModal && selectedRentalForDetail"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
-      style="margin-top: 0%;" @click.self="closeDetailModal">
-      <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5">
-        <RentalDetail :rental-id="selectedRentalForDetail.id" @close="closeDetailModal" />
+      <!-- Context Menu -->
+      <div v-if="contextMenu.open" ref="contextMenuElement"
+        class="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]"
+        :style="{ top: contextMenu.y + 'px', [isRTL ? 'right' : 'left']: contextMenu.x + 'px' }" @click.stop
+        @contextmenu.prevent>
+        <button @click="handleContextMenuAction('viewDetails')"
+          class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+            </path>
+          </svg>
+          {{ $t('equipmentLog.viewDetails') }}
+        </button>
+        <button @click="handleContextMenuAction('payouts')"
+          class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+            </path>
+          </svg>
+          {{ $t('equipmentLog.payouts') }}
+        </button>
+        <button @click="handleContextMenuAction('edit')"
+          class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+          <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+            </path>
+          </svg>
+          {{ $t('labels.edit') }}
+        </button>
+        <div class="border-t border-gray-200 my-1"></div>
+        <button @click="handleContextMenuAction('delete')"
+          class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+            </path>
+          </svg>
+          {{ $t('labels.delete') }}
+        </button>
       </div>
-    </div>
 
-    <!-- Context Menu -->
-    <div v-if="contextMenu.open" ref="contextMenuElement"
-      class="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]"
-      :style="{ top: contextMenu.y + 'px', [isRTL ? 'right' : 'left']: contextMenu.x + 'px' }" @click.stop
-      @contextmenu.prevent>
-      <button @click="handleContextMenuAction('viewDetails')"
-        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-          </path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-          </path>
-        </svg>
-        {{ $t('rental.viewDetails') }}
-      </button>
-      <button @click="handleContextMenuAction('payouts')"
-        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-          </path>
-        </svg>
-        {{ $t('rental.payouts') }}
-      </button>
-      <button @click="handleContextMenuAction('edit')"
-        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-          </path>
-        </svg>
-        {{ $t('labels.edit') }}
-      </button>
-      <div class="border-t border-gray-200 my-1"></div>
-      <button @click="handleContextMenuAction('delete')"
-        class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
-        :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-          </path>
-        </svg>
-        {{ $t('labels.delete') }}
-      </button>
-    </div>
-
-    <!-- Payouts Modal -->
-    <div v-if="showPayoutsModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
-      style="margin-top: 0%;" @click.self="triggerPayoutsShake">
-      <div
-        class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner"
-        :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
-        <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
-          <h3 class="text-lg font-medium text-gray-900">
-            {{ $t('rental.payouts') }} - {{ selectedRentalForPayouts?.name }}
-          </h3>
-          <button @click="closePayoutsModal" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="p-5 space-y-6">
-          <!-- Add Payout Form -->
-          <div class="pb-6 border-b">
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.addPayout') }}</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <input v-model="payoutForm.amount" type="number" placeholder="Amount"
-                class="border border-gray-300 rounded px-3 py-2 text-sm" />
-              <input v-model="payoutForm.date" type="date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
-              <input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)"
-                class="border border-gray-300 rounded px-3 py-2 text-sm" />
-            </div>
-            <button @click="savePayout" :disabled="!payoutForm.amount || rentalsStore.payoutsLoading"
-              class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm">
-              {{ rentalsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
+      <!-- Payouts Modal -->
+      <div v-if="showPayoutsModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+        style="margin-top: 0%;" @click.self="triggerPayoutsShake">
+        <div
+          class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner"
+          :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
+          <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
+            <h3 class="text-lg font-medium text-gray-900">
+              {{ $t('equipmentLog.payouts') }} - {{ selectedRentalForPayouts?.name }}
+            </h3>
+            <button @click="closePayoutsModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
             </button>
           </div>
 
-          <!-- Payouts List -->
-          <div>
-            <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('rental.payoutsList') }}</h4>
-            <div v-if="rentalsStore.payouts.length === 0" class="text-center py-4 text-gray-500">
-              {{ $t('rental.noPayouts') }}
+          <div class="p-5 space-y-6">
+            <!-- Add Payout Form -->
+            <div class="pb-6 border-b">
+              <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('equipmentLog.addPayout') }}</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <input v-model="payoutForm.amount" type="number" placeholder="Amount"
+                  class="border border-gray-300 rounded px-3 py-2 text-sm" />
+                <input v-model="payoutForm.date" type="date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
+                <input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)"
+                  class="border border-gray-300 rounded px-3 py-2 text-sm" />
+              </div>
+              <button @click="savePayout" :disabled="!payoutForm.amount || rentalsStore.payoutsLoading"
+                class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm">
+                {{ rentalsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
+              </button>
             </div>
-            <div v-else class="space-y-2">
-              <div v-for="payout in rentalsStore.payouts" :key="payout.id"
-                class="flex items-center justify-between bg-gray-50 p-3 rounded border">
-                <div>
-                  <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
-                  <div class="text-xs text-gray-500">{{ formatDate(payout.date) }}</div>
-                  <div v-if="payout.notes" class="text-xs text-gray-600">{{ payout.notes }}</div>
+
+            <!-- Payouts List -->
+            <div>
+              <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('equipmentLog.payoutsList') }}</h4>
+              <div v-if="rentalsStore.payouts.length === 0" class="text-center py-4 text-gray-500">
+                {{ $t('equipmentLog.noPayouts') }}
+              </div>
+              <div v-else class="space-y-2">
+                <div v-for="payout in rentalsStore.payouts" :key="payout.id"
+                  class="flex items-center justify-between bg-gray-50 p-3 rounded border">
+                  <div>
+                    <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
+                    <div class="text-xs text-gray-500">{{ formatDate(payout.date) }}</div>
+                    <div v-if="payout.notes" class="text-xs text-gray-600">{{ payout.notes }}</div>
+                  </div>
+                  <button @click="deletePayout(payout.id)" :disabled="rentalsStore.payoutsLoading"
+                    class="text-red-600 hover:text-red-900 text-sm">
+                    {{ $t('labels.delete') }}
+                  </button>
                 </div>
-                <button @click="deletePayout(payout.id)" :disabled="rentalsStore.payoutsLoading"
-                  class="text-red-600 hover:text-red-900 text-sm">
-                  {{ $t('labels.delete') }}
-                </button>
               </div>
             </div>
-          </div>
 
-          <div class="flex justify-end gap-2 border-t pt-6">
-            <button @click="closePayoutsModal"
-              class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
-              {{ $t('labels.close') }}
-            </button>
+            <div class="flex justify-end gap-2 border-t pt-6">
+              <button @click="closePayoutsModal"
+                class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+                {{ $t('labels.close') }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -536,14 +501,17 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance, nextTick } from 'vue'
 import { useRentalsStore } from '@/stores/useRentalsStore'
-import RentalForm from './RentalForm.vue'
-import RentalDetail from './RentalDetail.vue'
-import Badge from '../shared/Badge.vue'
-import ConfirmDialog from '../shared/ConfirmDialog.vue'
+import EquipmentLogForm from './EquipmentLogForm.vue'
+import EquipmentLogDetail from './EquipmentLogDetail.vue'
+import Badge from '../../shared/Badge.vue'
+import ConfirmDialog from '../../shared/ConfirmDialog.vue'
+import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers } from '@/api'
+import EquipmentLogCreationModal from './EquipmentLogCreationModal.vue'
 
 export default {
-  name: 'RentalList',
-  components: { RentalForm, RentalDetail, Badge, ConfirmDialog },
+  name: 'EquipmentLogList',
+  components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog },
+    components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal },
   setup() {
     const instance = getCurrentInstance()
     const rentalsStore = useRentalsStore()
@@ -564,15 +532,37 @@ export default {
     const form = ref({
       id: null,
       date: new Date().toISOString().split('T')[0],
-      equipment: '',
+      equipmentLog: '',
       name: '',
       hourlyRate: 0,
       notes: '',
       isCompanyOwned: true
     })
+    const equipments = ref([])
+
+    const loadEquipments = async () => {
+      try {
+        const res = await getEquipments()
+        const payload = res.data || {}
+        equipments.value = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
+      } catch (e) {
+        equipments.value = []
+      }
+    }
 
     const showDetailModal = ref(false)
     const selectedRentalForDetail = ref(null)
+    const drivers = ref([])
+
+        const loadDrivers = async () => {
+          try {
+            const res = await getDrivers({ page: 1, pageSize: 1000 })
+            const payload = res.data || {}
+            drivers.value = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
+          } catch (e) {
+            drivers.value = []
+          }
+        }
     const showPayoutsModal = ref(false)
     const showModalShake = ref(false)
     const showPayoutsShake = ref(false)
@@ -708,7 +698,7 @@ export default {
       form.value = {
         id: null,
         date: new Date().toISOString().split('T')[0],
-        equipment: '',
+        equipmentLog: '',
         name: '',
         hourlyRate: 0,
         notes: '',
@@ -725,7 +715,7 @@ export default {
         form.value = {
           id: data.id,
           date: data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0],
-          equipment: data.equipment || '',
+          equipmentLog: data.equipmentLog || data.equipment || '',
           name: data.name || '',
           hourlyRate: parseFloat(data.hourlyRate) || 0,
           notes: data.notes || '',
@@ -737,7 +727,7 @@ export default {
         form.value = {
           id: rental.id,
           date: rental.date ? rental.date.split('T')[0] : new Date().toISOString().split('T')[0],
-          equipment: rental.equipment || '',
+          equipmentLog: rental.equipmentLog || rental.equipment || '',
           name: rental.name || '',
           hourlyRate: parseFloat(rental.hourlyRate) || 0,
           notes: rental.notes || '',
@@ -752,7 +742,7 @@ export default {
       form.value = {
         id: null,
         date: new Date().toISOString().split('T')[0],
-        equipment: '',
+        equipmentLog: '',
         name: '',
         hourlyRate: 0,
         notes: '',
@@ -763,26 +753,55 @@ export default {
     // updateForm removed — RentalForm no longer emits update:model-value
 
     const saveRental = async (rentalData) => {
+      // Persist this entry as an equipment-log using the new API
       saving.value = true
       try {
-        if (isEditing.value) {
-          await rentalsStore.updateRental(form.value.id, rentalData)
-          // Refetch rental details to get updated computed values
-          await rentalsStore.fetchRental(form.value.id)
-          if (window.$toast) {
-            window.$toast('Rental updated successfully', 'success')
-          }
+        // If rows are provided (multi-row creation), create one entry per row
+        if (!isEditing.value && rentalData.rows && Array.isArray(rentalData.rows) && rentalData.rows.length) {
+          const creates = rentalData.rows.map(row => {
+            const payloadRow = {
+              date: rentalData.date,
+              equipmentId: rentalData.equipmentId,
+              driverId: row.driverId != null ? row.driverId : (rentalData.driverId != null ? rentalData.driverId : null),
+              total: row.total != null ? row.total : Number(((row.hours || 0) * (row.hourlyRate != null ? row.hourlyRate : rentalData.hourlyRate || 0)).toFixed(2)),
+              hours: row.hours != null ? row.hours : (rentalData.hours || 0),
+              hourlyRate: row.hourlyRate != null ? row.hourlyRate : (rentalData.hourlyRate || 0),
+              note: row.notes || rentalData.notes || '',
+              isRental: rentalData.isRental !== undefined ? rentalData.isRental : false
+            }
+            return createEquipmentLog(payloadRow)
+          })
+          await Promise.all(creates)
+          if (window.$toast) window.$toast('Equipment logs created successfully', 'success')
         } else {
-          await rentalsStore.createRental(rentalData)
-          if (window.$toast) {
-            window.$toast('Rental created successfully', 'success')
+          const payload = {
+            date: rentalData.date,
+            equipmentId: rentalData.equipmentId,
+            driverId: rentalData.driverId,
+            total: rentalData.total,
+            hours: rentalData.hours,
+            hourlyRate: rentalData.hourlyRate,
+            note: rentalData.notes || rentalData.note || '',
+            isRental: rentalData.isRental !== undefined ? rentalData.isRental : false
+          }
+
+          if (isEditing.value && form.value && form.value.id) {
+            await updateEquipmentLog(form.value.id, payload)
+            if (window.$toast) window.$toast('Equipment log updated successfully', 'success')
+          } else {
+            await createEquipmentLog(payload)
+            if (window.$toast) window.$toast('Equipment log created successfully', 'success')
           }
         }
+
         closeModal()
+        // Refresh store listing if available
+        if (typeof rentalsStore.fetchRentals === 'function') rentalsStore.fetchRentals()
       } catch (error) {
-        console.error('Error saving rental:', error)
+        console.error('Error saving equipment log:', error)
         if (window.$toast) {
-          window.$toast(error.response?.data?.message || 'Failed to save rental', 'error')
+          const msg = error.response?.data?.message || (Array.isArray(error.response?.data?.issues) ? error.response.data.issues.map(i => i.message).join('; ') : 'Failed to save equipment log')
+          window.$toast(msg, 'error')
         }
       } finally {
         saving.value = false
@@ -797,20 +816,16 @@ export default {
     const deleteRental = async () => {
       deleting.value = true
       try {
-        const result = await rentalsStore.deleteRental(rentalToDelete.value.id)
+        if (!rentalToDelete.value) return
+        await deleteEquipmentLog(rentalToDelete.value.id)
         showDeleteModal.value = false
         rentalToDelete.value = null
-        if (window.$toast) {
-          if (result && result.alreadyDeleted) {
-            window.$toast(t('rental.alreadyDeleted'), 'info')
-          } else {
-            window.$toast(t('rental.deletedSuccessfully'), 'success')
-          }
-        }
+        if (window.$toast) window.$toast(t('equipmentLog.deletedSuccessfully') || 'Equipment log deleted', 'success')
+        if (typeof rentalsStore.fetchRentals === 'function') rentalsStore.fetchRentals()
       } catch (error) {
-        console.error('Error deleting rental:', error)
+        console.error('Error deleting equipment log:', error)
         if (window.$toast) {
-          window.$toast(error.response?.data?.message || 'Failed to delete rental', 'error')
+          window.$toast(error.response?.data?.message || 'Failed to delete equipment log', 'error')
         }
       } finally {
         deleting.value = false
@@ -1172,6 +1187,8 @@ export default {
         // Make table focusable
         tableContainer.value.setAttribute('tabindex', '0')
       }
+      loadEquipments()
+      loadDrivers()
     })
 
     onUnmounted(() => {
@@ -1184,6 +1201,7 @@ export default {
         tableContainer.value.removeEventListener('scroll', updateTableScrollVisibility)
         tableContainer.value.removeEventListener('keydown', handleTableKeydown)
       }
+      loadDrivers()
     })
 
     return {
@@ -1237,7 +1255,9 @@ export default {
       openContextMenu,
       closeContextMenu,
       handleContextMenuAction,
-      contextMenu
+      contextMenu,
+      equipments,
+      drivers
     }
   }
 }
