@@ -52,7 +52,7 @@
     <Pagination v-if="totalPages > 1" :current-page="page" :page-size="pageSize" :total="total" :total-pages="totalPages" @update:page="page = $event; loadEquipments()" @update:pageSize="pageSize = $event; page = 1; loadEquipments()" />
 
     <!-- Create/Edit Modal -->
-    <div v-if="showCreateModal || editingEquipment" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div v-if="showCreateModal || editingEquipment" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
       <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ editingEquipment ? $t('equipment.edit') : $t('equipment.add') }}</h3>

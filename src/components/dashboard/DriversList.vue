@@ -73,7 +73,7 @@
     <Pagination v-if="totalPages > 1" :current-page="page" :page-size="pageSize" :total="total" :total-pages="totalPages" @update:page="changePage" @update:pageSize="onPageSizeChange" />
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">{{ editing ? $t('labels.update') : $t('labels.add') }} {{ $t('drivers.singular') || 'Driver' }}</h3>

@@ -906,7 +906,7 @@
     "companyEquipment": "Company Equipment",
     "companyWallet": "Main Treasury",
     "externalRental": "External Rental",
-    "isCompanyOwned": "Company Owned Equipment",
+    "isCompanyOwned": "Company Owned",
     "isCompanyOwnedDescription": "Check if this equipment belongs to the company",
     "totalCanOverride": "Total can be manually overridden",
     "useArrowKeys": "Use keyboard arrow keys (← →) or A/D to scroll horizontally",
