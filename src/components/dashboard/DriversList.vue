@@ -21,11 +21,11 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-indigo-50">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('drivers.name') || 'Name' }}</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('drivers.phone') || 'Phone' }}</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('drivers.nationalId') || 'National ID' }}</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('labels.actions') }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('drivers.name') || 'Name' }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('drivers.phone') || 'Phone' }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('drivers.nationalId') || 'National ID' }}</th>
+              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.actions') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -46,7 +46,7 @@
               </td>
             </tr>
             <tr v-if="drivers.length === 0">
-              <td colspan="5" class="px-6 py-12 text-center text-gray-500">{{ $t('labels.noData') || 'No drivers found' }}</td>
+              <td colspan="5" class="px-3 py-2 text-start text-gray-500">{{ $t('labels.noData') || 'No drivers found' }}</td>
             </tr>
           </tbody>
         </table>

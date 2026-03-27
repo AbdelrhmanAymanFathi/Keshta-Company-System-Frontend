@@ -171,7 +171,7 @@
               {{ $t('labels.actions') }}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
           <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="hover:bg-gray-50" @contextmenu.prevent="onRowContextMenu($event, supply)">
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
