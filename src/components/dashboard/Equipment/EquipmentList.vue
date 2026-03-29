@@ -24,7 +24,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in equipments" :key="e.id" class="border-t hover:bg-gray-50">
+          <tr v-for="e in equipments" :key="e.id" class="border-t hover:bg-gray-50" @contextmenu.prevent="openContextMenu($event, e)">
             <td class="px-3 py-3 font-medium text-gray-800 text-start">{{ e.name }}</td>
             <td class="px-3 py-3 text-gray-700 text-start">{{ e.contractor?.name || '—' }}</td>
             <td class="px-3 py-3 text-gray-700 text-start">
@@ -37,9 +37,27 @@
               </span>
             </td>
             <td class="px-3 py-3 text-gray-700 text-start">{{ e.hourlyRate != null ? e.hourlyRate : '—' }}</td>
-            <td class="px-3 py-3 flex gap-2">
-              <button class="p-1.5 rounded bg-blue-600 text-white hover:bg-blue-700" @click="openEditModal(e)">{{ $t('labels.edit') || 'Edit' }}</button>
-              <button class="p-1.5 rounded bg-red-600 text-white hover:bg-red-700" @click="openDeleteConfirm(e)">{{ $t('labels.delete') || 'Delete' }}</button>
+            <td class="px-3 py-3">
+              <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
+                <button
+                  type="button"
+                  class="p-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+                  :title="$t('labels.edit') || 'Edit'"
+                  :aria-label="$t('labels.edit') || 'Edit'"
+                  @click.stop="openEditModal(e)"
+                >
+                  <PencilIcon class="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  class="p-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition"
+                  :title="$t('labels.delete') || 'Delete'"
+                  :aria-label="$t('labels.delete') || 'Delete'"
+                  @click.stop="openDeleteConfirm(e)"
+                >
+                  <TrashIcon class="w-5 h-5" />
+                </button>
+              </div>
             </td>
           </tr>
           <tr v-if="equipments.length === 0">
@@ -99,6 +117,35 @@
 
     <!-- Delete Confirm -->
     <ConfirmDialog :show="showDeleteConfirm" :title="$t('labels.confirmDelete')" :message="deleteMessage" type="danger" @confirm="confirmDelete" @cancel="cancelDelete" />
+
+    <!-- Row context menu -->
+    <div v-if="contextMenu.visible" class="fixed inset-0 z-40" @click="contextMenu.visible = false"></div>
+    <div
+      v-if="contextMenu.visible"
+      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      class="fixed bg-white border border-gray-200 rounded-lg shadow-lg z-50 py-1 min-w-[160px]"
+      @click.stop
+      @contextmenu.prevent
+    >
+      <button
+        type="button"
+        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2 transition"
+        :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
+        @click="onContextEdit"
+      >
+        <PencilIcon class="w-4 h-4 shrink-0" />
+        {{ $t('labels.edit') }}
+      </button>
+      <button
+        type="button"
+        class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition"
+        :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
+        @click="onContextDelete"
+      >
+        <TrashIcon class="w-4 h-4 shrink-0" />
+        {{ $t('labels.delete') }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -107,10 +154,11 @@ import { getEquipments, createEquipment, updateEquipment, deleteEquipment, getCo
 import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
+import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'EquipmentList',
-  components: { Pagination, ConfirmDialog, SearchDropdown },
+  components: { Pagination, ConfirmDialog, SearchDropdown, PencilIcon, TrashIcon },
   data() {
     return {
       equipments: [],
@@ -124,7 +172,13 @@ export default {
       form: { name: '', contractorId: '', contractorLabel: '', isCompanyOwned: false, hourlyRate: null },
       saving: false,
       deleteTarget: null,
-      showDeleteConfirm: false
+      showDeleteConfirm: false,
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        equipment: null
+      }
     }
   },
   computed: {
@@ -133,7 +187,7 @@ export default {
     ,
     deleteMessage() {
       if (this.deleteTarget && this.deleteTarget.name) {
-        return `${this.$t('labels.confirmDelete')} \"${this.deleteTarget.name}\"?`
+        return `${this.$t('labels.confirmDelete')} "${this.deleteTarget.name}"?`
       }
       return this.$t('equipment.deleteConfirm') || this.$t('labels.confirmDelete') || 'Are you sure?'
     }
@@ -177,6 +231,22 @@ export default {
     search() { this.page = 1; this.loadEquipments() },
     clearSearch() { this.q = ''; this.search() },
     openCreateModal() { this.resetForm(); this.showCreateModal = true },
+    openContextMenu(event, equipment) {
+      this.contextMenu.x = event.clientX
+      this.contextMenu.y = event.clientY
+      this.contextMenu.equipment = equipment
+      this.contextMenu.visible = true
+    },
+    onContextEdit() {
+      const row = this.contextMenu.equipment
+      this.contextMenu.visible = false
+      if (row) this.openEditModal(row)
+    },
+    onContextDelete() {
+      const row = this.contextMenu.equipment
+      this.contextMenu.visible = false
+      if (row) this.openDeleteConfirm(row)
+    },
     openEditModal(e) {
       this.editingEquipment = e
       this.form = {
@@ -231,7 +301,16 @@ export default {
     }
   },
   async mounted() {
+    this.closeContextMenuHandler = () => {
+      this.contextMenu.visible = false
+    }
+    document.addEventListener('click', this.closeContextMenuHandler)
     await Promise.all([this.loadEquipments(), this.loadContractors()])
+  },
+  beforeUnmount() {
+    if (this.closeContextMenuHandler) {
+      document.removeEventListener('click', this.closeContextMenuHandler)
+    }
   }
 }
 </script>
