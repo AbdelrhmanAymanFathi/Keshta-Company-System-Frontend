@@ -302,7 +302,9 @@
     "isActive": "Is Active",
     "manualDepositDesc": "Manual Deposit Desc",
     "page": "Page",
-    "selectAll": "Select All"
+    "selectAll": "Select All",
+    "no": "Equipment not owned by the company",
+    "yes": "Equipment owned by the company"
   },
   "payments": {
     "addPayment": "Pay",

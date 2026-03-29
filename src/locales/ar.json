@@ -301,7 +301,9 @@
     "isActive": "نشط",
     "manualDepositDesc": "وصف الإيداع اليدوي",
     "page": "الصفحة",
-    "selectAll": "تحديد الكل"
+    "selectAll": "تحديد الكل",
+    "no": "معدات غير مملوكه للشركه",
+    "yes": "معدات مملوكه للشركه"
   },
   "payments": {
     "addPayment": "دفع",
