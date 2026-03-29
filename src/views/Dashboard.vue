@@ -17,7 +17,7 @@
           <div class="truncate text-sm font-bold whitespace-nowrap sm:text-base lg:text-lg">{{ $t('appName') }}</div>
         </div>
         <!-- Top menus (desktop) -->
-        <nav class="app-scrollbar ml-2 hidden max-w-full items-center gap-1 overflow-x-auto whitespace-nowrap md:flex lg:ml-4 lg:gap-2">
+        <nav class="app-scrollbar hidden sm:flex ml-2 max-w-full items-center gap-1 overflow-x-auto whitespace-nowrap lg:ml-4 lg:gap-2">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
             :class="['rounded px-2 py-1.5 text-xs font-medium transition lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white/20' : 'hover:bg-white/10']">
             {{ $t('navbar.' + key) }}
@@ -58,7 +58,7 @@
             {{ userInitials }}
           </button>
           <!-- User Dropdown Menu -->
-          <div v-if="userMenuOpen" class="absolute top-12 z-60" :class="isRTL ? 'left-0' : 'right-0'">
+          <div v-if="userMenuOpen" class="absolute top-12 " :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
             <div class="bg-white rounded-lg shadow-lg py-2 min-w-[160px] border">
               <button @click="goToProfile(); userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+body{
+  overflow-y: hidden;
+}
 /* Small custom utilities for consistent modern look — لمسات بسيطة */
 .btn-gradient {
   @apply bg-gradient-to-r from-teal-500 to-teal-400 text-white font-semibold rounded-lg py-2 px-4;
