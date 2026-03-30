@@ -7,7 +7,7 @@
 
   <!-- Modal -->
   <teleport to="body">
-    <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+    <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-80 p-4 overflow-hidden"
       :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
@@ -501,7 +501,7 @@
   </div>
 
   <!-- Dialog: Add Vehicle (use shared CreateVehicle modal) -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-[1001] flex items-center justify-center px-4">
+  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-100 flex items-center justify-center px-4">
     <div class="fixed inset-0 bg-black bg-opacity-40" @click="showAddVehicleDialog = false"></div>
     <div class="relative w-full max-w-3xl z-[1002] mx-auto">
       <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">

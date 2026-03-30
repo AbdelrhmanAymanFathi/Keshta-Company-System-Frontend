@@ -166,6 +166,7 @@
     "addItem": "Add Item"
   },
   "labels": {
+    "create": "Create",
     "enterSupplies": "Enter Supplies",
     "step1BasicData": "Step 1: Basic Data",
     "step2Data": "Step 2: Enter Supplies",
@@ -821,6 +822,9 @@
     "contractor": "Contractor",
     "selectContractor": "Select Contractor",
     "addNewContractor": "Add New Contractor",
+    "contractorName": "Contractor Name",
+    "contractorNamePlaceholder": "Enter contractor name",
+    "contractorNameRequired": "Contractor name is required",
     "newContractorNamePlaceholder": "Enter contractor name",
     "contractorCreateError": "Error creating contractor",
     "crusherNumber": "Crusher Number",
@@ -859,6 +863,9 @@
     "changeOwner": "Change owner",
     "selectCrusher": "Select Crusher",
     "addNewCrusher": "Add New Crusher",
+    "crusherName": "Crusher Name",
+    "crusherNamePlaceholder": "Enter crusher name",
+    "crusherNameRequired": "Crusher name is required",
     "newCrusherNamePlaceholder": "Enter crusher name",
     "crusherCreateError": "Error creating crusher",
     "updateSuccess": "Vehicle updated successfully",

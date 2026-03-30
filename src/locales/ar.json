@@ -166,6 +166,7 @@
     "addItem": "إضافة بند"
   },
   "labels": {
+    "create": "إنشاء",
     "subtotal": "المجموع الفرعي",
     "totalDiscount": "إجمالي الخصم",
     "grandTotal": "الإجمالي النهائي",
@@ -821,6 +822,9 @@
     "contractor": "المقاول",
     "selectContractor": "اختر المقاول",
     "addNewContractor": "إضافة مقاول جديد",
+    "contractorName": "اسم المقاول",
+    "contractorNamePlaceholder": "أدخل اسم المقاول",
+    "contractorNameRequired": "اسم المقاول مطلوب",
     "newContractorNamePlaceholder": "أدخل اسم المقاول",
     "contractorCreateError": "خطأ في إنشاء المقاول",
     "crusherNumber": "رقم الكسارة",
@@ -857,6 +861,9 @@
     "changeOwner": "تغيير المالك",
     "selectCrusher": "اختر الكسارة",
     "addNewCrusher": "إضافة كسارة جديدة",
+    "crusherName": "اسم الكسارة",
+    "crusherNamePlaceholder": "أدخل اسم الكسارة",
+    "crusherNameRequired": "اسم الكسارة مطلوب",
     "newCrusherNamePlaceholder": "أدخل اسم الكسارة",
     "crusherCreateError": "خطأ في إنشاء الكسارة",
     "updateSuccess": "تم تحديث المركبة بنجاح",

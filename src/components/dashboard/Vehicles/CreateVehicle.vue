@@ -1,4 +1,19 @@
 <template>
+  <div>
+    <!-- Contractor Modal -->
+    <CreateContractorModal 
+      :isOpen="showCreateContractorModal"
+      @created="handleContractorCreated"
+      @cancel="showCreateContractorModal = false"
+    />
+
+    <!-- Crusher Modal -->
+    <CreateCrusherModal 
+      :isOpen="showCreateCrusherModal"
+      @created="handleCrusherCreated"
+      @cancel="showCreateCrusherModal = false"
+    />
+
   <form class="space-y-4" @submit.prevent="onCreate">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div class="sm:col-span-2 lg:col-span-3">
@@ -51,15 +66,6 @@
               <button @click.prevent="chooseAddNewContractor" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewContractor') }}</button>
             </div>
           </div>
-
-          <input
-            v-if="form.contractorId === '__new__'"
-            ref="newContractorInput"
-            v-model="form.newContractorName"
-            type="text"
-            :placeholder="$t('vehicles.newContractorNamePlaceholder')"
-            class="w-full border rounded px-3 py-2 mt-2"
-          />
         </div>
       </div>
 
@@ -91,15 +97,6 @@
               <button @click.prevent="chooseAddNewCrusher" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewCrusher') }}</button>
             </div>
           </div>
-
-          <input
-            v-if="form.crusherId === '__new__'"
-            ref="newCrusherInput"
-            v-model="form.newCrusherName"
-            type="text"
-            :placeholder="$t('vehicles.newCrusherNamePlaceholder')"
-            class="w-full border rounded px-3 py-2 mt-2"
-          />
         </div>
       </div>
 
@@ -133,13 +130,20 @@
       <div v-if="success" class="text-green-600 text-sm">{{ $t('vehicles.createdSuccessfully') }}</div>
     </div>
   </form>
+  </div>
 </template>
 
 <script>
-import { createVehicle, getContractors, getCrushers, createCrusher, createContractor } from '../../../api'
+import { createVehicle, getContractors, getCrushers } from '../../../api'
+import CreateContractorModal from './CreateContractorModal.vue'
+import CreateCrusherModal from './CreateCrusherModal.vue'
 
 export default {
   name: 'CreateVehicle',
+  components: {
+    CreateContractorModal,
+    CreateCrusherModal
+  },
   props: {
     mode: { type: String, default: 'transport' },
     prefilledContractorId: { type: Number, default: null },
@@ -154,13 +158,14 @@ export default {
       showContractorDropdown: false,
       crusherSearch: '',
       showCrusherDropdown: false,
+      // Modal states
+      showCreateContractorModal: false,
+      showCreateCrusherModal: false,
       form: {
         name: '',
         contractorId: '',
-        newContractorName: '',
         crusherId: '',
         crusherNumber: '',
-        newCrusherName: '',
         
         companyCapacity: '',
         crusherCapacity: ''
@@ -219,13 +224,6 @@ export default {
       }
       // drivers removed
     },
-    onContractorSelectChange() {
-      if (this.form.contractorId === '__new__') {
-        this.form.newContractorName = ''
-      } else {
-        this.form.newContractorName = ''
-      }
-    },
     openContractorDropdown() {
       this.showContractorDropdown = true
     },
@@ -233,15 +231,10 @@ export default {
       this.form.contractorId = c.id
       this.contractorSearch = c.name
       this.showContractorDropdown = false
-      this.form.newContractorName = ''
     },
     chooseAddNewContractor() {
-      this.form.contractorId = '__new__'
-      this.contractorSearch = ''
+      this.showCreateContractorModal = true
       this.showContractorDropdown = false
-      this.$nextTick(() => {
-        this.$refs.newContractorInput?.focus?.()
-      })
     },
     onCrusherSelectChange() {
       if (this.form.crusherId && this.form.crusherId !== '__new__') {
@@ -251,7 +244,6 @@ export default {
         }
       } else {
         this.form.crusherNumber = ''
-        this.form.newCrusherName = ''
       }
     },
     openCrusherDropdown() {
@@ -262,17 +254,26 @@ export default {
       this.form.crusherNumber = c.name
       this.crusherSearch = c.name
       this.showCrusherDropdown = false
-      this.form.newCrusherName = ''
     },
     chooseAddNewCrusher() {
-      this.form.crusherId = '__new__'
-      this.crusherSearch = ''
+      this.showCreateCrusherModal = true
       this.showCrusherDropdown = false
-      this.$nextTick(() => {
-        this.$refs.newCrusherInput?.focus?.()
-      })
     },
     // driver selection removed
+    handleContractorCreated(contractor) {
+      if (contractor) {
+        this.contractors.push(contractor)
+        this.selectContractor(contractor)
+      }
+      this.showCreateContractorModal = false
+    },
+    handleCrusherCreated(crusher) {
+      if (crusher) {
+        this.crushers.push(crusher)
+        this.selectCrusher(crusher)
+      }
+      this.showCreateCrusherModal = false
+    },
     async onCreate() {
       this.error = ''
       this.success = false
@@ -319,51 +320,6 @@ export default {
       try {
         let contractorId = this.form.contractorId
         let crusherNumber = this.form.crusherNumber || null
-        // driverId removed
-
-        // If user selected "add new contractor", create it first
-        if (this.form.contractorId === '__new__' && this.form.newContractorName) {
-          const newContractorName = this.form.newContractorName.trim()
-          if (newContractorName) {
-            try {
-              const newContractorRes = await createContractor({ name: newContractorName })
-              const createdList = newContractorRes.normalized || (Array.isArray(newContractorRes.data) ? newContractorRes.data : [newContractorRes.data])
-              const chosen = createdList.find(c => c.availableForTransports) || createdList[0]
-              if (chosen) {
-                contractorId = chosen.id
-                // Add all created to local list for future use
-                createdList.forEach(c => this.contractors.push(c))
-              }
-            } catch (e) {
-              this.error = e?.response?.data?.message || this.$t('vehicles.contractorCreateError')
-              if (window.$toast) {
-                window.$toast(this.error, 'error', 5000)
-              }
-              return
-            }
-          }
-        }
-
-        // If user selected "add new crusher", create it first
-        if (this.form.crusherId === '__new__' && this.form.newCrusherName) {
-          const newCrusherName = this.form.newCrusherName.trim()
-          if (newCrusherName) {
-            try {
-              const newCrusherRes = await createCrusher({ name: newCrusherName })
-              crusherNumber = newCrusherRes.data.name
-              // Add to local list for future use
-              this.crushers.push(newCrusherRes.data)
-            } catch (e) {
-              this.error = e?.response?.data?.message || this.$t('vehicles.crusherCreateError')
-              if (window.$toast) {
-                window.$toast(this.error, 'error', 5000)
-              }
-              return
-            }
-          }
-        }
-
-        // driver creation/assignment removed
 
         const payload = {
           name: this.form.name,
@@ -371,8 +327,6 @@ export default {
           crusherNumber: crusherNumber,
           mode: this.mode
         }
-
-        // driver assignment removed
         
         // Only include companyCapacity if it's a valid number > 0
         if (companyCapacityValue !== null && companyCapacityValue > 0) {
@@ -392,10 +346,10 @@ export default {
         this.$emit('created')
         this.form.name = ''
         this.form.contractorId = ''
-        this.form.newContractorName = ''
         this.form.crusherId = ''
         this.form.crusherNumber = ''
-        this.form.newCrusherName = ''
+        this.contractorSearch = ''
+        this.crusherSearch = ''
         
         this.form.companyCapacity = ''
         this.form.crusherCapacity = ''
