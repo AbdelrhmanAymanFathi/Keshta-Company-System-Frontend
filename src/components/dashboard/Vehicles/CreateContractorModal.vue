@@ -10,13 +10,61 @@
               {{ $t('vehicles.contractorName') || 'Contractor Name' }}
             </label>
             <input 
-              v-model="contractorName" 
+              v-model="form.name" 
               type="text" 
               :placeholder="$t('vehicles.contractorNamePlaceholder') || 'Enter contractor name'"
               class="w-full border rounded px-3 py-2"
               data-contractor-modal
               required
               autofocus
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ $t('contractors.phone') || 'Phone' }}
+            </label>
+            <input 
+              v-model="form.phone" 
+              type="tel" 
+              :placeholder="$t('contractors.phone') || 'Phone number'"
+              class="w-full border rounded px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ $t('contractors.bankName') || 'Bank Name' }}
+            </label>
+            <input 
+              v-model="form.bankName" 
+              type="text" 
+              :placeholder="$t('contractors.bankName') || 'Bank name'"
+              class="w-full border rounded px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ $t('contractors.accountNumber') || 'Account Number' }}
+            </label>
+            <input 
+              v-model="form.accountNumber" 
+              type="text" 
+              :placeholder="$t('contractors.accountNumber') || 'Account number'"
+              class="w-full border rounded px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ $t('labels.notes') || 'Notes' }}
+            </label>
+            <textarea 
+              v-model="form.notes" 
+              :placeholder="$t('labels.notes') || 'Notes'"
+              class="w-full border rounded px-3 py-2 resize-none"
+              rows="3"
             />
           </div>
 
@@ -52,11 +100,18 @@ export default {
   name: 'CreateContractorModal',
   emits: ['created', 'cancel'],
   props: {
-    isOpen: { type: Boolean, default: false }
+    isOpen: { type: Boolean, default: false },
+    mode: { type: String, default: 'transport', validator: v => ['supply', 'transport', 'equipment'].includes(v) }
   },
   data() {
     return {
-      contractorName: '',
+      form: {
+        name: '',
+        phone: '',
+        bankName: '',
+        accountNumber: '',
+        notes: ''
+      },
       loading: false,
       error: ''
     }
@@ -64,20 +119,36 @@ export default {
   methods: {
     async onSubmit() {
       this.error = ''
-      if (!this.contractorName.trim()) {
+      const name = this.form.name?.trim()
+      if (!name) {
         this.error = this.$t('vehicles.contractorNameRequired') || 'Contractor name is required'
         return
       }
 
       this.loading = true
       try {
-        const response = await createContractor({ name: this.contractorName.trim() })
+        const payload = { name }
+        
+        if (this.form.phone?.trim()) payload.phone = this.form.phone.trim()
+        if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
+        if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
+        if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
+        
+        // Set availability flag based on mode
+        if (this.mode === 'supply') {
+          payload.availableForSupplies = true
+        } else if (this.mode === 'transport') {
+          payload.availableForTransports = true
+        } else if (this.mode === 'equipment') {
+          payload.availableForEquipmentRental = true
+        }
+        
+        const response = await createContractor(payload)
         const createdList = response.normalized || (Array.isArray(response.data) ? response.data : [response.data])
-        const created = createdList.find(c => c.availableForTransports) || createdList[0]
+        const created = createdList[0]
         
         this.$emit('created', created)
-        this.contractorName = ''
-        this.error = ''
+        this.resetForm()
       } catch (e) {
         this.error = e?.response?.data?.message || this.$t('vehicles.contractorCreateError') || 'Error creating contractor'
         if (window.$toast) {
@@ -89,15 +160,23 @@ export default {
     },
     onCancel() {
       this.$emit('cancel')
-      this.contractorName = ''
+      this.resetForm()
+    },
+    resetForm() {
+      this.form = {
+        name: '',
+        phone: '',
+        bankName: '',
+        accountNumber: '',
+        notes: ''
+      }
       this.error = ''
     }
   },
   watch: {
     isOpen(newVal) {
       if (newVal) {
-        this.contractorName = ''
-        this.error = ''
+        this.resetForm()
         this.$nextTick(() => {
           document.querySelector('input[data-contractor-modal]')?.focus()
         })

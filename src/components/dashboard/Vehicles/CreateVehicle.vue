@@ -3,6 +3,7 @@
     <!-- Contractor Modal -->
     <CreateContractorModal 
       :isOpen="showCreateContractorModal"
+      :mode="mode"
       @created="handleContractorCreated"
       @cancel="showCreateContractorModal = false"
     />
