@@ -141,7 +141,9 @@ import { createVehicle, getContractors, getCrushers, createCrusher, createContra
 export default {
   name: 'CreateVehicle',
   props: {
-    mode: { type: String, default: 'transport' }
+    mode: { type: String, default: 'transport' },
+    prefilledContractorId: { type: Number, default: null },
+    prefilledCrusherName: { type: String, default: null }
   },
   data() {
     return {
@@ -410,6 +412,22 @@ export default {
   async mounted() {
     try {
       await this.loadLookups()
+      
+      // Pre-fill contractor if provided
+      if (this.prefilledContractorId) {
+        const contractor = this.contractors.find(c => c.id === this.prefilledContractorId)
+        if (contractor) {
+          this.selectContractor(contractor)
+        }
+      }
+      
+      // Pre-fill crusher if provided
+      if (this.prefilledCrusherName) {
+        const crusher = this.crushers.find(c => c.name === this.prefilledCrusherName)
+        if (crusher) {
+          this.selectCrusher(crusher)
+        }
+      }
     } catch (e) {
       this.contractors = []
     }

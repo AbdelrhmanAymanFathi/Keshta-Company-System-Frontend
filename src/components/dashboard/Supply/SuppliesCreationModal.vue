@@ -8,8 +8,7 @@
   <!-- Modal -->
   <teleport to="body">
     <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
-      :dir="isRTL ? 'rtl' : 'ltr'"
-      @click.self="closeModal">
+      :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
@@ -53,21 +52,16 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown
-                        v-model="filters.commonItemSearch"
-                        :items="exportItems"
-                        :allItems="exportItems"
+                      <SearchDropdown v-model="filters.commonItemSearch" :items="exportItems" :allItems="exportItems"
                         :placeholder="$t('labels.item')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
-                        @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }"
-                      >
+                        @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }">
                         <template #prefix>
                           <ArchiveBoxIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </template>
                         <template #afterOptions>
-                          <div @click="showAddExportItemDialog = true"
-                            style="color: #10b981;"
+                          <div @click="showAddExportItemDialog = true" style="color: #10b981;"
                             class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('labels.addNew') }}
                           </div>
@@ -97,21 +91,16 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown
-                        v-model="filters.commonSiteSearch"
-                        :items="sites"
-                        :allItems="sites"
+                      <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
                         :placeholder="$t('labels.site')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
-                        @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }"
-                      >
+                        @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                         <template #prefix>
                           <MapPinIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </template>
                         <template #afterOptions>
-                          <div @click="showAddSite = true; pendingRow = null"
-                            style="color: #10b981;"
+                          <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
                             class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('supply.addNewSite') }}
                           </div>
@@ -128,22 +117,16 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown
-                        v-model="filters.commonAreaSearch"
-                        :items="commonAvailableAreas"
-                        :allItems="commonAvailableAreas"
-                        :placeholder="$t('labels.area')"
-                        :disabled="!commonData.site"
+                      <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
+                        :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!commonData.site"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
-                        @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }"
-                      >
+                        @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
                         <template #prefix>
                           <MapIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </template>
                         <template #afterOptions>
-                          <div v-if="commonData.site"
-                            @click="showAddArea = true; pendingRow = null"
+                          <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null"
                             style="color: #10b981;"
                             class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('supply.addNewArea') }}
@@ -161,21 +144,16 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown
-                        v-model="filters.commonContractorSearch"
-                        :items="contractors"
-                        :allItems="contractors"
-                        :placeholder="$t('labels.contractor')"
+                      <SearchDropdown v-model="filters.commonContractorSearch" :items="contractors"
+                        :allItems="contractors" :placeholder="$t('labels.contractor')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
-                        @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }"
-                      >
+                        @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }">
                         <template #prefix>
                           <UserGroupIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </template>
                         <template #afterOptions>
-                          <div @click="showAddContractorDialog = true"
-                            style="color: #10b981;"
+                          <div @click="showAddContractorDialog = true" style="color: #10b981;"
                             class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('labels.addNew') }}
                           </div>
@@ -192,21 +170,16 @@
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown
-                        v-model="filters.commonCrusherSearch"
-                        :items="crushers"
-                        :allItems="crushers"
+                      <SearchDropdown v-model="filters.commonCrusherSearch" :items="crushers" :allItems="crushers"
                         :placeholder="$t('labels.crusher')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
-                        @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }"
-                      >
+                        @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
                         <template #prefix>
                           <WrenchScrewdriverIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                         </template>
                         <template #afterOptions>
-                          <div @click="showAddCrusherDialog = true"
-                            style="color: #10b981;"
+                          <div @click="showAddCrusherDialog = true" style="color: #10b981;"
                             class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('labels.addNew') }}
                           </div>
@@ -279,12 +252,20 @@
               </dl>
             </div>
 
+            <!-- Add New Vehicle Button -->
+            <div class="mb-6" style="display:none;">
+              <button @click="showAddVehicleDialog = true"
+                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">
+                + {{ $t('vehicles.addVehicle') || 'Add New Vehicle' }}
+              </button>
+            </div>
+
             <!-- Table for Variable Data -->
             <div class="    mb-8
-    relative
-    border border-gray-200 rounded-lg
-    overflow-visible
-    p-2">
+              relative
+              border border-gray-200 rounded-lg
+              overflow-visible
+              p-2">
               <div class="overflow-x-auto w-full">
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
                   <thead class="bg-indigo-50 sticky top-0 z-10">
@@ -324,11 +305,10 @@
                             @mousedown.prevent="toggleVehicleDropdown(row)">
                             <input v-model="row.search" type="text"
                               :placeholder="row.vehicle?.name || $t('labels.vehicle')"
-                              class="outline-none flex-1 text-sm bg-transparent"
-                              @keydown.enter.prevent
+                              class="outline-none flex-1 text-sm bg-transparent" @keydown.enter.prevent
                               @keydown.escape="row.open = false"
                               @keydown="onDropdownKeydown($event, row, filteredVehicles(row), (sel) => selectVehicle(row, sel))"
-                              @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false"/>
+                              @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false" />
                             <span class="text-gray-400">▾</span>
                           </div>
                         </div>
@@ -339,8 +319,8 @@
                             class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
                             :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
 
-                            <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id" @mousedown.prevent="selectVehicle(row, v)"
-                              @mousemove="row.highlightedVehicleIndex = vi"
+                            <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id"
+                              @mousedown.prevent="selectVehicle(row, v)" @mousemove="row.highlightedVehicleIndex = vi"
                               :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
                               {{ v.name }}
                             </div>
@@ -383,7 +363,8 @@
                       <!-- Crusher Cubic -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.crusherCapacity" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onCrusherCapacityTab(index, $event)"
+                          @keydown.enter.prevent="handleEnterKey(index)"
+                          @keydown.tab="onCrusherCapacityTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
 
@@ -520,16 +501,17 @@
   </div>
 
   <!-- Dialog: Add Vehicle (use shared CreateVehicle modal) -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-40 flex items-center justify-center px-4">
+  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-[1001] flex items-center justify-center px-4">
     <div class="fixed inset-0 bg-black bg-opacity-40" @click="showAddVehicleDialog = false"></div>
-    <div class="relative w-full max-w-3xl z-50 mx-auto">
+    <div class="relative w-full max-w-3xl z-[1002] mx-auto">
       <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
         <div class="flex items-center justify-between px-4 py-3 border-b">
           <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
           <button class="text-gray-500 hover:text-gray-700" @click="showAddVehicleDialog = false">✕</button>
         </div>
         <div class="p-4 overflow-y-auto">
-          <CreateVehicle @created="onCreatedFromVehicleModal" />
+          <CreateVehicle @created="onCreatedFromVehicleModal" :prefilledContractorId="commonData.contractor?.id"
+            :prefilledCrusherName="commonData.crusher?.name" />
         </div>
       </div>
     </div>
@@ -555,14 +537,10 @@
       <div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div>
     </div>
   </div>
-      <!-- Transport Modal (open after successful supply save when item supports transport) -->
-      <TransportCreationModal
-        :isOpen="showTransportModal"
-        :modalTitle="$t('transport.addTransportFromSupply') || 'Create Transport'"
-        :transport="transportModalPayload"
-        @close="showTransportModal = false"
-        @saved="onTransportSaved"
-      />
+  <!-- Transport Modal (open after successful supply save when item supports transport) -->
+  <TransportCreationModal :isOpen="showTransportModal"
+    :modalTitle="$t('transport.addTransportFromSupply') || 'Create Transport'" :transport="transportModalPayload"
+    @close="showTransportModal = false" @saved="onTransportSaved" />
 </template>
 
 <script>
@@ -615,35 +593,13 @@ export default {
     CheckIcon,
     ArrowRightIcon,
     SearchDropdown
-    ,CreateVehicle
-    ,TransportCreationModal
+    , CreateVehicle
+    , TransportCreationModal
   },
   props: {
     showTriggerButton: {
       type: Boolean,
       default: true
-    },
-
-    async onCreatedFromVehicleModal() {
-      try {
-        await this.loadLookups()
-      } catch (e) {
-        console.error('Failed to reload lookups after vehicle creation', e)
-      } finally {
-        this.showAddVehicleDialog = false
-      }
-    },
-
-    onAddVehicleClicked(row) {
-      console.log('SuppliesCreationModal: Add Vehicle clicked for row', row && row.id)
-      try {
-        // mark the row as new vehicle and open shared create vehicle modal
-        if (row) row.vehicle = '__new__'
-        this.showAddVehicleDialog = true
-        if (row) row.open = false
-      } catch (e) {
-        console.error('Error handling add vehicle click', e)
-      }
     },
     triggerButtonText: {
       type: String,
@@ -805,6 +761,28 @@ export default {
   },
 
   methods: {
+    async onCreatedFromVehicleModal() {
+      try {
+        await this.loadLookups()
+      } catch (e) {
+        console.error('Failed to reload lookups after vehicle creation', e)
+      } finally {
+        this.showAddVehicleDialog = false
+      }
+    },
+
+    onAddVehicleClicked(row) {
+      console.log('SuppliesCreationModal: Add Vehicle clicked for row', row && row.id)
+      try {
+        // mark the row as new vehicle and open shared create vehicle modal
+        if (row) row.vehicle = '__new__'
+        this.showAddVehicleDialog = true
+        if (row) row.open = false
+      } catch (e) {
+        console.error('Error handling add vehicle click', e)
+      }
+    },
+
     handleGlobalClick(e) {
       // Close vehicle dropdowns when clicking outside the table area
       const isClickInTable = e.target.closest('table') || e.target.closest('thead') || e.target.closest('tbody')
@@ -1020,7 +998,7 @@ export default {
         companyCapacity: 0,
         crusherCapacity: '',
         availableVehicles: []
-      ,
+        ,
         highlightedVehicleIndex: -1
       }
 
@@ -1641,17 +1619,17 @@ export default {
       } finally {
         this.isSaving = false
       }
-      },
-      onTransportSaved(payload) {
-        // Close the transport modal and re-emit if parent needs to react
-        this.showTransportModal = false
-        this.transportModalPayload = null
-        try {
-          this.$emit('transportSaved', payload)
-        } catch (e) {
-          // ignore
-        }
+    },
+    onTransportSaved(payload) {
+      // Close the transport modal and re-emit if parent needs to react
+      this.showTransportModal = false
+      this.transportModalPayload = null
+      try {
+        this.$emit('transportSaved', payload)
+      } catch (e) {
+        // ignore
       }
+    }
   }
 }
 </script>
