@@ -253,7 +253,7 @@
             </div>
 
             <!-- Add New Vehicle Button -->
-            <div class="mb-6" style="display:none;">
+            <div class="mb-6" >
               <button @click="showAddVehicleDialog = true"
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">
                 + {{ $t('vehicles.addVehicle') || 'Add New Vehicle' }}
@@ -326,10 +326,10 @@
                             </div>
 
                             <!-- Add new -->
-                            <div @click.prevent.stop="onAddVehicleClicked(row)"
+                            <!-- <div @click.stop="onAddVehicleClicked(row)"
                               class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
                               + {{ $t('labels.addNew') }}
-                            </div>
+                            </div> -->
                           </div>
                         </teleport>
                       </td>
@@ -774,8 +774,7 @@ export default {
     onAddVehicleClicked(row) {
       console.log('SuppliesCreationModal: Add Vehicle clicked for row', row && row.id)
       try {
-        // mark the row as new vehicle and open shared create vehicle modal
-        if (row) row.vehicle = '__new__'
+        // Open the vehicle creation modal directly (same as the button above table)
         this.showAddVehicleDialog = true
         if (row) row.open = false
       } catch (e) {
