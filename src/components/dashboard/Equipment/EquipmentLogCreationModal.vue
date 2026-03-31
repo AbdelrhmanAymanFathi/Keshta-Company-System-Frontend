@@ -58,10 +58,6 @@
               <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ form.date || '-' }}</dd>
-                </div>
-                <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.equipment') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ selectedEquipmentName || '-' }}</dd>
                 </div>
@@ -96,9 +92,9 @@
                     <tr v-for="(row, index) in rows" :key="row.id">
                       <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
-                      <!-- Date (readonly, from step 1 selection) -->
+                      <!-- Date (editable) -->
                       <td class="px-3 py-2">
-                        <div class="text-sm text-gray-800">{{ form.date || '-' }}</div>
+                        <input type="date" v-model="row.date" @keydown.enter.prevent="handleEnterKey(index)" class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                       </td>
 
                       <!-- Equipment (readonly, from step 1 selection) -->
@@ -284,6 +280,7 @@ export default {
     createEmptyRow() {
       return {
         id: Date.now() + Math.random(),
+        date: this.form.date || '',
         hours: this.form.hours || 1,
         driver: null,
         driverLabel: '',
@@ -420,8 +417,9 @@ export default {
 
         const hourlyRateNum = Number(this.form.hourlyRate || 0)
 
-        // Build rows payload (each row: hours, driverId, driverLabel, notes, hourlyRate, total)
+        // Build rows payload (each row: date, hours, driverId, driverLabel, notes, hourlyRate, total)
         const rowsPayload = (this.rows || []).map(r => {
+          const dateVal = r.date || this.form.date || new Date().toISOString().split('T')[0]
           const hoursVal = Number(r.hours || 0)
           let driverIdVal = null
           if (r.driver && r.driver.id != null) driverIdVal = Number(r.driver.id)
@@ -432,6 +430,7 @@ export default {
           const rowHourly = Number(r.hourlyRate != null ? r.hourlyRate : this.form.hourlyRate || 0)
           const rowTotal = Number((hoursVal * rowHourly).toFixed(2))
           return {
+            date: new Date(dateVal).toISOString(),
             hours: hoursVal,
             driverId: driverIdVal,
             driverLabel: r.driverLabel || '',
