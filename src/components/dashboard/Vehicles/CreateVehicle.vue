@@ -178,8 +178,20 @@ export default {
   },
   computed: {
     filteredContractors() {
-      if (!this.contractorSearch) return this.contractors
-      return this.contractors.filter(c => (c.name || '').toLowerCase().includes(this.contractorSearch.toLowerCase()))
+      let filtered = this.contractors
+      
+      // Filter by mode
+      if (this.mode === 'transport') {
+        filtered = filtered.filter(c => c.availableForTransports || c.isTransporter)
+      } else if (this.mode === 'supply') {
+        filtered = filtered.filter(c => c.availableForSupplies || c.isSupplier || c.availableForExports)
+      } else if (this.mode === 'equipment') {
+        filtered = filtered.filter(c => c.availableForEquipmentRental)
+      }
+      
+      // Filter by search
+      if (!this.contractorSearch) return filtered
+      return filtered.filter(c => (c.name || '').toLowerCase().includes(this.contractorSearch.toLowerCase()))
     },
     filteredCrushers() {
       if (!this.crusherSearch) return this.crushers
