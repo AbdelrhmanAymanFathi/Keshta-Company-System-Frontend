@@ -34,6 +34,67 @@
                     <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
                   </div>
                 </div>
+
+                <!-- Contractor (readonly, auto-populated from equipment selection) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('vehicles.contractor') }}</label>
+                  <div class="relative">
+                    <input type="text" v-model="form.contractorLabel" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed text-gray-600" :placeholder="$t('vehicles.contractor') || 'Contractor'" />
+                  </div>
+                </div>
+
+                <!-- Site (الموقع) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.site') }} <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
+                        :placeholder="$t('labels.site')"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        @select="(sel) => { form.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
+                        <template #prefix>
+                          <MapPinIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('supply.addNewSite') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Area (المنطقة) -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.area') }}
+                  </label>
+                  <div class="relative flex items-center gap-2">
+                    <div class="flex-1 relative">
+                      <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
+                        :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!form.site"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
+                        @select="(sel) => { form.area = sel; filters.commonAreaSearch = sel.name }">
+                        <template #prefix>
+                          <MapIcon
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                        </template>
+                        <template #afterOptions>
+                          <div v-if="form.site" @click="showAddArea = true; pendingRow = null"
+                            style="color: #10b981;"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            + {{ $t('supply.addNewArea') }}
+                          </div>
+                        </template>
+                      </SearchDropdown>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -62,8 +123,20 @@
                   <dd class="text-gray-900 mt-1">{{ selectedEquipmentName || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('vehicles.contractor') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ form.contractorLabel || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.hourlyRate') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ form.site?.name || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ form.area?.name || '-' }}</dd>
                 </div>
               </dl>
             </div>
@@ -190,15 +263,48 @@
       </div>
     </div>
   </teleport>
+
+  <!-- Dialog: Add Site -->
+  <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div class="bg-white p-6 rounded shadow w-96">
+      <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
+      <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
+      <div class="flex gap-2 justify-end">
+        <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="addSite" :disabled="!newSiteName || addingLocation"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
+        </button>
+      </div>
+      <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
+    </div>
+  </div>
+
+  <!-- Dialog: Add Area -->
+  <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div class="bg-white p-6 rounded shadow w-96">
+      <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
+      <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
+      <div class="flex gap-2 justify-end">
+        <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
+        <button @click="addArea" :disabled="!newAreaName || addingLocation"
+          class="bg-green-600 text-white px-3 py-1 rounded">
+          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
+        </button>
+      </div>
+      <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
+    </div>
+  </div>
 </template>
 
 <script>
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import { CalendarDaysIcon, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { CalendarDaysIcon, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@heroicons/vue/24/outline'
+import { getLocations, createLocation } from '@/api'
 
 export default {
   name: 'EquipmentLogCreationModal',
-  components: { SearchDropdown, CalendarDaysIcon, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon },
+  components: { SearchDropdown, CalendarDaysIcon, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon },
   props: {
     isOpen: { type: Boolean, default: false },
     modalTitle: { type: String, default: '' },
@@ -216,16 +322,33 @@ export default {
         date: this.modelValue.date || new Date().toISOString().split('T')[0],
         equipmentId: this.modelValue.equipmentId || '',
         equipmentLabel: this.modelValue.equipmentLabel || this.modelValue.equipment || this.modelValue.equipmentLog || '',
+        contractorId: this.modelValue.contractorId || '',
+        contractorLabel: this.modelValue.contractorLabel || '',
         hourlyRate: this.modelValue.hourlyRate || 0,
         hours: this.modelValue.hours || 1,
         driverId: this.modelValue.driverId || '',
         driverLabel: this.modelValue.driverLabel || '',
+        site: null,
+        area: null,
         notes: this.modelValue.notes || '',
         isRental: Boolean(this.modelValue.isRental)
       },
       rows: [],
       isSaving: false,
-      saveError: ''
+      saveError: '',
+      sites: [],
+      allLocations: [],
+      filters: {
+        commonSiteSearch: '',
+        commonAreaSearch: ''
+      },
+      showAddSite: false,
+      newSiteName: '',
+      showAddArea: false,
+      newAreaName: '',
+      addingLocation: false,
+      pendingRow: null,
+      locationError: ''
     }
   },
   computed: {
@@ -248,16 +371,172 @@ export default {
     },
     rowsHoursSum() {
       return (this.rows || []).reduce((s, r) => s + (Number(r.hours || 0) || 0), 0)
+    },
+    commonAvailableAreas() {
+      if (!this.form.site?.id) return []
+      if (Array.isArray(this.form.site.children) && this.form.site.children.length) {
+        return this.form.site.children
+      }
+      return this.allLocations.filter(l => l.parentId === this.form.site.id)
+    }
+  },
+  watch: {
+    isOpen(val) {
+      if (val) {
+        this.locationError = ''
+        this.$nextTick(() => {
+          this.onModalOpen()
+        })
+      }
     }
   },
   methods: {
+    async onModalOpen() {
+      await this.refreshLocations()
+      await this.$nextTick()
+      this.syncFormLocationsFromModel()
+    },
+    syncFormLocationsFromModel() {
+      const mv = this.modelValue || {}
+      this.form.site = null
+      this.form.area = null
+      this.filters.commonSiteSearch = ''
+      this.filters.commonAreaSearch = ''
+
+      if (mv.site && typeof mv.site === 'object' && mv.site.id != null) {
+        this.form.site = this.allLocations.find(l => l.id === mv.site.id) || mv.site
+      } else if (mv.locationId != null && this.allLocations.length) {
+        this.form.site = this.allLocations.find(l => l.id === Number(mv.locationId)) || null
+      } else if (typeof mv.site === 'string' && mv.site.trim() && this.sites.length) {
+        const found = this.sites.find(s => (s.name || '') === mv.site.trim())
+        if (found) this.form.site = found
+      }
+
+      if (this.form.site) this.filters.commonSiteSearch = this.form.site.name || ''
+
+      const areaId = mv.area?.id ?? mv.areaId
+      if (this.form.site?.id && areaId != null) {
+        let areas = []
+        if (Array.isArray(this.form.site.children) && this.form.site.children.length) {
+          areas = this.form.site.children
+        } else {
+          areas = this.allLocations.filter(l => l.parentId === this.form.site.id)
+        }
+        let found = areas.find(a => a.id === Number(areaId)) || this.allLocations.find(l => l.id === Number(areaId))
+        if (found) {
+          this.form.area = found
+          this.filters.commonAreaSearch = found.name || ''
+        }
+      } else if (typeof mv.area === 'string' && mv.area.trim() && this.form.site) {
+        let areas = []
+        if (Array.isArray(this.form.site.children) && this.form.site.children.length) {
+          areas = this.form.site.children
+        } else {
+          areas = this.allLocations.filter(l => l.parentId === this.form.site.id)
+        }
+        const found = areas.find(a => (a.name || '') === mv.area.trim())
+        if (found) {
+          this.form.area = found
+          this.filters.commonAreaSearch = found.name || ''
+        }
+      }
+    },
+    async refreshLocations() {
+      try {
+        const res = await getLocations()
+        this.allLocations = Array.isArray(res.data) ? res.data : []
+        this.sites = this.allLocations.filter(l => !l.parentId)
+      } catch (err) {
+        console.warn('Failed to refresh locations', err)
+      }
+    },
+    onCommonSiteChange() {
+      if (this.form.site === '__new__') {
+        this.showAddSite = true
+        this.form.site = null
+        this.form.area = null
+        this.filters.commonSiteSearch = ''
+        this.filters.commonAreaSearch = ''
+        return
+      }
+      if (this.form.site && this.form.site.id) {
+        this.form.area = null
+        this.filters.commonAreaSearch = ''
+      }
+    },
+    async addSite() {
+      if (!this.newSiteName?.trim()) return
+      this.addingLocation = true
+      this.locationError = ''
+      try {
+        const res = await createLocation({ name: this.newSiteName.trim(), parentId: null })
+        await this.refreshLocations()
+        const created = res?.data
+        if (created?.id) {
+          const newSite = this.allLocations.find(l => l.id === created.id)
+          if (newSite && this.currentStep === 1 && !this.pendingRow) {
+            this.form.site = newSite
+            this.filters.commonSiteSearch = newSite.name || ''
+            this.form.area = null
+            this.filters.commonAreaSearch = ''
+          }
+        }
+        this.showAddSite = false
+        this.newSiteName = ''
+        this.pendingRow = null
+      } catch (err) {
+        this.locationError = err?.response?.data?.message || 'Failed to add site'
+        console.error('addSite error:', err)
+      } finally {
+        this.addingLocation = false
+      }
+    },
+    async addArea() {
+      if (!this.newAreaName?.trim()) return
+      const siteId = this.currentStep === 1 ? this.form.site?.id : this.pendingRow?.site?.id
+      if (!siteId) return
+      this.addingLocation = true
+      this.locationError = ''
+      try {
+        const res = await createLocation({
+          name: this.newAreaName.trim(),
+          parentId: siteId
+        })
+        await this.refreshLocations()
+        const created = res?.data
+        if (created?.id) {
+          const newArea = this.allLocations.find(l => l.id === created.id)
+          if (newArea && this.currentStep === 1 && !this.pendingRow) {
+            this.form.area = newArea
+            this.filters.commonAreaSearch = newArea.name || ''
+          }
+        }
+        this.showAddArea = false
+        this.newAreaName = ''
+        this.pendingRow = null
+      } catch (err) {
+        this.locationError = err?.response?.data?.message || 'Failed to add area'
+        console.error('addArea error:', err)
+      } finally {
+        this.addingLocation = false
+      }
+    },
     closeModal() {
       this.$emit('close')
     },
     selectEquipment(item) {
-      if (!item) { this.form.equipmentId = ''; this.form.equipmentLabel = ''; this.form.isRental = false; return }
+      if (!item) { 
+        this.form.equipmentId = ''
+        this.form.equipmentLabel = ''
+        this.form.contractorId = ''
+        this.form.contractorLabel = ''
+        this.form.isRental = false
+        return 
+      }
       this.form.equipmentId = item.id != null ? Number(item.id) : ''
       this.form.equipmentLabel = item.name ?? ''
+      this.form.contractorId = item.contractorId != null ? Number(item.contractorId) : ''
+      this.form.contractorLabel = item.contractorName ?? item.contractor?.name ?? ''
       this.form.isRental = Boolean(item.contractorId ?? item.contractor ?? false)
       if (item.hourlyRate != null && item.hourlyRate !== '') this.form.hourlyRate = Number(item.hourlyRate)
     },
@@ -267,7 +546,10 @@ export default {
       this.form.driverLabel = item.name ?? ''
     },
     isStep1Valid() {
-      return (this.form.equipmentLabel || this.form.equipmentId) && Number(this.form.hourlyRate) > 0
+      return (this.form.equipmentLabel || this.form.equipmentId) &&
+        Number(this.form.hourlyRate) > 0 &&
+        this.form.site &&
+        this.form.site.id
     },
     goToStep2() {
       if (!this.isStep1Valid()) return
@@ -446,9 +728,14 @@ export default {
         const payload = {
           date: new Date(this.form.date).toISOString(),
           equipmentId: equipmentIdNumeric,
+          contractorId: this.form.contractorId || null,
           hourlyRate: hourlyRateNum,
           hours: hoursSum || Number(this.form.hours || 0),
           total: Number(totalSum.toFixed(2)),
+          locationId: this.form.site?.id ?? null,
+          areaId: this.form.area?.id ?? null,
+          site: this.form.site?.name || '',
+          area: this.form.area?.name || '',
           notes: this.form.notes || '',
           isRental: Boolean(this.form.isRental),
           rows: rowsPayload

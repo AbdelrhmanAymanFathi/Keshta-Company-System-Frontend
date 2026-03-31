@@ -510,8 +510,7 @@ import EquipmentLogCreationModal from './EquipmentLogCreationModal.vue'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog },
-    components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal },
+  components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal },
   setup() {
     const instance = getCurrentInstance()
     const rentalsStore = useRentalsStore()
@@ -767,7 +766,9 @@ export default {
               hours: row.hours != null ? row.hours : (rentalData.hours || 0),
               hourlyRate: row.hourlyRate != null ? row.hourlyRate : (rentalData.hourlyRate || 0),
               note: row.notes || rentalData.notes || '',
-              isRental: rentalData.isRental !== undefined ? rentalData.isRental : false
+              isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
+              ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
+              ...(rentalData.areaId != null && rentalData.areaId !== '' ? { areaId: rentalData.areaId } : {})
             }
             return createEquipmentLog(payloadRow)
           })
@@ -782,7 +783,9 @@ export default {
             hours: rentalData.hours,
             hourlyRate: rentalData.hourlyRate,
             note: rentalData.notes || rentalData.note || '',
-            isRental: rentalData.isRental !== undefined ? rentalData.isRental : false
+            isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
+            ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
+            ...(rentalData.areaId != null && rentalData.areaId !== '' ? { areaId: rentalData.areaId } : {})
           }
 
           if (isEditing.value && form.value && form.value.id) {
