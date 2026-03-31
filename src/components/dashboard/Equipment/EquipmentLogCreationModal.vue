@@ -188,8 +188,8 @@
                             class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
                             @click.stop="toggleDriverDropdown(row)">
                             <input v-model="row.search" type="text"
-                              :placeholder="row.driverLabel || $t('labels.driver')"
-                              class="outline-none flex-1 text-sm bg-transparent"
+                              :placeholder="$t('labels.driver')"
+                              class="outline-none flex-1 text-sm bg-transparent text-gray-900 placeholder:text-gray-400"
                               @keydown.enter.prevent
                               @keydown.escape="row.open = false"
                               @keydown="onDropdownKeydown($event, row, filteredDrivers(row), (sel) => selectDriverRow(row, sel))"
@@ -582,7 +582,7 @@ export default {
       const copy = JSON.parse(JSON.stringify(src))
       copy.id = Date.now() + Math.random()
       copy.open = false
-      copy.search = ''
+      copy.search = copy.driverLabel || ''
       this.rows.splice(index + 1, 0, copy)
     },
     removeRow(index) {
@@ -594,16 +594,22 @@ export default {
       return (this.drivers || []).filter(d => (d.name || '').toLowerCase().includes(q))
     },
     selectDriverRow(row, item) {
-      if (!item) { row.driver = null; row.driverLabel = ''; return }
+      if (!item) {
+        row.driver = null
+        row.driverLabel = ''
+        row.search = ''
+        return
+      }
       row.driver = item
       row.driverLabel = item.name || ''
+      row.search = item.name || ''
       row.open = false
     },
     toggleDriverDropdown(row) {
       row.open = !row.open
       if (row.open) {
         row.highlightedIndex = -1
-        row.search = ''
+        row.search = row.driverLabel || ''
       }
     },
     getDriverDropdownStyle(row) {
