@@ -9,7 +9,7 @@
         </div>
 
         <!-- Body -->
-        <div class="flex-1 overflow-y-auto p-6 modal-body-container relative">
+        <div class="flex-1 overflow-y-auto p-6 modal-body-container relative" @scroll.passive="onDriverDropdownParentScroll">
 
           <!-- ============================================ STEP 1 ============================================ -->
           <div v-if="currentStep === 1" class="w-full">
@@ -193,15 +193,15 @@
                               @keydown.enter.prevent
                               @keydown.escape="row.open = false"
                               @keydown="onDropdownKeydown($event, row, filteredDrivers(row), (sel) => selectDriverRow(row, sel))"
-                              @focus="row.open = true" @blur="onInputBlur(row)" />
+                              @focus="onDriverFieldFocus(row)" @blur="onInputBlur(row)" />
                             <span class="text-gray-400">▾</span>
                           </div>
                         </div>
 
-                        <teleport to=".modal-body-container" v-if="row.open">
+                        <teleport to="body" v-if="row.open">
                           <div
-                            class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
-                            :class="getDriverDropdownClasses()" :style="getDriverDropdownStyle(row)" @click.stop>
+                            class="border border-gray-200 bg-white rounded-md shadow-2xl"
+                            :style="getDriverDropdownStyle(row)" @click.stop>
 
                             <div v-for="(d, di) in filteredDrivers(row)" :key="d.id" @mousedown.prevent="selectDriverRow(row, d)"
                               @mousemove="row.highlightedIndex = di"
@@ -610,18 +610,55 @@ export default {
       if (row.open) {
         row.highlightedIndex = -1
         row.search = row.driverLabel || ''
+        this.$nextTick(() => this.scheduleDriverDropdownPosition(row))
       }
     },
-    getDriverDropdownStyle(row) {
-      if (!row.driverCell) return {}
-      const rect = row.driverCell.getBoundingClientRect()
-      const containerRect = document.querySelector('.modal-body-container')?.getBoundingClientRect()
-      if (!containerRect) return {}
-      const relativeTop = rect.bottom - containerRect.top
-      const relativeLeft = rect.left - containerRect.left
-      return { top: `${relativeTop}px`, left: `${relativeLeft}px`, width: `${rect.width}px`, position: 'absolute' }
+    onDriverFieldFocus(row) {
+      row.open = true
+      this.$nextTick(() => this.scheduleDriverDropdownPosition(row))
     },
-    getDriverDropdownClasses() { return 'z-50' },
+    onDriverDropdownParentScroll() {
+      if ((this.rows || []).some(r => r.open)) this.$forceUpdate()
+    },
+    scheduleDriverDropdownPosition(row) {
+      if (!row?.open) return
+      requestAnimationFrame(() => {
+        if (row.open) this.$forceUpdate()
+      })
+    },
+    getDriverDropdownStyle(row) {
+      if (!row.driverCell) return { display: 'none' }
+      const el = row.driverCell
+      const rect = el.getBoundingClientRect()
+      if (!rect.width && !rect.height) return { display: 'none' }
+      const gap = 4
+      const maxH = 160
+      const vw = typeof window !== 'undefined' ? window.innerWidth : 1024
+      const vh = typeof window !== 'undefined' ? window.innerHeight : 768
+      let top = rect.bottom + gap
+      let maxHeight = maxH
+      const spaceBelow = vh - rect.bottom - gap - 8
+      const spaceAbove = rect.top - 8
+      if (spaceBelow < 120 && spaceAbove > spaceBelow) {
+        top = Math.max(8, rect.top - gap - Math.min(maxH, spaceAbove))
+        maxHeight = Math.min(maxH, Math.max(80, spaceAbove - gap))
+      } else {
+        maxHeight = Math.min(maxH, Math.max(80, spaceBelow))
+      }
+      let left = rect.left
+      const width = Math.max(rect.width, 160)
+      if (left + width > vw - 8) left = Math.max(8, vw - width - 8)
+      if (left < 8) left = 8
+      return {
+        position: 'fixed',
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${width}px`,
+        maxHeight: `${maxHeight}px`,
+        overflowY: 'auto',
+        zIndex: 1100
+      }
+    },
     onInputBlur(row) {
       // small delay to allow mousedown on dropdown items to register
       if (row._closeTimeout) clearTimeout(row._closeTimeout)
@@ -634,12 +671,14 @@ export default {
         e.preventDefault()
         row.highlightedIndex = Math.min(max, (row.highlightedIndex ||  -1) + 1)
         row.open = true
+        this.$nextTick(() => this.scheduleDriverDropdownPosition(row))
         return
       }
       if (key === 'ArrowUp') {
         e.preventDefault()
         row.highlightedIndex = Math.max(0, (row.highlightedIndex || 0) - 1)
         row.open = true
+        this.$nextTick(() => this.scheduleDriverDropdownPosition(row))
         return
       }
       if (key === 'Enter') {
