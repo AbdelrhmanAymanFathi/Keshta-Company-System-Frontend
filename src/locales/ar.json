@@ -166,6 +166,9 @@
     "addItem": "إضافة بند"
   },
   "labels": {
+    "enterDetails": "أدخل التفاصيل",
+    "hours":"الساعات",
+    "driver":"السائق",
     "create": "إنشاء",
     "subtotal": "المجموع الفرعي",
     "totalDiscount": "إجمالي الخصم",

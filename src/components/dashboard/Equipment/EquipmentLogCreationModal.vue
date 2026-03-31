@@ -17,14 +17,6 @@
 
             <div class="max-w-6xl mx-auto">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                <!-- Date -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.date') }} <span class="text-red-600">*</span></label>
-                  <div class="relative">
-                    <input type="date" v-model="form.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
-                  </div>
-                </div>
-
                 <!-- Equipment -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
@@ -91,6 +83,7 @@
                   <thead class="bg-indigo-50 sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.date') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('equipmentLog.equipment') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.hours') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.driver') }}</th>
@@ -102,6 +95,11 @@
                   <tbody class="divide-y divide-gray-200 bg-white">
                     <tr v-for="(row, index) in rows" :key="row.id">
                       <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+
+                      <!-- Date (readonly, from step 1 selection) -->
+                      <td class="px-3 py-2">
+                        <div class="text-sm text-gray-800">{{ form.date || '-' }}</div>
+                      </td>
 
                       <!-- Equipment (readonly, from step 1 selection) -->
                       <td class="px-3 py-2">
@@ -273,7 +271,7 @@ export default {
       this.form.driverLabel = item.name ?? ''
     },
     isStep1Valid() {
-      return this.form.date && (this.form.equipmentLabel || this.form.equipmentId) && Number(this.form.hourlyRate) > 0
+      return (this.form.equipmentLabel || this.form.equipmentId) && Number(this.form.hourlyRate) > 0
     },
     goToStep2() {
       if (!this.isStep1Valid()) return

@@ -166,6 +166,9 @@
     "addItem": "Add Item"
   },
   "labels": {
+    "enterDetails": "Enter details",
+    "hours": "Hours", 
+    "driver": "Driver",
     "create": "Create",
     "enterSupplies": "Enter Supplies",
     "step1BasicData": "Step 1: Basic Data",
