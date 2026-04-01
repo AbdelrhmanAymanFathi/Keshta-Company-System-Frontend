@@ -70,6 +70,7 @@
     "newItem": "صنف جديد"
   },
   "equipmentLog": {
+    "deletedSuccessfully":"تم الحذف بنجاح",
     "list": "سجل المعدات",
     "searchPlaceholder": "ابحث عن المعدات أو الاسم...",
     "searchBy": "ابحث بواسطة المعدات أو الاسم",

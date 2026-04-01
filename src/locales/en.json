@@ -70,6 +70,7 @@
     "collapse": "Collapse"
   },
   "equipmentLog": {
+    "deletedSuccessfully": "Deleted successfully",
     "list": "Equipment Log",
     "searchPlaceholder": "Search equipment or name...",
     "searchBy": "Search by equipment or name",
