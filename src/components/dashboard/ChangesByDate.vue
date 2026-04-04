@@ -129,7 +129,7 @@ import {
   getContractorsChanges,
   getCrushersChanges,
   getTransportsChanges,
-  getRentalsChanges,
+  getEquipmentLogsChanges,
   getExpensesChanges,
   getVehiclesChanges,
   getCompanyWalletTransactionsChanges
@@ -182,7 +182,7 @@ export default {
           this.loadModuleChanges('contractors', () => getContractorsChanges(dateStr)),
           this.loadModuleChanges('crushers', () => getCrushersChanges(dateStr)),
           this.loadModuleChanges('transports', () => getTransportsChanges(dateStr)),
-          this.loadModuleChanges('rentals', () => getRentalsChanges(dateStr)),
+          this.loadModuleChanges('rentals', () => getEquipmentLogsChanges(dateStr)),
           this.loadModuleChanges('expenses', () => getExpensesChanges(dateStr)),
           this.loadModuleChanges('vehicles', () => getVehiclesChanges(dateStr)),
           this.loadModuleChanges('companyWallet', () => getCompanyWalletTransactionsChanges(dateStr))

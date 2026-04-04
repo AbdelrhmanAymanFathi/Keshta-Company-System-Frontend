@@ -87,3 +87,25 @@ export interface ContractorAccountTransaction {
   description?: string | null;
   createdAt: string;
 }
+
+// Equipment Log
+export interface EquipmentLog {
+  id: number | string;
+  date: string;
+  equipmentId: number;
+  equipment?: { id: number; name?: string } | string;
+  hours?: number;
+  hourlyRate?: number;
+  total?: number;
+  note?: string | null;
+  notes?: string | null;
+  isRental?: boolean;
+  driverId?: number | null;
+  driver?: { id: number; name?: string } | null;
+  locationId?: number | null;
+  areaId?: number | null;
+  location?: { id: number; name?: string } | null;
+  area?: { id: number; name?: string } | null;
+  createdAt?: string;
+  updatedAt?: string;
+}

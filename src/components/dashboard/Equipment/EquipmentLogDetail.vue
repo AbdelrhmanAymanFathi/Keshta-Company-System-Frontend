@@ -35,6 +35,21 @@
         </div>
       </div>
 
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('labels.location') || 'Location' }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ rental.location?.name || '-' }}</div>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('labels.area') || 'Area' }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ rental.area?.name || '-' }}</div>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('equipmentLog.driver') }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ rental.driver?.name || rental.driverLabel || '-' }}</div>
+        </div>
+      </div>
+
       <div class="mt-4 bg-white rounded-lg p-4 border">
         <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.jobEntries') }}</h4>
         <div v-if="jobs.length === 0" class="text-gray-500 py-6 text-center">

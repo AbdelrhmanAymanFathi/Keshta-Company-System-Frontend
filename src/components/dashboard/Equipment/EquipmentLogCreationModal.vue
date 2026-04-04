@@ -36,10 +36,10 @@
                 </div>
 
                 <!-- Contractor (readonly, auto-populated from equipment selection) -->
-                <div>
+                <div v-if="showContractorField">
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('vehicles.contractor') }}</label>
                   <div class="relative">
-                    <input type="text" v-model="form.contractorLabel" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed text-gray-600" :placeholder="$t('vehicles.contractor') || 'Contractor'" />
+                    <input type="text" :value="form.contractorLabel || ($t('vehicles.contractor') || 'Contractor')" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed text-gray-600" />
                   </div>
                 </div>
 
@@ -362,6 +362,11 @@ export default {
     isRTL() {
       return this.$i18n && this.$i18n.locale === 'ar'
     },
+    showContractorField() {
+      // Show contractor field when the selected equipment has a contractor
+      // and the entry is considered a rental (not company-owned).
+      return Boolean((this.form && (this.form.contractorId != null && this.form.contractorId !== '')) && this.form.isRental)
+    },
     rowsTotal() {
       return (this.rows || []).reduce((s, r) => {
         const h = Number(r.hours || 0)
@@ -546,10 +551,10 @@ export default {
       this.form.driverLabel = item.name ?? ''
     },
     isStep1Valid() {
+      const hr = Number(this.form.hourlyRate)
       return (this.form.equipmentLabel || this.form.equipmentId) &&
-        Number(this.form.hourlyRate) > 0 &&
-        this.form.site &&
-        this.form.site.id
+        (this.form.site && this.form.site.id) &&
+        !Number.isNaN(hr) && hr >= 0
     },
     goToStep2() {
       if (!this.isStep1Valid()) return

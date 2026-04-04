@@ -80,7 +80,15 @@
             />
           </div>
 
-          <div></div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              {{ $t('labels.location') || 'Location' }}
+            </label>
+            <select v-model="localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">{{ $t('labels.select') || 'Select location' }}</option>
+              <option v-for="loc in topLocations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
+            </select>
+          </div>
         </div>
 
         <div>
@@ -92,6 +100,15 @@
             rows="3"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.area') || 'Area' }}</label>
+          <select v-model="localForm.areaId" :disabled="!localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100">
+            <option value="">{{ $t('labels.select') || 'Select area' }}</option>
+            <option v-for="a in availableAreas" :key="a.id" :value="a.id">{{ a.name }}</option>
+          </select>
+          <p class="text-xs text-gray-400 mt-1">Optional — choose location and area where the work occurred</p>
         </div>
       </div>
 
@@ -139,6 +156,7 @@ import { ref, watch, computed, onMounted } from 'vue'
 import Badge from '../../shared/Badge.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { getDrivers } from '@/api'
+import { getLocations } from '@/api'
 
 export default {
   name: 'EquipmentLogForm',
@@ -181,6 +199,8 @@ export default {
     const driverItems = computed(() => ((props.drivers && props.drivers.length) ? props.drivers : fetchedDrivers.value))
 
     const currentStep = ref(1)
+    const locations = ref([])
+    const topLocations = ref([])
 
     onMounted(async () => {
       try {
@@ -188,6 +208,16 @@ export default {
         fetchedDrivers.value = Array.isArray(res.data) ? res.data : (res.data?.items || res.data || [])
       } catch (e) {
         fetchedDrivers.value = []
+      }
+      // load locations for optional site/area
+      try {
+        const locRes = await getLocations()
+        const all = Array.isArray(locRes.data) ? locRes.data : []
+        locations.value = all
+        topLocations.value = all.filter(l => !l.parentId)
+      } catch (e) {
+        locations.value = []
+        topLocations.value = []
       }
     })
 
@@ -215,6 +245,9 @@ export default {
         if (newVal.hours != null) {
           localForm.value.hours = Number(newVal.hours)
         }
+        // location/area
+        if (newVal.locationId != null) localForm.value.locationId = Number(newVal.locationId)
+        if (newVal.areaId != null) localForm.value.areaId = Number(newVal.areaId)
       }
     }, { deep: true, immediate: true })
 
@@ -267,6 +300,9 @@ export default {
         isRental: Boolean(localForm.value.isRental) // true when selected equipment has a contractor
       }
 
+      if (localForm.value.locationId != null && localForm.value.locationId !== '') submitData.locationId = Number(localForm.value.locationId)
+      if (localForm.value.areaId != null && localForm.value.areaId !== '') submitData.areaId = Number(localForm.value.areaId)
+
       emit('submit', submitData)
     }
 
@@ -289,6 +325,12 @@ export default {
       // On step 2, submit final payload
       handleSubmit()
     }
+
+    const availableAreas = computed(() => {
+      if (!locations.value || !Array.isArray(locations.value)) return []
+      if (!localForm.value.locationId) return []
+      return locations.value.filter(l => Number(l.parentId) === Number(localForm.value.locationId))
+    })
 
     function onSelectEquipment(item) {
       if (!item) {
@@ -314,7 +356,7 @@ export default {
       localForm.value.driverLabel = item.name ?? ''
     }
 
-    return { localForm, onSelectEquipment, onSelectDriver, handleSubmit, onFormSubmit, currentStep, driverItems }
+    return { localForm, onSelectEquipment, onSelectDriver, handleSubmit, onFormSubmit, currentStep, driverItems, locations, topLocations, availableAreas }
   }
 }
 </script>

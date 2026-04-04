@@ -205,7 +205,7 @@ const routes = [
         name: 'equipment-contractor-statement',
         component: ContractorStatement,
         meta: { title: 'dashboard.contractorStatement' },
-        props: { mode: 'rentals'}
+        props: { mode: 'equipmentLogs'}
       },
 
       // ==================== Company Wallet Module ====================

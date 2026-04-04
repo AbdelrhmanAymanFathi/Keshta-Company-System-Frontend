@@ -235,7 +235,7 @@ import Pagination from '@/components/shared/Pagination.vue'
 export default {
   name: 'EquipmentContractorsList',
   props: {
-    mode: { type: String, default: 'rentals' }
+    mode: { type: String, default: 'equipmentLogs' }
   },
   components: { Pagination },
   data() {
@@ -537,7 +537,7 @@ export default {
     ,
     goToDetail(c) {
       if (!c || !c.id) return
-      this.$router.push({ name: 'contractor-detail', params: { id: c.id }, query: { from: 'rentals' } }).catch(() => {})
+      this.$router.push({ name: 'contractor-detail', params: { id: c.id }, query: { from: 'equipmentLogs' } }).catch(() => {})
     }
   }
 }

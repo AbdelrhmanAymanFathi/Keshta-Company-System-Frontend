@@ -64,7 +64,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { getRentalReportData, getEquipments, getBranches } from '@/api'
+import { getEquipmentLogsReportData, getEquipments, getBranches } from '@/api'
 
 export default {
   name: 'EquipmentLogReport',
@@ -84,7 +84,7 @@ export default {
           equipmentId: filters.value.equipmentId,
           companyId: filters.value.companyId
         }
-        const res = await getRentalReportData(params)
+        const res = await getEquipmentLogsReportData(params)
         report.value = res.data || { rows: [] }
       } catch (e) {
         console.error('Failed to run report', e)

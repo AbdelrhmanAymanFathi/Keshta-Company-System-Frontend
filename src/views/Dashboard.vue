@@ -219,9 +219,9 @@ export default {
         ],
         equipmentLog: [
           { name: 'equipmentLogList', label: 'dashboard.equipmentLog', routeName: 'equipment-log-list' },
+          { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'equipment-contractors-list' },
           { name: 'equipmentList', label: 'equipment.title', routeName: 'equipment-list' },
           // { name: 'equipmentReport', label: 'equipment.reportMenu', routeName: 'equipment-report' },
-          { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'equipment-contractors-list' },
           { name: 'driversList', label: 'dashboard.driversList', routeName: 'equipment-drivers-list' },
           { name: 'contractorRentals', label: 'dashboard.contractorStatement', routeName: 'equipment-contractor-statement' }
         ],
@@ -335,9 +335,11 @@ export default {
       // If we're on contractor detail, prefer the originating module from query param
       const from = this.$route?.query?.from
       if (routeName === 'contractor-detail' && from) {
-        if (String(from).toLowerCase() === 'transport') return 'transport'
-        if (String(from).toLowerCase() === 'supplies' || String(from).toLowerCase() === 'export') return 'supplies'
-        if (String(from).toLowerCase() === 'equipment' || String(from).toLowerCase() === 'rental') return 'equipmentLog'
+        const f = String(from).toLowerCase()
+        if (f === 'transport') return 'transport'
+        if (f === 'supplies' || f === 'export') return 'supplies'
+        // Accept various legacy and new identifiers for equipment/rentals
+        if (f === 'equipment' || f === 'equipmentlogs' || f === 'equipmentlog') return 'equipmentLog'
       }
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']

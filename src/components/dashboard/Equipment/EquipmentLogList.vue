@@ -5,26 +5,7 @@
       <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div class="flex-1 w-full sm:w-auto">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('equipmentLog.list') }}</h2>
-          <!-- Search Bar -->
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <input :value="rentalsStore.filters.q" @input="onSearchInput" type="text"
-              :placeholder="$t('equipmentLog.searchPlaceholder')"
-              class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-            <div v-if="rentalsStore.filters.q" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <button @click="clearSearch" class="text-gray-400 hover:text-gray-600" aria-label="Clear search">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <p class="text-xs text-gray-500 mt-1">{{ $t('equipmentLog.searchBy') }}</p>
+          <!-- Search bar removed -->
         </div>
 
         <div class="flex gap-2">
@@ -36,45 +17,62 @@
             {{ $t('equipmentLog.addEntry') }}
           </button>
 
-          <button @click="$emit('navigate-report')"
+          <!-- <button @click="$emit('navigate-report')"
             class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
             </svg>
             {{ $t('equipmentLog.report') }}
-          </button>
+          </button> -->
         </div>
       </div>
 
       <!-- Filter Bar -->
-      <div class="flex flex-wrap items-center gap-3 bg-gray-50 rounded-lg p-3">
-        <span class="text-sm font-medium text-gray-700">{{ $t('equipmentLog.filterBy') }}:</span>
-        <div class="flex gap-2">
-          <button @click="setCompanyOwnedFilter(null)" :class="[
-            'px-3 py-1 rounded-md text-sm font-medium transition',
-            rentalsStore.filters.isCompanyOwned === null
-              ? 'bg-indigo-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-          ]">
-            {{ $t('equipmentLog.all') }}
-          </button>
-          <button @click="setCompanyOwnedFilter(true)" :class="[
-            'px-3 py-1 rounded-md text-sm font-medium transition',
-            rentalsStore.filters.isCompanyOwned === true
-              ? 'bg-green-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-          ]">
-            {{ $t('equipmentLog.companyOwned') }}
-          </button>
-          <button @click="setCompanyOwnedFilter(false)" :class="[
-            'px-3 py-1 rounded-md text-sm font-medium transition',
-            rentalsStore.filters.isCompanyOwned === false
-              ? 'bg-gray-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-          ]">
-            {{ $t('equipmentLog.external') }}
-          </button>
+      <div class="bg-white rounded-lg shadow p-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('equipmentLog.filters') || 'Filters' }}</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
+            <input v-model="filters.startDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
+            <input v-model="filters.endDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('equipmentLog.equipment') }}</label>
+            <SearchDropdown v-model="filters.equipmentSearch" :items="equipments" :allItems="equipments" :placeholder="$t('placeholders.searchEquipment')" @select="(sel) => { filters.equipmentId = sel.id; filters.equipmentSearch = sel.name }" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.driver') }}</label>
+            <SearchDropdown v-model="filters.driverSearch" :items="drivers" :allItems="drivers" :placeholder="$t('placeholders.searchDriver')" @select="(sel) => { filters.driverId = sel.id; filters.driverSearch = sel.name }" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
+            <SearchDropdown v-model="filters.locationSearch" :items="topLocations" :allItems="topLocations" :placeholder="$t('placeholders.searchLocation')" @select="(sel) => { filters.locationId = sel.id; filters.locationSearch = sel.name; filters.areaId = ''; filters.areaSearch = '' }" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
+            <SearchDropdown v-model="filters.areaSearch" :items="availableAreas(filters.locationId)" :allItems="availableAreas(filters.locationId)" :placeholder="$t('placeholders.searchArea')" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" :disabled="!filters.locationId" />
+          </div>
+
+          <div class="flex gap-2 items-center">
+            <div class="flex gap-2">
+              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-1 rounded-md text-sm font-medium transition', localIsCompanyOwned === null ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.all') }}</button>
+              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-1 rounded-md text-sm font-medium transition', localIsCompanyOwned === true ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.companyOwned') }}</button>
+              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-1 rounded-md text-sm font-medium transition', localIsCompanyOwned === false ? 'bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.external') }}</button>
+            </div>
+          </div>
+
+          <div class="col-span-full flex gap-2">
+            <button @click="applyFilters" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm">{{ $t('labels.search') }}</button>
+            <button @click="clearFilters" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-sm">{{ $t('labels.clear') }}</button>
+          </div>
         </div>
       </div>
     </div>
@@ -92,7 +90,7 @@
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600">
           <label>{{ $t('equipmentLog.pageSize') }}:</label>
-          <select :value="rentalsStore.pageSize" @change="onPageSizeChange"
+          <select :value="equipmentLogsStore.pageSize" @change="onPageSizeChange"
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
             <option value="10">10</option>
             <option value="20">20</option>
@@ -104,18 +102,18 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="rentalsStore.loading" class="flex justify-center py-8">
+    <div v-if="equipmentLogsStore.loading" class="flex justify-center py-8">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="rentalsStore.error" class="bg-red-50 border border-red-200 rounded-lg p-4">
+    <div v-else-if="equipmentLogsStore.error" class="bg-red-50 border border-red-200 rounded-lg p-4">
       <div class="flex items-center">
         <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <span class="text-red-800">{{ rentalsStore.error }}</span>
+        <span class="text-red-800">{{ equipmentLogsStore.error }}</span>
       </div>
     </div>
 
@@ -123,7 +121,7 @@
     <!-- Rentals Table -->
     <div v-else class="bg-white rounded-lg shadow overflow-hidden">
       <!-- No Results Message -->
-      <div v-if="rentalsStore.items.length === 0" class="text-center py-12">
+      <div v-if="equipmentLogsStore.items.length === 0" class="text-center py-12">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
@@ -164,6 +162,22 @@
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
+                  {{ $t('labels.location') || 'Location' }}
+                </th>
+                
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('labels.area') || 'Area' }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
+                  {{ $t('labels.contractor') || 'Contractor' }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.type') }}
                 </th>
                 <th
@@ -199,6 +213,16 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ rental.equipment.name }}
                 </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div class="truncate max-w-xs">{{ rental.location?.name || '-' }}</div>
+                </td>
+                
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div class="truncate max-w-xs">{{ rental.area?.name || '-' }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div class="truncate max-w-xs">{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <Badge :variant="!rental.isRental ? 'company' : 'external'">
                     {{ !rental.isRental ? $t('equipmentLog.companyOwned') : $t('equipmentLog.external') }}
@@ -218,23 +242,6 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex gap-3 items-center">
-                    <!-- <button @click="openDetailModal(rental)"
-                      class="text-blue-600 hover:text-blue-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
-                      {{ $t('equipmentLog.viewDetails') }}
-                    </button>
-                    <button @click="openPayoutsModal(rental)"
-                      class="text-green-600 hover:text-green-900 transition font-medium text-xs sm:text-sm whitespace-nowrap">
-                      {{ $t('equipmentLog.payouts') }}
-                    </button> -->
-                    <!-- <button @click="openEditModal(rental)"
-                      class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                      :title="$t('labels.edit')">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                        </path>
-                      </svg>
-                    </button> -->
                     <button @click="confirmDelete(rental)"
                       class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       :title="$t('labels.delete')">
@@ -263,18 +270,18 @@
       </div>
 
       <!-- Enhanced Pagination -->
-      <div v-if="rentalsStore.totalPages > 1"
+      <div v-if="equipmentLogsStore.totalPages > 1"
         class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
         <!-- Mobile Pagination -->
         <div class="flex-1 flex justify-between sm:hidden">
-          <button @click="changePage(rentalsStore.page - 1)" :disabled="rentalsStore.page <= 1"
+          <button @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.previous') }}
           </button>
           <span class="text-sm text-gray-700 self-center">
-            {{ rentalsStore.page }} / {{ rentalsStore.totalPages }}
+            {{ equipmentLogsStore.page }} / {{ equipmentLogsStore.totalPages }}
           </span>
-          <button @click="changePage(rentalsStore.page + 1)" :disabled="rentalsStore.page >= rentalsStore.totalPages"
+          <button @click="changePage(equipmentLogsStore.page + 1)" :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.next') }}
           </button>
@@ -285,12 +292,12 @@
           <div class="flex items-center gap-4">
             <p class="text-sm text-gray-700">
               {{ $t('labels.showing') }}
-              <span class="font-medium">{{ ((rentalsStore.page - 1) * rentalsStore.pageSize) + 1 }}</span>
+              <span class="font-medium">{{ ((equipmentLogsStore.page - 1) * equipmentLogsStore.pageSize) + 1 }}</span>
               {{ $t('labels.to') }}
-              <span class="font-medium">{{ Math.min(rentalsStore.page * rentalsStore.pageSize, rentalsStore.total)
+              <span class="font-medium">{{ Math.min(equipmentLogsStore.page * equipmentLogsStore.pageSize, equipmentLogsStore.total)
                 }}</span>
               {{ $t('labels.of') }}
-              <span class="font-medium">{{ rentalsStore.total }}</span>
+              <span class="font-medium">{{ equipmentLogsStore.total }}</span>
               {{ $t('labels.results') }}
             </p>
           </div>
@@ -298,7 +305,7 @@
           <!-- Page Numbers -->
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              <button @click="changePage(1)" :disabled="rentalsStore.page <= 1"
+              <button @click="changePage(1)" :disabled="equipmentLogsStore.page <= 1"
                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
@@ -307,7 +314,7 @@
                 </svg>
               </button>
 
-              <button @click="changePage(rentalsStore.page - 1)" :disabled="rentalsStore.page <= 1"
+              <button @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
                 class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
@@ -319,7 +326,7 @@
               <template v-for="page in visiblePages" :key="page">
                 <button @click="changePage(page)" :class="[
                   'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                  page === rentalsStore.page
+                  page === equipmentLogsStore.page
                     ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
                     : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
                 ]">
@@ -327,8 +334,8 @@
                 </button>
               </template>
 
-              <button @click="changePage(rentalsStore.page + 1)"
-                :disabled="rentalsStore.page >= rentalsStore.totalPages"
+              <button @click="changePage(equipmentLogsStore.page + 1)"
+                :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
                 class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
@@ -337,8 +344,8 @@
                 </svg>
               </button>
 
-              <button @click="changePage(rentalsStore.totalPages)"
-                :disabled="rentalsStore.page >= rentalsStore.totalPages"
+              <button @click="changePage(equipmentLogsStore.totalPages)"
+                :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
@@ -457,27 +464,27 @@
                 <input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)"
                   class="border border-gray-300 rounded px-3 py-2 text-sm" />
               </div>
-              <button @click="savePayout" :disabled="!payoutForm.amount || rentalsStore.payoutsLoading"
+              <button @click="savePayout" :disabled="!payoutForm.amount || equipmentLogsStore.payoutsLoading"
                 class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm">
-                {{ rentalsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
+                {{ equipmentLogsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
               </button>
             </div>
 
             <!-- Payouts List -->
             <div>
               <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('equipmentLog.payoutsList') }}</h4>
-              <div v-if="rentalsStore.payouts.length === 0" class="text-center py-4 text-gray-500">
+              <div v-if="equipmentLogsStore.payouts.length === 0" class="text-center py-4 text-gray-500">
                 {{ $t('equipmentLog.noPayouts') }}
               </div>
               <div v-else class="space-y-2">
-                <div v-for="payout in rentalsStore.payouts" :key="payout.id"
+                <div v-for="payout in equipmentLogsStore.payouts" :key="payout.id"
                   class="flex items-center justify-between bg-gray-50 p-3 rounded border">
                   <div>
                     <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
                     <div class="text-xs text-gray-500">{{ formatDate(payout.date) }}</div>
                     <div v-if="payout.notes" class="text-xs text-gray-600">{{ payout.notes }}</div>
                   </div>
-                  <button @click="deletePayout(payout.id)" :disabled="rentalsStore.payoutsLoading"
+                  <button @click="deletePayout(payout.id)" :disabled="equipmentLogsStore.payoutsLoading"
                     class="text-red-600 hover:text-red-900 text-sm">
                     {{ $t('labels.delete') }}
                   </button>
@@ -500,20 +507,21 @@
 
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance, nextTick } from 'vue'
-import { useRentalsStore } from '@/stores/useRentalsStore'
+import { useEquipmentLogsStore } from '@/stores/useEquipmentLogsStore'
 import EquipmentLogForm from './EquipmentLogForm.vue'
 import EquipmentLogDetail from './EquipmentLogDetail.vue'
 import Badge from '../../shared/Badge.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
-import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers } from '@/api'
+import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers, getLocations } from '@/api'
 import EquipmentLogCreationModal from './EquipmentLogCreationModal.vue'
+import SearchDropdown from '../../shared/SearchDropdown.vue'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal },
+  components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown },
   setup() {
     const instance = getCurrentInstance()
-    const rentalsStore = useRentalsStore()
+    const equipmentLogsStore = useEquipmentLogsStore()
     const showModal = ref(false)
     const showDeleteModal = ref(false)
     const isEditing = ref(false)
@@ -538,6 +546,12 @@ export default {
       isCompanyOwned: true
     })
     const equipments = ref([])
+    const locations = ref([])
+    const topLocations = ref([])
+    const availableAreas = (locId) => {
+      if (!locations.value || !locations.value.length) return []
+      return locations.value.filter(l => Number(l.parentId) === Number(locId))
+    }
 
     const loadEquipments = async () => {
       try {
@@ -546,6 +560,83 @@ export default {
         equipments.value = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
       } catch (e) {
         equipments.value = []
+      }
+    }
+
+    // Local UI filters (copied from SuppliesList pattern, adapted for equipment logs)
+    const filters = ref({
+      startDate: '',
+      endDate: '',
+      equipmentId: '',
+      equipmentSearch: '',
+      driverId: '',
+      driverSearch: '',
+      locationId: '',
+      locationSearch: '',
+      areaId: '',
+      areaSearch: ''
+    })
+
+    // Local client-side ownership filter (keeps UI state). Initialize from
+    // server `isRental` filter if present (server uses `isRental`: true => external)
+    const localIsCompanyOwned = ref(
+      (typeof equipmentLogsStore.filters.isRental !== 'undefined' && equipmentLogsStore.filters.isRental !== null)
+        ? !Boolean(equipmentLogsStore.filters.isRental)
+        : (equipmentLogsStore.filters.isCompanyOwned ?? null)
+    )
+
+    const applyFilters = () => {
+      // Try to infer selected IDs from typed search values when the user didn't select
+      if ((!filters.value.equipmentId || filters.value.equipmentId === '') && filters.value.equipmentSearch) {
+        const match = equipments.value.find(e => String(e.id) === String(filters.value.equipmentSearch) || (e.name && e.name.toLowerCase() === String(filters.value.equipmentSearch).toLowerCase()))
+        if (match) filters.value.equipmentId = match.id
+      }
+      if ((!filters.value.driverId || filters.value.driverId === '') && filters.value.driverSearch) {
+        const match = drivers.value.find(d => String(d.id) === String(filters.value.driverSearch) || (d.name && d.name.toLowerCase() === String(filters.value.driverSearch).toLowerCase()))
+        if (match) filters.value.driverId = match.id
+      }
+      if ((!filters.value.locationId || filters.value.locationId === '') && filters.value.locationSearch) {
+        const match = topLocations.value.find(l => String(l.id) === String(filters.value.locationSearch) || (l.name && l.name.toLowerCase() === String(filters.value.locationSearch).toLowerCase()))
+        if (match) filters.value.locationId = match.id
+      }
+      if ((!filters.value.areaId || filters.value.areaId === '') && filters.value.areaSearch && filters.value.locationId) {
+        const match = availableAreas(filters.value.locationId).find(a => String(a.id) === String(filters.value.areaSearch) || (a.name && a.name.toLowerCase() === String(filters.value.areaSearch).toLowerCase()))
+        if (match) filters.value.areaId = match.id
+      }
+
+      // copy local filters into the store and refresh
+      try { console.log('[component] applyFilters local filters BEFORE copy:', JSON.parse(JSON.stringify(filters.value))) } catch(e) { console.log('[component] applyFilters local filters BEFORE copy:', filters.value) }
+      equipmentLogsStore.filters.startDate = filters.value.startDate || ''
+      equipmentLogsStore.filters.endDate = filters.value.endDate || ''
+      equipmentLogsStore.filters.equipmentId = filters.value.equipmentId || ''
+      equipmentLogsStore.filters.driverId = filters.value.driverId || ''
+      equipmentLogsStore.filters.locationId = filters.value.locationId || ''
+      equipmentLogsStore.filters.areaId = filters.value.areaId || ''
+      try { console.log('[component] applyFilters store filters AFTER copy:', JSON.parse(JSON.stringify(equipmentLogsStore.filters))) } catch(e) { console.log('[component] applyFilters store filters AFTER copy:', equipmentLogsStore.filters) }
+      equipmentLogsStore.setPage(1)
+      if (typeof equipmentLogsStore.fetchRentals === 'function') equipmentLogsStore.fetchRentals()
+    }
+
+    const clearFilters = () => {
+      filters.value = {
+        startDate: '', endDate: '', equipmentId: '', equipmentSearch: '', driverId: '', driverSearch: '', locationId: '', locationSearch: '', areaId: '', areaSearch: ''
+      }
+      // reset local ownership filter as well
+      localIsCompanyOwned.value = null
+      // clear server-side ownership filter as well
+      equipmentLogsStore.filters.isRental = null
+      applyFilters()
+    }
+
+    const loadLocations = async () => {
+      try {
+        const res = await getLocations()
+        const all = Array.isArray(res.data) ? res.data : []
+        locations.value = all
+        topLocations.value = all.filter(l => !l.parentId)
+      } catch (e) {
+        locations.value = []
+        topLocations.value = []
       }
     }
 
@@ -579,8 +670,8 @@ export default {
     })
 
     const visiblePages = computed(() => {
-      const current = rentalsStore.page
-      const total = rentalsStore.totalPages
+      const current = equipmentLogsStore.page
+      const total = equipmentLogsStore.totalPages
       const delta = 2
 
       let start = Math.max(1, current - delta)
@@ -602,10 +693,40 @@ export default {
 
     // Client-side filtered items based on ownership filter
     const filteredItems = computed(() => {
-      const filter = rentalsStore.filters.isCompanyOwned
-      if (filter === null || filter === undefined) return rentalsStore.items
-      return rentalsStore.items.filter(item => {
-        // Primary: explicit boolean field
+      const filter = localIsCompanyOwned.value
+      if (filter === null || filter === undefined) return equipmentLogsStore.items
+
+      return equipmentLogsStore.items.filter(item => {
+        if (!item) return false
+
+        // Prefer explicit nested equipment ownership flag: equipment.isCompanyOwned
+        const equipment = item.equipment || (item.equipmentLog && item.equipmentLog.equipment) || null
+
+        if (equipment && Object.prototype.hasOwnProperty.call(equipment, 'isCompanyOwned')) {
+          const val = equipment.isCompanyOwned
+          if (typeof val === 'boolean') return val === filter
+          if (typeof val === 'string') {
+            const s = val.toLowerCase()
+            if (s === 'true' || s === '1') return filter === true
+            if (s === 'false' || s === '0') return filter === false
+          }
+          if (typeof val === 'number') return (val === 1) === filter
+          return Boolean(val) === Boolean(filter)
+        }
+
+        // If equipment has contractorId: null => company-owned
+        if (equipment && Object.prototype.hasOwnProperty.call(equipment, 'contractorId')) {
+          const cid = equipment.contractorId
+          const isCompany = cid === null || cid === undefined
+          return isCompany === filter
+        }
+
+        // Some APIs use an explicit isRental flag on the log: isRental === true => external
+        if (Object.prototype.hasOwnProperty.call(item, 'isRental')) {
+          return (!item.isRental) === filter
+        }
+
+        // Fall back to top-level isCompanyOwned if present
         if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) {
           const val = item.isCompanyOwned
           if (typeof val === 'boolean') return val === filter
@@ -617,24 +738,30 @@ export default {
           if (typeof val === 'number') return (val === 1) === filter
           return Boolean(val) === Boolean(filter)
         }
-        // Fallbacks: some APIs use different fields
-        const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership]
+
+        // Fallbacks: check a set of descriptive fields on both item and equipment
+        const candidates = [item.ownerType, item.type, item.rentalType, item.owner, item.ownership,
+          equipment && equipment.ownerType, equipment && equipment.owner, equipment && equipment.ownership]
         for (const c of candidates) {
-          if (!c && c !== 0) continue  // Skip if null/undefined but allow 0
+          if (c === null || typeof c === 'undefined') continue
           const s = String(c).toLowerCase()
-          if (s.includes('company') || s.includes('owned') || s === 'company') {
-            return filter === true
-          }
-          if (s.includes('external') || s.includes('third') || s.includes('vendor') || s === 'external') {
-            return filter === false
-          }
+          if (s.includes('company') || s.includes('owned') || s === 'company') return filter === true
+          if (s.includes('external') || s.includes('third') || s.includes('vendor') || s === 'external') return filter === false
           if (s === '1' || s === 'true') return filter === true
           if (s === '0' || s === 'false') return filter === false
         }
-        // Default: if no matching field found, EXCLUDE when a filter is applied
+
+        // Default: exclude when a filter is applied and no info available
         return false
       })
     })
+
+    // Debug: log ownership filter changes and filtered count
+    try {
+      watch(localIsCompanyOwned, (v) => {
+        try { console.log('[component] localIsCompanyOwned changed:', v, 'filtered length:', filteredItems.value.length) } catch(e) {}
+      })
+    } catch (e) { /* ignore during SSR or test env */ }
 
     // Calculate total sum of all visible filtered items
     const totalSum = computed(() => {
@@ -666,30 +793,43 @@ export default {
         // update the store filter; a watcher on the specific filter keys
         // will trigger fetchRentals. Avoid calling fetchRentals here to
         // prevent redundant/recursive triggers.
-        rentalsStore.setSearchQuery(event.target.value)
+        equipmentLogsStore.setSearchQuery(event.target.value)
       }, 500)
     }
 
     const clearSearch = () => {
       // update filter only; watcher will fetch results
-      rentalsStore.setSearchQuery('')
+      equipmentLogsStore.setSearchQuery('')
     }
 
     const setCompanyOwnedFilter = (value) => {
-      // update filter only; watcher will fetch results
-      rentalsStore.setCompanyOwnedFilter(value)
+      try { console.log('[component] setCompanyOwnedFilter called, value:', value, 'current:', localIsCompanyOwned.value) } catch(e) {}
+      // update local UI state
+      localIsCompanyOwned.value = value
+
+      // Map to server filter `isRental`: companyOwned(true) -> isRental=false, external(false) -> isRental=true
+      let isRentalValue = null
+      if (value === true) isRentalValue = false
+      else if (value === false) isRentalValue = true
+      else isRentalValue = null
+
+      // update store and reset to first page; watcher will trigger fetch
+      equipmentLogsStore.filters.isRental = isRentalValue
+      equipmentLogsStore.setPage(1)
+
+      try { console.log('[component] setCompanyOwnedFilter updated localIsCompanyOwned to:', localIsCompanyOwned.value, 'and equipmentLogsStore.filters.isRental to:', equipmentLogsStore.filters.isRental) } catch(e) {}
     }
 
     const changePage = (page) => {
-      if (page >= 1 && page <= rentalsStore.totalPages) {
-        rentalsStore.setPage(page)
-        rentalsStore.fetchRentals()
+      if (page >= 1 && page <= equipmentLogsStore.totalPages) {
+        equipmentLogsStore.setPage(page)
+        equipmentLogsStore.fetchRentals()
       }
     }
 
     const onPageSizeChange = (event) => {
-      rentalsStore.setPageSize(parseInt(event.target.value))
-      rentalsStore.fetchRentals()
+      equipmentLogsStore.setPageSize(parseInt(event.target.value))
+      equipmentLogsStore.fetchRentals()
     }
 
     const openAddModal = () => {
@@ -710,7 +850,7 @@ export default {
       isEditing.value = true
       try {
         // Fetch latest rental from API/store to ensure we have full/clean data
-        const data = await rentalsStore.fetchRental(rental.id)
+        const data = await equipmentLogsStore.fetchRental(rental.id)
         form.value = {
           id: data.id,
           date: data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0],
@@ -799,7 +939,7 @@ export default {
 
         closeModal()
         // Refresh store listing if available
-        if (typeof rentalsStore.fetchRentals === 'function') rentalsStore.fetchRentals()
+        if (typeof equipmentLogsStore.fetchRentals === 'function') equipmentLogsStore.fetchRentals()
       } catch (error) {
         console.error('Error saving equipment log:', error)
         if (window.$toast) {
@@ -824,7 +964,7 @@ export default {
         showDeleteModal.value = false
         rentalToDelete.value = null
         if (window.$toast) window.$toast(t('equipmentLog.deletedSuccessfully') || 'Equipment log deleted', 'success')
-        if (typeof rentalsStore.fetchRentals === 'function') rentalsStore.fetchRentals()
+        if (typeof equipmentLogsStore.fetchRentals === 'function') equipmentLogsStore.fetchRentals()
       } catch (error) {
         console.error('Error deleting equipment log:', error)
         if (window.$toast) {
@@ -870,7 +1010,7 @@ export default {
       selectedRentalForPayouts.value = rental
       showPayoutsModal.value = true
       try {
-        await rentalsStore.fetchRentalPayouts(rental.id)
+        await equipmentLogsStore.fetchRentalPayouts(rental.id)
       } catch (error) {
         console.error('Failed to load payouts:', error)
         if (window.$toast) {
@@ -921,14 +1061,14 @@ export default {
       }
 
       try {
-        await rentalsStore.createRentalPayout(selectedRentalForPayouts.value.id, {
+        await equipmentLogsStore.createRentalPayout(selectedRentalForPayouts.value.id, {
           amount: parseFloat(payoutForm.value.amount),
           date: payoutForm.value.date,
           notes: payoutForm.value.notes
         })
         // Refresh rental to get updated paid/remaining values
-        await rentalsStore.fetchRental(selectedRentalForPayouts.value.id)
-        await rentalsStore.fetchRentals()
+        await equipmentLogsStore.fetchRental(selectedRentalForPayouts.value.id)
+        await equipmentLogsStore.fetchRentals()
         if (window.$toast) {
           window.$toast('Payout created successfully', 'success')
         }
@@ -947,10 +1087,10 @@ export default {
 
     const deletePayout = async (payoutId) => {
       try {
-        const result = await rentalsStore.deleteRentalPayout(selectedRentalForPayouts.value.id, payoutId)
+        const result = await equipmentLogsStore.deleteRentalPayout(selectedRentalForPayouts.value.id, payoutId)
         // Refresh rental to get updated paid/remaining values
-        await rentalsStore.fetchRental(selectedRentalForPayouts.value.id)
-        await rentalsStore.fetchRentals()
+        await equipmentLogsStore.fetchRental(selectedRentalForPayouts.value.id)
+        await equipmentLogsStore.fetchRentals()
         if (window.$toast) {
           if (result && result.alreadyDeleted) {
             window.$toast(t('rental.payoutAlreadyDeleted'), 'info')
@@ -1106,9 +1246,9 @@ export default {
     // unrelated reactive changes occur; this can lead to recursive updates
     // if fetchRentals (or other actions) indirectly change reactive state.
     watch(
-      () => [rentalsStore.filters.q, rentalsStore.filters.isCompanyOwned],
+      () => [equipmentLogsStore.filters.q, equipmentLogsStore.filters.isRental],
       () => {
-        rentalsStore.fetchRentals()
+        equipmentLogsStore.fetchRentals()
       }
     )
 
@@ -1180,7 +1320,7 @@ export default {
     }
 
     onMounted(() => {
-      rentalsStore.fetchRentals()
+      equipmentLogsStore.fetchRentals()
       updateTableScrollVisibility()
       window.addEventListener('resize', updateTableScrollVisibility)
       document.addEventListener('click', closeContextMenu)
@@ -1192,6 +1332,7 @@ export default {
       }
       loadEquipments()
       loadDrivers()
+      loadLocations()
     })
 
     onUnmounted(() => {
@@ -1208,7 +1349,7 @@ export default {
     })
 
     return {
-      rentalsStore,
+      equipmentLogsStore,
       showModal,
       showDetailModal,
       selectedRentalForDetail,
@@ -1260,7 +1401,12 @@ export default {
       handleContextMenuAction,
       contextMenu,
       equipments,
-      drivers
+      drivers,
+      locations, topLocations, availableAreas,
+      filters,
+      applyFilters,
+      clearFilters,
+      localIsCompanyOwned
     }
   }
 }

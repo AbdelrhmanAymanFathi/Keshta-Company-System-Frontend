@@ -299,7 +299,11 @@ export default {
     const statementMode = computed(() => parseModeInput(mode.value || props.mode || ''))
     // contractorsListMode: lowercase mode for contractor list filtering (e.g. supply, transport)
     const contractorsListMode = computed(() => {
-      return statementMode.value ? statementMode.value.toLowerCase() : undefined
+      if (!statementMode.value) return undefined
+      const low = String(statementMode.value).toLowerCase()
+      // Backend and other components expect 'equipmentLogs' (camelCase) for equipment contractors.
+      if (low === 'equipmentlogs' || low === 'equipment_logs' || low === 'equipment-logs') return 'equipmentLogs'
+      return low
     })
 
     const getRowDebit = (row) => Number(row?.debit ?? row?.earnings ?? 0) || 0

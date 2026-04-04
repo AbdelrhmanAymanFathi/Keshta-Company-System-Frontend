@@ -897,9 +897,9 @@ export const updateTransport = (id, data) => {
 export const deleteTransport = (id) =>
   axios.delete(`${BASE_URL}/api/transports/${id}`);
 
-// Rentals (mapped to Equipment Logs)
-// NOTE: This frontend has migrated rental resources to the equipment-logs API.
-// These helpers keep the old function names but call the equipment-logs endpoints.
+// Equipment Logs (migrated from Rentals)
+// NOTE: Rental resources were migrated to the equipment-logs API.
+// Keep the equipment-logs helpers as the canonical API surface.
 export const getRentals = (params = {}) => {
   const { page = 1, pageSize = 20, q = '', isCompanyOwned = null } = params;
   const queryParams = new URLSearchParams({
@@ -954,16 +954,23 @@ export const getRentalJobsSummary = (rentalId) => {
 }
 
 // Equipment Logs (new API surface replacing rental jobs)
-// List: /api/equipment-logs?q=&equipmentId=&startDate=&endDate=&isRental=&page=&pageSize=
+// List: /api/equipment-logs?q=&equipmentId=&startDate=&endDate=&isRental=&driverId=&page=&pageSize=
 export const getEquipmentLogs = (params = {}) => {
-  const { page = 1, pageSize = 100, q = '', equipmentId, startDate, endDate, isRental } = params
+  const { page = 1, pageSize = 100, q = '', equipmentId, startDate, endDate, isRental, locationId, areaId, driverId } = params
   const query = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
   if (q) query.append('q', q)
   if (equipmentId !== undefined && equipmentId !== null) query.append('equipmentId', equipmentId)
   if (startDate) query.append('startDate', startDate)
   if (endDate) query.append('endDate', endDate)
   if (typeof isRental !== 'undefined' && isRental !== null) query.append('isRental', isRental ? 'true' : 'false')
-  return axios.get(`${BASE_URL}/api/equipment-logs?${query.toString()}`)
+  if (driverId !== undefined && driverId !== null && driverId !== '') query.append('driverId', String(driverId))
+  if (locationId !== undefined && locationId !== null && locationId !== '') query.append('locationId', String(locationId))
+  if (areaId !== undefined && areaId !== null && areaId !== '') query.append('areaId', String(areaId))
+  // Log params and the final URL so we can trace why filters may be missing
+  try { console.log('[api] getEquipmentLogs params:', params) } catch (e) { /* ignore */ }
+  const url = `${BASE_URL}/api/equipment-logs?${query.toString()}`
+  try { console.log('[api] getEquipmentLogs URL:', url) } catch (e) { /* ignore in old browsers */ }
+  return axios.get(url)
 }
 
 // Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, note, isRental })
@@ -987,7 +994,7 @@ export const getEquipmentLogsSummary = (params = {}) => {
   return axios.get(`${BASE_URL}/api/equipment-logs/summary?${q.toString()}`)
 }
 
-export const getRentalReportData = async (params = {}, format = 'json') => {
+export const getEquipmentLogsReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/equipment-logs/report`;
   let axiosParams = { ...params };
   if (format === 'xlsx') {
@@ -1001,8 +1008,8 @@ export const getRentalReportData = async (params = {}, format = 'json') => {
   }
 };
 
-export const downloadRentalReport = async (params = {}) => {
-  return getRentalReportData(params, 'xlsx');
+export const downloadEquipmentLogsReport = async (params = {}) => {
+  return getEquipmentLogsReportData(params, 'xlsx');
 };
 
 // Company Wallet & Finance
@@ -1235,7 +1242,7 @@ export const getTransportsChanges = (date) => {
   return axios.get(`${BASE_URL}/api/transports/changes?${queryParams.toString()}`);
 };
 
-export const getRentalsChanges = (date) => {
+export const getEquipmentLogsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
   return axios.get(`${BASE_URL}/api/equipment-logs/changes?${queryParams.toString()}`);
 };

@@ -1,5 +1,5 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-semibold">{{ $t('transport.transportList') }}</h2>
 

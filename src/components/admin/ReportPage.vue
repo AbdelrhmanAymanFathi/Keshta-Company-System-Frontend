@@ -283,12 +283,58 @@ export default {
       }
 
       const raw = readRaw(row, col)
-      if (raw == null) return ''
+
+      const pathSegments = String(col).toLowerCase().split('.')
+      const lastSegment = pathSegments[pathSegments.length - 1]
+      const lowerCol = String(col).toLowerCase()
+      const isContractorField = pathSegments.includes('contractor')
+      const isDriverField = pathSegments.some(s => s.includes('driver'))
+      const isIsRentalField = lowerCol.includes('isrental') || lowerCol.includes('is_rental') || lowerCol.includes('is-rental')
+
+      // If contractor/driver is not set, show a dash
+      if (raw == null) {
+        if (isContractorField || isDriverField) return '-'
+        return ''
+      }
+
+      // If this column refers to an isRental boolean, show translated Yes/No
+      if (isIsRentalField) {
+        if (raw == null) return '-'
+        const truthy = (raw === true || raw === 1 || raw === '1' || String(raw).toLowerCase() === 'true' || String(raw).toLowerCase() === 'yes' || String(raw).toLowerCase() === 'y')
+        return t(truthy ? 'labels.yes' : 'labels.no')
+      }
+
+      // If this column refers to a contractor, prefer showing the contractor's name
+      if (isContractorField) {
+        if (typeof raw === 'object' && raw !== null) {
+          const candidate = raw.name || raw.label || raw.title || raw.displayName || raw.fullName
+          if (candidate) return candidate
+        }
+        // Fallback: if the row contains a nested contractor object, use its name
+        if ((typeof raw === 'string' || typeof raw === 'number') && row && row.contractor && typeof row.contractor === 'object') {
+          const candidate2 = row.contractor.name || row.contractor.label || row.contractor.title
+          if (candidate2) return candidate2
+        }
+        // Fallback to raw primitive value if present
+        if (typeof raw === 'string' || typeof raw === 'number') return String(raw)
+      }
+
+      // If this column refers to a driver, prefer showing the driver's name
+      if (isDriverField) {
+        if (typeof raw === 'object' && raw !== null) {
+          const candidate = raw.name || raw.label || raw.title || raw.displayName || raw.fullName
+          if (candidate) return candidate
+        }
+        if ((typeof raw === 'string' || typeof raw === 'number') && row && row.driver && typeof row.driver === 'object') {
+          const candidate2 = row.driver.name || row.driver.label || row.driver.title
+          if (candidate2) return candidate2
+        }
+        if (typeof raw === 'string' || typeof raw === 'number') return String(raw)
+      }
 
       // format dates (ISO-like)
       if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(raw)) {
-        const last = String(col).split('.').pop().toLowerCase()
-        const keepTime = /datetime|timestamp|time|at/.test(last)
+        const keepTime = /datetime|timestamp|time|at/.test(lastSegment)
         const iso = parseIsoUtcString(raw)
         if (iso) {
           return keepTime ? `${iso.Y}/${iso.M}/${iso.D}` : `${iso.Y}/${iso.M}/${iso.D}`
@@ -315,6 +361,24 @@ export default {
       const keyFull = `reports.columns.${String(col).replace(/\./g, '_')}`
       const translatedFull = t(keyFull)
       if (translatedFull && translatedFull !== keyFull) return translatedFull
+
+      const lowerCol = String(col).toLowerCase()
+
+      // If the column path includes 'driver' or 'contractor', prefer contextual header.
+      if (lowerCol.includes('driver')) {
+        const translatedDriverName = t(`reports.columns.${String(col).replace(/\./g, '_')}`)
+        if (translatedDriverName && translatedDriverName !== `reports.columns.${String(col).replace(/\./g, '_')}`) return translatedDriverName
+        const translatedDriver = t('reports.columns.driver')
+        if (translatedDriver && translatedDriver !== 'reports.columns.driver') return translatedDriver
+        return humanize('driver')
+      }
+      if (lowerCol.includes('contractor')) {
+        const translatedContractorName = t(`reports.columns.${String(col).replace(/\./g, '_')}`)
+        if (translatedContractorName && translatedContractorName !== `reports.columns.${String(col).replace(/\./g, '_')}`) return translatedContractorName
+        const translatedContractor = t('reports.columns.contractor')
+        if (translatedContractor && translatedContractor !== 'reports.columns.contractor') return translatedContractor
+        return humanize('contractor')
+      }
 
       const last = String(col).split('.').pop()
       const keyLast = `reports.columns.${last}`
