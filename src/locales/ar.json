@@ -34,8 +34,10 @@
     "searchVehicle": "ابحث عن سيارة...",
     "searchToLocation": "ابحث عن موقع الوصول...",
     "searchFromLocation": "ابحث عن موقع الانطلاق...",
-    "search": "بحث..."
-    ,"select": "اختر"
+    "search": "بحث...",
+    "searchEquipment": "ابحث عن المعدات...",
+    "searchDriver": "ابحث عن سائق...",
+    "select": "اختر"
   },
   "navbar": {
     "supplies": "التوريدات",
@@ -747,6 +749,7 @@
     "reportDownloadError": "خطأ في تحميل التقرير",
     "noStatementData": "لا توجد بيانات للعرض",
     "placeholders": {
+      "searchEquipment": "البحث في المعدات...",
       "name": "أدخل اسم المورد",
       "phone": "أدخل رقم الهاتف",
       "bankName": "أدخل اسم البنك",

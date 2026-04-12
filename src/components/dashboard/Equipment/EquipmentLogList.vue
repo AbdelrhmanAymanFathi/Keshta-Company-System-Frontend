@@ -62,10 +62,10 @@
           </div>
 
           <div class="flex gap-2 items-center">
-            <div class="flex gap-2">
-              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-1 rounded-md text-sm font-medium transition', localIsCompanyOwned === null ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.all') }}</button>
-              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-1 rounded-md text-sm font-medium transition', localIsCompanyOwned === true ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.companyOwned') }}</button>
-              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-1 rounded-md text-sm font-medium transition', localIsCompanyOwned === false ? 'bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.external') }}</button>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.all') }}</button>
+              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.companyOwned') }}</button>
+              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.external') }}</button>
             </div>
           </div>
 

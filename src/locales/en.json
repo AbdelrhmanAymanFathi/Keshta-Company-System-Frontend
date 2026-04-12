@@ -34,8 +34,10 @@
     "searchVehicle": "Search vehicle...",
     "searchToLocation": "Search to location...",
     "searchFromLocation": "Search from location...",
-    "search": "Search..."
-    ,"select": "Select"
+    "search": "Search...",
+    "searchEquipment": "Search equipment...",
+    "searchDriver": "Search driver...",
+    "select": "Select"
   },
   "navbar": {
     "supplies": "Supplies",
@@ -803,6 +805,7 @@
     "isSupplier": "Also a supplier",
     "deleteError": "Error deleting transporter",
     "placeholders": {
+      "searchEquipment": "Search equipment...",
       "name": "Enter transporter name",
       "phone": "Enter phone number",
       "bankName": "Enter bank name",
