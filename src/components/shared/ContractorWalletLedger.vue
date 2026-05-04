@@ -11,11 +11,11 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <div>
           <label class="text-xs text-gray-600">{{ $t('labels.startDate') }}</label>
-          <input v-model="filters.start" type="date" class="w-full px-2 py-1 border rounded" />
+          <DateField v-model="filters.start" class="w-full px-2 py-1 border rounded" />
         </div>
         <div>
           <label class="text-xs text-gray-600">{{ $t('labels.endDate') }}</label>
-          <input v-model="filters.end" type="date" class="w-full px-2 py-1 border rounded" />
+          <DateField v-model="filters.end" class="w-full px-2 py-1 border rounded" />
         </div>
         <div>
           <label class="text-xs text-gray-600">{{ $t('labels.type') }}</label>
@@ -95,8 +95,10 @@
 
 <script>
 import { getContractorWalletTransactions, getAccountTransactions } from '@/api'
+import DateField from '@/components/shared/DateField.vue'
 export default {
   name: 'ContractorWalletLedger',
+  components: { DateField },
   props: { contractorId: { type: [String, Number], required: false }, accountId: { type: [String, Number], required: false }, visible: { type: Boolean, default: false } },
   data() {
     return {

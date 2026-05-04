@@ -37,21 +37,19 @@
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-          <input 
+          <DateField
             v-model="filters.startDate"
-            type="date"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          >
+          />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-          <input 
+          <DateField
             v-model="filters.endDate"
-            type="date"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-          >
+          />
         </div>
 
         <!-- Category Filter -->
@@ -181,12 +179,13 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { getExpensesReportData, downloadExpensesReport } from '@/api'
-import Badge from '../shared/Badge.vue'
+import DateField from '../shared/DateField.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
+import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'ExpensesReport',
-  components: { Badge },
+  components: { DateField },
   setup() {
     const downloading = ref(false)
     const error = ref(null)
@@ -342,24 +341,29 @@ export default {
       items.value = []
     }
 
-    const downloadReport = async () => {
+    const downloadReport = async (format = 'xlsx') => {
       downloading.value = true
       error.value = null
       try {
         const { data, headers } = await downloadExpensesReport(
-          buildQueryParams(filters.value)
+          buildQueryParams(filters.value),
+          format
         )
-        
-        const filename = `expenses-${filters.value.startDate}_${filters.value.endDate}.xlsx`
-        const blob = new Blob([data], { type: headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
+
+        // Prefer filename from headers
+        let filename = getFilenameFromHeaders(headers, null)
+        if (!filename) {
+          const ext = format === 'csv' ? 'csv' : (format === 'pdf' ? 'pdf' : 'xlsx')
+          filename = `expenses-${filters.value.startDate || 'all'}_${filters.value.endDate || 'all'}.${ext}`
+        }
+
+        const mimeType = format === 'csv'
+          ? (headers && (headers['content-type'] || headers['Content-Type']) || 'text/csv;charset=utf-8;')
+          : format === 'pdf'
+            ? (headers && (headers['content-type'] || headers['Content-Type']) || 'application/pdf')
+            : (headers && (headers['content-type'] || headers['Content-Type']) || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+        downloadBlobData(data, filename, mimeType)
       } catch (err) {
         console.error('Error downloading report:', err)
         error.value = err.response?.data?.message || 'Failed to download report'

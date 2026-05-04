@@ -134,87 +134,98 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { computed, ref, watch } from 'vue'
 
-const props = defineProps({
-  currentPage: { type: Number, required: true },
-  pageSize: { type: Number, required: true },
-  total: { type: Number, required: true },
-  totalPages: { type: Number, required: true },
-  pageSizeOptions: {
-    type: Array,
-    default: () => [10, 20, 50]
-  }
-})
-
-const emit = defineEmits(['update:page', 'update:pageSize'])
-
-const localPageSize = ref(props.pageSize)
-
-watch(
-  () => props.pageSize,
-  (v) => {
-    localPageSize.value = v
-  }
-)
-
-const startItem = computed(() => {
-  if (props.total === 0) return 0
-  return (props.currentPage - 1) * props.pageSize + 1
-})
-
-const endItem = computed(() => {
-  return Math.min(props.currentPage * props.pageSize, props.total)
-})
-
-const pageList = computed(() => {
-  const pages = []
-  const total = props.totalPages
-  const current = props.currentPage
-  const maxVisible = 7
-
-  if (total <= maxVisible) {
-    for (let i = 1; i <= total; i++) {
-      pages.push({ key: `p-${i}`, number: i, isEllipsis: false })
+export default {
+  name: 'AppPagination',
+  props: {
+    currentPage: { type: Number, required: true },
+    pageSize: { type: Number, required: true },
+    total: { type: Number, required: true },
+    totalPages: { type: Number, required: true },
+    pageSizeOptions: {
+      type: Array,
+      default: () => [10, 20, 50]
     }
-    return pages
+  },
+  emits: ['update:page', 'update:pageSize'],
+  setup(props, { emit }) {
+    const localPageSize = ref(props.pageSize)
+
+    watch(
+      () => props.pageSize,
+      (v) => {
+        localPageSize.value = v
+      }
+    )
+
+    const startItem = computed(() => {
+      if (props.total === 0) return 0
+      return (props.currentPage - 1) * props.pageSize + 1
+    })
+
+    const endItem = computed(() => {
+      return Math.min(props.currentPage * props.pageSize, props.total)
+    })
+
+    const pageList = computed(() => {
+      const pages = []
+      const total = props.totalPages
+      const current = props.currentPage
+      const maxVisible = 7
+
+      if (total <= maxVisible) {
+        for (let i = 1; i <= total; i++) {
+          pages.push({ key: `p-${i}`, number: i, isEllipsis: false })
+        }
+        return pages
+      }
+
+      const addPage = (n) => pages.push({ key: `p-${n}`, number: n, isEllipsis: false })
+      const addEllipsis = (key) => pages.push({ key, number: null, isEllipsis: true })
+
+      addPage(1)
+
+      const windowSize = 3
+      let start = Math.max(2, current - windowSize)
+      let end = Math.min(total - 1, current + windowSize)
+
+      if (start > 2) {
+        addEllipsis('ellipsis-start')
+      }
+
+      for (let i = start; i <= end; i++) {
+        addPage(i)
+      }
+
+      if (end < total - 1) {
+        addEllipsis('ellipsis-end')
+      }
+
+      addPage(total)
+
+      return pages
+    })
+
+    function changePage(p) {
+      if (p < 1 || p > props.totalPages || p === props.currentPage) return
+      emit('update:page', p)
+    }
+
+    function onPageSizeChange() {
+      emit('update:pageSize', localPageSize.value)
+    }
+
+    return {
+      localPageSize,
+      startItem,
+      endItem,
+      pageList,
+      changePage,
+      onPageSizeChange
+    }
   }
-
-  // Always show first and last; show window around current with ellipsis
-  const addPage = (n) => pages.push({ key: `p-${n}`, number: n, isEllipsis: false })
-  const addEllipsis = (key) => pages.push({ key, number: null, isEllipsis: true })
-
-  addPage(1)
-
-  const windowSize = 3
-  let start = Math.max(2, current - windowSize)
-  let end = Math.min(total - 1, current + windowSize)
-
-  if (start > 2) {
-    addEllipsis('ellipsis-start')
-  }
-
-  for (let i = start; i <= end; i++) {
-    addPage(i)
-  }
-
-  if (end < total - 1) {
-    addEllipsis('ellipsis-end')
-  }
-
-  addPage(total)
-
-  return pages
-})
-
-function changePage(p) {
-  if (p < 1 || p > props.totalPages || p === props.currentPage) return
-  emit('update:page', p)
-}
-
-function onPageSizeChange() {
-  emit('update:pageSize', localPageSize.value)
 }
 </script>
 

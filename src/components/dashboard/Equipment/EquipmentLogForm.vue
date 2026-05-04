@@ -11,9 +11,8 @@
           <label class="block text-sm font-medium text-gray-700 mb-1">
             {{ $t('equipmentLog.date') }} *
           </label>
-          <input
+          <DateField
             v-model="localForm.date"
-            type="date"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
@@ -92,9 +91,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            {{ $t('equipmentLog.notes') }}
-          </label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('equipmentLog.notes') }}</label>
           <textarea
             v-model="localForm.notes"
             rows="3"
@@ -153,19 +150,20 @@
 
 <script>
 import { ref, watch, computed, onMounted } from 'vue'
-import Badge from '../../shared/Badge.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
+import DateField from '../../shared/DateField.vue'
 import { getDrivers } from '@/api'
 import { getLocations } from '@/api'
+import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'EquipmentLogForm',
-  components: { Badge, SearchDropdown },
+  components: { SearchDropdown, DateField },
   props: {
     modelValue: {
       type: Object,
       default: () => ({
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayISO(),
         equipmentLog: '',
         equipmentId: '',
         isRental: false,

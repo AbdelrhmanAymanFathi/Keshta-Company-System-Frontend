@@ -32,18 +32,21 @@
             v-model="contractorSearch"
             @focus="openContractorDropdown"
             @input="openContractorDropdown"
+            @keydown="handleContractorKeydown"
             aria-autocomplete="list"
             aria-haspopup="true"
             role="combobox"
             required
           />
 
-          <div v-if="showContractorDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
+          <div v-if="showContractorDropdown" ref="contractorOptions" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
             <button
-              v-for="c in filteredContractors"
+              v-for="(c, i) in filteredContractors"
               :key="c.id"
+              ref="contractorOptionItems"
               @click.prevent="selectContractor(c)"
-              class="w-full text-left px-3 py-2 hover:bg-gray-100"
+              @mouseenter="contractorHighlightedIndex = i"
+              :class="i === contractorHighlightedIndex ? 'w-full text-left px-3 py-2 bg-indigo-100' : 'w-full text-left px-3 py-2 hover:bg-gray-100'"
             >
               <div class="flex items-center justify-between">
                 <div class="truncate">{{ c.name }}</div>
@@ -63,9 +66,7 @@
                 </div>
               </div>
             </button>
-            <div class="border-t px-3 py-2">
-              <button @click.prevent="chooseAddNewContractor" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewContractor') }}</button>
-            </div>
+            <!-- 'Add new contractor' removed -->
           </div>
         </div>
       </div>
@@ -136,6 +137,7 @@
 
 <script>
 import { createVehicle, getContractors, getCrushers } from '../../../api'
+import normalizeItem from '@/utils/normalizeItem'
 import CreateContractorModal from './CreateContractorModal.vue'
 import CreateCrusherModal from './CreateCrusherModal.vue'
 
@@ -157,6 +159,7 @@ export default {
       // Searchable dropdown state
       contractorSearch: '',
       showContractorDropdown: false,
+      contractorHighlightedIndex: -1,
       crusherSearch: '',
       showCrusherDropdown: false,
       // Modal states
@@ -208,15 +211,16 @@ export default {
     },
     async loadLookups() {
       try {
-        const contractorsRes = await getContractors()
+        const contractorsRes = await getContractors({ mode: 'transport' })
         const contractorsPayload = contractorsRes.data || {}
-        this.contractors = Array.isArray(contractorsPayload.items)
+        let contractors = Array.isArray(contractorsPayload.items)
           ? contractorsPayload.items
           : Array.isArray(contractorsPayload.data)
             ? contractorsPayload.data
             : Array.isArray(contractorsPayload)
               ? contractorsPayload
               : []
+        this.contractors = contractors.map(normalizeItem)
       } catch (error) {
         console.error('Error loading contractors:', error)
         this.contractors = []
@@ -239,15 +243,72 @@ export default {
     },
     openContractorDropdown() {
       this.showContractorDropdown = true
+      this.contractorHighlightedIndex = -1
     },
     selectContractor(c) {
       this.form.contractorId = c.id
       this.contractorSearch = c.name
       this.showContractorDropdown = false
+      this.contractorHighlightedIndex = -1
     },
     chooseAddNewContractor() {
       this.showCreateContractorModal = true
       this.showContractorDropdown = false
+    },
+    handleContractorKeydown(e) {
+      if (!this.showContractorDropdown && ['ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
+        this.showContractorDropdown = true
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        const next = this.contractorHighlightedIndex >= 0
+          ? Math.min(this.contractorHighlightedIndex + 1, this.filteredContractors.length - 1)
+          : 0
+        this.contractorHighlightedIndex = next
+        this.scrollToContractorHighlighted()
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        const prev = this.contractorHighlightedIndex > 0 ? this.contractorHighlightedIndex - 1 : 0
+        this.contractorHighlightedIndex = prev
+        this.scrollToContractorHighlighted()
+        return
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        if (this.filteredContractors.length) {
+          const pick = this.contractorHighlightedIndex >= 0 && this.contractorHighlightedIndex < this.filteredContractors.length
+            ? this.contractorHighlightedIndex
+            : 0
+          this.selectContractor(this.filteredContractors[pick])
+        }
+        return
+      }
+      if (e.key === 'Escape') {
+        this.showContractorDropdown = false
+      }
+    },
+    scrollToContractorHighlighted() {
+      this.$nextTick(() => {
+        const container = this.$refs.contractorOptions
+        const items = this.$refs.contractorOptionItems
+        if (!container || !items) return
+        const list = Array.isArray(items) ? items : [items]
+        const idx = this.contractorHighlightedIndex
+        if (idx < 0 || idx >= list.length) return
+        const el = list[idx]
+        if (!el) return
+        const containerTop = container.scrollTop
+        const containerHeight = container.clientHeight
+        const elTop = el.offsetTop
+        const elHeight = el.offsetHeight
+        if (elTop < containerTop) {
+          container.scrollTop = elTop
+        } else if (elTop + elHeight > containerTop + containerHeight) {
+          container.scrollTop = elTop + elHeight - containerHeight
+        }
+      })
     },
     onCrusherSelectChange() {
       if (this.form.crusherId && this.form.crusherId !== '__new__') {

@@ -9,9 +9,18 @@
       <div class="flex items-center gap-2">
         <button @click="execute" :disabled="executing" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-500 transition disabled:opacity-50">{{ $t('labels.search') }}</button>
         <button @click="clear" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition">{{ $t('labels.clear') }}</button>
-        <button @click="downloadXlsx" :disabled="!(tableData && tableData.length)" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition disabled:opacity-50">{{ $t('reports.downloadExcel') || 'Download Excel' }}</button>
+        <button @click="downloadCsv" :disabled="!report || !!exportingFormat" class="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-400 transition disabled:opacity-50">
+          {{ exportingFormat === 'csv' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadCsv') || 'Download CSV') }}
+        </button>
+        <button @click="downloadXlsx" :disabled="!report || !!exportingFormat" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition disabled:opacity-50">
+          {{ exportingFormat === 'xlsx' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadExcel') || 'Download Excel') }}
+        </button>
+        <button @click="downloadPdf" :disabled="!report || !!exportingFormat" class="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-500 transition disabled:opacity-50">
+          {{ exportingFormat === 'pdf' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadPdf') || 'Download PDF') }}
+        </button>
       </div>
     </div>
+    <p v-if="exportError" class="mb-4 text-sm text-red-600">{{ exportError }}</p>
 
     <div class="bg-white rounded shadow p-4 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -25,7 +34,7 @@
             <input type="number" v-model.number="values[p.name]" class="w-full border rounded px-3 py-2" />
           </div>
           <div v-else-if="p.type === 'DATE'">
-            <input type="date" v-model="values[p.name]" class="w-full border rounded px-3 py-2" />
+            <DateField v-model="values[p.name]" class="w-full border rounded px-3 py-2" />
           </div>
           <div v-else-if="p.type === 'BOOLEAN'">
             <input type="checkbox" v-model="values[p.name]" />
@@ -55,6 +64,18 @@
     </div>
 
     <div class="bg-white rounded shadow p-4">
+      <div v-if="effectiveImportantColumns.length" class="mb-4 rounded border border-amber-200 bg-amber-50 p-3">
+        <div class="text-sm font-medium text-amber-900">{{ $t('reports.importantColumns') || 'Totals columns' }}</div>
+        <div class="mt-2 flex flex-wrap gap-1">
+          <span
+            v-for="column in effectiveImportantColumns"
+            :key="`important-column-${column}`"
+            class="rounded-full bg-amber-200 px-2 py-1 text-xs font-medium text-amber-900"
+          >
+            {{ getHeaderLabel(column) }}
+          </span>
+        </div>
+      </div>
       <div v-if="executing" class="py-12 flex justify-center"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>
       <div v-else>
         <div class="overflow-x-auto">
@@ -68,8 +89,17 @@
               <tr v-if="!(tableData && tableData.length)">
                 <td :colspan="(columns && columns.length) || 1" class="px-4 py-6 text-sm text-gray-500 text-center">{{ $t('reports.noResults') || 'No results' }}</td>
               </tr>
-              <tr v-for="(row, idx) in tableData" :key="idx">
-                <td v-for="col in columns" :key="col" class="px-4 py-2 text-sm text-gray-700">
+              <tr
+                v-for="(row, idx) in tableData"
+                :key="idx"
+                :class="isTotalsRow(row) ? 'bg-amber-50 font-semibold' : ''"
+              >
+                <td
+                  v-for="col in columns"
+                  :key="col"
+                  class="px-4 py-2 text-sm"
+                  :class="isTotalsRow(row) ? 'border-t-2 border-amber-300 text-amber-950' : 'text-gray-700'"
+                >
                   <div class="truncate max-w-[20rem]">{{ getValue(row, col) }}</div>
                 </td>
               </tr>
@@ -86,10 +116,12 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportDef, executeReport, getReportParamOptions } from '@/api'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import * as XLSX from 'xlsx'
+import DateField from '@/components/shared/DateField.vue'
+import { isDynamicReportTotalsRow, normalizeImportantColumns, splitFooterRow } from '@/utils/reportDefinitions'
+import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
-  components: { SearchDropdown },
+  components: { SearchDropdown, DateField },
   props: { reportId: { type: [String, Number], required: true } },
   setup(props) {
     const { locale, t } = useI18n()
@@ -97,6 +129,8 @@ export default {
     const values = ref({})
     const result = ref(null)
     const executing = ref(false)
+    const exportingFormat = ref('')
+    const exportError = ref('')
 
     const paramOptions = ref({})
     const paramLoading = ref({})
@@ -116,15 +150,33 @@ export default {
       return deps
     })
 
-    const columns = computed(() => {
-      const table = (() => {
-        if (Array.isArray(result.value) && result.value.length) return result.value
-        if (result.value && Array.isArray(result.value.rows) && result.value.rows.length) return result.value.rows
-        if (result.value && Array.isArray(result.value.data) && result.value.data.length) return result.value.data
+    const reportImportantColumns = computed(() => normalizeImportantColumns(report.value || {}))
+    const resultImportantColumns = computed(() =>
+      Array.isArray(result.value?.importantColumns) ? result.value.importantColumns : []
+    )
+    const effectiveImportantColumns = computed(() =>
+      resultImportantColumns.value.length ? resultImportantColumns.value : reportImportantColumns.value
+    )
+
+    const normalizedResultRows = computed(() => {
+      const rawRows = (() => {
+        if (Array.isArray(result.value)) return result.value
+        if (result.value && Array.isArray(result.value.rows)) return result.value.rows
+        if (result.value && Array.isArray(result.value.data)) return result.value.data
         return []
       })()
+
+      const { dataRows, footerRow } = splitFooterRow(rawRows, isDynamicReportTotalsRow)
+      const standaloneFooter = isDynamicReportTotalsRow(result.value?.totalsRow) ? result.value.totalsRow : null
+      const effectiveFooter = footerRow || standaloneFooter
+
+      return effectiveFooter ? [...dataRows, effectiveFooter] : dataRows
+    })
+
+    const columns = computed(() => {
+      const table = normalizedResultRows.value
       if (!table || !table.length) return []
-      const first = table[0]
+      const first = table.find(row => !isTotalsRow(row)) || table[0]
       if (!first || typeof first !== 'object') return []
       // helper to read raw value for a column from an example row
       const rawValue = (row, col) => {
@@ -144,6 +196,7 @@ export default {
       // build initial candidate columns, skipping top-level *Id fields
       const baseCols = []
       Object.keys(first).forEach(k => {
+        if (String(k).startsWith('__')) return
         if (k.endsWith('Id')) return
         const v = first[k]
         if (v === null) baseCols.push(k)
@@ -219,11 +272,10 @@ export default {
     })
 
     const tableData = computed(() => {
-      if (Array.isArray(result.value) && result.value.length) return result.value
-      if (result.value && Array.isArray(result.value.rows) && result.value.rows.length) return result.value.rows
-      if (result.value && Array.isArray(result.value.data) && result.value.data.length) return result.value.data
-      return []
+      return normalizedResultRows.value
     })
+
+    const isTotalsRow = (row) => isDynamicReportTotalsRow(row)
 
     const getRawValue = (row, col) => {
       if (!row) return undefined
@@ -265,8 +317,27 @@ export default {
       return { Y, M, D}
     }
 
+    const totalsRowLabel = computed(() => t('reports.totalsLabel') || 'Totals')
+
+    const findTotalsRowLabel = (row) => {
+      if (!row || typeof row !== 'object') return totalsRowLabel.value
+      const labelPattern = /totals?/i
+      const labelEntry = Object.entries(row).find(([key, value]) => {
+        if (String(key).startsWith('__')) return false
+        return typeof value === 'string' && labelPattern.test(value)
+      })
+      return labelEntry?.[1] || totalsRowLabel.value
+    }
+
     const getValue = (row, col) => {
       if (!row) return ''
+      if (isTotalsRow(row)) {
+        const firstColumn = columns.value[0]
+        const rawTotalsValue = getRawValue(row, col)
+        const label = findTotalsRowLabel(row)
+        if (col === firstColumn) return label
+        if (typeof rawTotalsValue === 'string' && /totals?/i.test(rawTotalsValue)) return ''
+      }
       // attempt to read raw value
       const readRaw = (r, c) => {
         if (!r) return undefined
@@ -337,7 +408,10 @@ export default {
         const keepTime = /datetime|timestamp|time|at/.test(lastSegment)
         const iso = parseIsoUtcString(raw)
         if (iso) {
-          return keepTime ? `${iso.Y}/${iso.M}/${iso.D}` : `${iso.Y}/${iso.M}/${iso.D}`
+          const D = String(iso.D).padStart(2, '0')
+          const M = String(iso.M).padStart(2, '0')
+          const Y = iso.Y
+          return keepTime ? `${D}/${M}/${Y}` : `${D}/${M}/${Y}`
         }
         // fallback: return the raw string if not a strict UTC ISO
         return raw
@@ -401,6 +475,7 @@ export default {
             try { report.value.params = JSON.parse(report.value.params) } catch (e) { report.value.params = [] }
           }
           if (!Array.isArray(report.value.params)) report.value.params = []
+          report.value.importantColumns = normalizeImportantColumns(report.value)
 
           ;(report.value.params || []).forEach(p => {
             if (p.type === 'MULTISELECT') values.value[p.name] = p.default || []
@@ -413,105 +488,36 @@ export default {
       }
     }
 
-    function downloadExcel() {
-      try {
-        const rows = tableData.value || []
-        if (!rows.length) return
-        const cols = columns.value || []
-
-        const csvRows = []
-        // header row: use translated header labels where possible
-        csvRows.push(cols.map(c => '"' + String(getHeaderLabel(c)).replace(/"/g, '""') + '"').join(','))
-
-        rows.forEach(r => {
-          const vals = cols.map(c => {
-            const raw = getRawValue(r, c)
-            let v
-            if (raw === null || raw === undefined) v = ''
-            else if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(raw)) {
-              const last = String(c).split('.').pop().toLowerCase()
-              const keepTime = /datetime|timestamp|time|at/.test(last)
-              const iso = parseIsoUtcString(raw)
-              if (iso) {
-                v = keepTime ? `${iso.Y}/${iso.M}/${iso.D}` : `${iso.Y}/${iso.M}/${iso.D}`
-              } else {
-                v = raw
-              }
-            } else if (typeof raw === 'object') v = JSON.stringify(raw)
-            else v = String(raw)
-
-            v = v.replace(/"/g, '""')
-            return '"' + v + '"'
-          })
-          csvRows.push(vals.join(','))
-        })
-
-        const csvString = csvRows.join('\r\n')
-        // add BOM so Excel opens UTF-8 CSV correctly
-        const blob = new Blob(["\uFEFF", csvString], { type: 'text/csv;charset=utf-8;' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        const title = report.value && (locale.value === 'ar' ? (report.value.arTitle || report.value.title) : report.value.title) || 'report'
-        // keep unicode letters/numbers; replace spaces with underscores
-        const safe = String(title).replace(/[^^\p{L}\p{N}\- _.]/gu, '').replace(/\s+/g, '_') || 'report'
-        const dateStr = new Date().toISOString().slice(0, 10)
-        a.download = `${safe}_${dateStr}.csv`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
-      } catch (err) {
-        console.error('Download failed', err)
-      }
+    function buildExecutePayload() {
+      const params = {}
+      ;(report.value?.params || []).forEach(p => {
+        const val = values.value[p.name]
+        if (p.type === 'DROPDOWN') params[p.name] = val ? (val.id ?? val.value ?? val) : null
+        else if (p.type === 'MULTISELECT') params[p.name] = Array.isArray(val) ? val.map(it => it && (it.id ?? it.value ?? it)) : []
+        else if (p.type === 'NUMBER') params[p.name] = val !== null && val !== undefined && val !== '' ? Number(val) : null
+        else if (p.type === 'BOOLEAN') params[p.name] = Boolean(val)
+        else params[p.name] = val
+      })
+      return { params }
     }
 
-    function downloadXlsx() {
+    async function downloadReport(format) {
+      exportError.value = ''
+      exportingFormat.value = format
       try {
-        const rows = tableData.value || []
-        if (!rows.length) return
-        const cols = columns.value || []
-
-        const data = []
-        const header = cols.map(c => String(getHeaderLabel(c)))
-        data.push(header)
-
-        rows.forEach(r => {
-          const row = cols.map(c => {
-            const raw = getRawValue(r, c)
-            if (raw === null || raw === undefined) return ''
-            if (typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(raw)) {
-              const last = String(c).split('.').pop().toLowerCase()
-              const keepTime = /datetime|timestamp|time|at/.test(last)
-              const iso = parseIsoUtcString(raw)
-              if (iso) return keepTime ? `${iso.Y}/${iso.M}/${iso.D}` : `${iso.Y}/${iso.M}/${iso.D}`
-              return raw
-            }
-            if (typeof raw === 'object') return JSON.stringify(raw)
-            return raw
-          })
-          data.push(row)
+        const res = await executeReport(props.reportId, buildExecutePayload(), {
+          format,
+          responseType: 'blob'
         })
-
-        const ws = XLSX.utils.aoa_to_sheet(data)
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, 'Report')
-        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-        const blob = new Blob([wbout], { type: 'application/octet-stream' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        const title = report.value && (locale.value === 'ar' ? (report.value.arTitle || report.value.title) : report.value.title) || 'report'
-        // keep unicode letters/numbers; replace spaces with underscores
-        const safe = String(title).replace(/[^^\p{L}\p{N}\- _.]/gu, '').replace(/\s+/g, '_') || 'report'
-        const dateStr = new Date().toISOString().slice(0, 10)
-        a.download = `${safe}_${dateStr}.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
+        const fallbackName = `dynamic-report-${props.reportId}.${format}`
+        const filename = getFilenameFromHeaders(res.headers, fallbackName) || fallbackName
+        const mimeType = res.headers?.['content-type'] || res.headers?.['Content-Type'] || 'application/octet-stream'
+        downloadBlobData(res.data, filename, mimeType)
       } catch (err) {
-        console.error('XLSX download failed', err)
+        console.error(`Dynamic report ${format} export failed`, err)
+        exportError.value = err?.response?.data?.message || t('reports.downloadError') || 'Export failed'
+      } finally {
+        exportingFormat.value = ''
       }
     }
 
@@ -570,22 +576,18 @@ export default {
 
     function clear() {
       result.value = null
+      exportError.value = ''
       values.value = {}
+      ;(report.value?.params || []).forEach(p => {
+        values.value[p.name] = p.type === 'MULTISELECT' ? [] : (p.default ?? null)
+      })
     }
 
     async function execute() {
       try {
         executing.value = true
-        const params = {}
-        ;(report.value.params || []).forEach(p => {
-          const val = values.value[p.name]
-          if (p.type === 'DROPDOWN') params[p.name] = val ? (val.id ?? val.value ?? val) : null
-          else if (p.type === 'MULTISELECT') params[p.name] = Array.isArray(val) ? val.map(it => it && (it.id ?? it.value ?? it)) : []
-          else if (p.type === 'NUMBER') params[p.name] = val !== null && val !== undefined && val !== '' ? Number(val) : null
-          else if (p.type === 'BOOLEAN') params[p.name] = Boolean(val)
-          else params[p.name] = val
-        })
-        const res = await executeReport(props.reportId, { params })
+        exportError.value = ''
+        const res = await executeReport(props.reportId, buildExecutePayload())
         result.value = res.data
       } catch (err) {
         console.error('Execute failed', err)
@@ -593,9 +595,13 @@ export default {
       } finally { executing.value = false }
     }
 
+    const downloadCsv = () => downloadReport('csv')
+    const downloadXlsx = () => downloadReport('xlsx')
+    const downloadPdf = () => downloadReport('pdf')
+
     watch(() => props.reportId, load, { immediate: true })
 
-    return { report, values, execute, result, executing, paramOptions, paramDependencies, selectedLabels, onOptionSearch, onSelectOptionGeneric, clear, columns, locale, tableData, getValue, getHeaderLabel, downloadExcel, downloadXlsx }
+    return { report, values, execute, result, executing, exportingFormat, exportError, paramOptions, paramDependencies, selectedLabels, onOptionSearch, onSelectOptionGeneric, clear, columns, effectiveImportantColumns, isTotalsRow, locale, tableData, getValue, getHeaderLabel, downloadCsv, downloadXlsx, downloadPdf }
   }
 }
 </script>

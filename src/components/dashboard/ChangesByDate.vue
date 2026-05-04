@@ -13,9 +13,9 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">
             {{ $t('changes.selectDate') }}
           </label>
-          <input v-model="selectedDate" type="date"
+          <DateField v-model="selectedDate"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            @change="loadChanges" />
+            @update:modelValue="loadChanges" />
         </div>
         <button @click="loadChanges" :disabled="loading || !selectedDate"
           class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
@@ -134,16 +134,19 @@ import {
   getVehiclesChanges,
   getCompanyWalletTransactionsChanges
 } from '@/api'
+import DateField from '@/components/shared/DateField.vue'
+import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'ChangesByDate',
+  components: { DateField },
   setup() {
     const { locale } = useI18n()
     return { locale }
   },
   data() {
     return {
-      selectedDate: new Date().toISOString().split('T')[0],
+      selectedDate: getTodayISO(),
       loading: false,
       error: null,
       activeModule: null,

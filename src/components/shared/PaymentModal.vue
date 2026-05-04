@@ -9,7 +9,7 @@
         </div>
         <div>
           <label class="block text-sm text-gray-700">{{ $t('payments.date') }}</label>
-          <input v-model="form.date" type="datetime-local" class="w-full border rounded px-2 py-1" />
+          <DateTimeField v-model="form.date" class="w-full border rounded px-2 py-1" />
         </div>
         <div>
           <label class="block text-sm text-gray-700">{{ $t('payments.notes') }}</label>
@@ -29,8 +29,10 @@
 
 <script>
 import { createPayment } from '@/api'
+import DateTimeField from '@/components/shared/DateTimeField.vue'
 export default {
   name: 'PaymentModal',
+  components: { DateTimeField },
   props: {
     visible: { type: Boolean, default: false },
     parentType: { type: String, default: 'export' }, // 'export' or 'transport'

@@ -57,12 +57,34 @@
           <button @click="clearAll" class="px-2 py-1 border rounded">{{ $t('labels.clear') || 'Clear' }}</button>
         </div>
       </div>
+      <div class="mb-3 rounded border border-amber-200 bg-amber-50 p-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-sm font-medium text-amber-900">{{ $t('reports.importantColumns') || 'Totals columns' }}</div>
+            <div class="text-xs text-amber-800">
+              {{ $t('reports.importantColumnsHelp') || 'Choose summarizable numeric columns that should be totaled in the executed report.' }}
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="field in importantFields"
+              :key="`important-chip-${field.name}`"
+              class="rounded-full bg-amber-200 px-2 py-1 text-xs font-medium text-amber-900"
+            >
+              {{ displayLabel(field) }}
+            </span>
+            <span v-if="!importantFields.length" class="text-xs text-amber-800">
+              {{ $t('reports.noImportantColumns') || 'No totals columns selected.' }}
+            </span>
+          </div>
+        </div>
+      </div>
       <div v-if="errors.params" class="text-xs text-red-600 mb-2">{{ errors.params }}</div>
 
       <ul>
         <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="p-2 border-b flex items-start gap-3">
           <div class="flex items-center gap-2 w-48">
-            <input type="checkbox" v-model="f.included" />
+            <input type="checkbox" v-model="f.included" @change="onIncludedChange(f)" />
             <div class="text-sm">
               <div class="font-medium">{{ displayLabel(f) }}</div>
               <div class="text-xs text-gray-500">{{ f.dataType }}</div>
@@ -72,12 +94,16 @@
           <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
             <input v-model="f.label" placeholder="English label" class="w-full border rounded px-2 py-1" />
             <input v-model="f.arName" :placeholder="$t('reports.arLabelPlaceholder') || 'Arabic label (يظهر عند اختيار العربية)'" class="w-full border rounded px-2 py-1" />
-            <select v-model="f.paramType" class="w-full border rounded px-2 py-1">
+            <select v-model="f.paramType" @change="onParamTypeChange(f)" class="w-full border rounded px-2 py-1">
               <option v-for="t in paramTypes" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
 
           <div class="flex flex-col items-end gap-2">
+            <label v-if="showImportantToggle(f)" class="flex items-center gap-2 text-xs font-medium text-amber-700">
+              <input type="checkbox" v-model="f.important" :disabled="!f.included" />
+              <span>{{ $t('reports.totalThisColumn') || 'Total this column' }}</span>
+            </label>
             <button @click="moveUp(idx)" class="px-2 py-1 border rounded">↑</button>
             <button @click="moveDown(idx)" class="px-2 py-1 border rounded">↓</button>
           </div>
@@ -103,6 +129,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportTables, getTableFields, getReportModules, createReportFromTable, updateReportFromTable, getReportDef } from '@/api'
+import { normalizeImportantColumns } from '@/utils/reportDefinitions'
 
 export default {
   props: { reportId: { type: [String, Number], default: null } },
@@ -115,7 +142,7 @@ export default {
     const busy = ref(false)
     const isEdit = computed(() => !!props.reportId)
 
-    const form = ref({ key: '', title: '', arTitle: '', module: '', description: '' })
+    const form = ref({ key: '', title: '', arTitle: '', module: '', description: '', importantColumns: [] })
 
     const paramTypes = ['TEXT','NUMBER','DATE','DROPDOWN','MULTISELECT','BOOLEAN']
 
@@ -158,9 +185,11 @@ export default {
           name: c.name,
           dataType: c.dataType || c.type || '',
           included: false,
+          important: false,
           label: c.label || c.name,
           arName: c.arName || '',
           paramType: c.suggestedParamType || c.paramType || (c.dataType && String(c.dataType).toLowerCase().includes('date') ? 'DATE' : 'TEXT'),
+          summarizable: c.summarizable === true,
           _pos: idx+1
         }))
       } catch (err) { console.error('Failed to load fields', err) }
@@ -177,6 +206,7 @@ export default {
         form.value.arTitle = payload.arTitle || form.value.arTitle
         form.value.description = payload.description || form.value.description
         form.value.module = payload.module || form.value.module
+        form.value.importantColumns = normalizeImportantColumns(payload)
         const srcTable = payload.sourceTable || payload.tableName || payload.table || selectedTable.value
         selectedTable.value = srcTable || selectedTable.value
 
@@ -185,8 +215,25 @@ export default {
           tables.value.unshift({ tableName: selectedTable.value, label: selectedTable.value })
         }
 
-        // persisted params may be under different keys
-        const persisted = Array.isArray(payload.params) ? payload.params : (Array.isArray(payload.fields) ? payload.fields : (Array.isArray(payload.reportParameter) ? payload.reportParameter : []))
+        // persisted params may be under different keys or JSON strings
+        const parseArrayLike = (value) => {
+          if (Array.isArray(value)) return value
+          if (typeof value === 'string') {
+            try {
+              const parsed = JSON.parse(value)
+              return Array.isArray(parsed) ? parsed : []
+            } catch (error) {
+              return []
+            }
+          }
+          return []
+        }
+        const persisted = parseArrayLike(payload.params).length
+          ? parseArrayLike(payload.params)
+          : (parseArrayLike(payload.fields).length
+              ? parseArrayLike(payload.fields)
+              : parseArrayLike(payload.reportParameter))
+        const importantColumnSet = new Set(normalizeImportantColumns(payload))
 
         // fetch actual table columns and merge persisted params with table fields so new columns appear
         if (selectedTable.value) {
@@ -198,10 +245,12 @@ export default {
               return {
                 name: c.name,
                 dataType: c.dataType || c.type || '',
-                included: !!match,
+                included: !!match || importantColumnSet.has(String(c.name)),
+                important: importantColumnSet.has(String(c.name)) || match?.important === true,
                 label: match?.label || c.label || c.name,
                 arName: match?.arName || c.arName || '',
                 paramType: match?.type || match?.paramType || c.suggestedParamType || (c.dataType && String(c.dataType).toLowerCase().includes('date') ? 'DATE' : 'TEXT'),
+                summarizable: c.summarizable === true,
                 _pos: (typeof match?.position === 'number' ? match.position : idx+1)
               }
             })
@@ -210,13 +259,33 @@ export default {
           } catch (e) {
             // fallback: construct params from persisted only
             if (persisted.length) {
-              params.value = persisted.map((f, idx) => ({ name: f.name, dataType: f.dataType || '', included: true, label: f.label || f.name, arName: f.arName || '', paramType: f.type || f.paramType || 'TEXT', _pos: idx+1 }))
+              params.value = persisted.map((f, idx) => ({
+                name: f.name,
+                dataType: f.dataType || '',
+                included: true,
+                important: importantColumnSet.has(String(f.name)) || f.important === true,
+                label: f.label || f.name,
+                arName: f.arName || '',
+                paramType: f.type || f.paramType || 'TEXT',
+                summarizable: f.summarizable === true,
+                _pos: idx+1
+              }))
             }
           }
         } else {
           // no table known - fallback to persisted
           if (persisted.length) {
-            params.value = persisted.map((f, idx) => ({ name: f.name, dataType: f.dataType || '', included: true, label: f.label || f.name, arName: f.arName || '', paramType: f.type || f.paramType || 'TEXT', _pos: idx+1 }))
+            params.value = persisted.map((f, idx) => ({
+              name: f.name,
+              dataType: f.dataType || '',
+              included: true,
+              important: importantColumnSet.has(String(f.name)) || f.important === true,
+              label: f.label || f.name,
+              arName: f.arName || '',
+              paramType: f.type || f.paramType || 'TEXT',
+              summarizable: f.summarizable === true,
+              _pos: idx+1
+            }))
           }
         }
       } catch (err) {
@@ -225,7 +294,16 @@ export default {
     }
 
     function selectAll() { params.value.forEach(f => f.included = true) }
-    function clearAll() { params.value.forEach(f => f.included = false) }
+    function clearAll() { params.value.forEach(f => { f.included = false; f.important = false }) }
+    function onIncludedChange(field) {
+      if (!field?.included) field.important = false
+    }
+    function showImportantToggle(field) {
+      return field?.summarizable === true && field?.paramType === 'NUMBER'
+    }
+    function onParamTypeChange(field) {
+      if (!showImportantToggle(field)) field.important = false
+    }
 
     function onDragStart(e, i) {
       dragIndex.value = i
@@ -262,6 +340,8 @@ export default {
     }
 
     const selectedFields = computed(() => params.value.filter(f => f.included))
+    const importantFields = computed(() => selectedFields.value.filter(f => f.important && showImportantToggle(f)))
+    const importantColumns = computed(() => importantFields.value.map(f => f.name))
 
     const sqlPreview = computed(() => {
       if (!selectedTable.value) return ''
@@ -275,7 +355,7 @@ export default {
       return `SELECT ${cols} FROM "${selectedTable.value}"${where ? ' WHERE ' + where : ''}`
     })
 
-    const paramsPreview = computed(() => selectedFields.value.map(f => ({ name: f.name, type: f.paramType, label: f.label, arName: f.arName })))
+    const paramsPreview = computed(() => selectedFields.value.map(f => ({ name: f.name, type: f.paramType, label: f.label, arName: f.arName, important: !!f.important })))
 
     const errors = ref({ key: '', title: '', params: '' })
     function validate() {
@@ -305,7 +385,14 @@ export default {
         description: form.value.description,
         module: form.value.module,
         tableName: selectedTable.value,
-        params: selectedFields.value.map(f => ({ name: f.name, paramType: f.paramType, label: f.label, arName: f.arName }))
+        importantColumns: importantColumns.value,
+        params: selectedFields.value.map(f => ({
+          name: f.name,
+          paramType: f.paramType,
+          label: f.label,
+          arName: f.arName,
+          important: f.summarizable ? !!f.important : false
+        }))
       }
       busy.value = true
       try {
@@ -327,7 +414,7 @@ export default {
 
     onMounted(() => { loadTables(); loadModules(); loadExistingReport() })
 
-    return { tables, modules, selectedTable, params, form, paramTypes, onTableChange, selectAll, clearAll, moveUp, moveDown, displayLabel, sqlPreview, paramsPreview, generate, busy, isEdit, t, locale, errors, onDragStart, onDragOver, onDrop }
+    return { tables, modules, selectedTable, params, form, paramTypes, onTableChange, selectAll, clearAll, moveUp, moveDown, displayLabel, sqlPreview, paramsPreview, generate, busy, isEdit, t, locale, errors, importantFields, onIncludedChange, onParamTypeChange, showImportantToggle, onDragStart, onDragOver, onDrop }
   }
 }
 </script>

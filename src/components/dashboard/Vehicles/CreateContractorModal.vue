@@ -163,6 +163,8 @@ export default {
           payload.availableForTransports = true
         } else if (this.mode === 'equipment') {
           payload.availableForEquipmentRental = true
+        } else if (this.mode === 'extract') {
+          payload.availableForExtracts = true
         }
         
         const response = await createContractor(payload)

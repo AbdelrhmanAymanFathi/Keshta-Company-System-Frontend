@@ -59,7 +59,14 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 				}
 				console.log('[equipmentLogsStore] fetchRentals params:', params)
 				const response = await getEquipmentLogs(params)
-				const items = response.data.items || []
+				const payload = response?.data || {}
+				const items = Array.isArray(payload.items)
+					? payload.items
+					: Array.isArray(payload.data)
+						? payload.data
+						: Array.isArray(payload)
+							? payload
+							: []
 				this.items = items.filter(item => {
 					if (!item) return false
 					const keys = Object.keys(item)
@@ -76,9 +83,10 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 					}
 					return true
 				})
-				this.total = Array.isArray(response.data.items) ? this.items.length : response.data.total || 0
-				this.pageSize = response.data.pageSize || this.pageSize
-				return response.data
+				const meta = payload.meta || {}
+				this.total = meta.total ?? payload.total ?? this.items.length
+				this.pageSize = meta.pageSize ?? payload.pageSize ?? this.pageSize
+				return payload
 			} catch (error) {
 				console.error('Error fetching equipment logs:', error)
 				this.error = error.response?.data?.message || 'Failed to fetch equipment logs'

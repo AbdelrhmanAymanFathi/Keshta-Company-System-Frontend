@@ -11,8 +11,8 @@
 
     <div class="bg-white rounded-lg p-4 border">
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <input v-model="filters.from" type="date" class="border rounded px-3 py-2 text-sm" />
-        <input v-model="filters.to" type="date" class="border rounded px-3 py-2 text-sm" />
+        <DateField v-model="filters.from" class="border rounded px-3 py-2 text-sm" />
+        <DateField v-model="filters.to" class="border rounded px-3 py-2 text-sm" />
         <select v-model="filters.equipmentId" class="border rounded px-3 py-2 text-sm">
           <option value="">{{ $t('equipmentLog.allEquipments') }}</option>
           <option v-for="e in equipments" :key="e.id" :value="e.id">{{ e.name }}</option>
@@ -65,9 +65,11 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { getEquipmentLogsReportData, getEquipments, getBranches } from '@/api'
+import DateField from '@/components/shared/DateField.vue'
 
 export default {
   name: 'EquipmentLogReport',
+  components: { DateField },
   setup() {
     const filters = ref({ from: '', to: '', equipmentId: '', companyId: '' })
     const loading = ref(false)

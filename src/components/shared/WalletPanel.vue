@@ -89,7 +89,7 @@
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('labels.date') }}</div>
-            <input v-model="withdrawal.date" type="datetime-local" class="w-full px-3 py-2 border rounded" />
+            <DateTimeField v-model="withdrawal.date" class="w-full px-3 py-2 border rounded" />
           </label>
           <div v-if="withdrawalError" class="text-red-600">{{ withdrawalError }}</div>
         </div>
@@ -118,7 +118,7 @@
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('labels.date') }}</div>
-            <input v-model="deposit.date" type="datetime-local" class="w-full px-3 py-2 border rounded" />
+            <DateTimeField v-model="deposit.date" class="w-full px-3 py-2 border rounded" />
           </label>
         </div>
         <div class="mt-4 flex justify-end gap-2">
@@ -133,10 +133,12 @@
 <script>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import DateTimeField from '@/components/shared/DateTimeField.vue'
 import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions, getContractorAccounts } from '@/api'
 
 export default {
   name: 'WalletPanel',
+  components: { DateTimeField },
   props: { contractorId: { type: [String, Number], required: true }, showFor: { type: [String, Array], default: null } },
   setup(props) {
     const { locale, t } = useI18n()

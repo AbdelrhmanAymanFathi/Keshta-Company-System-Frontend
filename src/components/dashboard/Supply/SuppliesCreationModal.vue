@@ -40,8 +40,7 @@
                   <div class="relative">
                     <CalendarDaysIcon
                       class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    <input type="date" v-model="commonData.date"
-                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                    <DateField v-model="commonData.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
                   </div>
                 </div>
 
@@ -188,6 +187,17 @@
                     </div>
                   </div>
                 </div>
+
+                <div class="col-span-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    {{ $t('labels.notes') }}
+                  </label>
+                  <textarea
+                    v-model="commonData.notes"
+                    rows="3"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                  ></textarea>
+                </div>
               </div>
             </div>
 
@@ -248,6 +258,10 @@
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
+                </div>
+                <div class="flex flex-col col-span-full">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.notes') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ commonData.notes || '-' }}</dd>
                 </div>
               </dl>
             </div>
@@ -575,6 +589,8 @@ import {
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
 import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'
+import normalizeItem from '@/utils/normalizeItem'
+import DateField from '@/components/shared/DateField.vue'
 
 export default {
   emits: ['saved'],
@@ -595,6 +611,7 @@ export default {
     SearchDropdown
     , CreateVehicle
     , TransportCreationModal
+    , DateField
   },
   props: {
     showTriggerButton: {
@@ -623,7 +640,8 @@ export default {
         site: null,
         area: null,
         contractor: null,
-        crusher: null
+        crusher: null,
+        notes: ''
       },
 
       // Modal state
@@ -946,6 +964,7 @@ export default {
           }
 
           this.commonData.price = data.price || 0
+          this.commonData.notes = data.notes || ''
           console.log('📦 Final commonData:', this.commonData)
         }
       } catch (err) {
@@ -962,7 +981,8 @@ export default {
           contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
           crusher: this.commonData.crusher ? { id: this.commonData.crusher.id, name: this.commonData.crusher.name } : null,
           item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
-          price: this.commonData.price
+          price: this.commonData.price,
+          notes: this.commonData.notes
         }
         localStorage.setItem('suppliesCreationModalCommonData', JSON.stringify(data))
       } catch (err) {
@@ -1328,9 +1348,10 @@ export default {
     // ============ Lookups Management ============
     async loadExportItems() {
       try {
-        const res = await getExportItems()
-        this.exportItems = Array.isArray(res.data) ? res.data : []
-        console.log('✅ Export items loaded:', this.exportItems)
+        const res = await getExportItems({ mode: 'supply' })
+        const raw = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.data || [])
+        this.exportItems = raw.map(normalizeItem)
+        console.log('✅ Export items loaded (normalized):', this.exportItems)
       } catch (err) {
         console.warn('Failed to load export items', err)
       }
@@ -1339,9 +1360,9 @@ export default {
     async loadLookups() {
       try {
         const [cRes, cvRes, crushRes, vRes] = await Promise.all([
-          getContractors({ mode: 'export' }),
+          getContractors({ mode: 'supply' }),
           typeof getContractorsWithVehicles === 'function'
-            ? getContractorsWithVehicles({ mode: 'export' })
+            ? getContractorsWithVehicles({ mode: 'supply' })
             : Promise.resolve(null),
           getCrushers(),
           getVehicles()
@@ -1584,7 +1605,7 @@ export default {
 
         // Reset
         this.currentStep = 1
-        this.commonData = { date: '', item: null, price: 0, site: null, area: null, contractor: null, crusher: null }
+        this.commonData = { date: '', item: null, price: 0, site: null, area: null, contractor: null, crusher: null, notes: '' }
         this.rows = []
 
         this.closeModal()

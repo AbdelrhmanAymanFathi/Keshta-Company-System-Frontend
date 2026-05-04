@@ -294,7 +294,7 @@
                 </label>
                 <label>
                   <div class="text-sm mb-1">{{ $t('labels.date') || 'Date' }}</div>
-                  <input v-model="depositForm.date" type="date" class="w-full px-3 py-2 border rounded" />
+                  <DateField v-model="depositForm.date" class="w-full px-3 py-2 border rounded" />
                 </label>
                 <label>
                   <div class="text-sm mb-1">{{ $t('labels.description') || 'Description' }}</div>
@@ -429,7 +429,8 @@ export default {
     },
     openEdit(c) {
       this.editing = true
-      const { openingBalance, ...rest } = c || {}
+      const rest = { ...(c || {}) }
+      delete rest.openingBalance
       this.form = { ...rest }
       this.modalOpen = true
     },

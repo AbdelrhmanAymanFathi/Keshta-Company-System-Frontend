@@ -6,7 +6,7 @@
 
       <div class="flex justify-center gap-3">
         <button @click="retry" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">{{ $t('labels.retry') || 'Retry' }}</button>
-        <a :href="staticPage" target="_blank" rel="noopener" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Open static page</a>
+        <a :href="staticPageHref" target="_blank" rel="noopener" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Open static page</a>
         <button @click="dismiss" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Close</button>
       </div>
     </div>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 
 export default {
   name: 'ErrorOverlay',
@@ -53,7 +53,9 @@ export default {
       visible.value = false
     }
 
-    return { visible, code, message, retry, dismiss }
+    const staticPageHref = computed(() => props.staticPage)
+
+    return { visible, code, message, retry, dismiss, staticPageHref }
   }
 }
 </script>

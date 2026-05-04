@@ -194,7 +194,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', companyWallet: 'companyWallet', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', companyWallet: 'companyWallet', admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
@@ -230,6 +230,13 @@ export default {
           { name: 'companyTransactions', label: 'transactions', routeName: 'company-transactions' },
           { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
           { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
+        ],
+        extracts: [
+          { name: 'extractsList', label: 'extracts.title', routeName: 'extracts-list' },
+          { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'extracts-contractors-list' },
+          { name: 'extractItems', label: 'dashboard.extractItems', routeName: 'extracts-items' },
+          { name: 'contractorStatement', label: 'dashboard.contractorStatement', routeName: 'contractor-extract-statement' },
+          
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -292,16 +299,8 @@ export default {
     },
     reportsForModule() {
       if (!this.reports || !this.selectedTop) return []
-      const sel = String(this.selectedTop || '').toLowerCase().replace(/[^a-z0-9]/g, '')
-      return this.reports.filter(r => {
-        const m = String(r.module || '').toLowerCase()
-        if (!m) return false
-        const norm = m.replace(/[^a-z0-9]/g, '')
-        if (norm === sel) return true
-        if (norm.includes(sel)) return true
-        if (sel.includes(norm)) return true
-        return false
-      })
+      const selectedModule = this.normalizeDashboardModule(this.selectedTop)
+      return this.reports.filter((r) => this.normalizeDashboardModule(r?.module) === selectedModule)
     },
     currentRouteName() { return this.$route.name || '' },
     currentItem() {
@@ -324,11 +323,7 @@ export default {
         if (reportId && this.reports && this.reports.length) {
           const report = this.reports.find(r => r.id == reportId || r.id === String(reportId))
           if (report && report.module) {
-            const mod = String(report.module).toLowerCase()
-            if (mod.includes('supplies')) return 'supplies'
-            if (mod.includes('transport')) return 'transport'
-            if (mod.includes('equipment') || mod.includes('rent')) return 'equipmentLog'
-            if (mod.includes('wallet') || mod.includes('expense')) return 'companyWallet'
+            return this.normalizeDashboardModule(report.module) || 'admin'
           }
         }
       }
@@ -341,6 +336,9 @@ export default {
         // Accept various legacy and new identifiers for equipment/rentals
         if (f === 'equipment' || f === 'equipmentlogs' || f === 'equipmentlog') return 'equipmentLog'
       }
+      // Extracts module routes
+      const extractsRoutes = ['extracts-list', 'create-extract', 'extracts-detail', 'extracts-items', 'extracts-contractors-list', 'contractor-extract-statement']
+      if (extractsRoutes.includes(routeName)) return 'extracts'
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
@@ -362,6 +360,36 @@ export default {
     }
   },
   methods: {
+    normalizeDashboardModule(moduleName) {
+      const norm = String(moduleName || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+      if (!norm) return ''
+      if (['supplies', 'supply', 'exports', 'export'].includes(norm)) return 'supplies'
+      if (['transport', 'transports'].includes(norm)) return 'transport'
+      if ([
+        'equipment',
+        'equipmentlog',
+        'equipmentlogs',
+        'rent',
+        'rents',
+        'rental',
+        'rentals',
+        'equipmentrental',
+        'equipmentrentals'
+      ].includes(norm)) return 'equipmentLog'
+      if ([
+        'companywallet',
+        'wallet',
+        'companyfinance',
+        'finance',
+        'expenses',
+        'expense',
+        'transactions',
+        'companytransactions'
+      ].includes(norm)) return 'companyWallet'
+      if (['extract', 'extracts'].includes(norm)) return 'extracts'
+      if (['admin', 'administration'].includes(norm)) return 'admin'
+      return norm
+    },
     selectTop(key) {
       const first = this.menuMap[key]?.[0]
       if (first) {
@@ -387,11 +415,13 @@ export default {
       this.router.push({ name: 'equipment-report' })
     },
     navigateToStatement(contractorId) {
-      this.router.push({ 
-        name: 'contractor-supply-statement',
-        params: { id: contractorId },
-        // query: { transaction_type: 'EXPORT' }
-      })
+      let routeName = 'contractor-supply-statement'
+      const top = this.selectedTop
+      if (top === 'transport') routeName = 'contractor-transport-statement'
+      else if (top === 'equipmentLog') routeName = 'equipment-contractor-statement'
+      else if (top === 'extracts') routeName = 'contractor-extract-statement'
+
+      this.router.push({ name: routeName, params: { id: contractorId } })
       if (contractorId) localStorage.setItem('contractor-statement-id', contractorId.toString())
       if (this.isMobile) this.sidebarOpen = false
     },
@@ -421,6 +451,8 @@ export default {
         equipmentLogList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
         companyWallet: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
         changesByDate: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`,
+        extractsList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10v10H7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6M9 14h6"/></svg>`,
+        extractItems: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4v10l-9 4L3 17V7z"/></svg>`,
         usersList: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>`,
         default: `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8m-4-4h8" stroke-width="2"/></svg>`
       }
@@ -437,7 +469,11 @@ export default {
     async loadReports() {
       try {
         const res = await getReportDefs()
-        this.reports = res?.data || []
+        const payload = res?.data
+        if (Array.isArray(payload)) this.reports = payload
+        else if (Array.isArray(payload?.items)) this.reports = payload.items
+        else if (Array.isArray(payload?.data)) this.reports = payload.data
+        else this.reports = []
       } catch (err) {
         console.error('Failed to load reports', err)
         this.reports = []

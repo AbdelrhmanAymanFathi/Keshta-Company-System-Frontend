@@ -13,14 +13,14 @@
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-          <input v-model="filters.startDate" type="date"
+          <DateField v-model="filters.startDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-          <input v-model="filters.endDate" type="date"
+          <DateField v-model="filters.endDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
@@ -164,8 +164,9 @@
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.total') }}</th>
 
-            
-            <!-- <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.notes') }}</th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.actions') }}</th>
@@ -189,6 +190,9 @@
             <td class="px-6 py-3 min-w-[160px] text-start text-sm font-semibold text-indigo-900 whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">
+              <div class="max-w-xs truncate">{{ supply.notes || '-' }}</div>
+            </td>
 
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               <button @click.stop="openDeleteConfirm(supply)" :title="$t('labels.delete')" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
@@ -197,7 +201,7 @@
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="16">
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="17">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
@@ -264,7 +268,7 @@
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('labels.date') }}</div>
-            <input v-model="form.date" type="date" class="w-full px-3 py-2 border rounded" />
+            <DateField v-model="form.date" class="w-full px-3 py-2 border rounded" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('labels.contractor') }}</div>
@@ -273,6 +277,10 @@
           <label>
             <div class="text-sm mb-1">{{ $t('labels.total') }}</div>
             <input v-model.number="form.grandTotal" type="number" class="w-full px-3 py-2 border rounded" />
+          </label>
+          <label class="col-span-2">
+            <div class="text-sm mb-1">{{ $t('labels.notes') }}</div>
+            <textarea v-model="form.notes" rows="3" class="w-full px-3 py-2 border rounded"></textarea>
           </label>
         </div>
         <div class="mt-4 flex gap-2 justify-end">
@@ -287,9 +295,11 @@
 
 <script>
 import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles } from '../../../api'
+import normalizeItem from '@/utils/normalizeItem'
 import TableModal from './SuppliesCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
+import DateField from '@/components/shared/DateField.vue'
 // import PaymentModal from '../../shared/PaymentModal.vue'
 // import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
@@ -302,7 +312,8 @@ export default {
     TableModal,
     Pagination,
     SearchDropdown,
-    TrashIcon
+    TrashIcon,
+    DateField
     // PaymentModal,
     // SupplyDetailModal
   },
@@ -416,7 +427,7 @@ export default {
      */
     async loadFilterData() {
       try {
-        const contractorsRes = await getContractors({ pageSize: 1000 })
+        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'supply' })
         const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
         this.contractors = Array.isArray(contractorsData) ? contractorsData : []
 
@@ -428,9 +439,9 @@ export default {
         const crushersData = crushersRes.data?.data || crushersRes.data || []
         this.crushers = Array.isArray(crushersData) ? crushersData : []
 
-        const itemsRes = await getExportItems()
-        const itemsData = itemsRes.data?.data || itemsRes.data || []
-        this.items = Array.isArray(itemsData) ? itemsData : []
+        const itemsRes = await getExportItems({ mode: 'supply' })
+        const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
+        this.items = Array.isArray(itemsData) ? itemsData.map(normalizeItem) : []
 
         const vehiclesRes = await getVehicles({ pageSize: 1000 })
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
@@ -519,6 +530,8 @@ export default {
             console.log('🔄 New first item ID:', newItems[0]?.id)
           }
 
+          // Normalize nested `item` objects so templates can rely on canonical fields
+          newItems.forEach(s => { if (s && s.item) s.item = normalizeItem(s.item) })
           // In Vue 3, directly assign the array
           this.supplies = newItems
 

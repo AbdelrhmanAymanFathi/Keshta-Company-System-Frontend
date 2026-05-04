@@ -292,17 +292,76 @@ export const changePassword = (data = {}) =>
   axios.post(`${BASE_URL}/api/auth/password/change`, data);
 
 // Contractors
+function normalizeContractorMode(mode = '') {
+  const value = String(mode || '').trim().toLowerCase();
+  if (!value) return '';
+  if (['supply', 'supplies'].includes(value)) return 'supply';
+  if (['extract', 'extracts'].includes(value)) return 'extracts';
+  if (['transport', 'transports'].includes(value)) return 'transport';
+  if (['equipment', 'equipmentlog', 'equipmentlogs', 'rental', 'rentals'].includes(value)) return 'equipmentLogs';
+  return value;
+}
+
+function shouldIncludeContractorForMode(contractor, mode = '') {
+  const normalizedMode = normalizeContractorMode(mode);
+  if (!normalizedMode) return true;
+
+  if (normalizedMode === 'supply') {
+    return contractor?.availableForSupplies === true || contractor?.availableForExports === true;
+  }
+  if (normalizedMode === 'extracts') {
+    return contractor?.availableForExtracts === true || contractor?.availableForExports === true;
+  }
+  if (normalizedMode === 'transport') {
+    return contractor?.availableForTransports === true;
+  }
+  if (normalizedMode === 'equipmentLogs') {
+    return contractor?.availableForRentals === true || contractor?.availableForEquipmentRental === true;
+  }
+
+  return true;
+}
+
+function filterContractorsPayload(payload, mode = '') {
+  const normalizedMode = normalizeContractorMode(mode);
+  if (!normalizedMode) return payload;
+
+  if (Array.isArray(payload)) {
+    return payload.filter(contractor => shouldIncludeContractorForMode(contractor, normalizedMode));
+  }
+
+  if (payload && Array.isArray(payload.items)) {
+    return {
+      ...payload,
+      items: payload.items.filter(contractor => shouldIncludeContractorForMode(contractor, normalizedMode))
+    };
+  }
+
+  if (payload && Array.isArray(payload.data)) {
+    return {
+      ...payload,
+      data: payload.data.filter(contractor => shouldIncludeContractorForMode(contractor, normalizedMode))
+    };
+  }
+
+  return payload;
+}
+
 export const getContractors = (params = {}) => {
   const { page = 1, pageSize = 20, q = '', mode = '' } = params;
+  const normalizedMode = normalizeContractorMode(mode);
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString(),
-    mode: mode
+    mode: normalizedMode
   });
   if (q) {
     queryParams.append('q', q);
   }
-  return axios.get(`${BASE_URL}/api/contractors?${queryParams.toString()}`);
+  return axios.get(`${BASE_URL}/api/contractors?${queryParams.toString()}`).then(res => {
+    res.data = filterContractorsPayload(res.data, normalizedMode);
+    return res;
+  });
 };
 export const createContractor = (data) =>
   axios.post(`${BASE_URL}/api/contractors`, data).then(res => {
@@ -504,38 +563,31 @@ export const withdrawFromContractorWallet = async (contractorId, data) => {
 export const getContractorReportData = async (contractorId, params = {}, format = 'json', mode = null) => {
   const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
   let axiosParams = { ...params };
-  
-  // Set format
-  if (format === 'json') {
-    axiosParams.format = 'json';
-  } else if (format === 'xlsx') {
-    axiosParams.format = 'xlsx';
-  } else if (format === 'csv') {
-    axiosParams.format = 'csv';
-  }
-  
+
   // Add transaction_type if provided (either from params or as separate parameter)
   if (mode) {
     axiosParams.mode = mode;
   } else if (params.mode) {
     axiosParams.mode = params.mode;
   }
-  
-  // Make request based on format
+
+  // Normalize format param and request accordingly
   if (format === 'json') {
-    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
-  } else if (format === 'xlsx') {
-    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
-  } else if (format === 'csv') {
-    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
-  } else {
-    // fallback: just get json
+    axiosParams.format = 'json';
     const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
     return { data: resp.data, headers: resp.headers };
   }
+
+  // Binary formats (xlsx, csv, pdf) -> request as arraybuffer
+  if (format === 'xlsx' || format === 'csv' || format === 'pdf') {
+    axiosParams.format = format;
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // fallback to JSON
+  const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+  return { data: resp.data, headers: resp.headers };
 };
 
 export const downloadContractorReport = async (contractorId, params = {}, format = 'xlsx') => {
@@ -574,13 +626,19 @@ export const getReportParamOptions = (id, paramName, paramsObj = {}) => {
   return axios.get(`${BASE_URL}/api/report-defs/${id}/params/options?param=${encodeURIComponent(paramName)}${qs.toString() ? `&${qs.toString()}` : ''}`)
 }
 
-export const executeReport = (id, body) => axios.post(`${BASE_URL}/api/report-defs/${id}/execute`, body)
+export const executeReport = (id, body, options = {}) => {
+  const { format, ...axiosConfig } = options || {}
+  const query = new URLSearchParams()
+  if (format) query.append('format', format)
+  const suffix = query.toString() ? `?${query.toString()}` : ''
+  return axios.post(`${BASE_URL}/api/report-defs/${id}/execute${suffix}`, body, axiosConfig)
+}
 
 // --- Helpers for creating reports from database tables ---
 export const getReportTables = () => axios.get(`${BASE_URL}/api/report-defs/tables`)
 export const getTableFields = (tableName) => axios.get(`${BASE_URL}/api/report-defs/tables/${encodeURIComponent(tableName)}/fields`)
 export const createReportFromTable = (data) => axios.post(`${BASE_URL}/api/report-defs/generate`, data)
-export const updateReportFromTable = (id, data) => axios.put(`${BASE_URL}/api/report-defs/${id}/`, data)
+export const updateReportFromTable = (id, data) => axios.put(`${BASE_URL}/api/report-defs/generate/${id}`, data)
 
 // === TOTP (2FA) ===
 export const startTotpRegister = (data = {}) =>
@@ -718,12 +776,20 @@ export const getVehicleOwnershipHistory = (vehicleId) =>
   axios.get(`${BASE_URL}/api/vehicles/${vehicleId}/ownership-history`);
 
 // Contractors with vehicles
-export const getContractorsWithVehicles = (onlyWithVehicles = true) => {
+export const getContractorsWithVehicles = (options = true) => {
+  const opts = typeof options === 'boolean' ? { onlyWithVehicles: options } : (options || {});
+  const normalizedMode = normalizeContractorMode(opts.mode);
   const params = new URLSearchParams();
-  if (onlyWithVehicles) {
+  if (opts.onlyWithVehicles !== false) {
     params.append('onlyWithVehicles', 'true');
   }
-  return axios.get(`${BASE_URL}/api/contractors/with-vehicles?${params.toString()}`);
+  if (normalizedMode) {
+    params.append('mode', normalizedMode);
+  }
+  return axios.get(`${BASE_URL}/api/contractors/with-vehicles?${params.toString()}`).then(res => {
+    res.data = filterContractorsPayload(res.data, normalizedMode);
+    return res;
+  });
 };
 
 // --- Drivers ---
@@ -814,23 +880,26 @@ export const deleteDelivery = (id) =>
 export const getSuppliesReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/supplies/report`;
   let axiosParams = { ...params };
+
   if (format === 'json') {
     axiosParams.format = 'json';
     const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
     return { data: resp.data, headers: resp.headers };
-  } else if (format === 'xlsx') {
-    axiosParams.format = 'xlsx';
+  }
+
+  if (format === 'xlsx' || format === 'csv' || format === 'pdf') {
+    axiosParams.format = format;
     const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
     return { data: resp.data, headers: resp.headers };
-  } else {
-    // fallback: just get json
-    const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
   }
+
+  // fallback: json
+  const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+  return { data: resp.data, headers: resp.headers };
 };
 
-export const downloadSuppliesReport = async (params = {}) => {
-  return getSuppliesReportData(params, 'xlsx');
+export const downloadSuppliesReport = async (params = {}, format = 'xlsx') => {
+  return getSuppliesReportData(params, format);
 };
 
 // Deprecated: use getSuppliesReportData instead
@@ -896,6 +965,50 @@ export const updateTransport = (id, data) => {
 }
 export const deleteTransport = (id) =>
   axios.delete(`${BASE_URL}/api/transports/${id}`);
+
+// Extracts
+export const createExtract = (data) =>
+  axios.post(`${BASE_URL}/api/extracts`, data);
+
+export const getExtract = (id) =>
+  axios.get(`${BASE_URL}/api/extracts/${id}`);
+
+export const getExtractsForContractor = (contractorId, start, end) => {
+  const params = {};
+  if (start) params.startDate = start;
+  if (end) params.endDate = end;
+  return axios.get(`${BASE_URL}/api/extracts/contractor/${contractorId}`, { params });
+};
+
+export const getExtracts = (params = {}) => {
+  const {
+    page = 1,
+    pageSize = 20,
+    q = '',
+    startDate = '',
+    endDate = '',
+    contractorId = '',
+    locationId = '',
+    crusherId = '',
+    itemId = '',
+    vehicleId = ''
+  } = params;
+
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  if (q) queryParams.append('q', q);
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (contractorId) queryParams.append('contractorId', contractorId.toString());
+  if (locationId) queryParams.append('locationId', locationId.toString());
+  if (crusherId) queryParams.append('crusherId', crusherId.toString());
+  if (itemId) queryParams.append('itemId', itemId.toString());
+  if (vehicleId) queryParams.append('vehicleId', vehicleId.toString());
+
+  return axios.get(`${BASE_URL}/api/extracts?${queryParams.toString()}`);
+};
 
 // Equipment Logs (migrated from Rentals)
 // NOTE: Rental resources were migrated to the equipment-logs API.
@@ -973,7 +1086,7 @@ export const getEquipmentLogs = (params = {}) => {
   return axios.get(url)
 }
 
-// Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, note, isRental })
+// Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, notes, isRental })
 export const createEquipmentLog = (data) =>
   axios.post(`${BASE_URL}/api/equipment-logs`, data)
 
@@ -997,19 +1110,25 @@ export const getEquipmentLogsSummary = (params = {}) => {
 export const getEquipmentLogsReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/equipment-logs/report`;
   let axiosParams = { ...params };
-  if (format === 'xlsx') {
-    axiosParams.format = 'xlsx';
-    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
-  } else {
+  if (format === 'json') {
     axiosParams.format = 'json';
     const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
     return { data: resp.data, headers: resp.headers };
   }
+
+  if (format === 'xlsx' || format === 'csv' || format === 'pdf') {
+    axiosParams.format = format;
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // fallback
+  const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+  return { data: resp.data, headers: resp.headers };
 };
 
-export const downloadEquipmentLogsReport = async (params = {}) => {
-  return getEquipmentLogsReportData(params, 'xlsx');
+export const downloadEquipmentLogsReport = async (params = {}, format = 'xlsx') => {
+  return getEquipmentLogsReportData(params, format);
 };
 
 // Company Wallet & Finance
@@ -1134,25 +1253,34 @@ export const updateExpense = (id, data) =>
   axios.patch(`${BASE_URL}/api/expenses/${id}`, data);
 export const deleteExpense = (id) =>
   axios.delete(`${BASE_URL}/api/expenses/${id}`);
-export const getExpensesReport = (params = {}) => {
-  const search = new URLSearchParams(params).toString();
+export const getExpensesReport = (params = {}, format = 'xlsx') => {
+  const axiosParams = { ...params };
+  if (format) axiosParams.format = format;
+  const search = new URLSearchParams(axiosParams).toString();
   const url = `${BASE_URL}/api/expenses/report${search ? `?${search}` : ''}`;
-  return axios.get(url, { responseType: 'blob' });
+  return axios.get(url, { responseType: 'blob', withCredentials: true });
 };
 
 // Expenses Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getExpensesReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/expenses/report`;
   let axiosParams = { ...params };
-  if (format === 'xlsx') {
-    axiosParams.format = 'xlsx';
-    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
-    return { data: resp.data, headers: resp.headers };
-  } else {
+
+  if (format === 'json') {
     axiosParams.format = 'json';
     const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
     return { data: resp.data, headers: resp.headers };
   }
+
+  if (format === 'xlsx' || format === 'csv' || format === 'pdf') {
+    axiosParams.format = format;
+    const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
+    return { data: resp.data, headers: resp.headers };
+  }
+
+  // fallback: json
+  const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
+  return { data: resp.data, headers: resp.headers };
 
   // If HEAD indicated an Excel/zip/binary, fetch as arraybuffer and parse
   // if (contentType && (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') || contentType.includes('application/zip') || contentType.includes('application/octet-stream') || contentType.includes('application/vnd.ms-excel'))) {
@@ -1212,8 +1340,8 @@ export const getExpensesSummary = async (params = {}) => {
   return resp.data;
 };
 
-export const downloadExpensesReport = async (params = {}) => {
-  return getExpensesReportData(params, 'xlsx');
+export const downloadExpensesReport = async (params = {}, format = 'xlsx') => {
+  return getExpensesReportData(params, format);
 };
 
 // Changes by Date (Admin-only endpoints)
@@ -1411,13 +1539,13 @@ export const getTransportReportData = async (params = {}, options = { download: 
   }
 };
 
-export const downloadTransportReport = async (params = {}) => {
-  const response = await axios.get(`${BASE_URL}/api/transports/report`, {
-    params: { ...params, download: 'true' },
-    responseType: 'blob',
+export const downloadTransportReport = async (params = {}, format = 'xlsx') => {
+  const resp = await axios.get(`${BASE_URL}/api/transports/report`, {
+    params: { ...params, format },
+    responseType: 'arraybuffer',
     withCredentials: true
   });
-  return response;
+  return { data: resp.data, headers: resp.headers };
 };
 
 // --- Additional API helpers ---
@@ -1513,10 +1641,81 @@ export const getExportPayments = (exportId) => {
   if (!exportId) return Promise.resolve({ data: [] });
   return axios.get(`${BASE_URL}/api/supplies/${exportId}/payments`);
 };
+
+function getCurrentApiLang() {
+  try {
+    const locale = localStorage.getItem('app-locale') || 'en';
+    return locale === 'ar' ? 'ar' : 'en';
+  } catch (error) {
+    return 'en';
+  }
+}
+
+function appendLangParam(params = {}) {
+  const normalized = { ...(params || {}) };
+  if (!normalized.lang) normalized.lang = getCurrentApiLang();
+  return normalized;
+}
+
+function normalizeItemMode(mode = '') {
+  const value = String(mode || '').trim().toLowerCase();
+  if (!value) return '';
+  if (['supply', 'supplies', 'export', 'exports'].includes(value)) return 'supply';
+  if (['extract', 'extracts'].includes(value)) return 'extracts';
+  if (['transport', 'transports'].includes(value)) return 'transport';
+  return value;
+}
+
+function shouldIncludeItemForMode(item, mode = '') {
+  const normalizedMode = normalizeItemMode(mode);
+  if (!normalizedMode) return true;
+
+  if (normalizedMode === 'supply') {
+    return item?.availableForSupplies === true;
+  }
+  if (normalizedMode === 'extracts') {
+    return item?.availableForExtracts === true || item?.availableForExports === true;
+  }
+  if (normalizedMode === 'transport') {
+    return item?.availableForTransports === true;
+  }
+
+  return true;
+}
+
+function filterItemsPayload(payload, mode = '') {
+  const normalizedMode = normalizeItemMode(mode);
+  if (!normalizedMode) return payload;
+
+  if (Array.isArray(payload)) {
+    return payload.filter(item => shouldIncludeItemForMode(item, normalizedMode));
+  }
+
+  if (payload && Array.isArray(payload.items)) {
+    return {
+      ...payload,
+      items: payload.items.filter(item => shouldIncludeItemForMode(item, normalizedMode))
+    };
+  }
+
+  if (payload && Array.isArray(payload.data)) {
+    return {
+      ...payload,
+      data: payload.data.filter(item => shouldIncludeItemForMode(item, normalizedMode))
+    };
+  }
+
+  return payload;
+}
+
 export const getExportItems = (params = {}) => {
-  const search = new URLSearchParams(params).toString();
+  const normalizedMode = normalizeItemMode(params.mode || 'supply');
+  const search = new URLSearchParams(appendLangParam({ ...params, mode: normalizedMode })).toString();
   const url = `${BASE_URL}/api/items${search ? `?${search}` : ''}`;
-  return axios.get(url);
+  return axios.get(url).then(res => {
+    res.data = filterItemsPayload(res.data, normalizedMode);
+    return res;
+  });
 };
 
 export const createExportItem = (data) =>
@@ -1545,9 +1744,13 @@ export const getSuppliesChanges = getExportsChanges;
 
 // --- Items & Units API (used by ItemList.vue) ---
 export const getItems = (params = {}) => {
-  const search = new URLSearchParams(params).toString();
+  const normalizedMode = normalizeItemMode(params.mode);
+  const search = new URLSearchParams(appendLangParam({ ...params, ...(normalizedMode ? { mode: normalizedMode } : {}) })).toString();
   const url = `${BASE_URL}/api/items${search ? `?${search}` : ''}`;
-  return axios.get(url);
+  return axios.get(url).then(res => {
+    res.data = filterItemsPayload(res.data, normalizedMode);
+    return res;
+  });
 }
 
 export const createItem = (data) =>
@@ -1563,5 +1766,7 @@ export const deleteItem = (id, params = {}) => {
   return axios.delete(`${BASE_URL}/api/items/${id}${q ? `?${q}` : ''}`);
 }
 
-export const getUnits = () =>
-  axios.get(`${BASE_URL}/api/units`);
+export const getUnits = (params = {}) => {
+  const search = new URLSearchParams(appendLangParam(params)).toString();
+  return axios.get(`${BASE_URL}/api/units${search ? `?${search}` : ''}`);
+}

@@ -242,11 +242,7 @@
                     {{ c.name }}
                   </option>
                 </select>
-                <input
-                  v-model="changeOwnerForm.effectiveDate"
-                  type="datetime-local"
-                  class="border rounded px-2 py-1 text-sm"
-                />
+                <DateTimeField v-model="changeOwnerForm.effectiveDate" class="border rounded px-2 py-1 text-sm" />
                 <button
                   type="submit"
                   class="px-3 py-1.5 text-xs md:text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
@@ -328,6 +324,7 @@ import {
 } from '../../../api'
 import CreateVehicle from './CreateVehicle.vue'
 import Pagination from '../../shared/Pagination.vue'
+import DateTimeField from '@/components/shared/DateTimeField.vue'
 
 export default {
   name: 'VehiclesList',
@@ -335,7 +332,7 @@ export default {
     mode: { type: String, default: 'transport' }
   },
   emits: ["navigateReport", "navigateStatement"],
-  components: { CreateVehicle, Pagination },
+  components: { CreateVehicle, Pagination, DateTimeField },
   data() {
     return {
       vehicles: [],
@@ -471,7 +468,7 @@ export default {
     },
     async loadContractors() {
       try {
-        const res = await getContractors()
+        const res = await getContractors({ mode: 'transport' })
         const payload = res.data || {}
         this.contractors = Array.isArray(payload.items)
           ? payload.items

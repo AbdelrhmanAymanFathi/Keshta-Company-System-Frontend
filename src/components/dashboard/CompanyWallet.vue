@@ -21,39 +21,9 @@
         </li>
       </ul>
     </aside>
-    <div class="flex gap-6">
-      <!-- Sidebar for branches -->
-      <aside class="w-64 bg-white rounded-lg shadow p-4 h-fit self-start sticky top-4">
-        <h3 class="text-lg font-semibold mb-4">{{ $t('company.wallet.branches') || 'Branches' }}</h3>
-        <ul>
-          <li
-            :class="['mb-2', selectedBranchId === null ? 'font-bold text-indigo-700' : 'text-gray-700', 'cursor-pointer', 'hover:bg-indigo-50', 'rounded', 'px-2', 'py-1']"
-            @click="selectBranch(null)"
-          >
-            <span>{{ $t('company.wallet.mainCompany') || 'Main Company' }}</span>
-          </li>
-          <li
-            v-for="branch in branches"
-            :key="branch.id"
-            :class="['mb-2', selectedBranchId === branch.id ? 'font-bold text-indigo-700' : 'text-gray-700', 'cursor-pointer', 'hover:bg-indigo-50', 'rounded', 'px-2', 'py-1', 'flex', 'justify-between', 'items-center']"
-            @click="selectBranch(branch.id)"
-          >
-            <span>{{ branch.name }}</span>
-            <span v-if="branchSummaries[branch.id]" class="text-xs text-gray-500">{{ formatCurrency(branchSummaries[branch.id].balance) }}</span>
-          </li>
-        </ul>
-      </aside>
-      <div class="flex-1 space-y-6">
-        <!-- كل محتوى المحفظة الرئيسي هنا -->
-        <slot />
-      </div>
-    </div>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-            </svg>
-            {{ $t('company.wallet.withdraw') }}
-          </button>
-        </div>
-      </div>
+    <div class="flex-1 space-y-6">
+      <!-- كل محتوى المحفظة الرئيسي هنا -->
+      <slot />
     </div>
 
     <!-- Stats Bar -->
@@ -237,12 +207,11 @@
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('company.wallet.date') }} *
               </label>
-              <input
+              <DateField
                 v-model="depositForm.date"
-                type="date"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
+              />
             </div>
             <div class="flex justify-end gap-3 pt-4">
               <button type="button" @click="closeDepositModal"
@@ -292,12 +261,11 @@
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 {{ $t('company.wallet.date') }} *
               </label>
-              <input
+              <DateField
                 v-model="withdrawForm.date"
-                type="date"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
+              />
             </div>
             <div class="flex justify-end gap-3 pt-4">
               <button type="button" @click="closeWithdrawModal"
@@ -321,10 +289,12 @@ import { ref, onMounted } from 'vue'
 import { useCompanyStore } from '@/stores/useCompanyStore'
 import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet } from '../../api'
 import Badge from '../shared/Badge.vue'
+import DateField from '../shared/DateField.vue'
+import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'CompanyWallet',
-  components: { Badge },
+  components: { Badge, DateField },
   setup() {
     const companyStore = useCompanyStore()
     const showDepositModal = ref(false)
@@ -348,12 +318,12 @@ export default {
     const depositForm = ref({
       amount: 0,
       description: '',
-      date: new Date().toISOString().split('T')[0]
+      date: getTodayISO()
     })
     const withdrawForm = ref({
       amount: 0,
       description: '',
-      date: new Date().toISOString().split('T')[0]
+      date: getTodayISO()
     })
 
     // Fetch branches and summaries
@@ -434,7 +404,7 @@ export default {
       depositForm.value = {
         amount: 0,
         description: '',
-        date: new Date().toISOString().split('T')[0]
+        date: getTodayISO()
       }
       showDepositModal.value = true
     }
@@ -445,7 +415,7 @@ export default {
       withdrawForm.value = {
         amount: 0,
         description: '',
-        date: new Date().toISOString().split('T')[0]
+        date: getTodayISO()
       }
       showWithdrawModal.value = true
     }

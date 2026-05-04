@@ -109,3 +109,121 @@ export interface EquipmentLog {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface Extract {
+  id: number | string;
+  date: string;
+  contractorId?: number | null;
+  contractor?: { id: number; name?: string } | null;
+  locationId?: number | null;
+  areaId?: number | null;
+  location?: { id: number; name?: string } | null;
+  area?: { id: number; name?: string } | null;
+  total?: number;
+  notes?: string | null;
+  lines?: ExtractLine[];
+  createdAt?: string;
+  updatedAt?: string | null;
+}
+
+export interface ExtractLine {
+  id?: number | string;
+  extractId?: number | string;
+  itemId: number;
+  item?: { id: number; name?: string; unit?: { id: number | string; name?: string } | null } | null;
+  quantity: number;
+  price?: number | null;
+  total?: number | null;
+}
+
+export interface PaginatedExtractsResponse {
+  items: Extract[];
+  meta: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+// Item shape used across the app
+export interface Item {
+  id: number | string;
+  name: string;
+  unitId?: number | null;
+  unit?: { id: number | string; name?: string } | null;
+  currentPrice?: number | null; // legacy field
+  defaultSupplyPrice?: number | null;
+  defaultTransportPrice?: number | null;
+  defaultExtractPrice?: number | null; // new field
+  availableForSupplies?: boolean;
+  availableForTransports?: boolean;
+  availableForExtracts?: boolean;
+  availableForExports?: boolean;
+  notes?: string | null;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string | null;
+}
+
+export interface ReportFieldMeta {
+  name: string;
+  label?: string;
+  arName?: string;
+  dataType?: string;
+  type?: string;
+  paramType?: string;
+  suggestedParamType?: string;
+  summarizable?: boolean;
+  important?: boolean;
+  position?: number;
+}
+
+export interface ReportDefinition {
+  id?: number | string;
+  key: string;
+  title: string;
+  arTitle?: string;
+  module?: string;
+  description?: string;
+  queryText?: string;
+  sourceTable?: string;
+  tableName?: string;
+  table?: string;
+  active?: boolean;
+  importantColumns?: string[];
+  fields?: ReportFieldMeta[];
+  params?: ReportFieldMeta[];
+  reportParameter?: ReportFieldMeta[];
+}
+
+export interface DynamicReportTotalsRow {
+  __rowType: 'TOTALS';
+  __isTotalsRow: true;
+  [key: string]: unknown;
+}
+
+export interface DynamicReportExecutionResult {
+  rows?: Array<Record<string, unknown>>;
+  totalsRow?: DynamicReportTotalsRow | null;
+  importantColumns?: string[];
+  related?: Record<string, unknown>;
+  data?: Array<Record<string, unknown>>;
+}
+
+export interface ContractorStatementRow {
+  date?: string;
+  type: string;
+  refId?: string | number | null;
+  description?: string | null;
+  debit?: number | null;
+  credit?: number | null;
+  balance?: number | null;
+  earnings?: number | null;
+  payments?: number | null;
+  balanceOwed?: number | null;
+}
+
+export interface ContractorStatementTotalsRow extends ContractorStatementRow {
+  type: 'TOTAL';
+}

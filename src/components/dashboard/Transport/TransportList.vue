@@ -16,14 +16,14 @@
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-          <input v-model="filters.startDate" type="date"
+          <DateField v-model="filters.startDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-          <input v-model="filters.endDate" type="date"
+          <DateField v-model="filters.endDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
@@ -165,6 +165,10 @@
             </th>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.notes') }}
+            </th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               {{ $t('common.actions') }}
             </th>
           </tr>
@@ -214,6 +218,9 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(transport.total) }}
             </td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">
+              <div class="max-w-xs truncate">{{ transport.notes || transport.note || '-' }}</div>
+            </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
                 <!-- <button @click.stop="editTransport(transport)" class="text-indigo-600 hover:text-indigo-900"
@@ -242,7 +249,7 @@
           <tr v-if="transports.length === 0">
             <td
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-              :colspan="14">
+              :colspan="15">
               {{ $t('transport.noTransports') || 'No transports found' }}
             </td>
           </tr>
@@ -258,10 +265,10 @@
     <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
       <ul class="p-2">
-        <li>
+        <!-- <li>
           <button @click="editTransport(contextMenu.item)"
             class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm">{{ $t('common.edit') }}</button>
-        </li>
+        </li> -->
         <li>
           <button @click="openDeleteConfirm(contextMenu.item)"
             class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
@@ -302,6 +309,7 @@
 import { getTransports, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import DateField from '@/components/shared/DateField.vue'
 import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
@@ -313,7 +321,8 @@ export default {
     Pagination,
     TransportModal,
     SearchDropdown,
-    PaymentModal
+    PaymentModal,
+    DateField
   },
 
   data() {
@@ -390,7 +399,7 @@ export default {
      */
     async loadFilterData() {
       try {
-        const contractorsRes = await getContractors({ pageSize: 1000 })
+        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'transport' })
         const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
         this.contractors = Array.isArray(contractorsData) ? contractorsData : []
 
@@ -398,8 +407,8 @@ export default {
         const locationsData = locationsRes.data?.data || locationsRes.data || []
         this.locations = Array.isArray(locationsData) ? locationsData : []
 
-        const itemsRes = await getItems()
-        const itemsData = itemsRes.data?.data || itemsRes.data || []
+        const itemsRes = await getItems({ mode: 'transport' })
+        const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
         this.items = Array.isArray(itemsData) ? itemsData : []
 
         const vehiclesRes = await getVehicles({ pageSize: 1000 })

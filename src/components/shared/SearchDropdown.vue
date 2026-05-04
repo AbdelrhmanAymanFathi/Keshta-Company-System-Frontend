@@ -14,6 +14,7 @@
     />
     <div
       v-if="isOpen"
+      ref="options"
       class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
       @mousedown.prevent
     >
@@ -21,7 +22,9 @@
         <div
           v-for="(item, i) in filteredItems"
           :key="getKey(item, i)"
+          ref="optionItems"
           @mousedown.prevent="selectItem(item)"
+          @mouseenter="highlightedIndex = i"
           :class="[
             'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
             i === highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
@@ -30,7 +33,7 @@
           {{ getLabel(item) }}
         </div>
       </div>
-      <slot name="afterOptions"></slot>
+      <!-- removed afterOptions slot to prevent inline create/add actions -->
     </div>
   </div>
 </template>
@@ -139,12 +142,14 @@ export default {
           ? Math.min(this.highlightedIndex + 1, this.filteredItems.length - 1)
           : 0
         this.highlightedIndex = next
+        this.scrollToHighlighted()
         return
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault()
         const prev = this.highlightedIndex > 0 ? this.highlightedIndex - 1 : 0
         this.highlightedIndex = prev
+        this.scrollToHighlighted()
         return
       }
       if (e.key === 'Enter') {
@@ -167,6 +172,28 @@ export default {
       this.$emit('select', item)
       this.isOpen = false
       this.highlightedIndex = -1
+    }
+    ,
+    scrollToHighlighted() {
+      this.$nextTick(() => {
+        const container = this.$refs.options
+        const items = this.$refs.optionItems
+        if (!container || !items) return
+        const list = Array.isArray(items) ? items : [items]
+        const idx = this.highlightedIndex
+        if (idx < 0 || idx >= list.length) return
+        const el = list[idx]
+        if (!el) return
+        const containerTop = container.scrollTop
+        const containerHeight = container.clientHeight
+        const elTop = el.offsetTop
+        const elHeight = el.offsetHeight
+        if (elTop < containerTop) {
+          container.scrollTop = elTop
+        } else if (elTop + elHeight > containerTop + containerHeight) {
+          container.scrollTop = elTop + elHeight - containerHeight
+        }
+      })
     }
   }
 }

@@ -24,6 +24,13 @@
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportCSV') }}
         </button>
+        <button @click="downloadReport('pdf')" :disabled="downloading"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+          {{ downloading ? $t('labels.downloading') : $t('contractors.exportPDF') }}
+        </button>
       </div>
     </div>
 
@@ -44,15 +51,15 @@
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-          <input v-model="filters.startDate" type="date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+          <DateField v-model="filters.startDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-          <input v-model="filters.endDate" type="date"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+          <DateField v-model="filters.endDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
         </div>
 
         <!-- Load Button -->
@@ -190,22 +197,26 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
-              'hover:bg-gray-50',
+              isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'hover:bg-gray-50',
               row.type === 'DEPOSIT' ? 'bg-green-50' : '',
               row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'bg-blue-50' : '',
-              row.type === 'OPENING' ? 'bg-gray-100' : ''
+              row.type === 'OPENING' ? 'bg-gray-100' : '',
+              isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
             ]">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.date }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <Badge :variant="getTypeVariant(row.type)">
-                  {{ getTypeLabel(row.type) }}
-                </Badge>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.refId || '-' }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ row.description || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
-                {{ formatCurrency(getRowDebit(row)) }}
-              </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.date }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <span v-if="isTotalsRow(row)" class="font-bold text-amber-900">
+                    {{ getTypeLabel(row.type) }}
+                  </span>
+                  <Badge v-else :variant="getTypeVariant(row.type)">
+                    {{ getTypeLabel(row.type) }}
+                  </Badge>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
+                  {{ formatCurrency(getRowDebit(row)) }}
+                </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'text-blue-600')">
                 {{ formatCurrency(getRowCredit(row)) }}
               </td>
@@ -218,7 +229,7 @@
       </div>
 
       <!-- Pagination -->
-      <Pagination v-if="totalPages > 1" :current-page="currentPage" :page-size="pageSize" :total="report.rows.length"
+      <Pagination v-if="totalPages > 1" :current-page="currentPage" :page-size="pageSize" :total="statementDataRows.length"
         :total-pages="totalPages" :page-size-options="[10, 20, 50, 100]" @update:page="currentPage = $event"
         @update:pageSize="onPageSizeChange" />
     </div>
@@ -236,12 +247,17 @@ import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { getContractorReportData, getContractors } from '@/api'
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
+import DateField from '@/components/shared/DateField.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
+import normalizeItem from '@/utils/normalizeItem'
+import { formatToISODate } from '@/utils/dateUtils'
+import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
+import { isContractorStatementTotalsRow, splitFooterRow } from '@/utils/reportDefinitions'
 // import { useRoute } from 'vue-router'
 
 export default {
   name: 'ContractorStatement',
-  components: { Badge, Pagination },
+  components: { Badge, Pagination, DateField },
   props: {
     mode: {
       type: String,
@@ -289,6 +305,7 @@ export default {
       if (low === 'export') return 'SUPPLY'
       if (low === 'supply') return 'SUPPLY'
       if (low === 'transport') return 'TRANSPORT'
+      if (low === 'extract') return 'EXTRACT'
       if (low === 'expense') return 'EXPENSE'
       if (low === 'deposit') return 'DEPOSIT'
       if (low === 'withdrawal') return 'WITHDRAWAL'
@@ -309,11 +326,20 @@ export default {
     const getRowDebit = (row) => Number(row?.debit ?? row?.earnings ?? 0) || 0
     const getRowCredit = (row) => Number(row?.credit ?? row?.payments ?? 0) || 0
     const getRowBalance = (row) => Number(row?.balance ?? row?.balanceOwed ?? 0) || 0
+    const isTotalsRow = (row) => isContractorStatementTotalsRow(row)
+
+    const normalizedStatementRows = computed(() => {
+      const rows = Array.isArray(report.value?.rows) ? report.value.rows : []
+      return splitFooterRow(rows, isTotalsRow)
+    })
+
+    const statementDataRows = computed(() => normalizedStatementRows.value.dataRows)
+    const statementTotalsRow = computed(() => normalizedStatementRows.value.footerRow)
 
     const lastBalance = computed(() => {
-      if (!report.value || !report.value.rows || report.value.rows.length === 0) return 0
-      const lastRow = report.value.rows[report.value.rows.length - 1]
-      return getRowBalance(lastRow)
+      if (statementTotalsRow.value) return getRowBalance(statementTotalsRow.value)
+      if (!statementDataRows.value.length) return 0
+      return getRowBalance(statementDataRows.value[statementDataRows.value.length - 1])
     })
 
     // Normalize mode (use reactive mode if set, otherwise fall back to prop)
@@ -328,14 +354,16 @@ export default {
     const totalDebits = computed(() => {
       const v = report.value?.totals?.debits
       if (v !== undefined && v !== null) return Number(v) || 0
-      const rows = report.value?.rows || []
+      if (statementTotalsRow.value) return getRowDebit(statementTotalsRow.value)
+      const rows = statementDataRows.value || []
       return rows.reduce((sum, row) => sum + getRowDebit(row), 0)
     })
 
     const totalCredits = computed(() => {
       const v = report.value?.totals?.credits
       if (v !== undefined && v !== null) return Number(v) || 0
-      const rows = report.value?.rows || []
+      if (statementTotalsRow.value) return getRowCredit(statementTotalsRow.value)
+      const rows = statementDataRows.value || []
       return rows.reduce((sum, row) => sum + getRowCredit(row), 0)
     })
 
@@ -353,15 +381,15 @@ export default {
     })
 
     const paginatedRows = computed(() => {
-      if (!report.value || !report.value.rows) return []
       const start = (currentPage.value - 1) * pageSize.value
       const end = start + pageSize.value
-      return report.value.rows.slice(start, end)
+      const pageRows = statementDataRows.value.slice(start, end)
+      return statementTotalsRow.value ? [...pageRows, statementTotalsRow.value] : pageRows
     })
 
     const totalPages = computed(() => {
-      if (!report.value || !report.value.rows) return 0
-      return Math.ceil(report.value.rows.length / pageSize.value)
+      if (!statementDataRows.value.length) return statementTotalsRow.value ? 1 : 0
+      return Math.ceil(statementDataRows.value.length / pageSize.value)
     })
 
     const formatCurrency = (amount) => {
@@ -380,7 +408,8 @@ export default {
         'EXPENSE': 'danger',
         'DEPOSIT': 'success',
         'WITHDRAWAL': 'warning',
-        'OPENING': 'default'
+        'OPENING': 'default',
+        'TOTAL': 'warning'
       }
       return variants[type] || 'default'
     }
@@ -398,8 +427,11 @@ export default {
         'TRANSPORT': translateWithFallback('contractors.typeTransport', 'contractors.typeTransport'),
         'EXPENSE': translateWithFallback('contractors.typeExpense', 'contractors.typeExpense'),
         'DEPOSIT': t('labels.deposit'),
+        'RENTAL': translateWithFallback('contractors.typeRental', 'contractors.typeRental'),
         'WITHDRAWAL': translateWithFallback('contractors.typeWithdrawal', 'contractors.typeWithdrawal'),
-        'OPENING': t('contractors.openingBalance')
+        'OPENING': t('contractors.openingBalance'),
+        'EXTRACT': translateWithFallback('contractors.typeExtract', 'contractors.typeExtract'),
+        'TOTAL': t('reports.totalsLabel') || 'Totals'
       }
       return labels[type] || type
     }
@@ -420,13 +452,24 @@ export default {
       try {
         const res = await getContractors({ page: 1, pageSize: 1000, mode: contractorsListMode.value || undefined })
         const payload = res.data || {}
-        contractors.value = Array.isArray(payload.items)
+        let items = Array.isArray(payload.items)
           ? payload.items
           : Array.isArray(payload.data)
             ? payload.data
             : Array.isArray(payload)
               ? payload
               : []
+
+        // Normalize contractor objects, then filter by availability according to mode.
+        items = items.map(normalizeItem)
+        if (contractorsListMode.value === 'extract') {
+          items = items.filter(c => c && c.availableForExtracts === true)
+        }
+
+        if (contractorsListMode.value === 'export' || contractorsListMode.value === 'supply') {
+          items = items.filter(c => c && c.availableForSupplies === true)
+        }
+        contractors.value = items
       } catch (e) {
         console.error('Error loading contractors:', e)
         contractors.value = []
@@ -479,17 +522,7 @@ export default {
       }
     }
 
-    const buildExportRows = (rows = []) => {
-      return rows.map((row) => ({
-        date: row?.date || '-',
-        type: (row?.type || '').toString().toUpperCase() || '-',
-        refId: row?.refId || '-',
-        description: row?.description || '-',
-        debit: getRowDebit(row),
-        credit: getRowCredit(row),
-        balance: getRowBalance(row)
-      }))
-    }
+    // buildExportRows removed (unused)
 
     const downloadReport = async (format) => {
       if (!selectedContractorId.value) {
@@ -520,33 +553,20 @@ export default {
           ? `${filters.value.startDate}_${filters.value.endDate}`
           : 'all'
 
-        // Try to extract filename from Content-Disposition header if provided by server
-        let filename = null
-        const cd = headers && (headers['content-disposition'] || headers['Content-Disposition'])
-        if (cd) {
-          const m = cd.match(/filename\*=UTF-8''([^;\n]+)/) || cd.match(/filename=\"?([^\";\n]+)\"?/) || cd.match(/filename=([^;\n]+)/)
-          if (m && m[1]) filename = decodeURIComponent(m[1])
-        }
+        // Prefer filename from headers (Content-Disposition) when provided
+        let filename = getFilenameFromHeaders(headers, null)
         if (!filename) {
-          const extension = format === 'csv' ? 'csv' : 'xlsx'
+          const extension = format === 'csv' ? 'csv' : (format === 'pdf' ? 'pdf' : 'xlsx')
           filename = `contractor-${contractorName}-statement-${dateRange}.${extension}`
         }
 
-        let blob
-        if (format === 'csv') {
-          blob = new Blob([data], { type: headers['content-type'] || 'text/csv;charset=utf-8;' })
-        } else {
-          blob = new Blob([data], { type: headers['content-type'] || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-        }
+        const mimeType = format === 'csv'
+          ? (headers && (headers['content-type'] || headers['Content-Type']) || 'text/csv;charset=utf-8;')
+          : format === 'pdf'
+            ? (headers && (headers['content-type'] || headers['Content-Type']) || 'application/pdf')
+            : (headers && (headers['content-type'] || headers['Content-Type']) || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
+        downloadBlobData(data, filename, mimeType)
       } catch (err) {
         console.error('Error downloading report:', err)
         error.value = err.response?.data?.message || t('contractors.reportDownloadError')
@@ -584,8 +604,8 @@ export default {
       // Set default date range to last 30 days
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-      filters.value.endDate = endDate.toISOString().split('T')[0]
-      filters.value.startDate = startDate.toISOString().split('T')[0]
+      filters.value.endDate = formatToISODate(endDate)
+      filters.value.startDate = formatToISODate(startDate)
 
       // Check if contractor ID was passed via localStorage (from navigation)
       const storedContractorId = localStorage.getItem('contractor-statement-id')
@@ -623,6 +643,8 @@ export default {
       pageSize,
       isRTL,
       lastBalance,
+      statementDataRows,
+      isTotalsRow,
       paginatedRows,
       totalPages,
       formatCurrency,

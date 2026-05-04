@@ -388,9 +388,8 @@
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.date') }} <span class="text-red-500">*</span>
               </label>
-              <input 
-                v-model="form.date" 
-                type="date" 
+              <DateField
+                v-model="form.date"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 :class="isRTL ? 'text-right' : 'text-left'"
@@ -494,9 +493,8 @@
               <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.settlementDate') }}
               </label>
-              <input 
-                v-model="form.settlementDate" 
-                type="date" 
+              <DateField
+                v-model="form.settlementDate"
                 :placeholder="$t('expenses.settlementDatePlaceholder')"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 :class="isRTL ? 'text-right' : 'text-left'"
@@ -763,11 +761,13 @@ import {
   createLocation
 } from '../../api'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
+import DateField from '@/components/shared/DateField.vue'
+import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
-  components: { AddFieldModal },
+  components: { AddFieldModal, DateField },
   data() {
     return {
       expenses: [],
@@ -1069,7 +1069,7 @@ export default {
       this.editing = false
       this.form = {
         id: null,
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayISO(),
         categoryId: null,
         subCategoryId: null,
         kind: 'EXPENSE',
@@ -1384,7 +1384,7 @@ export default {
         link.href = url
         
         // Map selected location to filename
-        let filename = 'expenses-report-' + new Date().toISOString().split('T')[0] + '.xlsx'
+        let filename = 'expenses-report-' + getTodayISO() + '.xlsx'
         
         // Create download link with filename
         link.setAttribute('download', filename)

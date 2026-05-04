@@ -231,6 +231,7 @@
 import * as XLSX from 'xlsx'
 import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
+import normalizeItem from '@/utils/normalizeItem'
 
 export default {
   name: 'EquipmentContractorsList',
@@ -289,13 +290,22 @@ export default {
   methods: {
     async loadContractors() {
       try {
-        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode })
-        const payload = res.data || {}
-        this.contractors = Array.isArray(payload.items) ? payload.items :
-                         Array.isArray(payload.data) ? payload.data :
-                         Array.isArray(payload) ? payload : []
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.contractors.length
+          const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode })
+          const payload = res.data || {}
+          let items = Array.isArray(payload.items) ? payload.items :
+                           Array.isArray(payload.data) ? payload.data :
+                           Array.isArray(payload) ? payload : []
+
+          // If component is used for extracts/exports, show only contractors flagged for exports
+          items = items.map(normalizeItem)
+          const modeLower = String(this.mode || '').toLowerCase()
+          if (modeLower === 'export' || modeLower === 'exports' || modeLower === 'extracts') {
+            items = items.filter(c => c && c.availableForExports === true)
+          }
+
+          this.contractors = items
+          const meta = payload.meta || {}
+          this.total = meta.total ?? payload.total ?? this.contractors.length
       } catch (e) {
         this.contractors = []
         this.total = 0
@@ -326,7 +336,8 @@ export default {
     },
     openEdit(c) {
       this.editing = true
-      const { openingBalance, ...rest } = c || {}
+      const rest = { ...(c || {}) }
+      delete rest.openingBalance
       this.form = { ...rest }
       this.modalOpen = true
     },
@@ -345,8 +356,16 @@ export default {
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
       if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
-      // equipment rental availability toggle
-      payload.availableForEquipmentRental = true
+      // set availability flag based on mode (equipment / transport / export)
+      if (!this.mode || this.mode === 'equipmentLogs') {
+        payload.availableForEquipmentRental = true
+      } else if (this.mode === 'transport') {
+        payload.availableForTransports = true
+      } else if (this.mode === 'supply' || this.mode === 'export' || this.mode === 'exports') {
+        payload.availableForExports = true
+      } else {
+        payload.availableForEquipmentRental = true
+      }
       try {
         if (this.editing && this.form.id) {
           await updateContractor(this.form.id, payload)

@@ -1,213 +1,109 @@
-/**
- * Date Utilities for handling timezone conversions
- * Store dates in UTC, display in Africa/Cairo timezone
- */
+function pad(n) {
+  return n < 10 ? `0${n}` : String(n)
+}
 
-/**
- * Format date to ISO string (YYYY-MM-DD)
- * @param {Date | string} date - Date object or string
- * @returns {string} ISO date string (YYYY-MM-DD)
- */
+function isISODateString(s) {
+  return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}($|T)/.test(s)
+}
+
+export function formatDateDMY(date) {
+  if (date === null || date === undefined || date === '') return ''
+  let d
+  if (date instanceof Date) d = date
+  else if (typeof date === 'string') {
+    if (isISODateString(date)) d = new Date(date)
+    else {
+      const m = date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+      if (m) {
+        const dd = Number(m[1])
+        const mm = Number(m[2])
+        const yyyy = Number(m[3])
+        d = new Date(yyyy, mm - 1, dd)
+      } else d = new Date(date)
+    }
+  } else d = new Date(date)
+
+  if (!d || Number.isNaN(d.getTime())) return ''
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`
+}
+
+export function parseDateDMY(str) {
+  if (!str) return null
+  const m = String(str).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (!m) return null
+  const dd = Number(m[1])
+  const mm = Number(m[2])
+  const yyyy = Number(m[3])
+  const d = new Date(yyyy, mm - 1, dd)
+  if (Number.isNaN(d.getTime())) return null
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
 export function formatToISODate(date) {
-  if (!date) return '';
-  
-  const d = typeof date === 'string' ? new Date(date) : date;
-  if (isNaN(d.getTime())) return '';
-  
-  // Return UTC date as YYYY-MM-DD
-  return d.toISOString().split('T')[0];
-}
-
-/**
- * Parse ISO date string to Date object (UTC)
- * @param {string} isoString - ISO date string (YYYY-MM-DD or full ISO)
- * @returns {Date} Date object in UTC
- */
-export function parseISODate(isoString) {
-  if (!isoString) return null;
-  
-  // Handle YYYY-MM-DD format
-  if (typeof isoString === 'string' && isoString.length === 10) {
-    return new Date(`${isoString}T00:00:00Z`);
+  if (date === null || date === undefined || date === '') return ''
+  if (date instanceof Date) return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  if (typeof date === 'string') {
+    if (isISODateString(date)) return date.slice(0, 10)
+    const parsed = parseDateDMY(date)
+    if (parsed) return parsed
+    const d = new Date(date)
+    if (!Number.isNaN(d.getTime())) return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
   }
-  
-  return new Date(isoString);
+  return ''
 }
 
-/**
- * Format date for display in Africa/Cairo timezone
- * @param {Date | string} date - Date object or ISO string
- * @param {string} locale - Locale for formatting (default: 'en-US')
- * @returns {string} Formatted date string
- */
-export function formatDateCairo(date, locale = 'en-US') {
-  if (!date) return '';
-  
-  const d = typeof date === 'string' ? parseISODate(date) : date;
-  if (!d || isNaN(d.getTime())) return '';
-  
-  try {
-    // Format using Africa/Cairo timezone
-    return new Intl.DateTimeFormat(locale, {
-      timeZone: 'Africa/Cairo',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }).format(d);
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return d.toLocaleDateString(locale);
+export function parseISODateToDate(iso) {
+  if (!iso) return null
+  // Handle plain YYYY-MM-DD as local date (avoid UTC shift)
+  if (typeof iso === 'string') {
+    const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+    if (m) {
+      const yyyy = Number(m[1])
+      const mm = Number(m[2])
+      const dd = Number(m[3])
+      const d = new Date(yyyy, mm - 1, dd)
+      if (!Number.isNaN(d.getTime())) return d
+      return null
+    }
   }
+
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return null
+  return d
 }
 
-/**
- * Format date with full datetime in Cairo timezone
- * @param {Date | string} date - Date object or ISO string
- * @param {string} locale - Locale for formatting
- * @returns {string} Formatted datetime string
- */
-export function formatDateTimeCairo(date, locale = 'en-US') {
-  if (!date) return '';
-  
-  const d = typeof date === 'string' ? parseISODate(date) : date;
-  if (!d || isNaN(d.getTime())) return '';
-  
-  try {
-    return new Intl.DateTimeFormat(locale, {
-      timeZone: 'Africa/Cairo',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }).format(d);
-  } catch (error) {
-    console.error('Error formatting datetime:', error);
-    return d.toLocaleString(locale);
-  }
-}
-
-/**
- * Get current date in YYYY-MM-DD format (UTC)
- * @returns {string} Today's date in ISO format
- */
 export function getTodayISO() {
-  return formatToISODate(new Date());
+  return formatToISODate(new Date())
 }
 
-/**
- * Format currency amount
- * @param {number | string} amount - Amount to format
- * @param {string} locale - Locale for formatting (default: 'en-US')
- * @param {string} currency - Currency code (default: 'EGP')
- * @returns {string} Formatted currency string
- */
-export function formatCurrency(amount, locale = 'en-US', currency = 'EGP') {
+export function formatDateTime(value) {
+  if (value === null || value === undefined || value === '') return ''
+  const d = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(d.getTime())) return ''
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+export function formatDateTimeCairo(value, locale = 'en-GB') {
+  if (!value) return ''
+  const d = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(d.getTime())) return ''
   try {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    
-    if (isNaN(num)) return '0.00';
-    
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(num);
-  } catch (error) {
-    console.error('Error formatting currency:', error);
-    return amount?.toString() || '0.00';
+    const opts = { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }
+    const parts = new Intl.DateTimeFormat(locale, opts).formatToParts(d)
+    const map = {}
+    for (const p of parts) map[p.type] = p.value
+    return `${map.day}/${map.month}/${map.year} ${map.hour}:${map.minute}`
+  } catch (e) {
+    return formatDateTime(d)
   }
 }
 
-/**
- * Format number with locale-specific formatting
- * @param {number | string} num - Number to format
- * @param {string} locale - Locale for formatting
- * @returns {string} Formatted number
- */
-export function formatNumber(num, locale = 'en-US') {
-  try {
-    const n = typeof num === 'string' ? parseFloat(num) : num;
-    
-    if (isNaN(n)) return '0';
-    
-    return new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(n);
-  } catch (error) {
-    console.error('Error formatting number:', error);
-    return num?.toString() || '0';
-  }
+export default {
+  formatDateDMY,
+  parseDateDMY,
+  formatToISODate,
+  parseISODateToDate,
+  getTodayISO
+  , formatDateTime, formatDateTimeCairo
 }
 
-/**
- * Get date range for filters (Today, This week, This month)
- * @param {string} range - 'today' | 'week' | 'month' | 'year'
- * @returns {{startDate: string, endDate: string}} ISO date range
- */
-export function getDateRange(range = 'today') {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  let startDate = new Date(today);
-  let endDate = new Date(today);
-  endDate.setHours(23, 59, 59, 999);
-  
-  switch (range) {
-    case 'week': {
-      const dayOfWeek = today.getDay();
-      startDate.setDate(today.getDate() - dayOfWeek);
-      endDate.setDate(today.getDate() + (6 - dayOfWeek));
-      break;
-    }
-    case 'month': {
-      startDate.setDate(1);
-      endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      break;
-    }
-    case 'year': {
-      startDate = new Date(today.getFullYear(), 0, 1);
-      endDate = new Date(today.getFullYear(), 11, 31);
-      break;
-    }
-    // 'today' is default
-  }
-  
-  return {
-    startDate: formatToISODate(startDate),
-    endDate: formatToISODate(endDate)
-  };
-}
-
-/**
- * Check if date is today
- * @param {Date | string} date - Date to check
- * @returns {boolean} True if date is today
- */
-export function isToday(date) {
-  const d = typeof date === 'string' ? parseISODate(date) : date;
-  const today = new Date();
-  
-  return (
-    d.getUTCDate() === today.getUTCDate() &&
-    d.getUTCMonth() === today.getUTCMonth() &&
-    d.getUTCFullYear() === today.getUTCFullYear()
-  );
-}
-
-/**
- * Difference in days between two dates
- * @param {Date | string} date1 - First date
- * @param {Date | string} date2 - Second date
- * @returns {number} Difference in days
- */
-export function daysDifference(date1, date2) {
-  const d1 = typeof date1 === 'string' ? parseISODate(date1) : date1;
-  const d2 = typeof date2 === 'string' ? parseISODate(date2) : date2;
-  
-  const timeDiff = Math.abs(d2.getTime() - d1.getTime());
-  return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-}

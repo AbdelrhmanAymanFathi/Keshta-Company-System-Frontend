@@ -225,9 +225,8 @@
               <!-- From Date -->
               <div>
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.fromDate') || $t('labels.startDate') || 'From Date' }}</label>
-                <input
+                <DateField
                   v-model="expensesFilters.startDate"
-                  type="date"
                   :disabled="loading"
                   :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
                 />
@@ -236,9 +235,8 @@
               <!-- To Date -->
               <div>
                 <label :class="['block text-xs font-medium text-gray-600 mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('labels.toDate') || $t('labels.endDate') || 'To Date' }}</label>
-                <input
+                <DateField
                   v-model="expensesFilters.endDate"
-                  type="date"
                   :disabled="loading"
                   :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs', isRTL ? 'text-right' : 'text-left']"
                 />
@@ -668,9 +666,8 @@
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-start' : 'text-start']">
                   {{ $t('expenses.date') || 'Date' }} <span class="text-red-500">*</span>
                 </label>
-                <input 
-                  v-model="expenseForm.date" 
-                  type="date" 
+                <DateField
+                  v-model="expenseForm.date"
                   required
                   :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
                 />
@@ -767,9 +764,8 @@
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('expenses.settlementDate') || 'Settlement Date' }}
                 </label>
-                <input 
-                  v-model="expenseForm.settlementDate" 
-                  type="date" 
+                <DateField
+                  v-model="expenseForm.settlementDate"
                   :placeholder="$t('expenses.settlementDatePlaceholder') || 'Settlement date (optional)'"
                   :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
                 />
@@ -1012,12 +1008,11 @@
                 <label :class="['block text-xs font-medium text-gray-700 mb-1', isRTL ? 'text-right' : 'text-left']">
                   {{ $t('finance.date') }} *
                 </label>
-                <input 
-                  v-model="transferForm.date" 
-                  type="date" 
+                <DateField
+                  v-model="transferForm.date"
                   required
                   :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
-                >
+                />
               </div>
 
               <!-- Buttons - Full Width -->
@@ -1050,14 +1045,16 @@
 
 import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getBranches, getBranchWalletSummary, getBranchExpenses, getCompanyExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpenseCategory, createExpense, createBranch, createLocation, createExpenseSubCategory, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
+import { getBranches, getBranchWalletSummary, getBranchExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpenseCategory, createExpense, createBranch, createLocation, createExpenseSubCategory, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
-import BadgeComponent from '../shared/Badge.vue'
+
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
+import DateField from '@/components/shared/DateField.vue'
+import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'CompanyFinance',
-  components: { BadgeComponent, AddFieldModal },
+  components: { AddFieldModal, DateField },
   setup() {
     const financeStore = useCompanyFinanceStore()
     const showTransferModal = ref(false)
@@ -1082,7 +1079,7 @@ export default {
     const error = ref(null)
 
     const expenseForm = ref({ 
-      date: new Date().toISOString().split('T')[0], 
+      date: getTodayISO(), 
       category: '', 
       description: '', 
       amount: 0,
@@ -1113,7 +1110,7 @@ export default {
       const cat = expenseCategories.value.find(c => c.id === catId)
       return Array.isArray(cat?.subCategories) ? cat.subCategories : []
     })
-    const { t, tm, locale } = useI18n()
+    const { t, tm } = useI18n()
 
     // ✅ Category combobox state
     const categoryInput = ref('')
@@ -1204,7 +1201,11 @@ export default {
           expenseForm.value.categoryId = simulated.id
           expensesFilters.value.categoryId = simulated.id
           // Persist extra categories locally so they survive refreshes
-          try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
+          try {
+            localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value))
+          } catch (e) {
+            // ignore localStorage errors
+          }
           if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
           closeFieldModal()
           return
@@ -1332,7 +1333,11 @@ export default {
       showCategoryDropdown.value = false
       selectedCategoryIndex.value = -1
       // Persist extra categories locally
-      try { localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value)) } catch (e) { }
+      try {
+        localStorage.setItem('extraExpenseCategories', JSON.stringify(extraCategories.value))
+      } catch (e) {
+        // ignore localStorage errors
+      }
       if (window.$toast) window.$toast(t('expenses.success.categoryAdded') || 'Category added', 'success')
     }
 
@@ -1444,7 +1449,7 @@ export default {
     }
 
     // Keep subcategory input in sync when category changes
-    watch(() => expensesFilters.value.categoryId, (newVal) => {
+    watch(() => expensesFilters.value.categoryId, () => {
       expensesFilters.value.subCategoryId = null
       subcategoryInput.value = ''
     })
@@ -1479,7 +1484,7 @@ export default {
     })
     const showExpenseModal = ref(false)
     const expenseProcessing = ref(false)
-    const transferForm = ref({ branchId: null, amount: 0, description: '', date: new Date().toISOString().split('T')[0] })
+    const transferForm = ref({ branchId: null, amount: 0, description: '', date: getTodayISO() })
     const editBranchForm = ref({ name: '' })
     const editBranchTarget = ref(null)
 
@@ -1675,7 +1680,7 @@ export default {
       dragOverMain.value = false
     }
 
-    const onDragEnter = (index, event) => { dragOverIndex.value = index }
+    const onDragEnter = (index) => { dragOverIndex.value = index }
 
     const onDropAt = async (index, event) => {
       event.preventDefault()
@@ -1704,7 +1709,7 @@ export default {
     }
 
     const onDragOverMain = (event) => { event.preventDefault(); dragOverMain.value = true }
-    const onDragEnd = (event) => {
+    const onDragEnd = () => {
       dragIndex.value = null
       dragOverIndex.value = null
       dragOverMain.value = false
@@ -1787,7 +1792,9 @@ export default {
         o.start(now)
         g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18)
         o.stop(now + 0.19)
-      } catch (e) { }
+      } catch (e) {
+        // ignore audio playback errors
+      }
     }
 
     const openTransferModal = () => {
@@ -1797,7 +1804,7 @@ export default {
         transferType: selectedBranch.value ? 'toCompany' : null,
         amount: 0, 
         description: '', 
-        date: new Date().toISOString().split('T')[0] 
+        date: getTodayISO() 
       }
       showTransferModal.value = true
     }
@@ -1809,7 +1816,7 @@ export default {
         transferType: selectedBranch.value ? 'toCompany' : null,
         amount: 0,
         description: '',
-        date: new Date().toISOString().split('T')[0]
+        date: getTodayISO()
       }
     }
 
@@ -1974,7 +1981,7 @@ export default {
     const openExpenseModal = () => {
       // Use new fields: categoryId, subCategoryId, kind
       expenseForm.value = { 
-        date: new Date().toISOString().split('T')[0], 
+        date: getTodayISO(), 
         categoryId: null,
         subCategoryId: null,
         kind: 'EXPENSE', // default as per spec
@@ -1991,7 +1998,7 @@ export default {
     const closeExpenseModal = () => {
       showExpenseModal.value = false
       expenseForm.value = {
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayISO(),
         categoryId: null,
         subCategoryId: null,
         kind: 'EXPENSE',
@@ -2092,12 +2099,16 @@ export default {
       try {
         const saved = localStorage.getItem('extraExpenseCategories')
         if (saved) extraCategories.value = JSON.parse(saved)
-      } catch (e) { }
+      } catch (e) {
+        // ignore localStorage read errors
+      }
       // Load persisted sidebar collapsed state
       try {
         const savedSidebar = localStorage.getItem('companyFinanceSidebarCollapsed')
         if (savedSidebar !== null) sidebarCollapsed.value = savedSidebar === 'true'
-      } catch (e) { }
+      } catch (e) {
+        // ignore localStorage read errors
+      }
       await fetchBranches()
       await fetchSummary()
       await fetchLocations()
@@ -2113,7 +2124,11 @@ export default {
 
     // Persist sidebar state
     watch(sidebarCollapsed, (val) => {
-      try { localStorage.setItem('companyFinanceSidebarCollapsed', String(val)) } catch (e) { }
+      try {
+        localStorage.setItem('companyFinanceSidebarCollapsed', String(val))
+      } catch (e) {
+        // ignore localStorage write errors
+      }
     })
 
     // Add isRTL computed property

@@ -2,7 +2,7 @@
   <!-- Button to open the Modal (you can remove or change it depending on the page) -->
   <button v-if="showTriggerButton" @click="openModal"
     class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition">
-    {{ triggerButtonText }}
+    {{ triggerButtonText || ($t('dashboard.newSupply') + ' +') }}
   </button>
 
   <!-- Modal -->
@@ -12,7 +12,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle }}</h2>
+          <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle || $t('dashboard.newSupply') }}</h2>
           <button @click="closeModal"
             class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">
             ×
@@ -50,7 +50,7 @@
 
                   <!-- Date -->
                   <td class="px-3 py-2">
-                    <input type="date" v-model="row.date"
+                    <DateField v-model="row.date"
                       class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
@@ -389,27 +389,20 @@ import {
   getExportItems,
   createExportItem
 } from '@/api'
+import normalizeItem from '@/utils/normalizeItem'
+import DateField from './DateField.vue'
 
 export default {
   emits: ['saved'],
   name: 'TableModal',
+  components: { DateField },
   props: {
     showTriggerButton: {
       type: Boolean,
       default: true
     },
-    triggerButtonText: {
-      type: String,
-      default() {
-        return this.$t('dashboard.newSupply') + ' +'
-      }
-    },
-    modalTitle: {
-      type: String,
-      default() {
-        return this.$t('dashboard.newSupply')
-      }
-    }
+    triggerButtonText: { type: String, default: '' },
+    modalTitle: { type: String, default: '' }
   },
   data() {
     return {
@@ -756,7 +749,8 @@ row.price = this.lastEnteredData.price ?? 0
     async loadExportItems() {
       try {
         const res = await getExportItems()
-        this.exportItems = Array.isArray(res.data) ? res.data : []
+        const raw = Array.isArray(res.data) ? res.data : []
+        this.exportItems = raw.map(normalizeItem)
       } catch (err) {
         console.warn('Failed to load export items', err)
       }
@@ -931,7 +925,7 @@ handleEnterKey(rowIndex) {
     const allRows = this.tableRef.querySelectorAll('tbody tr')
     const newRowEl = allRows[rowIndex + 1]
     if (newRowEl) {
-      const firstInput = newRowEl.querySelector('input[type="date"]')
+      const firstInput = newRowEl.querySelector('input.date-field, input[type="date"]')
       firstInput?.focus()
     }
   })

@@ -19,6 +19,7 @@
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnKey') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnModule') }}</th>
+            <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.importantColumns') || 'Totals columns' }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActive') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActions') }}</th>
           </tr>
@@ -28,12 +29,24 @@
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.key }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ (locale.value !== 'en' && r.arTitle) ? r.arTitle : r.title }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.module }}</td>
+            <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">
+              <div v-if="getImportantColumns(r).length" class="flex flex-wrap gap-1">
+                <span
+                  v-for="column in getImportantColumns(r)"
+                  :key="`${r.id}-${column}`"
+                  class="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900"
+                >
+                  {{ column }}
+                </span>
+              </div>
+              <span v-else class="text-sm text-gray-400">-</span>
+            </td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.active ? $t('labels.active') : $t('labels.inactive') }}</td>
             <td :class="isRTL ? 'text-left p-2' : 'text-right p-2'">
               <div :class="isRTL ? 'flex items-center justify-start gap-2' : 'flex items-center justify-end gap-2'">
-                <button @click="runReport(r.id)" class="px-2 py-1 bg-indigo-600 text-white rounded inline-flex items-center gap-2 hover:bg-indigo-500 transition">
+                <router-link :to="{ name: 'admin-reports-run', params: { id: r.id } }" class="px-2 py-1 bg-indigo-600 text-white rounded inline-flex items-center gap-2 hover:bg-indigo-500 transition">
                   <span> {{ $t('admin.run') }}</span>
-                </button>
+                </router-link>
                 <router-link :to="{ name: 'admin-reports-from-table', params: { id: r.id } }" class="px-2 py-1 bg-amber-500 text-white rounded inline-flex items-center gap-2 hover:bg-amber-400 transition">
                   <span>{{ $t('labels.edit') }}</span>
                 </router-link>
@@ -46,8 +59,6 @@
         </tbody>
       </table>
     </div>
-      <ReportRunModal v-if="showRun" :reportId="runReportId" @close="showRun=false" />
-
       <!-- Report creation/editing now handled by DynamicReportFromTable route -->
   </div>
 </template>
@@ -56,16 +67,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportDefs, deleteReportDef } from '@/api'
-import ReportRunModal from './ReportRunModal.vue'
+import { normalizeImportantColumns } from '@/utils/reportDefinitions'
 
 export default {
-  components: { ReportRunModal },
   setup() {
     const { locale, t } = useI18n()
     const isRTL = computed(() => locale.value === 'ar')
     const reports = ref([])
-    const showRun = ref(false)
-    const runReportId = ref(null)
 
     // Using DynamicReportFromTable route for create/edit
 
@@ -88,15 +96,12 @@ export default {
       }
     }
 
-    const runReport = (id) => {
-      runReportId.value = id
-      showRun.value = true
-    }
+    const getImportantColumns = (report) => normalizeImportantColumns(report || {})
 
     // legacy modal handlers removed; route-based editor used instead
 
     onMounted(load)
-    return { reports, showRun, runReportId, remove, runReport, isRTL, locale }
+    return { reports, remove, getImportantColumns, isRTL, locale }
   }
 }
 </script>

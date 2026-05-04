@@ -53,8 +53,7 @@
                 </div>
 
                 <div v-else-if="p.type === 'DATE'">
-                  <input
-                    type="date"
+                  <DateField
                     v-model="values[p.name]"
                     class="w-full border rounded px-3 py-2 focus:ring-1 focus:ring-indigo-300"
                   />
@@ -129,21 +128,39 @@
               <div class="flex gap-2 justify-end mt-3">
                 <button
                   @click="execute"
+                  :disabled="executing"
                   class="px-4 py-2 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition"
                 >
-                  <span>{{ $t("admin.run") }}</span>
+                  <span>{{ executing ? ($t('labels.loading') || 'Loading...') : $t("admin.run") }}</span>
+                </button>
+                <button
+                  @click="downloadCsv"
+                  :disabled="!report || !!exportingFormat"
+                  class="px-4 py-2 bg-amber-500 text-white rounded flex items-center gap-2 hover:bg-amber-400 transition disabled:opacity-50"
+                >
+                  <span>{{ exportingFormat === 'csv' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadCsv') || 'Download CSV') }}</span>
+                </button>
+                <button
+                  @click="downloadXlsx"
+                  :disabled="!report || !!exportingFormat"
+                  class="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition disabled:opacity-50"
+                >
+                  <span>{{ exportingFormat === 'xlsx' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadExcel') || 'Download Excel') }}</span>
+                </button>
+                <button
+                  @click="downloadPdf"
+                  :disabled="!report || !!exportingFormat"
+                  class="px-4 py-2 bg-rose-600 text-white rounded flex items-center gap-2 hover:bg-rose-500 transition disabled:opacity-50"
+                >
+                  <span>{{ exportingFormat === 'pdf' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadPdf') || 'Download PDF') }}</span>
                 </button>
               </div>
+              <p v-if="exportError" class="text-sm text-red-600">{{ exportError }}</p>
             </div>
 
             <div v-if="result">
               <div class="mt-4 flex items-center justify-between">
                 <h5 class="font-semibold">{{ $t("labels.results") }}</h5>
-                <div class="flex items-center gap-2">
-                  <button @click="downloadResultExcel" class="px-3 py-1 bg-amber-500 text-white rounded hover:bg-amber-400 text-sm">
-                    {{ $t('reports.downloadExcel') || 'Download Excel' }}
-                  </button>
-                </div>
               </div>
               <pre dir="ltr" class="text-xs bg-gray-100 p-2 rounded max-h-64 overflow-auto text-left" style="direction:ltr; unicode-bidi:embed;">{{ JSON.stringify(result, null, 2) }}</pre>
             </div>
@@ -159,16 +176,21 @@ import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { getReportDef, executeReport, getReportParamOptions } from "@/api";
 import SearchDropdown from "@/components/shared/SearchDropdown.vue";
+import DateField from "@/components/shared/DateField.vue";
+import { downloadBlobData, getFilenameFromHeaders } from "@/utils/downloadFile";
 
 export default {
-  components: { SearchDropdown },
+  components: { SearchDropdown, DateField },
   props: ["reportId"],
   setup(props) {
-    const { locale } = useI18n();
+    const { locale, t } = useI18n();
     const report = ref(null);
     const loading = ref(false);
     const values = ref({});
     const result = ref(null);
+    const executing = ref(false);
+    const exportingFormat = ref("");
+    const exportError = ref("");
 
     const paramOptions = ref({});
     const paramLoading = ref({});
@@ -238,17 +260,25 @@ export default {
       return val;
     }
 
+    const buildExecutePayload = () => {
+      const params = {};
+      (report.value?.params || []).forEach((p) => {
+        params[p.name] = serializeParamValue(p);
+      });
+      return { params };
+    };
+
     const execute = async () => {
       try {
-        const params = {};
-        (report.value.params || []).forEach((p) => {
-          params[p.name] = serializeParamValue(p);
-        });
-        const res = await executeReport(props.reportId, { params });
+        executing.value = true;
+        exportError.value = "";
+        const res = await executeReport(props.reportId, buildExecutePayload());
         result.value = res.data;
       } catch (err) {
         console.error("Execute failed", err);
         alert("Execute failed");
+      } finally {
+        executing.value = false;
       }
     };
 
@@ -258,76 +288,29 @@ export default {
       loadOptions(paramName, q);
     }
 
-    const flattenRow = (row) => {
-      const out = {}
-      if (!row || typeof row !== 'object') return out
-      Object.keys(row).forEach(k => {
-        const v = row[k]
-        if (v == null) { out[k] = '' }
-        else if (typeof v === 'object') {
-          // prefer name/arName fields when object
-          if (v.name) out[k] = v.name
-          else if (v.arName) out[k] = v.arName
-          else if (v.label) out[k] = v.label
-          else out[k] = JSON.stringify(v)
-        } else {
-          out[k] = v
-        }
-      })
-      return out
-    }
-
-    const detectTable = (res) => {
-      if (!res) return null
-      if (Array.isArray(res)) return res
-      if (res && Array.isArray(res.rows)) return res.rows
-      if (res && Array.isArray(res.data)) return res.data
-      return null
-    }
-
-    const downloadResultExcel = () => {
-      const table = detectTable(result.value)
-      if (!table || !table.length) {
-        // fallback: download raw JSON
-        const blob = new Blob([JSON.stringify(result.value, null, 2)], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `report-${props.reportId || 'result'}.json`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
-        return
+    const downloadReport = async (format) => {
+      exportingFormat.value = format
+      exportError.value = ""
+      try {
+        const res = await executeReport(props.reportId, buildExecutePayload(), {
+          format,
+          responseType: "blob"
+        })
+        const fallbackName = `dynamic-report-${props.reportId}.${format}`
+        const filename = getFilenameFromHeaders(res.headers, fallbackName) || fallbackName
+        const mimeType = res.headers?.["content-type"] || res.headers?.["Content-Type"] || "application/octet-stream"
+        downloadBlobData(res.data, filename, mimeType)
+      } catch (err) {
+        console.error(`Dynamic report ${format} export failed`, err)
+        exportError.value = err?.response?.data?.message || t("reports.downloadError") || "Export failed"
+      } finally {
+        exportingFormat.value = ""
       }
-
-      const rows = table.map(r => flattenRow(r))
-      // collect headers
-      const headers = Array.from(rows.reduce((acc, r) => { Object.keys(r).forEach(k => acc.add(k)); return acc }, new Set()))
-
-      const escapeCSV = (v) => {
-        if (v == null) return ''
-        const s = String(v)
-        return '"' + s.replace(/"/g, '""') + '"'
-      }
-
-      const lines = [headers.map(h => escapeCSV(h)).join(',')]
-      rows.forEach(r => {
-        const line = headers.map(h => escapeCSV(r[h] ?? '')).join(',')
-        lines.push(line)
-      })
-
-      const csv = lines.join('\n')
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `report-${props.reportId || 'result'}.csv`
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      URL.revokeObjectURL(url)
     }
+
+    const downloadCsv = () => downloadReport("csv")
+    const downloadXlsx = () => downloadReport("xlsx")
+    const downloadPdf = () => downloadReport("pdf")
 
     function onSelectOption(paramName, item) {
       // for dropdown: set single object
@@ -350,7 +333,7 @@ export default {
     }
 
     watch(() => props.reportId, load, { immediate: true })
-    return { report, loading, values, execute, result, paramOptions, paramLoading, selectedLabels, onOptionSearch, onSelectOption, onSelectMulti, removeMultiItem, locale, downloadResultExcel }
+    return { report, loading, values, execute, executing, result, exportingFormat, exportError, paramOptions, paramLoading, selectedLabels, onOptionSearch, onSelectOption, onSelectMulti, removeMultiItem, locale, downloadCsv, downloadXlsx, downloadPdf }
   }
 }
 </script>

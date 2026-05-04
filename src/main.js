@@ -1,6 +1,7 @@
 // src/main.js
 import { createApp, watch } from 'vue'
 import { createPinia } from 'pinia'
+import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
@@ -14,6 +15,10 @@ initializeAuthStore()
 
 const app = createApp(App)
 const pinia = createPinia()
+
+// Register TanStack Vue Query plugin (optional - install @tanstack/vue-query)
+const queryClient = new QueryClient()
+app.use(VueQueryPlugin, { queryClient })
 
 // use pinia
 app.use(pinia)

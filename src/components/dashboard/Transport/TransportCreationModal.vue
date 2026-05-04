@@ -330,7 +330,7 @@
                       <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
                       <!-- Row Date -->
                       <td class="px-3 py-2">
-                        <input type="date" v-model="row.date"
+                        <DateField v-model="row.date"
                           @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm" />
                       </td>
@@ -521,6 +521,8 @@ import {
   ArrowRightIcon
 } from '@heroicons/vue/24/outline'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import DateField from '@/components/shared/DateField.vue'
+import { getTodayISO, formatToISODate } from '@/utils/dateUtils'
 
 export default {
   name: 'TransportModal',
@@ -534,7 +536,8 @@ export default {
     TrashIcon,
     CheckIcon,
     ArrowRightIcon
-    ,SearchDropdown
+    ,SearchDropdown,
+    DateField
   },
   props: {
     isOpen: {
@@ -794,7 +797,7 @@ export default {
       if (this.transport) {
         this.populateForm()
       } else {
-        this.commonData.date = new Date().toISOString().split('T')[0]
+        this.commonData.date = getTodayISO()
       }
     },
     closeModal() {
@@ -897,7 +900,7 @@ export default {
         // per-row variable fields
         count: 1,
         distanceKm: 0,
-        date: this.commonData.date || new Date().toISOString().split('T')[0],
+        date: this.commonData.date ? formatToISODate(this.commonData.date) : getTodayISO(),
         highlightedVehicleIndex: -1
       }
       // rows inherit the header-selected vehicle by default

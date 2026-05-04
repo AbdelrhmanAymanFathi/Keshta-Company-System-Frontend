@@ -101,6 +101,7 @@
 
 <script>
 import { getExport, getExportPayments } from '@/api'
+import normalizeItem from '@/utils/normalizeItem'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 export default {
   name: 'SupplyDetailModal',
@@ -136,6 +137,7 @@ export default {
       try {
         const res = await getExport(id)
         this.exportData = res.data
+        if (this.exportData && this.exportData.item) this.exportData.item = normalizeItem(this.exportData.item)
       } catch (e) {
         console.error('Failed to load export:', e)
         this.exportData = {}

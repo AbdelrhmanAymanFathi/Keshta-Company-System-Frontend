@@ -1,3 +1,4 @@
+/* eslint-env jest */
 import { shallowMount } from '@vue/test-utils'
 import ItemList from '@/components/dashboard/ItemList.vue'
 

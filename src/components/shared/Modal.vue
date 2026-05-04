@@ -44,7 +44,7 @@ import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 export default {
-  name: 'Modal',
+  name: 'AppModal',
   props: {
     visible: {
       type: Boolean,

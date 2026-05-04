@@ -167,7 +167,7 @@
 
                       <!-- Date (editable) -->
                       <td class="px-3 py-2">
-                        <input type="date" v-model="row.date" @keydown.enter.prevent="handleEnterKey(index)" class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                        <DateField v-model="row.date" @keydown.enter.prevent="handleEnterKey(index)" class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
                       </td>
 
                       <!-- Equipment (readonly, from step 1 selection) -->
@@ -299,12 +299,14 @@
 
 <script>
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import { CalendarDaysIcon, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@heroicons/vue/24/outline'
+import DateField from '@/components/shared/DateField.vue'
+import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
+import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@heroicons/vue/24/outline'
 import { getLocations, createLocation } from '@/api'
 
 export default {
   name: 'EquipmentLogCreationModal',
-  components: { SearchDropdown, CalendarDaysIcon, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon },
+  components: { SearchDropdown, DateField, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon },
   props: {
     isOpen: { type: Boolean, default: false },
     modalTitle: { type: String, default: '' },
@@ -319,7 +321,7 @@ export default {
     return {
       currentStep: 1,
       form: {
-        date: this.modelValue.date || new Date().toISOString().split('T')[0],
+        date: this.modelValue.date ? formatToISODate(this.modelValue.date) : getTodayISO(),
         equipmentId: this.modelValue.equipmentId || '',
         equipmentLabel: this.modelValue.equipmentLabel || this.modelValue.equipment || this.modelValue.equipmentLog || '',
         contractorId: this.modelValue.contractorId || '',
@@ -751,7 +753,7 @@ export default {
 
         // Build rows payload (each row: date, hours, driverId, driverLabel, notes, hourlyRate, total)
         const rowsPayload = (this.rows || []).map(r => {
-          const dateVal = r.date || this.form.date || new Date().toISOString().split('T')[0]
+          const dateVal = (r.date && formatToISODate(r.date)) || (this.form.date && formatToISODate(this.form.date)) || getTodayISO()
           const hoursVal = Number(r.hours || 0)
           let driverIdVal = null
           if (r.driver && r.driver.id != null) driverIdVal = Number(r.driver.id)

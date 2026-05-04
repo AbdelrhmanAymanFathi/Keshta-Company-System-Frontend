@@ -25,6 +25,7 @@ const TransportReport = () => import('@/components/dashboard/Transport/Transport
 const DriversList = () => import('@/components/dashboard/DriversList.vue')
 const EquipmentContractorsList = () => import('@/components/dashboard/Equipment/EquipmentContractorsList.vue')
 const ContractorDetail = () => import('@/views/ContractorDetail.vue')
+const ExtractContractorsList = () => import('@/components/dashboard/Extracts/ExtractContractorslist.vue')
 const EquipmentLogList = () => import('@/components/dashboard/Equipment/EquipmentLogList.vue')
 const EquipmentReport = () => import('@/components/dashboard/Equipment/EquipmentLogReport.vue')
 const EquipmentList = () => import('@/components/dashboard/Equipment/EquipmentList.vue')
@@ -36,6 +37,10 @@ const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
 const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
 const Profile = () => import('@/views/Profile.vue')
+const ExtractsPage = () => import('@/views/extracts/ExtractsPage.vue')
+const CreateExtract = () => import('@/views/extracts/CreateExtract.vue')
+const ExtractDetail = () => import('@/views/extracts/ExtractDetail.vue')
+// const ExtractItemsManager = () => import('@/components/dashboard/Extracts/ExtractItemsManager.vue')
 
 const routes = [
   // ==================== Auth Routes ====================
@@ -45,12 +50,6 @@ const routes = [
     component: Login,
     meta: { requiresAuth: false, title: 'auth.login.title' }
   },
-  // {
-  //   path: '/register',
-  //   name: 'register',
-  //   component: Register,
-  //   meta: { requiresAuth: false, title: 'auth.register.title' }
-  // },
 
   // ==================== Dashboard Layout ====================
   {
@@ -285,6 +284,48 @@ const routes = [
         name: 'profile',
         component: Profile,
         meta: { title: 'profile.title' }
+      },
+
+      // ==================== Extracts Module ====================
+      {
+        path: 'extracts',
+        name: 'extracts-list',
+        component: ExtractsPage,
+        meta: { title: 'extracts.title' }
+      },
+      {
+        path: 'extracts/create',
+        name: 'create-extract',
+        component: CreateExtract,
+        meta: { title: 'extracts.create.title' }
+      },
+      {
+        path: 'extracts/contractors',
+        name: 'extracts-contractors-list',
+        component: ExtractContractorsList,
+        meta: { title: 'dashboard.contractorsList' },
+        props: { mode: 'extracts' }
+      },
+      {
+        path: 'extracts/contractor-statement/:id?',
+        name: 'contractor-extract-statement',
+        component: ContractorStatement,
+        meta: { title: 'dashboard.contractorStatement' },
+        props: { mode: 'extract' }
+      },
+      {
+        path: 'extracts/items',
+        name: 'extracts-items',
+        component: ItemList,
+        meta: { title: 'dashboard.itemsList' },
+        props: { mode: 'extracts' }
+      },
+      {
+        path: 'extracts/:id',
+        name: 'extracts-detail',
+        component: ExtractDetail,
+        meta: { title: 'extracts.detail' },
+        props: true
       },
 
       // ==================== Default Redirect ====================

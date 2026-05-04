@@ -37,6 +37,18 @@
           <label class="block text-sm font-medium">{{ $t('reports.description') }}</label>
           <textarea v-model="form.description" class="w-full border rounded px-2 py-1" rows="3"></textarea>
         </div>
+        <div v-if="form.importantColumns && form.importantColumns.length" class="col-span-2">
+          <label class="block text-sm font-medium">{{ $t('reports.importantColumns') || 'Totals columns' }}</label>
+          <div class="mt-2 flex flex-wrap gap-1">
+            <span
+              v-for="column in form.importantColumns"
+              :key="`important-column-${column}`"
+              class="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900"
+            >
+              {{ column }}
+            </span>
+          </div>
+        </div>
         <div class="col-span-2">
           <label class="block text-sm font-medium">{{ $t('reports.queryText') }}</label>
           <textarea v-model="form.queryText" class="w-full border rounded px-2 py-1 text-left font-mono text-sm" rows="8" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;"></textarea>
@@ -152,6 +164,7 @@ import { useI18n } from 'vue-i18n'
 import { getReportDef, createReportDef, updateReportDef, getReportParamOptions, getReportModules } from '@/api'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { useRoute, useRouter } from 'vue-router'
+import { normalizeImportantColumns } from '@/utils/reportDefinitions'
 
 export default {
   components: { SearchDropdown },
@@ -163,7 +176,7 @@ export default {
     const router = useRouter()
     const id = route.params.id
     const isNew = !id || id === 'new'
-    const form = ref({ key: '', title: '', arTitle: '', ReportJobType: '', description: '', queryText: '', active: true, params: [] })
+    const form = ref({ key: '', title: '', arTitle: '', ReportJobType: '', description: '', queryText: '', active: true, importantColumns: [], params: [] })
     const editingParam = ref(null)
     const dragIndex = ref(-1)
     const nameError = ref('')
@@ -176,7 +189,7 @@ export default {
       try {
         const res = await getReportModules()
         const list = Array.isArray(res?.data?.modules) ? res.data.modules : (res?.data || [])
-        modulesOptions.value = list.map((m, idx) => ({ id: m, label: String(m) }))
+        modulesOptions.value = list.map((m) => ({ id: m, label: String(m) }))
       } catch (err) {
         console.error('Failed to load report modules', err)
         modulesOptions.value = []
@@ -249,7 +262,20 @@ export default {
     const load = async () => {
       if (!isNew) {
         const res = await getReportDef(id)
-        form.value = res.data || form.value
+        const payload = res?.data?.data ?? res?.data ?? form.value
+        form.value = {
+          ...form.value,
+          ...payload,
+          importantColumns: normalizeImportantColumns(payload || {})
+        }
+        if (typeof form.value.params === 'string') {
+          try {
+            const parsedParams = JSON.parse(form.value.params)
+            form.value.params = Array.isArray(parsedParams) ? parsedParams : []
+          } catch (error) {
+            form.value.params = []
+          }
+        }
       }
       // set selected module label from loaded form
       selectedModuleLabel.value = form.value.module || ''
@@ -281,10 +307,20 @@ export default {
           names.add(p.name)
         }
 
+        const importantColumns = normalizeImportantColumns(form.value || {})
+        const payload = {
+          ...form.value,
+          importantColumns,
+          params: (form.value.params || []).map((p) => ({
+            ...p,
+            important: importantColumns.includes(String(p.name))
+          }))
+        }
+
         if (isNew) {
-          await createReportDef(form.value)
+          await createReportDef(payload)
         } else {
-          await updateReportDef(id, form.value)
+          await updateReportDef(id, payload)
         }
         if (props.modal) {
           emit('saved')

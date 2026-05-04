@@ -34,11 +34,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
-            <input v-model="filters.startDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+            <DateField v-model="filters.startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
           </div>
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
-            <input v-model="filters.endDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+            <DateField v-model="filters.endDate" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
           </div>
 
           <div>
@@ -238,7 +238,7 @@
                   {{ formatCurrency(rental.total) }}
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                  {{ rental.note || '-' }}
+                  {{ rental.notes || rental.note || '-' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex gap-3 items-center">
@@ -388,41 +388,8 @@
       <!-- Context Menu -->
       <div v-if="contextMenu.open" ref="contextMenuElement"
         class="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]"
-        :style="{ top: contextMenu.y + 'px', [isRTL ? 'right' : 'left']: contextMenu.x + 'px' }" @click.stop
+        :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }" @click.stop
         @contextmenu.prevent>
-        <button @click="handleContextMenuAction('viewDetails')"
-          class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-            </path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-            </path>
-          </svg>
-          {{ $t('equipmentLog.viewDetails') }}
-        </button>
-        <button @click="handleContextMenuAction('payouts')"
-          class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-            </path>
-          </svg>
-          {{ $t('equipmentLog.payouts') }}
-        </button>
-        <button @click="handleContextMenuAction('edit')"
-          class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-          :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
-          <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-            </path>
-          </svg>
-          {{ $t('labels.edit') }}
-        </button>
-        <div class="border-t border-gray-200 my-1"></div>
         <button @click="handleContextMenuAction('delete')"
           class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
           :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
@@ -460,7 +427,7 @@
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <input v-model="payoutForm.amount" type="number" placeholder="Amount"
                   class="border border-gray-300 rounded px-3 py-2 text-sm" />
-                <input v-model="payoutForm.date" type="date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
+                <DateField v-model="payoutForm.date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
                 <input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)"
                   class="border border-gray-300 rounded px-3 py-2 text-sm" />
               </div>
@@ -508,17 +475,18 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance, nextTick } from 'vue'
 import { useEquipmentLogsStore } from '@/stores/useEquipmentLogsStore'
-import EquipmentLogForm from './EquipmentLogForm.vue'
 import EquipmentLogDetail from './EquipmentLogDetail.vue'
 import Badge from '../../shared/Badge.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers, getLocations } from '@/api'
 import EquipmentLogCreationModal from './EquipmentLogCreationModal.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
+import DateField from '../../shared/DateField.vue'
+import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogForm, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown },
+  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField },
   setup() {
     const instance = getCurrentInstance()
     const equipmentLogsStore = useEquipmentLogsStore()
@@ -538,7 +506,7 @@ export default {
 
     const form = ref({
       id: null,
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayISO(),
       equipmentLog: '',
       name: '',
       hourlyRate: 0,
@@ -581,7 +549,7 @@ export default {
     // server `isRental` filter if present (server uses `isRental`: true => external)
     const localIsCompanyOwned = ref(
       (typeof equipmentLogsStore.filters.isRental !== 'undefined' && equipmentLogsStore.filters.isRental !== null)
-        ? !Boolean(equipmentLogsStore.filters.isRental)
+        ? !equipmentLogsStore.filters.isRental
         : (equipmentLogsStore.filters.isCompanyOwned ?? null)
     )
 
@@ -699,6 +667,22 @@ export default {
       return equipmentLogsStore.items.filter(item => {
         if (!item) return false
 
+        // Primary source of truth: log-level isRental
+        // (this is also what the table badge uses: !isRental => company-owned).
+        if (Object.prototype.hasOwnProperty.call(item, 'isRental')) {
+          const v = item.isRental
+          let isRental = false
+          if (typeof v === 'boolean') isRental = v
+          else if (typeof v === 'number') isRental = v === 1
+          else if (typeof v === 'string') {
+            const s = v.toLowerCase()
+            isRental = (s === 'true' || s === '1' || s === 'yes' || s === 'y')
+          } else {
+            isRental = Boolean(v)
+          }
+          return (!isRental) === filter
+        }
+
         // Prefer explicit nested equipment ownership flag: equipment.isCompanyOwned
         const equipment = item.equipment || (item.equipmentLog && item.equipmentLog.equipment) || null
 
@@ -719,11 +703,6 @@ export default {
           const cid = equipment.contractorId
           const isCompany = cid === null || cid === undefined
           return isCompany === filter
-        }
-
-        // Some APIs use an explicit isRental flag on the log: isRental === true => external
-        if (Object.prototype.hasOwnProperty.call(item, 'isRental')) {
-          return (!item.isRental) === filter
         }
 
         // Fall back to top-level isCompanyOwned if present
@@ -759,9 +738,9 @@ export default {
     // Debug: log ownership filter changes and filtered count
     try {
       watch(localIsCompanyOwned, (v) => {
-        try { console.log('[component] localIsCompanyOwned changed:', v, 'filtered length:', filteredItems.value.length) } catch(e) {}
+        try { console.log('[component] localIsCompanyOwned changed:', v, 'filtered length:', filteredItems.value.length) } catch(e) { void 0 }
       })
-    } catch (e) { /* ignore during SSR or test env */ }
+    } catch (e) { void 0 }
 
     // Calculate total sum of all visible filtered items
     const totalSum = computed(() => {
@@ -803,7 +782,7 @@ export default {
     }
 
     const setCompanyOwnedFilter = (value) => {
-      try { console.log('[component] setCompanyOwnedFilter called, value:', value, 'current:', localIsCompanyOwned.value) } catch(e) {}
+      try { console.log('[component] setCompanyOwnedFilter called, value:', value, 'current:', localIsCompanyOwned.value) } catch(e) { void 0 }
       // update local UI state
       localIsCompanyOwned.value = value
 
@@ -817,7 +796,7 @@ export default {
       equipmentLogsStore.filters.isRental = isRentalValue
       equipmentLogsStore.setPage(1)
 
-      try { console.log('[component] setCompanyOwnedFilter updated localIsCompanyOwned to:', localIsCompanyOwned.value, 'and equipmentLogsStore.filters.isRental to:', equipmentLogsStore.filters.isRental) } catch(e) {}
+      try { console.log('[component] setCompanyOwnedFilter updated localIsCompanyOwned to:', localIsCompanyOwned.value, 'and equipmentLogsStore.filters.isRental to:', equipmentLogsStore.filters.isRental) } catch(e) { void 0 }
     }
 
     const changePage = (page) => {
@@ -851,21 +830,21 @@ export default {
       try {
         // Fetch latest rental from API/store to ensure we have full/clean data
         const data = await equipmentLogsStore.fetchRental(rental.id)
-        form.value = {
-          id: data.id,
-          date: data.date ? data.date.split('T')[0] : new Date().toISOString().split('T')[0],
-          equipmentLog: data.equipmentLog || data.equipment || '',
-          name: data.name || '',
-          hourlyRate: parseFloat(data.hourlyRate) || 0,
-          notes: data.notes || '',
-          isCompanyOwned: data.isCompanyOwned !== undefined ? data.isCompanyOwned : true
-        }
+          form.value = {
+            id: data.id,
+            date: data.date ? formatToISODate(data.date) : getTodayISO(),
+            equipmentLog: data.equipmentLog || data.equipment || '',
+            name: data.name || '',
+            hourlyRate: parseFloat(data.hourlyRate) || 0,
+            notes: data.notes || '',
+            isCompanyOwned: data.isCompanyOwned !== undefined ? data.isCompanyOwned : true
+          }
       } catch (error) {
         console.error('Failed to load rental for edit:', error)
         // Fallback to given object
         form.value = {
           id: rental.id,
-          date: rental.date ? rental.date.split('T')[0] : new Date().toISOString().split('T')[0],
+          date: rental.date ? formatToISODate(rental.date) : getTodayISO(),
           equipmentLog: rental.equipmentLog || rental.equipment || '',
           name: rental.name || '',
           hourlyRate: parseFloat(rental.hourlyRate) || 0,
@@ -880,7 +859,7 @@ export default {
       showModal.value = false
       form.value = {
         id: null,
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayISO(),
         equipmentLog: '',
         name: '',
         hourlyRate: 0,
@@ -905,7 +884,7 @@ export default {
               total: row.total != null ? row.total : Number(((row.hours || 0) * (row.hourlyRate != null ? row.hourlyRate : rentalData.hourlyRate || 0)).toFixed(2)),
               hours: row.hours != null ? row.hours : (rentalData.hours || 0),
               hourlyRate: row.hourlyRate != null ? row.hourlyRate : (rentalData.hourlyRate || 0),
-              note: row.notes || rentalData.notes || '',
+              notes: row.notes || rentalData.notes || '',
               isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
               ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
               ...(rentalData.areaId != null && rentalData.areaId !== '' ? { areaId: rentalData.areaId } : {})
@@ -922,7 +901,7 @@ export default {
             total: rentalData.total,
             hours: rentalData.hours,
             hourlyRate: rentalData.hourlyRate,
-            note: rentalData.notes || rentalData.note || '',
+            notes: rentalData.notes || rentalData.note || '',
             isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
             ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
             ...(rentalData.areaId != null && rentalData.areaId !== '' ? { areaId: rentalData.areaId } : {})
@@ -1110,65 +1089,16 @@ export default {
       event.stopPropagation()
       contextMenu.value.rental = rental
 
-      // Get viewport dimensions
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-
-      // Approximate menu dimensions
-      const menuWidth = 180
-      const menuHeight = 220
-
-      let x, y
-
-      // Calculate horizontal position
-      if (isRTL.value) {
-        // For RTL, we use 'right' positioning
-        // event.clientX is distance from left, we need distance from right
-        const rightPos = viewportWidth - event.clientX
-
-        // Check if menu would overflow to the left
-        if (rightPos + menuWidth > viewportWidth) {
-          // Menu would overflow, position it from the right edge
-          x = viewportWidth - menuWidth - 10
-        } else {
-          // Use the click position (convert to right positioning)
-          x = viewportWidth - event.clientX
-        }
-
-        // Ensure minimum distance from edges
-        if (x < 10) x = 10
-        if (x > viewportWidth - menuWidth - 10) x = viewportWidth - menuWidth - 10
-      } else {
-        // For LTR, we use 'left' positioning
-        x = event.clientX
-
-        // Check if menu would overflow to the right
-        if (x + menuWidth > viewportWidth) {
-          x = viewportWidth - menuWidth - 10
-        }
-
-        // Ensure minimum distance from edges
-        if (x < 10) x = 10
-      }
-
-      // Calculate vertical position
-      y = event.clientY
-
-      // Check if menu would overflow bottom
-      if (y + menuHeight > viewportHeight) {
-        // Show menu above the click point
-        y = Math.max(10, event.clientY - menuHeight - 5)
-      } else if (y < 0) {
-        y = 10
-      }
-
-      contextMenu.value.x = x
-      contextMenu.value.y = y
+      // Open exactly at the mouse pointer.
+      contextMenu.value.x = event.clientX
+      contextMenu.value.y = event.clientY
       contextMenu.value.open = true
 
       // Fine-tune position after menu is rendered using actual dimensions
       nextTick(() => {
         if (contextMenuElement.value) {
+          const viewportWidth = window.innerWidth
+          const viewportHeight = window.innerHeight
           const rect = contextMenuElement.value.getBoundingClientRect()
           const actualWidth = rect.width
           const actualHeight = rect.height
@@ -1177,25 +1107,13 @@ export default {
           let newY = contextMenu.value.y
           let needsAdjustment = false
 
-          // Horizontal adjustment
-          if (isRTL.value) {
-            // For RTL, check right positioning
-            if (newX + actualWidth > viewportWidth) {
-              newX = Math.max(10, viewportWidth - actualWidth - 10)
-              needsAdjustment = true
-            } else if (newX < 10) {
-              newX = 10
-              needsAdjustment = true
-            }
-          } else {
-            // For LTR, check left positioning
-            if (newX + actualWidth > viewportWidth) {
-              newX = Math.max(10, viewportWidth - actualWidth - 10)
-              needsAdjustment = true
-            } else if (newX < 10) {
-              newX = 10
-              needsAdjustment = true
-            }
+          // Clamp to viewport only when needed.
+          if (newX + actualWidth > viewportWidth) {
+            newX = Math.max(10, viewportWidth - actualWidth - 10)
+            needsAdjustment = true
+          } else if (newX < 10) {
+            newX = 10
+            needsAdjustment = true
           }
 
           // Vertical adjustment
@@ -1225,19 +1143,8 @@ export default {
       const rental = contextMenu.value.rental
       closeContextMenu()
 
-      switch (action) {
-        case 'viewDetails':
-          openDetailModal(rental)
-          break
-        case 'payouts':
-          openPayoutsModal(rental)
-          break
-        case 'edit':
-          openEditModal(rental)
-          break
-        case 'delete':
-          confirmDelete(rental)
-          break
+      if (action === 'delete') {
+        confirmDelete(rental)
       }
     }
 

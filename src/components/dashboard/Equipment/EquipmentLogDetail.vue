@@ -58,7 +58,7 @@
         <div v-else class="space-y-3">
           <div v-for="job in jobs" :key="job.id" class="flex items-center justify-between p-3 border rounded">
             <div>
-              <div class="text-sm font-medium">{{ job.name || job.note || '-' }}</div>
+              <div class="text-sm font-medium">{{ job.name || job.notes || job.note || '-' }}</div>
               <div class="text-xs text-gray-500">{{ formatDate(job.date) }} • {{ job.hours }} {{ $t('equipmentLog.hours') }}</div>
             </div>
             <div class="flex items-center gap-3">
@@ -73,7 +73,7 @@
       <div class="bg-white rounded-lg p-4 border">
         <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.addJob') }}</h4>
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <input v-model="jobForm.date" type="date" class="border rounded px-3 py-2 text-sm" />
+          <DateField v-model="jobForm.date" class="border rounded px-3 py-2 text-sm" />
           <input v-model.number="jobForm.hours" type="number" min="0" step="0.1" placeholder="Hours"
             class="border rounded px-3 py-2 text-sm" />
           <input v-model.number="jobForm.hourlyRate" type="number" min="0" step="0.01" placeholder="Hourly Rate"
@@ -101,6 +101,8 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import DateField from '@/components/shared/DateField.vue'
+import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 import { getRental, getRentalJobs, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog } from '@/api'
 
 export default {
@@ -112,19 +114,20 @@ export default {
     }
   },
   emits: ['close'],
-  setup(props, { emit }) {
+  components: { DateField },
+  setup(props) {
     const loading = ref(true)
     const error = ref(null)
     const rental = ref({})
     const jobs = ref([])
     const savingJob = ref(false)
-    const jobForm = ref({ id: null, date: new Date().toISOString().split('T')[0], hours: 0, hourlyRate: 0, note: '' })
+    const jobForm = ref({ id: null, date: getTodayISO(), hours: 0, hourlyRate: 0, note: '' })
 
     const fetchRental = async () => {
       loading.value = true
       error.value = null
       try {
-        const res = await getEquipmentLog(props.rentalId)
+        const res = await getRental(props.rentalId)
         rental.value = res.data || res
         await fetchJobs()
       } catch (e) {
@@ -136,7 +139,7 @@ export default {
 
     const fetchJobs = async () => {
       try {
-        const res = await getEquipmentLogJobs(props.rentalId)
+        const res = await getRentalJobs(props.rentalId)
         jobs.value = Array.isArray(res.data) ? res.data : (res.data?.items || [])
       } catch (e) {
         jobs.value = []
@@ -160,14 +163,14 @@ export default {
 
         const hourlyRateNum = Number(jobForm.value.hourlyRate || rental.value.hourlyRate || 0)
 
-        const payload = {
-          date: new Date(jobForm.value.date).toISOString(),
-          hours: hoursNum,
-          hourlyRate: hourlyRateNum,
-          note: jobForm.value.note,
-          isRental: true,
-          equipmentId: equipmentIdNumeric
-        }
+          const payload = {
+            date: new Date(jobForm.value.date).toISOString(),
+            hours: hoursNum,
+            hourlyRate: hourlyRateNum,
+            notes: jobForm.value.note,
+            isRental: true,
+            equipmentId: equipmentIdNumeric
+          }
 
         if (jobForm.value.id) {
           await updateEquipmentLog(jobForm.value.id, payload)
@@ -187,7 +190,7 @@ export default {
     const editJob = (job) => {
       jobForm.value = {
         id: job.id,
-        date: job.date ? job.date.split('T')[0] : new Date().toISOString().split('T')[0],
+        date: job.date ? formatToISODate(job.date) : getTodayISO(),
         hours: job.hours || 0,
         hourlyRate: job.hourlyRate || 0,
         note: job.note || job.notes || ''
@@ -206,7 +209,7 @@ export default {
     }
 
     const resetJobForm = () => {
-      jobForm.value = { id: null, date: new Date().toISOString().split('T')[0], hours: 0, hourlyRate: 0, note: '' }
+      jobForm.value = { id: null, date: getTodayISO(), hours: 0, hourlyRate: 0, note: '' }
     }
 
     const saveNotes = async () => {

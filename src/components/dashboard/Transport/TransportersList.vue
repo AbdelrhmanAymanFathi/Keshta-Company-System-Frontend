@@ -290,7 +290,7 @@
                 </label>
                 <label>
                   <div class="text-sm mb-1">{{ $t('labels.date') || 'Date' }}</div>
-                  <input v-model="depositForm.date" type="date" class="w-full px-3 py-2 border rounded" />
+                  <DateField v-model="depositForm.date" class="w-full px-3 py-2 border rounded" />
                 </label>
                 <label>
                   <div class="text-sm mb-1">{{ $t('labels.description') || 'Description' }}</div>
@@ -330,13 +330,15 @@
 import * as XLSX from 'xlsx'
 import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
+import DateField from '@/components/shared/DateField.vue'
+import normalizeItem from '@/utils/normalizeItem'
 
 export default {
   name: 'SuppliersList',
   props: {
     mode: { type: String, default: 'transport' }
   },
-  components: { Pagination },
+  components: { Pagination, DateField },
   data() {
     return {
       q: '',
@@ -390,9 +392,11 @@ export default {
       try {
         const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: 'transport' })
         const payload = res.data || {}
-        this.contractors = Array.isArray(payload.items) ? payload.items :
+        let items = Array.isArray(payload.items) ? payload.items :
                          Array.isArray(payload.data) ? payload.data :
                          Array.isArray(payload) ? payload : []
+        items = items.map(normalizeItem)
+        this.contractors = items
         const meta = payload.meta || {}
         this.total = meta.total ?? payload.total ?? this.contractors.length
       } catch (e) {
@@ -425,7 +429,8 @@ export default {
     },
     openEdit(c) {
       this.editing = true
-      const { openingBalance, ...rest } = c || {}
+      const rest = { ...(c || {}) }
+      delete rest.openingBalance
       this.form = { ...rest }
       this.modalOpen = true
     },

@@ -28,6 +28,9 @@
             <th v-if="mode === 'transport' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ $t('labels.defaultTransportPrice') || 'Transport Price' }}</th>
+            <th v-if="mode === 'extracts' || mode === 'all'"
+              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              {{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }}</th>
             <!-- <th
               class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ $t('labels.exports') || 'For Exports' }}</th>
@@ -54,13 +57,16 @@
             <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
               {{ item.name }}</td>
             <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
-              {{ getUnitName(item.unitId) || '-' }}</td>
+              {{ item.unit?.name || getUnitName(item.unitId) || '-' }}</td>
             <td v-if="mode === 'supply' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ formatPrice(item.defaultSupplyPrice) }}</td>
             <td v-if="mode === 'transport' || mode === 'all'"
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
               {{ formatPrice(item.defaultTransportPrice) }}</td>
+            <td v-if="mode === 'extracts' || mode === 'all'"
+              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
+              {{ formatPrice(item.defaultExtractPrice ?? item.currentPrice) }}</td>
             <!-- <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
               <span v-if="item.availableForSupplies">✓</span><span v-else>-</span></td>
             <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
@@ -105,91 +111,101 @@
       @update:pageSize="(size) => { pageSize = size; page = 1; loadItems() }" />
 
     <!-- Create/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 z-10">
-        <h3 class="text-lg font-semibold mb-4">
-          {{ editingItem ? ($t('labels.edit') + ' ' + $t('labels.item')) : ($t('labels.new') + ' ' + $t('labels.item'))
-          }}
-        </h3>
+    <teleport to="body">
+      <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 z-10">
+          <h3 class="text-lg font-semibold mb-4">
+            {{ editingItem ? ($t('labels.edit') + ' ' + $t('labels.item')) : ($t('labels.new') + ' ' + $t('labels.item'))
+            }}
+          </h3>
 
-        <form @submit.prevent="submitForm" class="space-y-4">
-          <!-- Item Name -->
-          <label class="block">
-            <div class="text-sm font-medium mb-1">{{ $t('labels.itemName') || 'Item Name' }} *</div>
-            <input v-model="form.name" type="text" required
-              class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              :placeholder="$t('placeholders.enterItemName') || 'Enter item name'" />
-            <div v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</div>
-          </label>
+          <form @submit.prevent="submitForm" class="space-y-4">
+            <!-- Item Name -->
+            <label class="block">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.itemName') || 'Item Name' }} *</div>
+              <input v-model="form.name" type="text" required
+                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                :placeholder="$t('placeholders.enterItemName') || 'Enter item name'" />
+              <div v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</div>
+            </label>
 
-          <!-- Unit -->
-          <label class="block">
-            <div class="text-sm font-medium mb-1">{{ $t('labels.unit') || 'Unit' }}</div>
-            <select v-model="form.unitId"
-              class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option :value="null">-- {{ $t('placeholders.selectUnit') || 'Select unit' }} --</option>
-              <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }}</option>
-            </select>
-          </label>
+            <!-- Unit -->
+            <label class="block">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.unit') || 'Unit' }}</div>
+              <select v-model="form.unitId"
+                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option :value="null">-- {{ $t('placeholders.selectUnit') || 'Select unit' }} --</option>
+                <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }}</option>
+              </select>
+            </label>
 
-          <!-- Prices (mode-specific) -->
-          <label class="block" v-if="mode === 'supply' || mode === 'all'">
-            <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</div>
-            <input v-model.number="form.defaultSupplyPrice" :required="mode === 'supply'" type="number" step="0.01" min="0"
-              class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+            <!-- Prices (mode-specific) -->
+            <label class="block" v-if="mode === 'supply' || mode === 'all'">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</div>
+              <input v-model.number="form.defaultSupplyPrice" :required="mode === 'supply'" type="number" step="0.01" min="0"
+                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
 
-            <!-- When in supply mode allow marking also available for transport -->
-            <div v-if="mode === 'supply'" class="mt-2 flex items-center gap-2">
-              <input id="availTransport" type="checkbox" v-model="form.availableForTransports" class="w-4 h-4" />
-              <label for="availTransport" class="text-sm">{{ $t('labels.availableForTransports') || 'Also available for transport' }}</label>
-            </div>
+              <!-- When in supply mode allow marking also available for transport -->
+              <div v-if="mode === 'supply'" class="mt-2 flex items-center gap-2">
+                <input id="availTransport" type="checkbox" v-model="form.availableForTransports" class="w-4 h-4" />
+                <label for="availTransport" class="text-sm">{{ $t('labels.availableForTransports') || 'Also available for transport' }}</label>
+              </div>
 
-            <!-- If checkbox set, show transport price field -->
-            <label class="block mt-2" v-if="form.availableForTransports">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }}</div>
-              <input v-model.number="form.defaultTransportPrice" :required="form.availableForTransports" type="number" step="0.01" min="0"
+              <!-- If checkbox set, show transport price field -->
+              <label class="block mt-2" v-if="form.availableForTransports">
+                <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }}</div>
+                <input v-model.number="form.defaultTransportPrice" :required="form.availableForTransports" type="number" step="0.01" min="0"
+                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+              </label>
+            </label>
+
+            <label class="block" v-if="mode === 'transport' || mode === 'all'">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }} {{ mode === 'transport' ? '*' : '' }}</div>
+              <input v-model.number="form.defaultTransportPrice" :required="mode === 'transport'" type="number" step="0.01" min="0"
+                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+
+              <!-- When in transport mode allow marking also available for supply -->
+              <div v-if="mode === 'transport'" class="mt-2 flex items-center gap-2">
+                <input id="availSupply" type="checkbox" v-model="form.availableForSupplies" class="w-4 h-4" />
+                <label for="availSupply" class="text-sm">{{ $t('labels.availableForSupplies') || 'Also available for supply' }}</label>
+              </div>
+
+              <!-- If checkbox set, show supply price field -->
+              <label class="block mt-2" v-if="form.availableForSupplies">
+                <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }}</div>
+                <input v-model.number="form.defaultSupplyPrice" :required="form.availableForSupplies" type="number" step="0.01" min="0"
+                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+              </label>
+            </label>
+
+            <!-- Export price (for extracts) -->
+            <label class="block" v-if="mode === 'extracts' || form.availableForExtracts">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }} {{ mode === 'extracts' ? '*' : '' }}</div>
+              <input v-model.number="form.defaultExtractPrice" :required="mode === 'extracts' || form.availableForExtracts" type="number" step="0.01" min="0"
                 class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
             </label>
-          </label>
 
-          <label class="block" v-if="mode === 'transport' || mode === 'all'">
-            <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }} {{ mode === 'transport' ? '*' : '' }}</div>
-            <input v-model.number="form.defaultTransportPrice" :required="mode === 'transport'" type="number" step="0.01" min="0"
-              class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-
-            <!-- When in transport mode allow marking also available for supply -->
-            <div v-if="mode === 'transport'" class="mt-2 flex items-center gap-2">
-              <input id="availSupply" type="checkbox" v-model="form.availableForSupplies" class="w-4 h-4" />
-              <label for="availSupply" class="text-sm">{{ $t('labels.availableForSupplies') || 'Also available for supply' }}</label>
+            <!-- Buttons -->
+            <div class="flex gap-3 pt-4">
+              <button type="submit" :disabled="submitting"
+                class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 transition">
+                {{ submitting ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
+              </button>
+              <button type="button" @click="closeModal"
+                class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">
+                {{ $t('labels.cancel') || 'Cancel' }}
+              </button>
             </div>
-
-            <!-- If checkbox set, show supply price field -->
-            <label class="block mt-2" v-if="form.availableForSupplies">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }}</div>
-              <input v-model.number="form.defaultSupplyPrice" :required="form.availableForSupplies" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-            </label>
-          </label>
-
-          <!-- Buttons -->
-          <div class="flex gap-3 pt-4">
-            <button type="submit" :disabled="submitting"
-              class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 transition">
-              {{ submitting ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
-            </button>
-            <button type="button" @click="closeModal"
-              class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">
-              {{ $t('labels.cancel') || 'Cancel' }}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </teleport>
 
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog :show="deleteDialogOpen" type="danger" :title="$t('labels.confirmDelete') || 'Confirm Delete'"
@@ -229,6 +245,7 @@
 
 <script>
 import { getItems, createItem, updateItem, deleteItem, getUnits } from '@/api'
+import normalizeItem from '@/utils/normalizeItem'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
@@ -236,9 +253,10 @@ import { TrashIcon, PencilIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'ItemList',
+  emits: ['saved'],
   components: { Pagination, ConfirmDialog, Toast, TrashIcon, PencilIcon },
   props: {
-    mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'all'
+    mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'extracts' | 'all'
   },
   data() {
     return {
@@ -257,12 +275,14 @@ export default {
       form: {
         name: '',
         currentPrice: null,
+        defaultExtractPrice: null,
         defaultSupplyPrice: null,
         defaultTransportPrice: null,
         unitId: null,
         notes: '',
         isActive: true,
         availableForSupplies: false,
+        availableForExtracts: false,
         availableForTransports: false
       },
       errors: {
@@ -286,7 +306,14 @@ export default {
       let base = 8
       if (this.mode === 'supply' || this.mode === 'all') base += 1
       if (this.mode === 'transport' || this.mode === 'all') base += 1
+      if (this.mode === 'extracts' || this.mode === 'all') base += 1
       return base
+    }
+  },
+  watch: {
+    '$i18n.locale'() {
+      this.loadItems()
+      this.loadUnits()
     }
   },
   methods: {
@@ -300,15 +327,15 @@ export default {
         }
         const response = await getItems(params)
 
-        if (Array.isArray(response.data)) {
-          this.items = response.data
-          this.total = response.data.length
-          this.totalPages = Math.ceil(this.total / this.pageSize)
-        } else if (response.data && response.data.data) {
-          this.items = response.data.data
-          this.total = response.data.total || response.data.data.length
-          this.totalPages = response.data.totalPages || Math.ceil(this.total / this.pageSize)
-        }
+        // Normalize response into an items array
+        let raw = []
+        if (Array.isArray(response.data)) raw = response.data
+        else if (response.data && response.data.items) raw = response.data.items
+        else if (response.data && response.data.data) raw = response.data.data
+
+        this.items = raw.map(normalizeItem)
+        this.total = response.data?.meta?.total || this.items.length
+        this.totalPages = response.data?.meta?.totalPages || Math.ceil(this.total / this.pageSize)
       } catch (error) {
         this.showToast(error.response?.data?.message || this.$t('labels.failedLoadItems') || 'Failed to load items', 'error')
       } finally {
@@ -316,20 +343,33 @@ export default {
       }
     },
 
-    openCreateModal() {
+    openCreateModal(preset = {}) {
       this.editingItem = null
       this.resetForm()
       // Set availability flags based on incoming mode
       if (this.mode === 'supply') {
         this.form.availableForSupplies = true
         this.form.availableForTransports = false
+        this.form.availableForExtracts = false
       } else if (this.mode === 'transport') {
         this.form.availableForSupplies = false
         this.form.availableForTransports = true
+        this.form.availableForExtracts = false
+      } else if (this.mode === 'extracts') {
+        this.form.availableForSupplies = false
+        this.form.availableForTransports = false
+        this.form.availableForExtracts = true
       } else {
         this.form.availableForSupplies = true
         this.form.availableForTransports = true
+        this.form.availableForExtracts = true
       }
+      // Apply preset flags if provided (used when reusing this modal from other components)
+      if (preset.availableForSupplies !== undefined) this.form.availableForSupplies = !!preset.availableForSupplies
+      if (preset.availableForTransports !== undefined) this.form.availableForTransports = !!preset.availableForTransports
+      // Backwards-compatible: accept `availableForExports` as alias for `availableForExtracts`
+      if (preset.availableForExports !== undefined) this.form.availableForExtracts = !!preset.availableForExports
+      if (preset.availableForExtracts !== undefined) this.form.availableForExtracts = !!preset.availableForExtracts
       this.modalOpen = true
     },
 
@@ -338,6 +378,7 @@ export default {
       this.form.name = item.name
       // support older payloads
       this.form.currentPrice = item.currentPrice !== undefined ? parseFloat(item.currentPrice) : null
+      this.form.defaultExtractPrice = item.defaultExtractPrice !== undefined ? parseFloat(item.defaultExtractPrice) : null
       this.form.defaultSupplyPrice = item.defaultSupplyPrice !== undefined ? parseFloat(item.defaultSupplyPrice) : null
       this.form.defaultTransportPrice = item.defaultTransportPrice !== undefined ? parseFloat(item.defaultTransportPrice) : null
       this.form.unitId = item.unitId || null
@@ -345,6 +386,7 @@ export default {
       this.form.isActive = item.isActive !== undefined ? !!item.isActive : true
       this.form.availableForSupplies = !!item.availableForSupplies
       this.form.availableForTransports = !!item.availableForTransports
+      this.form.availableForExtracts = !!item.availableForExtracts
       this.modalOpen = true
     },
 
@@ -352,12 +394,14 @@ export default {
       this.form = {
         name: '',
         currentPrice: null,
+        defaultExtractPrice: null,
         defaultSupplyPrice: null,
         defaultTransportPrice: null,
         unitId: null,
         notes: '',
         isActive: true,
         availableForSupplies: false,
+        availableForExtracts: false,
         availableForTransports: false
       }
       this.errors = {
@@ -395,6 +439,10 @@ export default {
             this.errors.currentPrice = this.$t('validation.priceRequired') || 'Supply price is required and must be positive'
           }
         }
+      } else if (this.mode === 'extracts') {
+        if (this.form.currentPrice === null || this.form.currentPrice === '' || this.form.currentPrice < 0) {
+          this.errors.currentPrice = this.$t('validation.priceRequired') || 'Price is required and must be positive'
+        }
       } else {
         // mode === 'all'
         // If availability flags are used, require the corresponding prices; otherwise require at least one price
@@ -404,10 +452,14 @@ export default {
         if (this.form.availableForTransports && (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0)) {
           this.errors.currentPrice = this.$t('validation.priceRequired') || 'Transport price is required and must be positive'
         }
-        if (!this.form.availableForSupplies && !this.form.availableForTransports) {
-          // no flags set — require at least one price
+        if (this.form.availableForExtracts && (this.form.currentPrice === null || this.form.currentPrice === '' || this.form.currentPrice < 0)) {
+          this.errors.currentPrice = this.$t('validation.priceRequired') || 'Extract price is required and must be positive'
+        }
+        if (!this.form.availableForSupplies && !this.form.availableForTransports && !this.form.availableForExtracts) {
+          // no flags set — require at least one price (supply, transport or extract)
           if ((this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0) &&
-            (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0)) {
+            (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0) &&
+            (this.form.currentPrice === null || this.form.currentPrice === '' || this.form.currentPrice < 0)) {
             this.errors.currentPrice = this.$t('validation.priceRequired') || 'At least one price is required and must be positive'
           }
         }
@@ -437,17 +489,26 @@ export default {
           payload.defaultTransportPrice = this.form.defaultTransportPrice
           payload.availableForTransports = true
         }
+        if (this.form.availableForExtracts || this.mode === 'extracts') {
+          // Prefer explicit defaultExtractPrice field; keep currentPrice for backward compatibility
+          if (this.form.defaultExtractPrice !== null && this.form.defaultExtractPrice !== undefined) payload.defaultExtractPrice = this.form.defaultExtractPrice
+          if (this.form.currentPrice !== null && this.form.currentPrice !== undefined) payload.currentPrice = this.form.currentPrice
+          payload.availableForExtracts = true
+        }
 
+        let res
         if (this.editingItem) {
-          await updateItem(this.editingItem.id, payload)
+          res = await updateItem(this.editingItem.id, payload)
           this.showToast(this.$t('messages.itemUpdated') || 'Item updated successfully', 'success')
         } else {
-          await createItem(payload)
+          res = await createItem(payload)
           this.showToast(this.$t('messages.itemCreated') || 'Item created successfully', 'success')
         }
 
         this.closeModal()
         this.loadItems()
+        // Emit saved event so parent components can react (e.g., refresh lists)
+        this.$emit('saved', res?.data ?? res)
       } catch (error) {
         this.showToast(error.response?.data?.message || this.$t('labels.failedSaveItem') || 'Failed to save item', 'error')
       } finally {
@@ -459,6 +520,7 @@ export default {
       try {
         const resp = await getUnits()
         if (Array.isArray(resp.data)) this.units = resp.data
+        else if (resp.data && resp.data.items) this.units = resp.data.items
         else if (resp.data && resp.data.data) this.units = resp.data.data
       } catch (err) {
         // ignore silently, units optional
