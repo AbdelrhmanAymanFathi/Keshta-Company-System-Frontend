@@ -82,7 +82,8 @@
         <thead class="bg-indigo-50">
           <tr>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
-            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateFrom') || 'Date From' }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateTo') || 'Date To' }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.quantity') }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.price') }}</th>
@@ -95,11 +96,12 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(extract, idx) in extracts" :key="`extract-${extract.id}`" class="hover:bg-gray-50">
+          <tr v-for="(extract, idx) in extracts" :key="extract.rowKey || `extract-${extract.id}`" class="hover:bg-gray-50">
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.date) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateFrom || extract.date) }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateTo || extract.date) }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ extract.itemName || '-' }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemQuantity !== null && extract.itemQuantity !== undefined ? formatNumber(extract.itemQuantity) : '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemQuantity !== null && extract.itemQuantity !== undefined ? extract.itemQuantity : '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemPrice !== null && extract.itemPrice !== undefined ? formatCurrency(extract.itemPrice) : '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.contractorName || '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.locationName || '-' }}</td>
@@ -115,7 +117,7 @@
             </td>
           </tr>
           <tr v-if="extracts.length === 0">
-              <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="11">
+              <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="12">
               {{ $t('extracts.noExtractsFound') || 'No extracts found' }}
             </td>
           </tr>
@@ -199,20 +201,41 @@ export default {
   methods: {
     normalizeExtractForList(extract) {
       const lines = Array.isArray(extract?.lines) ? extract.lines : []
-      const firstLine = lines[0] || null
-      const normalizedItem = normalizeItem(firstLine?.item || extract?.item || null)
 
-      return {
-        ...extract,
-        item: normalizedItem,
-        itemName: normalizedItem?.name || firstLine?.itemName || '-',
-        itemQuantity: firstLine?.quantity !== undefined && firstLine?.quantity !== null ? Number(firstLine.quantity) : null,
-        itemPrice: firstLine?.price !== undefined && firstLine?.price !== null ? Number(firstLine.price) : null,
-        contractorName: extract?.contractor?.name || '-',
-        locationName: extract?.location?.name || '-',
-        areaName: extract?.area?.name || '-',
-        total: extract?.total !== undefined && extract?.total !== null ? Number(extract.total) : extract?.total
+      if (!lines.length) {
+        return [{
+          ...extract,
+          rowKey: `extract-${extract.id}`,
+          item: null,
+          itemName: '-',
+          itemQuantity: null,
+          itemPrice: null,
+          contractorName: extract?.contractor?.name || '-',
+          locationName: extract?.location?.name || '-',
+          areaName: extract?.area?.name || '-',
+          total: extract?.total !== undefined && extract?.total !== null ? Number(extract.total) : extract?.total,
+          extractTotal: extract?.total
+        }]
       }
+
+      return lines.map((line) => {
+        const normalizedItem = normalizeItem(line?.item || null)
+
+        return {
+          ...extract,
+          line,
+          rowKey: `extract-${extract.id}-line-${line.id}`,
+          item: normalizedItem,
+          itemName: normalizedItem?.name || line?.itemName || '-',
+          itemQuantity: line?.quantity !== undefined && line?.quantity !== null ? Number(line.quantity) : null,
+          itemPrice: line?.price !== undefined && line?.price !== null ? Number(line.price) : null,
+          contractorName: extract?.contractor?.name || '-',
+          locationName: extract?.location?.name || '-',
+          areaName: extract?.area?.name || '-',
+          total: line?.total !== undefined && line?.total !== null ? Number(line.total) : null,
+          extractTotal: extract?.total
+        }
+      })
     },
     async loadFilterData() {
       try {
@@ -250,17 +273,18 @@ export default {
           endDate: this.filters.endDate,
           contractorId: this.filters.contractorId,
           locationId: this.filters.locationId,
+          areaId: this.filters.areaId,
           itemId: this.filters.itemId
         }
         const cleanParams = buildQueryParams(queryParams)
         const res = await getExtracts(cleanParams)
         const responseData = res.data
         if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          this.extracts = responseData.items.map(this.normalizeExtractForList)
+          this.extracts = responseData.items.flatMap(this.normalizeExtractForList)
           this.total = responseData.meta?.total || responseData.total || this.extracts.length
           this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
         } else if (Array.isArray(res.data)) {
-          this.extracts = res.data.map(this.normalizeExtractForList)
+          this.extracts = res.data.flatMap(this.normalizeExtractForList)
           this.total = res.data.length
         } else {
           this.extracts = []
@@ -315,7 +339,7 @@ export default {
       try { return new Intl.DateTimeFormat('en-GB').format(new Date(dateString)) } catch (e) { return dateString }
     },
 
-    formatNumber(v) { return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 }) },
+    // formatNumber(v) { return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 }) },
     formatCurrency(v) {
       if (v === undefined || v === null || v === '') return '-'
       const n = Number(v)

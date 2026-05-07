@@ -17,7 +17,8 @@ export const extractLineSchema = z.object({
 })
 
 export const createExtractSchema = z.object({
-  date: z.string().min(1),
+  dateFrom: z.string().min(1),
+  dateTo: z.string().min(1),
   contractorId: z.number().int().positive(),
   locationId: z.number().int().positive(),
   areaId: z.number().int().positive().optional(),
@@ -25,6 +26,9 @@ export const createExtractSchema = z.object({
   total: z.number().nonnegative().optional(),
   lines: z.array(extractLineSchema).min(1),
   idempotencyKey: z.string().optional()
+}).refine(payload => payload.dateTo >= payload.dateFrom, {
+  message: 'Date To must be greater than or equal to Date From',
+  path: ['dateTo']
 })
 
 export function parseCreateExtract(payload) {

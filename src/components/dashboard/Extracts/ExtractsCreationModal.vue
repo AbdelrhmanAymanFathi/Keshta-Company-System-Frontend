@@ -36,12 +36,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                      {{ $t('labels.date') }} <span class="text-red-600">*</span>
+                      {{ $t('labels.dateFrom') || 'Date From' }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative">
                       <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                       <DateField
-                        v-model="commonData.date"
+                        v-model="commonData.dateFrom"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
                       />
                     </div>
@@ -49,46 +49,12 @@
 
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                      {{ $t('labels.item') }} <span class="text-red-600">*</span>
-                    </label>
-                    <div class="relative flex items-center gap-2">
-                      <div class="flex-1 relative">
-                        <SearchDropdown
-                          v-model="filters.commonItemSearch"
-                          :items="extractItems"
-                          :allItems="extractItems"
-                          :placeholder="$t('labels.item')"
-                          :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
-                          @select="selectCommonItem"
-                        >
-                          <template #prefix>
-                            <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                          </template>
-                          <template #afterOptions>
-                            <div
-                              @click="showAddExportItemDialog = true"
-                              style="color: #10b981;"
-                              class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
-                            >
-                              + {{ $t('labels.addNew') }}
-                            </div>
-                          </template>
-                        </SearchDropdown>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                      {{ $t('labels.price') }} <span class="text-red-600">*</span>
+                      {{ $t('labels.dateTo') || 'Date To' }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative">
-                      <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                      <input
-                        v-model.number="commonData.price"
-                        type="number"
-                        step="0.01"
-                        min="0"
+                      <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <DateField
+                        v-model="commonData.dateTo"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
                       />
                     </div>
@@ -187,7 +153,7 @@
                     </div>
                   </div>
 
-                  <div>
+                  <!-- <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">
                       {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
                     </label>
@@ -216,7 +182,7 @@
                         </SearchDropdown>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
 
                   <div class="col-span-full">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.notes') }}</label>
@@ -264,16 +230,12 @@
                 <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd>
+                    <dt class="font-semibold text-gray-700">{{ $t('labels.dateFrom') || 'Date From' }}:</dt>
+                    <dd class="text-gray-900 mt-1">{{ commonData.dateFrom || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
-                  </div>
-                  <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.price') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ formatCurrency(commonData.price) }}</dd>
+                    <dt class="font-semibold text-gray-700">{{ $t('labels.dateTo') || 'Date To' }}:</dt>
+                    <dd class="text-gray-900 mt-1">{{ commonData.dateTo || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
                     <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
@@ -287,10 +249,10 @@
                     <dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt>
                     <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                   </div>
-                  <div class="flex flex-col">
+                  <!-- <div class="flex flex-col">
                     <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
                     <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
-                  </div>
+                  </div> -->
                   <div class="flex flex-col col-span-full">
                     <dt class="font-semibold text-gray-700">{{ $t('labels.notes') }}:</dt>
                     <dd class="text-gray-900 mt-1">{{ commonData.notes || '-' }}</dd>
@@ -308,7 +270,7 @@
               </div>
 
               <div class="mb-8 relative border border-gray-200 rounded-lg overflow-visible p-2">
-                <div class="overflow-x-auto w-full">
+                <div class="overflow-x-auto overflow-y-visible w-full">
                   <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                     <thead class="bg-indigo-50 sticky top-0 z-10">
                       <tr>
@@ -323,21 +285,75 @@
                     <tbody class="divide-y divide-gray-200 bg-white">
                       <tr v-for="(row, index) in rows" :key="row.id">
                         <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
-                        <td class="px-3 py-2">
-                          <div class="text-sm text-gray-800">{{ commonData.item?.name || '-' }}</div>
+                        <td class="px-3 py-2" :ref="el => row.itemCell = el">
+                          <div class="relative">
+                            <div
+                              class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
+                              @mousedown.prevent="toggleItemDropdown(row)"
+                            >
+                              <input
+                                v-model="row.itemSearch"
+                                type="text"
+                                :placeholder="row.item?.name || $t('labels.item')"
+                                class="outline-none flex-1 text-sm bg-transparent"
+                                @keydown.enter.prevent
+                                @keydown.escape="row.itemOpen = false"
+                                @keydown="onItemDropdownKeydown($event, row)"
+                                @mousedown.prevent=""
+                                @focus="row.itemOpen = true"
+                                @blur="row.itemOpen = false"
+                              />
+                              <span class="text-gray-400">▾</span>
+                            </div>
+
+                            <teleport to=".modal-body-container" v-if="row.itemOpen">
+                              <div
+                                class="extract-item-dropdown absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl z-[9999]"
+                                :style="getItemDropdownStyle(row)"
+                                @click.stop
+                              >
+                                <div
+                                  v-if="filteredExtractItems(row).length === 0"
+                                  class="px-3 py-2 text-sm text-gray-500 text-start"
+                                >
+                                  {{ $t('labels.noResults') || 'No items found' }}
+                                </div>
+
+                                <div
+                                  v-for="(item, itemIndex) in filteredExtractItems(row)"
+                                  :key="item.id"
+                                  @mousedown.prevent="selectRowItem(row, item)"
+                                  @mousemove="row.highlightedItemIndex = itemIndex"
+                                  :class="[
+                                    'px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start',
+                                    itemIndex === row.highlightedItemIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
+                                  ]"
+                                >
+                                  {{ item.name }}
+                                </div>
+
+                                <!-- <div
+                                  @mousedown.prevent="pendingItemRow = row; row.itemOpen = false; showAddExportItemDialog = true"
+                                  class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start"
+                                >
+                                  + {{ $t('labels.addNew') }}
+                                </div> -->
+                              </div>
+                            </teleport>
+                          </div>
                         </td>
                         <td class="px-3 py-2">
                           <input
                             :ref="el => row.quantityInput = el"
-                            v-model.number="row.quantity"
+                            v-model="row.quantity"
                             type="number"
-                            min="1"
                             step="1"
                             @input="syncRowTotal(row)"
                             @keydown.enter.prevent="handleEnterKey(index)"
                             class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
                           />
                         </td>
+                        
                         <td class="px-3 py-2">
                           <input
                             v-model.number="row.price"
@@ -483,8 +499,6 @@
 <script>
 import {
   CalendarDaysIcon,
-  ArchiveBoxIcon,
-  CurrencyDollarIcon,
   MapPinIcon,
   MapIcon,
   UserGroupIcon,
@@ -517,8 +531,6 @@ export default {
     SearchDropdown,
     DateField,
     CalendarDaysIcon,
-    ArchiveBoxIcon,
-    CurrencyDollarIcon,
     MapPinIcon,
     MapIcon,
     UserGroupIcon,
@@ -559,7 +571,6 @@ export default {
       sites: [],
       allLocations: [],
       filters: {
-        commonItemSearch: '',
         commonSiteSearch: '',
         commonAreaSearch: '',
         commonContractorSearch: '',
@@ -574,6 +585,7 @@ export default {
       showAddCrusherDialog: false,
       newCrusherName: '',
       showAddExportItemDialog: false,
+      pendingItemRow: null,
       newExportItemForm: {
         name: '',
         currentPrice: ''
@@ -609,12 +621,101 @@ export default {
       if (this.isOpen || this.items.length) this.loadExportItems()
     }
   },
+  mounted() {
+    document.addEventListener('click', this.handleGlobalClick)
+  },
+
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleGlobalClick)
+  },
   methods: {
+    handleGlobalClick(e) {
+      const isClickInDropdown = e.target.closest('.extract-item-dropdown')
+      const isClickInTable = e.target.closest('table')
+
+      if (!isClickInDropdown && !isClickInTable) {
+        this.rows.forEach(row => {
+          row.itemOpen = false
+        })
+      }
+    },
+
+    toggleItemDropdown(row) {
+      this.rows.forEach(r => {
+        if (r !== row) r.itemOpen = false
+      })
+
+      row.itemOpen = !row.itemOpen
+
+      if (row.itemOpen) {
+        this.$nextTick(() => {
+          const input = row.itemCell?.querySelector('input')
+          if (input) input.focus()
+        })
+      }
+    },
+
+    filteredExtractItems(row) {
+      const q = (row.itemSearch || '').toLowerCase().trim()
+
+      if (!q) return this.extractItems
+
+      return this.extractItems.filter(item =>
+        (item.name || '').toLowerCase().includes(q)
+      )
+    },
+
+    getItemDropdownStyle(row) {
+      if (!row.itemCell) return {}
+
+      const rect = row.itemCell.getBoundingClientRect()
+      const container = document.querySelector('.modal-body-container')
+      const containerRect = container?.getBoundingClientRect()
+
+      if (!container || !containerRect) return {}
+
+      const top = rect.bottom - containerRect.top + container.scrollTop + 4
+      const left = rect.left - containerRect.left + container.scrollLeft
+
+      return {
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${rect.width}px`,
+        zIndex: '9999'
+      }
+    },
+
+    onItemDropdownKeydown(event, row) {
+      const items = this.filteredExtractItems(row)
+
+      if (!items.length) return
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        row.highlightedItemIndex = Math.min(
+          (row.highlightedItemIndex || 0) + 1,
+          items.length - 1
+        )
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        row.highlightedItemIndex = Math.max(
+          (row.highlightedItemIndex || 0) - 1,
+          0
+        )
+      }
+
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        const selected = items[row.highlightedItemIndex || 0]
+        if (selected) this.selectRowItem(row, selected)
+      }
+    },
     getDefaultCommonData() {
       return {
-        date: '',
-        item: null,
-        price: 0,
+        dateFrom: '',
+        dateTo: '',
         site: null,
         area: null,
         contractor: null,
@@ -624,13 +725,17 @@ export default {
       }
     },
     getDefaultRow() {
-      const price = Number(this.commonData.price || 0)
       return {
         id: Date.now() + Math.random(),
-        itemId: this.commonData.item?.id ? String(this.commonData.item.id) : '',
-        quantity: 1,
-        price,
-        total: price > 0 ? Number(price.toFixed(2)) : 0,
+        itemId: '',
+        item: null,
+        itemSearch: '',
+        itemOpen: false,
+        highlightedItemIndex: 0,
+        itemCell: null,
+        quantity: '',
+        price: '',
+        total: 0,
         quantityInput: null
       }
     },
@@ -645,7 +750,6 @@ export default {
       this.commonData = this.getDefaultCommonData()
       this.rows = []
       this.filters = {
-        commonItemSearch: '',
         commonSiteSearch: '',
         commonAreaSearch: '',
         commonContractorSearch: '',
@@ -656,6 +760,7 @@ export default {
       this.newContractorName = ''
       this.newCrusherName = ''
       this.newExportItemForm = { name: '', currentPrice: '' }
+      this.pendingItemRow = null
     },
     async openModal() {
       this.resetState()
@@ -718,16 +823,33 @@ export default {
         console.warn('Failed to load export items', error)
       }
     },
-    selectCommonItem(item) {
-      this.commonData.item = item
-      this.filters.commonItemSearch = item?.name || ''
-      this.syncRowsWithCommonItem()
-      const maybePrice = item?.defaultExtractPrice ?? item?.currentPrice ?? item?.price ?? item?.current_price
-      const parsed = Number(maybePrice)
-      if (!Number.isNaN(parsed)) {
-        this.commonData.price = parsed
-        this.syncRowsWithCommonPrice()
+    selectRowItem(row, item) {
+      if (!row || !item) return
+
+      row.item = item
+      row.itemId = item.id
+      row.itemSearch = item.name
+      row.itemOpen = false
+      row.highlightedItemIndex = 0
+
+      const maybePrice =
+        item.currentPrice ??
+        item.defaultExtractPrice ??
+        item.defaultExportPrice ??
+        item.price ??
+        item.current_price
+
+      const parsedPrice = Number(maybePrice)
+
+      if (!Number.isNaN(parsedPrice)) {
+        row.price = parsedPrice
       }
+
+      this.syncRowTotal(row)
+
+      this.$nextTick(() => {
+        row.quantityInput?.focus?.()
+      })
     },
     selectSite(site) {
       this.commonData.site = site
@@ -749,12 +871,11 @@ export default {
     },
     isStep1Valid() {
       return Boolean(
-        this.commonData.date &&
-        this.commonData.item &&
-        Number(this.commonData.price) > 0 &&
+        this.commonData.dateFrom &&
+        this.commonData.dateTo &&
+        this.commonData.dateTo >= this.commonData.dateFrom &&
         this.commonData.site &&
-        this.commonData.contractor &&
-        this.commonData.crusher
+        this.commonData.contractor
       )
     },
     goToStep2() {
@@ -762,39 +883,27 @@ export default {
       this.currentStep = 2
       if (!this.rows.length) {
         this.rows = [this.getDefaultRow()]
-      } else {
-        this.syncRowsWithCommonItem()
-        this.syncRowsWithCommonPrice()
       }
     },
     goBackToStep1() {
       this.currentStep = 1
     },
-    syncRowsWithCommonItem() {
-      const itemId = this.commonData.item?.id ? String(this.commonData.item.id) : ''
-      this.rows.forEach(row => {
-        row.itemId = itemId
-      })
-    },
-    syncRowsWithCommonPrice() {
-      const nextPrice = Number(this.commonData.price || 0)
-      this.rows.forEach(row => {
-        if (row.price === null || row.price === undefined || row.price === '' || Number(row.price) === 0) {
-          row.price = nextPrice
-        }
-        this.syncRowTotal(row)
-      })
-    },
     syncRowTotal(row) {
-      const price = Number(row.price || 0)
-      const quantity = Math.max(1, Number(row.quantity || 0))
-      row.quantity = quantity
-      row.total = Number((price * quantity).toFixed(2))
+      // const price = Number(row.price || 0)
+      // const quantity = Math.max(1, Number(row.quantity || 0))
+      // row.quantity = quantity
+      row.total = this.totalPerRow(row)
     },
     totalPerRow(row) {
-      const total = Number(row.total)
-      if (!Number.isNaN(total) && total > 0) return total
-      return Number((Number(row.price || 0) * Number(row.quantity || 0)).toFixed(2)) || 0
+      const quantity = row.quantity === '' || row.quantity === null || row.quantity === undefined
+        ? 0
+        : Number(row.quantity)
+
+      const price = row.price === '' || row.price === null || row.price === undefined
+        ? 0
+        : Number(row.price)
+
+      return quantity * price
     },
     addRow() {
       this.rows.push(this.getDefaultRow())
@@ -859,37 +968,50 @@ export default {
       this.isSaving = true
 
       try {
-        const lines = this.rows
-          .map(row => {
-            const quantity = Number(row.quantity || 0)
-            const rawPrice = row.price === '' || row.price === null || row.price === undefined ? null : Number(row.price)
-            const fallbackPrice = Number(this.commonData.price || 0)
-            const price = rawPrice !== null && !Number.isNaN(rawPrice) ? rawPrice : fallbackPrice
-            const total = Number((price * quantity).toFixed(2))
 
-            return {
-              itemId: this.toNumericId(row.itemId || this.commonData.item?.id),
-              quantity,
-              price,
-              total
-            }
-          })
-          .filter(line => line.itemId && line.quantity > 0)
+        
+        // const lines = this.rows
+        //   .map(row => {
+        //     const quantity = Number(row.quantity)
+        //     const rawPrice = row.price === '' || row.price === null || row.price === undefined ? null : Number(row.price)
+        //     const price = rawPrice !== null && !Number.isNaN(rawPrice) ? rawPrice : undefined
 
-        if (!lines.length) {
-          this.saveError = this.$t('labels.noData') || 'No data'
-          this.isSaving = false
-          return
-        }
+        //     if (!row.quantity || Number.isNaN(quantity) || quantity <= 0) {
+        //       throw new Error('Quantity is required')
+        //     }
+
+        //     const line = {
+        //       itemId: this.toNumericId(row.itemId),
+        //       quantity
+        //     }
+        //     if (price !== undefined) {
+        //       line.price = price
+        //       line.total = Number((price * quantity).toFixed(2))
+        //     }
+        //     return line
+        //   })
+        //   .filter(line => line.itemId && line.quantity > 0)
+
+        // if (!lines.length) {
+        //   this.saveError = this.$t('labels.noData') || 'No data'
+        //   this.isSaving = false
+        //   return
+        // }
 
         const payload = {
-          date: this.commonData.date,
+          dateFrom: this.commonData.dateFrom,
+          dateTo: this.commonData.dateTo,
           contractorId: this.toNumericId(this.commonData.contractor?.id),
           locationId: this.toNumericId(this.commonData.site?.id),
           areaId: this.toNumericId(this.commonData.area?.id),
           notes: this.commonData.notes || '',
           total: Number(this.subtotal.toFixed(2)),
-          lines,
+          lines: this.rows.map(row => ({
+            itemId: Number(row.itemId),
+            quantity: Number(row.quantity),
+            price: Number(row.price),
+            total: Number(this.totalPerRow(row))
+          })),
           idempotencyKey: this.commonData.idempotencyKey || this.genIdempotencyKey()
         }
 
@@ -1016,10 +1138,9 @@ export default {
         const newItem = res?.data
         await this.loadExportItems()
         const updatedItem = this.extractItems.find(item => item.id === newItem?.id)
-        if (updatedItem) {
-          this.selectCommonItem(updatedItem)
-        }
+        if (updatedItem && this.pendingItemRow) this.selectRowItem(this.pendingItemRow, updatedItem)
         this.newExportItemForm = { name: '', currentPrice: '' }
+        this.pendingItemRow = null
         this.showAddExportItemDialog = false
       } catch (error) {
         this.exportItemDialogError = error?.response?.data?.message || error?.message || 'Error'

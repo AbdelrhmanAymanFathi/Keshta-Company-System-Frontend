@@ -1,6 +1,25 @@
 <template>
-  <div class="grid grid-cols-6 gap-2 items-center">
-    <input v-model="internal.itemId" placeholder="Item ID" class="col-span-2 p-2 border rounded" />
+  <div class="grid grid-cols-6 gap-2 items-start">
+    <div class="col-span-2">
+      <SearchDropdown
+        v-model="internal.itemSearch"
+        :items="items"
+        :allItems="items"
+        :placeholder="$t ? $t('labels.item') : 'Item'"
+        :inputClass="'w-full p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'"
+        @select="selectItem"
+      >
+        <template #afterOptions>
+          <div
+            @click="emitAddItem"
+            style="color: #10b981;"
+            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
+          >
+            + {{ $t ? $t('labels.addNew') : 'Add New' }}
+          </div>
+        </template>
+      </SearchDropdown>
+    </div>
     <div class="relative">
       <input type="number" step="0.01" v-model="internal.price" placeholder="Price" class="p-2 border rounded" />
       <div v-if="showDefaultHint" class="text-xs text-gray-500 mt-1">Will use item default extract price</div>
@@ -14,19 +33,16 @@
 <script setup>
 /* global defineProps, defineEmits */
 import { reactive, watch, computed } from 'vue'
+import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 
 const props = defineProps({
   modelValue: {
     type: Object,
-    default: () => ({ itemId: '', price: null, quantity: 1, total: null })
+    default: () => ({ itemId: '', itemSearch: '', price: null, quantity: 1, total: null })
   },
-  // optional hint: item default extract price (number|null)
-  itemDefaultPrice: {
-    type: [Number, String, null],
-    default: null
-  }
+  items: { type: Array, default: () => [] }
 })
-const emit = defineEmits(['update:modelValue','remove'])
+const emit = defineEmits(['update:modelValue', 'remove', 'add-item'])
 
 const internal = reactive({ ...props.modelValue })
 
@@ -35,7 +51,9 @@ watch(() => props.modelValue, (v) => {
 })
 
 const showDefaultHint = computed(() => {
-  return (internal.price === null || internal.price === '' || internal.price === undefined) && (props.itemDefaultPrice !== null && props.itemDefaultPrice !== undefined)
+  const item = props.items.find(i => Number(i.id) === Number(internal.itemId))
+  const defaultPrice = item?.defaultExtractPrice ?? item?.currentPrice ?? item?.price ?? item?.current_price
+  return (internal.price === null || internal.price === '' || internal.price === undefined) && defaultPrice !== null && defaultPrice !== undefined
 })
 
 const formattedTotal = computed(() => {
@@ -53,9 +71,7 @@ watch(internal, (val) => {
   const qtyNum = Number(val.quantity) || 0
 
   if (priceNum !== null && !Number.isNaN(priceNum)) {
-    if (val.total === null || val.total === undefined || val.total === '') {
-      val.total = Number((priceNum * qtyNum).toFixed(2))
-    }
+    val.total = Number((priceNum * qtyNum).toFixed(2))
   } else {
     // price not set — keep total as provided (could be null) and don't override
     if (val.total === undefined) val.total = null
@@ -66,6 +82,21 @@ watch(internal, (val) => {
 
 function onRemove() {
   emit('remove')
+}
+
+function emitAddItem() {
+  emit('add-item')
+}
+
+function selectItem(item) {
+  internal.itemId = item?.id || ''
+  internal.itemSearch = item?.name || ''
+  const maybePrice = item?.defaultExtractPrice ?? item?.currentPrice ?? item?.price ?? item?.current_price
+  const parsed = Number(maybePrice)
+  if (!Number.isNaN(parsed) && (internal.price === null || internal.price === undefined || internal.price === '' || Number(internal.price) === 0)) {
+    internal.price = parsed
+    internal.total = Number((parsed * Number(internal.quantity || 0)).toFixed(2))
+  }
 }
 </script>
 

@@ -17,6 +17,12 @@
 
             <div class="max-w-6xl mx-auto">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <!-- Date -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.date') }} <span class="text-red-600">*</span></label>
+                  <DateField v-model="form.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                </div>
+                
                 <!-- Equipment -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
@@ -33,6 +39,19 @@
                   <div class="relative">
                     <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
                   </div>
+                </div>
+
+                <!-- Driver -->
+                <div v-if="isCompanyOwnedEquipment">
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.driver') }}</label>
+                  <SearchDropdown
+                    v-model="form.driverLabel"
+                    :items="drivers"
+                    :allItems="drivers"
+                    :placeholder="$t('labels.driver')"
+                    :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                    @select="selectDriver"
+                  />
                 </div>
 
                 <!-- Contractor (readonly, auto-populated from equipment selection) -->
@@ -131,6 +150,14 @@
                   <dd class="text-gray-900 mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
                 </div>
                 <div class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ form.date || '-' }}</dd>
+                </div>
+                <div v-if="isCompanyOwnedEquipment" class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('labels.driver') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ form.driverLabel || '-' }}</dd>
+                </div>
+                <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ form.site?.name || '-' }}</dd>
                 </div>
@@ -152,10 +179,7 @@
                   <thead class="bg-indigo-50 sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.date') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('equipmentLog.equipment') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.hours') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.driver') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.notes') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
@@ -165,53 +189,10 @@
                     <tr v-for="(row, index) in rows" :key="row.id">
                       <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
-                      <!-- Date (editable) -->
-                      <td class="px-3 py-2">
-                        <DateField v-model="row.date" @keydown.enter.prevent="handleEnterKey(index)" class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-                      </td>
-
-                      <!-- Equipment (readonly, from step 1 selection) -->
-                      <td class="px-3 py-2">
-                        <div class="text-sm text-gray-800">{{ selectedEquipmentName || form.equipmentLabel || '-' }}</div>
-                      </td>
-
                       <!-- Hours -->
                       <td class="px-3 py-2">
                         <input :ref="el => row.hoursInput = el" type="number" v-model.number="row.hours" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
-                      </td>
-
-                      <!-- Driver -->
-                      <td class="px-3 py-2" :ref="el => row.driverCell = el">
-                        <div class="relative">
-                          <div
-                            class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
-                            @click.stop="toggleDriverDropdown(row)">
-                            <input v-model="row.search" type="text"
-                              :placeholder="$t('labels.driver')"
-                              class="outline-none flex-1 text-sm bg-transparent text-gray-900 placeholder:text-gray-400"
-                              @keydown.enter.prevent
-                              @keydown.escape="row.open = false"
-                              @keydown="onDropdownKeydown($event, row, filteredDrivers(row), (sel) => selectDriverRow(row, sel))"
-                              @focus="onDriverFieldFocus(row)" @blur="onInputBlur(row)" />
-                            <span class="text-gray-400">▾</span>
-                          </div>
-                        </div>
-
-                        <teleport to="body" v-if="row.open">
-                          <div
-                            class="border border-gray-200 bg-white rounded-md shadow-2xl"
-                            :style="getDriverDropdownStyle(row)" @click.stop>
-
-                            <div v-for="(d, di) in filteredDrivers(row)" :key="d.id" @mousedown.prevent="selectDriverRow(row, d)"
-                              @mousemove="row.highlightedIndex = di"
-                              :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', di === row.highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
-                              {{ d.name }}
-                            </div>
-
-                            <div v-if="(!drivers || !drivers.length)" class="px-3 py-2 text-sm text-gray-500">{{ $t('labels.noResults') || 'No results' }}</div>
-                          </div>
-                        </teleport>
                       </td>
 
                       <!-- Notes -->
@@ -333,7 +314,9 @@ export default {
         site: null,
         area: null,
         notes: this.modelValue.note ?? this.modelValue.notes ?? '',
-        isRental: Boolean(this.modelValue.isRental)
+        isRental: this.modelValue.isRental !== undefined
+          ? Boolean(this.modelValue.isRental)
+          : (this.modelValue.isCompanyOwned !== undefined ? !Boolean(this.modelValue.isCompanyOwned) : false)
       },
       rows: [],
       isSaving: false,
@@ -368,6 +351,9 @@ export default {
       // Show contractor field when the selected equipment has a contractor
       // and the entry is considered a rental (not company-owned).
       return Boolean((this.form && (this.form.contractorId != null && this.form.contractorId !== '')) && this.form.isRental)
+    },
+    isCompanyOwnedEquipment() {
+      return !Boolean(this.form.isRental)
     },
     rowsTotal() {
       return (this.rows || []).reduce((s, r) => {
@@ -538,14 +524,26 @@ export default {
         this.form.contractorId = ''
         this.form.contractorLabel = ''
         this.form.isRental = false
+        this.clearDriver()
         return 
       }
       this.form.equipmentId = item.id != null ? Number(item.id) : ''
       this.form.equipmentLabel = item.name ?? ''
       this.form.contractorId = item.contractorId != null ? Number(item.contractorId) : ''
       this.form.contractorLabel = item.contractorName ?? item.contractor?.name ?? ''
-      this.form.isRental = Boolean(item.contractorId ?? item.contractor ?? false)
+      this.form.isRental = this.equipmentIsRental(item)
+      if (this.form.isRental) this.clearDriver()
       if (item.hourlyRate != null && item.hourlyRate !== '') this.form.hourlyRate = Number(item.hourlyRate)
+    },
+    equipmentIsRental(item) {
+      if (!item) return false
+      if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) return !Boolean(item.isCompanyOwned)
+      if (Object.prototype.hasOwnProperty.call(item, 'isRental')) return Boolean(item.isRental)
+      return Boolean(item.contractorId ?? item.contractor ?? false)
+    },
+    clearDriver() {
+      this.form.driverId = ''
+      this.form.driverLabel = ''
     },
     selectDriver(item) {
       if (!item) { this.form.driverId = ''; this.form.driverLabel = ''; return }
@@ -555,6 +553,7 @@ export default {
     isStep1Valid() {
       const hr = Number(this.form.hourlyRate)
       return (this.form.equipmentLabel || this.form.equipmentId) &&
+        Boolean(this.form.date) &&
         (this.form.site && this.form.site.id) &&
         !Number.isNaN(hr) && hr >= 0
     },
@@ -748,26 +747,25 @@ export default {
           if (foundDriver && foundDriver.id != null) driverIdNumeric = Number(foundDriver.id)
         }
         if (isNaN(driverIdNumeric)) driverIdNumeric = null
+        if (!this.isCompanyOwnedEquipment) {
+          driverIdNumeric = null
+          this.clearDriver()
+        }
 
         const hourlyRateNum = Number(this.form.hourlyRate || 0)
 
-        // Build rows payload (each row: date, hours, driverId, driverLabel, note, hourlyRate, total)
+        const commonDate = (this.form.date && formatToISODate(this.form.date)) || getTodayISO()
+
+        // Build rows payload. Step-one date/driver apply to every row.
         const rowsPayload = (this.rows || []).map(r => {
-          const dateVal = (r.date && formatToISODate(r.date)) || (this.form.date && formatToISODate(this.form.date)) || getTodayISO()
           const hoursVal = Number(r.hours || 0)
-          let driverIdVal = null
-          if (r.driver && r.driver.id != null) driverIdVal = Number(r.driver.id)
-          else if (r.driverLabel) {
-            const found = (this.drivers || []).find(d => (d.name || '').toString() === r.driverLabel)
-            if (found && found.id != null) driverIdVal = Number(found.id)
-          }
           const rowHourly = Number(r.hourlyRate != null ? r.hourlyRate : this.form.hourlyRate || 0)
           const rowTotal = Number((hoursVal * rowHourly).toFixed(2))
           return {
-            date: new Date(dateVal).toISOString(),
+            date: new Date(commonDate).toISOString(),
             hours: hoursVal,
-            driverId: driverIdVal,
-            driverLabel: r.driverLabel || '',
+            driverId: driverIdNumeric,
+            driverLabel: this.isCompanyOwnedEquipment ? (this.form.driverLabel || '') : '',
             note: r.notes || '',
             hourlyRate: rowHourly,
             total: rowTotal
@@ -778,9 +776,11 @@ export default {
         const hoursSum = rowsPayload.reduce((s, rr) => s + (Number(rr.hours) || 0), 0)
 
         const payload = {
-          date: new Date(this.form.date).toISOString(),
+          date: new Date(commonDate).toISOString(),
           equipmentId: equipmentIdNumeric,
           contractorId: this.form.contractorId || null,
+          driverId: driverIdNumeric,
+          driverLabel: this.isCompanyOwnedEquipment ? (this.form.driverLabel || '') : '',
           hourlyRate: hourlyRateNum,
           hours: hoursSum || Number(this.form.hours || 0),
           total: Number(totalSum.toFixed(2)),

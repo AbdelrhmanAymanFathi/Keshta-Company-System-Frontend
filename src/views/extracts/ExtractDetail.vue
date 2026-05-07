@@ -7,7 +7,8 @@
       <div class="mb-4">
         <strong>ID:</strong> {{ extract.id }}
       </div>
-      <div class="mb-2"><strong>Date:</strong> {{ extract.date || '-' }}</div>
+      <div class="mb-2"><strong>Date From:</strong> {{ formatDate(extract.dateFrom || extract.date) }}</div>
+      <div class="mb-2"><strong>Date To:</strong> {{ formatDate(extract.dateTo || extract.date) }}</div>
       <div class="mb-2"><strong>Contractor:</strong> {{ extract.contractor?.name || extract.contractorId || '-' }}</div>
       <div class="mb-2"><strong>Location:</strong> {{ extract.location?.name || '-' }}</div>
       <div class="mb-2"><strong>Area:</strong> {{ extract.area?.name || '-' }}</div>
@@ -33,6 +34,15 @@ const id = route.params.id
 const extract = ref(null)
 const isLoading = ref(false)
 const error = ref(null)
+
+function formatDate(value) {
+  if (!value) return '-'
+  try {
+    return new Intl.DateTimeFormat('en-GB').format(new Date(value))
+  } catch (e) {
+    return value
+  }
+}
 
 onMounted(async () => {
   if (!id) return

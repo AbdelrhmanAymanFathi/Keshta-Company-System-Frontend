@@ -7,36 +7,18 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.date') }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.dateFrom') || 'Date From' }} <span class="text-red-600">*</span></label>
             <div class="relative">
               <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              <DateField v-model="commonData.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+              <DateField v-model="commonData.dateFrom" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.item') }} <span class="text-red-600">*</span></label>
-            <div class="relative flex items-center gap-2">
-              <div class="flex-1 relative">
-                <SearchDropdown v-model="filters.commonItemSearch" :items="exportItems" :allItems="exportItems" :placeholder="$t('labels.item')"
-                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
-                  @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }">
-                  <template #prefix>
-                    <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                  </template>
-                  <template #afterOptions>
-                    <div @click="showAddExportItemDialog = true" style="color: #10b981;" class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
-                  </template>
-                </SearchDropdown>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.price') }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.dateTo') || 'Date To' }} <span class="text-red-600">*</span></label>
             <div class="relative">
-              <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              <input type="number" v-model.number="commonData.price" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+              <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              <DateField v-model="commonData.dateTo" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
             </div>
           </div>
 
@@ -136,9 +118,8 @@
         <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
           <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
           <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.price') }}:</dt><dd class="text-gray-900 mt-1">{{ formatCurrency(commonData.price) }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.dateFrom') || 'Date From' }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.dateFrom || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.dateTo') || 'Date To' }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.dateTo || '-' }}</dd></div>
             <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd></div>
             <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd></div>
             <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd></div>
@@ -151,7 +132,16 @@
 
         <div class="mb-8 relative border border-gray-200 rounded-lg overflow-visible p-2">
           <div class="overflow-x-auto w-full">
-            <div class="space-y-2"><ExtractLineEditor v-for="(r, i) in rows" :key="r.id" v-model="rows[i]" :itemDefaultPrice="commonData.item?.defaultExtractPrice ?? commonData.item?.currentPrice" @remove="() => removeRow(i)" /></div>
+            <div class="space-y-2">
+              <ExtractLineEditor
+                v-for="(r, i) in rows"
+                :key="r.id"
+                v-model="rows[i]"
+                :items="exportItems"
+                @add-item="pendingRow = r; showAddExportItemDialog = true"
+                @remove="() => removeRow(i)"
+              />
+            </div>
           </div>
         </div>
 
@@ -190,8 +180,6 @@ import { getContractors, getLocations, getCrushers, getExportItems, getVehicles,
 import normalizeItem from '@/utils/normalizeItem'
 import {
   CalendarDaysIcon,
-  ArchiveBoxIcon,
-  CurrencyDollarIcon,
   MapPinIcon,
   MapIcon,
   UserGroupIcon,
@@ -203,7 +191,7 @@ import {
 
 export default {
   name: 'CreateExtractView',
-  components: { ExtractLineEditor, SearchDropdown, DateField, CalendarDaysIcon, ArchiveBoxIcon, CurrencyDollarIcon, MapPinIcon, MapIcon, UserGroupIcon, WrenchScrewdriverIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon },
+  components: { ExtractLineEditor, SearchDropdown, DateField, CalendarDaysIcon, MapPinIcon, MapIcon, UserGroupIcon, WrenchScrewdriverIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon },
   props: { modalMode: { type: Boolean, default: false } },
   emits: ['submitted', 'cancelled', 'step-change'],
   setup(props, { emit }) {
@@ -213,9 +201,8 @@ export default {
     const currentStep = ref(1)
 
     const commonData = reactive({
-      date: '',
-      item: null,
-      price: 0,
+      dateFrom: '',
+      dateTo: '',
       site: null,
       area: null,
       contractor: null,
@@ -240,7 +227,7 @@ export default {
     const contractorsWithVehicles = ref([])
 
     // search filters group (used by SearchDropdown v-model)
-    const filters = reactive({ commonItemSearch: '', commonSiteSearch: '', commonAreaSearch: '', commonContractorSearch: '', commonCrusherSearch: '' })
+    const filters = reactive({ commonSiteSearch: '', commonAreaSearch: '', commonContractorSearch: '', commonCrusherSearch: '' })
 
     // small dialog state + errors
     const showAddSite = ref(false)
@@ -275,7 +262,7 @@ export default {
     }
 
     function createEmptyRow() {
-      return { id: Date.now() + Math.random(), itemId: commonData.item?.id || '', price: Number(commonData.price || 0), quantity: 1, total: 0 }
+      return { id: Date.now() + Math.random(), itemId: '', itemSearch: '', price: '', quantity: 1, total: 0 }
     }
 
     function addRow() { rows.value.push(createEmptyRow()) }
@@ -287,21 +274,11 @@ export default {
     function formatCurrency(v){ if (v===undefined||v===null||v==='') return '-'; const n=Number(v); if (Number.isNaN(n)) return v; return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(n) }
 
     function isStep1Valid(){
-      return commonData.date && commonData.item && Number(commonData.price) > 0 && commonData.site && commonData.contractor
-    }
-
-    function onItemSelect(sel){ commonData.item = sel; filters.commonItemSearch = sel?.name || ''; // auto-fill price
-      const maybePrice = sel?.defaultExtractPrice ?? sel?.currentPrice ?? sel?.defaultSupplyPrice ?? sel?.defaultExportPrice ?? sel?.price ?? sel?.current_price
-      const parsed = Number(maybePrice)
-      if (!Number.isNaN(parsed)) commonData.price = parsed
-    }
-
-    function onCommonItemSelect(){
-      const sel = commonData.item
-      filters.commonItemSearch = sel?.name || ''
-      const maybePrice = sel?.defaultExtractPrice ?? sel?.currentPrice ?? sel?.defaultSupplyPrice ?? sel?.defaultExportPrice ?? sel?.price ?? sel?.current_price
-      const parsed = Number(maybePrice)
-      if (!Number.isNaN(parsed)) commonData.price = parsed
+      return commonData.dateFrom &&
+        commonData.dateTo &&
+        commonData.dateTo >= commonData.dateFrom &&
+        commonData.site &&
+        commonData.contractor
     }
 
     function onCommonSiteChange(){
@@ -408,20 +385,9 @@ export default {
       saveError.value = ''
       isSaving.value = true
       try{
-        // Client-side validation for missing line prices: if a line has no price and
-        // the selected item has no defaultExtractPrice, block submit.
-        for (const r of rows.value) {
-          const priceEmpty = r.price === null || r.price === undefined || r.price === ''
-          const itemDefault = commonData.item?.defaultExtractPrice ?? commonData.item?.currentPrice ?? null
-          if (priceEmpty && (itemDefault === null || itemDefault === undefined)) {
-            saveError.value = 'Each line must have a price or the selected item must define a default extract price.'
-            isSaving.value = false
-            return
-          }
-        }
-
         const payload = {
-          date: commonData.date,
+          dateFrom: commonData.dateFrom,
+          dateTo: commonData.dateTo,
           contractorId: toNumericId(commonData.contractor?.id || commonData.contractor),
           locationId: toNumericId(commonData.site?.id),
           areaId: toNumericId(commonData.area?.id || commonData.area),
@@ -429,10 +395,15 @@ export default {
           total: subtotal.value,
           lines: rows.value.map(r => {
             const line = { itemId: toNumericId(r.itemId), quantity: Number(r.quantity || 0) }
-            if (r.price !== null && r.price !== undefined && r.price !== '') line.price = Number(r.price)
-            if (r.total !== null && r.total !== undefined && r.total !== '') line.total = Number(r.total)
+            if (r.price !== null && r.price !== undefined && r.price !== '') {
+              const price = Number(r.price)
+              line.price = price
+              line.total = Number((price * Number(r.quantity || 0)).toFixed(2))
+            } else if (r.total !== null && r.total !== undefined && r.total !== '' && Number(r.total) > 0) {
+              line.total = Number(r.total)
+            }
             return line
-          }),
+          }).filter(line => line.itemId && line.quantity > 0),
           idempotencyKey: commonData.idempotencyKey || genIdempotencyKey()
         }
 
@@ -582,15 +553,19 @@ export default {
         const newItem = res?.data
         if (!newItem || !newItem.id) throw new Error('Invalid response')
         await loadExportItems()
-        if (currentStep.value === 1) {
-          const updatedItem = exportItems.value.find(i => i.id === newItem.id)
-          if (updatedItem) {
-            commonData.item = updatedItem
-            onCommonItemSelect()
+        const updatedItem = exportItems.value.find(i => i.id === newItem.id)
+        if (updatedItem && pendingRow.value && currentStep.value === 2) {
+          pendingRow.value.itemId = updatedItem.id
+          pendingRow.value.itemSearch = updatedItem.name || ''
+          const parsed = Number(updatedItem.defaultExtractPrice ?? updatedItem.currentPrice ?? updatedItem.price ?? updatedItem.current_price)
+          if (!Number.isNaN(parsed)) {
+            pendingRow.value.price = parsed
+            pendingRow.value.total = Number((parsed * Number(pendingRow.value.quantity || 0)).toFixed(2))
           }
         }
         newExportItemForm.name = ''
         newExportItemForm.currentPrice = ''
+        pendingRow.value = null
         showAddExportItemDialog.value = false
       } catch (e) {
         exportItemDialogError.value = e?.response?.data?.message || e?.message || 'Error'
@@ -655,8 +630,6 @@ export default {
       subtotal,
       formatCurrency,
       isStep1Valid,
-      onItemSelect,
-      onCommonItemSelect,
       onCommonSiteChange,
       onCommonContractorChange,
       onCommonCrusherChange,
