@@ -78,7 +78,7 @@
     </div>
 
     <!-- Stats Bar -->
-    <div class="bg-gray-50 rounded-lg p-4">
+    <!-- <div class="bg-gray-50 rounded-lg p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div class="flex flex-col gap-2 text-sm text-gray-600">
           <div>
@@ -99,7 +99,7 @@
           </select>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Loading State -->
     <div v-if="equipmentLogsStore.loading" class="flex justify-center py-8">
