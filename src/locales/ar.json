@@ -41,7 +41,7 @@
   },
   "navbar": {
     "supplies": "التوريدات",
-    "extracts": "المستخرجات",
+    "extracts": "المستخلصات",
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentLog": "سجل المعدات",
@@ -71,9 +71,9 @@
     "items": "الأصناف",
     "itemsList": "قائمة الأصناف",
     "newItem": "صنف جديد",
-    "extractsList": "قائمة المستخرجات",
-    "newExtract": "مستخرج جديد" ,
-    "extractItems": "بنود المستخرجات"
+    "extractsList": "قائمة المستخلصات",
+    "newExtract": "مستخلص جديد" ,
+    "extractItems": "بنود المستخلصات"
   },
   "equipmentLog": {
     "deletedSuccessfully":"تم الحذف بنجاح",
@@ -624,9 +624,9 @@
     "to": "إلى"
   },
   "extracts": {
-    "title": "المستخرجات",
-    "create": { "title": "إنشاء مستخرج" },
-    "detail": "تفاصيل المستخرج",
+    "title": "المستخلصات",
+    "create": { "title": "إنشاء مستخلص" },
+    "detail": "تفاصيل المستخلص",
     "add": "إضافة",
     "searchPlaceholder": "ابحث عن مقاول...",
     "name": "الاسم",
@@ -680,7 +680,7 @@
     "exportExcel": "تصدير إكسل",
     "exportCSV": "تصدير CSV",
     "confirmDelete": "هل أنت متأكد من حذف هذا المستخرج؟",
-    "noExtractsFound": "لم يتم العثور على بيانات مستخرج"
+    "noExtractsFound": "لم يتم العثور على بيانات مستخلص"
   },
   "contractors": {
     "title": "الموردين",
@@ -748,7 +748,7 @@
     "credit": "دائن",
     "paidToContractor": "المدفوع للمقاول",
     "owedToContractor": "المستحق للمقاول",
-    "typeExport": "توريد",
+    "typeExtract": "مستخلص",
     "typeSupply": "توريد",
     "typeTransport": "نقل",
     "invalidDateRange": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية",

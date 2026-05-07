@@ -1086,7 +1086,7 @@ export const getEquipmentLogs = (params = {}) => {
   return axios.get(url)
 }
 
-// Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, notes, isRental })
+// Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, note, isRental })
 export const createEquipmentLog = (data) =>
   axios.post(`${BASE_URL}/api/equipment-logs`, data)
 

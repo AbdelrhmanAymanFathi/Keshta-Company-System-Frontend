@@ -26,8 +26,9 @@
         </button>
         <button @click="downloadReport('pdf')" :disabled="downloading"
           class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportPDF') }}
         </button>

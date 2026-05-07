@@ -332,7 +332,7 @@ export default {
         driverLabel: this.modelValue.driverLabel || '',
         site: null,
         area: null,
-        notes: this.modelValue.notes || '',
+        notes: this.modelValue.note ?? this.modelValue.notes ?? '',
         isRental: Boolean(this.modelValue.isRental)
       },
       rows: [],
@@ -751,7 +751,7 @@ export default {
 
         const hourlyRateNum = Number(this.form.hourlyRate || 0)
 
-        // Build rows payload (each row: date, hours, driverId, driverLabel, notes, hourlyRate, total)
+        // Build rows payload (each row: date, hours, driverId, driverLabel, note, hourlyRate, total)
         const rowsPayload = (this.rows || []).map(r => {
           const dateVal = (r.date && formatToISODate(r.date)) || (this.form.date && formatToISODate(this.form.date)) || getTodayISO()
           const hoursVal = Number(r.hours || 0)
@@ -768,7 +768,7 @@ export default {
             hours: hoursVal,
             driverId: driverIdVal,
             driverLabel: r.driverLabel || '',
-            notes: r.notes || '',
+            note: r.notes || '',
             hourlyRate: rowHourly,
             total: rowTotal
           }
@@ -788,7 +788,7 @@ export default {
           areaId: this.form.area?.id ?? null,
           site: this.form.site?.name || '',
           area: this.form.area?.name || '',
-          notes: this.form.notes || '',
+          note: this.form.notes || '',
           isRental: Boolean(this.form.isRental),
           rows: rowsPayload
         }

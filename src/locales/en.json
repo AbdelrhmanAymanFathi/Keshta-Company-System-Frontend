@@ -747,7 +747,7 @@
     "credit": "Credit",
     "paidToContractor": "Paid to Contractor",
     "owedToContractor": "Owed to Contractor",
-    "typeExport": "Export",
+    "typeExtract": "Extract",
     "typeSupply": "Supply Account (all transactions)",
     "typeTransport": "Transport",
     "invalidDateRange": "End date must be after or equal to start date",

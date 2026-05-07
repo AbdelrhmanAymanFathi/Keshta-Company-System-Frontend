@@ -294,7 +294,7 @@ export default {
         hourlyRate: hourlyRateNum,
         hours: hoursNum,
         total: Number((hourlyRateNum * hoursNum).toFixed(2)),
-        notes: localForm.value.notes || '',
+        note: localForm.value.notes || '',
         isRental: Boolean(localForm.value.isRental) // true when selected equipment has a contractor
       }
 

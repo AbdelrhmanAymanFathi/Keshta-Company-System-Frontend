@@ -280,7 +280,7 @@
               border border-gray-200 rounded-lg
               overflow-visible
               p-2">
-              <div class="overflow-x-auto w-full">
+              <div class="overflow-x-auto overflow-y-visible w-full">
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
                   <thead class="bg-indigo-50 sticky top-0 z-10">
                     <tr>
@@ -325,14 +325,16 @@
                               @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false" />
                             <span class="text-gray-400">▾</span>
                           </div>
-                        </div>
 
-                        <!-- Dropdown (Teleported to Modal) -->
-                        <teleport to=".modal-body-container" v-if="row.open">
+                          <!-- Dropdown -->
+                          <teleport to=".modal-body-container" v-if="row.open">
                           <div
-                            class="absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
+                            class="vehicle-dropdown absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
                             :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
-
+                            <div v-if="filteredVehicles(row).length === 0"
+                              class="px-3 py-2 text-sm text-gray-500 text-start">
+                              {{ $t('vehicles.noResults') || 'No vehicles found' }}
+                            </div>
                             <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id"
                               @mousedown.prevent="selectVehicle(row, v)" @mousemove="row.highlightedVehicleIndex = vi"
                               :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
@@ -341,11 +343,12 @@
 
                             <!-- Add new -->
                             <!-- <div @click.stop="onAddVehicleClicked(row)"
-                              class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
-                              + {{ $t('labels.addNew') }}
-                            </div> -->
+                            class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
+                            + {{ $t('labels.addNew') }}
+                          </div> -->
                           </div>
-                        </teleport>
+                          </teleport>
+                        </div>
                       </td>
 
                       <!-- Crusher Ticket -->
@@ -803,7 +806,7 @@ export default {
     handleGlobalClick(e) {
       // Close vehicle dropdowns when clicking outside the table area
       const isClickInTable = e.target.closest('table') || e.target.closest('thead') || e.target.closest('tbody')
-      const isClickInDropdown = e.target.closest('[class*="border-gray-200"][class*="bg-white"]')
+      const isClickInDropdown = e.target.closest('.vehicle-dropdown')
       const isClickInVehicleCell = e.target.closest('td')?.querySelector('input[type="text"]') === e.target
 
       if (!isClickInTable && !isClickInDropdown && !isClickInVehicleCell) {
@@ -1021,12 +1024,7 @@ export default {
         highlightedVehicleIndex: -1
       }
 
-      if (this.commonData.contractor?.id) {
-        const cv = this.contractorsWithVehicles.find(c => c.id === this.commonData.contractor.id)
-        row.availableVehicles = cv?.vehicles?.length ? [...cv.vehicles] : this.vehicles.filter(v => v.contractorId === this.commonData.contractor.id)
-      } else {
-        row.availableVehicles = [...this.vehicles]
-      }
+      row.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
 
       return row
     },
@@ -1117,6 +1115,14 @@ export default {
         this.showAddContractorDialog = true
         return
       }
+      const availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
+      this.rows.forEach(row => {
+        row.availableVehicles = availableVehicles
+        row.vehicle = null
+        row.search = ''
+        row.companyCapacity = 0
+        row.crusherCapacity = ''
+      })
     },
 
     onCommonCrusherChange() {
@@ -1146,33 +1152,67 @@ export default {
     // ============ Field Interactions (Step 2) ============
     filteredVehicles(row) {
       const q = row.search?.toLowerCase() || ''
-      return row.availableVehicles.filter(v =>
-        v.name.toLowerCase().includes(q)
+      return (row.availableVehicles || []).filter(v =>
+        (v.name || '').toLowerCase().includes(q)
       )
+    },
+
+    getVehicleContractorId(vehicle, fallbackContractorId = null) {
+      return vehicle?.contractorId ??
+        vehicle?.contractor_id ??
+        vehicle?.contractor?.id ??
+        vehicle?.ownerId ??
+        vehicle?.owner_id ??
+        fallbackContractorId
+    },
+
+    normalizeVehicle(vehicle, fallbackContractorId = null) {
+      const contractorId = this.getVehicleContractorId(vehicle, fallbackContractorId)
+      return {
+        ...vehicle,
+        contractorId: contractorId !== null && contractorId !== undefined && contractorId !== ''
+          ? Number(contractorId)
+          : null
+      }
+    },
+
+    getAvailableVehiclesForContractor(contractorId) {
+      if (!contractorId) return [...this.vehicles]
+
+      const currentContractorId = Number(contractorId)
+      const contractorWithVehicles = this.contractorsWithVehicles.find(c => Number(c.id) === currentContractorId)
+
+      if (Array.isArray(contractorWithVehicles?.vehicles) && contractorWithVehicles.vehicles.length) {
+        return contractorWithVehicles.vehicles.map(v => ({
+          ...this.normalizeVehicle(v, contractorWithVehicles.id)
+        }))
+      }
+
+      return this.vehicles.filter(v => Number(v.contractorId) === currentContractorId)
     },
 
     getVehicleDropdownStyle(row) {
       if (!row.vehicleCell) return {}
 
       const rect = row.vehicleCell.getBoundingClientRect()
-      const containerRect = document.querySelector('.modal-body-container')?.getBoundingClientRect()
+      const container = document.querySelector('.modal-body-container')
+      const containerRect = container?.getBoundingClientRect()
 
-      if (!containerRect) return {}
+      if (!container || !containerRect) return {}
 
-      // Calculate position relative to the modal container
-      const relativeTop = rect.top - containerRect.top
-      const relativeLeft = rect.left - containerRect.left
+      const top = rect.bottom - containerRect.top + container.scrollTop + 4
+      const left = rect.left - containerRect.left + container.scrollLeft
 
       return {
-        top: `${relativeTop + rect.height + 4}px`,
-        left: `${relativeLeft}px`,
+        top: `${top}px`,
+        left: `${left}px`,
         width: `${rect.width}px`,
-        zIndex: '50'
+        zIndex: '9999'
       }
     },
 
     getVehicleDropdownClasses() {
-      return 'z-50'
+      return 'z-[9999]'
     },
 
     selectVehicle(row, vehicle) {
@@ -1365,36 +1405,41 @@ export default {
             ? getContractorsWithVehicles({ mode: 'supply' })
             : Promise.resolve(null),
           getCrushers(),
-          getVehicles()
+          getVehicles({ mode: 'supply', pageSize: 1000 })
         ])
 
         const extractArray = (res) => {
           console.log('🔍 Raw response:', res)
-          // Handle different API response formats
-          if (res?.data?.items) return Array.isArray(res.data.items) ? res.data.items : []
-          if (res?.data) {
-            if (Array.isArray(res.data)) return res.data
-            if (typeof res.data === 'object' && !Array.isArray(res.data)) {
-              // If data is an object, try to extract array from it
-              const firstValue = Object.values(res.data)[0]
-              return Array.isArray(firstValue) ? firstValue : []
-            }
-          }
-          if (Array.isArray(res)) return res
+          const payload = res?.data ?? res
+          if (Array.isArray(payload)) return payload
+          if (Array.isArray(payload?.items)) return payload.items
+          if (Array.isArray(payload?.data)) return payload.data
+          if (Array.isArray(payload?.data?.items)) return payload.data.items
+          if (Array.isArray(payload?.data?.data)) return payload.data.data
           return []
         }
 
         this.contractors = extractArray(cRes)
         this.contractorsWithVehicles = extractArray(cvRes)
         this.crushers = extractArray(crushRes)
-        this.vehicles = extractArray(vRes)
+        const vehiclesFromList = extractArray(vRes).map(vehicle => this.normalizeVehicle(vehicle))
+        const vehiclesFromContractors = this.contractorsWithVehicles.flatMap(contractor =>
+          Array.isArray(contractor.vehicles)
+            ? contractor.vehicles.map(vehicle => this.normalizeVehicle(vehicle, contractor.id))
+            : []
+        )
+        const vehiclesById = new Map()
+        ;[...vehiclesFromList, ...vehiclesFromContractors].forEach(vehicle => {
+          if (vehicle?.id) vehiclesById.set(Number(vehicle.id), vehicle)
+        })
+        this.vehicles = Array.from(vehiclesById.values())
 
         console.log('✅ Loaded contractors:', this.contractors)
         console.log('✅ Loaded crushers:', this.crushers)
         console.log('✅ Loaded vehicles:', this.vehicles)
 
         this.rows.forEach(row => {
-          row.availableVehicles = [...this.vehicles]
+          row.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
         })
       } catch (err) {
         console.error('loadLookups failed:', err)

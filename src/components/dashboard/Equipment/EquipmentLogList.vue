@@ -836,7 +836,7 @@ export default {
             equipmentLog: data.equipmentLog || data.equipment || '',
             name: data.name || '',
             hourlyRate: parseFloat(data.hourlyRate) || 0,
-            notes: data.notes || '',
+            notes: data.note ?? data.notes ?? '',
             isCompanyOwned: data.isCompanyOwned !== undefined ? data.isCompanyOwned : true
           }
       } catch (error) {
@@ -848,7 +848,7 @@ export default {
           equipmentLog: rental.equipmentLog || rental.equipment || '',
           name: rental.name || '',
           hourlyRate: parseFloat(rental.hourlyRate) || 0,
-          notes: rental.notes || '',
+          notes: rental.note ?? rental.notes ?? '',
           isCompanyOwned: rental.isCompanyOwned !== undefined ? rental.isCompanyOwned : true
         }
       }
@@ -884,7 +884,7 @@ export default {
               total: row.total != null ? row.total : Number(((row.hours || 0) * (row.hourlyRate != null ? row.hourlyRate : rentalData.hourlyRate || 0)).toFixed(2)),
               hours: row.hours != null ? row.hours : (rentalData.hours || 0),
               hourlyRate: row.hourlyRate != null ? row.hourlyRate : (rentalData.hourlyRate || 0),
-              notes: row.notes || rentalData.notes || '',
+              note: row.note ?? rentalData.note ?? rentalData.notes ?? '',
               isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
               ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
               ...(rentalData.areaId != null && rentalData.areaId !== '' ? { areaId: rentalData.areaId } : {})
@@ -901,7 +901,7 @@ export default {
             total: rentalData.total,
             hours: rentalData.hours,
             hourlyRate: rentalData.hourlyRate,
-            notes: rentalData.notes || rentalData.note || '',
+            note: rentalData.note ?? rentalData.notes ?? '',
             isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
             ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
             ...(rentalData.areaId != null && rentalData.areaId !== '' ? { areaId: rentalData.areaId } : {})

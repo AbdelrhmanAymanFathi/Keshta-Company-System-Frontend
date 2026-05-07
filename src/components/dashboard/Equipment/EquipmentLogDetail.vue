@@ -167,7 +167,7 @@ export default {
             date: new Date(jobForm.value.date).toISOString(),
             hours: hoursNum,
             hourlyRate: hourlyRateNum,
-            notes: jobForm.value.note,
+            note: jobForm.value.note,
             isRental: true,
             equipmentId: equipmentIdNumeric
           }
@@ -214,7 +214,7 @@ export default {
 
     const saveNotes = async () => {
       try {
-        await updateEquipmentLog(props.rentalId, { notes: rental.value.notes })
+        await updateEquipmentLog(props.rentalId, { note: rental.value.notes })
         if (window.$toast) window.$toast('Notes saved', 'success')
       } catch (e) {
         console.error(e)

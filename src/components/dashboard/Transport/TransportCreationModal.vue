@@ -505,6 +505,7 @@ import {
   getContractorsWithVehicles,
   createContractor,
   createVehicle,
+  getVehicles,
   getLocations,
   createLocation,
   getItems
@@ -666,7 +667,7 @@ export default {
     filteredCommonVehicles() {
       const q = (this.filters.commonVehicleSearch || '').toLowerCase()
       if (!this.commonData.contractor?.id) return []
-      let list = this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id))
+      let list = this.getAvailableVehiclesForContractor(this.commonData.contractor.id)
       if (!q) return list
       return list.filter(v => (v.name || '').toLowerCase().includes(q))
     },
@@ -907,7 +908,7 @@ export default {
       row.vehicle = this.commonData.vehicle || null
       // default companyCapacity for row comes from selected header vehicle capacity
       row.companyCapacity = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
-      row.availableVehicles = this.commonData.contractor?.id ? this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id)) : [...this.vehicles]
+      row.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
       return row
     },
     addRow() {
@@ -938,9 +939,41 @@ export default {
     },
     filteredVehicles(row) {
       const q = row.search?.toLowerCase() || ''
-      return row.availableVehicles.filter(v =>
-        v.name.toLowerCase().includes(q)
+      return (row.availableVehicles || []).filter(v =>
+        (v.name || '').toLowerCase().includes(q)
       )
+    },
+
+    getVehicleContractorId(vehicle, fallbackContractorId = null) {
+      return vehicle?.contractorId ??
+        vehicle?.contractor_id ??
+        vehicle?.contractor?.id ??
+        vehicle?.ownerId ??
+        vehicle?.owner_id ??
+        fallbackContractorId
+    },
+
+    normalizeVehicle(vehicle, fallbackContractorId = null) {
+      const contractorId = this.getVehicleContractorId(vehicle, fallbackContractorId)
+      return {
+        ...vehicle,
+        contractorId: contractorId !== null && contractorId !== undefined && contractorId !== ''
+          ? Number(contractorId)
+          : null
+      }
+    },
+
+    getAvailableVehiclesForContractor(contractorId) {
+      if (!contractorId) return [...this.vehicles]
+
+      const currentContractorId = Number(contractorId)
+      const contractorWithVehicles = this.contractorsWithVehicles.find(c => Number(c.id) === currentContractorId)
+
+      if (Array.isArray(contractorWithVehicles?.vehicles) && contractorWithVehicles.vehicles.length) {
+        return contractorWithVehicles.vehicles.map(vehicle => this.normalizeVehicle(vehicle, contractorWithVehicles.id))
+      }
+
+      return this.vehicles.filter(v => Number(v.contractorId) === currentContractorId)
     },
 
     // Dropdown keyboard navigation helper
@@ -1086,30 +1119,43 @@ export default {
     async loadLookups() {
       console.log('Starting loadLookups...');
       try {
-        const [cRes, cvRes] = await Promise.all([
+        const [cRes, cvRes, vRes] = await Promise.all([
           getContractors({ mode: 'transport' }),
           typeof getContractorsWithVehicles === 'function'
             ? getContractorsWithVehicles({ mode: 'transport' })
-            : Promise.resolve(null)
+            : Promise.resolve(null),
+          getVehicles({ mode: 'transport', pageSize: 1000 })
         ])
         console.log('getContractors response:', cRes)
         console.log('getContractorsWithVehicles response:', cvRes)
         // Improved parsing
-        const extractArray = (res) => Array.isArray(res?.data) ? res.data : (res?.data?.items || res?.data?.data || [])
+        const extractArray = (res) => {
+          const payload = res?.data ?? res
+          if (Array.isArray(payload)) return payload
+          if (Array.isArray(payload?.items)) return payload.items
+          if (Array.isArray(payload?.data)) return payload.data
+          if (Array.isArray(payload?.data?.items)) return payload.data.items
+          if (Array.isArray(payload?.data?.data)) return payload.data.data
+          return []
+        }
         this.contractors = extractArray(cRes)
         this.contractorsWithVehicles = extractArray(cvRes)
-        // Extract vehicles from contractorsWithVehicles and attach contractorId
-        this.vehicles = this.contractorsWithVehicles.reduce((acc, c) => {
-          if (Array.isArray(c.vehicles)) {
-            acc.push(...c.vehicles.map(v => ({ ...v, contractorId: c.id })))
-          }
-          return acc
-        }, [])
+        const vehiclesFromList = extractArray(vRes).map(vehicle => this.normalizeVehicle(vehicle))
+        const vehiclesFromContractors = this.contractorsWithVehicles.flatMap(contractor =>
+          Array.isArray(contractor.vehicles)
+            ? contractor.vehicles.map(vehicle => this.normalizeVehicle(vehicle, contractor.id))
+            : []
+        )
+        const vehiclesById = new Map()
+        ;[...vehiclesFromList, ...vehiclesFromContractors].forEach(vehicle => {
+          if (vehicle?.id) vehiclesById.set(Number(vehicle.id), vehicle)
+        })
+        this.vehicles = Array.from(vehiclesById.values())
         console.log('Processed contractors:', this.contractors.length)
         console.log('Processed vehicles:', this.vehicles.length)
         // update rows' available vehicles if any
         this.rows.forEach(r => {
-          r.availableVehicles = this.commonData.contractor?.id ? this.vehicles.filter(v => Number(v.contractorId) === Number(this.commonData.contractor.id)) : [...this.vehicles]
+          r.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
         })
       } catch (err) {
         console.error('loadLookups failed:', err)
@@ -1316,8 +1362,9 @@ export default {
       // clear header vehicle capacity when contractor changes
       this.vehicleCompanyCapacity = 0
       // update available vehicles for each row and clear row vehicle
+      const availableVehicles = this.getAvailableVehiclesForContractor(sel?.id)
       this.rows.forEach(r => {
-        r.availableVehicles = this.vehicles.filter(v => Number(v.contractorId) === Number(sel.id))
+        r.availableVehicles = availableVehicles
         r.vehicle = null
       })
       this.filters.showCommonContractorDropdown = false
