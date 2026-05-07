@@ -178,6 +178,11 @@
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
+                  {{ $t('labels.driver') || 'Driver' }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.type') }}
                 </th>
                 <th
@@ -222,6 +227,9 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div class="truncate max-w-xs">{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div class="truncate max-w-xs">{{ rental.driver?.name || rental.driverName || rental.driverLabel || '-' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <Badge :variant="!rental.isRental ? 'company' : 'external'">
