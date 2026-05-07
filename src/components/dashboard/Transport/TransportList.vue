@@ -179,35 +179,35 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ transport.contractor?.name || '-' }}</div>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+              <div class="">{{ transport.contractor?.name || '-' }}</div>
               <!-- <div class="text-sm text-gray-500">{{ transport.contractor?.phone || '-' }}</div> -->
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              <div class="text-sm text-gray-900"><span class="font-bold">{{ transport.location.name || '-' }}</span></div>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+              <div class=""><span class="">{{ transport.location.name || '-' }}</span></div>
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              <div class="text-sm text-gray-900"><span class="font-bold">{{ transport.area.name || '-' }}</span></div>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+              <div class=""><span class="">{{ transport.area.name || '-' }}</span></div>
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ getVehicleDisplay(transport) }}</div>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+              <div class="">{{ getVehicleDisplay(transport) }}</div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ transport.item?.name || '-' }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ transport.numTrips }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ transport.distanceKm }} km
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ transport.vehicleCompanyCapacity != null ? transport.vehicleCompanyCapacity : '-' }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(getTransportFirstKmPrice(transport)) }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(getTransportPerKmPrice(transport)) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">
@@ -215,7 +215,7 @@
                 {{ transport.discount }}
               </span>
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(transport.total) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">
