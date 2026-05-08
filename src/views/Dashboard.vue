@@ -1,25 +1,25 @@
 <template>
   <div class="flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
-    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow sm:gap-4 sm:px-4 sm:py-3 lg:px-6" :class="headerGradient">
+    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow-lg sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out" :class="headerGradient">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile -->
-        <button @click="toggleSidebar" class="sm:hidden p-2 rounded hover:bg-white/10">
+        <button @click="toggleSidebar" class="sm:hidden p-2 rounded-lg hover:bg-white/20 hover:scale-105 transition-all duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
         <!-- Brand -->
         <div class="flex min-w-0 items-center gap-2 sm:gap-3">
-          <div class="h-8 w-14 rounded-md flex items-center justify-center overflow-hidden sm:h-9 sm:w-16">
-            <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-fill">
+          <div class="h-8 w-14 rounded-md flex items-center justify-center overflow-hidden sm:h-9 sm:w-16 shadow-md">
+            <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-fill transition-transform duration-300 hover:scale-110">
           </div>
           <div class="truncate text-sm font-bold whitespace-nowrap sm:text-base lg:text-lg">{{ $t('appName') }}</div>
         </div>
         <!-- Top menus (desktop) -->
-        <nav class="app-scrollbar hidden sm:flex ml-2 max-w-full items-center gap-1 overflow-x-auto whitespace-nowrap lg:ml-4 lg:gap-2">
+        <nav class="hidden sm:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['rounded px-2 py-1.5 text-xs font-medium transition lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white/20' : 'hover:bg-white/10']">
+            :class="['rounded-lg px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white/30 shadow-lg' : 'hover:bg-white/15']">
             {{ $t('navbar.' + key) }}
           </button>
         </nav>
@@ -29,14 +29,14 @@
       <div class="flex shrink-0 items-center gap-2 sm:gap-3">
         <!-- Language Switcher -->
         <div
-          class="flex items-center gap-1 rounded-xl border border-white/20 bg-white/10 p-1 shadow-sm backdrop-blur-sm"
+          class="flex items-center gap-1 rounded-xl border border-white/30 bg-white/10 p-1 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl"
           role="group"
           aria-label="Language switcher"
         >
           <button
             @click="switchLang('en')"
             :class="langBtnClass('en')"
-            class="rounded-lg p-1 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-1 focus-visible:ring-offset-indigo-700"
+            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-1 focus-visible:ring-offset-indigo-700"
             aria-label="Switch to English"
           >
             <img src="/flags/us.png" alt="English" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
@@ -44,7 +44,7 @@
           <button
             @click="switchLang('ar')"
             :class="langBtnClass('ar')"
-            class="rounded-lg p-1 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-1 focus-visible:ring-offset-indigo-700"
+            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-1 focus-visible:ring-offset-indigo-700"
             aria-label="التبديل إلى العربية"
           >
             <img src="/flags/eg.png" alt="العربية" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
@@ -54,21 +54,21 @@
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
           <button @click="toggleUserMenu"
-            class="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-sm font-semibold text-white transition hover:bg-white/30 sm:h-10 sm:w-10 sm:text-lg">
+            class="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/30 hover:scale-105 shadow-md sm:h-10 sm:w-10 sm:text-lg">
             {{ userInitials }}
           </button>
           <!-- User Dropdown Menu -->
-          <div v-if="userMenuOpen" class="absolute top-12 " :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
-            <div class="bg-white rounded-lg shadow-lg py-2 min-w-[160px] border">
+          <div v-if="userMenuOpen" class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100" :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
+            <div class="bg-white rounded-lg shadow-xl py-2 min-w-[160px] border animate-fade-in">
               <button @click="goToProfile(); userMenuOpen = false"
-                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.824.645 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {{ $t('profile.title') || 'Profile' }}
               </button>
               <button @click="showLogoutDialog = true; userMenuOpen = false"
-                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800">
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
@@ -97,7 +97,7 @@
               {{ $t('appName') }}
             </div>
           </div>
-          <button v-if="!isMobile" @click="toggleCollapsed" class="rounded p-2 sm:p-3 hover:bg-indigo-200 transition">
+          <button v-if="!isMobile" @click="toggleCollapsed" class="rounded-lg p-2 sm:p-3 hover:bg-indigo-200 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
             <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
@@ -112,12 +112,12 @@
         <!-- Mobile Header -->
         <div v-if="isMobile" class="mb-4 flex items-center justify-between sm:hidden">
           <div class="flex min-w-0 items-center gap-3">
-            <div class="w-9 h-9 rounded-md overflow-hidden">
-              <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
+            <div class="w-9 h-9 rounded-md overflow-hidden shadow-md">
+              <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
             </div>
             <div class="truncate font-semibold text-base">{{ $t('appName') }}</div>
           </div>
-          <button @click="toggleSidebar" class="p-2 rounded hover:bg-indigo-200">
+          <button @click="toggleSidebar" class="p-2 rounded-lg hover:bg-indigo-200 hover:scale-105 transition-all duration-200">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -127,7 +127,7 @@
         <!-- Mobile Top Menu -->
         <div v-if="isMobile" class="mb-4 space-y-1 sm:hidden">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['w-full rounded px-3 py-2 text-left text-sm font-medium', selectedTop === key ? 'bg-indigo-600 text-white' : 'hover:bg-indigo-100']">
+            :class="['w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100']">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
@@ -136,7 +136,7 @@
         <ul class="space-y-1">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.routeName)"
-              :class="['flex w-full items-center gap-3 rounded px-3 py-2.5 transition sm:px-4 sm:py-3', currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
+              :class="['flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
               <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, currentRouteName === item.routeName)"></div>
               <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">
                 {{ $t(item.label) }}
@@ -148,7 +148,7 @@
             <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
             <ul class="mt-2 space-y-1 px-1 sm:px-2">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button @click="openReport(r.id)" class="flex w-full items-center gap-3 rounded px-3 py-2 text-left text-sm hover:bg-gray-100">
+                <button @click="openReport(r.id)" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 hover:scale-105 transition-all duration-200">
                   <div class="w-4 h-4 text-indigo-600">
                     <svg class="w-4 h-4 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6M9 16h6M12 8v8"/></svg>
                   </div>
@@ -163,13 +163,15 @@
       </aside>
 
       <!-- Mobile Overlay -->
-      <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/50 z-30" @click="toggleSidebar"></div>
+      <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300" @click="toggleSidebar"></div>
 
       <!-- Main Content -->
       <main class="dashboard-module-content app-scrollbar flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-4 lg:p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
-        <router-view @navigate-report="navigateToReport"
-          @navigate-statement="navigateToStatement" />
+        <transition name="fade" mode="out-in">
+          <router-view @navigate-report="navigateToReport"
+            @navigate-statement="navigateToStatement" />
+        </transition>
       </main>
     </div>
 
@@ -568,5 +570,37 @@ aside {
   background: linear-gradient(180deg, rgba(99, 102, 241, 0.85), rgba(79, 70, 229, 0.95));
   border: 2px solid transparent;
   background-clip: padding-box;
+}
+
+/* Fade transition for router views */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Animate fade-in for dropdown */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
 }
 </style>
