@@ -316,7 +316,7 @@ export default {
         notes: this.modelValue.note ?? this.modelValue.notes ?? '',
         isRental: this.modelValue.isRental !== undefined
           ? Boolean(this.modelValue.isRental)
-          : (this.modelValue.isCompanyOwned !== undefined ? !Boolean(this.modelValue.isCompanyOwned) : false)
+          : (this.modelValue.isCompanyOwned !== undefined ? !this.modelValue.isCompanyOwned : false)
       },
       rows: [],
       isSaving: false,
@@ -353,7 +353,7 @@ export default {
       return Boolean((this.form && (this.form.contractorId != null && this.form.contractorId !== '')) && this.form.isRental)
     },
     isCompanyOwnedEquipment() {
-      return !Boolean(this.form.isRental)
+      return !this.form.isRental
     },
     rowsTotal() {
       return (this.rows || []).reduce((s, r) => {
@@ -537,7 +537,7 @@ export default {
     },
     equipmentIsRental(item) {
       if (!item) return false
-      if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) return !Boolean(item.isCompanyOwned)
+      if (Object.prototype.hasOwnProperty.call(item, 'isCompanyOwned')) return !item.isCompanyOwned
       if (Object.prototype.hasOwnProperty.call(item, 'isRental')) return Boolean(item.isRental)
       return Boolean(item.contractorId ?? item.contractor ?? false)
     },
