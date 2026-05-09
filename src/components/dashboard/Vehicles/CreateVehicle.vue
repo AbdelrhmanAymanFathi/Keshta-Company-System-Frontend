@@ -332,12 +332,6 @@ export default {
     openCrusherDropdown() {
       this.showCrusherDropdown = true
     },
-    closeCrusherDropdown() {
-      // Delay closing to allow click events on dropdown items
-      setTimeout(() => {
-        this.showCrusherDropdown = false
-      }, 150)
-    },
     selectCrusher(c) {
       this.form.crusherId = c.id
       this.form.crusherNumber = c.name

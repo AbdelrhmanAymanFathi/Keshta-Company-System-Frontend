@@ -195,6 +195,7 @@
     "totalDiscount": "Total Discount",
     "grandTotal": "Grand Total",
     "createdAt": "Created At",
+    "noResults": "No results found",
     "logout": "Logout",
     "close": "Close",
     "add": "Add",
