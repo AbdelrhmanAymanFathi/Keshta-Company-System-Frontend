@@ -196,7 +196,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', companyWallet: 'companyWallet', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts',  admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
@@ -227,12 +227,12 @@ export default {
           { name: 'driversList', label: 'dashboard.driversList', routeName: 'equipment-drivers-list' },
           { name: 'contractorRentals', label: 'dashboard.contractorStatement', routeName: 'equipment-contractor-statement' }
         ],
-        companyWallet: [
-          { name: 'companyWallet', label: 'dashboard.companyWallet', routeName: 'company-wallet' },
-          { name: 'companyTransactions', label: 'transactions', routeName: 'company-transactions' },
-          { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
-          { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
-        ],
+        // companyWallet: [
+        //   { name: 'companyWallet', label: 'dashboard.companyWallet', routeName: 'company-wallet' },
+        //   { name: 'companyTransactions', label: 'transactions', routeName: 'company-transactions' },
+        //   { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
+        //   { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
+        // ],
         extracts: [
           { name: 'extractsList', label: 'extracts.title', routeName: 'extracts-list' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'extracts-contractors-list' },
