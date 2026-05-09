@@ -211,7 +211,7 @@ export default {
     },
     async loadLookups() {
       try {
-        const contractorsRes = await getContractors({ mode: 'transport' })
+        const contractorsRes = await getContractors({ mode: this.mode })
         const contractorsPayload = contractorsRes.data || {}
         let contractors = Array.isArray(contractorsPayload.items)
           ? contractorsPayload.items
