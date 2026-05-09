@@ -446,7 +446,8 @@
       "isRental": "Is Rental",
       "note": "Note",
       "hours": "Hours",
-      "hourlyRate": "Hourly Rate"
+      "hourlyRate": "Hourly Rate",
+      "equipment": "Equipment"
     },
     "downloadCsv": "Download CSV",
     "downloadExcel": "Download Excel",

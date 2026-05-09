@@ -448,7 +448,8 @@
       "earnings": "الأرباح",
       "payments": "المدفوعات",
       "balanceOwed": "الرصيد المستحق",
-      "refId": "المرجع"
+      "refId": "المرجع",
+      "equipment": "المعدات"
     },
     "downloadCsv": "تحميل CSV",
     "downloadExcel": "تحميل إكسل",
