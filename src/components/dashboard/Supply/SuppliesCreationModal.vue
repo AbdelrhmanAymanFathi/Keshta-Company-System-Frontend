@@ -7,9 +7,10 @@
 
   <!-- Modal -->
   <teleport to="body">
-    <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-80 p-4 overflow-hidden"
-      :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+    <transition name="kc-modal">
+      <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-80 p-4 overflow-hidden"
+        :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
+        <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold text-indigo-800">
@@ -446,8 +447,9 @@
             </p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </transition>
   </teleport>
 
   <!-- Dialog: Add Site -->
@@ -891,6 +893,7 @@ export default {
       this.isOpen = false
       this.saveError = ''
       this.currentStep = 1
+      this.saveCommonDataToStorage()
     },
 
     async loadInitialData() {

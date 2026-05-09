@@ -1,7 +1,8 @@
 <template>
   <teleport to="body">
-    <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+    <transition name="kc-modal">
+      <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
+        <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold text-indigo-800">{{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterDetails') || 'Enter Details') }}</h2>
@@ -129,7 +130,7 @@
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
               <button @click="goBackToStep1" class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-              <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
+              <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2DataEquipment') }}</h3>
               <div></div>
             </div>
 
@@ -241,8 +242,9 @@
             <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">{{ saveError }}</p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </transition>
   </teleport>
 
   <!-- Dialog: Add Site -->
@@ -380,14 +382,19 @@ export default {
         this.$nextTick(() => {
           this.onModalOpen()
         })
+      } else {
+        this.currentStep = 1
+        this.saveCommonDataToStorage()
       }
     }
   },
   methods: {
     async onModalOpen() {
+      this.currentStep = 1
       await this.refreshLocations()
       await this.$nextTick()
       this.syncFormLocationsFromModel()
+      this.loadCommonDataFromStorage()
     },
     syncFormLocationsFromModel() {
       const mv = this.modelValue || {}
@@ -799,6 +806,67 @@ export default {
         this.saveError = e?.message || (this.$t('common.saveError') || 'Error saving')
       } finally {
         this.isSaving = false
+      }
+    },
+    saveCommonDataToStorage() {
+      try {
+        const data = {
+          date: this.form.date,
+          equipmentId: this.form.equipmentId,
+          equipmentLabel: this.form.equipmentLabel,
+          contractorId: this.form.contractorId,
+          contractorLabel: this.form.contractorLabel,
+          hourlyRate: this.form.hourlyRate,
+          hours: this.form.hours,
+          driverId: this.form.driverId,
+          driverLabel: this.form.driverLabel,
+          site: this.form.site ? { id: this.form.site.id, name: this.form.site.name } : null,
+          area: this.form.area ? { id: this.form.area.id, name: this.form.area.name } : null,
+          notes: this.form.notes,
+          isRental: this.form.isRental
+        }
+        localStorage.setItem('equipmentLogCreationModalCommonData', JSON.stringify(data))
+      } catch (err) {
+        console.warn('Failed to save equipment log data:', err)
+      }
+    },
+    loadCommonDataFromStorage() {
+      try {
+        const saved = localStorage.getItem('equipmentLogCreationModalCommonData')
+        if (saved) {
+          const data = JSON.parse(saved)
+          console.log('📦 Loaded equipment log data from storage:', data)
+          this.form.date = data.date || this.form.date
+          this.form.equipmentId = data.equipmentId || ''
+          this.form.equipmentLabel = data.equipmentLabel || ''
+          this.form.contractorId = data.contractorId || ''
+          this.form.contractorLabel = data.contractorLabel || ''
+          this.form.hourlyRate = data.hourlyRate || 0
+          this.form.hours = data.hours || 1
+          this.form.driverId = data.driverId || ''
+          this.form.driverLabel = data.driverLabel || ''
+          this.form.notes = data.notes || ''
+          this.form.isRental = data.isRental || false
+          
+          // Restore site
+          if (data.site?.id) {
+            this.form.site = this.allLocations.find(l => l.id === data.site.id) || null
+            if (this.form.site) this.filters.commonSiteSearch = this.form.site.name
+          }
+          
+          // Restore area
+          if (data.area?.id && this.form.site) {
+            let found = null
+            if (Array.isArray(this.form.site.children) && this.form.site.children.length) {
+              found = this.form.site.children.find(c => c.id === data.area.id) || null
+            }
+            if (!found) found = this.allLocations.find(l => l.id === data.area.id) || null
+            this.form.area = found
+            if (this.form.area) this.filters.commonAreaSearch = this.form.area.name
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load equipment log data:', err)
       }
     }
   }

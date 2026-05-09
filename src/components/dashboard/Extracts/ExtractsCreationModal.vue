@@ -9,13 +9,14 @@
     </button>
 
     <teleport to="body">
-      <div
-        v-if="isOpen"
-        class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
-        :dir="isRTL ? 'rtl' : 'ltr'"
-        @click.self="closeModal"
-      >
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+      <transition name="kc-modal">
+        <div
+          v-if="isOpen"
+          class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+          :dir="isRTL ? 'rtl' : 'ltr'"
+          @click.self="closeModal"
+        >
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
             <h2 class="text-2xl font-bold text-indigo-800">
               {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterDetails') || 'Enter Details') }}
@@ -415,8 +416,9 @@
               </p>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </transition>
     </teleport>
 
     <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
@@ -766,8 +768,10 @@ export default {
       this.resetState()
       this.isOpen = true
       await this.loadInitialData()
+      this.loadCommonDataFromStorage()
     },
     closeModal() {
+      this.saveCommonDataToStorage()
       this.isOpen = false
       this.resetState()
     },
@@ -1146,6 +1150,65 @@ export default {
         this.exportItemDialogError = error?.response?.data?.message || error?.message || 'Error'
       } finally {
         this.creatingExportItem = false
+      }
+    },
+    saveCommonDataToStorage() {
+      try {
+        const data = {
+          dateFrom: this.commonData.dateFrom,
+          dateTo: this.commonData.dateTo,
+          site: this.commonData.site ? { id: this.commonData.site.id, name: this.commonData.site.name } : null,
+          area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
+          contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
+          crusher: this.commonData.crusher ? { id: this.commonData.crusher.id, name: this.commonData.crusher.name } : null,
+          notes: this.commonData.notes
+        }
+        localStorage.setItem('extractsCreationModalCommonData', JSON.stringify(data))
+      } catch (err) {
+        console.warn('Failed to save extracts data:', err)
+      }
+    },
+    loadCommonDataFromStorage() {
+      try {
+        const saved = localStorage.getItem('extractsCreationModalCommonData')
+        if (saved) {
+          const data = JSON.parse(saved)
+          console.log('📦 Loaded extracts data from storage:', data)
+          this.commonData.dateFrom = data.dateFrom || ''
+          this.commonData.dateTo = data.dateTo || ''
+          this.commonData.notes = data.notes || ''
+          
+          // Restore site
+          if (data.site?.id) {
+            this.commonData.site = this.allLocations.find(l => l.id === data.site.id) || null
+            if (this.commonData.site) this.filters.commonSiteSearch = this.commonData.site.name
+          }
+          
+          // Restore area
+          if (data.area?.id && this.commonData.site) {
+            let found = null
+            if (Array.isArray(this.commonData.site.children) && this.commonData.site.children.length) {
+              found = this.commonData.site.children.find(c => c.id === data.area.id) || null
+            }
+            if (!found) found = this.allLocations.find(l => l.id === data.area.id) || null
+            this.commonData.area = found
+            if (this.commonData.area) this.filters.commonAreaSearch = this.commonData.area.name
+          }
+          
+          // Restore contractor
+          if (data.contractor?.id) {
+            this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
+            if (this.commonData.contractor) this.filters.commonContractorSearch = this.commonData.contractor.name
+          }
+          
+          // Restore crusher
+          if (data.crusher?.id) {
+            this.commonData.crusher = this.crushers.find(c => c.id === data.crusher.id) || null
+            if (this.commonData.crusher) this.filters.commonCrusherSearch = this.commonData.crusher.name
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load extracts data:', err)
       }
     }
   }

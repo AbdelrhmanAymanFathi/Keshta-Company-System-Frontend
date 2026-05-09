@@ -12,6 +12,32 @@ body{
 .card {
   @apply bg-white rounded-2xl shadow-lg p-6;
 }
+/* to make a creative app */
+/* .glass-panel {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+.glass-modal {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.14);
+  border: 1px solid rgba(148, 163, 184, 0.20);
+}
+.soft-input {
+  background: #f8fafc;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+.soft-input:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.5);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+} */
 
 /* assets/main.css */
 .direction-rtl input,
@@ -52,6 +78,37 @@ body{
 
 .dashboard-module-content table tbody {
   background-color: #ffffff;
+}
+
+/* =========================
+   Modal open/close animation
+   ========================= */
+.kc-modal-enter-active,
+.kc-modal-leave-active {
+  transition: opacity 160ms ease;
+}
+
+.kc-modal-enter-from,
+.kc-modal-leave-to {
+  opacity: 0;
+}
+
+.kc-modal-enter-active .kc-modal-panel,
+.kc-modal-leave-active .kc-modal-panel {
+  transition: transform 180ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 300ms ease;
+  will-change: transform, opacity;
+}
+
+.kc-modal-enter-from .kc-modal-panel,
+.kc-modal-leave-to .kc-modal-panel {
+  transform: translateY(6px) scale(0.985);
+  opacity: 0;
+}
+
+.kc-modal-enter-to .kc-modal-panel,
+.kc-modal-leave-from .kc-modal-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
 }
 
 .dashboard-module-content table tbody tr {

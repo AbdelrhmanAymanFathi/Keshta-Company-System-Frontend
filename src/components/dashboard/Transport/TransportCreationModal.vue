@@ -1,13 +1,14 @@
 <template>
   <!-- Modal (no internal trigger button anymore) -->
   <teleport to="body">
-    <div
-      v-if="isOpen"
-      :dir="isRTL ? 'rtl' : 'ltr'"
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
-      @click.self="handleBackdropClick"
-    >
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+    <transition name="kc-modal">
+      <div
+        v-if="isOpen"
+        :dir="isRTL ? 'rtl' : 'ltr'"
+        class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+        @click.self="handleBackdropClick"
+      >
+        <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold text-indigo-800">
@@ -408,8 +409,9 @@
             </p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </transition>
   </teleport>
 
   <!-- Dialog: Add Location -->
@@ -705,6 +707,7 @@ export default {
           this.currentStep = 1
           this.rows = []
           this.saveError = ''
+          this.saveCommonDataToStorage()
         }
       }
     },
