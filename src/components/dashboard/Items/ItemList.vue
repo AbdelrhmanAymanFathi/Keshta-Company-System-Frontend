@@ -440,8 +440,14 @@ export default {
           }
         }
       } else if (this.mode === 'extracts') {
-        if (this.form.currentPrice === null || this.form.currentPrice === '' || this.form.currentPrice < 0) {
-          this.errors.currentPrice = this.$t('validation.priceRequired') || 'Price is required and must be positive'
+        if (
+          this.form.defaultExtractPrice === null ||
+          this.form.defaultExtractPrice === '' ||
+          this.form.defaultExtractPrice < 0
+        ) {
+          this.errors.currentPrice =
+            this.$t('validation.priceRequired') ||
+            'Extract price is required and must be positive'
         }
       } else {
         // mode === 'all'
@@ -452,14 +458,23 @@ export default {
         if (this.form.availableForTransports && (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0)) {
           this.errors.currentPrice = this.$t('validation.priceRequired') || 'Transport price is required and must be positive'
         }
-        if (this.form.availableForExtracts && (this.form.currentPrice === null || this.form.currentPrice === '' || this.form.currentPrice < 0)) {
-          this.errors.currentPrice = this.$t('validation.priceRequired') || 'Extract price is required and must be positive'
+        if (
+          this.form.availableForExtracts &&
+          (
+            this.form.defaultExtractPrice === null ||
+            this.form.defaultExtractPrice === '' ||
+            this.form.defaultExtractPrice < 0
+          )
+        ) {
+          this.errors.currentPrice =
+            this.$t('validation.priceRequired') ||
+            'Extract price is required and must be positive'
         }
         if (!this.form.availableForSupplies && !this.form.availableForTransports && !this.form.availableForExtracts) {
           // no flags set — require at least one price (supply, transport or extract)
           if ((this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0) &&
             (this.form.defaultTransportPrice === null || this.form.defaultTransportPrice === '' || this.form.defaultTransportPrice < 0) &&
-            (this.form.currentPrice === null || this.form.currentPrice === '' || this.form.currentPrice < 0)) {
+            (this.form.defaultExtractPrice === null || this.form.defaultExtractPrice === '' || this.form.defaultExtractPrice < 0)) {
             this.errors.currentPrice = this.$t('validation.priceRequired') || 'At least one price is required and must be positive'
           }
         }
