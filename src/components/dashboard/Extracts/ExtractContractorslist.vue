@@ -337,7 +337,7 @@ import normalizeItem from '@/utils/normalizeItem'
 export default {
   name: 'ExtractContractorsList',
   props: {
-    mode: { type: String, default: 'export' }
+    mode: { type: String, default: 'extracts' }
   },
   components: { Pagination, DateField },
   data() {
@@ -653,7 +653,7 @@ export default {
     ,
     goToDetail(c) {
       if (!c || !c.id) return
-      this.$router.push({ name: 'contractor-detail', params: { id: c.id }, query: { from: 'export' } }).catch(() => {})
+      this.$router.push({ name: 'contractor-detail', params: { id: c.id }, query: { from: 'extracts' } }).catch(() => {})
     }
   }
 }

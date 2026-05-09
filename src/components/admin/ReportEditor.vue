@@ -1,8 +1,8 @@
 <template>
-  <div class="p-6 max-w-4xl mx-auto">
+  <div class="relative z-20 p-6 max-w-4xl mx-auto">
     <h2 class="text-xl font-bold mb-4">{{ isNew ? $t('admin.createReport') : $t('admin.editReport') }}</h2>
-    <div class="bg-white rounded shadow p-4">
-      <div class="grid grid-cols-2 gap-4">
+    <div class="relative z-20 bg-white rounded shadow p-4 overflow-visible">
+      <div class="grid grid-cols-2 gap-4 overflow-visible">
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnKey') }}</label>
           <input v-model="form.key" class="w-full border rounded px-2 py-1" />
@@ -15,19 +15,22 @@
           <label class="block text-sm font-medium">{{ $t('reports.columnArTitle') || 'Arabic Title' }}</label>
           <input v-model="form.arTitle" class="w-full border rounded px-2 py-1" />
         </div>
-        <div>
+        <div class="relative z-50 overflow-visible">
           <label class="block text-sm font-medium">{{ $t('reports.columnModule') }}</label>
-          <SearchDropdown
-            :modelValue="selectedModuleLabel"
-            :items="modulesOptions"
-            :allItems="modulesOptions"
-            itemKey="id"
-            itemLabel="label"
-            :placeholder="$t('placeholders.search')"
-            :inputClass="'w-full border rounded px-2 py-1'"
-            @update:modelValue="val => selectedModuleLabel = val"
-            @select="onSelectModule"
-          />
+
+          <div class="relative z-50">
+            <SearchDropdown
+              :modelValue="selectedModuleLabel"
+              :items="modulesOptions"
+              :allItems="modulesOptions"
+              itemKey="id"
+              itemLabel="label"
+              :placeholder="$t('placeholders.search')"
+              :inputClass="'w-full border rounded px-2 py-1'"
+              @update:modelValue="val => selectedModuleLabel = val"
+              @select="onSelectModule"
+            />
+          </div>
         </div>
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnActive') }}</label>
@@ -37,22 +40,27 @@
           <label class="block text-sm font-medium">{{ $t('reports.description') }}</label>
           <textarea v-model="form.description" class="w-full border rounded px-2 py-1" rows="3"></textarea>
         </div>
-        <div v-if="form.importantColumns && form.importantColumns.length" class="col-span-2">
-          <label class="block text-sm font-medium">{{ $t('reports.importantColumns') || 'Totals columns' }}</label>
-          <div class="mt-2 flex flex-wrap gap-1">
-            <span
-              v-for="column in form.importantColumns"
-              :key="`important-column-${column}`"
-              class="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900"
-            >
-              {{ column }}
-            </span>
-          </div>
-        </div>
         <div class="col-span-2">
           <label class="block text-sm font-medium">{{ $t('reports.queryText') }}</label>
           <textarea v-model="form.queryText" class="w-full border rounded px-2 py-1 text-left font-mono text-sm" rows="8" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;"></textarea>
           <p class="text-xs text-gray-500 mt-1">{{ $t('reports.queryHelp') }}</p>
+        </div>
+      </div>
+
+      <div class="mt-4 rounded border border-sky-200 bg-sky-50 p-3">
+        <div class="text-sm font-medium text-sky-900">{{ $t('reports.selectFields') || 'Output fields' }}</div>
+        <div class="text-xs text-sky-800 mt-1">
+          {{ $t('reports.selectFieldsHelp') || 'Choose which fields appear in the result table and exports.' }}
+        </div>
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label
+            v-for="field in form.params"
+            :key="`select-field-${field.name}`"
+            class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm border border-sky-100"
+          >
+            <input type="checkbox" :value="field.name" v-model="form.selectFieldNames" />
+            <span>{{ field.label || field.name }}</span>
+          </label>
         </div>
       </div>
 
@@ -67,7 +75,7 @@
     </div>
 </div>
 
-  <div class="max-w-4xl mx-auto mt-6">
+  <div class="relative z-10 max-w-4xl mx-auto mt-6">
     <h3 class="font-semibold mb-2">{{ $t('admin.parameters') }}</h3>
     <div class="bg-white rounded shadow p-3">
       <div class="flex justify-between mb-2">
@@ -154,17 +162,54 @@
           </button>
         </div>
       </div>
+
+      <div class="mt-4 rounded border border-amber-200 bg-amber-50 p-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-sm font-medium text-amber-900">{{ $t('reports.totalsLabel') || 'Totals' }}</div>
+            <div class="text-xs text-amber-800">
+              {{ $t('reports.importantColumnsHelp') || 'Choose numeric columns to sum in the executed report.' }}
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="field in selectedTotalParams"
+              :key="`total-chip-${field.name}`"
+              class="rounded-full bg-amber-200 px-2 py-1 text-xs font-medium text-amber-900"
+            >
+              {{ field.label || field.name }}
+            </span>
+            <span v-if="!selectedTotalParams.length" class="text-xs text-amber-800">
+              {{ $t('reports.noImportantColumns') || 'No totals columns selected.' }}
+            </span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label
+            v-for="field in numericParams"
+            :key="`total-toggle-${field.name}`"
+            class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm border border-amber-100"
+          >
+            <input
+              type="checkbox"
+              :value="field.name"
+              v-model="form.totals"
+            />
+            <span>{{ field.label || field.name }}</span>
+          </label>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportDef, createReportDef, updateReportDef, getReportParamOptions, getReportModules } from '@/api'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { useRoute, useRouter } from 'vue-router'
-import { normalizeImportantColumns } from '@/utils/reportDefinitions'
+import { normalizeReportTotals, normalizeReportFilterFields, normalizeReportSelectFields } from '@/utils/reportDefinitions'
 
 export default {
   components: { SearchDropdown },
@@ -176,7 +221,7 @@ export default {
     const router = useRouter()
     const id = route.params.id
     const isNew = !id || id === 'new'
-    const form = ref({ key: '', title: '', arTitle: '', ReportJobType: '', description: '', queryText: '', active: true, importantColumns: [], params: [] })
+    const form = ref({ key: '', title: '', arTitle: '', ReportJobType: '', description: '', queryText: '', active: true, totals: [], params: [], selectFieldNames: [] })
     const editingParam = ref(null)
     const dragIndex = ref(-1)
     const nameError = ref('')
@@ -230,6 +275,12 @@ export default {
       form.value.params.forEach((pp, i) => pp.position = i + 1)
     }
 
+    function isNumericParam(field) {
+      const type = String(field?.type || field?.paramType || '').toUpperCase()
+      const dataType = String(field?.dataType || '').toLowerCase()
+      return type === 'NUMBER' || /int|decimal|numeric|number|float|double|money|currency/.test(dataType) || field?.summarizable === true
+    }
+
     function removeParam(i) {
       if (!confirm(t('reports.confirmRemoveParam'))) return
       form.value.params.splice(i,1)
@@ -266,7 +317,7 @@ export default {
         form.value = {
           ...form.value,
           ...payload,
-          importantColumns: normalizeImportantColumns(payload || {})
+          totals: normalizeReportTotals(payload || {})
         }
         if (typeof form.value.params === 'string') {
           try {
@@ -276,6 +327,10 @@ export default {
             form.value.params = []
           }
         }
+        const filterFields = normalizeReportFilterFields(payload || {})
+        const selectFields = normalizeReportSelectFields(payload || {})
+        form.value.params = filterFields.length ? filterFields : form.value.params
+        form.value.selectFieldNames = (selectFields.length ? selectFields : form.value.params).map((field) => field.name)
       }
       // set selected module label from loaded form
       selectedModuleLabel.value = form.value.module || ''
@@ -307,14 +362,27 @@ export default {
           names.add(p.name)
         }
 
-        const importantColumns = normalizeImportantColumns(form.value || {})
+        const { importantColumns, selectFieldNames, selectFields: legacySelectFields, filterFields: legacyFilterFields, params: legacyParams, ...rest } = form.value
+        const filterFields = (form.value.params || []).map((p) => ({
+          name: p.name,
+          arName: p.arName || '',
+          label: p.label,
+          type: p.type,
+          paramType: p.paramType,
+          required: Boolean(p.required),
+          position: p.position || null,
+          dataSourceSql: p.dataSourceSql || '',
+          meta: p.meta || {}
+        }))
+        const selectFieldSet = new Set((selectFieldNames || []).map(String))
+        const selectFields = filterFields.filter((field) => selectFieldSet.has(String(field.name)))
         const payload = {
-          ...form.value,
-          importantColumns,
-          params: (form.value.params || []).map((p) => ({
-            ...p,
-            important: importantColumns.includes(String(p.name))
-          }))
+          ...rest,
+          selectFields,
+          filterFields,
+          totals: (form.value.totals || []).filter((name) => {
+            return (form.value.params || []).some((param) => param.name === name && isNumericParam(param))
+          }),
         }
 
         if (isNew) {
@@ -358,7 +426,10 @@ export default {
 
     onMounted(load)
     onMounted(loadModules)
-    return { form, save, isNew, editingParam, paramTypes, startEditParam, removeParam, onDragStart, onDragOver, onDrop, saveParam, cancelEditParam, nameError, previewOptions, locale, modulesOptions, selectedModuleLabel, onSelectModule }
+    const numericParams = computed(() => (form.value.params || []).filter((field) => isNumericParam(field)))
+    const selectedTotalParams = computed(() => numericParams.value.filter((field) => (form.value.totals || []).includes(field.name)))
+
+    return { form, save, isNew, editingParam, paramTypes, startEditParam, removeParam, onDragStart, onDragOver, onDrop, saveParam, cancelEditParam, nameError, previewOptions, locale, modulesOptions, selectedModuleLabel, onSelectModule, numericParams, selectedTotalParams }
   }
 }
 </script>

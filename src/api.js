@@ -627,9 +627,11 @@ export const getReportParamOptions = (id, paramName, paramsObj = {}) => {
 }
 
 export const executeReport = (id, body, options = {}) => {
-  const { format, ...axiosConfig } = options || {}
+  const { format, shape, lang, ...axiosConfig } = options || {}
   const query = new URLSearchParams()
   if (format) query.append('format', format)
+  if (shape) query.append('shape', shape)
+  if (lang) query.append('lang', lang)
   const suffix = query.toString() ? `?${query.toString()}` : ''
   return axios.post(`${BASE_URL}/api/report-defs/${id}/execute${suffix}`, body, axiosConfig)
 }

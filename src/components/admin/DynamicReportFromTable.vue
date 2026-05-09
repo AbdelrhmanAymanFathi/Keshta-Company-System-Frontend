@@ -49,49 +49,34 @@
           </div>
     </div>
 
-    <div v-if="params.length" class="bg-white rounded shadow p-4 mb-4">
-      <div class="flex justify-between items-center mb-2">
-        <div class="text-sm text-gray-600">{{ $t('reports.fieldSelectorHelp') || 'Select fields to include and edit labels/types.' }}</div>
-        <div class="flex gap-2">
-          <button @click="selectAll" class="px-2 py-1 border rounded">{{ $t('labels.selectAll') || 'Select All' }}</button>
-          <button @click="clearAll" class="px-2 py-1 border rounded">{{ $t('labels.clear') || 'Clear' }}</button>
-        </div>
-      </div>
-      <div class="mb-3 rounded border border-amber-200 bg-amber-50 p-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <div class="text-sm font-medium text-amber-900">{{ $t('reports.importantColumns') || 'Totals columns' }}</div>
-            <div class="text-xs text-amber-800">
-              {{ $t('reports.importantColumnsHelp') || 'Choose summarizable numeric columns that should be totaled in the executed report.' }}
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-1">
-            <span
-              v-for="field in importantFields"
-              :key="`important-chip-${field.name}`"
-              class="rounded-full bg-amber-200 px-2 py-1 text-xs font-medium text-amber-900"
-            >
-              {{ displayLabel(field) }}
-            </span>
-            <span v-if="!importantFields.length" class="text-xs text-amber-800">
-              {{ $t('reports.noImportantColumns') || 'No totals columns selected.' }}
-            </span>
+      <div v-if="params.length" class="bg-white rounded shadow p-4 mb-4 overflow-hidden">
+        <div class="flex justify-between items-center mb-2">
+          <div class="text-sm text-gray-600">{{ $t('reports.fieldSelectorHelp') || 'Choose output fields and filter fields independently.' }}</div>
+          <div class="flex gap-2">
+            <button @click="selectAllOutput" class="px-2 py-1 border rounded">{{ $t('labels.selectAll') || 'Select Output' }}</button>
+            <button @click="clearAllOutput" class="px-2 py-1 border rounded">{{ $t('labels.clear') || 'Clear Output' }}</button>
           </div>
         </div>
-      </div>
       <div v-if="errors.params" class="text-xs text-red-600 mb-2">{{ errors.params }}</div>
 
-      <ul>
-        <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="p-2 border-b flex items-start gap-3">
-          <div class="flex items-center gap-2 w-48">
-            <input type="checkbox" v-model="f.included" @change="onIncludedChange(f)" />
+      <ul class="divide-y divide-gray-100">
+        <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="p-3 border-b flex flex-col lg:flex-row lg:items-start gap-3 overflow-visible">
+          <div class="flex flex-wrap items-center gap-3 w-full lg:w-64 shrink-0">
+            <label class="flex items-center gap-1 text-sm">
+              <input type="checkbox" v-model="f.selectIncluded" @change="onSelectChange(f)" />
+              <span>{{ $t('reports.selectField') || 'Output' }}</span>
+            </label>
+            <label class="flex items-center gap-1 text-sm">
+              <input type="checkbox" v-model="f.filterIncluded" @change="onFilterChange(f)" />
+              <span>{{ $t('reports.filterField') || 'Filter' }}</span>
+            </label>
             <div class="text-sm">
               <div class="font-medium">{{ displayLabel(f) }}</div>
               <div class="text-xs text-gray-500">{{ f.dataType }}</div>
             </div>
           </div>
 
-          <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+          <div class="w-full min-w-0 flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 items-center">
             <input v-model="f.label" placeholder="English label" class="w-full border rounded px-2 py-1" />
             <input v-model="f.arName" :placeholder="$t('reports.arLabelPlaceholder') || 'Arabic label (يظهر عند اختيار العربية)'" class="w-full border rounded px-2 py-1" />
             <select v-model="f.paramType" @change="onParamTypeChange(f)" class="w-full border rounded px-2 py-1">
@@ -99,16 +84,49 @@
             </select>
           </div>
 
-          <div class="flex flex-col items-end gap-2">
-            <label v-if="showImportantToggle(f)" class="flex items-center gap-2 text-xs font-medium text-amber-700">
-              <input type="checkbox" v-model="f.important" :disabled="!f.included" />
-              <span>{{ $t('reports.totalThisColumn') || 'Total this column' }}</span>
-            </label>
+          <div class="flex flex-row lg:flex-col items-end gap-2 shrink-0">
             <button @click="moveUp(idx)" class="px-2 py-1 border rounded">↑</button>
             <button @click="moveDown(idx)" class="px-2 py-1 border rounded">↓</button>
           </div>
         </li>
       </ul>
+
+      <div class="mt-4 rounded border border-amber-200 bg-amber-50 p-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-sm font-medium text-amber-900">{{ $t('reports.totalsLabel') || 'Totals' }}</div>
+            <div class="text-xs text-amber-800">
+              {{ $t('reports.importantColumnsHelp') || 'Choose numeric columns to sum in the executed report.' }}
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="field in selectedTotalFields"
+              :key="`total-chip-${field.name}`"
+              class="rounded-full bg-amber-200 px-2 py-1 text-xs font-medium text-amber-900"
+            >
+              {{ displayLabel(field) }}
+            </span>
+            <span v-if="!selectedTotalFields.length" class="text-xs text-amber-800">
+              {{ $t('reports.noImportantColumns') || 'No totals columns selected.' }}
+            </span>
+          </div>
+        </div>
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          <label
+            v-for="field in numericFields"
+            :key="`total-toggle-${field.name}`"
+            class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm border border-amber-100"
+          >
+            <input
+              type="checkbox"
+              :value="field.name"
+              v-model="form.totals"
+            />
+            <span>{{ displayLabel(field) }}</span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="bg-white rounded shadow p-4">
@@ -129,7 +147,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportTables, getTableFields, getReportModules, createReportFromTable, updateReportFromTable, getReportDef } from '@/api'
-import { normalizeImportantColumns } from '@/utils/reportDefinitions'
+import { normalizeReportTotals, normalizeReportFilterFields, normalizeReportSelectFields } from '@/utils/reportDefinitions'
 
 export default {
   props: { reportId: { type: [String, Number], default: null } },
@@ -142,7 +160,7 @@ export default {
     const busy = ref(false)
     const isEdit = computed(() => !!props.reportId)
 
-    const form = ref({ key: '', title: '', arTitle: '', module: '', description: '', importantColumns: [] })
+    const form = ref({ key: '', title: '', arTitle: '', module: '', description: '', totals: [] })
 
     const paramTypes = ['TEXT','NUMBER','DATE','DROPDOWN','MULTISELECT','BOOLEAN']
 
@@ -184,8 +202,8 @@ export default {
         params.value = list.map((c, idx) => ({
           name: c.name,
           dataType: c.dataType || c.type || '',
-          included: false,
-          important: false,
+          selectIncluded: false,
+          filterIncluded: false,
           label: c.label || c.name,
           arName: c.arName || '',
           paramType: c.suggestedParamType || c.paramType || (c.dataType && String(c.dataType).toLowerCase().includes('date') ? 'DATE' : 'TEXT'),
@@ -206,7 +224,7 @@ export default {
         form.value.arTitle = payload.arTitle || form.value.arTitle
         form.value.description = payload.description || form.value.description
         form.value.module = payload.module || form.value.module
-        form.value.importantColumns = normalizeImportantColumns(payload)
+        form.value.totals = normalizeReportTotals(payload)
         const srcTable = payload.sourceTable || payload.tableName || payload.table || selectedTable.value
         selectedTable.value = srcTable || selectedTable.value
 
@@ -233,8 +251,8 @@ export default {
           : (parseArrayLike(payload.fields).length
               ? parseArrayLike(payload.fields)
               : parseArrayLike(payload.reportParameter))
-        const importantColumnSet = new Set(normalizeImportantColumns(payload))
-
+        const selectNameSet = new Set(normalizeReportSelectFields(payload).map((f) => String(f.name)))
+        const filterNameSet = new Set(normalizeReportFilterFields(payload).map((f) => String(f.name)))
         // fetch actual table columns and merge persisted params with table fields so new columns appear
         if (selectedTable.value) {
           try {
@@ -245,8 +263,8 @@ export default {
               return {
                 name: c.name,
                 dataType: c.dataType || c.type || '',
-                included: !!match || importantColumnSet.has(String(c.name)),
-                important: importantColumnSet.has(String(c.name)) || match?.important === true,
+                selectIncluded: selectNameSet.has(String(c.name)),
+                filterIncluded: filterNameSet.has(String(c.name)),
                 label: match?.label || c.label || c.name,
                 arName: match?.arName || c.arName || '',
                 paramType: match?.type || match?.paramType || c.suggestedParamType || (c.dataType && String(c.dataType).toLowerCase().includes('date') ? 'DATE' : 'TEXT'),
@@ -262,8 +280,8 @@ export default {
               params.value = persisted.map((f, idx) => ({
                 name: f.name,
                 dataType: f.dataType || '',
-                included: true,
-                important: importantColumnSet.has(String(f.name)) || f.important === true,
+                selectIncluded: selectNameSet.has(String(f.name)) || !selectNameSet.size,
+                filterIncluded: filterNameSet.has(String(f.name)),
                 label: f.label || f.name,
                 arName: f.arName || '',
                 paramType: f.type || f.paramType || 'TEXT',
@@ -275,16 +293,16 @@ export default {
         } else {
           // no table known - fallback to persisted
           if (persisted.length) {
-            params.value = persisted.map((f, idx) => ({
-              name: f.name,
-              dataType: f.dataType || '',
-              included: true,
-              important: importantColumnSet.has(String(f.name)) || f.important === true,
-              label: f.label || f.name,
-              arName: f.arName || '',
-              paramType: f.type || f.paramType || 'TEXT',
-              summarizable: f.summarizable === true,
-              _pos: idx+1
+              params.value = persisted.map((f, idx) => ({
+                name: f.name,
+                dataType: f.dataType || '',
+                selectIncluded: selectNameSet.has(String(f.name)) || !selectNameSet.size,
+                filterIncluded: filterNameSet.has(String(f.name)),
+                label: f.label || f.name,
+                arName: f.arName || '',
+                paramType: f.type || f.paramType || 'TEXT',
+                summarizable: f.summarizable === true,
+                _pos: idx+1
             }))
           }
         }
@@ -293,16 +311,14 @@ export default {
       }
     }
 
-    function selectAll() { params.value.forEach(f => f.included = true) }
-    function clearAll() { params.value.forEach(f => { f.included = false; f.important = false }) }
-    function onIncludedChange(field) {
-      if (!field?.included) field.important = false
-    }
-    function showImportantToggle(field) {
-      return field?.summarizable === true && field?.paramType === 'NUMBER'
-    }
+    function selectAllOutput() { params.value.forEach(f => { f.selectIncluded = true }) }
+    function clearAllOutput() { params.value.forEach(f => { f.selectIncluded = false }) }
+    function onSelectChange() {}
+    function onFilterChange() {}
     function onParamTypeChange(field) {
-      if (!showImportantToggle(field)) field.important = false
+      if (!isNumericField(field)) {
+        form.value.totals = (form.value.totals || []).filter(name => name !== field?.name)
+      }
     }
 
     function onDragStart(e, i) {
@@ -339,15 +355,30 @@ export default {
       arr.splice(i+1,0,it)
     }
 
-    const selectedFields = computed(() => params.value.filter(f => f.included))
-    const importantFields = computed(() => selectedFields.value.filter(f => f.important && showImportantToggle(f)))
-    const importantColumns = computed(() => importantFields.value.map(f => f.name))
+    const selectedFields = computed(() => params.value.filter(f => f.selectIncluded))
+    const filterFields = computed(() => params.value.filter(f => f.filterIncluded))
+    const numericFields = computed(() => params.value.filter(f => isNumericField(f)))
+    const selectedTotalFields = computed(() =>
+      numericFields.value.filter(f => (form.value.totals || []).includes(f.name))
+    )
+    const totalsColumns = computed(() => (form.value.totals || []).filter(Boolean))
+
+    function isNumericField(field) {
+      const type = String(field?.paramType || '').toUpperCase()
+      const dataType = String(field?.dataType || '').toLowerCase()
+      return type === 'NUMBER' || /int|decimal|numeric|number|float|double|money|currency/.test(dataType) || field?.summarizable === true
+    }
 
     const sqlPreview = computed(() => {
       if (!selectedTable.value) return ''
       const cols = selectedFields.value.map(f => `"${f.name}"`).join(', ') || '*'
-      const where = selectedFields.value.map(f => {
-        if (f.paramType === 'DATE') return `("${f.name}" BETWEEN :${f.name}_from AND :${f.name}_to)`
+      const dateFieldCount = filterFields.value.filter(f => f.paramType === 'DATE').length
+      const useRangeForSingleDateField = dateFieldCount === 1
+      const where = filterFields.value.map(f => {
+        if (f.paramType === 'DATE') {
+          if (useRangeForSingleDateField) return `("${f.name}" BETWEEN :${f.name}_from AND :${f.name}_to)`
+          return `("${f.name}" = :${f.name})`
+        }
         if (f.paramType === 'DROPDOWN' || f.paramType === 'MULTISELECT') return `("${f.name}" IN (:${f.name}))`
         if (f.paramType === 'NUMBER') return `("${f.name}" = :${f.name})`
         return `("${f.name}" LIKE :${f.name})`
@@ -355,7 +386,12 @@ export default {
       return `SELECT ${cols} FROM "${selectedTable.value}"${where ? ' WHERE ' + where : ''}`
     })
 
-    const paramsPreview = computed(() => selectedFields.value.map(f => ({ name: f.name, type: f.paramType, label: f.label, arName: f.arName, important: !!f.important })))
+    const paramsPreview = computed(() => JSON.stringify({
+      selectFields: selectedFields.value.map(f => ({ name: f.name, type: f.paramType, label: f.label, arName: f.arName })),
+      filterFields: filterFields.value.map(f => ({ name: f.name, type: f.paramType, label: f.label, arName: f.arName })),
+      totals: totalsColumns.value.slice()
+    }, null, 2))
+    const totalsPreview = computed(() => totalsColumns.value.slice())
 
     const errors = ref({ key: '', title: '', params: '' })
     function validate() {
@@ -364,7 +400,7 @@ export default {
       errors.value.params = ''
       if (!form.value.key) errors.value.key = t('reports.errorKeyRequired') || 'Key is required'
       if (!form.value.title) errors.value.title = t('reports.errorTitleRequired') || 'Title is required'
-      if (!selectedFields.value.length) errors.value.params = t('reports.errorAtLeastOne') || 'Select at least one field'
+      if (!selectedFields.value.length) errors.value.params = t('reports.errorAtLeastOne') || 'Select at least one output field'
       // param label length
       for (const f of selectedFields.value) {
         if (f.label && f.label.length > 100) { errors.value.params = t('reports.errorLabelTooLong') || 'Label too long'; break }
@@ -385,14 +421,19 @@ export default {
         description: form.value.description,
         module: form.value.module,
         tableName: selectedTable.value,
-        importantColumns: importantColumns.value,
-        params: selectedFields.value.map(f => ({
+        selectFields: selectedFields.value.map(f => ({
           name: f.name,
           paramType: f.paramType,
           label: f.label,
-          arName: f.arName,
-          important: f.summarizable ? !!f.important : false
-        }))
+          arName: f.arName
+        })),
+        filterFields: filterFields.value.map(f => ({
+          name: f.name,
+          paramType: f.paramType,
+          label: f.label,
+          arName: f.arName
+        })),
+        totals: totalsColumns.value,
       }
       busy.value = true
       try {
@@ -414,7 +455,7 @@ export default {
 
     onMounted(() => { loadTables(); loadModules(); loadExistingReport() })
 
-    return { tables, modules, selectedTable, params, form, paramTypes, onTableChange, selectAll, clearAll, moveUp, moveDown, displayLabel, sqlPreview, paramsPreview, generate, busy, isEdit, t, locale, errors, importantFields, onIncludedChange, onParamTypeChange, showImportantToggle, onDragStart, onDragOver, onDrop }
+    return { tables, modules, selectedTable, params, form, paramTypes, onTableChange, selectAllOutput, clearAllOutput, moveUp, moveDown, displayLabel, sqlPreview, paramsPreview, totalsPreview, generate, busy, isEdit, t, locale, errors, selectedTotalFields, numericFields, onSelectChange, onFilterChange, onParamTypeChange, onDragStart, onDragOver, onDrop, selectedFields, filterFields }
   }
 }
 </script>

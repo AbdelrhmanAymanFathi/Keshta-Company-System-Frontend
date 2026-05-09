@@ -135,21 +135,21 @@
                 </button>
                 <button
                   @click="downloadCsv"
-                  :disabled="!report || !!exportingFormat"
+                  :disabled="!report || !hasExportableRows || !!exportingFormat"
                   class="px-4 py-2 bg-amber-500 text-white rounded flex items-center gap-2 hover:bg-amber-400 transition disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'csv' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadCsv') || 'Download CSV') }}</span>
                 </button>
                 <button
                   @click="downloadXlsx"
-                  :disabled="!report || !!exportingFormat"
+                  :disabled="!report || !hasExportableRows || !!exportingFormat"
                   class="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'xlsx' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadExcel') || 'Download Excel') }}</span>
                 </button>
                 <button
                   @click="downloadPdf"
-                  :disabled="!report || !!exportingFormat"
+                  :disabled="!report || !hasExportableRows || !!exportingFormat"
                   class="px-4 py-2 bg-rose-600 text-white rounded flex items-center gap-2 hover:bg-rose-500 transition disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'pdf' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadPdf') || 'Download PDF') }}</span>
@@ -172,7 +172,7 @@
 </template>
 
 <script>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { getReportDef, executeReport, getReportParamOptions } from "@/api";
 import SearchDropdown from "@/components/shared/SearchDropdown.vue";
@@ -195,6 +195,14 @@ export default {
     const paramOptions = ref({});
     const paramLoading = ref({});
     const selectedLabels = ref({});
+    const hasExportableRows = computed(() => {
+      if (Array.isArray(result.value)) return result.value.length > 0;
+      if (result.value && Array.isArray(result.value.rows)) return result.value.rows.length > 0;
+      if (result.value && Array.isArray(result.value.data)) return result.value.data.length > 0;
+      return false;
+    });
+
+    const getParamByName = (paramName) => (report.value?.params || []).find((p) => p.name === paramName)
 
     const load = async () => {
       loading.value = true;
@@ -245,7 +253,7 @@ export default {
     function serializeParamValue(p) {
       const val = values.value[p.name];
       if (p.type === "DROPDOWN") {
-        if (!val) return null;
+        if (!val || typeof val !== "object") return null;
         return val.id ?? val.value ?? val;
       }
       if (p.type === "MULTISELECT") {
@@ -257,7 +265,7 @@ export default {
           ? Number(val)
           : null;
       if (p.type === "BOOLEAN") return Boolean(val);
-      return val;
+      return val === "" || val === null || val === undefined ? null : val;
     }
 
     const buildExecutePayload = () => {
@@ -284,6 +292,9 @@ export default {
 
     function onOptionSearch(paramName, q) {
       selectedLabels.value[paramName] = q;
+      if (getParamByName(paramName)?.type === "DROPDOWN") {
+        values.value[paramName] = null;
+      }
       // fetch options for this query
       loadOptions(paramName, q);
     }
@@ -291,9 +302,17 @@ export default {
     const downloadReport = async (format) => {
       exportingFormat.value = format
       exportError.value = ""
+
+      if (!hasExportableRows.value) {
+        exportError.value = t("reports.noResults") || "No results"
+        exportingFormat.value = ""
+        return
+      }
+
       try {
         const res = await executeReport(props.reportId, buildExecutePayload(), {
           format,
+          lang: locale.value === "ar" ? "ar" : "en",
           responseType: "blob"
         })
         const fallbackName = `dynamic-report-${props.reportId}.${format}`
@@ -333,7 +352,7 @@ export default {
     }
 
     watch(() => props.reportId, load, { immediate: true })
-    return { report, loading, values, execute, executing, result, exportingFormat, exportError, paramOptions, paramLoading, selectedLabels, onOptionSearch, onSelectOption, onSelectMulti, removeMultiItem, locale, downloadCsv, downloadXlsx, downloadPdf }
+    return { report, loading, values, execute, executing, result, exportingFormat, exportError, paramOptions, paramLoading, selectedLabels, hasExportableRows, onOptionSearch, onSelectOption, onSelectMulti, removeMultiItem, locale, downloadCsv, downloadXlsx, downloadPdf }
   }
 }
 </script>

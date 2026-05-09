@@ -57,7 +57,7 @@
     "driversList": "قائمة السائقين",
     "contractorsList": "قائمة المقاولين",
     "contractorSupplyStatement": "كشف حساب المقاول",
-    "contractorTransportStatement": "كشف حساب مقاول النقل",
+    "contractorTransportStatement": "كشف حساب المقاول",
     "contractorStatement": "كشف حساب المقاول",
     "vehiclesList": "قائمة المركبات",
     "suppliesReport": "تقرير التوريدات",
@@ -500,7 +500,9 @@
     "errorLabelTooLong": "إحدى التسميات أو أكثر تتجاوز الحد المسموح",
     "errorArLabelTooLong": "إحدى التسميات العربية أو أكثر تتجاوز الحد المسموح",
     "createSuccess": "تم إنشاء التقرير بنجاح",
-    "updateSuccess": "تم تحديث التقرير بنجاح"
+    "updateSuccess": "تم تحديث التقرير بنجاح",
+    "selectField": "اختر الحقل",
+    "filterField": "حقل تصفية"
   },
   "auth": {
     "login": {
@@ -852,7 +854,7 @@
     "accountNumber": "رقم الحساب",
     "openingBalance": "الرصيد الافتتاحي",
     "notes": "ملاحظات",
-    "statement": "كشف حساب مقاول النقل",
+    "statement": "كشف حساب المقاول",
     "wallet": "محفظة مقاول النقل",
     "balance": "الرصيد",
     "totalDeposits": "إجمالي الإيداعات",

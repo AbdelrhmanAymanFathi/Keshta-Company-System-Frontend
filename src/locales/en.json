@@ -498,7 +498,9 @@
     "errorLabelTooLong": "One or more labels exceed maximum length",
     "errorArLabelTooLong": "One or more Arabic labels exceed maximum length",
     "createSuccess": "Report created successfully",
-    "updateSuccess": "Report updated successfully"
+    "updateSuccess": "Report updated successfully",
+    "selectField": "Select",
+    "filterField": "Filter"
   },
   "auth": {
     "login": {

@@ -19,7 +19,7 @@
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnKey') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnModule') }}</th>
-            <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.importantColumns') || 'Totals columns' }}</th>
+            <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.totalsLabel') || 'Totals' }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActive') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActions') }}</th>
           </tr>
@@ -30,9 +30,9 @@
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ (locale.value !== 'en' && r.arTitle) ? r.arTitle : r.title }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.module }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">
-              <div v-if="getImportantColumns(r).length" class="flex flex-wrap gap-1">
+              <div v-if="getTotalsColumns(r).length" class="flex flex-wrap gap-1">
                 <span
-                  v-for="column in getImportantColumns(r)"
+                  v-for="column in getTotalsColumns(r)"
                   :key="`${r.id}-${column}`"
                   class="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900"
                 >
@@ -67,7 +67,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportDefs, deleteReportDef } from '@/api'
-import { normalizeImportantColumns } from '@/utils/reportDefinitions'
+import { normalizeReportTotals } from '@/utils/reportDefinitions'
 
 export default {
   setup() {
@@ -96,12 +96,12 @@ export default {
       }
     }
 
-    const getImportantColumns = (report) => normalizeImportantColumns(report || {})
+    const getTotalsColumns = (report) => normalizeReportTotals(report || {})
 
     // legacy modal handlers removed; route-based editor used instead
 
     onMounted(load)
-    return { reports, remove, getImportantColumns, isRTL, locale }
+    return { reports, remove, getTotalsColumns, isRTL, locale }
   }
 }
 </script>

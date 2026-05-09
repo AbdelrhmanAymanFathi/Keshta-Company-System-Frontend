@@ -136,8 +136,8 @@
         <ul class="space-y-1">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.routeName)"
-              :class="['flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
-              <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, currentRouteName === item.routeName)"></div>
+              :class="['flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100') : (currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100'), effectiveCollapsed ? 'justify-center px-3' : '']">
+              <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName)"></div>
               <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">
                 {{ $t(item.label) }}
               </span>
@@ -145,14 +145,14 @@
           </li>
           <!-- Transport module: show dynamic reports inline under the transport menu -->
           <li v-if="reportsForModule && reportsForModule.length">
-            <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
-            <ul class="mt-2 space-y-1 px-1 sm:px-2">
+            <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4 m:px-4 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
+            <ul class=" space-y-1 ">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button @click="openReport(r.id)" class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-100 hover:scale-105 transition-all duration-200">
-                  <div class="w-4 h-4 text-indigo-600">
-                    <svg class="w-4 h-4 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6M9 16h6M12 8v8"/></svg>
+                <button @click="openReport(r.id)" :class="['flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
+                  <div class="w-5 h-5 text-indigo-600">
+                    <svg :class="['w-5 h-5', isDynamicReportActive(r) ? 'text-white' : 'text-indigo-600']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                   </div>
-                  <span class="truncate">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
+                  <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
                 </button>
               </li>
             </ul>
@@ -314,6 +314,9 @@ export default {
       return null
     },
     currentLabel() { return this.currentItem ? this.currentItem.label : '' },
+    isReportsListActive() {
+      return this.currentRouteName === 'admin-reports-list' || String(this.currentRouteName || '').startsWith('admin-reports-')
+    },
     selectedTop() {
       const routeName = this.currentRouteName
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
@@ -337,6 +340,7 @@ export default {
         if (f === 'supplies' || f === 'export') return 'supplies'
         // Accept various legacy and new identifiers for equipment/rentals
         if (f === 'equipment' || f === 'equipmentlogs' || f === 'equipmentlog') return 'equipmentLog'
+        if (f === 'extract' || f === 'extracts') return 'extracts'
       }
       // Extracts module routes
       const extractsRoutes = ['extracts-list', 'create-extract', 'extracts-detail', 'extracts-items', 'extracts-contractors-list', 'contractor-extract-statement']
@@ -391,6 +395,11 @@ export default {
       if (['extract', 'extracts'].includes(norm)) return 'extracts'
       if (['admin', 'administration'].includes(norm)) return 'admin'
       return norm
+    },
+    isDynamicReportActive(report) {
+      if (!report) return false
+      if (this.currentRouteName !== 'admin-reports-run') return false
+      return String(this.$route?.params?.id) === String(report.id)
     },
     selectTop(key) {
       const first = this.menuMap[key]?.[0]

@@ -191,6 +191,9 @@ export interface ReportDefinition {
   tableName?: string;
   table?: string;
   active?: boolean;
+  selectFields?: ReportFieldMeta[];
+  filterFields?: ReportFieldMeta[];
+  totals?: string[];
   importantColumns?: string[];
   fields?: ReportFieldMeta[];
   params?: ReportFieldMeta[];
@@ -206,6 +209,9 @@ export interface DynamicReportTotalsRow {
 export interface DynamicReportExecutionResult {
   rows?: Array<Record<string, unknown>>;
   totalsRow?: DynamicReportTotalsRow | null;
+  selectFields?: ReportFieldMeta[];
+  filterFields?: ReportFieldMeta[];
+  totals?: string[];
   importantColumns?: string[];
   related?: Record<string, unknown>;
   data?: Array<Record<string, unknown>>;
