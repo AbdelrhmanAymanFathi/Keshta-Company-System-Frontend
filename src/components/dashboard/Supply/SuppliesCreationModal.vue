@@ -529,7 +529,7 @@
           <button class="text-gray-500 hover:text-gray-700" @click="showAddVehicleDialog = false">✕</button>
         </div>
         <div class="p-4 overflow-y-auto">
-          <CreateVehicle @created="onCreatedFromVehicleModal" :prefilledContractorId="commonData.contractor?.id"
+          <CreateVehicle :mode="'supply'" @created="onCreatedFromVehicleModal" :prefilledContractorId="commonData.contractor?.id"
             :prefilledCrusherName="commonData.crusher?.name" />
         </div>
       </div>
