@@ -32,6 +32,7 @@
             v-model="contractorSearch"
             @focus="openContractorDropdown"
             @input="openContractorDropdown"
+            @blur="closeContractorDropdown"
             @keydown="handleContractorKeydown"
             aria-autocomplete="list"
             aria-haspopup="true"
@@ -81,6 +82,7 @@
             v-model="crusherSearch"
             @focus="openCrusherDropdown"
             @input="openCrusherDropdown"
+            @blur="closeCrusherDropdown"
             aria-autocomplete="list"
             aria-haspopup="true"
             role="combobox"
@@ -245,6 +247,13 @@ export default {
       this.showContractorDropdown = true
       this.contractorHighlightedIndex = -1
     },
+    closeContractorDropdown() {
+      // Delay closing to allow click events on dropdown items
+      setTimeout(() => {
+        this.showContractorDropdown = false
+        this.contractorHighlightedIndex = -1
+      }, 150)
+    },
     selectContractor(c) {
       this.form.contractorId = c.id
       this.contractorSearch = c.name
@@ -322,6 +331,12 @@ export default {
     },
     openCrusherDropdown() {
       this.showCrusherDropdown = true
+    },
+    closeCrusherDropdown() {
+      // Delay closing to allow click events on dropdown items
+      setTimeout(() => {
+        this.showCrusherDropdown = false
+      }, 150)
     },
     selectCrusher(c) {
       this.form.crusherId = c.id
