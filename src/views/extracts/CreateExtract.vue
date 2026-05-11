@@ -262,14 +262,22 @@ export default {
     }
 
     function createEmptyRow() {
-      return { id: Date.now() + Math.random(), itemId: '', itemSearch: '', price: '', quantity: 1, total: 0 }
+      return { id: Date.now() + Math.random(), itemId: '', itemSearch: '', price: '', quantity: 1, discount: 0, total: 0 }
     }
 
     function addRow() { rows.value.push(createEmptyRow()) }
     function removeRow(i) { rows.value.splice(i,1); if (!rows.value.length) addRow() }
     function duplicateLastRow() { const last = rows.value[rows.value.length-1]; if (last) rows.value.push({ ...JSON.parse(JSON.stringify(last)), id: Date.now()+Math.random() }) }
 
-    const subtotal = computed(() => rows.value.reduce((s,r) => s + (Number(r.total || r.price * r.quantity) || 0), 0))
+    const subtotal = computed(() => rows.value.reduce((s, r) => {
+      const price = Number(r.price || 0)
+      const quantity = Number(r.quantity || 0)
+      const discount = Math.max(0, Number(r.discount || 0))
+      const total = r.total !== undefined && r.total !== null && r.total !== ''
+        ? Number(r.total)
+        : Math.max(0, (price * quantity) - discount)
+      return s + (Number.isFinite(total) ? total : 0)
+    }, 0))
 
     function formatCurrency(v){ if (v===undefined||v===null||v==='') return '-'; const n=Number(v); if (Number.isNaN(n)) return v; return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(n) }
 
@@ -394,13 +402,14 @@ export default {
           notes: commonData.notes,
           total: subtotal.value,
           lines: rows.value.map(r => {
-            const line = { itemId: toNumericId(r.itemId), quantity: Number(r.quantity || 0) }
+            const discount = Math.max(0, Number(r.discount || 0))
+            const line = { itemId: toNumericId(r.itemId), quantity: Number(r.quantity || 0), discount }
             if (r.price !== null && r.price !== undefined && r.price !== '') {
               const price = Number(r.price)
               line.price = price
-              line.total = Number((price * Number(r.quantity || 0)).toFixed(2))
+              line.total = Number(Math.max(0, price * Number(r.quantity || 0)).toFixed(2))
             } else if (r.total !== null && r.total !== undefined && r.total !== '' && Number(r.total) > 0) {
-              line.total = Number(r.total)
+              line.total = Number(Math.max(0, Number(r.total)).toFixed(2))
             }
             return line
           }).filter(line => line.itemId && line.quantity > 0),

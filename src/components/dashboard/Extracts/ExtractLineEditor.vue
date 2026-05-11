@@ -25,6 +25,7 @@
       <div v-if="showDefaultHint" class="text-xs text-gray-500 mt-1">Will use item default extract price</div>
     </div>
     <input type="number" v-model.number="internal.quantity" placeholder="Qty" class="p-2 border rounded" />
+    <input type="number" min="0" step="0.01" v-model.number="internal.discount" placeholder="Discount" class="p-2 border rounded" />
     <div class="p-2">{{ formattedTotal }}</div>
     <button type="button" @click="onRemove" class="text-red-600">Remove</button>
   </div>
@@ -38,7 +39,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 const props = defineProps({
   modelValue: {
     type: Object,
-    default: () => ({ itemId: '', itemSearch: '', price: null, quantity: 1, total: null })
+    default: () => ({ itemId: '', itemSearch: '', price: null, quantity: 1, discount: 0, total: null })
   },
   items: { type: Array, default: () => [] }
 })
@@ -57,25 +58,20 @@ const showDefaultHint = computed(() => {
 })
 
 const formattedTotal = computed(() => {
-  const totalVal = internal.total
-  if (totalVal !== null && totalVal !== undefined && totalVal !== '') return Number(totalVal).toFixed(2)
   const p = Number(internal.price)
   const q = Number(internal.quantity)
-  if (!Number.isNaN(p) && p !== 0 && !Number.isNaN(q)) return Number((p * q) || 0).toFixed(2)
-  return '-'
+  const discount = Math.max(0, Number(internal.discount || 0))
+  const total = Math.max(0, (Number.isFinite(p) ? p : 0) * (Number.isFinite(q) ? q : 0) - discount)
+  return Number(total).toFixed(2)
 })
 
 watch(internal, (val) => {
-  // When price exists, auto-calc total if total is not provided or is falsy
-  const priceNum = val.price === null || val.price === '' || val.price === undefined ? null : Number(val.price)
-  const qtyNum = Number(val.quantity) || 0
-
-  if (priceNum !== null && !Number.isNaN(priceNum)) {
-    val.total = Number((priceNum * qtyNum).toFixed(2))
-  } else {
-    // price not set — keep total as provided (could be null) and don't override
-    if (val.total === undefined) val.total = null
-  }
+  const priceNum = val.price === null || val.price === '' || val.price === undefined ? 0 : Number(val.price)
+  const qtyNum = val.quantity === null || val.quantity === '' || val.quantity === undefined ? 0 : Number(val.quantity)
+  const discountNum = val.discount === null || val.discount === '' || val.discount === undefined ? 0 : Number(val.discount)
+  val.discount = Number.isFinite(discountNum) ? Math.max(0, discountNum) : 0
+  const total = Math.max(0, (Number.isFinite(priceNum) ? priceNum : 0) * (Number.isFinite(qtyNum) ? qtyNum : 0) - val.discount)
+  val.total = Number(total.toFixed(2))
 
   emit('update:modelValue', { ...val })
 }, { deep: true })
@@ -95,7 +91,7 @@ function selectItem(item) {
   const parsed = Number(maybePrice)
   if (!Number.isNaN(parsed) && (internal.price === null || internal.price === undefined || internal.price === '' || Number(internal.price) === 0)) {
     internal.price = parsed
-    internal.total = Number((parsed * Number(internal.quantity || 0)).toFixed(2))
+    internal.total = Number(Math.max(0, parsed * Number(internal.quantity || 0) - Number(internal.discount || 0)).toFixed(2))
   }
 }
 </script>

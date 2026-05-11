@@ -279,6 +279,7 @@
                         <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.item') }}</th>
                         <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.quantity') || 'Quantity' }}</th>
                         <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') || 'Discount' }}</th>
                         <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
                         <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
                       </tr>
@@ -358,6 +359,17 @@
                         <td class="px-3 py-2">
                           <input
                             v-model.number="row.price"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            @input="syncRowTotal(row)"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                          />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input
+                            v-model.number="row.discount"
                             type="number"
                             min="0"
                             step="0.01"
@@ -737,6 +749,7 @@ export default {
         itemCell: null,
         quantity: '',
         price: '',
+        discount: 0,
         total: 0,
         quantityInput: null
       }
@@ -907,7 +920,11 @@ export default {
         ? 0
         : Number(row.price)
 
-      return quantity * price
+      const discount = row.discount === '' || row.discount === null || row.discount === undefined
+        ? 0
+        : Number(row.discount)
+
+      return Math.max(0, (quantity * price) - Math.max(0, discount))
     },
     addRow() {
       this.rows.push(this.getDefaultRow())
@@ -1014,7 +1031,8 @@ export default {
             itemId: Number(row.itemId),
             quantity: Number(row.quantity),
             price: Number(row.price),
-            total: Number(this.totalPerRow(row))
+            discount: Math.max(0, Number(row.discount || 0)),
+            total: Number(Math.max(0, Number(row.price) * Number(row.quantity)).toFixed(2))
           })),
           idempotencyKey: this.commonData.idempotencyKey || this.genIdempotencyKey()
         }

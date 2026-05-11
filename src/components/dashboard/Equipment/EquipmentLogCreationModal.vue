@@ -18,12 +18,6 @@
 
             <div class="max-w-6xl mx-auto">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                <!-- Date -->
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.date') }} <span class="text-red-600">*</span></label>
-                  <DateField v-model="form.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
-                </div>
-                
                 <!-- Equipment -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
@@ -150,10 +144,6 @@
                   <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.hourlyRate') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
                 </div>
-                <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ form.date || '-' }}</dd>
-                </div>
                 <div v-if="isCompanyOwnedEquipment" class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.driver') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ form.driverLabel || '-' }}</dd>
@@ -180,7 +170,9 @@
                   <thead class="bg-indigo-50 sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.date') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.hours') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.notes') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
@@ -190,9 +182,20 @@
                     <tr v-for="(row, index) in rows" :key="row.id">
                       <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
 
+                      <!-- Date -->
+                      <td class="px-3 py-2">
+                        <DateField v-model="row.date" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+                      </td>
+
                       <!-- Hours -->
                       <td class="px-3 py-2">
                         <input :ref="el => row.hoursInput = el" type="number" v-model.number="row.hours" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
+                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                      </td>
+
+                      <!-- Discount -->
+                      <td class="px-3 py-2">
+                        <input type="number" v-model.number="row.discount" min="0" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
 
@@ -310,6 +313,7 @@ export default {
         contractorId: this.modelValue.contractorId || '',
         contractorLabel: this.modelValue.contractorLabel || '',
         hourlyRate: this.modelValue.hourlyRate || 0,
+        discount: this.modelValue.discount || 0,
         hours: this.modelValue.hours || 1,
         driverId: this.modelValue.driverId || '',
         driverLabel: this.modelValue.driverLabel || '',
@@ -361,7 +365,8 @@ export default {
       return (this.rows || []).reduce((s, r) => {
         const h = Number(r.hours || 0)
         const rate = Number(r.hourlyRate != null ? r.hourlyRate : this.form.hourlyRate || 0)
-        return s + Math.max(0, h * rate)
+        const discount = Number(r.discount || 0)
+        return s + Math.max(0, h * rate - discount)
       }, 0)
     },
     rowsHoursSum() {
@@ -560,7 +565,6 @@ export default {
     isStep1Valid() {
       const hr = Number(this.form.hourlyRate)
       return (this.form.equipmentLabel || this.form.equipmentId) &&
-        Boolean(this.form.date) &&
         (this.form.site && this.form.site.id) &&
         !Number.isNaN(hr) && hr >= 0
     },
@@ -577,6 +581,7 @@ export default {
         id: Date.now() + Math.random(),
         date: this.form.date || '',
         hours: this.form.hours || 1,
+        discount: 0,
         driver: null,
         driverLabel: '',
         notes: '',
@@ -715,7 +720,8 @@ export default {
     totalPerRow(row) {
       const h = Number(row.hours || 0)
       const r = Number(row.hourlyRate != null ? row.hourlyRate : this.form.hourlyRate || 0)
-      return Math.max(0, h * r)
+      const discount = Number(row.discount || 0)
+      return Math.max(0, h * r - discount)
     },
     handleEnterKey(index) {
       const newRow = this.createEmptyRow()
@@ -767,14 +773,17 @@ export default {
         const rowsPayload = (this.rows || []).map(r => {
           const hoursVal = Number(r.hours || 0)
           const rowHourly = Number(r.hourlyRate != null ? r.hourlyRate : this.form.hourlyRate || 0)
-          const rowTotal = Number((hoursVal * rowHourly).toFixed(2))
+          const rowDiscount = Number(r.discount || 0)
+          const rowDate = r.date ? formatToISODate(r.date) : commonDate
+          const rowTotal = Number(Math.max(0, (hoursVal * rowHourly) - rowDiscount).toFixed(2))
           return {
-            date: new Date(commonDate).toISOString(),
+            date: new Date(rowDate).toISOString(),
             hours: hoursVal,
             driverId: driverIdNumeric,
             driverLabel: this.isCompanyOwnedEquipment ? (this.form.driverLabel || '') : '',
             note: r.notes || '',
             hourlyRate: rowHourly,
+            discount: rowDiscount,
             total: rowTotal
           }
         })
@@ -783,7 +792,7 @@ export default {
         const hoursSum = rowsPayload.reduce((s, rr) => s + (Number(rr.hours) || 0), 0)
 
         const payload = {
-          date: new Date(commonDate).toISOString(),
+          date: rowsPayload[0]?.date || new Date(commonDate).toISOString(),
           equipmentId: equipmentIdNumeric,
           contractorId: this.form.contractorId || null,
           driverId: driverIdNumeric,
@@ -817,6 +826,7 @@ export default {
           contractorId: this.form.contractorId,
           contractorLabel: this.form.contractorLabel,
           hourlyRate: this.form.hourlyRate,
+          discount: this.form.discount,
           hours: this.form.hours,
           driverId: this.form.driverId,
           driverLabel: this.form.driverLabel,
@@ -842,6 +852,7 @@ export default {
           this.form.contractorId = data.contractorId || ''
           this.form.contractorLabel = data.contractorLabel || ''
           this.form.hourlyRate = data.hourlyRate || 0
+          this.form.discount = data.discount || 0
           this.form.hours = data.hours || 1
           this.form.driverId = data.driverId || ''
           this.form.driverLabel = data.driverLabel || ''

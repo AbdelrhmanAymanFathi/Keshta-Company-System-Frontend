@@ -757,7 +757,7 @@ export const getVehicles = (params = {}) => {
   if (q) {
     queryParams.append('q', q);
   }
-  return axios.get(`${BASE_URL}/api/vehicles?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/vehicles`, Object.fromEntries(queryParams.entries())));
 };
 export const createVehicle = (data) =>
   axios.post(`${BASE_URL}/api/vehicles`, data);
@@ -788,7 +788,7 @@ export const getContractorsWithVehicles = (options = true) => {
   if (normalizedMode) {
     params.append('mode', normalizedMode);
   }
-  return axios.get(`${BASE_URL}/api/contractors/with-vehicles?${params.toString()}`).then(res => {
+  return axios.get(withLangQuery(`${BASE_URL}/api/contractors/with-vehicles`, Object.fromEntries(params.entries()))).then(res => {
     res.data = filterContractorsPayload(res.data, normalizedMode);
     return res;
   });
@@ -820,7 +820,7 @@ export const getEquipments = (params = {}) => {
   // Support filtering by contractorId or isCompanyOwned flag
   if (typeof params.isCompanyOwned !== 'undefined') queryParams.append('isCompanyOwned', params.isCompanyOwned ? 'true' : 'false');
   if (params.contractorId) queryParams.append('contractorId', params.contractorId);
-  return axios.get(`${BASE_URL}/api/equipment?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/equipment`, Object.fromEntries(queryParams.entries())));
 };
 
 export const getEquipment = (id) =>
@@ -870,18 +870,18 @@ export const getDeliveries = (params = {}) => {
   if (itemId) queryParams.append('itemId', itemId.toString());
   if (vehicleId) queryParams.append('vehicleId', vehicleId.toString());
 
-  return axios.get(`${BASE_URL}/api/supplies?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/supplies`, Object.fromEntries(queryParams.entries())));
 };
 
 
 export const deleteDelivery = (id) =>
-  axios.delete(`${BASE_URL}/api/supplies/${id}`);
+  axios.delete(withLangQuery(`${BASE_URL}/api/supplies/${id}`));
 
 // Reports
 // Supplies/Exports Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getSuppliesReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/supplies/report`;
-  let axiosParams = { ...params };
+  let axiosParams = appendLangParam({ ...params });
 
   if (format === 'json') {
     axiosParams.format = 'json';
@@ -906,7 +906,7 @@ export const downloadSuppliesReport = async (params = {}, format = 'xlsx') => {
 
 // Deprecated: use getSuppliesReportData instead
 export const getSuppliesReport = (params = {}) => {
-  const search = new URLSearchParams(params).toString();
+  const search = new URLSearchParams(appendLangParam(params)).toString();
   const url = `${BASE_URL}/api/supplies/report${search ? `?${search}` : ''}`;
   return axios.get(url, { responseType: 'blob' });
 };
@@ -940,10 +940,10 @@ export const getTransports = (params = {}) => {
   if (itemId !== undefined && itemId !== null && itemId !== '') queryParams.append('itemId', itemId.toString());
   if (vehicleId !== undefined && vehicleId !== null && vehicleId !== '') queryParams.append('vehicleId', vehicleId.toString());
 
-  return axios.get(`${BASE_URL}/api/transports?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/transports`, Object.fromEntries(queryParams.entries())));
 };
 export const getTransport = (id) =>
-  axios.get(`${BASE_URL}/api/transports/${id}`);
+  axios.get(withLangQuery(`${BASE_URL}/api/transports/${id}`));
 // Sanitize transport payloads to the new flat model (remove legacy lines/flags)
 function sanitizeTransportPayload(payload = {}) {
   const p = { ...payload };
@@ -958,28 +958,28 @@ export const createTransport = (data) => {
   const payload = sanitizeTransportPayload(data);
   // ensure accountType is provided so backend can record transaction against correct account
   if (!payload.accountType) payload.accountType = 'TRANSPORT';
-  return axios.post(`${BASE_URL}/api/transports`, payload);
+  return axios.post(withLangQuery(`${BASE_URL}/api/transports`), payload);
 }
 
 export const updateTransport = (id, data) => {
   const payload = sanitizeTransportPayload(data);
-  return axios.patch(`${BASE_URL}/api/transports/${id}`, payload);
+  return axios.patch(withLangQuery(`${BASE_URL}/api/transports/${id}`), payload);
 }
 export const deleteTransport = (id) =>
-  axios.delete(`${BASE_URL}/api/transports/${id}`);
+  axios.delete(withLangQuery(`${BASE_URL}/api/transports/${id}`));
 
 // Extracts
 export const createExtract = (data) =>
-  axios.post(`${BASE_URL}/api/extracts`, data);
+  axios.post(withLangQuery(`${BASE_URL}/api/extracts`), data);
 
 export const getExtract = (id) =>
-  axios.get(`${BASE_URL}/api/extracts/${id}`);
+  axios.get(withLangQuery(`${BASE_URL}/api/extracts/${id}`));
 
 export const getExtractsForContractor = (contractorId, start, end) => {
   const params = {};
   if (start) params.startDate = start;
   if (end) params.endDate = end;
-  return axios.get(`${BASE_URL}/api/extracts/contractor/${contractorId}`, { params });
+  return axios.get(`${BASE_URL}/api/extracts/contractor/${contractorId}`, { params: appendLangParam(params) });
 };
 
 export const getExtracts = (params = {}) => {
@@ -1009,7 +1009,7 @@ export const getExtracts = (params = {}) => {
   if (itemId) queryParams.append('itemId', itemId.toString());
   if (vehicleId) queryParams.append('vehicleId', vehicleId.toString());
 
-  return axios.get(`${BASE_URL}/api/extracts?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/extracts`, Object.fromEntries(queryParams.entries())));
 };
 
 // Equipment Logs (migrated from Rentals)
@@ -1029,22 +1029,22 @@ export const getRentals = (params = {}) => {
     queryParams.append('isCompanyOwned', isCompanyOwned.toString());
   }
   // Route to equipment-logs listing endpoint
-  return axios.get(`${BASE_URL}/api/equipment-logs?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/equipment-logs`, Object.fromEntries(queryParams.entries())));
 };
 export const getRental = (id) =>
-  axios.get(`${BASE_URL}/api/equipment-logs/${id}`);
+  axios.get(withLangQuery(`${BASE_URL}/api/equipment-logs/${id}`));
 export const createRental = (data) =>
-  axios.post(`${BASE_URL}/api/equipment-logs`, data);
+  axios.post(withLangQuery(`${BASE_URL}/api/equipment-logs`), data);
 export const updateRental = (id, data) =>
-  axios.patch(`${BASE_URL}/api/equipment-logs/${id}`, data);
+  axios.patch(withLangQuery(`${BASE_URL}/api/equipment-logs/${id}`), data);
 export const deleteRental = (id) =>
-  axios.delete(`${BASE_URL}/api/equipment-logs/${id}`);
+  axios.delete(withLangQuery(`${BASE_URL}/api/equipment-logs/${id}`));
 export const getRentalPayouts = (rentalId) =>
-  axios.get(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts`);
+  axios.get(withLangQuery(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts`));
 export const createRentalPayout = (rentalId, data) =>
-  axios.post(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts`, data);
+  axios.post(withLangQuery(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts`), data);
 export const deleteRentalPayout = (rentalId, payoutId) =>
-  axios.delete(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts/${payoutId}`);
+  axios.delete(withLangQuery(`${BASE_URL}/api/equipment-logs/${rentalId}/payouts/${payoutId}`));
 
 // Rental Jobs
 export const getRentalJobs = (rentalId) => {
@@ -1083,22 +1083,22 @@ export const getEquipmentLogs = (params = {}) => {
   if (areaId !== undefined && areaId !== null && areaId !== '') query.append('areaId', String(areaId))
   // Log params and the final URL so we can trace why filters may be missing
   try { console.log('[api] getEquipmentLogs params:', params) } catch (e) { /* ignore */ }
-  const url = `${BASE_URL}/api/equipment-logs?${query.toString()}`
+  const url = withLangQuery(`${BASE_URL}/api/equipment-logs`, Object.fromEntries(query.entries()))
   try { console.log('[api] getEquipmentLogs URL:', url) } catch (e) { /* ignore in old browsers */ }
   return axios.get(url)
 }
 
 // Create a new equipment log (body: { equipmentId, date, hourlyRate?, hours, note, isRental })
 export const createEquipmentLog = (data) =>
-  axios.post(`${BASE_URL}/api/equipment-logs`, data)
+  axios.post(withLangQuery(`${BASE_URL}/api/equipment-logs`), data)
 
 // Update equipment log by id
 export const updateEquipmentLog = (id, data) =>
-  axios.patch(`${BASE_URL}/api/equipment-logs/${id}`, data)
+  axios.patch(withLangQuery(`${BASE_URL}/api/equipment-logs/${id}`), data)
 
 // Delete equipment log by id
 export const deleteEquipmentLog = (id) =>
-  axios.delete(`${BASE_URL}/api/equipment-logs/${id}`)
+  axios.delete(withLangQuery(`${BASE_URL}/api/equipment-logs/${id}`))
 
 // Equipment logs summary (generic query params)
 export const getEquipmentLogsSummary = (params = {}) => {
@@ -1106,12 +1106,12 @@ export const getEquipmentLogsSummary = (params = {}) => {
   Object.entries(params || {}).forEach(([k, v]) => {
     if (v !== undefined && v !== null && v !== '') q.append(k, String(v))
   })
-  return axios.get(`${BASE_URL}/api/equipment-logs/summary?${q.toString()}`)
+  return axios.get(withLangQuery(`${BASE_URL}/api/equipment-logs/summary`, Object.fromEntries(q.entries())))
 }
 
 export const getEquipmentLogsReportData = async (params = {}, format = 'json') => {
   const url = `${BASE_URL}/api/equipment-logs/report`;
-  let axiosParams = { ...params };
+  let axiosParams = appendLangParam({ ...params });
   if (format === 'json') {
     axiosParams.format = 'json';
     const resp = await axios.get(url, { params: axiosParams, withCredentials: true });
@@ -1349,7 +1349,7 @@ export const downloadExpensesReport = async (params = {}, format = 'xlsx') => {
 // Changes by Date (Admin-only endpoints)
 export const getExportsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
-  return axios.get(`${BASE_URL}/api/supplies/changes?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/supplies/changes`, Object.fromEntries(queryParams.entries())));
 };
 
 export const getLocationsChanges = (date) => {
@@ -1369,12 +1369,12 @@ export const getCrushersChanges = (date) => {
 
 export const getTransportsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
-  return axios.get(`${BASE_URL}/api/transports/changes?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/transports/changes`, Object.fromEntries(queryParams.entries())));
 };
 
 export const getEquipmentLogsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
-  return axios.get(`${BASE_URL}/api/equipment-logs/changes?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/equipment-logs/changes`, Object.fromEntries(queryParams.entries())));
 };
 
 export const getExpensesChanges = (date) => {
@@ -1518,10 +1518,10 @@ tokenManager.initialize();
 
 // --- Additional Transport helpers ---
 export const calculateTransportFare = (data) =>
-  axios.post(`${BASE_URL}/api/transports/calculate-fare`, data);
+  axios.post(withLangQuery(`${BASE_URL}/api/transports/calculate-fare`), data);
 
 export const getTransportReport = (params = {}) => {
-  const search = new URLSearchParams(params).toString();
+  const search = new URLSearchParams(appendLangParam(params)).toString();
   const url = `${BASE_URL}/api/transports/report${search ? `?${search}` : ''}`;
   return axios.get(url, { responseType: 'blob' });
 };
@@ -1529,7 +1529,7 @@ export const getTransportReport = (params = {}) => {
 // Transport Report - Get JSON data by default (same pattern as getRentalReportData)
 export const getTransportReportData = async (params = {}, options = { download: false }) => {
   const url = `${BASE_URL}/api/transports/report`;
-  let axiosParams = { ...params };
+  let axiosParams = appendLangParam({ ...params });
   if (options && options.download) {
     axiosParams.format = 'xlsx';
     const resp = await axios.get(url, { params: axiosParams, responseType: 'arraybuffer', withCredentials: true });
@@ -1543,7 +1543,7 @@ export const getTransportReportData = async (params = {}, options = { download: 
 
 export const downloadTransportReport = async (params = {}, format = 'xlsx') => {
   const resp = await axios.get(`${BASE_URL}/api/transports/report`, {
-    params: { ...params, format },
+    params: appendLangParam({ ...params, format }),
     responseType: 'arraybuffer',
     withCredentials: true
   });
@@ -1552,7 +1552,7 @@ export const downloadTransportReport = async (params = {}, format = 'xlsx') => {
 
 // --- Additional API helpers ---
 export const getTransportById = (id) =>
-  axios.get(`${BASE_URL}/api/transports/${id}`);
+  axios.get(withLangQuery(`${BASE_URL}/api/transports/${id}`));
 
 // --- Export Items API ---
 // Exports (parent entity with lines)
@@ -1584,11 +1584,11 @@ export const getExports = (params = {}) => {
   if (itemId !== undefined && itemId !== null && itemId !== '') queryParams.append('itemId', itemId.toString());
   if (vehicleId !== undefined && vehicleId !== null && vehicleId !== '') queryParams.append('vehicleId', vehicleId.toString());
 
-  return axios.get(`${BASE_URL}/api/supplies?${queryParams.toString()}`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/supplies`, Object.fromEntries(queryParams.entries())));
 };
 
 export const getExport = (id) =>
-  axios.get(`${BASE_URL}/api/supplies/${id}`);
+  axios.get(withLangQuery(`${BASE_URL}/api/supplies/${id}`));
 
 // Sanitize export payloads to the new flat shape expected by the server
 function sanitizeExportPayload(payload = {}) {
@@ -1604,19 +1604,19 @@ function sanitizeExportPayload(payload = {}) {
 export const createExport = (data) => {
   const payload = sanitizeExportPayload(data);
   if (!payload.accountType) payload.accountType = 'EXPORT';
-  return axios.post(`${BASE_URL}/api/supplies`, payload);
+  return axios.post(withLangQuery(`${BASE_URL}/api/supplies`), payload);
 }
 
 export const updateExport = (id, data) => {
   const payload = sanitizeExportPayload(data);
-  return axios.put(`${BASE_URL}/api/supplies/${id}`, payload);
+  return axios.put(withLangQuery(`${BASE_URL}/api/supplies/${id}`), payload);
 }
 
 export const deleteExport = (id) =>
-  axios.delete(`${BASE_URL}/api/supplies/${id}`);
+  axios.delete(withLangQuery(`${BASE_URL}/api/supplies/${id}`));
 
 export const restoreExport = (id) =>
-  axios.post(`${BASE_URL}/api/supplies/${id}/restore`);
+  axios.post(withLangQuery(`${BASE_URL}/api/supplies/${id}/restore`));
 
 // Payments
 export const createPayment = (data = {}) => {
@@ -1641,7 +1641,7 @@ export const getPayments = (params = {}) => {
 // Fetch payments for a specific export (document-level endpoint)
 export const getExportPayments = (exportId) => {
   if (!exportId) return Promise.resolve({ data: [] });
-  return axios.get(`${BASE_URL}/api/supplies/${exportId}/payments`);
+  return axios.get(withLangQuery(`${BASE_URL}/api/supplies/${exportId}/payments`));
 };
 
 function getCurrentApiLang() {
@@ -1657,6 +1657,12 @@ function appendLangParam(params = {}) {
   const normalized = { ...(params || {}) };
   if (!normalized.lang) normalized.lang = getCurrentApiLang();
   return normalized;
+}
+
+function withLangQuery(url, params = {}) {
+  const query = new URLSearchParams(appendLangParam(params));
+  const suffix = query.toString() ? `?${query.toString()}` : '';
+  return `${url}${suffix}`;
 }
 
 function normalizeItemMode(mode = '') {
@@ -1721,13 +1727,13 @@ export const getExportItems = (params = {}) => {
 };
 
 export const createExportItem = (data) =>
-  axios.post(`${BASE_URL}/api/items`, data);
+  axios.post(withLangQuery(`${BASE_URL}/api/items`), data);
 
 export const updateExportItem = (id, data) =>
-  axios.put(`${BASE_URL}/api/items/${id}`, data);
+  axios.put(withLangQuery(`${BASE_URL}/api/items/${id}`), data);
 
 export const deleteExportItem = (id) =>
-  axios.delete(`${BASE_URL}/api/items/${id}`);
+  axios.delete(withLangQuery(`${BASE_URL}/api/items/${id}`));
 
 // --- Supply aliases (new names mapping to existing Export functions) ---
 // These provide a migration path: prefer `getSupplies/createSupply/etc` going forward.
@@ -1756,14 +1762,15 @@ export const getItems = (params = {}) => {
 }
 
 export const createItem = (data) =>
-  axios.post(`${BASE_URL}/api/items`, data);
+  axios.post(withLangQuery(`${BASE_URL}/api/items`), data);
 
 export const updateItem = (id, data) =>
-  axios.put(`${BASE_URL}/api/items/${id}`, data);
+  axios.put(withLangQuery(`${BASE_URL}/api/items/${id}`), data);
 
 export const deleteItem = (id, params = {}) => {
   const query = new URLSearchParams();
   if (params.mode) query.append('mode', params.mode);
+  query.append('lang', getCurrentApiLang());
   const q = query.toString();
   return axios.delete(`${BASE_URL}/api/items/${id}${q ? `?${q}` : ''}`);
 }

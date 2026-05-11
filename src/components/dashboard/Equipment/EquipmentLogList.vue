@@ -58,7 +58,7 @@
 
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
-            <SearchDropdown v-model="filters.areaSearch" :items="availableAreas(filters.locationId)" :allItems="availableAreas(filters.locationId)" :placeholder="$t('placeholders.searchArea')" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" :disabled="!filters.locationId" />
+            <SearchDropdown v-model="filters.areaSearch" :items="availableAreas" :allItems="availableAreas" :placeholder="$t('placeholders.searchArea')" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" />
           </div>
 
           <div class="flex gap-2 items-center">
@@ -198,6 +198,11 @@
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
+                  {{ $t('labels.discount') || 'Discount' }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.total') }}
                 </th>
                 <th
@@ -242,8 +247,11 @@
                 <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
                   {{ formatCurrency(rental.hourlyRate) }}
                 </td>
+                <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
+                  {{ formatCurrency(rental.discount || 0) }}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                  {{ formatCurrency(rental.total) }}
+                  {{ formatCurrency(rental.total ?? Math.max(0, (Number(rental.hours || 0) * Number(rental.hourlyRate || 0)) - Number(rental.discount || 0))) }}
                 </td>
                 <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                   {{ rental.notes || rental.note || '-' }}
@@ -524,11 +532,6 @@ export default {
     const equipments = ref([])
     const locations = ref([])
     const topLocations = ref([])
-    const availableAreas = (locId) => {
-      if (!locations.value || !locations.value.length) return []
-      return locations.value.filter(l => Number(l.parentId) === Number(locId))
-    }
-
     const loadEquipments = async () => {
       try {
         const res = await getEquipments()
@@ -576,7 +579,7 @@ export default {
         if (match) filters.value.locationId = match.id
       }
       if ((!filters.value.areaId || filters.value.areaId === '') && filters.value.areaSearch && filters.value.locationId) {
-        const match = availableAreas(filters.value.locationId).find(a => String(a.id) === String(filters.value.areaSearch) || (a.name && a.name.toLowerCase() === String(filters.value.areaSearch).toLowerCase()))
+        const match = availableAreas.value.find(a => String(a.id) === String(filters.value.areaSearch) || (a.name && a.name.toLowerCase() === String(filters.value.areaSearch).toLowerCase()))
         if (match) filters.value.areaId = match.id
       }
 
@@ -615,6 +618,13 @@ export default {
         topLocations.value = []
       }
     }
+
+    const availableAreas = computed(() => {
+      if (!filters.value.locationId) return []
+      const selected = locations.value.find(l => l.id === filters.value.locationId)
+      if (selected && Array.isArray(selected.children) && selected.children.length) return selected.children
+      return locations.value.filter(l => l.parentId === filters.value.locationId)
+    })
 
     const showDetailModal = ref(false)
     const selectedRentalForDetail = ref(null)
@@ -751,10 +761,20 @@ export default {
     } catch (e) { void 0 }
 
     // Calculate total sum of all visible filtered items
+    const resolveRentalTotal = (item) => {
+      if (item && Object.prototype.hasOwnProperty.call(item, 'total')) {
+        const backendTotal = parseFloat(String(item?.total || 0).replace(/,/g, ''))
+        if (!Number.isNaN(backendTotal)) return backendTotal
+      }
+      const hours = Number(item?.hours || 0)
+      const hourlyRate = Number(item?.hourlyRate || 0)
+      const discount = Number(item?.discount || 0)
+      return Math.max(0, (hours * hourlyRate) - discount)
+    }
+
     const totalSum = computed(() => {
       return filteredItems.value.reduce((sum, item) => {
-        const itemTotal = parseFloat(String(item.total || 0).replace(/,/g, '')) || 0
-        return sum + itemTotal
+        return sum + resolveRentalTotal(item)
       }, 0)
     })
 
@@ -827,6 +847,7 @@ export default {
         equipmentLog: '',
         name: '',
         hourlyRate: 0,
+        discount: 0,
         notes: '',
         isCompanyOwned: true
       }
@@ -844,6 +865,7 @@ export default {
             equipmentLog: data.equipmentLog || data.equipment || '',
             name: data.name || '',
             hourlyRate: parseFloat(data.hourlyRate) || 0,
+            discount: parseFloat(data.discount) || 0,
             notes: data.note ?? data.notes ?? '',
             isCompanyOwned: data.isCompanyOwned !== undefined ? data.isCompanyOwned : true
           }
@@ -856,6 +878,7 @@ export default {
           equipmentLog: rental.equipmentLog || rental.equipment || '',
           name: rental.name || '',
           hourlyRate: parseFloat(rental.hourlyRate) || 0,
+          discount: parseFloat(rental.discount) || 0,
           notes: rental.note ?? rental.notes ?? '',
           isCompanyOwned: rental.isCompanyOwned !== undefined ? rental.isCompanyOwned : true
         }
@@ -865,15 +888,16 @@ export default {
 
     const closeModal = () => {
       showModal.value = false
-      form.value = {
-        id: null,
-        date: getTodayISO(),
-        equipmentLog: '',
-        name: '',
-        hourlyRate: 0,
-        notes: '',
-        isCompanyOwned: true
-      }
+        form.value = {
+          id: null,
+          date: getTodayISO(),
+          equipmentLog: '',
+          name: '',
+          hourlyRate: 0,
+          discount: 0,
+          notes: '',
+          isCompanyOwned: true
+        }
     }
 
     // updateForm removed — RentalForm no longer emits update:model-value
@@ -886,12 +910,13 @@ export default {
         if (!isEditing.value && rentalData.rows && Array.isArray(rentalData.rows) && rentalData.rows.length) {
           const creates = rentalData.rows.map(row => {
             const payloadRow = {
-              date: rentalData.date,
+              date: row.date || rentalData.date,
               equipmentId: rentalData.equipmentId,
               driverId: row.driverId != null ? row.driverId : (rentalData.driverId != null ? rentalData.driverId : null),
-              total: row.total != null ? row.total : Number(((row.hours || 0) * (row.hourlyRate != null ? row.hourlyRate : rentalData.hourlyRate || 0)).toFixed(2)),
+              total: row.total != null ? row.total : Number(Math.max(0, ((row.hours || 0) * (row.hourlyRate != null ? row.hourlyRate : rentalData.hourlyRate || 0)) - (row.discount != null ? row.discount : (rentalData.discount || 0))).toFixed(2)),
               hours: row.hours != null ? row.hours : (rentalData.hours || 0),
               hourlyRate: row.hourlyRate != null ? row.hourlyRate : (rentalData.hourlyRate || 0),
+              discount: row.discount != null ? row.discount : (rentalData.discount || 0),
               note: row.note ?? rentalData.note ?? rentalData.notes ?? '',
               isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
               ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),
@@ -906,9 +931,10 @@ export default {
             date: rentalData.date,
             equipmentId: rentalData.equipmentId,
             driverId: rentalData.driverId,
-            total: rentalData.total,
+            total: rentalData.total != null ? rentalData.total : Number(Math.max(0, (Number(rentalData.hours || 0) * Number(rentalData.hourlyRate || 0)) - Number(rentalData.discount || 0)).toFixed(2)),
             hours: rentalData.hours,
             hourlyRate: rentalData.hourlyRate,
+            discount: rentalData.discount || 0,
             note: rentalData.note ?? rentalData.notes ?? '',
             isRental: rentalData.isRental !== undefined ? rentalData.isRental : false,
             ...(rentalData.locationId != null && rentalData.locationId !== '' ? { locationId: rentalData.locationId } : {}),

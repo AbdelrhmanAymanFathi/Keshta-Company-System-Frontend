@@ -20,7 +20,7 @@
     </div>
 
     <div v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg p-4 border">
           <div class="text-sm text-gray-500">{{ $t('equipmentLog.date') }}</div>
           <div class="mt-2 font-medium text-gray-900">{{ formatDate(rental.date) }}</div>
@@ -32,6 +32,10 @@
         <div class="bg-white rounded-lg p-4 border">
           <div class="text-sm text-gray-500">{{ $t('equipmentLog.total') }}</div>
           <div class="mt-2 font-medium text-gray-900">{{ formatCurrency(rental.total || 0) }}</div>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+          <div class="text-sm text-gray-500">{{ $t('labels.discount') || 'Discount' }}</div>
+          <div class="mt-2 font-medium text-gray-900">{{ formatCurrency(rental.discount || 0) }}</div>
         </div>
       </div>
 
@@ -59,10 +63,12 @@
           <div v-for="job in jobs" :key="job.id" class="flex items-center justify-between p-3 border rounded">
             <div>
               <div class="text-sm font-medium">{{ job.name || job.notes || job.note || '-' }}</div>
-              <div class="text-xs text-gray-500">{{ formatDate(job.date) }} • {{ job.hours }} {{ $t('equipmentLog.hours') }}</div>
+              <div class="text-xs text-gray-500">
+                {{ formatDate(job.date) }} • {{ job.hours }} {{ $t('equipmentLog.hours') }} • {{ $t('labels.discount') || 'Discount' }}: {{ formatCurrency(job.discount || 0) }}
+              </div>
             </div>
             <div class="flex items-center gap-3">
-              <div class="text-sm font-semibold">{{ formatCurrency(job.hourlyRate || rental.hourlyRate || 0) }}</div>
+              <div class="text-sm font-semibold">{{ formatCurrency(job.total ?? Math.max(0, (Number(job.hours || 0) * Number(job.hourlyRate || rental.hourlyRate || 0)) - Number(job.discount || 0))) }}</div>
               <button @click="editJob(job)" class="text-indigo-600 hover:text-indigo-900 text-sm">{{ $t('labels.edit') }}</button>
               <button @click="deleteJob(job)" class="text-red-600 hover:text-red-900 text-sm">{{ $t('labels.delete') }}</button>
             </div>
@@ -77,6 +83,8 @@
           <input v-model.number="jobForm.hours" type="number" min="0" step="0.1" placeholder="Hours"
             class="border rounded px-3 py-2 text-sm" />
           <input v-model.number="jobForm.hourlyRate" type="number" min="0" step="0.01" placeholder="Hourly Rate"
+            class="border rounded px-3 py-2 text-sm" />
+          <input v-model.number="jobForm.discount" type="number" min="0" step="0.01" placeholder="Discount"
             class="border rounded px-3 py-2 text-sm" />
           <input v-model="jobForm.note" type="text" placeholder="Note"
             class="border rounded px-3 py-2 text-sm col-span-1 sm:col-span-4" />
@@ -121,7 +129,7 @@ export default {
     const rental = ref({})
     const jobs = ref([])
     const savingJob = ref(false)
-    const jobForm = ref({ id: null, date: getTodayISO(), hours: 0, hourlyRate: 0, note: '' })
+    const jobForm = ref({ id: null, date: getTodayISO(), hours: 0, hourlyRate: 0, discount: 0, note: '' })
 
     const fetchRental = async () => {
       loading.value = true
@@ -162,11 +170,15 @@ export default {
         if (isNaN(hoursNum) || hoursNum <= 0) hoursNum = 1
 
         const hourlyRateNum = Number(jobForm.value.hourlyRate || rental.value.hourlyRate || 0)
+        const discountNum = Math.max(0, Number(jobForm.value.discount || 0))
+        const totalNum = Number(Math.max(0, (hoursNum * hourlyRateNum) - discountNum).toFixed(2))
 
           const payload = {
             date: new Date(jobForm.value.date).toISOString(),
             hours: hoursNum,
             hourlyRate: hourlyRateNum,
+            discount: discountNum,
+            total: totalNum,
             note: jobForm.value.note,
             isRental: true,
             equipmentId: equipmentIdNumeric
@@ -193,6 +205,7 @@ export default {
         date: job.date ? formatToISODate(job.date) : getTodayISO(),
         hours: job.hours || 0,
         hourlyRate: job.hourlyRate || 0,
+        discount: job.discount || 0,
         note: job.note || job.notes || ''
       }
     }
@@ -209,7 +222,7 @@ export default {
     }
 
     const resetJobForm = () => {
-      jobForm.value = { id: null, date: getTodayISO(), hours: 0, hourlyRate: 0, note: '' }
+      jobForm.value = { id: null, date: getTodayISO(), hours: 0, hourlyRate: 0, discount: 0, note: '' }
     }
 
     const saveNotes = async () => {

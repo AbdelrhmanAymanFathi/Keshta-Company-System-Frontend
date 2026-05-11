@@ -136,7 +136,7 @@
               <select v-model="form.unitId"
                 class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option :value="null">-- {{ $t('placeholders.selectUnit') || 'Select unit' }} --</option>
-                <option v-for="u in units" :key="u.id" :value="u.id">{{ u.name }}</option>
+                <option v-for="u in unitOptions" :key="u.id" :value="u.id">{{ u.name }}</option>
               </select>
             </label>
 
@@ -308,6 +308,14 @@ export default {
       if (this.mode === 'transport' || this.mode === 'all') base += 1
       if (this.mode === 'extracts' || this.mode === 'all') base += 1
       return base
+    },
+    unitOptions() {
+      const fallbackUnits = [
+        { id: 'daily', name: 'daily' },
+        { id: 'sectional', name: 'sectional' }
+      ]
+      const seen = new Set((this.units || []).map(u => String(u.id)))
+      return [...(this.units || []), ...fallbackUnits.filter(u => !seen.has(String(u.id)))]
     }
   },
   watch: {
@@ -634,7 +642,7 @@ export default {
 
     getUnitName(id) {
       if (!id) return null
-      const u = this.units.find(x => x.id === id || x.id === Number(id))
+      const u = this.unitOptions.find(x => x.id === id || x.id === Number(id))
       return u ? u.name : null
     },
 

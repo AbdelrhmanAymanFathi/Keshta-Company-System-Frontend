@@ -87,6 +87,7 @@
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.quantity') }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.price') }}</th>
+            <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.discount') || 'Discount' }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.contractor') }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
             <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.area') }}</th>
@@ -103,6 +104,7 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ extract.itemName || '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemQuantity !== null && extract.itemQuantity !== undefined ? extract.itemQuantity : '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemPrice !== null && extract.itemPrice !== undefined ? formatCurrency(extract.itemPrice) : '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ extract.itemDiscount !== null && extract.itemDiscount !== undefined ? formatCurrency(extract.itemDiscount) : '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.contractorName || '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.locationName || '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.areaName || '-' }}</td>
@@ -117,7 +119,7 @@
             </td>
           </tr>
           <tr v-if="extracts.length === 0">
-              <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="12">
+              <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="13">
               {{ $t('extracts.noExtractsFound') || 'No extracts found' }}
             </td>
           </tr>
@@ -229,6 +231,7 @@ export default {
           itemName: normalizedItem?.name || line?.itemName || '-',
           itemQuantity: line?.quantity !== undefined && line?.quantity !== null ? Number(line.quantity) : null,
           itemPrice: line?.price !== undefined && line?.price !== null ? Number(line.price) : null,
+          itemDiscount: line?.discount !== undefined && line?.discount !== null ? Number(line.discount) : null,
           contractorName: extract?.contractor?.name || '-',
           locationName: extract?.location?.name || '-',
           areaName: extract?.area?.name || '-',

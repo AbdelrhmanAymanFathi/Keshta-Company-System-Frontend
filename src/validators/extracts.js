@@ -7,11 +7,15 @@ export const extractLineSchema = z.object({
   // price and total are now optional: backend will fallback to item.defaultExtractPrice
   price: z.number().nonnegative().optional(),
   quantity: z.number().int().nonnegative(),
+  discount: z.number().nonnegative().optional(),
   total: z.number().nonnegative().optional()
 }).refine(l => {
-  // If both price and total are provided, validate price * quantity ~= total
+  // If both price and total are provided, accept either gross or discount-adjusted totals.
   if (typeof l.price !== 'number' || typeof l.total !== 'number') return true
-  return Math.abs(l.price * l.quantity - l.total) < 0.01
+  const gross = l.price * l.quantity
+  const discount = typeof l.discount === 'number' ? l.discount : 0
+  const net = Math.max(0, gross - discount)
+  return Math.abs(gross - l.total) < 0.01 || Math.abs(net - l.total) < 0.01
 }, {
   message: 'Line total must equal price * quantity'
 })
