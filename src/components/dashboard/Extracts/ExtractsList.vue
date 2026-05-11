@@ -101,7 +101,9 @@
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateFrom || extract.date) }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateTo || extract.date) }}</td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ extract.itemName || '-' }}</td>
+            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+              {{ formatItemWithUnit(extract.item) || extract.itemName || '-' }}
+            </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemQuantity !== null && extract.itemQuantity !== undefined ? extract.itemQuantity : '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ extract.itemPrice !== null && extract.itemPrice !== undefined ? formatCurrency(extract.itemPrice) : '-' }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ extract.itemDiscount !== null && extract.itemDiscount !== undefined ? formatCurrency(extract.itemDiscount) : '-' }}</td>
@@ -348,6 +350,16 @@ export default {
       const n = Number(v)
       if (Number.isNaN(n)) return v
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(n)
+    },
+
+    formatItemWithUnit(item) {
+      if (!item) return ''
+      const name = item?.name || ''
+      const unitName = item?.unit?.name || item?.unitName || item?.unit_name || ''
+      if (!name && !unitName) return ''
+      if (!unitName) return name
+      if (!name) return unitName
+      return `${name} (${unitName})`
     },
 
     onRowContextMenu() {

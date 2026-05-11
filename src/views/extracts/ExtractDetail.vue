@@ -17,7 +17,9 @@
       <div class="mt-4">
         <h3 class="font-semibold">Lines</h3>
         <ul class="list-disc pl-6">
-          <li v-for="(l, i) in extract.lines" :key="i">{{ l.item?.name || l.itemId }} — {{ l.quantity }} × {{ l.price }} = {{ l.total }}</li>
+          <li v-for="(l, i) in extract.lines" :key="i">
+            {{ formatItemWithUnit(l.item) || l.item?.name || l.itemId }} — {{ l.quantity }} × {{ l.price }} = {{ l.total }}
+          </li>
         </ul>
       </div>
     </div>
@@ -42,6 +44,16 @@ function formatDate(value) {
   } catch (e) {
     return value
   }
+}
+
+function formatItemWithUnit(item) {
+  if (!item) return ''
+  const name = item?.name || ''
+  const unitName = item?.unit?.name || item?.unitName || item?.unit_name || ''
+  if (!name && !unitName) return ''
+  if (!unitName) return name
+  if (!name) return unitName
+  return `${name} (${unitName})`
 }
 
 onMounted(async () => {

@@ -19,6 +19,9 @@
           </div>
         </template>
       </SearchDropdown>
+      <div v-if="displayUnitName" class="mt-1 text-xs text-gray-500">
+        {{ displayUnitName }}
+      </div>
     </div>
     <div class="relative">
       <input type="number" step="0.01" v-model="internal.price" placeholder="Price" class="p-2 border rounded" />
@@ -55,6 +58,11 @@ const showDefaultHint = computed(() => {
   const item = props.items.find(i => Number(i.id) === Number(internal.itemId))
   const defaultPrice = item?.defaultExtractPrice ?? item?.currentPrice ?? item?.price ?? item?.current_price
   return (internal.price === null || internal.price === '' || internal.price === undefined) && defaultPrice !== null && defaultPrice !== undefined
+})
+
+const displayUnitName = computed(() => {
+  const item = props.items.find(i => Number(i.id) === Number(internal.itemId))
+  return item?.unit?.name || item?.unitName || item?.unit_name || ''
 })
 
 const formattedTotal = computed(() => {
