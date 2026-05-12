@@ -86,6 +86,7 @@
                   <div class="relative">
                     <input type="text" :value="form.contractorLabel || ($t('vehicles.contractor') || 'Contractor')" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed text-gray-600" />
                   </div>
+                  <p class="mt-2 text-xs text-blue-500">{{ $t('equipmentLog.contractorReadonlyNote') || 'Contractor is auto-selected and cannot be edited.' }}</p>
                 </div>
 
                 <!-- Site (الموقع) -->
@@ -401,9 +402,8 @@ export default {
       return this.$i18n && this.$i18n.locale === 'ar'
     },
     showContractorField() {
-      // Show contractor field when the selected equipment has a contractor
-      // and the entry is considered a rental (not company-owned).
-      return Boolean((this.form && (this.form.contractorId != null && this.form.contractorId !== '')) && this.form.isRental)
+      // Show contractor field for rented equipment. The input remains readonly.
+      return Boolean(this.form && this.form.isRental)
     },
     isCompanyOwnedEquipment() {
       return !this.form.isRental

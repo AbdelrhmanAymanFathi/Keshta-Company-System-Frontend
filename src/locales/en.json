@@ -119,6 +119,7 @@
     "selectOwnershipType": "Choose Equipment Type",
     "addCompanyOwnedEntry": "Add a log for equipment owned by the company.",
     "addRentalEntry": "Add a log for rented equipment.",
+    "contractorReadonlyNote": "Contractor is auto-selected and cannot be edited.",
     "filters": "Filters",
     "detail": "Detail",
     "jobEntries": "Job Entries",

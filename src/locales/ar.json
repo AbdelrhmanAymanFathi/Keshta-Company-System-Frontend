@@ -119,6 +119,7 @@
     "selectOwnershipType": "اختر نوع المعدات",
     "addCompanyOwnedEntry": "أضف سجلًا لمعدة مملوكة للشركة.",
     "addRentalEntry": "أضف سجلًا لمعدة مؤجرة.",
+    "contractorReadonlyNote": "المقاول يتم اختياره تلقائيًا ولا يمكن تعديله.",
     "filters": "عوامل التصفية",
     "detail": "التفاصيل",
     "typeWithdrawal": "سحب",
