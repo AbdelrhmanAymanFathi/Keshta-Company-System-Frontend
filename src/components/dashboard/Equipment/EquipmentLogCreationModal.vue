@@ -451,10 +451,26 @@ export default {
     },
     chooseOwnership(isRental) {
       this.form.isRental = Boolean(isRental)
+      // Clear equipment-related data when switching ownership type
+      this.form.equipmentId = ''
+      this.form.equipmentLabel = ''
+      this.form.contractorId = ''
+      this.form.contractorLabel = ''
+      this.form.driverId = ''
+      this.form.driverLabel = ''
+      this.form.hourlyRate = 0
+      this.form.discount = 0
+      this.form.hours = 1
+      this.form.notes = ''
+      this.form.site = null
+      this.form.area = null
+      this.filters.commonSiteSearch = ''
+      this.filters.commonAreaSearch = ''
       this.currentStep = 1
       if (!this.rows || !this.rows.length) {
         this.rows = [this.createEmptyRow()]
       }
+      this.loadCommonDataFromStorage()
     },
     syncFormLocationsFromModel() {
       const mv = this.modelValue || {}
@@ -876,6 +892,7 @@ export default {
     },
     saveCommonDataToStorage() {
       try {
+        const key = this.form.isRental ? 'equipmentLogCreationModalCommonData_rental' : 'equipmentLogCreationModalCommonData_company'
         const data = {
           date: this.form.date,
           equipmentId: this.form.equipmentId,
@@ -892,14 +909,15 @@ export default {
           notes: this.form.notes,
           isRental: this.form.isRental
         }
-        localStorage.setItem('equipmentLogCreationModalCommonData', JSON.stringify(data))
+        localStorage.setItem(key, JSON.stringify(data))
       } catch (err) {
         console.warn('Failed to save equipment log data:', err)
       }
     },
     loadCommonDataFromStorage() {
       try {
-        const saved = localStorage.getItem('equipmentLogCreationModalCommonData')
+        const key = this.form.isRental ? 'equipmentLogCreationModalCommonData_rental' : 'equipmentLogCreationModalCommonData_company'
+        const saved = localStorage.getItem(key)
         if (saved) {
           const data = JSON.parse(saved)
           console.log('📦 Loaded equipment log data from storage:', data)
