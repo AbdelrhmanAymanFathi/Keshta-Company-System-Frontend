@@ -5,12 +5,43 @@
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-indigo-800">{{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterDetails') || 'Enter Details') }}</h2>
+          <h2 class="text-2xl font-bold text-indigo-800">{{ modalHeaderTitle }}</h2>
           <button @click="closeModal" class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">×</button>
         </div>
 
         <!-- Body -->
         <div class="flex-1 overflow-y-auto p-6 modal-body-container relative" @scroll.passive="onDriverDropdownParentScroll">
+
+          <!-- ============================================ STEP 0 ============================================ -->
+          <div v-if="currentStep === 0" class="w-full">
+            <h3 class="text-lg font-bold mb-6 text-center text-gray-800">{{ $t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type' }}</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              <button @click="chooseOwnership(false)" type="button"
+                class="w-full rounded-2xl border border-indigo-200 bg-white p-6 text-left shadow-sm hover:border-indigo-300 hover:bg-indigo-50 transition">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-lg font-semibold text-gray-900">{{ $t('equipmentLog.companyOwned') || 'Company-owned Equipment' }}</p>
+                    <p class="mt-2 text-sm text-gray-600">{{ $t('equipmentLog.addCompanyOwnedEntry') || 'Add a log for equipment owned by the company.' }}</p>
+                  </div>
+                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">1</span>
+                </div>
+              </button>
+
+              <button @click="chooseOwnership(true)" type="button"
+                class="w-full rounded-2xl border border-indigo-200 bg-white p-6 text-left shadow-sm hover:border-indigo-300 hover:bg-indigo-50 transition">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <p class="text-lg font-semibold text-gray-900">{{ $t('equipmentLog.external') || 'Rented Equipment' }}</p>
+                    <p class="mt-2 text-sm text-gray-600">{{ $t('equipmentLog.addRentalEntry') || 'Add a log for rented equipment.' }}</p>
+                  </div>
+                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">2</span>
+                </div>
+              </button>
+            </div>
+            <div class="mt-10 flex justify-center">
+              <button @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition">{{ $t('labels.cancel') }}</button>
+            </div>
+          </div>
 
           <!-- ============================================ STEP 1 ============================================ -->
           <div v-if="currentStep === 1" class="w-full">
@@ -23,7 +54,7 @@
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown v-model="form.equipmentLabel" :items="equipments" :allItems="equipments" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'" @select="selectEquipment" />
+                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'" @select="selectEquipment" />
                     </div>
                   </div>
                 </div>
@@ -112,15 +143,15 @@
               </div>
             </div>
 
-            <!-- Next / Cancel Buttons -->
+            <!-- Back / Next Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition">{{ $t('labels.cancel') }}</button>
+              <button @click="goBackToStep0" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
               <button @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></button>
             </div>
           </div>
 
           <!-- ============================================ STEP 2 ============================================ -->
-          <div v-else class="w-full">
+          <div v-if="currentStep === 2" class="w-full">
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
               <button @click="goBackToStep1" class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
@@ -305,7 +336,7 @@ export default {
   emits: ['close', 'saved'],
   data() {
     return {
-      currentStep: 1,
+      currentStep: 0,
       form: {
         date: this.modelValue.date ? formatToISODate(this.modelValue.date) : getTodayISO(),
         equipmentId: this.modelValue.equipmentId || '',
@@ -343,6 +374,22 @@ export default {
     }
   },
   computed: {
+    modalHeaderTitle() {
+      if (this.currentStep === 0) {
+        return this.$t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type'
+      }
+      if (this.currentStep === 1) {
+        return this.modalTitleComputed
+      }
+      return this.$t('labels.enterDetails') || 'Enter Details'
+    },
+    equipmentOptions() {
+      const isRentalMode = Boolean(this.form.isRental)
+      return (this.equipments || []).filter(item => {
+        if (!item) return false
+        return isRentalMode ? this.equipmentIsRental(item) : !this.equipmentIsRental(item)
+      })
+    },
     selectedEquipmentName() {
       const found = (this.equipments || []).find(e => Number(e.id) === Number(this.form.equipmentId))
       return found?.name || this.form.equipmentLabel || ''
@@ -388,18 +435,26 @@ export default {
           this.onModalOpen()
         })
       } else {
-        this.currentStep = 1
+        this.currentStep = 0
         this.saveCommonDataToStorage()
       }
     }
   },
   methods: {
     async onModalOpen() {
-      this.currentStep = 1
+      this.currentStep = this.isEditing ? 1 : 0
+      this.rows = []
       await this.refreshLocations()
       await this.$nextTick()
       this.syncFormLocationsFromModel()
       this.loadCommonDataFromStorage()
+    },
+    chooseOwnership(isRental) {
+      this.form.isRental = Boolean(isRental)
+      this.currentStep = 1
+      if (!this.rows || !this.rows.length) {
+        this.rows = [this.createEmptyRow()]
+      }
     },
     syncFormLocationsFromModel() {
       const mv = this.modelValue || {}
@@ -527,6 +582,7 @@ export default {
       }
     },
     closeModal() {
+      this.currentStep = 0
       this.$emit('close')
     },
     selectEquipment(item) {
@@ -574,6 +630,7 @@ export default {
       // initialize rows for step 2 if empty
       if (!this.rows || !this.rows.length) this.rows = [this.createEmptyRow()]
     },
+    goBackToStep0() { this.currentStep = 0 },
     goBackToStep1() { this.currentStep = 1 },
     formatNumber(v) { return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 }) },
     createEmptyRow() {
@@ -885,5 +942,5 @@ export default {
 </script>
 
 <style scoped>
-.modal-body-container { max-height: 70vh; overflow: auto; }
+.modal-body-container { max-height: 80vh; overflow: auto; }
 </style>

@@ -115,8 +115,10 @@
     "isCompanyOwned": "مملوكة للشركة؟",
     "companyEquipment": "معدات الشركة",
     "externalRental": "إيجار خارجي",
-    "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدات مملوكة للشركة"
-    ,
+    "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدات مملوكة للشركة",
+    "selectOwnershipType": "اختر نوع المعدات",
+    "addCompanyOwnedEntry": "أضف سجلًا لمعدة مملوكة للشركة.",
+    "addRentalEntry": "أضف سجلًا لمعدة مؤجرة.",
     "filters": "عوامل التصفية",
     "detail": "التفاصيل",
     "typeWithdrawal": "سحب",

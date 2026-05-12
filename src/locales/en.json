@@ -115,8 +115,10 @@
     "isCompanyOwned": "Is Company Owned",
     "companyEquipment": "Company Equipment",
     "externalRental": "External Rental",
-    "isCompanyOwnedDescription": "Mark if this equipment is owned by the company"
-    ,
+    "isCompanyOwnedDescription": "Mark if this equipment is owned by the company",
+    "selectOwnershipType": "Choose Equipment Type",
+    "addCompanyOwnedEntry": "Add a log for equipment owned by the company.",
+    "addRentalEntry": "Add a log for rented equipment.",
     "filters": "Filters",
     "detail": "Detail",
     "jobEntries": "Job Entries",
