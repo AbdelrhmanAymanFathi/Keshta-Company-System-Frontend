@@ -374,6 +374,7 @@
     "noDevices": "No TOTP devices configured"
   },
   "common": {
+    "step2DataEquipment": "Step 2: Enter Equipment Log",
     "requiredFields": "Required fields",
     "rowError": "Row",
     "error": "Error",
