@@ -458,7 +458,7 @@ export default {
       this.form.contractorLabel = ''
       this.form.driverId = ''
       this.form.driverLabel = ''
-      this.form.hourlyRate = isRental ? 0 : 0  // Set to 0 for both, but field is hidden for company-owned
+      this.form.hourlyRate = isRental ? 1 : 1 // Set to 1 for both, but field is hidden for company-owned
       this.form.discount = 0
       this.form.hours = 1
       this.form.notes = ''
