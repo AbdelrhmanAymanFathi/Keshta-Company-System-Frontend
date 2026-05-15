@@ -60,7 +60,7 @@
                 </div>
 
                 <!-- Hourly Rate -->
-                <div>
+                <div v-if="!isCompanyOwnedEquipment">
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.price') }} <span class="text-red-600">*</span></label>
                   <div class="relative">
                     <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
@@ -172,13 +172,13 @@
                   <dt class="font-semibold text-gray-700">{{ $t('vehicles.contractor') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ form.contractorLabel || '-' }}</dd>
                 </div>
-                <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.hourlyRate') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
-                </div>
                 <div v-if="isCompanyOwnedEquipment" class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.driver') }}:</dt>
                   <dd class="text-gray-900 mt-1">{{ form.driverLabel || '-' }}</dd>
+                </div>
+                <div v-if="!isCompanyOwnedEquipment" class="flex flex-col">
+                  <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.hourlyRate') }}:</dt>
+                  <dd class="text-gray-900 mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
                 </div>
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
@@ -204,7 +204,7 @@
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.date') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.hours') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
+                      <th v-if="!isCompanyOwnedEquipment" class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.notes') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
@@ -226,7 +226,7 @@
                       </td>
 
                       <!-- Discount -->
-                      <td class="px-3 py-2">
+                      <td v-if="!isCompanyOwnedEquipment" class="px-3 py-2">
                         <input type="number" v-model.number="row.discount" min="0" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
                           class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
                       </td>
@@ -458,7 +458,7 @@ export default {
       this.form.contractorLabel = ''
       this.form.driverId = ''
       this.form.driverLabel = ''
-      this.form.hourlyRate = 0
+      this.form.hourlyRate = isRental ? 0 : 0  // Set to 0 for both, but field is hidden for company-owned
       this.form.discount = 0
       this.form.hours = 1
       this.form.notes = ''
@@ -793,7 +793,7 @@ export default {
     totalPerRow(row) {
       const h = Number(row.hours || 0)
       const r = Number(row.hourlyRate != null ? row.hourlyRate : this.form.hourlyRate || 0)
-      const discount = Number(row.discount || 0)
+      const discount = this.isCompanyOwnedEquipment ? 0 : Number(row.discount || 0)
       return Math.max(0, h * r - discount)
     },
     handleEnterKey(index) {
@@ -846,7 +846,7 @@ export default {
         const rowsPayload = (this.rows || []).map(r => {
           const hoursVal = Number(r.hours || 0)
           const rowHourly = Number(r.hourlyRate != null ? r.hourlyRate : this.form.hourlyRate || 0)
-          const rowDiscount = Number(r.discount || 0)
+          const rowDiscount = this.isCompanyOwnedEquipment ? 0 : Number(r.discount || 0)
           const rowDate = r.date ? formatToISODate(r.date) : commonDate
           const rowTotal = Number(Math.max(0, (hoursVal * rowHourly) - rowDiscount).toFixed(2))
           return {
