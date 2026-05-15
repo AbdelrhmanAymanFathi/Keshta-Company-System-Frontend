@@ -458,7 +458,7 @@ export default {
       this.form.contractorLabel = ''
       this.form.driverId = ''
       this.form.driverLabel = ''
-      this.form.hourlyRate = isRental ? 1 : 1 // Set to 1 for both, but field is hidden for company-owned
+      this.form.hourlyRate = 0 // Will be set from equipment for rental, 0 for company-owned
       this.form.discount = 0
       this.form.hours = 1
       this.form.notes = ''
@@ -617,7 +617,7 @@ export default {
       this.form.contractorLabel = item.contractorName ?? item.contractor?.name ?? ''
       this.form.isRental = this.equipmentIsRental(item)
       if (this.form.isRental) this.clearDriver()
-      if (item.hourlyRate != null && item.hourlyRate !== '') this.form.hourlyRate = Number(item.hourlyRate)
+      if (item.hourlyRate != null && item.hourlyRate !== '' && this.form.isRental) this.form.hourlyRate = Number(item.hourlyRate)
     },
     equipmentIsRental(item) {
       if (!item) return false
