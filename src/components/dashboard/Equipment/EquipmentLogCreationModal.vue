@@ -458,7 +458,7 @@ export default {
       this.form.contractorLabel = ''
       this.form.driverId = ''
       this.form.driverLabel = ''
-      this.form.hourlyRate = 0 // Will be set from equipment for rental, 0 for company-owned
+      this.form.hourlyRate = null
       this.form.discount = 0
       this.form.hours = 1
       this.form.notes = ''
