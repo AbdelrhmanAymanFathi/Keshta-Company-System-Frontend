@@ -450,14 +450,26 @@ export default {
       this.loadCommonDataFromStorage()
     },
     chooseOwnership(isRental) {
-      this.form.isRental = Boolean(isRental)
-      // Clear equipment-related data when switching ownership type
+      const targetIsRental = Boolean(isRental)
+      const isSameMode = this.form.isRental === targetIsRental
+      this.form.isRental = targetIsRental
+
+      if (!isSameMode || (!this.form.equipmentLabel && !this.form.equipmentId)) {
+        this.clearFormValuesForOwnershipSwitch()
+      }
+
+      this.currentStep = 1
+      if (!this.rows || !this.rows.length) {
+        this.rows = [this.createEmptyRow()]
+      }
+      this.loadCommonDataFromStorage()
+    },
+    clearFormValuesForOwnershipSwitch() {
       this.form.equipmentId = ''
       this.form.equipmentLabel = ''
       this.form.contractorId = ''
       this.form.contractorLabel = ''
-      this.form.driverId = ''
-      this.form.driverLabel = ''
+      this.clearDriver()
       this.form.hourlyRate = null
       this.form.discount = 0
       this.form.hours = 1
@@ -466,11 +478,35 @@ export default {
       this.form.area = null
       this.filters.commonSiteSearch = ''
       this.filters.commonAreaSearch = ''
-      this.currentStep = 1
-      if (!this.rows || !this.rows.length) {
-        this.rows = [this.createEmptyRow()]
+    },
+    restoreEquipmentFromSavedData() {
+      const label = (this.form.equipmentLabel || '').toString().trim()
+      const items = Array.isArray(this.equipments) ? this.equipments : []
+      let found = null
+      if (this.form.equipmentId !== '' && this.form.equipmentId != null) {
+        found = items.find(e => Number(e.id) === Number(this.form.equipmentId))
       }
-      this.loadCommonDataFromStorage()
+      if (!found && label) {
+        found = items.find(e => String(e.name || '').trim().toLowerCase() === label.toLowerCase())
+      }
+      if (found) {
+        this.form.equipmentId = found.id != null ? Number(found.id) : ''
+        this.form.equipmentLabel = found.name || label
+        this.form.contractorId = found.contractorId != null ? Number(found.contractorId) : (found.contractor?.id != null ? Number(found.contractor.id) : this.form.contractorId)
+        this.form.contractorLabel = found.contractorName || found.contractor?.name || this.form.contractorLabel
+        if (found.hourlyRate != null && found.hourlyRate !== '') {
+          this.form.hourlyRate = Number(found.hourlyRate)
+        }
+        this.form.isRental = this.equipmentIsRental(found)
+        if (this.form.isRental) this.clearDriver()
+      }
+      if (this.rows && this.rows.length) {
+        const hourly = Number(this.form.hourlyRate || 0)
+        this.rows = this.rows.map(row => ({
+          ...row,
+          hourlyRate: row.hourlyRate || hourly
+        }))
+      }
     },
     syncFormLocationsFromModel() {
       const mv = this.modelValue || {}
@@ -956,6 +992,7 @@ export default {
             this.form.area = found
             if (this.form.area) this.filters.commonAreaSearch = this.form.area.name
           }
+          this.restoreEquipmentFromSavedData()
         }
       } catch (err) {
         console.warn('Failed to load equipment log data:', err)
