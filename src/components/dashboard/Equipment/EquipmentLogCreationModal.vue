@@ -617,7 +617,13 @@ export default {
       this.form.contractorLabel = item.contractorName ?? item.contractor?.name ?? ''
       this.form.isRental = this.equipmentIsRental(item)
       if (this.form.isRental) this.clearDriver()
-      if (item.hourlyRate != null && item.hourlyRate !== '' && this.form.isRental) this.form.hourlyRate = Number(item.hourlyRate)
+      if (item.hourlyRate != null && item.hourlyRate !== '') {
+        this.form.hourlyRate = Number(item.hourlyRate)
+        this.rows = (this.rows || []).map(row => ({
+          ...row,
+          hourlyRate: Number(item.hourlyRate)
+        }))
+      }
     },
     equipmentIsRental(item) {
       if (!item) return false
