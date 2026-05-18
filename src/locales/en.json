@@ -440,6 +440,7 @@
       "firstKmPrice": "First Km Price",
       "perKmPrice": "Per Km Price",
       "vehicleCompanyCapacity": "Vehicle Company Capacity",
+      "vehicleCapacity": "Vehicle Capacity",
       "distanceKm": "Distance Km",
       "numTrips": "Num Trips",
       "total": "Total",
