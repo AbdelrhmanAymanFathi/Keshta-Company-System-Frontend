@@ -2,15 +2,13 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
 
     <!-- Header -->
-    <div class="flex items-center" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+        class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
+        <PlusIcon class="w-5 h-5" />
         {{ $t('crushers.add') }}
       </button>
     </div>
@@ -27,9 +25,9 @@
     </div>
 
     <!-- Desktop Table -->
-    <div class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-indigo-50">
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">
               {{ $t('labels.#') }}
@@ -46,7 +44,7 @@
           <tr
             v-for="(crusher, idx) in filtered"
             :key="crusher.id"
-            class="hover:bg-gray-50 cursor-pointer transition-colors"
+            class="hover:bg-indigo-50/40 cursor-pointer transition-colors"
             @click="openContextMenu($event, crusher)"
             @contextmenu.prevent="openContextMenu($event, crusher)"
           >
@@ -61,17 +59,11 @@
             </td>
             <td class="px-6 py-4">
               <div class="flex gap-4" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openEdit(crusher)" class="text-yellow-600 hover:text-yellow-800">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                <button @click.stop="openEdit(crusher)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100">
+                  <PencilSquareIcon class="h-5 w-5" />
                 </button>
-                <button @click.stop="confirmDelete(crusher)" class="text-red-600 hover:text-red-800">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                <button @click.stop="confirmDelete(crusher)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100">
+                  <TrashIcon class="h-5 w-5" />
                 </button>
               </div>
             </td>
@@ -90,19 +82,15 @@
       <div
         v-for="crusher in filtered"
         :key="crusher.id"
-        class="bg-white rounded-lg shadow-sm border p-4 cursor-pointer"
+        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-4 cursor-pointer"
         @click="openContextMenu($event, crusher)"
         @contextmenu.prevent="openContextMenu($event, crusher)"
       >
         <div class="flex items-center justify-between" :class="isRTL ? 'flex-row-reverse' : ''">
           <div class="flex items-center gap-4" :class="isRTL ? 'flex-row-reverse' : 'flex-row'">
             <div class="flex-shrink-0 h-12 w-12">
-              <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center">
-                <!-- Same modern icon for mobile -->
-                <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+              <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+                <CubeIcon class="h-7 w-7 text-white" />
               </div>
             </div>
             <div :class="isRTL ? 'text-right' : 'text-left'">
@@ -111,17 +99,11 @@
             </div>
           </div>
           <div class="flex gap-4">
-            <button @click.stop="openEdit(crusher)" class="text-yellow-600 hover:text-yellow-800">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
+            <button @click.stop="openEdit(crusher)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100">
+              <PencilSquareIcon class="h-5 w-5" />
             </button>
-            <button @click.stop="confirmDelete(crusher)" class="text-red-600 hover:text-red-800">
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+            <button @click.stop="confirmDelete(crusher)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100">
+              <TrashIcon class="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -142,7 +124,7 @@
     <!-- Context Menu -->
     <div
       v-if="contextMenu.open"
-      class="fixed bg-white rounded-lg shadow-lg py-2 z-50 border min-w-[140px]"
+      class="fixed bg-white rounded-xl shadow-lg py-2 z-50 border border-slate-200 min-w-[140px]"
       :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
       @click.stop
       @contextmenu.prevent
@@ -152,10 +134,7 @@
         class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
         :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
       >
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
+        <PencilSquareIcon class="h-4 w-4" />
         {{ $t('labels.edit') }}
       </button>
       <button
@@ -163,25 +142,20 @@
         class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"
         :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
       >
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
+        <TrashIcon class="h-4 w-4" />
         {{ $t('labels.delete') }}
       </button>
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0; ">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0; ">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('crushers.editCrusher') : $t('crushers.addCrusher') }}
           </h3>
           <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <XMarkIcon class="w-6 h-6" />
           </button>
         </div>
         <div>
@@ -210,14 +184,11 @@
     </div>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-6">
         <div class="text-center">
           <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+            <ExclamationTriangleIcon class="w-6 h-6 text-red-600" />
           </div>
           <p class="text-gray-900 mb-6">
             {{ $t('crushers.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
@@ -239,10 +210,11 @@
 <script>
 import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../api'
 import Pagination from '@/components/shared/Pagination.vue'
+import { CubeIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'CrushersList',
-  components: { Pagination },
+  components: { Pagination, CubeIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   data() {
     return {
       q: '',

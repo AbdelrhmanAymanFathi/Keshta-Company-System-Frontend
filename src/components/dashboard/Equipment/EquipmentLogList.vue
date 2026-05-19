@@ -1,8 +1,8 @@
 <template>
-  <div class="space-y-6">
+    <div class="space-y-6">
     <!-- Header with Search, Filter and Add Button -->
     <div class="flex flex-col gap-4">
-      <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+      <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
         <div class="flex-1 w-full sm:w-auto">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('equipmentLog.list') }}</h2>
           <!-- Search bar removed -->
@@ -10,7 +10,7 @@
 
         <div class="flex gap-2">
           <button @click="openAddModal"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
+            class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition whitespace-nowrap shadow-sm shadow-indigo-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -29,7 +29,7 @@
       </div>
 
       <!-- Filter Bar -->
-      <div class="bg-white rounded-lg shadow p-4">
+      <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-lg shadow-slate-200/40">
         <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('equipmentLog.filters') || 'Filters' }}</h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
           <div>
@@ -63,15 +63,15 @@
 
           <div class="flex gap-2 items-center">
             <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.all') }}</button>
-              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.companyOwned') }}</button>
-              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300']">{{ $t('equipmentLog.external') }}</button>
+              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.all') }}</button>
+              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'bg-indigo-500 text-white shadow-sm shadow-indigo-200' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.companyOwned') }}</button>
+              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-slate-600 text-white shadow-sm shadow-slate-200' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.external') }}</button>
             </div>
           </div>
 
           <div class="col-span-full flex gap-2">
-            <button @click="applyFilters" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm">{{ $t('labels.search') }}</button>
-            <button @click="clearFilters" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg text-sm">{{ $t('labels.clear') }}</button>
+            <button @click="applyFilters" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl text-sm shadow-sm shadow-indigo-200">{{ $t('labels.search') }}</button>
+            <button @click="clearFilters" class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-sm">{{ $t('labels.clear') }}</button>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@
 
     <!-- Rentals Table -->
     <!-- Rentals Table -->
-    <div v-else class="bg-white rounded-lg shadow overflow-hidden">
+    <div v-else class="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40 overflow-hidden">
       <!-- No Results Message -->
       <div v-if="equipmentLogsStore.items.length === 0" class="text-center py-12">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,10 +144,10 @@
 
         <!-- Table Container with keyboard focus -->
         <div ref="tableContainer"
-          class="overflow-x-auto scroll-smooth focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset rounded"
+          class="overflow-x-auto scroll-smooth focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset rounded-xl"
           tabindex="0" @keydown="handleTableKeydown" :title="$t('equipmentLog.useArrowKeys')">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50" :class="{ 'direction-rtl': isRTL }">
+            <thead class="bg-gradient-to-r from-slate-50 to-indigo-50" :class="{ 'direction-rtl': isRTL }">
               <tr>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
@@ -215,7 +215,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-gray-50"
+              <tr v-for="rental in filteredItems" :key="rental.id" class="hover:bg-indigo-50/40"
                 @contextmenu.prevent="openContextMenu($event, rental)">
                 <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
                   {{ formatDate(rental.date) }}

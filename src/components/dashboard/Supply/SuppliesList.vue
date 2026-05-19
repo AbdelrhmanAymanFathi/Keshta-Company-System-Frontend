@@ -1,13 +1,13 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'">
-    <div class="flex items-center justify-between mb-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
+    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.suppliesList') }}</h2>
 
       <TableModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newSupply') + ' +'" @saved="onSupplySaved"/>
     </div>
 
     <!-- Filters Section -->
-    <div class="bg-white rounded-lg shadow p-4 space-y-4 mb-6">
+    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 space-y-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
@@ -108,20 +108,20 @@
 
       <div class="flex gap-2">
         <button @click="page = 1; loadSupplies()" :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
+          class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-sm font-medium shadow-sm shadow-indigo-200">
           {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
-          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium">
+          class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition-colors text-sm font-medium">
           {{ $t('labels.clear') }}
         </button>
       </div>
     </div>
 
     <!-- table -->
-    <div class="overflow-auto bg-white rounded shadow">
+    <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-indigo-50">
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -180,7 +180,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
-          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="hover:bg-gray-50" @contextmenu.prevent="onRowContextMenu($event, supply)">
+          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="hover:bg-indigo-50/40" @contextmenu.prevent="onRowContextMenu($event, supply)">
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
@@ -201,7 +201,7 @@
             </td>
 
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-              <button @click.stop="openDeleteConfirm(supply)" :title="$t('labels.delete')" class="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">
+              <button @click.stop="openDeleteConfirm(supply)" :title="$t('labels.delete')" class="px-2.5 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100">
                 <TrashIcon class="w-4 h-4" />
               </button>
             </td>
@@ -243,15 +243,15 @@
     </div>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 w-full max-w-sm">
         <h3 class="text-lg font-bold mb-3 text-gray-900">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
         <p class="text-gray-600 mb-6">{{ $t('supply.confirmDeleteExport') || 'Are you sure you want to delete this export?' }}</p>
         <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50">
             {{ $t('labels.cancel') || 'Cancel' }}
           </button>
-          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50">
             {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
           </button>
         </div>
@@ -261,7 +261,7 @@
     <!-- Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 z-10">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-2xl p-6 z-10">
         <h3 class="text-lg font-semibold mb-4">{{ $t('dashboard.suppliesList') }} — {{ $t('labels.edit') }}</h3>
         <div class="grid grid-cols-2 gap-4">
           <label>
@@ -291,7 +291,7 @@
         </div>
         <div class="mt-4 flex gap-2 justify-end">
           <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button @click="saveEdit" class="px-4 py-2 rounded text-white bg-indigo-600 hover:bg-indigo-700">{{
+          <button @click="saveEdit" class="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500">{{
             $t('labels.save') }}</button>
         </div>
       </div>
