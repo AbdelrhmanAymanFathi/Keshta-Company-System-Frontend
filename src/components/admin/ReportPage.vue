@@ -5,7 +5,7 @@
     :dir="isRTL ? 'rtl' : 'ltr'"
     :class="{ 'direction-rtl': isRTL }"
   >
-    <header class="relative mb-6 overflow-hidden rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 px-5 py-6 sm:px-8 sm:py-7 shadow-lg shadow-slate-200/50">
+    <header class="app-page-header relative mb-6 overflow-hidden rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 px-5 py-6 sm:px-8 sm:py-7 shadow-lg shadow-slate-200/50">
       <div
         class="pointer-events-none absolute inset-0 opacity-60"
         aria-hidden="true"

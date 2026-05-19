@@ -1,15 +1,17 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
     <!-- Header -->
-    <div class="flex justify-between items-center gap-4 flex-wrap">
-      <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('contractors.statementTitle') }}</h2>
+    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <div>
+        <h2 class="text-2xl font-semibold text-slate-900">{{ $t('contractors.statementTitle') }}</h2>
+      </div>
       <div class="flex items-center gap-2">
         <button @click="refresh" :disabled="loading"
-          class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg transition-colors disabled:opacity-50">
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50">
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport('xlsx')" :disabled="downloading"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
+          class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -17,7 +19,7 @@
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportExcel') }}
         </button>
         <button @click="downloadReport('csv')" :disabled="downloading"
-          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
+          class="flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-white shadow-sm shadow-sky-200 transition-colors hover:bg-sky-700 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -25,7 +27,7 @@
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportCSV') }}
         </button>
         <button @click="downloadReport('pdf')" :disabled="downloading"
-          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
+          class="flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-2 text-white shadow-sm shadow-slate-200 transition-colors hover:bg-slate-800 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -36,14 +38,14 @@
     </div>
 
     <!-- Filters Section -->
-    <div class="bg-white rounded-lg shadow p-4 space-y-4">
-      <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') }}</h4>
+    <div class="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
+      <h4 class="text-sm font-semibold text-slate-700">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Contractor Selector -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('contractors.name') }}</label>
           <select v-model="selectedContractorId" @change="onContractorChange"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">{{ $t('contractors.selectContractor') }}</option>
             <option v-for="c in contractors" :key="c.id" :value="c.id">{{ (isRTL && c.arName) ? c.arName : c.name }}</option>
           </select>
@@ -53,20 +55,20 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
         <!-- Load Button -->
         <div class="flex items-end">
           <button @click="loadReport" :disabled="loading || !selectedContractorId"
-            class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
+            class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:opacity-50">
             {{ $t('contractors.loadStatement') }}
           </button>
         </div>
@@ -74,14 +76,14 @@
 
       <div class="flex gap-2">
         <button @click="clearFilters"
-          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium">
+          class="rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">
           {{ $t('labels.clear') }}
         </button>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
+    <div v-if="error" class="rounded-2xl border border-rose-200 bg-rose-50 p-4">
       <div class="flex items-center gap-2">
         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -98,15 +100,15 @@
 
     <!-- Summary Cards -->
     <div v-else-if="report && report.contractorName" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-      <div class="bg-white rounded-lg shadow p-4">
+      <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.contractorName') }}</p>
         <p class="text-lg font-semibold text-gray-900">{{ getContractorDisplayName(report) }}</p>
       </div>
-      <div class="bg-white rounded-lg shadow p-4">
+      <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(totalDebits, 'text-green-600')">{{ formatCurrency(totalDebits) }}</p>
       </div>
-      <div class="bg-white rounded-lg shadow p-4">
+      <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'text-blue-600')">{{ formatCurrency(totalCredits) }}</p>
       </div>
@@ -114,11 +116,11 @@
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalEarnings') }}</p>
         <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
       </div> -->
-      <div class="bg-white rounded-lg shadow p-4">
+      <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.paidToContractor', 'contractors.payments') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(paidToContractor, 'text-teal-600')">{{ formatCurrency(paidToContractor) }}</p>
       </div>
-      <div class="bg-white rounded-lg shadow p-4">
+      <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.owedToContractor', 'contractors.owedToCompany') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(owedToContractor, 'text-purple-600')">{{ formatCurrency(owedToContractor) }}</p>
       </div>
@@ -126,7 +128,7 @@
     </div>
 
     <!-- Balance Owed Card -->
-    <div v-if="report && report.rows && report.rows.length > 0" class="bg-white rounded-lg shadow p-4">
+    <div v-if="report && report.rows && report.rows.length > 0" class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.openingBalance') }}</p>
@@ -160,11 +162,11 @@
     </div>
 
     <!-- Statement Table -->
-    <div v-if="report && report.rows && report.rows.length > 0" class="bg-white shadow-sm rounded-lg overflow-hidden">
-      <div class="px-4 py-3 text-sm text-gray-600">{{ $t('contractors.statementDescription') }}</div>
+    <div v-if="report && report.rows && report.rows.length > 0" class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <div class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">{{ $t('contractors.statementDescription') }}</div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+          <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
             <tr>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap"
                 :class="isRTL ? 'text-right' : 'text-left'">
@@ -196,12 +198,12 @@
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="divide-y divide-slate-200 bg-white">
               <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
-              isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'hover:bg-gray-50',
-              row.type === 'DEPOSIT' ? 'bg-green-50' : '',
-              row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'bg-blue-50' : '',
-              row.type === 'OPENING' ? 'bg-gray-100' : '',
+              isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'hover:bg-indigo-50/40',
+              row.type === 'DEPOSIT' ? 'bg-emerald-50/70' : '',
+              row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'bg-sky-50/70' : '',
+              row.type === 'OPENING' ? 'bg-slate-100' : '',
               isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
             ]">
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.date }}</td>
@@ -237,7 +239,7 @@
 
     <!-- Empty State -->
     <div v-else-if="report && (!report.rows || report.rows.length === 0)"
-      class="bg-white rounded-lg shadow p-8 text-center">
+      class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
       <p class="text-gray-500">{{ $t('contractors.noStatementData') }}</p>
     </div>
   </div>

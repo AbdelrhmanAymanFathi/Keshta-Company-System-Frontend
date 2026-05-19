@@ -1,24 +1,24 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
     <!-- Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-semibold text-gray-900 mb-2">{{ $t('changes.title') }}</h1>
-      <p class="text-gray-600">{{ $t('changes.description') }}</p>
+    <div class="app-page-header rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <h1 class="mb-2 text-2xl font-semibold text-slate-900">{{ $t('changes.title') }}</h1>
+      <p class="text-slate-600">{{ $t('changes.description') }}</p>
     </div>
 
     <!-- Date Selector -->
-    <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="flex flex-col sm:flex-row gap-4 items-end">
         <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-2">
+          <label class="mb-2 block text-sm font-medium text-slate-700">
             {{ $t('changes.selectDate') }}
           </label>
           <DateField v-model="selectedDate"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            class="w-full rounded-xl border border-slate-200 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
             @update:modelValue="loadChanges" />
         </div>
         <button @click="loadChanges" :disabled="loading || !selectedDate"
-          class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          class="rounded-xl bg-indigo-600 px-6 py-2 text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
           {{ $t('changes.loadChanges') }}
         </button>
       </div>
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <div v-else-if="error" class="rounded-2xl border border-rose-200 bg-rose-50 p-4">
       <div class="flex items-center">
         <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -45,8 +45,8 @@
       <!-- Summary Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <div v-for="(module, key) in changes" :key="key"
-          class="bg-white rounded-lg shadow-sm border p-4 cursor-pointer hover:shadow-md transition-shadow"
-          :class="{ 'ring-2 ring-indigo-500': activeModule === key }" @click="activeModule = key">
+          class="cursor-pointer rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-200/50"
+          :class="{ 'ring-2 ring-indigo-500 border-indigo-200': activeModule === key }" @click="activeModule = key">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600">{{ $t(`changes.modules.${key}`) }}</p>
@@ -54,10 +54,10 @@
                 {{ module.count || 0 }}
               </p>
             </div>
-            <div class="w-12 h-12 rounded-full flex items-center justify-center"
-              :class="module.count > 0 ? 'bg-indigo-100' : 'bg-gray-100'">
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl"
+              :class="module.count > 0 ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'">
               <div v-html="moduleIcon(key)" class="w-7 h-7"
-                :class="module.count > 0 ? 'text-indigo-600' : 'text-gray-400'"></div>
+                :class="module.count > 0 ? 'text-indigo-600' : 'text-slate-400'"></div>
             </div>
           </div>
         </div>
@@ -65,18 +65,18 @@
 
       <!-- Detailed View -->
       <div v-if="activeModule && changes[activeModule]?.items?.length > 0"
-        class="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 class="text-lg font-semibold text-gray-900">
+        class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+        <div class="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-indigo-50 px-6 py-4">
+          <h2 class="text-lg font-semibold text-slate-900">
             {{ $t(`changes.modules.${activeModule}`) }} - {{ $t('changes.changesFor') }} {{ formatDate(selectedDate) }}
           </h2>
-          <p class="text-sm text-gray-600 mt-1">
+          <p class="mt-1 text-sm text-slate-600">
             {{ $t('changes.totalChanges') }}: {{ changes[activeModule].count }}
           </p>
         </div>
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
               <tr>
                 <th v-for="header in getHeadersForModule(activeModule)" :key="header"
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -85,8 +85,8 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="hover:bg-gray-50">
+            <tbody class="divide-y divide-slate-200 bg-white">
+              <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="hover:bg-indigo-50/40">
                 <td v-for="field in getFieldsForModule(activeModule)" :key="field"
                   class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ formatField(item, field, activeModule) }}
@@ -98,25 +98,25 @@
       </div>
 
       <!-- No Changes Message -->
-      <div v-else-if="selectedDate && !loading" class="bg-white rounded-lg shadow-sm border p-8 text-center">
+      <div v-else-if="selectedDate && !loading" class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
         <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
           </path>
         </svg>
-        <p class="text-gray-600 text-lg">{{ $t('changes.noChanges') }}</p>
-        <p class="text-gray-500 text-sm mt-2">{{ $t('changes.noChangesDesc') }}</p>
+        <p class="text-lg text-slate-600">{{ $t('changes.noChanges') }}</p>
+        <p class="mt-2 text-sm text-slate-500">{{ $t('changes.noChangesDesc') }}</p>
       </div>
     </div>
 
     <!-- Initial State -->
-    <div v-else class="bg-white rounded-lg shadow-sm border p-8 text-center">
+    <div v-else class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
       <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
       </svg>
-      <p class="text-gray-600 text-lg">{{ $t('changes.selectDatePrompt') }}</p>
-      <p class="text-gray-500 text-sm mt-2">{{ $t('changes.selectDateDesc') }}</p>
+      <p class="text-lg text-slate-600">{{ $t('changes.selectDatePrompt') }}</p>
+      <p class="mt-2 text-sm text-slate-500">{{ $t('changes.selectDateDesc') }}</p>
     </div>
   </div>
 </template>

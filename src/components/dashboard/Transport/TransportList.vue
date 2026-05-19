@@ -1,6 +1,6 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
-    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('transport.transportList') }}</h2>
 
       <button @click="showAddModal = true"
@@ -236,12 +236,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
                   </svg>
                 </button> -->
-                <button @click.stop="openDeleteConfirm(transport)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100"
+                <button @click.stop="openDeleteConfirm(transport)" class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md"
                   :title="$t('common.delete')">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <TrashIcon class="h-5 w-5" />
                 </button>
               </div>
             </td>
@@ -313,6 +310,7 @@ import DateField from '@/components/shared/DateField.vue'
 import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'TransportList',
@@ -322,7 +320,8 @@ export default {
     TransportModal,
     SearchDropdown,
     PaymentModal,
-    DateField
+    DateField,
+    TrashIcon
   },
 
   data() {

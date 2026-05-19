@@ -1,12 +1,14 @@
 <template>
-  <div class="p-6">
-    <h2 class="text-xl font-bold mb-4">{{ isEdit ? $t('admin.editReport') : $t('admin.createReport') }}</h2>
+  <div class="p-6 space-y-4">
+    <div class="app-page-header rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <h2 class="text-xl font-bold text-slate-900">{{ isEdit ? $t('admin.editReport') : $t('admin.createReport') }}</h2>
+    </div>
 
-    <div class="bg-white rounded shadow p-4 mb-4">
+    <div class="mb-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.selectTable') || 'Table' }}</label>
-          <select v-model="selectedTable" @change="onTableChange" class="w-full border rounded px-2 py-1">
+          <select v-model="selectedTable" @change="onTableChange" class="w-full rounded-xl border border-slate-200 px-3 py-2">
             <option value="">-- {{ $t('placeholders.select') }} --</option>
             <option v-for="t in tables" :key="t.tableName" :value="t.tableName">{{ t.label || t.tableName }}</option>
           </select>
@@ -14,7 +16,7 @@
 
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnModule') }}</label>
-          <select v-model="form.module" class="w-full border rounded px-2 py-1">
+          <select v-model="form.module" class="w-full rounded-xl border border-slate-200 px-3 py-2">
             <option value="">-- {{ $t('placeholders.select') }} --</option>
             <option v-for="m in modules" :key="m" :value="m">{{ m }}</option>
           </select>
@@ -22,7 +24,7 @@
 
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnKey') }}</label>
-          <input v-model="form.key" class="w-full border rounded px-2 py-1" />
+          <input v-model="form.key" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
           <div v-if="errors.key" class="text-xs text-red-600 mt-1">{{ errors.key }}</div>
         </div>
       </div>
@@ -30,37 +32,37 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
           <div>
             <label class="block text-sm font-medium">{{ $t('reports.columnTitle') }}</label>
-            <input v-model="form.title" class="w-full border rounded px-2 py-1" />
+            <input v-model="form.title" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
           </div>
             <div>
               <label class="block text-sm font-medium">{{ $t('reports.columnArTitle') || 'Arabic Title' }}</label>
-              <input v-model="form.arTitle" class="w-full border rounded px-2 py-1" />
+              <input v-model="form.arTitle" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
             </div>
         </div>
 
         <div class="mt-3">
           <label class="block text-sm font-medium">{{ $t('reports.description') || 'Description' }}</label>
-          <textarea v-model="form.description" rows="3" class="w-full border rounded px-2 py-1"></textarea>
+          <textarea v-model="form.description" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2"></textarea>
         </div>
       <div class="flex items-end justify-end mt-3">
-            <button @click="generate" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-500" :disabled="busy">
+            <button @click="generate" class="rounded-xl bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700" :disabled="busy">
               {{ isEdit ? $t('common.update') : $t('common.generate') || 'Generate' }}
             </button>
           </div>
     </div>
 
-      <div v-if="params.length" class="bg-white rounded shadow p-4 mb-4 overflow-hidden">
+      <div v-if="params.length" class="mb-4 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <div class="flex justify-between items-center mb-2">
           <div class="text-sm text-gray-600">{{ $t('reports.fieldSelectorHelp') || 'Choose output fields and filter fields independently.' }}</div>
           <div class="flex gap-2">
-            <button @click="selectAllOutput" class="px-2 py-1 border rounded">{{ $t('labels.selectAll') || 'Select Output' }}</button>
-            <button @click="clearAllOutput" class="px-2 py-1 border rounded">{{ $t('labels.clear') || 'Clear Output' }}</button>
+            <button @click="selectAllOutput" class="rounded-lg border border-slate-200 px-2 py-1 hover:bg-slate-50">{{ $t('labels.selectAll') || 'Select Output' }}</button>
+            <button @click="clearAllOutput" class="rounded-lg border border-slate-200 px-2 py-1 hover:bg-slate-50">{{ $t('labels.clear') || 'Clear Output' }}</button>
           </div>
         </div>
       <div v-if="errors.params" class="text-xs text-red-600 mb-2">{{ errors.params }}</div>
 
       <ul class="divide-y divide-gray-100">
-        <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="p-3 border-b flex flex-col lg:flex-row lg:items-start gap-3 overflow-visible">
+        <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="flex flex-col gap-3 overflow-visible border-b border-slate-200 p-3 lg:flex-row lg:items-start hover:bg-indigo-50/40">
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-64 shrink-0">
             <label class="flex items-center gap-1 text-sm">
               <input type="checkbox" v-model="f.selectIncluded" @change="onSelectChange(f)" />
@@ -77,21 +79,21 @@
           </div>
 
           <div class="w-full min-w-0 flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 items-center">
-            <input v-model="f.label" placeholder="English label" class="w-full border rounded px-2 py-1" />
-            <input v-model="f.arName" :placeholder="$t('reports.arLabelPlaceholder') || 'Arabic label (يظهر عند اختيار العربية)'" class="w-full border rounded px-2 py-1" />
-            <select v-model="f.paramType" @change="onParamTypeChange(f)" class="w-full border rounded px-2 py-1">
+            <input v-model="f.label" placeholder="English label" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
+            <input v-model="f.arName" :placeholder="$t('reports.arLabelPlaceholder') || 'Arabic label (يظهر عند اختيار العربية)'" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
+            <select v-model="f.paramType" @change="onParamTypeChange(f)" class="w-full rounded-xl border border-slate-200 px-3 py-2">
               <option v-for="t in paramTypes" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
 
           <div class="flex flex-row lg:flex-col items-end gap-2 shrink-0">
-            <button @click="moveUp(idx)" class="px-2 py-1 border rounded">↑</button>
-            <button @click="moveDown(idx)" class="px-2 py-1 border rounded">↓</button>
+            <button @click="moveUp(idx)" class="rounded-lg border border-slate-200 px-2 py-1 hover:bg-slate-50">↑</button>
+            <button @click="moveDown(idx)" class="rounded-lg border border-slate-200 px-2 py-1 hover:bg-slate-50">↓</button>
           </div>
         </li>
       </ul>
 
-      <div class="mt-4 rounded border border-amber-200 bg-amber-50 p-3">
+      <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div class="text-sm font-medium text-amber-900">{{ $t('reports.totalsLabel') || 'Totals' }}</div>
@@ -116,7 +118,7 @@
           <label
             v-for="field in numericFields"
             :key="`total-toggle-${field.name}`"
-            class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm border border-amber-100"
+            class="flex items-center gap-2 rounded-xl border border-amber-100 bg-white px-3 py-2 text-sm"
           >
             <input
               type="checkbox"
@@ -129,15 +131,15 @@
       </div>
     </div>
 
-    <div class="bg-white rounded shadow p-4">
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <h4 class="font-semibold mb-2">{{ $t('reports.preview') || 'Preview' }}</h4>
       <div class="mb-2">
         <label class="text-sm text-gray-600">{{ $t('reports.sqlPreview') || 'SQL Preview' }}</label>
-        <pre class="text-xs bg-gray-100 p-2 rounded overflow-auto" style="direction:ltr; unicode-bidi:embed;">{{ sqlPreview }}</pre>
+        <pre class="overflow-auto rounded-xl bg-slate-100 p-3 text-xs" style="direction:ltr; unicode-bidi:embed;">{{ sqlPreview }}</pre>
       </div>
       <div>
         <label class="text-sm text-gray-600">{{ $t('reports.paramsPreview') || 'Parameters' }}</label>
-        <pre class="text-xs bg-gray-100 p-2 rounded overflow-auto">{{ paramsPreview }}</pre>
+        <pre class="overflow-auto rounded-xl bg-slate-100 p-3 text-xs">{{ paramsPreview }}</pre>
       </div>
     </div>
   </div>
