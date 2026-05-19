@@ -68,6 +68,14 @@
               </td>
               <td class="px-6 py-4 text-sm" :class="textAlign">
                 <div class="flex flex-wrap gap-1" :class="'justify-start'">
+                  <!-- <span
+                    :class="[
+                      'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
+                      isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'
+                    ]"
+                  >
+                    {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
+                  </span> -->
                   <span
                     v-for="role in user.roles"
                     :key="role.roleId || role.id"
@@ -133,11 +141,29 @@
             </div>
             <div v-if="user.roles && user.roles.length > 0" class="flex flex-wrap gap-1 mt-2" :class="isRTL ? 'justify-end' : 'justify-start'">
               <span
+                :class="[
+                  'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
+                  isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'
+                ]"
+              >
+                {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
+              </span>
+              <span
                 v-for="role in user.roles"
                 :key="role.roleId || role.id"
                 class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800"
               >
                 {{ role.role?.label || role.role?.name || 'N/A' }}
+              </span>
+            </div>
+            <div v-else class="flex flex-wrap gap-1 mt-2" :class="isRTL ? 'justify-end' : 'justify-start'">
+              <span
+                :class="[
+                  'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
+                  isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'
+                ]"
+              >
+                {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
               </span>
             </div>
           </div>
@@ -275,11 +301,14 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('users.roles') }}</label>
-            <div class="space-y-2">
+            <div v-if="rolesLoading" class="text-sm text-gray-500">
+              {{ $t('users.rolesLoading') }}
+            </div>
+            <div v-else class="space-y-2">
               <label
                 v-for="role in availableRoles"
                 :key="role.id"
-                class="flex items-center gap-2 cursor-pointer"
+                class="flex items-start gap-2 cursor-pointer"
               >
                 <input
                   v-model="form.roles"
@@ -287,8 +316,14 @@
                   type="checkbox"
                   class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                 />
-                <span class="text-sm text-gray-700">{{ role.label || role.name }}</span>
+                <span class="min-w-0">
+                  <span class="block text-sm text-gray-700">{{ role.label || role.name }}</span>
+                  <span v-if="role.description" class="block text-xs text-gray-500">{{ role.description }}</span>
+                </span>
               </label>
+              <p v-if="availableRoles.length === 0" class="text-sm text-gray-500">
+                {{ $t('users.noRolesAvailable') }}
+              </p>
             </div>
           </div>
           <div class="flex gap-3 pt-4" :class="isRTL ? 'flex-row-reverse' : ''">
@@ -340,7 +375,7 @@
 
 <script>
 import { useI18n } from 'vue-i18n'
-import { getUsers, createUser, deleteUser, adminResetUserPassword } from '@/api'
+import { getUsers, getUserRoles, createUser, updateUser, deleteUser, adminResetUserPassword } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 
 export default {
@@ -363,6 +398,8 @@ export default {
       totalPages: 0,
       modalOpen: false,
       editing: false,
+      editingUserId: null,
+      rolesLoading: false,
       saving: false,
       form: {
         name: '',
@@ -389,10 +426,7 @@ export default {
         newPassword: '',
         adminTotp: ''
       },
-      availableRoles: [
-        { id: 1, name: 'ADMIN', label: 'Administrator' }
-        // Add more roles as needed
-      ]
+      availableRoles: []
     }
   },
   computed: {
@@ -411,12 +445,33 @@ export default {
   },
   mounted() {
     this.loadUsers()
+    this.loadAvailableRoles()
     document.addEventListener('click', this.closeContextMenu)
   },
   beforeUnmount() {
     document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {
+    isUserAdmin(user) {
+      return (user.roles || []).some(role => role.role?.name === 'ADMIN')
+    },
+    getAssignedRoleIds(user) {
+      return (user.roles || []).map(role => role.role?.id || role.roleId || role.id).filter(Boolean)
+    },
+    async loadAvailableRoles() {
+      this.rolesLoading = true
+      try {
+        const response = await getUserRoles()
+        this.availableRoles = Array.isArray(response.data) ? response.data : (response.data?.items || [])
+      } catch (error) {
+        console.error('Error loading user roles:', error)
+        if (window.$toast) {
+          window.$toast(this.$t('users.rolesLoadError'), 'error')
+        }
+      } finally {
+        this.rolesLoading = false
+      }
+    },
     async loadUsers() {
       this.loading = true
       try {
@@ -460,17 +515,20 @@ export default {
         isActive: true,
         roles: []
       }
+      this.editingUserId = null
       this.modalOpen = true
     },
     openEdit(user) {
+      const roles = this.getAssignedRoleIds(user)
       this.editing = true
+      this.editingUserId = user.id
       this.form = {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
         password: '',
         isActive: user.isActive !== undefined ? user.isActive : true,
-        roles: (user.roles || []).map(r => r.roleId || r.id).filter(Boolean)
+        roles
       }
       this.contextMenu.user = user
       this.modalOpen = true
@@ -479,6 +537,7 @@ export default {
     closeModal() {
       this.modalOpen = false
       this.editing = false
+      this.editingUserId = null
       this.form = {
         name: '',
         email: '',
@@ -491,20 +550,23 @@ export default {
     async saveUser() {
       this.saving = true
       try {
+        const roleIds = Array.isArray(this.form.roles) ? [...this.form.roles] : []
         const payload = {
           name: this.form.name,
           email: this.form.email,
           phone: this.form.phone,
-          isActive: this.form.isActive
+          isActive: this.form.isActive,
+          isAdmin: roleIds.some(roleId => {
+            const role = this.availableRoles.find(item => item.id === roleId)
+            return role?.name === 'ADMIN'
+          }),
+          roleIds
         }
         if (!this.editing && this.form.password) {
           payload.password = this.form.password
         }
-        if (this.form.roles && this.form.roles.length > 0) {
-          payload.roles = this.form.roles
-        }
         if (this.editing) {
-          console.warn('Update user endpoint not implemented, using create instead')
+          await updateUser(this.editingUserId, payload)
         } else {
           await createUser(payload)
         }

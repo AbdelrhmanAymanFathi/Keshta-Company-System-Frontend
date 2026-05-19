@@ -278,8 +278,12 @@ export const getUsers = (params = {}) => {
   }
   return axios.get(`${BASE_URL}/api/users?${queryParams.toString()}`);
 };
+export const getUserRoles = () =>
+  axios.get(`${BASE_URL}/api/users/roles`);
 export const createUser = (data) =>
   axios.post(`${BASE_URL}/api/users`, data);
+export const updateUser = (id, data) =>
+  axios.patch(`${BASE_URL}/api/users/${id}`, data);
 export const deleteUser = (id) =>
   axios.delete(`${BASE_URL}/api/users/${id}`);
 
