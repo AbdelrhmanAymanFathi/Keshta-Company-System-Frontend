@@ -392,7 +392,7 @@ export default {
   methods: {
     async loadContractors() {
       try {
-        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: 'supply' })
+        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode || 'supply' })
         const payload = res.data || {}
         this.contractors = Array.isArray(payload.items) ? payload.items :
                          Array.isArray(payload.data) ? payload.data :

@@ -337,7 +337,7 @@ import normalizeItem from '@/utils/normalizeItem'
 export default {
   name: 'ExtractContractorsList',
   props: {
-    mode: { type: String, default: 'extracts' }
+    mode: { type: String, default: 'extract' }
   },
   components: { Pagination, DateField },
   data() {
@@ -391,20 +391,13 @@ export default {
   methods: {
     async loadContractors() {
       try {
-        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode || 'extracts' })
+        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode || 'extract' })
         const payload = res.data || {}
-        let items = Array.isArray(payload.items) ? payload.items :
+        const items = Array.isArray(payload.items) ? payload.items :
                          Array.isArray(payload.data) ? payload.data :
                          Array.isArray(payload) ? payload : []
 
-        // Normalize and show only contractors available for exports when used in extracts mode
-        items = items.map(normalizeItem)
-        const modeLower = String(this.mode || '').toLowerCase()
-        if (modeLower === 'export' || modeLower === 'exports' || modeLower === 'extracts') {
-          items = items.filter(c => c && c.availableForExtracts === true)
-        }
-
-        this.contractors = items
+        this.contractors = items.map(normalizeItem)
         const meta = payload.meta || {}
         this.total = meta.total ?? payload.total ?? this.contractors.length
       } catch (e) {
@@ -488,7 +481,7 @@ export default {
     async doDelete() {
       try {
         const params = {}
-        if (this.mode === 'export') params.mode = this.mode
+        if (this.mode) params.mode = this.mode
         const res = await deleteContractor(this.deleteConfirm.item.id, params)
         const data = res?.data ?? null
         if ((res && res.status === 204) || (data && data.deletedAt)) {

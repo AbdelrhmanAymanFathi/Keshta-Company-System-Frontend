@@ -204,7 +204,7 @@ const routes = [
         name: 'equipment-contractor-statement',
         component: ContractorStatement,
         meta: { title: 'dashboard.contractorStatement' },
-        props: { mode: 'equipmentLogs'}
+        props: { mode: 'rentals' }
       },
 
       // ==================== Company Wallet Module ====================
@@ -304,7 +304,7 @@ const routes = [
         name: 'extracts-contractors-list',
         component: ExtractContractorsList,
         meta: { title: 'dashboard.contractorsList' },
-        props: { mode: 'extracts' }
+        props: { mode: 'extract' }
       },
       {
         path: 'extracts/contractor-statement/:id?',
@@ -318,7 +318,7 @@ const routes = [
         name: 'extracts-items',
         component: ItemList,
         meta: { title: 'dashboard.itemsList' },
-        props: { mode: 'extracts' }
+        props: { mode: 'extract' }
       },
       {
         path: 'extracts/:id',

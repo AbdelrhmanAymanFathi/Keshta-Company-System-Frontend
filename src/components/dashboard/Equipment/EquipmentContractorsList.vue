@@ -236,7 +236,7 @@ import normalizeItem from '@/utils/normalizeItem'
 export default {
   name: 'EquipmentContractorsList',
   props: {
-    mode: { type: String, default: 'equipmentLogs' }
+    mode: { type: String, default: 'rentals' }
   },
   components: { Pagination },
   data() {
@@ -296,14 +296,7 @@ export default {
                            Array.isArray(payload.data) ? payload.data :
                            Array.isArray(payload) ? payload : []
 
-          // If component is used for extracts/exports, show only contractors flagged for exports
-          items = items.map(normalizeItem)
-          const modeLower = String(this.mode || '').toLowerCase()
-          if (modeLower === 'export' || modeLower === 'exports' || modeLower === 'extracts') {
-            items = items.filter(c => c && c.availableForExports === true)
-          }
-
-          this.contractors = items
+          this.contractors = items.map(normalizeItem)
           const meta = payload.meta || {}
           this.total = meta.total ?? payload.total ?? this.contractors.length
       } catch (e) {
@@ -357,7 +350,7 @@ export default {
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
       if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
       // set availability flag based on mode (equipment / transport / export)
-      if (!this.mode || this.mode === 'equipmentLogs') {
+      if (!this.mode || this.mode === 'rentals' || this.mode === 'equipmentLogs') {
         payload.availableForEquipmentRental = true
       } else if (this.mode === 'transport') {
         payload.availableForTransports = true

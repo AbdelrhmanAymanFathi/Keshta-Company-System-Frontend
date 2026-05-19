@@ -306,7 +306,8 @@ export default {
       if (low === 'export') return 'SUPPLY'
       if (low === 'supply') return 'SUPPLY'
       if (low === 'transport') return 'TRANSPORT'
-      if (low === 'extract') return 'EXTRACT'
+      if (low === 'extract' || low === 'extracts') return 'EXTRACT'
+      if (low === 'rental' || low === 'rentals' || low === 'equipmentlogs' || low === 'equipment_logs' || low === 'equipment-logs') return 'RENTALS'
       if (low === 'expense') return 'EXPENSE'
       if (low === 'deposit') return 'DEPOSIT'
       if (low === 'withdrawal') return 'WITHDRAWAL'
@@ -315,12 +316,14 @@ export default {
 
     // statementMode: uppercase mode for report APIs (e.g. SUPPLY, TRANSPORT)
     const statementMode = computed(() => parseModeInput(mode.value || props.mode || ''))
-    // contractorsListMode: lowercase mode for contractor list filtering (e.g. supply, transport)
+    // contractorsListMode: canonical mode for GET /api/contractors (supply, transport, extract, rentals)
     const contractorsListMode = computed(() => {
       if (!statementMode.value) return undefined
       const low = String(statementMode.value).toLowerCase()
-      // Backend and other components expect 'equipmentLogs' (camelCase) for equipment contractors.
-      if (low === 'equipmentlogs' || low === 'equipment_logs' || low === 'equipment-logs') return 'equipmentLogs'
+      if (low === 'supply') return 'supply'
+      if (low === 'transport') return 'transport'
+      if (low === 'extract') return 'extract'
+      if (low === 'rentals' || low === 'rental' || low === 'equipmentlogs') return 'rentals'
       return low
     })
 
@@ -461,16 +464,7 @@ export default {
               ? payload
               : []
 
-        // Normalize contractor objects, then filter by availability according to mode.
-        items = items.map(normalizeItem)
-        if (contractorsListMode.value === 'extract') {
-          items = items.filter(c => c && c.availableForExtracts === true)
-        }
-
-        if (contractorsListMode.value === 'export' || contractorsListMode.value === 'supply') {
-          items = items.filter(c => c && c.availableForSupplies === true)
-        }
-        contractors.value = items
+        contractors.value = items.map(normalizeItem)
       } catch (e) {
         console.error('Error loading contractors:', e)
         contractors.value = []

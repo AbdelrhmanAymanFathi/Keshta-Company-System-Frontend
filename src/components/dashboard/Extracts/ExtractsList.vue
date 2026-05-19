@@ -244,9 +244,12 @@ export default {
     },
     async loadFilterData() {
       try {
-        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'extracts' })
-        const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
-        this.contractors = Array.isArray(contractorsData) ? contractorsData : []
+        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'extract' })
+        const payload = contractorsRes.data || {}
+        const contractorsData = Array.isArray(payload.items) ? payload.items
+          : Array.isArray(payload.data) ? payload.data
+          : Array.isArray(payload) ? payload : []
+        this.contractors = contractorsData
 
         const locationsRes = await getLocations()
         const locationsData = locationsRes.data?.data || locationsRes.data || []

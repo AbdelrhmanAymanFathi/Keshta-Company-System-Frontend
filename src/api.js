@@ -291,14 +291,15 @@ export const adminResetUserPassword = (userId, data = {}) =>
 export const changePassword = (data = {}) =>
   axios.post(`${BASE_URL}/api/auth/password/change`, data);
 
-// Contractors
+// Contractors — mode query values: supply | transport | rentals | extract
+// Backend aliases: rental→rentals, extracts→extract, equipmentlogs→rentals
 function normalizeContractorMode(mode = '') {
   const value = String(mode || '').trim().toLowerCase();
   if (!value) return '';
-  if (['supply', 'supplies'].includes(value)) return 'supply';
-  if (['extract', 'extracts'].includes(value)) return 'extracts';
+  if (['supply', 'supplies', 'export', 'exports'].includes(value)) return 'supply';
+  if (['extract', 'extracts'].includes(value)) return 'extract';
   if (['transport', 'transports'].includes(value)) return 'transport';
-  if (['equipment', 'equipmentlog', 'equipmentlogs', 'rental', 'rentals'].includes(value)) return 'equipmentLogs';
+  if (['rental', 'rentals', 'equipment', 'equipmentlog', 'equipmentlogs', 'equipment-logs', 'equipment_logs'].includes(value)) return 'rentals';
   return value;
 }
 
@@ -309,13 +310,13 @@ function shouldIncludeContractorForMode(contractor, mode = '') {
   if (normalizedMode === 'supply') {
     return contractor?.availableForSupplies === true || contractor?.availableForExports === true;
   }
-  if (normalizedMode === 'extracts') {
+  if (normalizedMode === 'extract') {
     return contractor?.availableForExtracts === true || contractor?.availableForExports === true;
   }
   if (normalizedMode === 'transport') {
     return contractor?.availableForTransports === true;
   }
-  if (normalizedMode === 'equipmentLogs') {
+  if (normalizedMode === 'rentals') {
     return contractor?.availableForRentals === true || contractor?.availableForEquipmentRental === true;
   }
 
@@ -353,11 +354,9 @@ export const getContractors = (params = {}) => {
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString(),
-    mode: normalizedMode
   });
-  if (q) {
-    queryParams.append('q', q);
-  }
+  if (normalizedMode) queryParams.append('mode', normalizedMode);
+  if (q) queryParams.append('q', q);
   return axios.get(`${BASE_URL}/api/contractors?${queryParams.toString()}`).then(res => {
     res.data = filterContractorsPayload(res.data, normalizedMode);
     return res;
@@ -382,7 +381,8 @@ export const updateContractor = (id, data) => {
 // with response.status === 204 and an empty body.
 export const deleteContractor = (id, params = {}) => {
   const query = new URLSearchParams();
-  if (params.mode) query.append('mode', params.mode);
+  const normalizedMode = normalizeContractorMode(params.mode);
+  if (normalizedMode) query.append('mode', normalizedMode);
   const q = query.toString();
   return axios.delete(`${BASE_URL}/api/contractors/${id}${q ? `?${q}` : ''}`);
 }
