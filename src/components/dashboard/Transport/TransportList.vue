@@ -1,16 +1,16 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'">
-    <div class="flex items-center justify-between mb-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
+    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('transport.transportList') }}</h2>
 
       <button @click="showAddModal = true"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+        class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200">
         {{ $t('transport.addTransport') }} +
       </button>
     </div>
 
     <!-- Filters Section -->
-    <div class="bg-white rounded-lg shadow p-4 space-y-4 mb-6">
+    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 space-y-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
@@ -96,20 +96,20 @@
 
       <div class="flex gap-2">
         <button @click="page = 1; loadTransports()" :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
+          class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-sm font-medium shadow-sm shadow-indigo-200">
           {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
-          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium">
+          class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition-colors text-sm font-medium">
           {{ $t('labels.clear') }}
         </button>
       </div>
     </div>
 
     <!-- table -->
-    <div class="overflow-auto bg-white rounded shadow">
+    <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-indigo-50">
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -174,7 +174,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" class="hover:bg-gray-50"
+          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" class="hover:bg-indigo-50/40"
               @contextmenu.prevent="onRowContextMenu($event, transport)">
             <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}
@@ -236,7 +236,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
                   </svg>
                 </button> -->
-                <button @click.stop="openDeleteConfirm(transport)" class="text-red-600 hover:text-red-900"
+                <button @click.stop="openDeleteConfirm(transport)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100"
                   :title="$t('common.delete')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -277,15 +277,15 @@
     </div>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 w-full max-w-sm">
         <h3 class="text-lg font-bold mb-3 text-gray-900">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
         <p class="text-gray-600 mb-6">{{ $t('transport.confirmDelete') || 'Are you sure you want to delete this transport?' }}</p>
         <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50">
             {{ $t('labels.cancel') || 'Cancel' }}
           </button>
-          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50">
             {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
           </button>
         </div>

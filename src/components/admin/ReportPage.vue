@@ -1,31 +1,36 @@
 <!-- eslint-disable no-useless-escape -->
 <template>
   <div
-    class="report-page min-h-full p-4 sm:p-6 lg:p-8 overflow-visible"
+    class="report-page min-h-full sm:p-6 lg:p-8 overflow-visible"
     :dir="isRTL ? 'rtl' : 'ltr'"
     :class="{ 'direction-rtl': isRTL }"
   >
-    <header class="relative mb-6 overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-5 py-6 sm:px-8 sm:py-7 shadow-xl shadow-indigo-950/20">
+    <header class="relative mb-6 overflow-hidden rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 px-5 py-6 sm:px-8 sm:py-7 shadow-lg shadow-slate-200/50">
       <div
-        class="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
+        class="pointer-events-none absolute inset-0 opacity-60"
+        aria-hidden="true"
+        style="background-image: radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.09) 1px, transparent 0); background-size: 24px 24px;"
+      />
+      <div
+        class="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-indigo-200/25 blur-3xl"
         aria-hidden="true"
       />
       <div
-        class="pointer-events-none absolute -bottom-20 -start-10 h-56 w-56 rounded-full bg-violet-500/15 blur-3xl"
+        class="pointer-events-none absolute -bottom-20 -start-10 h-56 w-56 rounded-full bg-sky-200/25 blur-3xl"
         aria-hidden="true"
       />
       <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div class="min-w-0 flex-1 space-y-2">
-          <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100 backdrop-blur-sm">
+          <div class="inline-flex items-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-3 py-1 text-xs font-medium text-indigo-700 backdrop-blur-sm">
             <ChartBarSquareIcon class="h-3.5 w-3.5 shrink-0" />
             <span>{{ $t('admin.runReport') }}</span>
           </div>
-          <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             {{ reportTitle }}
           </h1>
           <p
             v-if="report?.description"
-            class="max-w-2xl text-sm leading-relaxed text-slate-300"
+            class="max-w-2xl text-sm leading-relaxed text-slate-600"
           >
             {{ report.description }}
           </p>
@@ -36,7 +41,7 @@
             type="button"
             @click="execute"
             :disabled="executing"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-900/30 transition hover:from-emerald-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 disabled:cursor-not-allowed disabled:opacity-50"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-200 transition hover:from-indigo-500 hover:to-sky-500 focus:outline-none focus:ring-2 focus:ring-indigo-300/60 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowPathIcon v-if="executing" class="h-4 w-4 animate-spin" />
             <MagnifyingGlassIcon v-else class="h-4 w-4" />
@@ -45,7 +50,7 @@
           <button
             type="button"
             @click="clear"
-            class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-medium text-slate-700 backdrop-blur-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-200"
           >
             <ArrowUturnLeftIcon class="h-4 w-4" />
             {{ $t('labels.clear') }}
@@ -162,7 +167,7 @@
               v-else
               :class="[inputClass, 'flex items-center gap-2 bg-slate-100/80 text-slate-500']"
             >
-              <InformationCircleIcon class="h-4 w-4 shrink-0 text-amber-500" />
+              <InformationCircleIcon class="h-4 w-4 shrink-0 text-indigo-500" />
               <span class="text-xs leading-snug">
               {{ locale === 'ar' ? 'يرجى اختيار ' : 'Please select ' }}{{ (paramDependencies[p.name] || []).map(dep => {
                 const depParam = reportFilterFields.find(pr => pr.name === dep)
@@ -286,7 +291,7 @@
                 :class="[
                   'transition-colors',
                   isTotalsRow(row)
-                    ? 'report-totals-row bg-gradient-to-r from-amber-50 to-orange-50 font-semibold'
+                    ? 'report-totals-row bg-gradient-to-r from-slate-50 to-indigo-50 font-semibold'
                     : 'hover:bg-indigo-50/40'
                 ]"
               >
@@ -294,7 +299,7 @@
                   v-for="col in columns"
                   :key="col"
                   class="whitespace-nowrap px-4 py-3 text-sm sm:px-6"
-                  :class="isTotalsRow(row) ? 'border-t-2 border-amber-300/80 text-amber-950' : 'text-slate-700'"
+                  :class="isTotalsRow(row) ? 'border-t-2 border-indigo-200 text-slate-900' : 'text-slate-700'"
                 >
                   <div class="max-w-[20rem] truncate" :title="getValue(row, col)">
                     {{ getValue(row, col) }}
@@ -885,7 +890,7 @@ export default {
 
 <style scoped>
 .report-page {
-  background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 45%, #f5f3ff 100%);
+  background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 52%, #f8fafc 100%);
   min-height: 100%;
 }
 
@@ -905,19 +910,19 @@ export default {
 }
 
 .report-export-btn--csv {
-  @apply border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 focus:ring-amber-400;
+  @apply border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 focus:ring-slate-300;
 }
 
 .report-export-btn--xlsx {
-  @apply border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 focus:ring-emerald-400;
+  @apply border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 focus:ring-indigo-300;
 }
 
 .report-export-btn--pdf {
-  @apply border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 focus:ring-rose-400;
+  @apply border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 focus:ring-sky-300;
 }
 
 .report-table thead {
-  @apply bg-gradient-to-r from-slate-50 to-indigo-50/80;
+  @apply bg-gradient-to-r from-slate-50 to-indigo-50;
 }
 
 .report-table tbody tr + tr td {

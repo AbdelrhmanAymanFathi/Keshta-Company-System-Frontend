@@ -1,20 +1,19 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
-    <h2 class="text-2xl font-semibold mb-4 text-gray-800">{{ $t('equipment.title') || 'Equipment' }}</h2>
-
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <h2 class="text-2xl font-semibold text-gray-800">{{ $t('equipment.title') || 'Equipment' }}</h2>
       <div class="flex gap-2 items-center">
         <input v-model="q" @keyup.enter="search" type="search" :placeholder="$t('equipment.searchPlaceholder')" class="border rounded px-3 py-2 text-sm" />
         <button @click="clearSearch" class="px-3 py-2 rounded border">{{ $t('labels.clear') || 'Clear' }}</button>
       </div>
       <div>
-        <button @click="openCreateModal" class="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">{{ $t('equipment.add') || 'Add Equipment' }}</button>
+        <button @click="openCreateModal" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 inline-flex items-center gap-2 shadow-sm shadow-indigo-200"><PlusIcon class="w-5 h-5" />{{ $t('equipment.add') || 'Add Equipment' }}</button>
       </div>
     </div>
 
-    <div class="overflow-x-auto bg-white rounded border">
+    <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <table :dir="isRTL ? 'rtl' : 'ltr'" class="min-w-full w-full table-fixed text-sm">
-        <thead class="bg-indigo-50">
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('equipment.name') || 'Name' }}</th>
             <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">{{ $t('labels.contractor') || 'Contractor' }}</th>
@@ -24,7 +23,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in equipments" :key="e.id" class="border-t hover:bg-gray-50" @contextmenu.prevent="openContextMenu($event, e)">
+          <tr v-for="e in equipments" :key="e.id" class="border-t hover:bg-indigo-50/40" @contextmenu.prevent="openContextMenu($event, e)">
             <td class="px-3 py-3 font-medium text-gray-800 text-start">{{ e.name }}</td>
             <td class="px-3 py-3 text-gray-700 text-start">{{ e.contractor?.name || '—' }}</td>
             <td class="px-3 py-3 text-gray-700 text-start">
@@ -41,7 +40,7 @@
               <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
                 <button
                   type="button"
-                  class="p-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+                  class="p-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition"
                   :title="$t('labels.edit') || 'Edit'"
                   :aria-label="$t('labels.edit') || 'Edit'"
                   @click.stop="openEditModal(e)"
@@ -50,7 +49,7 @@
                 </button>
                 <button
                   type="button"
-                  class="p-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition"
+                  class="p-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition"
                   :title="$t('labels.delete') || 'Delete'"
                   :aria-label="$t('labels.delete') || 'Delete'"
                   @click.stop="openDeleteConfirm(e)"
@@ -71,10 +70,10 @@
 
     <!-- Create/Edit Modal -->
     <div v-if="showCreateModal || editingEquipment" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ editingEquipment ? $t('equipment.edit') : $t('equipment.add') }}</h3>
-          <button class="text-gray-400 hover:text-gray-600" @click="closeModals">✕</button>
+          <button class="text-gray-400 hover:text-gray-600" @click="closeModals"><XMarkIcon class="w-5 h-5" /></button>
         </div>
         <form @submit.prevent="onSave" class="space-y-4">
           <div>
@@ -154,11 +153,11 @@ import { getEquipments, createEquipment, updateEquipment, deleteEquipment, getCo
 import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
-import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { PencilIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'EquipmentList',
-  components: { Pagination, ConfirmDialog, SearchDropdown, PencilIcon, TrashIcon },
+  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, SearchDropdown, TrashIcon, XMarkIcon },
   data() {
     return {
       equipments: [],

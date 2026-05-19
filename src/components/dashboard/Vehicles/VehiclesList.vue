@@ -1,15 +1,14 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
-    <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('vehicles.title') }}</h2>
-  </div>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <h2 class="text-2xl font-semibold text-gray-800">{{ $t('vehicles.title') }}</h2>
       <div></div>
       <div>
         <button
           @click="openCreateModal"
-          class="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-green-700"
+          class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 flex items-center gap-2 shadow-sm shadow-indigo-200"
         >
+          <PlusIcon class="w-5 h-5" />
           {{ $t('vehicles.createVehicle') }}
         </button>
       </div>
@@ -20,9 +19,9 @@
     </div> -->
 
     <!-- Table view -->
-    <div class="overflow-x-auto bg-white rounded border">
+    <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <table class="min-w-full text-sm">
-        <thead class="bg-indigo-50">
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
             <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
@@ -35,7 +34,7 @@
         </thead>
         <tbody>
           <tr v-for="v in vehicles" :key="v.id"
-              class="border-t hover:bg-gray-50"
+              class="border-t hover:bg-indigo-50/40"
               @contextmenu.prevent="onRowContextMenu($event, v)"
           >
             <!-- <td class="px-3 py-3 text-gray-700">{{ v.id }}</td> -->
@@ -47,25 +46,22 @@
             <!-- driver cell removed -->
             <td class="px-3 py-3 flex gap-2">
               <button
-                class="px-3 py-1.5 text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700"
+                class="px-3 py-1.5 text-sm rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 inline-flex items-center gap-1.5 shadow-sm shadow-indigo-200"
                 @click="openVehicleDetails(v)">
+                <ArrowsRightLeftIcon class="w-4 h-4" />
                 {{ $t('vehicles.changeOwner') }}
               </button>
               <button
-                class="p-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                class="p-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
                 @click="openEditModal(v)"
                 :title="$t('labels.edit') || 'Edit'">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
+                <PencilSquareIcon class="w-4 h-4" />
               </button>
               <button
-                class="p-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
+                class="p-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
                 @click="openDeleteConfirm(v)"
                 :title="$t('labels.delete') || 'Delete'">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
+                <TrashIcon class="w-4 h-4" />
               </button>
             </td>
           </tr>
@@ -83,7 +79,7 @@
     <div v-if="contextMenu && contextMenu.visible"
          ref="contextMenuRef"
          :style="{ position: 'absolute', top: contextMenu.y + 'px', left: contextMenu.x + 'px' }"
-         class="w-56 bg-white border rounded shadow-lg z-50 text-sm">
+         class="w-56 bg-white border border-slate-200 rounded-xl shadow-lg z-50 text-sm">
       <ul class="py-1">
         <li>
           <button
@@ -113,10 +109,10 @@
     <!-- Create Vehicle Modal -->
     <div v-if="showCreateModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
       <div class="relative w-full max-w-sm sm:max-w-2xl lg:max-w-3xl z-50 mx-auto">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
           <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b">
             <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
-            <button class="text-gray-500 hover:text-gray-700" @click="closeCreateModal">✕</button>
+            <button class="text-gray-500 hover:text-gray-700" @click="closeCreateModal"><XMarkIcon class="w-5 h-5" /></button>
           </div>
           <div class="p-4 sm:p-6 overflow-y-auto">
             <CreateVehicle :mode="mode" @created="onCreatedFromModal" />
@@ -127,10 +123,10 @@
 
     <!-- Edit Vehicle Modal -->
     <div v-if="editingVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-sm sm:max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm sm:max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.edit') || 'Edit' }} {{ editingVehicle.name }}</h3>
-          <button class="text-gray-400 hover:text-gray-600" @click="closeEditModal">✕</button>
+          <button class="text-gray-400 hover:text-gray-600" @click="closeEditModal"><XMarkIcon class="w-5 h-5" /></button>
         </div>
         <form @submit.prevent="onSaveEdit" class="grid grid-cols-1 sm:grid-cols-2 gap-4 space-y-4 sm:space-y-0">
           <div class="sm:col-span-2">
@@ -161,7 +157,7 @@
 
     <!-- Delete Confirmation Modal -->
     <div v-if="deleteConfirmVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-sm z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
         <p class="text-gray-700 mb-6">{{ $t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete' }} "{{ deleteConfirmVehicle.name }}"?</p>
         <div class="flex gap-2 justify-end">
@@ -189,7 +185,7 @@
       class="fixed inset-0 z-40 flex items-center justify-center"
     >
       <div class="fixed inset-0 bg-black bg-opacity-40" @click="closeVehicleDetails"></div>
-      <div class="relative bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden z-50">
+      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden z-50">
         <div class="flex items-center justify-between px-5 py-4 border-b">
           <div>
             <h3 class="text-lg font-semibold">
@@ -199,11 +195,8 @@
               {{ $t('vehicles.detailsSubtitle') }}
             </p>
           </div>
-          <button
-            class="text-gray-400 hover:text-gray-600"
-            @click="closeVehicleDetails"
-          >
-            ✕
+          <button class="text-gray-400 hover:text-gray-600" @click="closeVehicleDetails">
+            <XMarkIcon class="w-5 h-5" />
           </button>
         </div>
 
@@ -325,6 +318,7 @@ import {
 import CreateVehicle from './CreateVehicle.vue'
 import Pagination from '../../shared/Pagination.vue'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
+import { ArrowsRightLeftIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'VehiclesList',
@@ -332,7 +326,7 @@ export default {
     mode: { type: String, default: 'transport' }
   },
   emits: ["navigateReport", "navigateStatement"],
-  components: { CreateVehicle, Pagination, DateTimeField },
+  components: { ArrowsRightLeftIcon, CreateVehicle, DateTimeField, Pagination, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   data() {
     return {
       vehicles: [],

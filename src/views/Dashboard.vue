@@ -1,10 +1,10 @@
 <template>
   <div class="flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
-    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow-lg sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out" :class="headerGradient">
+    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70" :class="headerGradient">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile -->
-        <button @click="toggleSidebar" class="sm:hidden p-2 rounded-lg hover:bg-white/20 hover:scale-105 transition-all duration-200">
+        <button @click="toggleSidebar" class="sm:hidden p-2 rounded-lg hover:bg-white/12 hover:scale-105 transition-all duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
@@ -19,7 +19,7 @@
         <!-- Top menus (desktop) -->
         <nav class="hidden sm:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['rounded-lg px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white/30 shadow-lg' : 'hover:bg-white/15']">
+            :class="['rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white text-slate-900 shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200']">
             {{ $t('navbar.' + key) }}
           </button>
         </nav>
@@ -29,14 +29,14 @@
       <div class="flex shrink-0 items-center gap-2 sm:gap-3">
         <!-- Language Switcher -->
         <div
-          class="flex items-center gap-1 rounded-xl border border-white/30 bg-white/10 p-1 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl"
+          class="flex items-center gap-1 rounded-xl border border-white/10 bg-white/10 p-1 shadow-md shadow-slate-950/10 backdrop-blur-sm transition-all duration-300 hover:bg-white/14 hover:shadow-lg"
           role="group"
           aria-label="Language switcher"
         >
           <button
             @click="switchLang('en')"
             :class="langBtnClass('en')"
-            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-1 focus-visible:ring-offset-indigo-700"
+            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
             aria-label="Switch to English"
           >
             <img src="/flags/us.png" alt="English" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
@@ -44,7 +44,7 @@
           <button
             @click="switchLang('ar')"
             :class="langBtnClass('ar')"
-            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-1 focus-visible:ring-offset-indigo-700"
+            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
             aria-label="التبديل إلى العربية"
           >
             <img src="/flags/eg.png" alt="العربية" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
@@ -54,12 +54,12 @@
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
           <button @click="toggleUserMenu"
-            class="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/30 hover:scale-105 shadow-md sm:h-10 sm:w-10 sm:text-lg">
+            class="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/16 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10 sm:text-lg">
             {{ userInitials }}
           </button>
           <!-- User Dropdown Menu -->
           <div v-if="userMenuOpen" class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100" :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
-            <div class="bg-white rounded-lg shadow-xl py-2 min-w-[160px] border animate-fade-in">
+            <div class="min-w-[160px] animate-fade-in rounded-xl border border-slate-200 bg-white py-2 shadow-xl shadow-slate-200/60">
               <button @click="goToProfile(); userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@
               {{ $t('appName') }}
             </div>
           </div>
-          <button v-if="!isMobile" @click="toggleCollapsed" class="rounded-lg p-2 sm:p-3 hover:bg-indigo-200 hover:scale-105 transition-all duration-200">
+          <button v-if="!isMobile" @click="toggleCollapsed" class="rounded-lg p-2 sm:p-3 hover:bg-indigo-100 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
             <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
@@ -117,7 +117,7 @@
             </div>
             <div class="truncate font-semibold text-base">{{ $t('appName') }}</div>
           </div>
-          <button @click="toggleSidebar" class="p-2 rounded-lg hover:bg-indigo-200 hover:scale-105 transition-all duration-200">
+          <button @click="toggleSidebar" class="p-2 rounded-lg hover:bg-indigo-100 hover:scale-105 transition-all duration-200">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -127,7 +127,7 @@
         <!-- Mobile Top Menu -->
         <div v-if="isMobile" class="mb-4 space-y-1 sm:hidden">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100']">
+            :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700']">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
@@ -136,7 +136,7 @@
         <ul class="space-y-1">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.routeName)"
-              :class="['flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100') : (currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100'), effectiveCollapsed ? 'justify-center px-3' : '']">
+              :class="['flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700') : (currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700'), effectiveCollapsed ? 'justify-center px-3' : '']">
               <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName)"></div>
               <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">
                 {{ $t(item.label) }}
@@ -148,7 +148,7 @@
             <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4 m:px-4 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
             <ul class=" space-y-1 ">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button @click="openReport(r.id)" :class="['flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-indigo-100', effectiveCollapsed ? 'justify-center px-3' : '']">
+                <button @click="openReport(r.id)" :class="['flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700', effectiveCollapsed ? 'justify-center px-3' : '']">
                   <div class="w-5 h-5 text-indigo-600">
                     <svg :class="['w-5 h-5', isDynamicReportActive(r) ? 'text-white' : 'text-indigo-600']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                   </div>
@@ -166,7 +166,7 @@
       <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300" @click="toggleSidebar"></div>
 
       <!-- Main Content -->
-      <main class="dashboard-module-content app-scrollbar flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-4 lg:p-6">
+      <main class="dashboard-module-content app-scrollbar flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 via-indigo-50/40 to-slate-50 p-3 sm:p-4 lg:p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
         <transition name="fade" mode="out-in">
           <router-view @navigate-report="navigateToReport"
@@ -258,7 +258,7 @@ export default {
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
     effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
-    headerGradient() { return 'bg-gradient-to-r from-indigo-800 via-indigo-700 to-indigo-600' },
+    headerGradient() { return 'bg-gradient-to-r from-indigo-700 via-indigo-700 to-indigo-900' },
     userInitials() {
       if (!this.user || !this.user.name) return '??'
       const names = this.user.name.trim().split(' ')
@@ -268,11 +268,11 @@ export default {
     },
     langBtnClass() {
       return (lang) => this.$i18n.locale === lang
-        ? 'bg-white/25 ring-2 ring-white/90 scale-105'
-        : 'opacity-75 hover:opacity-100 hover:bg-white/15'
+        ? 'bg-white/90 ring-2 ring-sky-300 scale-105 shadow-sm'
+        : 'opacity-80 hover:opacity-100 hover:bg-white/10'
     },
     asideClasses() {
-      const base = 'app-scrollbar bg-indigo-50 p-3 sm:p-4 transition-all duration-300 z-40 flex flex-col overflow-y-auto'
+      const base = 'app-scrollbar border-r border-indigo-100/80 bg-white/90 backdrop-blur-sm p-3 sm:p-4 transition-all duration-300 z-40 flex flex-col overflow-y-auto shadow-sm'
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'
         const transform = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')

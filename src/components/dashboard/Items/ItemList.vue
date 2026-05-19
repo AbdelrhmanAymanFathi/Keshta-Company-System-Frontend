@@ -1,17 +1,18 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6">
-    <div class="flex items-center justify-between mb-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
+    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.items') || 'Items' }}</h2>
       <button @click="openCreateModal"
-        class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+        class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl hover:from-indigo-500 hover:to-sky-500 transition inline-flex items-center gap-2 shadow-sm shadow-indigo-200">
+        <PlusIcon class="w-5 h-5" />
         {{ $t('dashboard.newItem') || 'Add Item' }} +
       </button>
     </div>
 
     <!-- Table -->
-    <div class="overflow-auto bg-white rounded shadow">
+    <div class="overflow-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-indigo-50">
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th
               class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
@@ -49,7 +50,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-gray-50"
+          <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-indigo-50/40"
             @contextmenu.prevent="openContextMenu($event, item)">
             <td
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
@@ -78,11 +79,11 @@
             <td
               class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start flex gap-2">
               <button @click="editItem(item)"
-                class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-sm">
+                class="px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm">
                 <PencilIcon class="w-5 h-5" />
               </button>
               <button @click="confirmDelete(item)"
-                class="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 text-sm">
+                class="px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 text-sm">
                 <TrashIcon class="w-5 h-5" />
               </button>
             </td>
@@ -114,7 +115,7 @@
     <teleport to="body">
       <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 z-10">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6 z-10">
           <h3 class="text-lg font-semibold mb-4">
             {{ editingItem ? ($t('labels.edit') + ' ' + $t('labels.item')) : ($t('labels.new') + ' ' + $t('labels.item'))
             }}
@@ -217,7 +218,7 @@
     <!-- Context Menu -->
     <div v-if="contextMenu.visible" class="fixed inset-0 z-40" @click="contextMenu.visible = false"></div>
     <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
-      class="fixed bg-white border border-gray-200 rounded shadow-lg z-50 py-1 min-w-[150px]" @click.stop>
+      class="fixed bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 min-w-[150px]" @click.stop>
       <button @click="() => { editItem(contextMenu.item); contextMenu.visible = false }"
         class="w-full px-4 py-2 text-left text-sm hover:bg-blue-50 text-gray-700 flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,12 +250,12 @@ import normalizeItem from '@/utils/normalizeItem'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
-import { TrashIcon, PencilIcon } from '@heroicons/vue/24/outline'
+import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 export default {
   name: 'ItemList',
   emits: ['saved'],
-  components: { Pagination, ConfirmDialog, Toast, TrashIcon, PencilIcon },
+  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, Toast, TrashIcon },
   props: {
     mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'extracts' | 'all'
   },
