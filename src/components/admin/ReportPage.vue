@@ -1,76 +1,103 @@
 <!-- eslint-disable no-useless-escape -->
 <template>
-  <div class="p-6 overflow-visible">
-    <div class="flex items-center justify-between mb-4">
-      <div>
-        <h2 class="text-2xl font-semibold">
-          {{ (report && (locale === 'ar' ? (report.arTitle || report.title) : report.title)) || $t('admin.runReport') }}
-        </h2>
-        <p class="text-sm text-gray-600">{{ (report && report.description) || '' }}</p>
+  <div
+    class="report-page min-h-full p-4 sm:p-6 lg:p-8 overflow-visible"
+    :dir="isRTL ? 'rtl' : 'ltr'"
+    :class="{ 'direction-rtl': isRTL }"
+  >
+    <header class="relative mb-6 overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-5 py-6 sm:px-8 sm:py-7 shadow-xl shadow-indigo-950/20">
+      <div
+        class="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
+        aria-hidden="true"
+      />
+      <div
+        class="pointer-events-none absolute -bottom-20 -start-10 h-56 w-56 rounded-full bg-violet-500/15 blur-3xl"
+        aria-hidden="true"
+      />
+      <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div class="min-w-0 flex-1 space-y-2">
+          <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100 backdrop-blur-sm">
+            <ChartBarSquareIcon class="h-3.5 w-3.5 shrink-0" />
+            <span>{{ $t('admin.runReport') }}</span>
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            {{ reportTitle }}
+          </h1>
+          <p
+            v-if="report?.description"
+            class="max-w-2xl text-sm leading-relaxed text-slate-300"
+          >
+            {{ report.description }}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          <button
+            type="button"
+            @click="execute"
+            :disabled="executing"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-900/30 transition hover:from-emerald-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ArrowPathIcon v-if="executing" class="h-4 w-4 animate-spin" />
+            <MagnifyingGlassIcon v-else class="h-4 w-4" />
+            {{ $t('labels.search') }}
+          </button>
+          <button
+            type="button"
+            @click="clear"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+          >
+            <ArrowUturnLeftIcon class="h-4 w-4" />
+            {{ $t('labels.clear') }}
+          </button>
+        </div>
       </div>
+    </header>
 
-      <div class="flex items-center gap-2">
-        <button
-          @click="execute"
-          :disabled="executing"
-          class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-500 transition disabled:opacity-50"
-        >
-          {{ $t('labels.search') }}
-        </button>
-
-        <button
-          @click="clear"
-          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
-        >
-          {{ $t('labels.clear') }}
-        </button>
-
-        <button
-          @click="downloadCsv"
-          :disabled="!report || !hasExportableRows || !!exportingFormat"
-          class="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-400 transition disabled:opacity-50"
-        >
-          {{ exportingFormat === 'csv' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadCsv') || 'Download CSV') }}
-        </button>
-
-        <button
-          @click="downloadXlsx"
-          :disabled="!report || !hasExportableRows || !!exportingFormat"
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition disabled:opacity-50"
-        >
-          {{ exportingFormat === 'xlsx' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadExcel') || 'Download Excel') }}
-        </button>
-
-        <button
-          @click="downloadPdf"
-          :disabled="!report || !hasExportableRows || !!exportingFormat"
-          class="px-4 py-2 bg-rose-600 text-white rounded hover:bg-rose-500 transition disabled:opacity-50"
-        >
-          {{ exportingFormat === 'pdf' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadPdf') || 'Download PDF') }}
-        </button>
+    <Transition name="report-fade">
+      <div
+        v-if="exportError"
+        class="mb-5 flex items-start gap-3 rounded-2xl border border-red-200/80 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm"
+        role="alert"
+      >
+        <ExclamationCircleIcon class="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+        <span>{{ exportError }}</span>
       </div>
-    </div>
+    </Transition>
 
-    <p v-if="exportError" class="mb-4 text-sm text-red-600">
-      {{ exportError }}
-    </p>
-
-    <div class="relative z-30 bg-white rounded shadow p-4 mb-6 overflow-visible">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-visible">
+    <section
+      v-if="reportFilterFields.length"
+      class="relative z-30 mb-6 overflow-visible rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-lg shadow-slate-200/40 backdrop-blur-sm sm:p-6"
+    >
+      <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+          <FunnelIcon class="h-5 w-5" />
+        </div>
+        <div>
+          <h2 class="text-sm font-semibold text-slate-900">
+            {{ $t('admin.parameters') || $t('labels.filters') }}
+          </h2>
+          <p class="text-xs text-slate-500">
+            {{ locale === 'ar' ? 'حدّد المعايير ثم اضغط بحث' : 'Set criteria, then run search' }}
+          </p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 gap-5 overflow-visible md:grid-cols-2 xl:grid-cols-3">
         <div
           v-for="p in reportFilterFields"
           :key="p.name"
           class="relative overflow-visible"
           :class="activeDropdown === p.name ? 'z-[9999]' : 'z-0'"
         >
-          <label class="block text-sm font-medium mb-1">
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
             {{ (locale === 'ar' && p.arName) ? p.arName : (p.label || p.name) }}
           </label>
 
           <div v-if="!p.type || p.type === 'TEXT'">
             <input
               v-model="values[p.name]"
-              class="w-full border rounded px-3 py-2"
+              :class="inputClass"
+              :placeholder="$t('placeholders.search')"
             />
           </div>
 
@@ -78,22 +105,31 @@
             <input
               type="number"
               v-model.number="values[p.name]"
-              class="w-full border rounded px-3 py-2"
+              :class="inputClass"
             />
           </div>
 
           <div v-else-if="p.type === 'DATE'">
             <DateField
               v-model="values[p.name]"
-              class="w-full border rounded px-3 py-2"
+              :class="inputClass"
             />
           </div>
 
-          <div v-else-if="p.type === 'BOOLEAN'">
-            <input
-              type="checkbox"
-              v-model="values[p.name]"
-            />
+          <div
+            v-else-if="p.type === 'BOOLEAN'"
+            class="flex h-[42px] items-center"
+          >
+            <label class="group inline-flex cursor-pointer items-center gap-3">
+              <span class="relative">
+                <input type="checkbox" v-model="values[p.name]" class="peer sr-only" />
+                <span class="block h-6 w-11 rounded-full bg-slate-200 transition peer-checked:bg-indigo-600 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500/40" />
+                <span class="absolute start-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-5 rtl:peer-checked:-translate-x-5" />
+              </span>
+              <span class="text-sm text-slate-600 group-hover:text-slate-900">
+                {{ values[p.name] ? ($t('labels.active') || 'Yes') : ($t('labels.inactive') || 'No') }}
+              </span>
+            </label>
           </div>
 
           <div
@@ -102,34 +138,71 @@
             @focusin="activeDropdown = p.name"
             @mousedown="activeDropdown = p.name"
           >
+            <div
+              v-if="paramLoading[p.name]"
+              class="flex items-center gap-2 py-2 text-xs text-slate-500"
+            >
+              <ArrowPathIcon class="h-3.5 w-3.5 animate-spin text-indigo-500" />
+              {{ $t('reports.loadingOptions') || $t('labels.loading') }}
+            </div>
             <SearchDropdown
-              v-if="!paramDependencies[p.name] || (paramDependencies[p.name] && paramDependencies[p.name].every(dep => values[dep]))"
+              v-else-if="!paramDependencies[p.name] || (paramDependencies[p.name] && paramDependencies[p.name].every(dep => values[dep]))"
               :modelValue="selectedLabels[p.name] || ''"
               :items="paramOptions[p.name] || []"
               :allItems="paramOptions[p.name] || []"
               :placeholder="$t('placeholders.search')"
               itemKey="id"
               itemLabel="label"
-              :inputClass="'w-full border rounded px-3 py-2'"
+              :inputClass="inputClass"
               @update:modelValue="q => onOptionSearch(p.name, q)"
               @select="item => onSelectOptionGeneric(p, item)"
             />
 
             <div
               v-else
-              class="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 text-sm"
+              :class="[inputClass, 'flex items-center gap-2 bg-slate-100/80 text-slate-500']"
             >
+              <InformationCircleIcon class="h-4 w-4 shrink-0 text-amber-500" />
+              <span class="text-xs leading-snug">
               {{ locale === 'ar' ? 'يرجى اختيار ' : 'Please select ' }}{{ (paramDependencies[p.name] || []).map(dep => {
                 const depParam = reportFilterFields.find(pr => pr.name === dep)
                 return (locale === 'ar' && depParam?.arName) ? depParam.arName : (depParam?.label || dep)
               }).join(', ') }}{{ locale === 'ar' ? ' أولاً' : ' first' }}
+              </span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="relative z-10 bg-white rounded shadow p-4">
+    <section class="relative z-10 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <TableCellsIcon class="h-5 w-5 text-indigo-600" />
+          <span class="text-sm font-semibold text-slate-800">{{ locale === 'ar' ? 'النتائج' : 'Results' }}</span>
+          <span v-if="hasResults && !executing" class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
+            {{ dataRowCount }} {{ locale === 'ar' ? 'صف' : 'rows' }}
+          </span>
+          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+            {{ columns.length }} {{ locale === 'ar' ? 'عمود' : 'cols' }}
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" @click="downloadCsv" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--csv" :title="$t('reports.downloadCsv') || 'CSV'">
+            <DocumentTextIcon class="h-4 w-4" />
+            <span class="hidden sm:inline">{{ exportingFormat === 'csv' ? ($t('labels.loading') || '...') : 'CSV' }}</span>
+          </button>
+          <button type="button" @click="downloadXlsx" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--xlsx" :title="$t('reports.downloadExcel') || 'Excel'">
+            <TableCellsIcon class="h-4 w-4" />
+            <span class="hidden sm:inline">{{ exportingFormat === 'xlsx' ? ($t('labels.loading') || '...') : 'Excel' }}</span>
+          </button>
+          <button type="button" @click="downloadPdf" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--pdf" :title="$t('reports.downloadPdf') || 'PDF'">
+            <DocumentArrowDownIcon class="h-4 w-4" />
+            <span class="hidden sm:inline">{{ exportingFormat === 'pdf' ? ($t('labels.loading') || '...') : 'PDF' }}</span>
+          </button>
+        </div>
+      </div>
+      <div class="p-4 sm:p-6">
       <!-- <div
         v-if="reportSelectFields.length"
         class="mb-4 rounded border border-sky-200 bg-sky-50 p-3"
@@ -168,50 +241,62 @@
         </div>
       </div> -->
 
-      <div
-        v-if="executing"
-        class="py-12 flex justify-center"
-      >
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div v-if="executing" class="flex flex-col items-center justify-center gap-4 py-16">
+        <div class="relative h-12 w-12">
+          <div class="absolute inset-0 rounded-full border-4 border-indigo-100" />
+          <div class="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-indigo-600" />
+        </div>
+        <p class="text-sm font-medium text-slate-500">{{ $t('labels.loading') }}</p>
       </div>
 
-      <div v-else>
+      <div v-else class="overflow-hidden rounded-xl border border-slate-200/80">
         <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+          <table class="report-table min-w-full">
+            <thead>
               <tr>
                 <th
                   v-for="col in columns"
                   :key="col"
-                  class="px-4 py-2 text-start text-xs font-medium text-gray-500 uppercase"
+                  class="whitespace-nowrap px-4 py-3.5 text-start text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6"
                 >
                   {{ getHeaderLabel(col) }}
                 </th>
               </tr>
             </thead>
 
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody>
               <tr v-if="!(tableData && tableData.length)">
-                <td
-                  :colspan="(columns && columns.length) || 1"
-                  class="px-4 py-6 text-sm text-gray-500 text-center"
-                >
-                  {{ $t('reports.noResults') || 'No results' }}
+                <td :colspan="(columns && columns.length) || 1" class="px-6 py-16 text-center">
+                  <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                      <TableCellsIcon class="h-7 w-7" />
+                    </div>
+                    <p class="text-sm font-medium text-slate-600">
+                      {{ $t('reports.noResults') || 'No results' }}
+                    </p>
+                    <p class="text-xs text-slate-400">
+                      {{ locale === 'ar' ? 'اضبط الفلاتر واضغط بحث لعرض البيانات' : 'Adjust filters and run search to view data' }}
+                    </p>
+                  </div>
                 </td>
               </tr>
-
               <tr
                 v-for="(row, idx) in tableData"
                 :key="idx"
-                :class="isTotalsRow(row) ? 'bg-amber-50 font-semibold' : ''"
+                :class="[
+                  'transition-colors',
+                  isTotalsRow(row)
+                    ? 'report-totals-row bg-gradient-to-r from-amber-50 to-orange-50 font-semibold'
+                    : 'hover:bg-indigo-50/40'
+                ]"
               >
                 <td
                   v-for="col in columns"
                   :key="col"
-                  class="px-4 py-2 text-sm"
-                  :class="isTotalsRow(row) ? 'border-t-2 border-amber-300 text-amber-950' : 'text-gray-700'"
+                  class="whitespace-nowrap px-4 py-3 text-sm sm:px-6"
+                  :class="isTotalsRow(row) ? 'border-t-2 border-amber-300/80 text-amber-950' : 'text-slate-700'"
                 >
-                  <div class="truncate max-w-[20rem]">
+                  <div class="max-w-[20rem] truncate" :title="getValue(row, col)">
                     {{ getValue(row, col) }}
                   </div>
                 </td>
@@ -220,7 +305,8 @@
           </table>
         </div>
       </div>
-    </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -238,9 +324,37 @@ import {
   splitFooterRow
 } from '@/utils/reportDefinitions'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
+import {
+  ArrowPathIcon,
+  ArrowUturnLeftIcon,
+  ChartBarSquareIcon,
+  DocumentArrowDownIcon,
+  DocumentTextIcon,
+  ExclamationCircleIcon,
+  FunnelIcon,
+  InformationCircleIcon,
+  MagnifyingGlassIcon,
+  TableCellsIcon
+} from '@heroicons/vue/24/outline'
+
+const INPUT_CLASS =
+  'w-full px-4 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 focus:bg-white transition-all duration-200'
 
 export default {
-  components: { SearchDropdown, DateField },
+  components: {
+    SearchDropdown,
+    DateField,
+    ArrowPathIcon,
+    ArrowUturnLeftIcon,
+    ChartBarSquareIcon,
+    DocumentArrowDownIcon,
+    DocumentTextIcon,
+    ExclamationCircleIcon,
+    FunnelIcon,
+    InformationCircleIcon,
+    MagnifyingGlassIcon,
+    TableCellsIcon
+  },
 
   props: {
     reportId: {
@@ -263,6 +377,16 @@ export default {
     const paramLoading = ref({})
     const selectedLabels = ref({})
     const activeDropdown = ref(null)
+
+    const isRTL = computed(() => locale.value === 'ar')
+    const inputClass = INPUT_CLASS
+
+    const reportTitle = computed(() => {
+      if (!report.value) return t('admin.runReport')
+      return locale.value === 'ar'
+        ? (report.value.arTitle || report.value.title || t('admin.runReport'))
+        : (report.value.title || report.value.arTitle || t('admin.runReport'))
+    })
 
     const reportSelectFields = computed(() => normalizeReportSelectFields(report.value || {}))
     const reportFilterFields = computed(() => normalizeReportFilterFields(report.value || {}))
@@ -349,6 +473,12 @@ export default {
 
     const hasExportableRows = computed(() => {
       return normalizedResultRows.value.some((row) => !isTotalsRow(row))
+    })
+
+    const hasResults = computed(() => normalizedResultRows.value.length > 0)
+
+    const dataRowCount = computed(() => {
+      return normalizedResultRows.value.filter((row) => !isTotalsRow(row)).length
     })
 
     const isTotalsRow = (row) => isDynamicReportTotalsRow(row)
@@ -716,6 +846,7 @@ export default {
 
     return {
       report,
+      reportTitle,
       reportSelectFields,
       reportFilterFields,
       values,
@@ -725,6 +856,7 @@ export default {
       exportingFormat,
       exportError,
       paramOptions,
+      paramLoading,
       paramDependencies,
       selectedLabels,
       activeDropdown,
@@ -734,9 +866,13 @@ export default {
       columns,
       effectiveTotalsColumns,
       isTotalsRow,
+      isRTL,
       locale,
+      inputClass,
       tableData,
       hasExportableRows,
+      hasResults,
+      dataRowCount,
       getValue,
       getHeaderLabel,
       downloadCsv,
@@ -746,3 +882,49 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.report-page {
+  background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 45%, #f5f3ff 100%);
+  min-height: 100%;
+}
+
+.report-fade-enter-active,
+.report-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.report-fade-enter-from,
+.report-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.report-export-btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+.report-export-btn--csv {
+  @apply border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 focus:ring-amber-400;
+}
+
+.report-export-btn--xlsx {
+  @apply border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 focus:ring-emerald-400;
+}
+
+.report-export-btn--pdf {
+  @apply border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100 focus:ring-rose-400;
+}
+
+.report-table thead {
+  @apply bg-gradient-to-r from-slate-50 to-indigo-50/80;
+}
+
+.report-table tbody tr + tr td {
+  @apply border-t border-slate-100;
+}
+
+.report-totals-row td:first-child {
+  @apply font-bold;
+}
+</style>
