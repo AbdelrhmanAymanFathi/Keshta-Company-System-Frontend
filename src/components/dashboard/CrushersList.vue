@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
 
     <!-- Header -->
-    <div class="flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"

@@ -1,13 +1,24 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
-    <div class="flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-gray-800">{{ $t('equipment.title') || 'Equipment' }}</h2>
-      <div class="flex gap-2 items-center">
-        <input v-model="q" @keyup.enter="search" type="search" :placeholder="$t('equipment.searchPlaceholder')" class="border rounded px-3 py-2 text-sm" />
-        <button @click="clearSearch" class="px-3 py-2 rounded border">{{ $t('labels.clear') || 'Clear' }}</button>
-      </div>
       <div>
         <button @click="openCreateModal" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 inline-flex items-center gap-2 shadow-sm shadow-indigo-200"><PlusIcon class="w-5 h-5" />{{ $t('equipment.add') || 'Add Equipment' }}</button>
+      </div>
+    </div>
+
+    <div class="max-w-md rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg shadow-slate-200/30">
+      <div class="flex items-center gap-2">
+        <input
+          v-model="q"
+          @keyup.enter="search"
+          type="search"
+          :placeholder="$t('equipment.searchPlaceholder')"
+          class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+        />
+        <button @click="clearSearch" class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+          {{ $t('labels.clear') || 'Clear' }}
+        </button>
       </div>
     </div>
 
@@ -40,7 +51,7 @@
               <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
                 <button
                   type="button"
-                  class="p-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition"
+                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-md"
                   :title="$t('labels.edit') || 'Edit'"
                   :aria-label="$t('labels.edit') || 'Edit'"
                   @click.stop="openEditModal(e)"
@@ -49,7 +60,7 @@
                 </button>
                 <button
                   type="button"
-                  class="p-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition"
+                  class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md"
                   :title="$t('labels.delete') || 'Delete'"
                   :aria-label="$t('labels.delete') || 'Delete'"
                   @click.stop="openDeleteConfirm(e)"

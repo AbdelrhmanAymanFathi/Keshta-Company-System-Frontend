@@ -93,9 +93,11 @@
               <img src="../../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover">
             </div> -->
             <!-- App name visible only when expanded -->
-            <div v-if="!effectiveCollapsed" class="font-semibold text-base lg:text-lg">
-              {{ $t('appName') }}
-            </div>
+            <transition name="sidebar-label">
+              <div v-if="!effectiveCollapsed" class="font-semibold text-base lg:text-lg">
+                {{ $t('appName') }}
+              </div>
+            </transition>
           </div>
           <button v-if="!isMobile" @click="toggleCollapsed" class="rounded-lg p-2 sm:p-3 hover:bg-indigo-100 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
@@ -136,23 +138,37 @@
         <ul class="space-y-1">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.routeName)"
-              :class="['flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700') : (currentRouteName === item.routeName ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700'), effectiveCollapsed ? 'justify-center px-3' : '']">
-              <div class="w-5 h-5 flex-shrink-0" v-html="menuIcon(item.name, item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName)"></div>
-              <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">
-                {{ $t(item.label) }}
-              </span>
+              :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700') : (currentRouteName === item.routeName ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+              <div
+                class="sidebar-link-icon flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
+                :class="(item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName) ? 'bg-white/15 text-white scale-110' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 group-hover:text-indigo-700'"
+              >
+                <component :is="menuIconComponent(item.name)" class="h-5 w-5" />
+              </div>
+              <transition name="sidebar-label">
+                <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">
+                  {{ $t(item.label) }}
+                </span>
+              </transition>
             </button>
           </li>
           <!-- Transport module: show dynamic reports inline under the transport menu -->
           <li v-if="reportsForModule && reportsForModule.length">
-            <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4 m:px-4 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
-            <ul class=" space-y-1 ">
+            <transition name="sidebar-label">
+              <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
+            </transition>
+            <ul class=" space-y-2 ">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button @click="openReport(r.id)" :class="['flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-105 hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700', effectiveCollapsed ? 'justify-center px-3' : '']">
-                  <div class="w-5 h-5 text-indigo-600">
-                    <svg :class="['w-5 h-5', isDynamicReportActive(r) ? 'text-white' : 'text-indigo-600']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <button @click="openReport(r.id)" :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+                  <div
+                    class="sidebar-link-icon flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200"
+                    :class="isDynamicReportActive(r) ? 'bg-white/15 text-white scale-110' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 group-hover:text-indigo-700'"
+                  >
+                    <DocumentTextIcon class="h-5 w-6" />
                   </div>
-                  <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
+                  <transition name="sidebar-label">
+                    <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
+                  </transition>
                 </button>
               </li>
             </ul>
@@ -185,10 +201,27 @@ import AuthLogout from '@/components/auth/Logout.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { getReportDefs } from '@/api'
+import {
+  ArchiveBoxIcon,
+  BanknotesIcon,
+  BuildingOffice2Icon,
+  ChartBarIcon,
+  ClipboardDocumentListIcon,
+  ClockIcon,
+  DocumentTextIcon,
+  IdentificationIcon,
+  MapPinIcon,
+  Squares2X2Icon,
+  TruckIcon,
+  UserGroupIcon,
+  UsersIcon,
+  WalletIcon,
+  WrenchScrewdriverIcon
+} from '@heroicons/vue/24/outline'
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout },
+  components: { AuthLogout, DocumentTextIcon },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
@@ -447,27 +480,26 @@ export default {
       document.documentElement.lang = lang
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
     },
-    menuIcon(name, isActive) {
-      const color = isActive ? 'text-white' : 'text-indigo-600'
-      const svg = (path) => `<svg class="${color} w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">${path}</svg>`
+    menuIconComponent(name) {
       const iconTypes = {
-        records: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>'),
-        contractors: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>'),
-        crushers: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>'),
-        items: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>'),
-        vehicles: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-8-4h8M3 8h18M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>'),
-        statement: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>'),
-        drivers: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>'),
-        equipment: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>'),    extract: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>'),        wallet: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/>'),
-        money: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'),
-        users: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>'),
-        locations: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>'),
-        reports: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 5a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V9l-6-6H7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3v6h6"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6M9 17h3M9 9h3"/>'),
-        add: svg('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>'),
-        default: svg('<circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v8m-4-4h8" stroke-width="2"/>')
+        records: ClipboardDocumentListIcon,
+        contractors: UsersIcon,
+        crushers: BuildingOffice2Icon,
+        items: Squares2X2Icon,
+        vehicles: TruckIcon,
+        statement: DocumentTextIcon,
+        drivers: IdentificationIcon,
+        equipment: WrenchScrewdriverIcon,
+        extract: ArchiveBoxIcon,
+        wallet: WalletIcon,
+        money: BanknotesIcon,
+        users: UserGroupIcon,
+        locations: MapPinIcon,
+        reports: ChartBarIcon,
+        changes: ClockIcon,
+        default: ClipboardDocumentListIcon
       }
       const aliases = {
-        newSupply: 'add',
         suppliesList: 'records',
         transportList: 'records',
         extractsList: 'records',
@@ -490,7 +522,7 @@ export default {
         companyTransactions: 'wallet',
         expensesList: 'money',
         expensesReport: 'reports',
-        changesByDate: 'reports',
+        changesByDate: 'changes',
         reportsList: 'reports',
         usersList: 'users',
         locations: 'locations'
@@ -544,6 +576,115 @@ export default {
 <style scoped>
 .direction-rtl {
   direction: rtl;
+}
+
+.sidebar-link {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sidebar-link-collapsed {
+  width: 3rem;
+  min-width: 3rem;
+  height: 3rem;
+  min-height: 3rem;
+  border-radius: 1rem;
+}
+
+.sidebar-link-collapsed:not(.sidebar-link-active) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.sidebar-link-collapsed:not(.sidebar-link-active):hover {
+  background: rgb(238 242 255 / 0.8);
+}
+
+.sidebar-link-collapsed .sidebar-link-icon {
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.sidebar-link-collapsed:not(.sidebar-link-active) .sidebar-link-icon {
+  background: transparent !important;
+  color: rgb(99 102 241) !important;
+}
+
+.sidebar-link-collapsed:not(.sidebar-link-active):hover .sidebar-link-icon {
+  background: rgb(224 231 255 / 0.7) !important;
+  color: rgb(67 56 202) !important;
+}
+
+.sidebar-link::before {
+  content: '';
+  position: absolute;
+  inset-block: 0.5rem;
+  inset-inline-start: 0.2rem;
+  width: 0.22rem;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.92);
+  opacity: 0;
+  transform: scaleY(0.35);
+  transform-origin: center;
+  z-index: 0;
+}
+
+.sidebar-link-active {
+  animation: sidebar-active-glow 2.2s ease-in-out infinite;
+}
+
+.sidebar-link-active::before {
+  opacity: 1;
+  animation: sidebar-active-indicator 1.45s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.sidebar-label-enter-active,
+.sidebar-label-leave-active {
+  transition: opacity 180ms ease, transform 220ms ease, max-width 220ms ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar-label-enter-from,
+.sidebar-label-leave-to {
+  opacity: 0;
+  transform: translateX(-8px);
+  max-width: 0;
+}
+
+.direction-rtl .sidebar-label-enter-from,
+.direction-rtl .sidebar-label-leave-to {
+  transform: translateX(8px);
+}
+
+.sidebar-label-enter-to,
+.sidebar-label-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+  max-width: 14rem;
+}
+
+.sidebar-link-collapsed.sidebar-link-active {
+  border-radius: 1rem;
+  animation: none;
+}
+
+.sidebar-link-collapsed.sidebar-link-active::before {
+  display: none;
+  inset-block: 0.55rem;
+  inset-inline-start: 0.16rem;
+  width: 0.18rem;
+  animation: none;
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.sidebar-link-collapsed.sidebar-link-active .sidebar-link-icon {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: rgb(255 255 255) !important;
+  transform: none !important;
 }
 
 /* Sidebar transition */
@@ -611,5 +752,24 @@ aside {
 
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
+}
+
+@keyframes sidebar-active-glow {
+  0%,
+  100% {
+    box-shadow: 0 8px 18px rgb(99 102 241 / 0.18);
+  }
+  50% {
+    box-shadow: 0 12px 26px rgb(99 102 241 / 0.3);
+  }
+}
+
+@keyframes sidebar-active-indicator {
+  0% {
+    transform: scaleY(0.45) translateY(-0.1rem);
+  }
+  100% {
+    transform: scaleY(1) translateY(0.1rem);
+  }
 }
 </style>

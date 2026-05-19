@@ -1,9 +1,9 @@
 <template>
   <div class="p-6" :dir="isRTL ? 'rtl' : 'ltr'" :class="{ 'direction-rtl': isRTL }">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold">{{ $t('admin.reports') }}</h2>
+    <div class="app-page-header mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <h2 class="text-xl font-bold text-slate-900">{{ $t('admin.reports') }}</h2>
       <div class="flex gap-2">
-        <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition">
+        <router-link :to="{ name: 'admin-reports-from-table' }" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700">
           <span>{{ $t('admin.newReport') }}</span>
         </router-link>
         <!-- <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition">
@@ -12,9 +12,9 @@
       </div>
     </div>
 
-    <div class="bg-white rounded shadow p-4">
+    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <table class="w-full table-auto">
-        <thead>
+        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnKey') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
@@ -25,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in reports" :key="r.id">
+          <tr v-for="r in reports" :key="r.id" class="border-t border-slate-200 hover:bg-indigo-50/40">
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.key }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ (locale.value !== 'en' && r.arTitle) ? r.arTitle : r.title }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.module }}</td>
@@ -44,14 +44,29 @@
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.active ? $t('labels.active') : $t('labels.inactive') }}</td>
             <td :class="isRTL ? 'text-left p-2' : 'text-right p-2'">
               <div :class="isRTL ? 'flex items-center justify-start gap-2' : 'flex items-center justify-end gap-2'">
-                <router-link :to="{ name: 'admin-reports-run', params: { id: r.id } }" class="px-2 py-1 bg-indigo-600 text-white rounded inline-flex items-center gap-2 hover:bg-indigo-500 transition">
-                  <span> {{ $t('admin.run') }}</span>
+                <router-link
+                  :to="{ name: 'admin-reports-run', params: { id: r.id } }"
+                  :title="$t('admin.run')"
+                  :aria-label="$t('admin.run')"
+                  class="inline-flex items-center rounded-lg bg-indigo-600 p-2 text-white transition hover:bg-indigo-700"
+                >
+                  <PlayIcon class="h-4 w-4" />
                 </router-link>
-                <router-link :to="{ name: 'admin-reports-from-table', params: { id: r.id } }" class="px-2 py-1 bg-amber-500 text-white rounded inline-flex items-center gap-2 hover:bg-amber-400 transition">
-                  <span>{{ $t('labels.edit') }}</span>
+                <router-link
+                  :to="{ name: 'admin-reports-from-table', params: { id: r.id } }"
+                  :title="$t('labels.edit')"
+                  :aria-label="$t('labels.edit')"
+                  class="inline-flex items-center rounded-lg bg-slate-700 p-2 text-white transition hover:bg-slate-800"
+                >
+                  <PencilSquareIcon class="h-4 w-4" />
                 </router-link>
-                <button @click="remove(r.id)" class="px-2 py-1 bg-red-600 text-white rounded inline-flex items-center gap-2 hover:bg-red-500 transition">
-                  <span>{{ $t('labels.delete') }}</span>
+                <button
+                  @click="remove(r.id)"
+                  :title="$t('labels.delete')"
+                  :aria-label="$t('labels.delete')"
+                  class="inline-flex items-center rounded-lg bg-red-600 p-2 text-white transition hover:bg-red-700"
+                >
+                  <TrashIcon class="h-4 w-4" />
                 </button>
               </div>
             </td>
@@ -66,10 +81,16 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { PencilSquareIcon, PlayIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { getReportDefs, deleteReportDef } from '@/api'
 import { normalizeReportTotals } from '@/utils/reportDefinitions'
 
 export default {
+  components: {
+    PencilSquareIcon,
+    PlayIcon,
+    TrashIcon
+  },
   setup() {
     const { locale, t } = useI18n()
     const isRTL = computed(() => locale.value === 'ar')

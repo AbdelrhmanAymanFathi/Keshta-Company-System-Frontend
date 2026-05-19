@@ -1,13 +1,13 @@
 <template>
-  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
     <div
-      class="bg-white rounded shadow w-11/12 max-w-3xl p-4 flex flex-col max-h-[80vh]"
+      class="flex max-h-[80vh] w-11/12 max-w-3xl flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-xl"
     >
       <div class="flex justify-between items-center mb-4 flex-none">
         <h3 class="font-bold">{{ $t("admin.runReport") }}</h3>
         <button
           @click="$emit('close')"
-          class="p-2 rounded hover:bg-gray-100 transition"
+          class="rounded-xl p-2 transition hover:bg-slate-100"
           aria-label="Close"
         >
           <svg
@@ -40,7 +40,7 @@
                 <div v-if="!p.type || p.type === 'TEXT'">
                   <input
                     v-model="values[p.name]"
-                    class="w-full border rounded px-3 py-2 focus:ring-1 focus:ring-indigo-300"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300"
                   />
                 </div>
                 
@@ -48,14 +48,14 @@
                   <input
                     type="number"
                     v-model.number="values[p.name]"
-                    class="w-full border rounded px-3 py-2 focus:ring-1 focus:ring-indigo-300"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300"
                   />
                 </div>
 
                 <div v-else-if="p.type === 'DATE'">
                   <DateField
                     v-model="values[p.name]"
-                    class="w-full border rounded px-3 py-2 focus:ring-1 focus:ring-indigo-300"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300"
                   />
                 </div>
 
@@ -81,7 +81,7 @@
                     :placeholder="$t('placeholders.search')"
                     itemKey="id"
                     itemLabel="label"
-                    :inputClass="'w-full border rounded px-3 py-2 focus:ring-1 focus:ring-indigo-300'"
+                    :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300'"
                     @update:modelValue="(q) => onOptionSearch(p.name, q)"
                     @select="(item) => onSelectOption(p.name, item)"
                   />
@@ -104,7 +104,7 @@
                     :placeholder="$t('placeholders.search')"
                     itemKey="id"
                     itemLabel="label"
-                    :inputClass="'w-full border rounded px-3 py-2 focus:ring-1 focus:ring-indigo-300'"
+                    :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300'"
                     @update:modelValue="(q) => onOptionSearch(p.name, q)"
                     @select="(item) => onSelectMulti(p.name, item)"
                   />
@@ -112,7 +112,7 @@
                     <span
                       v-for="it in values[p.name] || []"
                       :key="it.id"
-                      class="bg-gray-200 px-2 py-1 rounded-full text-sm flex items-center gap-2"
+                      class="flex items-center gap-2 rounded-full bg-slate-100 px-2 py-1 text-sm text-slate-700"
                     >
                       <span>{{ it.label }}</span>
                       <button
@@ -129,28 +129,28 @@
                 <button
                   @click="execute"
                   :disabled="executing"
-                  class="px-4 py-2 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition"
+                  class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white transition hover:bg-indigo-700"
                 >
                   <span>{{ executing ? ($t('labels.loading') || 'Loading...') : $t("admin.run") }}</span>
                 </button>
                 <button
                   @click="downloadCsv"
                   :disabled="!report || !hasExportableRows || !!exportingFormat"
-                  class="px-4 py-2 bg-amber-500 text-white rounded flex items-center gap-2 hover:bg-amber-400 transition disabled:opacity-50"
+                  class="flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-2 text-white transition hover:bg-slate-800 disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'csv' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadCsv') || 'Download CSV') }}</span>
                 </button>
                 <button
                   @click="downloadXlsx"
                   :disabled="!report || !hasExportableRows || !!exportingFormat"
-                  class="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition disabled:opacity-50"
+                  class="flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-white transition hover:bg-sky-700 disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'xlsx' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadExcel') || 'Download Excel') }}</span>
                 </button>
                 <button
                   @click="downloadPdf"
                   :disabled="!report || !hasExportableRows || !!exportingFormat"
-                  class="px-4 py-2 bg-rose-600 text-white rounded flex items-center gap-2 hover:bg-rose-500 transition disabled:opacity-50"
+                  class="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'pdf' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadPdf') || 'Download PDF') }}</span>
                 </button>
@@ -162,7 +162,7 @@
               <div class="mt-4 flex items-center justify-between">
                 <h5 class="font-semibold">{{ $t("labels.results") }}</h5>
               </div>
-              <pre dir="ltr" class="text-xs bg-gray-100 p-2 rounded max-h-64 overflow-auto text-left" style="direction:ltr; unicode-bidi:embed;">{{ JSON.stringify(result, null, 2) }}</pre>
+              <pre dir="ltr" class="max-h-64 overflow-auto rounded-xl bg-slate-100 p-3 text-left text-xs" style="direction:ltr; unicode-bidi:embed;">{{ JSON.stringify(result, null, 2) }}</pre>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@
     <div class="space-y-6">
     <!-- Header with Search, Filter and Add Button -->
     <div class="flex flex-col gap-4">
-      <div class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <div class="app-page-header flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
         <div class="flex-1 w-full sm:w-auto">
           <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('equipmentLog.list') }}</h2>
           <!-- Search bar removed -->

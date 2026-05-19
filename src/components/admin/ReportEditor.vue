@@ -1,19 +1,21 @@
 <template>
-  <div class="relative z-20 p-6 max-w-4xl mx-auto">
-    <h2 class="text-xl font-bold mb-4">{{ isNew ? $t('admin.createReport') : $t('admin.editReport') }}</h2>
-    <div class="relative z-20 bg-white rounded shadow p-4 overflow-visible">
+  <div class="relative z-20 mx-auto max-w-4xl p-6">
+    <div class="app-page-header mb-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <h2 class="text-xl font-bold text-slate-900">{{ isNew ? $t('admin.createReport') : $t('admin.editReport') }}</h2>
+    </div>
+    <div class="relative z-20 overflow-visible rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="grid grid-cols-2 gap-4 overflow-visible">
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnKey') }}</label>
-          <input v-model="form.key" class="w-full border rounded px-2 py-1" />
+          <input v-model="form.key" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
         </div>
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnTitle') }}</label>
-          <input v-model="form.title" class="w-full border rounded px-2 py-1" />
+          <input v-model="form.title" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
         </div>
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnArTitle') || 'Arabic Title' }}</label>
-          <input v-model="form.arTitle" class="w-full border rounded px-2 py-1" />
+          <input v-model="form.arTitle" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
         </div>
         <div class="relative z-50 overflow-visible">
           <label class="block text-sm font-medium">{{ $t('reports.columnModule') }}</label>
@@ -26,7 +28,7 @@
               itemKey="id"
               itemLabel="label"
               :placeholder="$t('placeholders.search')"
-              :inputClass="'w-full border rounded px-2 py-1'"
+              :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2'"
               @update:modelValue="val => selectedModuleLabel = val"
               @select="onSelectModule"
             />
@@ -34,20 +36,20 @@
         </div>
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnActive') }}</label>
-          <input type="checkbox" v-model="form.active" />
+          <input type="checkbox" v-model="form.active" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
         </div>
         <div class="col-span-2">
           <label class="block text-sm font-medium">{{ $t('reports.description') }}</label>
-          <textarea v-model="form.description" class="w-full border rounded px-2 py-1" rows="3"></textarea>
+          <textarea v-model="form.description" class="w-full rounded-xl border border-slate-200 px-3 py-2" rows="3"></textarea>
         </div>
         <div class="col-span-2">
           <label class="block text-sm font-medium">{{ $t('reports.queryText') }}</label>
-          <textarea v-model="form.queryText" class="w-full border rounded px-2 py-1 text-left font-mono text-sm" rows="8" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;"></textarea>
+          <textarea v-model="form.queryText" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left font-mono text-sm" rows="8" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;"></textarea>
           <p class="text-xs text-gray-500 mt-1">{{ $t('reports.queryHelp') }}</p>
         </div>
       </div>
 
-      <div class="mt-4 rounded border border-sky-200 bg-sky-50 p-3">
+      <div class="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4">
         <div class="text-sm font-medium text-sky-900">{{ $t('reports.selectFields') || 'Output fields' }}</div>
         <div class="text-xs text-sky-800 mt-1">
           {{ $t('reports.selectFieldsHelp') || 'Choose which fields appear in the result table and exports.' }}
@@ -56,7 +58,7 @@
           <label
             v-for="field in form.params"
             :key="`select-field-${field.name}`"
-            class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm border border-sky-100"
+            class="flex items-center gap-2 rounded-xl border border-indigo-100 bg-white px-3 py-2 text-sm"
           >
             <input type="checkbox" :value="field.name" v-model="form.selectFieldNames" />
             <span>{{ field.label || field.name }}</span>
@@ -65,10 +67,10 @@
       </div>
 
       <div class="mt-4 flex justify-end gap-2">
-          <router-link to="/dashboard/admin/reports" class="px-3 py-2 border rounded flex items-center gap-2 hover:bg-gray-50 transition">
+          <router-link to="/dashboard/admin/reports" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </router-link>
-          <button @click="save" class="px-4 py-2 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition">
+          <button @click="save" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white transition hover:bg-indigo-700">
             <span>{{ $t('labels.save') }}</span>
           </button>
         </div>
@@ -77,11 +79,11 @@
 
   <div class="relative z-10 max-w-4xl mx-auto mt-6">
     <h3 class="font-semibold mb-2">{{ $t('admin.parameters') }}</h3>
-    <div class="bg-white rounded shadow p-3">
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg shadow-slate-200/40">
       <div class="flex justify-between mb-2">
           <div class="text-sm text-gray-600">{{ $t('reports.parametersHelp') || '' }}</div>
         <div>
-          <button @click="startEditParam(null)" class="px-3 py-1 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition">
+          <button @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white transition hover:bg-indigo-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
             </svg>
@@ -92,7 +94,7 @@
 
       <ul>
         <li v-for="(p, idx) in form.params" :key="p.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event, idx)" @drop="onDrop($event, idx)"
-            class="p-3 border-b flex items-center justify-between hover:bg-gray-50 transition">
+            class="flex items-center justify-between border-b border-slate-200 p-3 transition hover:bg-indigo-50/40">
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
               <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7.414A2 2 0 0016.586 6L13 2.414A2 2 0 0011.586 2H4z" />
@@ -103,11 +105,11 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <button @click="startEditParam(p, idx)" class="px-2 py-1 bg-yellow-400 text-white rounded flex items-center gap-1 hover:bg-yellow-300 transition">
+            <button @click="startEditParam(p, idx)" class="flex items-center gap-1 rounded-lg bg-slate-700 px-2 py-1 text-white transition hover:bg-slate-800">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /></svg>
               <span class="text-sm">{{ $t('labels.edit') }}</span>
             </button>
-            <button @click="removeParam(idx)" class="px-2 py-1 bg-red-600 text-white rounded flex items-center gap-1 hover:bg-red-500 transition">
+            <button @click="removeParam(idx)" class="flex items-center gap-1 rounded-lg bg-red-600 px-2 py-1 text-white transition hover:bg-red-700">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 011 1v6a1 1 0 11-2 0V9a1 1 0 011-1z" clip-rule="evenodd" /></svg>
               <span class="text-sm">{{ $t('labels.delete') }}</span>
             </button>
@@ -120,20 +122,20 @@
         <div class="grid grid-cols-2 gap-3 mt-2">
           <div>
             <label class="block text-sm">{{ $t('reports.paramName') }}</label>
-            <input v-model="editingParam.name" class="w-full border rounded px-2 py-1" />
+            <input v-model="editingParam.name" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
             <div v-if="nameError" class="text-red-600 text-sm mt-1">{{ nameError }}</div>
           </div>
           <div>
             <label class="block text-sm">{{ $t('reports.paramLabel') }}</label>
-            <input v-model="editingParam.label" class="w-full border rounded px-2 py-1" />
+            <input v-model="editingParam.label" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
           </div>
           <div>
             <label class="block text-sm">{{ $t('reports.paramArName') }}</label>
-            <input v-model="editingParam.arName" class="w-full border rounded px-2 py-1" />
+            <input v-model="editingParam.arName" class="w-full rounded-xl border border-slate-200 px-3 py-2" />
           </div>
           <div>
             <label class="block text-sm">{{ $t('reports.paramType') }}</label>
-            <select v-model="editingParam.type" class="w-full border rounded px-2 py-1">
+            <select v-model="editingParam.type" class="w-full rounded-xl border border-slate-200 px-3 py-2">
               <option v-for="t in paramTypes" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
@@ -143,27 +145,27 @@
           </div>
           <div class="col-span-2">
             <label class="block text-sm">{{ $t('reports.dataSourceSql') }}</label>
-            <textarea v-model="editingParam.dataSourceSql" class="w-full border rounded px-2 py-1" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;" rows="3"></textarea>
+            <textarea v-model="editingParam.dataSourceSql" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;" rows="3"></textarea>
           </div>
           <div class="col-span-2">
             <label class="block text-sm">{{ $t('reports.metaJson') }}</label>
-            <textarea v-model="editingParam.meta" placeholder='e.g. { "placeholder":"Search..." }' class="w-full border rounded px-2 py-1" rows="3"></textarea>
+            <textarea v-model="editingParam.meta" placeholder='e.g. { "placeholder":"Search..." }' class="w-full rounded-xl border border-slate-200 px-3 py-2" rows="3"></textarea>
           </div>
         </div>
         <div class="flex gap-2 justify-end mt-3">
-          <button @click="cancelEditParam" class="px-3 py-1 border rounded flex items-center gap-2 hover:bg-gray-50 transition">
+          <button @click="cancelEditParam" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </button>
-          <button @click="saveParam" class="px-3 py-1 bg-emerald-600 text-white rounded flex items-center gap-2 hover:bg-emerald-500 transition">
+          <button @click="saveParam" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white transition hover:bg-indigo-700">
             <span>{{ $t('reports.saveParam') }}</span>
           </button>
-          <button v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="px-3 py-1 bg-indigo-600 text-white rounded flex items-center gap-2 hover:bg-indigo-500 transition">
+          <button v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="flex items-center gap-2 rounded-xl bg-sky-600 px-3 py-2 text-white transition hover:bg-sky-700">
             <span>{{ $t('admin.previewOptions') }}</span>
           </button>
         </div>
       </div>
 
-      <div class="mt-4 rounded border border-amber-200 bg-amber-50 p-3">
+      <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div class="text-sm font-medium text-amber-900">{{ $t('reports.totalsLabel') || 'Totals' }}</div>
@@ -188,7 +190,7 @@
           <label
             v-for="field in numericParams"
             :key="`total-toggle-${field.name}`"
-            class="flex items-center gap-2 rounded bg-white px-3 py-2 text-sm border border-amber-100"
+            class="flex items-center gap-2 rounded-xl border border-amber-100 bg-white px-3 py-2 text-sm"
           >
             <input
               type="checkbox"
@@ -362,7 +364,7 @@ export default {
           names.add(p.name)
         }
 
-        const { importantColumns, selectFieldNames, selectFields: legacySelectFields, filterFields: legacyFilterFields, params: legacyParams, ...rest } = form.value
+        const { selectFieldNames, ...rest } = form.value
         const filterFields = (form.value.params || []).map((p) => ({
           name: p.name,
           arName: p.arName || '',
