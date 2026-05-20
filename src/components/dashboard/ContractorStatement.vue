@@ -1,17 +1,17 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
     <!-- Header -->
-    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex flex-col gap-3 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h2 class="text-2xl font-semibold text-slate-900">{{ $t('contractors.statementTitle') }}</h2>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center justify-end gap-2">
         <button @click="refresh" :disabled="loading"
-          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50">
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50">
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport('xlsx')" :disabled="downloading"
-          class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl bg-indigo-600 px-3 py-2 text-xs sm:text-sm text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -19,7 +19,7 @@
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportExcel') }}
         </button>
         <button @click="downloadReport('csv')" :disabled="downloading"
-          class="flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-white shadow-sm shadow-sky-200 transition-colors hover:bg-sky-700 disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl bg-sky-600 px-3 py-2 text-xs sm:text-sm text-white shadow-sm shadow-sky-200 transition-colors hover:bg-sky-700 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -27,7 +27,7 @@
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportCSV') }}
         </button>
         <button @click="downloadReport('pdf')" :disabled="downloading"
-          class="flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-2 text-white shadow-sm shadow-slate-200 transition-colors hover:bg-slate-800 disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs sm:text-sm text-white shadow-sm shadow-slate-200 transition-colors hover:bg-slate-800 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -74,9 +74,9 @@
         </div>
       </div>
 
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <button @click="clearFilters"
-          class="rounded-xl border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">
+          class="w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">
           {{ $t('labels.clear') }}
         </button>
       </div>
