@@ -1,15 +1,15 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-3 sm:p-6 space-y-6">
+    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.driversList') || 'Drivers' }}</h2>
-      <button @click="openAdd" class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm shadow-indigo-200">
+      <button @click="openAdd" class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
         {{ $t('labels.add') || 'Add' }}
       </button>
     </div>
 
     <div class="max-w-md">
-      <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('placeholders.search') || 'Search...'" class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+      <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('placeholders.search') || 'Search...'" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
     </div>
 
     <div v-if="loading" class="flex justify-center py-12">
@@ -21,20 +21,20 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('drivers.name') || 'Name' }}</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('drivers.phone') || 'Phone' }}</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('drivers.nationalId') || 'National ID' }}</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.actions') }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">#</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.name') || 'Name' }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.phone') || 'Phone' }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.nationalId') || 'National ID' }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="(d, idx) in drivers" :key="d.id" class="hover:bg-indigo-50/40">
-              <td class="px-6 py-4 text-sm text-indigo-800">{{ (page - 1) * pageSize + idx + 1 }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ d.name || '-' }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ d.phone || '-' }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ d.nationalId || '-' }}</td>
-              <td class="px-6 py-4">
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-indigo-800 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.name || '-' }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.phone || '-' }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.nationalId || '-' }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4">
                 <div class="flex gap-3 justify-end">
                   <button @click.stop="openEdit(d)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" title="Edit">
                     <PencilSquareIcon class="h-5 w-5" />
@@ -55,7 +55,7 @@
 
     <!-- Mobile Cards -->
     <div v-if="!loading" class="sm:hidden space-y-4">
-      <div v-for="d in drivers" :key="d.id" class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-4">
+      <div v-for="d in drivers" :key="d.id" class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4">
         <div class="flex justify-between">
           <div>
             <div class="font-semibold text-gray-900">{{ d.name }}</div>
@@ -74,7 +74,7 @@
 
     <!-- Add/Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm p-4" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">{{ editing ? $t('labels.update') : $t('labels.add') }} {{ $t('drivers.singular') || 'Driver' }}</h3>
           <button @click="closeModal" class="text-gray-400 hover:text-gray-600"><XMarkIcon class="w-5 h-5" /></button>
@@ -102,7 +102,7 @@
 
     <!-- Delete Confirmation -->
     <div v-if="deleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-6">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6">
         <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') }}</h3>
         <p class="text-gray-600 mb-6">{{ $t('messages.confirmDeleteItem') || 'Confirm delete?' }}</p>
         <div class="flex gap-3">

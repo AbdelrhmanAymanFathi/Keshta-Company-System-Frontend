@@ -1,7 +1,7 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-3 sm:p-6 space-y-6">
     <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('transporters.title') }}</h2>
       <div class="flex items-center gap-3">
         <!-- Import Excel -->
@@ -16,7 +16,7 @@
         </label> -->
         <!-- Add Button -->
         <button @click="openAdd"
-          class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200">
+          class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200 text-xs sm:text-sm">
           <PlusIcon class="w-5 h-5" />
           {{ $t('transporters.add') }}
         </button>
@@ -34,13 +34,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.name') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.phone') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.bankName') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.accountNumber') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.notes') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.actions') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.name') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.phone') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.bankName') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.accountNumber') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.notes') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -51,14 +51,14 @@
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-6 py-4 text-sm text-indigo-800" :class="textAlign">{{ idx + 1 }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-indigo-800" :class="textAlign">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">
               <button @click.stop="goToDetail(c)" class="text-indigo-800 hover:underline">{{ c.name }}</button>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.accountNumber || '-' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.notes || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.accountNumber || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.notes || '-' }}</td>
             <td class="px-6 py-4">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
                 <button @click.stop="openStatement(c)" class="rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-700 hover:bg-violet-100" :title="$t('transporters.statement')">
@@ -90,7 +90,7 @@
       <div
         v-for="c in filtered"
         :key="c.id"
-        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-4 cursor-pointer"
+        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4 cursor-pointer"
         @click="openContextMenu($event, c)"
         @contextmenu.prevent="openContextMenu($event, c)"
       >

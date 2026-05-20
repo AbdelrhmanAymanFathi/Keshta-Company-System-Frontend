@@ -1,12 +1,12 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-3 sm:p-6 space-y-6">
 
     <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"
-        class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200"
+        class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200 text-xs sm:text-sm"
       >
         <PlusIcon class="w-5 h-5" />
         {{ $t('crushers.add') }}
@@ -20,7 +20,7 @@
         @input="onSearchInput"
         type="search"
         :placeholder="$t('crushers.searchPlaceholder')"
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
       />
     </div>
 
@@ -29,13 +29,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
               {{ $t('labels.#') }}
             </th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
               {{ $t('crushers.name') }}
             </th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
               {{ $t('labels.actions') }}
             </th>
           </tr>
@@ -48,8 +48,8 @@
             @click="openContextMenu($event, crusher)"
             @contextmenu.prevent="openContextMenu($event, crusher)"
           >
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ idx + 1 }}</td>
-            <td class="px-6 py-4">
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4">
               <div class="flex items-center gap-4" :class="isRTL ? 'flex-row-reverse justify-end' : 'flex-row justify-start'">
                 
                 <div :class="isRTL ? 'text-right' : 'text-left'">
@@ -57,7 +57,7 @@
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4">
+            <td class="px-3 py-2 sm:px-6 sm:py-4">
               <div class="flex gap-4" :class="isRTL ? 'justify-start' : 'justify-end'">
                 <button @click.stop="openEdit(crusher)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100">
                   <PencilSquareIcon class="h-5 w-5" />
@@ -69,7 +69,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="3" class="px-6 py-2 text-start text-gray-500">
+            <td colspan="3" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-gray-500">
               {{ $t('crushers.noResults') }}
             </td>
           </tr>
@@ -82,7 +82,7 @@
       <div
         v-for="crusher in filtered"
         :key="crusher.id"
-        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-4 cursor-pointer"
+        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4 cursor-pointer"
         @click="openContextMenu($event, crusher)"
         @contextmenu.prevent="openContextMenu($event, crusher)"
       >
@@ -149,7 +149,7 @@
 
     <!-- Add/Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0; ">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('crushers.editCrusher') : $t('crushers.addCrusher') }}
@@ -185,7 +185,7 @@
 
     <!-- Delete Confirm Modal -->
     <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-6">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6">
         <div class="text-center">
           <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
             <ExclamationTriangleIcon class="w-6 h-6 text-red-600" />
