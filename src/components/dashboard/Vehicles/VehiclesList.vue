@@ -1,12 +1,12 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-gray-800">{{ $t('vehicles.title') }}</h2>
       <div></div>
       <div>
         <button
           @click="openCreateModal"
-          class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 flex items-center gap-2 shadow-sm shadow-indigo-200"
+          class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm"
         >
           <PlusIcon class="w-5 h-5" />
           {{ $t('vehicles.createVehicle') }}

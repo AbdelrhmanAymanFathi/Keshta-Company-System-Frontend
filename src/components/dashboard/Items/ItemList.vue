@@ -1,9 +1,9 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-3 sm:p-6 space-y-6">
+    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.items') || 'Items' }}</h2>
       <button @click="openCreateModal"
-        class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl hover:from-indigo-500 hover:to-sky-500 transition inline-flex items-center gap-2 shadow-sm shadow-indigo-200">
+        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl hover:from-indigo-500 hover:to-sky-500 transition inline-flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
         {{ $t('dashboard.newItem') || 'Add Item' }} +
       </button>
@@ -15,37 +15,37 @@
         <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               #</th>
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.itemName') || 'Item Name' }}</th>
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.unit') || 'Unit' }}</th>
             <th v-if="mode === 'supply' || mode === 'all'"
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultSupplyPrice') || 'Supply Price' }}</th>
             <th v-if="mode === 'transport' || mode === 'all'"
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultTransportPrice') || 'Transport Price' }}</th>
             <th v-if="mode === 'extracts' || mode === 'all'"
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }}</th>
             <!-- <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.exports') || 'For Exports' }}</th>
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.transport') || 'For Transports' }}</th>
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.isActive') || 'Active' }}</th> -->
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.createdAt') || 'Created At' }}</th>
             <th
-              class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.actions') }}</th>
           </tr>
         </thead>
@@ -53,20 +53,20 @@
           <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-indigo-50/40"
             @contextmenu.prevent="openContextMenu($event, item)">
             <td
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
               {{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap text-start">
               {{ item.name }}</td>
-            <td class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
               {{ item.unit?.name || getUnitName(item.unitId) || '-' }}</td>
             <td v-if="mode === 'supply' || mode === 'all'"
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatPrice(item.defaultSupplyPrice) }}</td>
             <td v-if="mode === 'transport' || mode === 'all'"
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatPrice(item.defaultTransportPrice) }}</td>
             <td v-if="mode === 'extracts' || mode === 'all'"
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatPrice(item.defaultExtractPrice ?? item.currentPrice) }}</td>
             <!-- <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
               <span v-if="item.availableForSupplies">✓</span><span v-else>-</span></td>
@@ -74,10 +74,10 @@
               <span v-if="item.availableForTransports">✓</span><span v-else>-</span></td>
             <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
               <span v-if="item.isActive">✓</span><span v-else>-</span></td> -->
-            <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatDate(item.createdAt) }}</td>
             <td
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start flex gap-2">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start flex gap-2">
               <button @click="editItem(item)"
                 class="px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm">
                 <PencilIcon class="w-5 h-5" />
@@ -90,14 +90,14 @@
           </tr>
           <tr v-if="items.length === 0 && !loading">
             <td
-              class="px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-start"
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start"
               :colspan="columnsCount">
               {{ $t('labels.noDataFound') || 'No items found' }}
             </td>
           </tr>
           <tr v-if="loading">
             <td
-              class="px-6 py-3 text-xs font-medium text-gray-800 uppercase tracking-wider  whitespace-nowrap text-start "
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start"
               :colspan="columnsCount">
               {{ $t('labels.loading') || 'Loading...' }}
             </td>
@@ -115,7 +115,7 @@
     <teleport to="body">
       <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-6 z-10">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6 z-10">
           <h3 class="text-lg font-semibold mb-4">
             {{ editingItem ? ($t('labels.edit') + ' ' + $t('labels.item')) : ($t('labels.new') + ' ' + $t('labels.item'))
             }}

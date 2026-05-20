@@ -1,12 +1,12 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-6 space-y-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-3 sm:p-6 space-y-6">
     <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.contractorsList') || 'Contractors' }}</h2>
       <div class="flex items-center gap-3">
         <!-- Add Button -->
         <button @click="openAdd"
-          class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200">
+          class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200 text-xs sm:text-sm">
           <PlusIcon class="w-5 h-5" />
           {{ $t('suppliers.add') }}
         </button>
@@ -16,7 +16,7 @@
     <!-- Search -->
     <div class="max-w-md">
       <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('suppliers.searchPlaceholder')"
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
     </div>
 
     <!-- Desktop Table -->
@@ -24,13 +24,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.name') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.phone') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.bankName') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.accountNumber') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.notes') }}</th>
-            <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.actions') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.#') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.name') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.phone') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.bankName') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.accountNumber') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.notes') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -41,17 +41,17 @@
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-6 py-4 text-sm text-indigo-800" :class="textAlign">{{ idx + 1 }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-indigo-800 text-start">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">
               <button @click.stop="goToDetail(c)" class="text-indigo-600 hover:underline">
                 {{ c.name }}
               </button>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.accountNumber || '-' }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.notes || '-' }}</td>
-            <td class="px-6 py-4">
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.phone || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.bankName || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.accountNumber || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.notes || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
                 <button @click.stop="openStatement(c)" class="rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-700 hover:bg-violet-100" :title="$t('suppliers.statement')">
                   <DocumentTextIcon class="h-5 w-5" />
@@ -66,7 +66,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="7" class="px-6 py-2 text-start text-gray-500">
+            <td colspan="7" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-gray-500">
                 {{ $t('suppliers.noResults') }}
               </td>
           </tr>
@@ -79,7 +79,7 @@
       <div
         v-for="c in filtered"
         :key="c.id"
-        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-4 cursor-pointer"
+        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4 cursor-pointer"
         @click="openContextMenu($event, c)"
         @contextmenu.prevent="openContextMenu($event, c)"
       >
@@ -194,7 +194,7 @@
 
     <!-- Confirm delete modal -->
     <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-6 z-10">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6 z-10">
         <p class="mb-4 text-center" :class="isRTL ? 'text-right' : 'text-left'">
           {{ $t('suppliers.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
         </p>
