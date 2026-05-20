@@ -291,7 +291,7 @@ export default {
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
     effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
-    headerGradient() { return 'bg-gradient-to-r from-indigo-700 via-indigo-700 to-indigo-900' },
+    headerGradient() { return this.isRTL ? 'bg-gradient-to-l from-indigo-700 via-indigo-700 to-indigo-900' : 'bg-gradient-to-r from-indigo-700 via-indigo-700 to-indigo-900' },
     userInitials() {
       if (!this.user || !this.user.name) return '??'
       const names = this.user.name.trim().split(' ')
