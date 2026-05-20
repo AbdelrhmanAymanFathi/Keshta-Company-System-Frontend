@@ -1,6 +1,6 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex flex-col gap-3 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.extractsList') || 'Extracts' }}</h2>
       <ExtractsCreationModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newExtract') + ' +'" @saved="onExtractSaved"/>
     </div>
@@ -67,12 +67,12 @@
 
       </div>
 
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <button @click="page = 1; loadExtracts()" :disabled="loading"
-          class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-sm font-medium shadow-sm shadow-indigo-200">
+          class="w-full sm:w-auto px-3 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm shadow-indigo-200">
           {{ $t('labels.search') }}</button>
         <button @click="clearFilters"
-          class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition-colors text-sm font-medium">{{ $t('labels.clear') }}</button>
+          class="w-full sm:w-auto px-3 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition-colors text-xs sm:text-sm font-medium">{{ $t('labels.clear') }}</button>
       </div>
     </div>
 

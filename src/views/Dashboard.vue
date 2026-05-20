@@ -135,10 +135,10 @@
         </div>
 
         <!-- Vertical Menu -->
-        <ul class="space-y-1">
+        <ul class="space-y-2.5">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.routeName)"
-              :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700') : (currentRouteName === item.routeName ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+              :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700') : (currentRouteName === item.routeName ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
               <div
                 class="sidebar-link-icon flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
                 :class="(item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName) ? 'bg-white/15 text-white scale-110' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 group-hover:text-indigo-700'"

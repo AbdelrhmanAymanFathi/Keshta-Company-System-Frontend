@@ -3,7 +3,7 @@
     <button
       v-if="showTriggerButton"
       @click="openModal"
-      class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition"
+      class="bg-indigo-600 text-white px-3 py-2 text-sm rounded-lg hover:bg-indigo-700 font-medium shadow-md transition sm:px-6 sm:py-3"
     >
       {{ triggerText }}
     </button>
