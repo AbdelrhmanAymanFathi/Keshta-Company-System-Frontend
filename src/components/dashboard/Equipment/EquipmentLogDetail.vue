@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6 p-4">
+  <div class="space-y-6 p-0 sm:p-0.5 md:p-1 lg:p-0">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ $t('equipmentLog.detail') }}</h3>
       <div class="flex items-center gap-2">

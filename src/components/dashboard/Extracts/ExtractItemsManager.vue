@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 w-full">
+  <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 w-full">
     <h3 class="text-lg font-semibold mb-4">{{ $t('extracts.title') }} - {{ $t('labels.add') }}</h3>
 
     <div class="flex items-center justify-between mb-4">

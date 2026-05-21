@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-4">
+  <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-4">
     <div class="app-page-header rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-xl font-bold text-slate-900">{{ isEdit ? $t('admin.editReport') : $t('admin.createReport') }}</h2>
     </div>
