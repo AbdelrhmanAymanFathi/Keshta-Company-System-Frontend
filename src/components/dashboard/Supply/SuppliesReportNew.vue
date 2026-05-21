@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
     <div class="flex justify-between items-center gap-4 flex-wrap">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('supply.exportTableTitle') }}</h2>

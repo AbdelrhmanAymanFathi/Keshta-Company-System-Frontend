@@ -1,14 +1,14 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-2xl font-bold text-slate-900">{{ $t('locations.title') || 'Locations' }}</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-900">{{ $t('locations.title') || 'Locations' }}</h2>
       <div class="flex items-center gap-3">
         <button @click="openAddSite()" class="rounded-xl bg-indigo-600 px-4 py-2 text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700">+ {{ $t('locations.addLocation') || 'Add Location' }}</button>
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <table class="w-full table-auto">
+    <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <table class="min-w-full table-auto">
         <thead class="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">#</th>

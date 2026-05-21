@@ -1,10 +1,12 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8 pb-4">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-0 sm:p-0.5 md:p-1 lg:p-0">
     <div class="max-w-5xl mx-auto">
       <!-- Header Section -->
-      <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{{ $t('profile.title') || 'Profile' }}</h1>
-        <p class="text-gray-600">{{ $t('profile.account') || 'Account' }} & {{ $t('profile.security') || 'Security' }}</p>
+      <div class="app-page-header mb-6 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900 mb-2">{{ $t('profile.title') || 'Profile' }}</h1>
+          <p class="text-sm text-gray-600">{{ $t('profile.account') || 'Account' }} & {{ $t('profile.security') || 'Security' }}</p>
+        </div>
       </div>
 
       <!-- Cards Grid -->
@@ -52,7 +54,7 @@
         <!-- Security Card -->
         <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
           <!-- Card Header -->
-          <div class="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4 sm:px-8 sm:py-6">
+          <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-4 sm:px-8 sm:py-6">
             <div class="flex items-center gap-3">
               <div class="bg-white bg-opacity-20 rounded-lg p-2">
                 <ShieldCheckIcon class="w-6 h-6 text-white" />
@@ -76,7 +78,7 @@
               </button>
               <button 
                 @click="showTotpModal = true" 
-                class="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md active:scale-95"
+                class="w-full px-4 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md active:scale-95"
               >
                 <span class="flex items-center justify-center gap-2">
                   <DevicePhoneMobileIcon class="w-5 h-5" />

@@ -1,7 +1,7 @@
 <template>
-  <div class="p-6" :dir="isRTL ? 'rtl' : 'ltr'" :class="{ 'direction-rtl': isRTL }">
+  <div class="p-0 sm:p-0.5 md:p-1 lg:p-0" :dir="isRTL ? 'rtl' : 'ltr'" :class="{ 'direction-rtl': isRTL }">
     <div class="app-page-header mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-xl font-bold text-slate-900">{{ $t('admin.reports') }}</h2>
+      <h2 class="text-lg sm:text-xl font-bold text-slate-900">{{ $t('admin.reports') }}</h2>
       <div class="flex gap-2">
         <router-link :to="{ name: 'admin-reports-from-table' }" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700">
           <span>{{ $t('admin.newReport') }}</span>
@@ -12,8 +12,8 @@
       </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-      <table class="w-full table-auto">
+    <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
+      <table class="min-w-full table-auto">
         <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
           <tr>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnKey') }}</th>
