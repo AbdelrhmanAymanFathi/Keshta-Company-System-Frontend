@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
+body {
   overflow-y: hidden;
+  transition: background-color 0.45s ease;
+}
+
+html {
+  --theme-motion-duration: 0.45s;
+  --theme-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 :root {
   --theme-primary: #4f46e5;
@@ -175,6 +181,13 @@ body{
   box-shadow: 0 10px 15px -3px rgba(var(--theme-primary-rgb), 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
 }
 
+.theme-page-header-bar.theme-animated-surface,
+.app-page-header.theme-page-header-bar {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
 .theme-main-gradient {
   background: linear-gradient(to bottom right, rgb(248 250 252), rgba(var(--theme-primary-rgb), 0.04), rgb(248 250 252));
 }
@@ -244,6 +257,33 @@ body{
   border-color: rgba(var(--theme-primary-rgb), 0.18);
   background-color: rgba(var(--theme-primary-rgb), 0.06);
   color: rgb(var(--theme-primary-900));
+}
+
+.theme-animated-surface {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    background var(--theme-motion-duration) var(--theme-motion-ease),
+    background-color var(--theme-motion-duration) var(--theme-motion-ease),
+    box-shadow var(--theme-motion-duration) var(--theme-motion-ease),
+    border-color var(--theme-motion-duration) var(--theme-motion-ease),
+    opacity 0.35s ease,
+    filter var(--theme-motion-duration) var(--theme-motion-ease);
+}
+
+.theme-glow {
+  box-shadow:
+    0 0 0 1px rgba(var(--theme-primary-rgb), 0.08),
+    0 12px 32px rgba(var(--theme-primary-rgb), 0.14);
+}
+
+.theme-motion-soft {
+  transition:
+    transform 0.25s var(--theme-motion-ease),
+    opacity 0.25s ease,
+    background var(--theme-motion-duration) var(--theme-motion-ease),
+    box-shadow var(--theme-motion-duration) var(--theme-motion-ease);
 }
 
 /* Small custom utilities for consistent modern look — لمسات بسيطة */
@@ -380,6 +420,9 @@ body{
   white-space: nowrap;
 }
 
+/* =========================
+   Animated page headers
+   ========================= */
 .app-page-header {
   position: relative;
   overflow: hidden;
@@ -393,31 +436,11 @@ body{
   inset: auto;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.9;
-}
-
-.app-page-header::before {
-  top: -3.5rem;
-  left: -4rem;
-  width: 10rem;
-  height: 10rem;
-  border-radius: 9999px;
-  background:
-    radial-gradient(circle at 35% 35%, rgb(255 255 255 / 0.48) 0%, rgb(255 255 255 / 0.18) 16%, rgba(var(--theme-primary-rgb), 0.22) 34%, rgba(var(--theme-primary-rgb), 0.12) 52%, rgba(var(--theme-primary-rgb), 0) 72%);
-  filter: blur(18px);
-  animation: header-sphere-drift-a 14.5s cubic-bezier(0.37, 0, 0.18, 1) infinite;
-}
-
-.app-page-header::after {
-  top: 1rem;
-  right: -3rem;
-  width: 8.5rem;
-  height: 8.5rem;
-  border-radius: 9999px;
-  background:
-    radial-gradient(circle at 40% 40%, rgb(255 255 255 / 0.38) 0%, rgb(255 255 255 / 0.12) 18%, rgba(var(--theme-primary-rgb), 0.18) 38%, rgba(var(--theme-primary-rgb), 0.14) 58%, rgba(var(--theme-primary-rgb), 0) 76%);
-  filter: blur(16px);
-  animation: header-sphere-drift-b 17.25s cubic-bezier(0.41, 0.04, 0.23, 0.99) infinite;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    opacity var(--theme-motion-duration) var(--theme-motion-ease),
+    filter var(--theme-motion-duration) var(--theme-motion-ease);
 }
 
 .app-page-header > * {
@@ -425,71 +448,681 @@ body{
   z-index: 1;
 }
 
-@keyframes header-sphere-drift-a {
-  0% {
-    transform: translate3d(0, 0, 0) scale(0.96);
-    opacity: 0.42;
-  }
-  14% {
-    transform: translate3d(4.5rem, 1.1rem, 0) scale(1.08);
-    opacity: 0.86;
-  }
-  31% {
-    transform: translate3d(13.5rem, -0.85rem, 0) scale(1.02);
-    opacity: 0.58;
-  }
-  47% {
-    transform: translate3d(20rem, 1.9rem, 0) scale(1.18);
-    opacity: 0.8;
-  }
-  63% {
-    transform: translate3d(29rem, -1.4rem, 0) scale(0.94);
-    opacity: 0.44;
-  }
-  79% {
-    transform: translate3d(38rem, 0.7rem, 0) scale(1.1);
-    opacity: 0.72;
-  }
-  100% {
-    transform: translate3d(51rem, -0.6rem, 0) scale(0.98);
-    opacity: 0.3;
-  }
+/* =========================
+   Animation Presets
+   ========================= */
+
+/* --- bubbles (default) --- */
+.theme-anim-bubbles .app-page-header::before {
+  top: -3.5rem;
+  left: -4rem;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 9999px;
+  opacity: 0.9;
+  background:
+    radial-gradient(circle at 35% 35%, rgb(255 255 255 / 0.48) 0%, rgb(255 255 255 / 0.18) 16%, rgba(var(--theme-primary-rgb), 0.22) 34%, rgba(var(--theme-primary-rgb), 0.12) 52%, rgba(var(--theme-primary-rgb), 0) 72%);
+  filter: blur(18px);
+  animation: theme-bubbles-drift-a 14.5s cubic-bezier(0.37, 0, 0.18, 1) infinite;
 }
 
-@keyframes header-sphere-drift-b {
+.theme-anim-bubbles .app-page-header::after {
+  top: 1rem;
+  right: -3rem;
+  width: 8.5rem;
+  height: 8.5rem;
+  border-radius: 9999px;
+  opacity: 0.9;
+  background:
+    radial-gradient(circle at 40% 40%, rgb(255 255 255 / 0.38) 0%, rgb(255 255 255 / 0.12) 18%, rgba(var(--theme-primary-rgb), 0.18) 38%, rgba(var(--theme-primary-rgb), 0.14) 58%, rgba(var(--theme-primary-rgb), 0) 76%);
+  filter: blur(16px);
+  animation: theme-bubbles-drift-b 17.25s cubic-bezier(0.41, 0.04, 0.23, 0.99) infinite;
+}
+
+/* --- aurora --- */
+.theme-anim-aurora .app-page-header {
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.94) 0%, rgba(var(--theme-primary-rgb), 0.04) 100%);
+}
+
+.theme-anim-aurora .app-page-header::before {
+  top: -40%;
+  left: -20%;
+  width: 70%;
+  height: 140%;
+  border-radius: 50%;
+  opacity: 0.55;
+  background:
+    conic-gradient(
+      from 120deg at 50% 50%,
+      rgba(var(--theme-primary-rgb), 0) 0deg,
+      rgba(var(--theme-primary-rgb), 0.28) 80deg,
+      rgba(var(--theme-primary-rgb), 0.08) 160deg,
+      rgba(var(--theme-primary-rgb), 0.22) 240deg,
+      rgba(var(--theme-primary-rgb), 0) 360deg
+    );
+  filter: blur(42px);
+  animation: theme-aurora-sweep 18s ease-in-out infinite;
+}
+
+.theme-anim-aurora .app-page-header::after {
+  top: -25%;
+  right: -15%;
+  width: 55%;
+  height: 120%;
+  border-radius: 50%;
+  opacity: 0.45;
+  background:
+    radial-gradient(ellipse at 60% 40%, rgba(var(--theme-primary-rgb), 0.24) 0%, rgba(var(--theme-primary-rgb), 0) 68%);
+  filter: blur(36px);
+  animation: theme-aurora-pulse 22s ease-in-out infinite reverse;
+}
+
+/* --- grid --- */
+.theme-anim-grid .app-page-header {
+  background-color: rgb(255 255 255 / 0.96);
+  background-image:
+    linear-gradient(rgba(var(--theme-primary-rgb), 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--theme-primary-rgb), 0.09) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(var(--theme-primary-rgb), 0.05) 0%, transparent 55%);
+  background-size: 28px 28px, 28px 28px, 100% 100%;
+  mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.92) 0%, rgb(0 0 0 / 0.35) 100%);
+}
+
+.theme-anim-grid .app-page-header::before {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  opacity: 0.35;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(var(--theme-primary-rgb), 0.14) 50%, transparent 100%);
+  filter: none;
+  animation: theme-grid-scan 9s linear infinite;
+}
+
+.theme-anim-grid .app-page-header::after {
+  top: -30%;
+  right: -10%;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 9999px;
+  opacity: 0.4;
+  background: radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.2) 0%, rgba(var(--theme-primary-rgb), 0) 70%);
+  filter: blur(24px);
+  animation: theme-grid-glow 12s ease-in-out infinite;
+}
+
+/* --- liquid --- */
+.theme-anim-liquid .app-page-header {
+  background:
+    linear-gradient(120deg, rgb(255 255 255 / 0.95) 0%, rgba(var(--theme-primary-rgb), 0.03) 100%);
+}
+
+.theme-anim-liquid .app-page-header::before {
+  top: -25%;
+  left: -15%;
+  width: 55%;
+  height: 150%;
+  border-radius: 42% 58% 62% 38% / 42% 46% 54% 58%;
+  opacity: 0.5;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(var(--theme-primary-rgb), 0.26) 0%, rgba(var(--theme-primary-rgb), 0) 72%);
+  filter: blur(28px);
+  animation: theme-liquid-morph-a 16s ease-in-out infinite;
+}
+
+.theme-anim-liquid .app-page-header::after {
+  top: -10%;
+  right: -20%;
+  width: 48%;
+  height: 130%;
+  border-radius: 58% 42% 38% 62% / 48% 54% 46% 52%;
+  opacity: 0.42;
+  background:
+    radial-gradient(ellipse at 70% 40%, rgba(var(--theme-primary-rgb), 0.2) 0%, rgba(var(--theme-primary-rgb), 0) 68%);
+  filter: blur(32px);
+  animation: theme-liquid-morph-b 20s ease-in-out infinite reverse;
+}
+
+/* --- particles --- */
+.theme-anim-particles .app-page-header {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(var(--theme-primary-rgb), 0.06) 0%, transparent 42%),
+    radial-gradient(circle at 80% 70%, rgba(var(--theme-primary-rgb), 0.05) 0%, transparent 38%),
+    rgb(255 255 255 / 0.97);
+}
+
+.theme-anim-particles .app-page-header::before {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  opacity: 0.75;
+  background-image:
+    radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.55) 0 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.35) 0 1px, transparent 1.5px);
+  background-size: 42px 42px, 64px 64px;
+  background-position: 0 0, 18px 24px;
+  filter: blur(0.2px);
+  animation: theme-particles-float 24s linear infinite;
+}
+
+.theme-anim-particles .app-page-header::after {
+  top: 10%;
+  right: 8%;
+  width: 9rem;
+  height: 9rem;
+  border-radius: 9999px;
+  opacity: 0.35;
+  background:
+    radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.22) 0%, rgba(var(--theme-primary-rgb), 0) 70%);
+  filter: blur(20px);
+  animation: theme-particles-glow 14s ease-in-out infinite;
+}
+
+/* --- Vue motion layer presets (truck, smart-city, construction, blueprint) --- */
+.theme-anim-truck .app-page-header,
+.theme-anim-smart-city .app-page-header,
+.theme-anim-construction .app-page-header,
+.theme-anim-blueprint .app-page-header {
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.98) 0%,
+      rgba(var(--theme-primary-rgb), 0.03) 52%,
+      rgba(var(--theme-primary-rgb), 0.07) 100%
+    );
+}
+
+.theme-anim-smart-city .app-page-header {
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.99) 0%,
+      rgba(var(--theme-primary-rgb), 0.04) 45%,
+      rgba(var(--theme-primary-rgb), 0.09) 100%
+    );
+}
+
+.theme-anim-construction .app-page-header {
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.97) 0%,
+      rgba(var(--theme-primary-rgb), 0.05) 50%,
+      rgba(var(--theme-primary-rgb), 0.08) 100%
+    );
+}
+
+.theme-anim-blueprint .app-page-header {
+  background:
+    linear-gradient(
+      180deg,
+      rgb(255 255 255 / 0.99) 0%,
+      rgba(var(--theme-primary-rgb), 0.02) 40%,
+      rgba(var(--theme-primary-rgb), 0.06) 100%
+    );
+}
+
+.theme-anim-truck .app-page-header::before,
+.theme-anim-truck .app-page-header::after,
+.theme-anim-smart-city .app-page-header::before,
+.theme-anim-smart-city .app-page-header::after,
+.theme-anim-construction .app-page-header::before,
+.theme-anim-construction .app-page-header::after,
+.theme-anim-blueprint .app-page-header::before,
+.theme-anim-blueprint .app-page-header::after {
+  display: none;
+  animation: none;
+  opacity: 0;
+}
+
+.header-motion-layer-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.header-motion-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.92;
+  transition: opacity var(--theme-motion-duration) var(--theme-motion-ease);
+}
+
+.header-motion-layer__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 4.5rem;
+}
+
+/* Shared SVG fills (all motion scenes) */
+.hm-fill-sky { stop-color: rgba(var(--theme-primary-rgb), 0.1); }
+.hm-fill-road-a { stop-color: rgba(var(--theme-primary-rgb), 0.06); }
+.hm-fill-road-b { stop-color: rgba(var(--theme-primary-rgb), 0.14); }
+.hm-fill-fog-a { stop-color: rgba(var(--theme-primary-rgb), 0.12); }
+.hm-fill-building { fill: rgba(var(--theme-primary-rgb), 0.2); }
+.hm-fill-building--far { fill: rgba(var(--theme-primary-rgb), 0.12); }
+.hm-fill-building--b,
+.hm-fill-building--tall { fill: rgba(var(--theme-primary-rgb), 0.28); }
+.hm-fill-building--d { fill: rgba(var(--theme-primary-rgb), 0.24); }
+.hm-fill-shadow { fill: rgba(var(--theme-primary-rgb), 0.1); }
+.hm-fill-trailer { fill: rgba(var(--theme-primary-rgb), 0.32); }
+.hm-fill-cab { fill: var(--theme-primary); }
+.hm-fill-glass { fill: rgba(255 255 255 / 0.55); }
+.hm-fill-wheel { fill: rgba(var(--theme-primary-rgb), 0.45); }
+.hm-fill-hub { fill: rgba(255 255 255 / 0.7); }
+.hm-fill-haze { fill: rgba(var(--theme-primary-rgb), 0.08); }
+.hm-fill-haze--soft { fill: rgba(var(--theme-primary-rgb), 0.05); }
+.hm-stroke-road { stroke: rgba(var(--theme-primary-rgb), 0.2); stroke-width: 1; }
+
+/* --- truck scene --- */
+.hm-truck__city { will-change: transform; animation: theme-truck-city-drift 48s linear infinite; }
+.hm-truck__vehicle { will-change: transform; animation: theme-truck-drive 16s cubic-bezier(0.42, 0.02, 0.28, 1) infinite; }
+.hm-truck__vehicle .hm-fill-wheel {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: theme-truck-wheel 0.55s linear infinite;
+}
+.hm-truck__haze { will-change: transform, opacity; animation: theme-truck-haze 20s ease-in-out infinite; }
+
+/* --- smart-city scene --- */
+.hm-sc__bg { fill: rgba(var(--theme-primary-rgb), 0.02); }
+.hm-sc__grid-line { stroke: rgba(var(--theme-primary-rgb), 0.06); stroke-width: 0.5; }
+.hm-sc__skyline--far { will-change: transform; animation: theme-sc-parallax-far 56s linear infinite; }
+.hm-sc__skyline--mid { will-change: transform; animation: theme-sc-parallax-mid 40s linear infinite; }
+.hm-sc__window {
+  fill: rgba(var(--theme-primary-rgb), 0.5);
+  animation: theme-sc-window-pulse 3.2s ease-in-out infinite;
+}
+.hm-sc__window:nth-child(odd) { animation-delay: 0.6s; }
+.hm-sc__data-lines { will-change: transform, opacity; animation: theme-sc-data-flow 12s linear infinite; }
+.hm-sc__data-line {
+  stroke: rgba(var(--theme-primary-rgb), 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 6 14;
+}
+.hm-sc__data-line--b { stroke-opacity: 0.55; animation-delay: 1.2s; }
+.hm-sc__data-line--c { stroke-opacity: 0.35; stroke-dasharray: 4 18; }
+.hm-sc__scan {
+  fill: rgba(var(--theme-primary-rgb), 0.35);
+  filter: blur(1px);
+  will-change: transform, opacity;
+  animation: theme-sc-scan 8s ease-in-out infinite;
+}
+.hm-sc__particles { will-change: transform, opacity; animation: theme-sc-particles 18s ease-in-out infinite; }
+.hm-sc__particle { fill: rgba(var(--theme-primary-rgb), 0.45); }
+
+/* --- construction scene --- */
+.hm-cn__bg { fill: rgba(var(--theme-primary-rgb), 0.025); }
+.hm-cn__grid { will-change: transform; animation: theme-cn-grid-drift 32s linear infinite; }
+.hm-cn__grid-line { stroke: rgba(var(--theme-primary-rgb), 0.08); stroke-width: 0.5; }
+.hm-cn__skyline--back { will-change: transform; animation: theme-cn-parallax-back 50s linear infinite; }
+.hm-cn__skyline--front { will-change: transform; animation: theme-cn-parallax-front 38s linear infinite; }
+.hm-cn__crane { will-change: transform; animation: theme-cn-crane-sway 6s ease-in-out infinite; }
+.hm-cn__crane-cable { stroke: rgba(var(--theme-primary-rgb), 0.35); stroke-width: 1; }
+.hm-cn__glow-lines { will-change: opacity; animation: theme-cn-glow-pulse 4s ease-in-out infinite; }
+.hm-cn__glow-line { stroke: rgba(var(--theme-primary-rgb), 0.28); stroke-width: 1.5; }
+.hm-cn__glow-line--b { stroke-opacity: 0.45; }
+.hm-cn__scan-beam {
+  fill: rgba(var(--theme-primary-rgb), 0.12);
+  will-change: transform, opacity;
+  animation: theme-cn-sweep 10s ease-in-out infinite;
+}
+.hm-cn__vehicle { will-change: transform; animation: theme-truck-drive 18s cubic-bezier(0.42, 0.02, 0.28, 1) infinite; }
+.hm-cn__vehicle .hm-fill-wheel {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: theme-truck-wheel 0.6s linear infinite;
+}
+
+/* --- blueprint scene --- */
+.hm-bp__bg { fill: rgba(var(--theme-primary-rgb), 0.03); }
+.hm-bp__grid-fine { stroke: rgba(var(--theme-primary-rgb), 0.07); stroke-width: 0.35; }
+.hm-bp__grid-coarse { stroke: rgba(var(--theme-primary-rgb), 0.14); stroke-width: 0.6; }
+.hm-bp__grid { will-change: transform; animation: theme-bp-grid-shift 40s linear infinite; }
+.hm-bp__outline {
+  fill: none;
+  stroke: rgba(var(--theme-primary-rgb), 0.35);
+  stroke-width: 1;
+}
+.hm-bp__dimension {
+  stroke: rgba(var(--theme-primary-rgb), 0.4);
+  stroke-width: 0.75;
+  stroke-dasharray: 4 3;
+}
+.hm-bp__dimension--v { stroke-opacity: 0.55; }
+.hm-bp__tick { stroke: rgba(var(--theme-primary-rgb), 0.5); stroke-width: 1; }
+.hm-bp__corner { fill: rgba(var(--theme-primary-rgb), 0.55); }
+.hm-bp__guide { stroke: rgba(var(--theme-primary-rgb), 0.12); stroke-width: 0.5; stroke-dasharray: 2 6; }
+.hm-bp__wireframe { will-change: opacity; animation: theme-bp-wire-pulse 5s ease-in-out infinite; }
+.hm-bp__scan {
+  fill: rgba(var(--theme-primary-rgb), 0.06);
+  will-change: transform, opacity;
+  animation: theme-bp-scan 9s ease-in-out infinite;
+}
+
+/* Static / reduced motion overrides per scene */
+.header-motion-layer--static .hm-truck__city,
+.header-motion-layer--static .hm-truck__vehicle,
+.header-motion-layer--static .hm-truck__vehicle .hm-fill-wheel,
+.header-motion-layer--static .hm-truck__haze,
+.header-motion-layer--static .hm-sc__skyline--far,
+.header-motion-layer--static .hm-sc__skyline--mid,
+.header-motion-layer--static .hm-sc__data-lines,
+.header-motion-layer--static .hm-sc__scan,
+.header-motion-layer--static .hm-sc__particles,
+.header-motion-layer--static .hm-sc__window,
+.header-motion-layer--static .hm-cn__grid,
+.header-motion-layer--static .hm-cn__skyline--back,
+.header-motion-layer--static .hm-cn__skyline--front,
+.header-motion-layer--static .hm-cn__crane,
+.header-motion-layer--static .hm-cn__glow-lines,
+.header-motion-layer--static .hm-cn__scan-beam,
+.header-motion-layer--static .hm-cn__vehicle,
+.header-motion-layer--static .hm-cn__vehicle .hm-fill-wheel,
+.header-motion-layer--static .hm-bp__grid,
+.header-motion-layer--static .hm-bp__wireframe,
+.header-motion-layer--static .hm-bp__scan {
+  animation: none !important;
+  will-change: auto;
+}
+
+.header-motion-layer--static .hm-truck__vehicle,
+.header-motion-layer--static .hm-cn__vehicle {
+  transform: translate3d(38%, 0, 0);
+}
+
+.header-motion-layer--static .hm-sc__scan {
+  transform: translate3d(42%, 0, 0);
+  opacity: 0.35;
+}
+
+.header-motion-layer--static .hm-bp__scan {
+  opacity: 0.25;
+}
+
+.theme-anim-truck .theme-sidebar,
+.theme-anim-smart-city .theme-sidebar,
+.theme-anim-construction .theme-sidebar,
+.theme-anim-blueprint .theme-sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(var(--theme-primary-rgb), 0.05) 100%);
+}
+
+/* --- minimal --- */
+.theme-anim-minimal .app-page-header {
+  background:
+    linear-gradient(135deg, rgb(255 255 255) 0%, rgba(var(--theme-primary-rgb), 0.03) 48%, rgba(var(--theme-primary-rgb), 0.06) 100%);
+}
+
+.theme-anim-minimal .app-page-header::before,
+.theme-anim-minimal .app-page-header::after {
+  display: none;
+}
+
+/* Optional dashboard ambient glow per preset */
+.theme-anim-bubbles .theme-main-gradient,
+.theme-anim-aurora .theme-main-gradient,
+.theme-anim-liquid .theme-main-gradient {
+  transition: background var(--theme-motion-duration) var(--theme-motion-ease);
+}
+
+.theme-anim-aurora .theme-sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(var(--theme-primary-rgb), 0.06) 100%);
+}
+
+.theme-anim-grid .theme-sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(var(--theme-primary-rgb), 0.03) 100%);
+}
+
+/* =========================
+   Animation keyframes
+   ========================= */
+@keyframes theme-bubbles-drift-a {
+  0% { transform: translate3d(0, 0, 0) scale(0.96); opacity: 0.42; }
+  14% { transform: translate3d(4.5rem, 1.1rem, 0) scale(1.08); opacity: 0.86; }
+  31% { transform: translate3d(13.5rem, -0.85rem, 0) scale(1.02); opacity: 0.58; }
+  47% { transform: translate3d(20rem, 1.9rem, 0) scale(1.18); opacity: 0.8; }
+  63% { transform: translate3d(29rem, -1.4rem, 0) scale(0.94); opacity: 0.44; }
+  79% { transform: translate3d(38rem, 0.7rem, 0) scale(1.1); opacity: 0.72; }
+  100% { transform: translate3d(51rem, -0.6rem, 0) scale(0.98); opacity: 0.3; }
+}
+
+@keyframes theme-bubbles-drift-b {
+  0% { transform: translate3d(0, 0, 0) scale(1.02); opacity: 0.3; }
+  11% { transform: translate3d(-6rem, -1.2rem, 0) scale(1.14); opacity: 0.62; }
+  26% { transform: translate3d(-12.5rem, 1.35rem, 0) scale(0.92); opacity: 0.48; }
+  43% { transform: translate3d(-21rem, -0.35rem, 0) scale(1.08); opacity: 0.78; }
+  57% { transform: translate3d(-28rem, 2rem, 0) scale(0.96); opacity: 0.34; }
+  74% { transform: translate3d(-36rem, -1.6rem, 0) scale(1.16); opacity: 0.7; }
+  100% { transform: translate3d(-46rem, 0.9rem, 0) scale(0.9); opacity: 0.26; }
+}
+
+@keyframes theme-aurora-sweep {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.45; }
+  50% { transform: translate3d(8%, 4%, 0) rotate(12deg) scale(1.08); opacity: 0.62; }
+}
+
+@keyframes theme-aurora-pulse {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.35; }
+  50% { transform: translate3d(-6%, 3%, 0) scale(1.12); opacity: 0.55; }
+}
+
+@keyframes theme-grid-scan {
+  0% { transform: translate3d(-30%, 0, 0); opacity: 0.2; }
+  50% { opacity: 0.45; }
+  100% { transform: translate3d(30%, 0, 0); opacity: 0.2; }
+}
+
+@keyframes theme-grid-glow {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.32; }
+  50% { transform: translate3d(-1.5rem, 1rem, 0) scale(1.1); opacity: 0.5; }
+}
+
+@keyframes theme-liquid-morph-a {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate3d(6%, 4%, 0) rotate(8deg) scale(1.06); }
+  66% { transform: translate3d(2%, -3%, 0) rotate(-6deg) scale(0.96); }
+}
+
+@keyframes theme-liquid-morph-b {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  40% { transform: translate3d(-5%, 3%, 0) rotate(-10deg) scale(1.08); }
+  70% { transform: translate3d(-2%, -4%, 0) rotate(5deg) scale(0.94); }
+}
+
+@keyframes theme-particles-float {
+  0% { transform: translate3d(0, 0, 0); opacity: 0.55; }
+  50% { transform: translate3d(-12px, 8px, 0); opacity: 0.8; }
+  100% { transform: translate3d(-24px, 16px, 0); opacity: 0.55; }
+}
+
+@keyframes theme-particles-glow {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.28; }
+  50% { transform: translate3d(0, -0.75rem, 0) scale(1.15); opacity: 0.45; }
+}
+
+@keyframes theme-truck-city-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-6%, 0, 0); }
+}
+
+@keyframes theme-truck-drive {
+  0% { transform: translate3d(-18%, 0, 0); opacity: 0.85; }
+  8% { opacity: 1; }
+  50% { transform: translate3d(42%, -1px, 0); }
+  92% { opacity: 1; }
+  100% { transform: translate3d(108%, 0, 0); opacity: 0.85; }
+}
+
+@keyframes theme-truck-wheel {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes theme-truck-haze {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.55; }
+  50% { transform: translate3d(2%, -2px, 0); opacity: 0.75; }
+}
+
+@keyframes theme-sc-parallax-far {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-4%, 0, 0); }
+}
+
+@keyframes theme-sc-parallax-mid {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-7%, 0, 0); }
+}
+
+@keyframes theme-sc-window-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@keyframes theme-sc-data-flow {
+  0% { transform: translate3d(-8%, 0, 0); opacity: 0.35; }
+  50% { opacity: 0.7; }
+  100% { transform: translate3d(8%, 0, 0); opacity: 0.35; }
+}
+
+@keyframes theme-sc-scan {
+  0% { transform: translate3d(-12%, 0, 0); opacity: 0.15; }
+  50% { transform: translate3d(48%, 0, 0); opacity: 0.55; }
+  100% { transform: translate3d(108%, 0, 0); opacity: 0.15; }
+}
+
+@keyframes theme-sc-particles {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.4; }
+  50% { transform: translate3d(3%, -3px, 0); opacity: 0.75; }
+}
+
+@keyframes theme-cn-grid-drift {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-28px, 14px, 0); }
+}
+
+@keyframes theme-cn-parallax-back {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-5%, 0, 0); }
+}
+
+@keyframes theme-cn-parallax-front {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-8%, 0, 0); }
+}
+
+@keyframes theme-cn-crane-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+@keyframes theme-cn-glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes theme-cn-sweep {
+  0% { transform: translate3d(-100%, 0, 0); opacity: 0; }
+  20% { opacity: 0.5; }
+  80% { opacity: 0.5; }
+  100% { transform: translate3d(100%, 0, 0); opacity: 0; }
+}
+
+@keyframes theme-bp-grid-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-20px, 10px, 0); }
+}
+
+@keyframes theme-bp-wire-pulse {
+  0%, 100% { opacity: 0.65; }
+  50% { opacity: 1; }
+}
+
+@keyframes theme-bp-scan {
   0% {
-    transform: translate3d(0, 0, 0) scale(1.02);
-    opacity: 0.3;
+    transform: translate3d(0, -100%, 0);
+    opacity: 0;
   }
-  11% {
-    transform: translate3d(-6rem, -1.2rem, 0) scale(1.14);
-    opacity: 0.62;
-  }
-  26% {
-    transform: translate3d(-12.5rem, 1.35rem, 0) scale(0.92);
-    opacity: 0.48;
-  }
-  43% {
-    transform: translate3d(-21rem, -0.35rem, 0) scale(1.08);
-    opacity: 0.78;
-  }
-  57% {
-    transform: translate3d(-28rem, 2rem, 0) scale(0.96);
-    opacity: 0.34;
-  }
-  74% {
-    transform: translate3d(-36rem, -1.6rem, 0) scale(1.16);
-    opacity: 0.7;
-  }
+  15% { opacity: 0.35; }
+  85% { opacity: 0.35; }
   100% {
-    transform: translate3d(-46rem, 0.9rem, 0) scale(0.9);
-    opacity: 0.26;
+    transform: translate3d(0, 100%, 0);
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-page-header::before,
-  .app-page-header::after {
-    animation: none;
+  .theme-anim-bubbles .app-page-header::before,
+  .theme-anim-bubbles .app-page-header::after,
+  .theme-anim-aurora .app-page-header::before,
+  .theme-anim-aurora .app-page-header::after,
+  .theme-anim-grid .app-page-header::before,
+  .theme-anim-grid .app-page-header::after,
+  .theme-anim-liquid .app-page-header::before,
+  .theme-anim-liquid .app-page-header::after,
+  .theme-anim-particles .app-page-header::before,
+  .theme-anim-particles .app-page-header::after,
+  .theme-anim-truck .hm-truck__city,
+  .theme-anim-truck .hm-truck__vehicle,
+  .theme-anim-truck .hm-truck__vehicle .hm-fill-wheel,
+  .theme-anim-truck .hm-truck__haze,
+  .theme-anim-smart-city .hm-sc__skyline--far,
+  .theme-anim-smart-city .hm-sc__skyline--mid,
+  .theme-anim-smart-city .hm-sc__data-lines,
+  .theme-anim-smart-city .hm-sc__scan,
+  .theme-anim-smart-city .hm-sc__particles,
+  .theme-anim-smart-city .hm-sc__window,
+  .theme-anim-construction .hm-cn__grid,
+  .theme-anim-construction .hm-cn__skyline--back,
+  .theme-anim-construction .hm-cn__skyline--front,
+  .theme-anim-construction .hm-cn__crane,
+  .theme-anim-construction .hm-cn__glow-lines,
+  .theme-anim-construction .hm-cn__scan-beam,
+  .theme-anim-construction .hm-cn__vehicle,
+  .theme-anim-construction .hm-cn__vehicle .hm-fill-wheel,
+  .theme-anim-blueprint .hm-bp__grid,
+  .theme-anim-blueprint .hm-bp__wireframe,
+  .theme-anim-blueprint .hm-bp__scan {
+    animation: none !important;
+    will-change: auto;
+  }
+
+  .theme-anim-truck .hm-truck__vehicle,
+  .theme-anim-construction .hm-cn__vehicle {
+    transform: translate3d(38%, 0, 0);
+  }
+
+  .theme-anim-smart-city .hm-sc__scan {
+    transform: translate3d(42%, 0, 0);
+    opacity: 0.3;
+  }
+
+  .theme-anim-blueprint .hm-bp__scan {
+    opacity: 0.2;
+  }
+
+  .theme-anim-aurora .app-page-header,
+  .theme-anim-grid .app-page-header,
+  .theme-anim-liquid .app-page-header,
+  .theme-anim-particles .app-page-header,
+  .theme-anim-minimal .app-page-header,
+  .theme-anim-bubbles .app-page-header::before,
+  .theme-anim-bubbles .app-page-header::after {
+    transition: none;
+  }
+
+  .theme-anim-minimal .app-page-header,
+  .theme-anim-bubbles .app-page-header::before,
+  .theme-anim-bubbles .app-page-header::after {
+    opacity: 0.35;
   }
 }

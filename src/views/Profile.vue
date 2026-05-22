@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-0 sm:p-0.5 md:p-1 lg:p-0">
     <div class="max-w-5xl mx-auto">
       <!-- Header Section -->
-      <div class="app-page-header theme-header mb-6 rounded-2xl border border-gray-100 p-5 shadow-lg shadow-slate-200/50">
+      <div class="app-page-header theme-header theme-animated-surface theme-glow mb-6 rounded-2xl border border-gray-100 p-5 shadow-lg shadow-slate-200/50">
         <div>
           <h1 class="text-2xl font-semibold text-slate-900 mb-2">{{ $t('profile.title') || 'Profile' }}</h1>
           <p class="text-sm text-gray-600">{{ $t('profile.account') || 'Account' }} & {{ $t('profile.security') || 'Security' }}</p>
@@ -99,7 +99,7 @@
             </div>
           </div>
           <div class="p-6 sm:p-8 space-y-4">
-            <p class="text-sm text-gray-600">{{ $t('profile.themeDescription') || 'Pick a primary accent color and the app will update buttons, headers and focus states automatically.' }}</p>
+            <p class="text-sm text-gray-600">{{ $t('profile.themeDescription') || 'Pick a primary accent color and animation style. Buttons, headers, and motion update instantly across the app.' }}</p>
             <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
@@ -110,11 +110,37 @@
                 />
               </div>
               <div class="flex items-center gap-3">
-                <div class="h-14 w-14 rounded-lg shadow-sm" :style="{ backgroundColor: themeColor }"></div>
+                <div class="h-14 w-14 rounded-lg shadow-sm theme-glow" :style="{ backgroundColor: themeColor }"></div>
                 <div>
                   <p class="text-sm text-gray-500">{{ themeColor }}</p>
                   <p class="text-xs text-gray-400">{{ $t('profile.themePreview') || 'Live preview' }}</p>
                 </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('profile.animationPreset') || 'Animation Style' }}</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                <button
+                  v-for="preset in animationPresets"
+                  :key="preset"
+                  type="button"
+                  @click="themeAnimation = preset"
+                  :class="[
+                    'rounded-xl border px-3 py-2.5 text-sm font-medium capitalize transition theme-motion-soft',
+                    themeAnimation === preset
+                      ? 'theme-selected border-transparent shadow-sm'
+                      : 'border-gray-200 bg-white text-gray-700 hover:theme-hover-soft'
+                  ]"
+                >
+                  {{ animationLabel(preset) }}
+                </button>
+              </div>
+              <p class="mt-2 text-xs text-gray-400">{{ $t('profile.animationHint') || 'Affects page headers and ambient UI motion.' }}</p>
+            </div>
+            <div class="rounded-xl border theme-border theme-dashboard-bg-soft p-4 overflow-hidden">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{{ $t('profile.headerPreview') || 'Header preview' }}</p>
+              <div class="app-page-header theme-page-header-bar theme-animated-surface theme-glow rounded-xl p-4 min-h-[4.5rem] flex items-center">
+                <span class="text-sm font-semibold theme-text-strong">{{ animationLabel(themeAnimation) }}</span>
               </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
@@ -217,7 +243,14 @@ import TotpManager from '@/components/auth/TotpManager.vue'
 import { useAuth } from '@/composables/useAuth'
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { applyTheme, loadTheme, resetTheme, saveTheme, DEFAULT_THEME } from '@/theme'
+import {
+  ANIMATION_PRESETS,
+  applyTheme,
+  loadTheme,
+  resetTheme,
+  saveTheme,
+  DEFAULT_THEME
+} from '@/theme'
 import { changePassword } from '@/api'
 import { InformationCircleIcon, EnvelopeIcon, UserIcon, ShieldCheckIcon, KeyIcon, DevicePhoneMobileIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
@@ -243,14 +276,38 @@ export default {
     const changing = ref(false)
     const showChangeModal = ref(false)
     const showTotpModal = ref(false)
-    const themeColor = ref(loadTheme().primary || DEFAULT_THEME.primary)
+    const savedTheme = loadTheme()
+    const themeColor = ref(savedTheme.primary || DEFAULT_THEME.primary)
+    const themeAnimation = ref(savedTheme.animation || DEFAULT_THEME.animation)
+    const animationPresets = ANIMATION_PRESETS
     const isRTL = computed(() => locale.value === 'ar')
 
-    watch(themeColor, (value) => {
-      const nextTheme = { primary: value || DEFAULT_THEME.primary }
+    function animationLabel(preset) {
+      const labels = {
+        bubbles: t('profile.animBubbles') || 'Bubbles',
+        aurora: t('profile.animAurora') || 'Aurora',
+        grid: t('profile.animGrid') || 'Grid',
+        liquid: t('profile.animLiquid') || 'Liquid',
+        minimal: t('profile.animMinimal') || 'Minimal',
+        particles: t('profile.animParticles') || 'Particles',
+        truck: t('profile.animTruck') || 'City Truck',
+        'smart-city': t('profile.animSmartCity') || 'Smart City',
+        construction: t('profile.animConstruction') || 'Construction',
+        blueprint: t('profile.animBlueprint') || 'Blueprint'
+      }
+      return labels[preset] || preset
+    }
+
+    function persistTheme() {
+      const nextTheme = {
+        primary: themeColor.value || DEFAULT_THEME.primary,
+        animation: themeAnimation.value || DEFAULT_THEME.animation
+      }
       applyTheme(nextTheme)
       saveTheme(nextTheme)
-    }, { immediate: true })
+    }
+
+    watch([themeColor, themeAnimation], persistTheme, { immediate: true })
 
     function clearPasswordForm() {
       currentPassword.value = ''
@@ -266,6 +323,7 @@ export default {
     function resetThemeColor() {
       const reset = resetTheme()
       themeColor.value = reset.primary
+      themeAnimation.value = reset.animation
     }
 
     async function handleChangePassword() {
@@ -303,6 +361,9 @@ export default {
       closeChangeModal,
       isRTL,
       themeColor,
+      themeAnimation,
+      animationPresets,
+      animationLabel,
       resetThemeColor,
       t
     }
