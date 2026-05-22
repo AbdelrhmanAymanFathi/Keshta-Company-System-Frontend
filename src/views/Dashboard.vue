@@ -360,6 +360,10 @@ export default {
     },
     selectedTop() {
       const routeName = this.currentRouteName
+      // If the route explicitly opts out of dashboard top selection, keep no top highlight.
+      const routeModule = this.$route?.meta?.module
+      if (routeModule === 'profile') return ''
+
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
       const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''
       if (String(routeMode).toLowerCase() === 'equipment') return 'equipmentLog'
