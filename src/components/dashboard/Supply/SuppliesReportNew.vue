@@ -9,7 +9,7 @@
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport" :disabled="downloading"
-          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
+          class="theme-button px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -27,14 +27,14 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- Contractor -->
@@ -44,12 +44,12 @@
             <input v-model="filters.contractorSearch" @focus="filters.showContractorDropdown = true"
               @blur="closeDropdownDelayed('showContractorDropdown')" type="text"
               :placeholder="$t('placeholders.searchContractor')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
             <div v-if="filters.showContractorDropdown && filteredContractors.length"
               class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
               <div v-for="contractor in filteredContractors" :key="contractor.id"
                 @click="filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.showContractorDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                class="px-3 py-2 theme-hover-soft cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ contractor.name }}
               </div>
             </div>
@@ -63,12 +63,12 @@
             <input v-model="filters.locationSearch" @focus="filters.showLocationDropdown = true"
               @blur="closeDropdownDelayed('showLocationDropdown')" type="text"
               :placeholder="$t('placeholders.searchLocation')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
             <div v-if="filters.showLocationDropdown && filteredLocations.length"
               class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
               <div v-for="location in filteredLocations" :key="location.id"
                 @click="filters.locationId = location.id; filters.locationSearch = location.name; filters.showLocationDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                class="px-3 py-2 theme-hover-soft cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ location.name }}
               </div>
             </div>
@@ -81,12 +81,12 @@
           <div class="relative">
             <input v-model="filters.itemSearch" @focus="filters.showItemDropdown = true"
               @blur="closeDropdownDelayed('showItemDropdown')" type="text" :placeholder="$t('placeholders.searchItem')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
             <div v-if="filters.showItemDropdown && filteredItems.length"
               class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
               <div v-for="item in filteredItems" :key="item.id"
                 @click="filters.itemId = item.id; filters.itemSearch = item.name; filters.showItemDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                class="px-3 py-2 theme-hover-soft cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ item.name }}
               </div>
             </div>
@@ -100,12 +100,12 @@
             <input v-model="filters.vehicleSearch" @focus="filters.showVehicleDropdown = true"
               @blur="closeDropdownDelayed('showVehicleDropdown')" type="text"
               :placeholder="$t('placeholders.searchVehicle')"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
             <div v-if="filters.showVehicleDropdown && filteredVehicles.length"
               class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-md shadow-lg z-10 max-h-48 overflow-y-auto mt-0">
               <div v-for="vehicle in filteredVehicles" :key="vehicle.id"
                 @click="filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.showVehicleDropdown = false"
-                class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
+                class="px-3 py-2 theme-hover-soft cursor-pointer text-sm border-b border-gray-100 last:border-b-0">
                 {{ vehicle.plateNumber || vehicle.name }}
               </div>
             </div>
@@ -115,7 +115,7 @@
 
       <div class="flex gap-2">
         <button @click="loadReport" :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
+          class="px-4 py-2 theme-button rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
           {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
@@ -138,7 +138,7 @@
 
     <!-- Loading State -->
     <div v-else-if="loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 theme-border-accent"></div>
     </div>
 
     <!-- Data Table -->
@@ -146,7 +146,7 @@
       <div class="px-4 py-3 text-sm text-gray-600">Exports/Supplies Report</div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-indigo-50">
+          <thead class="theme-dashboard-bg-soft">
             <tr>
               <th
                 class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -213,7 +213,7 @@
                 formatCurrency(item.discount) }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{
                 formatCurrency(item.rowTotal) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600"
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text"
                 :title="`Running total up to this row`">{{ formatCurrency(item.accumulativeTotal) }}</td>
               <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.notes || '-' }}</td> -->
             </tr>
@@ -239,7 +239,7 @@
           </div>
           <div>
             <p class="text-xs text-gray-600">{{ $t('labels.companyCapacity') }}</p>
-            <p class="text-lg font-semibold text-indigo-600">{{ formatQuantity(totalQuantity) }} وحدة</p>
+            <p class="text-lg font-semibold theme-text">{{ formatQuantity(totalQuantity) }} وحدة</p>
           </div>
           <div>
             <p class="text-xs text-gray-600">متوسط السعر</p>

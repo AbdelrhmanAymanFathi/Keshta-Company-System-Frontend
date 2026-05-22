@@ -1,8 +1,8 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.driversList') || 'Drivers' }}</h2>
-      <button @click="openAdd" class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm">
+      <button @click="openAdd" class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 shadow-sm  text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
         {{ $t('labels.add') || 'Add' }}
       </button>
@@ -13,13 +13,13 @@
     </div>
 
     <div v-if="loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent"></div>
     </div>
 
     <div v-if="!loading" class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+          <thead class="theme-table-thead-gradient">
             <tr>
               <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">#</th>
               <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.name') || 'Name' }}</th>
@@ -29,8 +29,8 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="(d, idx) in drivers" :key="d.id" class="hover:bg-indigo-50/40">
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-indigo-800 text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <tr v-for="(d, idx) in drivers" :key="d.id" class="theme-table-row-hover">
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-muted text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
               <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.name || '-' }}</td>
               <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.phone || '-' }}</td>
               <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.nationalId || '-' }}</td>
@@ -94,7 +94,7 @@
           </div>
           <div class="flex gap-3 pt-4">
             <button type="button" @click="closeModal" class="flex-1 px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
-            <button type="submit" :disabled="saving" class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
+            <button type="submit" :disabled="saving" class="flex-1 px-4 py-2 theme-button rounded">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
           </div>
         </form>
       </div>

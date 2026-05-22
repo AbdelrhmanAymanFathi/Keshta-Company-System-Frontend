@@ -1,6 +1,6 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'"
-    class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center p-4">
+    class="min-h-screen bg-gradient-to-br theme-main-gradient flex items-center justify-center p-4">
     <!-- Language switcher -->
     <div class="absolute top-4 right-4 flex gap-2">
       <button @click="switchLang('en')" :class="btnClass('en')"
@@ -20,8 +20,8 @@
       <div class="bg-white rounded-2xl shadow-2xl p-8">
         <!-- Header -->
         <div class="text-center mb-8">
-          <div class="mx-auto w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="mx-auto w-16 h-16 theme-icon-bg rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 theme-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
@@ -46,7 +46,7 @@
                 </svg>
               </div>
               <input v-model="email" type="email" autocomplete="username" :placeholder="$t('auth.login.email')"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg theme-input-focus transition-colors"
                 :class="{ 'border-red-500': emailError }" required />
             </div>
             <p v-if="emailError" class="mt-1 text-sm text-red-600">{{ emailError }}</p>
@@ -67,7 +67,7 @@
               </div>
               <input v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password"
                 :placeholder="$t('auth.login.password')"
-                class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg theme-input-focus transition-colors"
                 :class="{ 'border-red-500': passwordError }" required />
               <button type="button" @click="showPassword = !showPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -93,17 +93,17 @@
           <div class="flex items-center justify-between">
             <label class="flex items-center">
               <input v-model="rememberMe" type="checkbox"
-                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                class="h-4 w-4 theme-text theme-input-focus border-gray-300 rounded" />
               <span class="ml-2 text-sm text-gray-700">{{ $t('auth.login.rememberMe') }}</span>
             </label>
-            <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">
+            <a href="#" class="text-sm theme-link">
               {{ $t('auth.login.forgotPassword') }}
             </a>
           </div>
 
           <!-- Submit Button -->
           <button v-if="step === 'credentials'" type="submit" :disabled="loading"
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white theme-button  focus:outline-none focus:ring-2 focus:ring-offset-2 theme-input-focus disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor"
@@ -121,7 +121,7 @@
             </div>
             <div class="flex gap-3">
               <button @click.prevent="restartLogin" class="flex-1 px-3 py-2 border rounded-md">{{ $t('labels.cancel') }}</button>
-              <button @click.prevent="submitTotp" :disabled="loading" class="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-md">{{ $t('auth.login.button') }}</button>
+              <button @click.prevent="submitTotp" :disabled="loading" class="flex-1 px-3 py-2 theme-button rounded-md">{{ $t('auth.login.button') }}</button>
             </div>
           </div>
 
@@ -160,7 +160,7 @@
           <p class="text-sm text-gray-600">
             {{ $t('auth.login.noAccount') }}
             <a href="#" @click.prevent="$emit('switch-auth', 'register')"
-              class="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+              class="font-medium theme-link transition-colors">
               {{ $t('auth.login.register') }}
             </a>
           </p>
@@ -414,7 +414,7 @@ export default {
     },
 
     btnClass(lang) {
-      return this.$i18n.locale === lang ? 'ring-2 ring-indigo-400' : ''
+      return this.$i18n.locale === lang ? 'theme-ring-active' : ''
     }
   },
 

@@ -40,7 +40,7 @@
                 <div v-if="!p.type || p.type === 'TEXT'">
                   <input
                     v-model="values[p.name]"
-                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus"
                   />
                 </div>
                 
@@ -48,14 +48,14 @@
                   <input
                     type="number"
                     v-model.number="values[p.name]"
-                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus"
                   />
                 </div>
 
                 <div v-else-if="p.type === 'DATE'">
                   <DateField
                     v-model="values[p.name]"
-                    class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300"
+                    class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus"
                   />
                 </div>
 
@@ -63,7 +63,7 @@
                   <input
                     type="checkbox"
                     v-model="values[p.name]"
-                    class="h-4 w-4 text-indigo-600"
+                    class="h-4 w-4 theme-text"
                   />
                 </div>
 
@@ -81,7 +81,7 @@
                     :placeholder="$t('placeholders.search')"
                     itemKey="id"
                     itemLabel="label"
-                    :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300'"
+                    :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus'"
                     @update:modelValue="(q) => onOptionSearch(p.name, q)"
                     @select="(item) => onSelectOption(p.name, item)"
                   />
@@ -104,7 +104,7 @@
                     :placeholder="$t('placeholders.search')"
                     itemKey="id"
                     itemLabel="label"
-                    :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2 focus:ring-1 focus:ring-indigo-300'"
+                    :inputClass="'w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus'"
                     @update:modelValue="(q) => onOptionSearch(p.name, q)"
                     @select="(item) => onSelectMulti(p.name, item)"
                   />
@@ -129,7 +129,7 @@
                 <button
                   @click="execute"
                   :disabled="executing"
-                  class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white transition hover:bg-indigo-700"
+                  class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 text-white transition "
                 >
                   <span>{{ executing ? ($t('labels.loading') || 'Loading...') : $t("admin.run") }}</span>
                 </button>
@@ -143,7 +143,7 @@
                 <button
                   @click="downloadXlsx"
                   :disabled="!report || !hasExportableRows || !!exportingFormat"
-                  class="flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-white transition hover:bg-sky-700 disabled:opacity-50"
+                  class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 transition disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'xlsx' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadExcel') || 'Download Excel') }}</span>
                 </button>

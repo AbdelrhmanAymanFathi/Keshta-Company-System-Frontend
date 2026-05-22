@@ -5,7 +5,7 @@
       <div class="text-xl text-gray-700 mb-6">{{ message || $t('common.error') }}</div>
 
       <div class="flex justify-center gap-3">
-        <button @click="retry" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">{{ $t('labels.retry') || 'Retry' }}</button>
+        <button @click="retry" class="px-4 py-2 theme-button rounded">{{ $t('labels.retry') || 'Retry' }}</button>
         <a :href="staticPageHref" target="_blank" rel="noopener" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Open static page</a>
         <button @click="dismiss" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Close</button>
       </div>

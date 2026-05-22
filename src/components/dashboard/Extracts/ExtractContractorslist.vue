@@ -1,11 +1,11 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('extracts.title') }}</h2>
       <div class="flex items-center gap-3">
         <!-- Import Excel -->
-        <!-- <label class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-flex items-center cursor-pointer transition-colors">
+        <!-- <label class="theme-button px-4 py-2 rounded  inline-flex items-center cursor-pointer transition-colors">
           <input ref="fileInput" type="file" accept=".xlsx,.xls" class="hidden" @change="onFileChange" />
           <svg class="w-5 h-5" :class="isRTL ? 'ml-2' : 'mr-2'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path d="M12 3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -16,7 +16,7 @@
         </label> -->
         <!-- Add Button -->
         <button @click="openAdd"
-          class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200">
+          class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm ">
           <PlusIcon class="w-5 h-5" />
           {{ $t('extracts.add') }}
         </button>
@@ -26,13 +26,13 @@
     <!-- Search -->
     <div class="max-w-md">
       <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('extracts.searchPlaceholder')"
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-input-focus" />
     </div>
 
     <!-- Desktop Table -->
     <div class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
             <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('extracts.name') }}</th>
@@ -47,13 +47,13 @@
           <tr
             v-for="(c, idx) in filtered"
             :key="c.id"
-            class="hover:bg-indigo-50/40 cursor-pointer transition-colors"
+            class="theme-table-row-hover cursor-pointer transition-colors"
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-6 py-4 text-sm text-indigo-800" :class="textAlign">{{ idx + 1 }}</td>
+            <td class="px-6 py-4 text-sm theme-text-muted" :class="textAlign">{{ idx + 1 }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">
-              <button @click.stop="goToDetail(c)" class="text-indigo-800 hover:underline">{{ c.name }}</button>
+              <button @click.stop="goToDetail(c)" class="theme-text-muted hover:underline">{{ c.name }}</button>
             </td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
@@ -61,10 +61,10 @@
             <td class="px-6 py-4 text-sm text-gray-900" :class="textAlign">{{ c.notes || '-' }}</td>
             <td class="px-6 py-4">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openStatement(c)" class="rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-700 hover:bg-violet-100" :title="$t('extracts.statement')">
+                <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('extracts.statement')">
                   <DocumentTextIcon class="h-5 w-5" />
                 </button>
-                <button @click.stop="openWallet(c)" class="rounded-lg border border-sky-200 bg-sky-50 p-2 text-sky-700 hover:bg-sky-100" :title="$t('extracts.wallet')">
+                <button @click.stop="openWallet(c)" class="rounded-lg border theme-border theme-dashboard-bg-soft p-2 theme-text-strong hover:theme-icon-bg" :title="$t('extracts.wallet')">
                   <WalletIcon class="h-5 w-5" />
                 </button>
                 <button @click.stop="openEdit(c)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" :title="$t('labels.edit')">
@@ -107,8 +107,8 @@
             </div>
           </div>
           <div class="flex flex-col gap-3">
-            <button @click.stop="openStatement(c)" class="text-purple-600 text-xs">{{ $t('extracts.statement') }}</button>
-            <button @click.stop="openWallet(c)" class="text-blue-600 text-xs">{{ $t('extracts.wallet') }}</button>
+            <button @click.stop="openStatement(c)" class="theme-text text-xs">{{ $t('extracts.statement') }}</button>
+            <button @click.stop="openWallet(c)" class="theme-text text-xs">{{ $t('extracts.wallet') }}</button>
             <button @click.stop="openEdit(c)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
             <button @click.stop="confirmDelete(c)" class="text-red-600 text-xs">{{ $t('labels.delete') }}</button>
           </div>
@@ -170,27 +170,27 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <label class="sm:col-span-2 lg:col-span-3">
             <div class="text-sm mb-1">{{ $t('extracts.name') }}</div>
-            <input v-model="form.name" :placeholder="$t('extracts.placeholders.name')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.name" :placeholder="$t('extracts.placeholders.name')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('extracts.phone') }}</div>
-            <input v-model="form.phone" :placeholder="$t('extracts.placeholders.phone')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.phone" :placeholder="$t('extracts.placeholders.phone')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('extracts.bankName') }}</div>
-            <input v-model="form.bankName" :placeholder="$t('extracts.placeholders.bankName')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.bankName" :placeholder="$t('extracts.placeholders.bankName')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('extracts.accountNumber') }}</div>
-            <input v-model="form.accountNumber" :placeholder="$t('extracts.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.accountNumber" :placeholder="$t('extracts.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label v-if="!editing">
             <div class="text-sm mb-1">{{ $t('extracts.openingBalance') || 'Opening Balance' }}</div>
-            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('extracts.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('extracts.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('extracts.notes') }}</div>
-            <input v-model="form.notes" :placeholder="$t('extracts.placeholders.notes')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.notes" :placeholder="$t('extracts.placeholders.notes')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           
         </div>
@@ -198,7 +198,7 @@
           <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
-          <button @click="saveContractor" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+          <button @click="saveContractor" class="px-4 py-2 theme-button rounded">
             {{ $t('labels.save') }}
           </button>
         </div>
@@ -279,7 +279,7 @@
                 </label>
                 <div class="flex justify-end gap-2 mt-2">
                   <button @click="walletModalOpen = false" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-                  <button @click="doDeposit" class="px-4 py-2 rounded bg-indigo-600 text-white">{{ $t('labels.deposit') || 'Deposit' }}</button>
+                  <button @click="doDeposit" class="px-4 py-2 rounded theme-button">{{ $t('labels.deposit') || 'Deposit' }}</button>
                 </div>
               </div>
             </div>

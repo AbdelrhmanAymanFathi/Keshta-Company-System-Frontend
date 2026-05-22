@@ -39,7 +39,7 @@
             <td class="p-2">{{ it.availableForExports ? $t('labels.yes') : $t('labels.no') }}</td>
             <td class="p-2 flex gap-2">
               <button v-if="editingId !== it.id" @click="startEdit(it)" class="px-2 py-1 border rounded">{{ $t('edit') }}</button>
-              <button v-else @click="saveEdit(it)" class="px-2 py-1 bg-indigo-600 text-white rounded">{{ $t('save') }}</button>
+              <button v-else @click="saveEdit(it)" class="px-2 py-1 theme-button rounded">{{ $t('save') }}</button>
               <button @click="removeItem(it)" class="px-2 py-1 border rounded text-red-600">{{ $t('delete') }}</button>
             </td>
           </tr>

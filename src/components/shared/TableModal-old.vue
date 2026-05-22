@@ -1,7 +1,7 @@
 <template>
   <!-- Button to open the Modal (you can remove or change it depending on the page) -->
   <button v-if="showTriggerButton" @click="openModal"
-    class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition">
+    class="theme-button px-6 py-3 rounded-lg  font-medium shadow-md transition">
     {{ triggerButtonText || ($t('dashboard.newSupply') + ' +') }}
   </button>
 
@@ -24,7 +24,7 @@
           <!-- Table -->
           <div class="overflow-x-auto mb-8">
             <table ref="tableRef" class="min-w-full divide-y divide-gray-200 border">
-              <thead class="bg-indigo-50 sticky top-0 z-10">
+              <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                 <tr>
                   <th class="px-3 py-3 text-center w-10">{{ $t('#') }}</th>
                   <th class="px-3 py-3 text-start whitespace-nowrap">{{ $t('labels.date') }}</th>
@@ -51,7 +51,7 @@
                   <!-- Date -->
                   <td class="px-3 py-2">
                     <DateField v-model="row.date"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
@@ -59,7 +59,7 @@
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.item" @change="onItemSelect(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1  theme-input-focus"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.item') }} —</option>
                         <option v-for="i in exportItems" :key="i.id" :value="i">{{ i.name }} ({{ i.currentPrice }})
@@ -77,7 +77,7 @@
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.site" @change="onSiteChange(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1  theme-input-focus"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.site') }} —</option>
                         <option v-for="s in sites" :key="s.id" :value="s">{{ s.name }}</option>
@@ -94,7 +94,7 @@
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.area" :disabled="!row.site || row.site === '__new__'"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1  theme-input-focus disabled:bg-gray-100 disabled:cursor-not-allowed"
                         @change="onAreaChange(row)"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.area') }} —</option>
@@ -114,7 +114,7 @@
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.contractor" @change="onContractorChange(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1  theme-input-focus"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.contractor') }} —</option>
                         <option v-for="c in contractors" :key="c.id" :value="c">{{ c.name }}</option>
@@ -131,7 +131,7 @@
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.crusher" @change="onCrusherChange(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1  theme-input-focus"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.crusher') }} —</option>
                         <option v-for="c in crushers" :key="c.id" :value="c">{{ c.name }}</option>
@@ -148,7 +148,7 @@
                   <td class="px-3 py-2">
                     <div class="flex items-center gap-1">
                       <select v-model="row.vehicle" @change="onVehicleSelect(row)"
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        class="flex-1 border border-gray-300 rounded px-2 py-1  theme-input-focus"
                         @keydown.enter.prevent="handleEnterKey(index)">
                         <option :value="null">{{ $t('labels.vehicle') }} —</option>
                         <option v-for="v in row.availableVehicles" :key="v.id" :value="v">{{ v.name }}</option>
@@ -164,42 +164,42 @@
                   <!-- Crusher Bon -->
                   <td class="px-3 py-2">
                     <input type="text" v-model="row.crusherBon"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- Company Bon -->
                   <td class="px-3 py-2">
                     <input type="text" v-model="row.companyBon"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus"
                       @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- Discount -->
                   <td class="px-3 py-2">
                     <input type="number" v-model.number="row.discount"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus"
                       placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- Price -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.price"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner"
                       placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" @input="onPriceChange(row)" @change="onPriceChange(row)" />
                   </td>
 
                   <!-- Cubic -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.cubic"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner"
                       placeholder="0" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
                   <!-- Crusher Cubic -->
                   <td class="px-3 py-2">
                     <input type="number" step="any" v-model.number="row.crusherCapacity"
-                      class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner"
+                      class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner"
                       placeholder="-" @keydown.enter.prevent="handleEnterKey(index)" />
                   </td>
 
@@ -230,7 +230,7 @@
           <div class="mt-8 text-start space-y-1 text-sm">
             <div class="flex justify-end gap-8">
               <span class="text-gray-600">{{ $t('supply.subtotal') }}:</span>
-              <span class="font-semibold text-indigo-700 w-24">{{ formatNumber(subtotal) }}</span>
+              <span class="font-semibold theme-text-strong w-24">{{ formatNumber(subtotal) }}</span>
             </div>
             <div class="flex justify-end gap-8">
               <span class="text-gray-600">{{ $t('supply.totalDiscount') }}:</span>
@@ -238,7 +238,7 @@
             </div>
             <div class="flex justify-end gap-8 pt-2 border-t border-gray-300">
               <span class="text-gray-700 font-medium">{{ $t('supply.grandTotal') }}:</span>
-              <span class="font-bold text-indigo-800 w-24">{{ formatNumber(grandTotal) }}</span>
+              <span class="font-bold theme-text-muted w-24">{{ formatNumber(grandTotal) }}</span>
             </div>
           </div>
 

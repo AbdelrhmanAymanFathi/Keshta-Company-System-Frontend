@@ -1,6 +1,6 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-4">
-    <div class="app-page-header rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-xl font-bold text-slate-900">{{ isEdit ? $t('admin.editReport') : $t('admin.createReport') }}</h2>
     </div>
 
@@ -45,7 +45,7 @@
           <textarea v-model="form.description" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2"></textarea>
         </div>
       <div class="flex items-end justify-end mt-3">
-            <button @click="generate" class="rounded-xl bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700" :disabled="busy">
+            <button @click="generate" class="rounded-xl theme-button px-4 py-2 text-white " :disabled="busy">
               {{ isEdit ? $t('common.update') : $t('common.generate') || 'Generate' }}
             </button>
           </div>
@@ -62,7 +62,7 @@
       <div v-if="errors.params" class="text-xs text-red-600 mb-2">{{ errors.params }}</div>
 
       <ul class="divide-y divide-gray-100">
-        <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="flex flex-col gap-3 overflow-visible border-b border-slate-200 p-3 lg:flex-row lg:items-start hover:bg-indigo-50/40">
+        <li v-for="(f, idx) in params" :key="f.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event)" @drop="onDrop($event, idx)" class="flex flex-col gap-3 overflow-visible border-b border-slate-200 p-3 lg:flex-row lg:items-start theme-table-row-hover">
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-64 shrink-0">
             <label class="flex items-center gap-1 text-sm">
               <input type="checkbox" v-model="f.selectIncluded" @change="onSelectChange(f)" />

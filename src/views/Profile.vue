@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-0 sm:p-0.5 md:p-1 lg:p-0">
     <div class="max-w-5xl mx-auto">
       <!-- Header Section -->
-      <div class="app-page-header mb-6 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+      <div class="app-page-header theme-header mb-6 rounded-2xl border border-gray-100 p-5 shadow-lg shadow-slate-200/50">
         <div>
           <h1 class="text-2xl font-semibold text-slate-900 mb-2">{{ $t('profile.title') || 'Profile' }}</h1>
           <p class="text-sm text-gray-600">{{ $t('profile.account') || 'Account' }} & {{ $t('profile.security') || 'Security' }}</p>
@@ -14,7 +14,7 @@
         <!-- Account Card -->
         <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
           <!-- Card Header -->
-          <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-4 sm:px-8 sm:py-6">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <div class="flex items-center gap-3">
               <div class="bg-white bg-opacity-20 rounded-lg p-2">
                 <InformationCircleIcon class="w-6 h-6 text-white" />
@@ -27,8 +27,8 @@
           <div class="p-6 sm:p-8 space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-4 border-b border-gray-200">
               <div class="flex-shrink-0">
-                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-indigo-100">
-                  <EnvelopeIcon class="h-6 w-6 text-indigo-600" />
+                <div class="flex items-center justify-center h-12 w-12 rounded-lg theme-icon-bg">
+                  <EnvelopeIcon class="h-6 w-6 theme-text" />
                 </div>
               </div>
               <div class="flex-1 min-w-0">
@@ -39,8 +39,8 @@
 
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <div class="flex-shrink-0">
-                <div class="flex items-center justify-center h-12 w-12 rounded-lg bg-indigo-100">
-                  <UserIcon class="h-6 w-6 text-indigo-600" />
+                <div class="flex items-center justify-center h-12 w-12 rounded-lg theme-icon-bg">
+                  <UserIcon class="h-6 w-6 theme-text" />
                 </div>
               </div>
               <div class="flex-1 min-w-0">
@@ -54,7 +54,7 @@
         <!-- Security Card -->
         <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
           <!-- Card Header -->
-          <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-6 py-4 sm:px-8 sm:py-6">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <div class="flex items-center gap-3">
               <div class="bg-white bg-opacity-20 rounded-lg p-2">
                 <ShieldCheckIcon class="w-6 h-6 text-white" />
@@ -69,7 +69,7 @@
             <div class="flex flex-col gap-3">
               <button 
                 @click="showChangeModal = true" 
-                class="w-full px-4 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-sm hover:shadow-md active:scale-95"
+                class="w-full px-4 py-3 theme-button font-medium rounded-lg transition-all shadow-sm hover:shadow-md active:scale-95"
               >
                 <span class="flex items-center justify-center gap-2">
                   <KeyIcon class="w-5 h-5" />
@@ -78,12 +78,52 @@
               </button>
               <button 
                 @click="showTotpModal = true" 
-                class="w-full px-4 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md active:scale-95"
+                class="w-full px-4 py-3 theme-button font-medium rounded-lg transition-all shadow-sm hover:shadow-md active:scale-95"
               >
                 <span class="flex items-center justify-center gap-2">
                   <DevicePhoneMobileIcon class="w-5 h-5" />
                   {{ $t('profile.totpTitle') }}
                 </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <div class="flex items-center gap-3">
+              <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                <div class="w-6 h-6 rounded-full bg-white bg-opacity-30"></div>
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold text-white">{{ $t('profile.themeTitle') || 'Theme Accent' }}</h2>
+            </div>
+          </div>
+          <div class="p-6 sm:p-8 space-y-4">
+            <p class="text-sm text-gray-600">{{ $t('profile.themeDescription') || 'Pick a primary accent color and the app will update buttons, headers and focus states automatically.' }}</p>
+            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
+                <input
+                  type="color"
+                  v-model="themeColor"
+                  class="w-full h-14 p-0 border border-gray-300 rounded-lg theme-input-focus cursor-pointer"
+                />
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="h-14 w-14 rounded-lg shadow-sm" :style="{ backgroundColor: themeColor }"></div>
+                <div>
+                  <p class="text-sm text-gray-500">{{ themeColor }}</p>
+                  <p class="text-xs text-gray-400">{{ $t('profile.themePreview') || 'Live preview' }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                @click="resetThemeColor"
+                class="theme-button w-full sm:w-auto px-4 py-3 font-medium rounded-lg transition shadow-sm hover:shadow-md"
+              >
+                {{ $t('profile.resetTheme') || 'Reset Theme' }}
               </button>
             </div>
           </div>
@@ -108,7 +148,7 @@
               v-model="currentPassword" 
               type="password" 
               :placeholder="$t('profile.currentPassword')"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-input-focus transition" 
             />
           </div>
           <div>
@@ -117,7 +157,7 @@
               v-model="newPassword" 
               type="password" 
               :placeholder="$t('profile.newPassword')"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-input-focus transition" 
             />
           </div>
           <div>
@@ -126,7 +166,7 @@
               v-model="confirmPassword" 
               type="password" 
               :placeholder="$t('profile.confirmPassword')"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-input-focus transition" 
             />
           </div>
           <div class="pt-4 flex gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
@@ -140,7 +180,7 @@
             <button 
               type="submit" 
               :disabled="changing" 
-              class="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-indigo-800 disabled:opacity-50 transition whitespace-nowrap"
+              class="flex-1 px-4 py-2 theme-button font-medium rounded-lg disabled:opacity-50 transition whitespace-nowrap"
             >
               {{ changing ? $t('labels.saving') : $t('profile.changePassword') }}
             </button>
@@ -175,8 +215,9 @@
 <script>
 import TotpManager from '@/components/auth/TotpManager.vue'
 import { useAuth } from '@/composables/useAuth'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { applyTheme, loadTheme, resetTheme, saveTheme, DEFAULT_THEME } from '@/theme'
 import { changePassword } from '@/api'
 import { InformationCircleIcon, EnvelopeIcon, UserIcon, ShieldCheckIcon, KeyIcon, DevicePhoneMobileIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
@@ -194,7 +235,7 @@ export default {
   },
   setup() {
     const auth = useAuth()
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const user = auth.user
     const currentPassword = ref('')
     const newPassword = ref('')
@@ -202,8 +243,14 @@ export default {
     const changing = ref(false)
     const showChangeModal = ref(false)
     const showTotpModal = ref(false)
-    const { locale } = useI18n()
+    const themeColor = ref(loadTheme().primary || DEFAULT_THEME.primary)
     const isRTL = computed(() => locale.value === 'ar')
+
+    watch(themeColor, (value) => {
+      const nextTheme = { primary: value || DEFAULT_THEME.primary }
+      applyTheme(nextTheme)
+      saveTheme(nextTheme)
+    }, { immediate: true })
 
     function clearPasswordForm() {
       currentPassword.value = ''
@@ -214,6 +261,11 @@ export default {
     function closeChangeModal() {
       showChangeModal.value = false
       clearPasswordForm()
+    }
+
+    function resetThemeColor() {
+      const reset = resetTheme()
+      themeColor.value = reset.primary
     }
 
     async function handleChangePassword() {
@@ -238,7 +290,22 @@ export default {
         changing.value = false
       }
     }
-    return { user, currentPassword, newPassword, confirmPassword, changing, handleChangePassword, clearPasswordForm, showChangeModal, showTotpModal, closeChangeModal, isRTL }
+    return {
+      user,
+      currentPassword,
+      newPassword,
+      confirmPassword,
+      changing,
+      handleChangePassword,
+      clearPasswordForm,
+      showChangeModal,
+      showTotpModal,
+      closeChangeModal,
+      isRTL,
+      themeColor,
+      resetThemeColor,
+      t
+    }
   }
 }
 </script>

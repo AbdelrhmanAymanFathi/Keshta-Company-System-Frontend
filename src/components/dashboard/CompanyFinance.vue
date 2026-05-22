@@ -14,7 +14,7 @@
       <!-- Sidebar header -->
       <div :class="['flex items-center justify-between mb-3']">
         <div class="flex items-center gap-2">
-          <h3 :class="['text-sm font-semibold text-indigo-700', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.wallets') }}</h3>
+          <h3 :class="['text-sm font-semibold theme-text-strong', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.wallets') }}</h3>
           <button
             @click="sidebarCollapsed = !sidebarCollapsed"
             class="sidebar-toggle-glow text-gray-500 hover:text-gray-700 transition-colors p-1 rounded"
@@ -41,10 +41,10 @@
       <div class="mb-3">
         <button @click="selectBranch(null)" @dragover.prevent="onDragOverMain" @dragleave="dragOverMain = false"
           @drop.prevent="onDropOnMain"
-          :class="[selectedBranch === null ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700', 'w-full px-3 py-2 rounded transition border', dragOverMain ? 'border-dashed border-2 border-indigo-300' : '']">
+          :class="[selectedBranch === null ? 'theme-button' : 'bg-white theme-text-strong', 'w-full px-3 py-2 rounded transition border', dragOverMain ? 'border-dashed border-2 theme-border' : '']">
           <div class="flex items-center justify-between">
             <span class="font-semibold">{{ $t('finance.companyWallet') }}</span>
-            <svg v-if="dragOverMain" class="w-4 h-4 text-indigo-200" fill="none" stroke="currentColor"
+            <svg v-if="dragOverMain" class="w-4 h-4 text-white/60" fill="none" stroke="currentColor"
               viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -68,7 +68,7 @@
           <li v-for="(branch, index) in branches" :key="branch.id" tabindex="0" draggable="true"
             @dragstart="onDragStart(index, $event)" @dragenter="onDragEnter(index, $event)" @dragover.prevent
             @drop.prevent="onDropAt(index, $event)" @dragend="onDragEnd"
-            :class="['flex items-center justify-between px-3 py-2 rounded transition border', branch._dropped ? 'animate-flash' : '', selectedBranch && selectedBranch.id === branch.id ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-gray-100']">
+            :class="['flex items-center justify-between px-3 py-2 rounded transition border', branch._dropped ? 'animate-flash' : '', selectedBranch && selectedBranch.id === branch.id ? 'theme-dashboard-bg-soft theme-border' : 'bg-white border-gray-100']">
 
             <div class="flex items-center gap-2 w-full" @click="selectBranch(branch)">
               <div class="drag-handle mr-2 text-gray-400 cursor-grab" aria-hidden>
@@ -104,7 +104,7 @@
     <div v-if="sidebarCollapsed" :class="['fixed top-20 right-6 z-40', isRTL ? 'left-6 right-auto' : '']">
       <button
         @click="sidebarCollapsed = false"
-        class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-xl transition-all duration-200 flex items-center justify-center"
+        class="theme-button p-4 rounded-full shadow-xl transition-all duration-200 flex items-center justify-center"
         :title="$t('finance.showSidebar') || 'Show wallets'"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,16 +116,16 @@
     <div :class="['w-[72%] flex-1 p-4 sm:p-6 space-y-6 transition-all duration-200', isRTL ? 'text-end' : 'text-start']">
       <!-- Balance Card -->
 
-      <!-- <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 text-white">
+      <!-- <div class="theme-card-header rounded-lg shadow-lg p-6 text-white">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 class="text-sm font-medium text-indigo-100 mb-1">{{ $t('finance.balance') }}</h3>
+          <h3 class="text-sm font-medium text-white/80 mb-1">{{ $t('finance.balance') }}</h3>
           <p class="text-xl font-bold">{{ financeStore.formattedBalance }}</p>
         </div>
         <div class="flex gap-3">
           <button
             @click="openDepositModal"
-            class="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition flex items-center gap-2"
+            class="px-4 py-2 bg-white theme-text rounded-lg font-medium theme-hover-soft transition flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -134,7 +134,7 @@
           </button>
           <button
             @click="openWithdrawModal"
-            class="px-4 py-2 bg-indigo-700 text-white rounded-lg font-medium hover:bg-indigo-600 transition flex items-center gap-2"
+            class="px-4 py-2 theme-button rounded-lg font-medium  transition flex items-center gap-2"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
@@ -156,7 +156,7 @@
           {{ $t('finance.transfer') || 'Transfer' }}
         </button>
         <button @click="openExpenseModal"
-          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2">
+          class="px-4 py-2 theme-button rounded-lg transition flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
@@ -166,7 +166,7 @@
       <div :dir="isRTL ? 'rtl' : 'ltr'"
   class="grid gap-4 my-5
          [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600">
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 theme-border-accent">
           <p class="text-xs text-gray-600">{{ $t('expenses.totalAll') || 'Total Expenses (All)' }}</p>
           <p class="text-sm font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAll) }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAll }} {{ $t('labels.results') || 'records' }}</p>
@@ -178,7 +178,7 @@
           <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countMasrouf }} {{ $t('labels.results') || 'records' }}</p>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-400">
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 theme-border-accent">
           <p class="text-xs text-gray-600">{{ $t('expenses.totalAhd') || 'Deferred (Ahd)' }}</p>
           <p class="text-sm font-semibold text-gray-900 mt-1">{{ formatCurrency(expensesSummary.totalAhd) }}</p>
           <p class="text-xs text-gray-500 mt-1">{{ expensesSummary.countAhd }} {{ $t('labels.results') || 'records' }}</p>
@@ -193,7 +193,7 @@
           <p class="text-xs text-gray-600">{{ $t('expenses.totalIn') || 'Total In' }}</p>
           <p class="text-sm font-semibold text-green-600 mt-1">{{ formatCurrency(expensesSummary.totalIn) }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 border-l-4 border-purple-600">
+        <div class="bg-white rounded-lg shadow p-4 border-l-4 theme-border-accent">
           <p class="text-xs text-gray-600">{{ $t('expenses.netBalance') || 'Net Balance' }}</p>
           <p class="text-sm font-semibold" :class="{'text-green-600': expensesSummary.net >= 0, 'text-red-600': expensesSummary.net < 0}">
             {{ formatCurrency(expensesSummary.net || 0) }}
@@ -263,7 +263,7 @@
                     @keydown="handleCategoryKeydown"
                     :disabled="loading"
                     :placeholder="$t('expenses.category') || 'Category'"
-                    :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right direction-rtl' : 'text-left']"
+                    :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none theme-input-focus', isRTL ? 'text-right direction-rtl' : 'text-left']"
                   />
                   <!-- Dropdown -->
                   <div
@@ -276,7 +276,7 @@
                       v-for="(option, index) in filteredCategoryOptions"
                       :key="option.value"
                       @mousedown.prevent="selectCategory(option.value)"
-                      :class="['px-3 py-2 cursor-pointer hover:bg-indigo-50 transition-colors', selectedCategoryIndex === index ? 'bg-indigo-100' : '']"
+                      :class="['px-3 py-2 cursor-pointer theme-hover-soft transition-colors', selectedCategoryIndex === index ? 'theme-icon-bg' : '']"
                     >
                       {{ option.label }}
                     </div>
@@ -305,11 +305,11 @@
                       @keydown="handleSubcategoryKeydown"
                       :disabled="loading"
                       :placeholder="$t('expenses.subcategory') || 'Subcategory'"
-                      :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right direction-rtl' : 'text-left']"
+                      :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none theme-input-focus', isRTL ? 'text-right direction-rtl' : 'text-left']"
                     />
                     <!-- Dropdown -->
                     <div v-if="showSubcategoryDropdown && (filteredSubcategoryOptions.length > 0)" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto" :class="isRTL ? 'text-right direction-rtl' : 'text-left'">
-                      <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer hover:bg-indigo-50 transition-colors', selectedSubcategoryIndex === index ? 'bg-indigo-100' : '']">
+                      <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer theme-hover-soft transition-colors', selectedSubcategoryIndex === index ? 'theme-icon-bg' : '']">
                         {{ option.label }}
                       </div>
                     </div>
@@ -367,7 +367,7 @@
               {{ $t('labels.clear') || 'Clear' }}
             </button>
             <div v-if="loading" class="ml-2">
-              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 theme-border-accent"></div>
             </div>
           </div>
         </div>
@@ -379,7 +379,7 @@
           <div :class="['flex items-center gap-2 text-xs text-gray-600', isRTL ? 'justify-end' : 'justify-start']">
             <label>{{ $t('finance.pageSize') || 'Page Size' }}:</label>
             <select v-model.number="expenses.pageSize" @change="onPageSizeChange"
-              class="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              class="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none theme-input-focus">
               <option :value="10">10</option>
               <option :value="20">20</option>
               <option :value="50">50</option>
@@ -392,7 +392,7 @@
       <!-- Loading/Error/Main Content Switch -->
       <template v-if="loading">
         <div :class="['flex justify-center py-8', isRTL ? 'text-end' : 'text-start']">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 theme-border-accent"></div>
         </div>
       </template>
       <template v-else-if="error">
@@ -512,7 +512,7 @@
                     {{ expense.description || '-' }}
                   </td>
                   <td :class="['px-6 py-4 text-xs whitespace-nowrap', isRTL ? 'text-end' : 'text-start']">
-                    <span v-if="expense.branch && (expense.branch.name || expense.branch)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span v-if="expense.branch && (expense.branch.name || expense.branch)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                       {{ expense.branch?.name || expense.branch }}
                     </span>
                     <span v-else class="text-gray-400">{{ $t('finance.companyWallet') || 'Main Treasury' }}</span>
@@ -529,7 +529,7 @@
                   <!-- Kind -->
                   <td :class="['px-6 py-4 whitespace-nowrap text-xs', isRTL ? 'text-end' : 'text-start']">
                     <span :class="[
-                      expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'bg-indigo-100 text-indigo-800',
+                      expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'theme-icon-bg theme-text-muted',
                       'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
                     ]">
                       {{ expense.kind === 'ADVANCE' ? ($t('expenses.kind.advance') || 'Advance') : ($t('expenses.kind.expense') || 'Expense') }}
@@ -669,7 +669,7 @@
                 <DateField
                   v-model="expenseForm.date"
                   required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-start' : 'text-start']"
                 />
               </div>
 
@@ -682,7 +682,7 @@
                   <select
                     v-model.number="expenseForm.categoryId"
                     required
-                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-start' : 'text-start']"
                   >
                     <option :value="null">{{ $t('expenses.category') || 'Category' }}</option>
                     <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
@@ -722,7 +722,7 @@
                   type="text" 
                   required
                   :placeholder="$t('expenses.description') || 'Description'"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-start' : 'text-start']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-start' : 'text-start']"
                 />
               </div>
 
@@ -767,7 +767,7 @@
                 <DateField
                   v-model="expenseForm.settlementDate"
                   :placeholder="$t('expenses.settlementDatePlaceholder') || 'Settlement date (optional)'"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 />
                 <p :class="['text-xs text-gray-500 mt-1', isRTL ? 'text-right' : 'text-left']">{{ $t('expenses.settlementDateHint') || 'Date when this income will be settled' }}</p>
               </div>
@@ -780,7 +780,7 @@
                 <div :class="[isRTL ? 'flex-row-reverse' : '', 'flex gap-2']">
                   <select 
                     v-model.number="expenseForm.branchId" 
-                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                   >
                     <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
                     <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
@@ -798,7 +798,7 @@
                   <select 
                     v-model.number="expenseForm.locationId"
                     required
-                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                    :class="['flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                   >
                     <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
                     <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
@@ -819,7 +819,7 @@
                   min="0"
                   required
                   :placeholder="$t('expenses.amount') || 'Amount'"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 />
               </div>
 
@@ -832,7 +832,7 @@
                   v-model="expenseForm.notes" 
                   rows="2"
                   :placeholder="$t('expenses.notes') || 'Notes'"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 ></textarea>
               </div>
 
@@ -848,7 +848,7 @@
                 <button 
                   type="submit" 
                   :disabled="expenseProcessing"
-                  class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  class="flex-1 px-4 py-2 theme-button rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
                   <div v-if="expenseProcessing" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   {{ expenseProcessing ? ($t('labels.processing') || 'Processing...') : ($t('expenses.addExpense') || 'Add Expense') }}
@@ -874,7 +874,7 @@
                 {{ $t('finance.branchName') || 'Branch Name' }} *
               </label>
               <input v-model.trim="editBranchForm.name" type="text" required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus">
             </div>
             <div class="flex justify-end gap-3 pt-4">
               <button type="button" @click="closeEditBranchModal"
@@ -882,7 +882,7 @@
                 {{ $t('labels.cancel') || 'Cancel' }}
               </button>
               <button type="submit" :disabled="editBranchProcessing"
-                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition">
+                class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition">
                 {{ editBranchProcessing ? ($t('labels.processing') || 'Processing...') : ($t('labels.save') || 'Save') }}
               </button>
             </div>
@@ -920,7 +920,7 @@
                     :class="[
                       'flex-1 px-3 py-2 rounded-lg font-medium transition text-xs',
                       transferForm.transferType === 'toCompany' 
-                        ? 'bg-indigo-600 text-white' 
+                        ? 'theme-button' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     ]"
                   >
@@ -932,7 +932,7 @@
                     :class="[
                       'flex-1 px-3 py-2 rounded-lg font-medium transition text-xs',
                       transferForm.transferType === 'toBranch' 
-                        ? 'bg-indigo-600 text-white' 
+                        ? 'theme-button' 
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     ]"
                   >
@@ -956,7 +956,7 @@
                 <select 
                   v-model.number="transferForm.toBranchId" 
                   required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 >
                   <option :value="null">{{ $t('finance.selectBranch') }}</option>
                   <option 
@@ -970,8 +970,8 @@
               </div>
 
               <!-- To Company (read-only when transfer type is toCompany) - Column 1 -->
-              <div v-if="selectedBranch && transferForm.transferType === 'toCompany'" class="col-span-1 md:col-span-1 p-3 bg-indigo-50 rounded-md flex items-center">
-                <p :class="['text-xs text-indigo-700', isRTL ? 'text-right' : 'text-left']">
+              <div v-if="selectedBranch && transferForm.transferType === 'toCompany'" class="col-span-1 md:col-span-1 p-3 theme-dashboard-bg-soft rounded-md flex items-center">
+                <p :class="['text-xs theme-text-strong', isRTL ? 'text-right' : 'text-left']">
                   <strong>{{ $t('finance.to') }}:</strong> {{ $t('finance.companyWallet') }}
                 </p>
               </div>
@@ -987,7 +987,7 @@
                   min="0.01" 
                   step="0.01" 
                   required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 >
               </div>
 
@@ -999,7 +999,7 @@
                 <input 
                   v-model="transferForm.description" 
                   type="text"
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 >
               </div>
 
@@ -1011,7 +1011,7 @@
                 <DateField
                   v-model="transferForm.date"
                   required
-                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                  :class="['w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus', isRTL ? 'text-right' : 'text-left']"
                 />
               </div>
 
@@ -1027,7 +1027,7 @@
                 <button 
                   type="submit" 
                   :disabled="processing"
-                  class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition"
+                  class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition"
                 >
                   {{ processing ? ($t('labels.processing') || 'Processing...') : ($t('finance.transfer') || 'Transfer') }}
                 </button>

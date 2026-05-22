@@ -27,7 +27,7 @@
           @mouseenter="highlightedIndex = i"
           :class="[
             'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
-            i === highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
+            i === highlightedIndex ? 'theme-icon-bg' : 'theme-hover-soft'
           ]"
         >
           {{ getLabel(item) }}
@@ -73,7 +73,7 @@ export default {
     inputClass: {
       type: String,
       default:
-        'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'
+        'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'
     },
     dir: {
       type: String,

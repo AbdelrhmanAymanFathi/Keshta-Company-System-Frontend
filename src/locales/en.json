@@ -185,7 +185,7 @@
   },
   "labels": {
     "enterDetails": "Enter details",
-    "hours": "Hours", 
+    "hours": "Hours",
     "driver": "Driver",
     "create": "Create",
     "enterSupplies": "Enter Supplies",
@@ -353,6 +353,11 @@
     "noPayments": "No payments found"
   },
   "profile": {
+    "themeDescription": "Choose between light or dark mode or follow system settings.",
+    "themeTitle": "Theme",
+    "accentColor": "Accent Color",
+    "resetTheme": "Reset Theme",
+    "themePreview": "Theme Preview",
     "title": "Profile",
     "account": "Account",
     "security": "Security",
@@ -637,7 +642,9 @@
   },
   "extracts": {
     "title": "Extracts",
-    "create": { "title": "Create Extract" },
+    "create": {
+      "title": "Create Extract"
+    },
     "detail": "Extract Details",
     "add": "Add",
     "searchPlaceholder": "Search contractors...",
@@ -1049,8 +1056,7 @@
     "pay": "Pay",
     "amount": "Amount",
     "payoutDeletedSuccessfully": "Payout deleted successfully",
-    "payoutAlreadyDeleted": "Payout already deleted"
-    ,
+    "payoutAlreadyDeleted": "Payout already deleted",
     "billingConfirmTitle": "Confirm Billing",
     "billingConfirmMessage": "This job will bill the contractor. Hours: {hours}, Rate: {rate}, Estimated charge: {estimated}. Proceed?"
   },
@@ -1064,8 +1070,8 @@
     "noResults": "No equipment found",
     "createSuccess": "Equipment created successfully",
     "updateSuccess": "Equipment updated successfully",
-    "deleteSuccess": "Equipment deleted successfully"
-    ,"deleteConfirm": "Are you sure you want to delete this equipment?"
+    "deleteSuccess": "Equipment deleted successfully",
+    "deleteConfirm": "Are you sure you want to delete this equipment?"
   },
   "finance": {
     "wallets": "Wallets",

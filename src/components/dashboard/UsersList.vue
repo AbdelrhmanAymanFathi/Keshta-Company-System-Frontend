@@ -1,11 +1,11 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6 p-0 sm:p-0.5 md:p-1 lg:p-0">
     <!-- Header -->
-    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-slate-900">{{ $t('users.title') }}</h2>
       <button
         @click="openAdd"
-        class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700"
+        class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 text-white shadow-sm  transition-colors "
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -21,20 +21,20 @@
         @input="onSearchInput"
         type="search"
         :placeholder="$t('users.searchPlaceholder')"
-        class="w-full rounded-xl border border-slate-200 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+        class="w-full rounded-xl border border-slate-200 px-4 py-2  theme-input-focus"
       />
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent"></div>
     </div>
 
     <!-- Desktop Table -->
     <div v-if="!loading" class="hidden overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40 sm:block">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+          <thead class="theme-table-thead-gradient">
             <tr>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('labels.#') }}</th>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="textAlign">{{ $t('users.name') }}</th>
@@ -49,7 +49,7 @@
             <tr
               v-for="(user, idx) in users"
               :key="user.id"
-              class="transition-colors hover:bg-indigo-50/40"
+              class="transition-colors theme-table-row-hover"
               @contextmenu.prevent="openContextMenu($event, user)"
             >
               <td class="px-6 py-4 text-sm whitespace-nowrap text-gray-900" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
@@ -79,7 +79,7 @@
                   <span
                     v-for="role in user.roles"
                     :key="role.roleId || role.id"
-                    class="inline-flex items-center rounded-lg bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-800"
+                    class="inline-flex items-center rounded-lg theme-icon-bg px-2 py-1 text-xs font-medium theme-text-muted"
                   >
                     {{ role.role?.label || role.role?.name || 'N/A' }}
                   </span>
@@ -93,7 +93,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                    <button @click.stop="openReset(user)" class="text-blue-600 hover:text-blue-800" :title="$t('users.resetPassword')">
+                    <button @click.stop="openReset(user)" class="theme-text hover:theme-text-muted" :title="$t('users.resetPassword')">
                       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 10-8 0v4M5 11h14v8H5z" />
                       </svg>
@@ -151,7 +151,7 @@
               <span
                 v-for="role in user.roles"
                 :key="role.roleId || role.id"
-                class="inline-flex items-center rounded-lg bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-800"
+                class="inline-flex items-center rounded-lg theme-icon-bg px-2 py-1 text-xs font-medium theme-text-muted"
               >
                 {{ role.role?.label || role.role?.name || 'N/A' }}
               </span>
@@ -209,7 +209,7 @@
         </svg>
         {{ $t('labels.delete') }}
       </button>
-      <button @click="contextAction('reset')" class="flex w-full items-center gap-3 px-4 py-2 text-sm text-blue-600 hover:bg-slate-50" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      <button @click="contextAction('reset')" class="flex w-full items-center gap-3 px-4 py-2 text-sm theme-text hover:bg-slate-50" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.657 1.343-3 3-3s3 1.343 3 3v1h1a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 012-2h1v-1c0-1.657 1.343-3 3-3s3 1.343 3 3v1h2v-1z" />
         </svg>
@@ -225,17 +225,17 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('users.password') }}</label>
-            <input v-model="resetForm.newPassword" type="password" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+            <input v-model="resetForm.newPassword" type="password" class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus" />
             <p class="text-sm text-gray-500 mt-1">{{ $t('users.resetHint') }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">TOTP</label>
-            <input v-model="resetForm.adminTotp" type="text" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+            <input v-model="resetForm.adminTotp" type="text" class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus" />
           </div>
         </div>
         <div class="flex gap-3 mt-6" :class="isRTL ? 'flex-row-reverse' : ''">
           <button @click="closeResetModal" class="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50">{{ $t('labels.cancel') }}</button>
-          <button @click="confirmReset" :disabled="resetting" class="flex-1 rounded-xl bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:opacity-50">{{ resetting ? $t('labels.resetting') : $t('labels.reset') }}</button>
+          <button @click="confirmReset" :disabled="resetting" class="flex-1 rounded-xl theme-button px-4 py-2 text-white  disabled:opacity-50">{{ resetting ? $t('labels.resetting') : $t('labels.reset') }}</button>
         </div>
       </div>
     </div>
@@ -260,7 +260,7 @@
               v-model="form.name"
               type="text"
               required
-              class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus"
             />
           </div>
           <div>
@@ -269,7 +269,7 @@
               v-model="form.email"
               type="email"
               required
-              class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus"
             />
           </div>
           <div>
@@ -277,7 +277,7 @@
             <input
               v-model="form.phone"
               type="tel"
-              class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus"
             />
           </div>
           <div v-if="!editing">
@@ -286,7 +286,7 @@
               v-model="form.password"
               type="password"
               required
-              class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+              class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus"
             />
           </div>
           <div>
@@ -294,7 +294,7 @@
               <input
                 v-model="form.isActive"
                 type="checkbox"
-                class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                class="w-4 h-4 theme-text border-gray-300 rounded theme-input-focus"
               />
               <span class="text-sm font-medium text-gray-700">{{ $t('users.isActive') }}</span>
             </label>
@@ -314,7 +314,7 @@
                   v-model="form.roles"
                   :value="role.id"
                   type="checkbox"
-                  class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  class="h-4 w-4 rounded border-slate-300 theme-text theme-input-focus"
                 />
                 <span class="min-w-0">
                   <span class="block text-sm text-slate-700">{{ role.label || role.name }}</span>
@@ -337,7 +337,7 @@
             <button
               type="submit"
               :disabled="saving"
-              class="flex-1 rounded-xl bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:opacity-50"
+              class="flex-1 rounded-xl theme-button px-4 py-2 text-white  disabled:opacity-50"
             >
               {{ saving ? $t('labels.saving') : $t('labels.save') }}
             </button>

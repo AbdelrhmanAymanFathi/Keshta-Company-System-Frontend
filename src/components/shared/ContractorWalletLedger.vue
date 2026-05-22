@@ -33,7 +33,7 @@
 
       <div class="flex items-center justify-between mb-4">
         <div class="flex gap-2">
-          <button @click="applyFilters" class="px-3 py-1 bg-indigo-600 text-white rounded">{{ $t('labels.filter') }}</button>
+          <button @click="applyFilters" class="px-3 py-1 theme-button rounded">{{ $t('labels.filter') }}</button>
           <button @click="resetFilters" class="px-3 py-1 border rounded">{{ $t('labels.clear') }}</button>
         </div>
         <div class="flex gap-2">
@@ -46,7 +46,7 @@
       <div v-else>
         <div class="overflow-auto">
           <table class="min-w-full text-sm">
-            <thead class="bg-indigo-50">
+            <thead class="theme-dashboard-bg-soft">
               <tr>
                 <th class="px-3 py-2 text-left">#</th>
                 <th class="px-3 py-2 text-left">{{ $t('labels.date') }}</th>
