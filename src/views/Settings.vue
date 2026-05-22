@@ -21,20 +21,24 @@
 
           <div class="p-6 sm:p-8 space-y-4">
             <p class="text-sm text-gray-600">{{ $t('profile.themeDescription') || 'Pick a primary accent color and animation style. Buttons, headers, and motion update instantly across the app.' }}</p>
-            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
-              <div>
-                <label class="block text-sm font-semibold mb-2">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
-                <input
-                  type="color"
-                  v-model="themeColor"
-                  class="h-14 w-14 rounded-lg p-0 theme-input-focus cursor-pointer"
-                />
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="h-14 w-14 rounded-lg shadow-sm theme-glow" :style="{ backgroundColor: themeColor }"></div>
+            <div class="rounded-3xl border border-gray-200 bg-slate-50 p-4 shadow-sm">
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-[auto_1fr] sm:items-end">
                 <div>
-                  <p class="text-sm text-gray-500">{{ themeColor }}</p>
-                  <p class="text-xs text-gray-400">{{ $t('profile.themePreview') || 'Live preview' }}</p>
+                  <label class="block text-sm font-semibold mb-2">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
+                  <div class="rounded-3xl bg-white p-3">
+                    <input
+                      type="color"
+                      v-model="themeColor"
+                      class="theme-color-input h-14 w-full"
+                    />
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 rounded-3xl bg-white p-4 shadow-inner">
+                  <div class="h-14 w-full max-w-[220px] rounded-2xl shadow-sm theme-glow" :style="{ backgroundColor: themeColor }"></div>
+                  <div>
+                    <p class="text-sm text-gray-500">{{ themeColor }}</p>
+                    <p class="text-xs text-gray-400">{{ $t('profile.themePreview') || 'Live preview' }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -58,9 +62,9 @@
               </div>
               <p class="mt-2 text-xs text-gray-400">{{ $t('profile.animationHint') || 'Affects page headers and ambient UI motion.' }}</p>
             </div>
-            <div class="rounded-xl border theme-border theme-dashboard-bg-soft p-4 overflow-hidden">
+            <div class="rounded-3xl border theme-border theme-dashboard-bg-soft p-4 overflow-hidden">
               <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{{ $t('profile.headerPreview') || 'Header preview' }}</p>
-              <div class="app-page-header theme-page-header-bar theme-animated-surface theme-glow rounded-xl p-4 min-h-[4.5rem] flex items-center">
+              <div class="app-page-header theme-page-header-bar theme-animated-surface theme-glow rounded-2xl p-4 h-20 flex items-center">
                 <span class="text-sm font-semibold theme-text-strong">{{ animationLabel(themeAnimation) }}</span>
               </div>
             </div>
@@ -149,4 +153,32 @@ export default {
 </script>
 
 <style scoped>
+.theme-color-input {
+  width: 100%;
+  height: 56px;
+  border-radius: 8px;
+  border: 2px solid #1d9ae4;
+  background-color: #1d9ae4;
+  color: #ffffff;
+  padding: 10px 12px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.theme-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.theme-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 8px;
+}
+.theme-color-input::-moz-color-swatch-wrapper {
+  padding: 0;
+}
+.theme-color-input::-moz-color-swatch {
+  border: none;
+  border-radius: 8px;
+}
 </style>
