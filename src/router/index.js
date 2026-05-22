@@ -37,6 +37,7 @@ const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
 const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
 const Profile = () => import('@/views/Profile.vue')
+const Settings = () => import('@/views/Settings.vue')
 const ExtractsPage = () => import('@/views/extracts/ExtractsPage.vue')
 const CreateExtract = () => import('@/views/extracts/CreateExtract.vue')
 const ExtractDetail = () => import('@/views/extracts/ExtractDetail.vue')
@@ -284,6 +285,12 @@ const routes = [
         name: 'profile',
         component: Profile,
         meta: { title: 'profile.title', module: 'profile' }
+      },
+      {
+        path: '/dashboard/settings',
+        name: 'settings',
+        component: Settings,
+        meta: { title: 'settings', module: 'settings' }
       },
 
       // ==================== Extracts Module ====================

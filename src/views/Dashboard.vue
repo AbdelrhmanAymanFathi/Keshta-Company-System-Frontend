@@ -67,6 +67,11 @@
                 </svg>
                 {{ $t('profile.title') || 'Profile' }}
               </button>
+              <button @click="goToSettings(); userMenuOpen = false"
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
+                <WrenchScrewdriverIcon class="w-4 h-4" />
+                {{ $t('settings') || 'Settings' }}
+              </button>
               <button @click="showLogoutDialog = true; userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +232,7 @@ import {
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon },
+  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
@@ -334,6 +339,16 @@ export default {
       return menus
     },
     filteredVerticalMenu() {
+      // When viewing profile-related pages, show a small profile menu
+      const profileRoutes = ['profile', 'settings']
+      if (profileRoutes.includes(this.currentRouteName) || ['profile', 'settings'].includes(this.$route?.meta?.module)) {
+        return [
+          { name: 'profile', label: 'profile.title', routeName: 'profile' },
+          { name: 'settings', label: 'profile.settings', routeName: 'settings' },
+          { name: 'signout', label: 'labels.signOut', routeName: 'signout' }
+        ]
+      }
+
       const menu = this.verticalMenu || []
       if (this.selectedTop === 'admin' && !this.isAdmin) {
         return []
@@ -362,7 +377,7 @@ export default {
       const routeName = this.currentRouteName
       // If the route explicitly opts out of dashboard top selection, keep no top highlight.
       const routeModule = this.$route?.meta?.module
-      if (routeModule === 'profile') return ''
+      if (routeModule === 'profile' || routeModule === 'settings' || routeName === 'settings') return ''
 
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
       const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''
@@ -465,6 +480,13 @@ export default {
           name: 'contractor-supply-statement',
           // query: { transaction_type: 'EXPORT' }
         })
+        if (this.isMobile) this.sidebarOpen = false
+        return
+      }
+      if (routeName === 'signout') {
+        this.showLogoutDialog = true
+        if (this.isMobile) this.sidebarOpen = false
+        return
       } else {
         this.router.push({ name: routeName })
       }
@@ -488,6 +510,7 @@ export default {
       if (this.isMobile) this.sidebarOpen = false
     },
     goToProfile() { this.router.push({ name: 'profile' }) },
+    goToSettings() { this.router.push({ name: 'settings' }) },
     handleLogoutSuccess() {
       this.showLogoutDialog = false
       this.router.push({ name: 'login' })
@@ -545,7 +568,10 @@ export default {
         reportsList: 'reports',
         usersList: 'users',
         locations: 'locations',
-        payments: 'money'
+        payments: 'money',
+        profile: 'users',
+        settings: 'equipment',
+        signout: 'users'
       }
       return iconTypes[aliases[name]] || iconTypes.default
     },

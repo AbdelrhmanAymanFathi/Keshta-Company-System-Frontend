@@ -194,6 +194,7 @@
   },
   "labels": {
     "system": "System",
+    "signOut": "Sign Out",
     "enterDetails": "Enter details",
     "hours": "Hours",
     "driver": "Driver",
@@ -392,6 +393,8 @@
     "noPayments": "No payments found"
   },
   "profile": {
+    "settingsDescription": "Customize your profile and preferences here.",
+    "settings": "Settings",
     "animationHint": "Choose an animation preset to add some motion to your profile background.",
     "headerPreview": "This is how your profile will look to others",
     "animationPreset": "Animation Preset",
