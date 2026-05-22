@@ -185,6 +185,7 @@
     "addItem": "إضافة بند"
   },
   "labels": {
+    "signOut": "تسجيل الخروج",
     "enterDetails": "أدخل التفاصيل",
     "hours":"الساعات",
     "driver":"السائق",
@@ -355,6 +356,9 @@
     "noPayments": "لا توجد دفعات"
   },
   "profile": {
+    "settingsDescription": "قم بتخصيص ملفك الشخصي وتفضيلاتك هنا.",
+    "settings": "الإعدادات",
+
     "animationHint": "اختر تأثير حركة لإضافة بعض الحيوية إلى خلفية ملفك الشخصي.",
     "headerPreview": "هذه هي كيفية ظهور ملفك الشخصي للآخرين",
     "animationPreset": "تأثير الحركة",
