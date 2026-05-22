@@ -1,5 +1,22 @@
 const THEME_STORAGE_KEY = 'app-theme'
-const DEFAULT_THEME = { primary: '#4f46e5' }
+const DEFAULT_ANIMATION = 'bubbles'
+const ANIMATION_PRESETS = [
+  'bubbles',
+  'aurora',
+  'grid',
+  'liquid',
+  'minimal',
+  'particles',
+  'truck',
+  'smart-city',
+  'construction',
+  'blueprint'
+]
+
+const DEFAULT_THEME = {
+  primary: '#4f46e5',
+  animation: DEFAULT_ANIMATION
+}
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
@@ -16,6 +33,18 @@ function normalizeHex(hex) {
     return `#${hex}`
   }
   return DEFAULT_THEME.primary
+}
+
+function normalizeAnimation(animation) {
+  const value = (animation || DEFAULT_ANIMATION).toString().trim().toLowerCase()
+  return ANIMATION_PRESETS.includes(value) ? value : DEFAULT_ANIMATION
+}
+
+function normalizeTheme(theme = {}) {
+  return {
+    primary: normalizeHex(theme.primary),
+    animation: normalizeAnimation(theme.animation)
+  }
 }
 
 function hexToRgb(hex) {
@@ -139,8 +168,37 @@ function setThemeShadeVars(primary) {
   return shades
 }
 
+function clearAnimationClasses() {
+  if (typeof document === 'undefined' || !document.body) return
+  ANIMATION_PRESETS.forEach((preset) => {
+    document.body.classList.remove(`theme-anim-${preset}`)
+  })
+}
+
+function applyAnimationPreset(animation) {
+  if (typeof document === 'undefined') return normalizeAnimation(animation)
+
+  const preset = normalizeAnimation(animation)
+  const apply = () => {
+    if (!document.body) return
+    clearAnimationClasses()
+    document.body.classList.add(`theme-anim-${preset}`)
+    document.documentElement.dataset.themeAnimation = preset
+    document.documentElement.style.setProperty('--theme-animation', preset)
+  }
+
+  if (document.body) {
+    apply()
+  } else {
+    document.addEventListener('DOMContentLoaded', apply, { once: true })
+  }
+
+  return preset
+}
+
 function applyTheme(theme = {}) {
-  const primary = normalizeHex(theme.primary)
+  const normalized = normalizeTheme(theme)
+  const primary = normalized.primary
   const primaryDark = adjustLightness(primary, -18)
   const primaryRgb = hexToRgb(primary)
   const primaryDarkRgb = hexToRgb(primaryDark)
@@ -162,25 +220,27 @@ function applyTheme(theme = {}) {
     root.setProperty('--theme-primary-dark', `rgb(${shade700.r}, ${shade700.g}, ${shade700.b})`)
   }
 
-  return { primary }
+  applyAnimationPreset(normalized.animation)
+
+  return normalized
 }
 
 function loadTheme() {
-  if (typeof window === 'undefined') return DEFAULT_THEME
+  if (typeof window === 'undefined') return { ...DEFAULT_THEME }
 
   try {
     const saved = localStorage.getItem(THEME_STORAGE_KEY)
-    if (!saved) return DEFAULT_THEME
+    if (!saved) return { ...DEFAULT_THEME }
     const parsed = JSON.parse(saved)
-    return { primary: normalizeHex(parsed.primary || DEFAULT_THEME.primary) }
+    return normalizeTheme(parsed)
   } catch (error) {
-    return DEFAULT_THEME
+    return { ...DEFAULT_THEME }
   }
 }
 
 function saveTheme(theme) {
   if (typeof window === 'undefined') return
-  const normalized = { primary: normalizeHex(theme.primary) }
+  const normalized = normalizeTheme(theme)
   localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(normalized))
 }
 
@@ -194,4 +254,14 @@ if (typeof document !== 'undefined') {
   applyTheme(loadTheme())
 }
 
-export { DEFAULT_THEME, applyTheme, loadTheme, saveTheme, resetTheme }
+export {
+  ANIMATION_PRESETS,
+  DEFAULT_ANIMATION,
+  DEFAULT_THEME,
+  applyTheme,
+  loadTheme,
+  saveTheme,
+  resetTheme,
+  normalizeTheme,
+  normalizeAnimation
+}

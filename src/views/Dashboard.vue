@@ -184,10 +184,16 @@
       <!-- Main Content -->
       <main class="dashboard-module-content app-scrollbar theme-main-gradient flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
-        <transition name="fade" mode="out-in">
-          <router-view @navigate-report="navigateToReport"
-            @navigate-statement="navigateToStatement" />
-        </transition>
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component
+              :is="Component"
+              :key="$route.fullPath"
+              @navigate-report="navigateToReport"
+              @navigate-statement="navigateToStatement"
+            />
+          </transition>
+        </router-view>
       </main>
     </div>
 

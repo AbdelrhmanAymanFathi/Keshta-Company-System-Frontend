@@ -10,6 +10,7 @@ import i18n from './i18n'
 import authManager from './auth'
 import { initializeAuthStore } from './composables/authStore'
 import './api' // Initialize API with token management
+import { installHeaderMotion } from './utils/headerMotionMount'
 
 // Initialize auth store immediately on app load
 initializeAuthStore()
@@ -33,6 +34,7 @@ app.provide('authManager', authManager)
 
 // mount app
 app.mount('#app')
+installHeaderMotion(router)
 
 /**
  * Set document <html> lang and dir based on locale
