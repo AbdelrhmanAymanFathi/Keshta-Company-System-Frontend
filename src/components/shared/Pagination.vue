@@ -43,7 +43,7 @@
           <select
             v-model.number="localPageSize"
             @change="onPageSizeChange"
-            class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none theme-input-focus"
           >
             <option v-for="opt in pageSizeOptions" :key="opt" :value="opt">
               {{ opt }}
@@ -93,7 +93,7 @@
               p.isEllipsis
                 ? 'bg-white border-gray-300 text-gray-400 cursor-default'
                 : p.number === currentPage
-                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                ? 'z-10 theme-dashboard-bg-soft theme-pagination-active'
                 : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
             ]"
           >

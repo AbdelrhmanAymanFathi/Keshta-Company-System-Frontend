@@ -1,6 +1,6 @@
 <template>
   <div class="relative z-20 mx-auto max-w-4xl p-6">
-    <div class="app-page-header mb-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header mb-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-xl font-bold text-slate-900">{{ isNew ? $t('admin.createReport') : $t('admin.editReport') }}</h2>
     </div>
     <div class="relative z-20 overflow-visible rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
@@ -36,7 +36,7 @@
         </div>
         <div>
           <label class="block text-sm font-medium">{{ $t('reports.columnActive') }}</label>
-          <input type="checkbox" v-model="form.active" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+          <input type="checkbox" v-model="form.active" class="h-4 w-4 rounded border-slate-300 theme-text theme-input-focus" />
         </div>
         <div class="col-span-2">
           <label class="block text-sm font-medium">{{ $t('reports.description') }}</label>
@@ -49,16 +49,16 @@
         </div>
       </div>
 
-      <div class="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4">
-        <div class="text-sm font-medium text-sky-900">{{ $t('reports.selectFields') || 'Output fields' }}</div>
-        <div class="text-xs text-sky-800 mt-1">
+      <div class="mt-4 rounded-2xl border theme-border theme-dashboard-bg-soft/70 p-4">
+        <div class="text-sm font-medium theme-text-strong">{{ $t('reports.selectFields') || 'Output fields' }}</div>
+        <div class="text-xs theme-text-muted mt-1">
           {{ $t('reports.selectFieldsHelp') || 'Choose which fields appear in the result table and exports.' }}
         </div>
         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           <label
             v-for="field in form.params"
             :key="`select-field-${field.name}`"
-            class="flex items-center gap-2 rounded-xl border border-indigo-100 bg-white px-3 py-2 text-sm"
+            class="flex items-center gap-2 rounded-xl border theme-border bg-white px-3 py-2 text-sm"
           >
             <input type="checkbox" :value="field.name" v-model="form.selectFieldNames" />
             <span>{{ field.label || field.name }}</span>
@@ -70,7 +70,7 @@
           <router-link to="/dashboard/admin/reports" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </router-link>
-          <button @click="save" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white transition hover:bg-indigo-700">
+          <button @click="save" class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 text-white transition ">
             <span>{{ $t('labels.save') }}</span>
           </button>
         </div>
@@ -83,7 +83,7 @@
       <div class="flex justify-between mb-2">
           <div class="text-sm text-gray-600">{{ $t('reports.parametersHelp') || '' }}</div>
         <div>
-          <button @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white transition hover:bg-indigo-700">
+          <button @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 text-white transition ">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
             </svg>
@@ -94,9 +94,9 @@
 
       <ul>
         <li v-for="(p, idx) in form.params" :key="p.name" draggable @dragstart="onDragStart($event, idx)" @dragover.prevent="onDragOver($event, idx)" @drop="onDrop($event, idx)"
-            class="flex items-center justify-between border-b border-slate-200 p-3 transition hover:bg-indigo-50/40">
+            class="flex items-center justify-between border-b border-slate-200 p-3 transition theme-table-row-hover">
           <div class="flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 theme-text" viewBox="0 0 20 20" fill="currentColor">
               <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7.414A2 2 0 0016.586 6L13 2.414A2 2 0 0011.586 2H4z" />
             </svg>
             <div>
@@ -156,10 +156,10 @@
           <button @click="cancelEditParam" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </button>
-          <button @click="saveParam" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white transition hover:bg-indigo-700">
+          <button @click="saveParam" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 text-white transition ">
             <span>{{ $t('reports.saveParam') }}</span>
           </button>
-          <button v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="flex items-center gap-2 rounded-xl bg-sky-600 px-3 py-2 text-white transition hover:bg-sky-700">
+          <button v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 transition">
             <span>{{ $t('admin.previewOptions') }}</span>
           </button>
         </div>

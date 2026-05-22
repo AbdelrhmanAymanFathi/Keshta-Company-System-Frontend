@@ -1,6 +1,6 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.suppliesList') }}</h2>
 
       <TableModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newSupply') + ' +'" @saved="onSupplySaved"/>
@@ -14,14 +14,14 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         
@@ -108,7 +108,7 @@
 
       <div class="flex gap-2">
         <button @click="page = 1; loadSupplies()" :disabled="loading"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm shadow-indigo-200">
+          class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm ">
           {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
@@ -121,7 +121,7 @@
     <!-- table -->
     <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -180,9 +180,9 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
-          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="hover:bg-indigo-50/40" @contextmenu.prevent="onRowContextMenu($event, supply)">
+          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="theme-table-row-hover" @contextmenu.prevent="onRowContextMenu($event, supply)">
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.contractor?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
@@ -193,7 +193,7 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.companyTicket || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.companyCapacity ?? '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusherCapacity ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-sm font-semibold text-indigo-900 whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-sm font-semibold theme-text-muted whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 tracking-wider">
@@ -295,7 +295,7 @@
         </div>
         <div class="mt-4 flex gap-2 justify-end">
           <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button @click="saveEdit" class="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500">{{
+          <button @click="saveEdit" class="px-4 py-2 rounded-xl text-white theme-button">{{
             $t('labels.save') }}</button>
         </div>
       </div>

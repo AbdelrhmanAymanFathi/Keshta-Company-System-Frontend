@@ -1,15 +1,15 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-xl sm:text-2xl font-bold text-slate-900">{{ $t('locations.title') || 'Locations' }}</h2>
       <div class="flex items-center gap-3">
-        <button @click="openAddSite()" class="rounded-xl bg-indigo-600 px-4 py-2 text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700">+ {{ $t('locations.addLocation') || 'Add Location' }}</button>
+        <button @click="openAddSite()" class="rounded-xl theme-button px-4 py-2 text-white shadow-sm  transition ">+ {{ $t('locations.addLocation') || 'Add Location' }}</button>
       </div>
     </div>
 
     <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <table class="min-w-full table-auto">
-        <thead class="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="border-b border-slate-200 theme-table-thead-gradient">
           <tr>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">#</th>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('locations.locationName') || 'Name' }}</th>
@@ -19,13 +19,13 @@
         </thead>
         <tbody>
           <template v-for="(loc, idx) in sites" :key="loc.id">
-            <tr class="border-b border-slate-200 hover:bg-indigo-50/40">
+            <tr class="border-b border-slate-200 theme-table-row-hover">
               <td class="px-4 py-3">{{ idx + 1 }}</td>
               <td :class="['px-4 py-3 font-medium', isRTL ? 'text-right' : 'text-left']">{{ loc.name }}</td>
               <td class="px-4 py-3">{{ $t('locations.site') || 'Site' }}</td>
               <td :class="['px-4 py-3', isRTL ? 'text-right' : 'text-left']">
-                <button @click="openAddArea(loc)" :class="['text-sky-600 hover:text-sky-700 transition', isRTL ? 'ml-3' : 'mr-3']" :title="$t('locations.addArea')">{{ $t('locations.addArea') || 'Add Area' }}</button>
-                <button @click="openEdit(loc)" :class="['text-blue-600 hover:text-blue-700 transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
+                <button @click="openAddArea(loc)" :class="['theme-text hover:theme-text-muted transition', isRTL ? 'ml-3' : 'mr-3']" :title="$t('locations.addArea')">{{ $t('locations.addArea') || 'Add Area' }}</button>
+                <button @click="openEdit(loc)" :class="['theme-text hover:theme-text-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
                   <PencilIcon class="w-4 h-4" />
                 </button>
                 <button @click="confirmDelete(loc)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
@@ -34,12 +34,12 @@
               </td>
             </tr>
 
-            <tr v-for="(child) in loc.children" :key="child.id" class="border-b border-slate-200 bg-slate-50/70 hover:bg-indigo-50/40">
+            <tr v-for="(child) in loc.children" :key="child.id" class="border-b border-slate-200 bg-slate-50/70 theme-table-row-hover">
               <td class="px-4 py-2">&nbsp;</td>
               <td :class="['px-4 py-2 ps-8', isRTL ? 'text-right' : 'text-left']">— {{ child.name }}</td>
               <td class="px-4 py-2">{{ $t('locations.area') || 'Area' }}</td>
               <td :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">
-                <button @click="openEdit(child, loc)" :class="['text-blue-600 hover:text-blue-700 transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
+                <button @click="openEdit(child, loc)" :class="['theme-text hover:theme-text-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
                   <PencilIcon class="w-4 h-4" />
                 </button>
                 <button @click="confirmDelete(child)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
@@ -65,11 +65,11 @@
         </h3>
         <div class="mb-4">
           <label class="block text-sm text-gray-700 mb-1">{{ $t(form.parentId ? 'locations.areaName' : 'locations.locationName') || (form.parentId ? 'Area' : 'Name') }}</label>
-          <input v-model="form.name" class="w-full rounded-xl border border-slate-200 px-3 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+          <input v-model="form.name" class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus" />
         </div>
         <div class="flex justify-end gap-3">
           <button @click="closeModal" class="rounded-xl border border-slate-200 px-3 py-2 text-slate-700 hover:bg-slate-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-          <button @click="save()" :disabled="saving || !form.name.trim()" class="rounded-xl bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">{{ saving ? ($t('labels.saving')||'Saving') : ($t('labels.save')||'Save') }}</button>
+          <button @click="save()" :disabled="saving || !form.name.trim()" class="rounded-xl theme-button px-4 py-2 text-white ">{{ saving ? ($t('labels.saving')||'Saving') : ($t('labels.save')||'Save') }}</button>
         </div>
         <p v-if="error" class="text-red-600 mt-3">{{ error }}</p>
       </div>

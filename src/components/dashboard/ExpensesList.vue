@@ -18,7 +18,7 @@
 
       <button 
         @click="openAddModal" 
-        class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200 flex items-center gap-2 shadow-lg"
+        class="theme-button px-6 py-3 rounded-lg transition-all duration-200 flex items-center gap-2 shadow-lg"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -38,7 +38,7 @@
               v-model="searchQuery" 
               type="search" 
               :placeholder="$t('expenses.searchPlaceholder')"
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg theme-input-focus"
               :class="isRTL ? 'text-right' : 'text-left'"
             />
             <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" :class="isRTL ? 'left-auto right-3' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@
         <div class="flex gap-2">
           <select 
             v-model.number="selectedCategoryId" 
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            class="px-4 py-2 border border-gray-300 rounded-lg theme-input-focus"
             :class="isRTL ? 'text-right' : 'text-left'"
           >
             <option :value="null">{{ $t('expenses.category') }}</option>
@@ -66,10 +66,10 @@
                 @keydown="handleSubcategoryKeydown"
                 :disabled="loading"
                 :placeholder="$t('expenses.subcategory')"
-                :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none theme-input-focus', isRTL ? 'text-right' : 'text-left']"
               />
               <div v-if="showSubcategoryDropdown && (filteredSubcategoryOptions.length > 0)" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto" :class="isRTL ? 'text-right' : 'text-left'">
-                <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer hover:bg-indigo-50 transition-colors', selectedSubcategoryIndex === index ? 'bg-indigo-100' : '']">
+                <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer theme-hover-soft transition-colors', selectedSubcategoryIndex === index ? 'theme-icon-bg' : '']">
                   {{ option.label }}
                 </div>
               </div>
@@ -84,7 +84,7 @@
               +
             </button>
           </div>
-          <select v-model="selectedKind" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" :class="isRTL ? 'text-right' : 'text-left'">
+          <select v-model="selectedKind" class="px-4 py-2 border border-gray-300 rounded-lg theme-input-focus" :class="isRTL ? 'text-right' : 'text-left'">
             <option value="">{{ $t('expenses.typeAll') || 'All Types' }}</option>
             <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
             <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
@@ -103,7 +103,7 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent"></div>
     </div>
 
     <!-- Error State -->
@@ -171,7 +171,7 @@
                 {{ formatDate(expense.date) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'bg-indigo-100 text-indigo-800'">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'theme-icon-bg theme-text-muted'">
                   {{ expense.kind === 'ADVANCE' ? ( $t('expenses.kind.advance') || 'عهدة' ) : ( $t('expenses.kind.expense') || 'مصروف' ) }}
                 </span>
               </td>
@@ -194,13 +194,13 @@
                 {{ expense.description }}
               </td>
               <td class="px-6 py-4 text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
-                <span v-if="expense.branch" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span v-if="expense.branch" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                   {{ expense.branch.name }}
                 </span>
                 <span v-else class="text-gray-400">-</span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
-                <span v-if="expense.location" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                <span v-if="expense.location" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                   {{ expense.location.name }}
                 </span>
                 <span v-else class="text-gray-400">-</span>
@@ -223,7 +223,7 @@
                 <div class="flex gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
                   <button 
                     @click="openEditModal(expense)" 
-                    class="text-indigo-600 hover:text-indigo-900 transition-colors"
+                    class="theme-text hover:theme-text-muted transition-colors"
                     :title="$t('labels.edit')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,7 +280,7 @@
           <div class="flex gap-2">
             <button 
               @click="openEditModal(expense)" 
-              class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+              class="p-2 theme-text theme-hover-soft rounded-lg transition-colors"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -323,7 +323,7 @@
           <select 
             v-model="pageSize" 
             @change="onPageSizeChange"
-            class="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            class="px-2 py-1 text-sm border border-gray-300 rounded theme-input-focus"
           >
             <option value="10">10</option>
             <option value="20">20</option>
@@ -349,7 +349,7 @@
           :class="[
             'px-3 py-2 text-sm border rounded-lg transition-colors',
             page === currentPage 
-              ? 'bg-indigo-600 text-white border-indigo-600' 
+              ? 'theme-button theme-border-accent' 
               : 'border-gray-300 hover:bg-gray-50'
           ]"
         >
@@ -391,7 +391,7 @@
               <DateField
                 v-model="form.date"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                 :class="isRTL ? 'text-right' : 'text-left'"
               />
             </div>
@@ -405,7 +405,7 @@
                 <select 
                   v-model.number="form.categoryId" 
                   required
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                   :class="isRTL ? 'text-right' : 'text-left'"
                 >
                   <option :value="null">{{ $t('expenses.category') }}</option>
@@ -450,7 +450,7 @@
                 type="text" 
                 required
                 :placeholder="$t('expenses.description')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                 :class="isRTL ? 'text-right' : 'text-left'"
               />
             </div>
@@ -496,7 +496,7 @@
               <DateField
                 v-model="form.settlementDate"
                 :placeholder="$t('expenses.settlementDatePlaceholder')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                 :class="isRTL ? 'text-right' : 'text-left'"
               />
               <p class="text-xs text-gray-500 mt-1">{{ $t('expenses.settlementDateHint') }}</p>
@@ -510,7 +510,7 @@
               <div class="flex gap-2">
                 <select 
                   v-model="form.branchId" 
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                   :class="isRTL ? 'text-right' : 'text-left'"
                 >
                   <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
@@ -529,7 +529,7 @@
                 <select 
                   v-model="form.locationId" 
                   required
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                   :class="isRTL ? 'text-right' : 'text-left'"
                 >
                   <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
@@ -551,7 +551,7 @@
                 min="0"
                 required
                 :placeholder="$t('expenses.amount')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                 :class="isRTL ? 'text-right' : 'text-left'"
               />
             </div>
@@ -565,7 +565,7 @@
                 v-model="form.notes" 
                 rows="2"
                 :placeholder="$t('expenses.notes')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                 :class="isRTL ? 'text-right' : 'text-left'"
               ></textarea>
             </div>
@@ -582,7 +582,7 @@
               <button 
                 type="submit" 
                 :disabled="saving"
-                class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                class="flex-1 px-4 py-2 theme-button rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 <div v-if="saving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 {{ saving ? $t('labels.saving') : $t('labels.save') }}
@@ -681,7 +681,7 @@
                 isRTL ? 'flex-row-reverse text-right' : ''
               ]"
             >
-              <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 theme-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
               <div>
@@ -700,7 +700,7 @@
                 isRTL ? 'flex-row-reverse text-right' : ''
               ]"
             >
-              <svg class="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 theme-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <div>
@@ -1320,9 +1320,9 @@ export default {
       const actualCategory = categoryKey || category
       
       const colors = {
-        'Travel': 'bg-blue-100 text-blue-800',
+        'Travel': 'theme-badge',
         'Meals': 'bg-green-100 text-green-800',
-        'Office': 'bg-purple-100 text-purple-800',
+        'Office': 'theme-badge',
         'Equipment': 'bg-orange-100 text-orange-800',
         'Maintenance': 'bg-red-100 text-red-800',
         'Utilities': 'bg-yellow-100 text-yellow-800',

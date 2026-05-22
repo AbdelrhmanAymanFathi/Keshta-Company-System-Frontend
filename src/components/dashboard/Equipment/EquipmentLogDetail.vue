@@ -12,7 +12,7 @@
     </div>
 
     <div v-if="loading" class="flex justify-center py-6">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 theme-border-accent"></div>
     </div>
 
     <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -69,7 +69,7 @@
             </div>
             <div class="flex items-center gap-3">
               <div class="text-sm font-semibold">{{ formatCurrency(job.total ?? Math.max(0, (Number(job.hours || 0) * Number(job.hourlyRate || rental.hourlyRate || 0)) - Number(job.discount || 0))) }}</div>
-              <button @click="editJob(job)" class="text-indigo-600 hover:text-indigo-900 text-sm">{{ $t('labels.edit') }}</button>
+              <button @click="editJob(job)" class="theme-text hover:theme-text-muted text-sm">{{ $t('labels.edit') }}</button>
               <button @click="deleteJob(job)" class="text-red-600 hover:text-red-900 text-sm">{{ $t('labels.delete') }}</button>
             </div>
           </div>
@@ -91,7 +91,7 @@
         </div>
         <div class="mt-3 flex gap-2">
           <button @click="saveJob" :disabled="savingJob"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">{{ savingJob ? $t('labels.saving') : $t('labels.save') }}</button>
+            class="theme-button px-4 py-2 rounded">{{ savingJob ? $t('labels.saving') : $t('labels.save') }}</button>
           <button @click="resetJobForm" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</button>
         </div>
       </div>

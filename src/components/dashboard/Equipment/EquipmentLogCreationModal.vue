@@ -5,7 +5,7 @@
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-indigo-800">{{ modalHeaderTitle }}</h2>
+          <h2 class="text-2xl font-bold theme-text-muted">{{ modalHeaderTitle }}</h2>
           <button @click="closeModal" class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">×</button>
         </div>
 
@@ -17,24 +17,24 @@
             <h3 class="text-lg font-bold mb-6 text-center text-gray-800">{{ $t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type' }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
               <button @click="chooseOwnership(false)" type="button"
-                class="w-full rounded-2xl border border-indigo-200 bg-white p-6 text-left shadow-sm hover:border-indigo-300 hover:bg-indigo-50 transition">
+                class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
                 <div class="flex items-center justify-between gap-4">
                   <div>
                     <p class="text-lg font-semibold text-gray-900">{{ $t('equipmentLog.companyOwned') || 'Company-owned Equipment' }}</p>
                     <p class="mt-2 text-sm text-gray-600">{{ $t('equipmentLog.addCompanyOwnedEntry') || 'Add a log for equipment owned by the company.' }}</p>
                   </div>
-                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">1</span>
+                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-text-strong">1</span>
                 </div>
               </button>
 
               <button @click="chooseOwnership(true)" type="button"
-                class="w-full rounded-2xl border border-indigo-200 bg-white p-6 text-left shadow-sm hover:border-indigo-300 hover:bg-indigo-50 transition">
+                class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
                 <div class="flex items-center justify-between gap-4">
                   <div>
                     <p class="text-lg font-semibold text-gray-900">{{ $t('equipmentLog.external') || 'Rented Equipment' }}</p>
                     <p class="mt-2 text-sm text-gray-600">{{ $t('equipmentLog.addRentalEntry') || 'Add a log for rented equipment.' }}</p>
                   </div>
-                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">2</span>
+                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-text-strong">2</span>
                 </div>
               </button>
             </div>
@@ -54,7 +54,7 @@
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'" @select="selectEquipment" />
+                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" />
                     </div>
                   </div>
                 </div>
@@ -63,7 +63,7 @@
                 <div v-if="!isCompanyOwnedEquipment">
                   <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.price') }} <span class="text-red-600">*</span></label>
                   <div class="relative">
-                    <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                    <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
                   </div>
                 </div>
 
@@ -75,7 +75,7 @@
                     :items="drivers"
                     :allItems="drivers"
                     :placeholder="$t('labels.driver')"
-                    :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                    :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                     @select="selectDriver"
                   />
                 </div>
@@ -86,7 +86,7 @@
                   <div class="relative">
                     <input type="text" :value="form.contractorLabel || ($t('vehicles.contractor') || 'Contractor')" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed text-gray-600" />
                   </div>
-                  <p class="mt-2 text-xs text-blue-500">{{ $t('equipmentLog.contractorReadonlyNote') || 'Contractor is auto-selected and cannot be edited.' }}</p>
+                  <p class="mt-2 text-xs theme-text">{{ $t('equipmentLog.contractorReadonlyNote') || 'Contractor is auto-selected and cannot be edited.' }}</p>
                 </div>
 
                 <!-- Site (الموقع) -->
@@ -98,7 +98,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
                         :placeholder="$t('labels.site')"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { form.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                         <template #prefix>
                           <MapPinIcon
@@ -106,7 +106,7 @@
                         </template>
                         <template #afterOptions>
                           <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('supply.addNewSite') }}
                           </div>
                         </template>
@@ -124,7 +124,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
                         :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!form.site"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
                         @select="(sel) => { form.area = sel; filters.commonAreaSearch = sel.name }">
                         <template #prefix>
                           <MapIcon
@@ -133,7 +133,7 @@
                         <template #afterOptions>
                           <div v-if="form.site" @click="showAddArea = true; pendingRow = null"
                             style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('supply.addNewArea') }}
                           </div>
                         </template>
@@ -155,14 +155,14 @@
           <div v-if="currentStep === 2" class="w-full">
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
-              <button @click="goBackToStep1" class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+              <button @click="goBackToStep1" class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
               <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2DataEquipment') }}</h3>
               <div></div>
             </div>
 
             <!-- Summary Card of Common Data -->
-            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
-              <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
+            <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
+              <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.equipment') }}:</dt>
@@ -199,7 +199,7 @@
     p-2">
               <div class="overflow-x-auto w-full">
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
-                  <thead class="bg-indigo-50 sticky top-0 z-10">
+                  <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.date') }}</th>
@@ -222,30 +222,30 @@
                       <!-- Hours -->
                       <td class="px-3 py-2">
                         <input :ref="el => row.hoursInput = el" type="number" v-model.number="row.hours" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Discount -->
                       <td v-if="!isCompanyOwnedEquipment" class="px-3 py-2">
                         <input type="number" v-model.number="row.discount" min="0" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Notes -->
                       <td class="px-3 py-2">
                         <input type="text" v-model="row.notes" @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onLastFieldTab(index, $event)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                       </td>
 
                       <!-- Total per Row -->
-                      <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
+                      <td class="px-3 py-2 text-sm font-semibold theme-text">
                         {{ formatNumber(totalPerRow(row)) }}
                       </td>
 
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="text-blue-600 hover:text-blue-800 transition" title="Duplicate" tabindex="-1">
+                          <button @click="duplicateRow(index)" class="theme-text hover:theme-text-muted transition" title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
                           </button>
                           <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition" title="Delete" tabindex="-1">

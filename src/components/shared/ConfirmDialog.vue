@@ -24,7 +24,7 @@
           <button @click="handleConfirm" :disabled="loading"
             :class="[
               'px-4 py-2 rounded-md text-white transition disabled:opacity-50',
-              type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700'
+              type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'theme-button '
             ]">
             {{ loading ? loadingText : confirmText }}
           </button>
@@ -87,10 +87,10 @@ export default {
 
   computed: {
     iconBgClass() {
-      return this.type === 'danger' ? 'bg-red-100' : 'bg-blue-100'
+      return this.type === 'danger' ? 'bg-red-100' : 'theme-icon-bg'
     },
     iconColorClass() {
-      return this.type === 'danger' ? 'text-red-600' : 'text-blue-600'
+      return this.type === 'danger' ? 'text-red-600' : 'theme-text'
     }
   },
   methods: {

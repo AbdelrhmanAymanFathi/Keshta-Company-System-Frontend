@@ -1,12 +1,12 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.contractorsList') || 'Contractors' }}</h2>
       <div class="flex items-center gap-3">
         <!-- Add Button -->
         <button @click="openAdd"
-          class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200 text-xs sm:text-sm">
+          class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm">
           <PlusIcon class="w-5 h-5" />
           {{ $t('suppliers.add') }}
         </button>
@@ -16,13 +16,13 @@
     <!-- Search -->
     <div class="max-w-md">
       <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('suppliers.searchPlaceholder')"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus" />
     </div>
 
     <!-- Desktop Table -->
     <div class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.#') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.name') }}</th>
@@ -37,13 +37,13 @@
           <tr
             v-for="(c, idx) in filtered"
             :key="c.id"
-            class="hover:bg-indigo-50/40 cursor-pointer transition-colors"
+            class="theme-table-row-hover cursor-pointer transition-colors"
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-indigo-800 text-start">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-muted text-start">{{ idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">
-              <button @click.stop="goToDetail(c)" class="text-indigo-600 hover:underline">
+              <button @click.stop="goToDetail(c)" class="theme-text hover:underline">
                 {{ c.name }}
               </button>
             </td>
@@ -53,7 +53,7 @@
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.notes || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openStatement(c)" class="rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-700 hover:bg-violet-100" :title="$t('suppliers.statement')">
+                <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('suppliers.statement')">
                   <DocumentTextIcon class="h-5 w-5" />
                 </button>
                 <button @click.stop="openEdit(c)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" :title="$t('labels.edit')">
@@ -86,7 +86,7 @@
         <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
           <div :class="isRTL ? 'text-right' : 'text-left'">
             <div class="font-semibold text-gray-900">
-              <button @click.stop="goToDetail(c)" class="text-indigo-600 hover:underline text-left">
+              <button @click.stop="goToDetail(c)" class="theme-text hover:underline text-left">
                 {{ c.name }}
               </button>
             </div>
@@ -98,8 +98,8 @@
             </div>
           </div>
           <div class="flex flex-col gap-3">
-            <button @click.stop="openStatement(c)" class="text-purple-600 text-xs">{{ $t('suppliers.statement') }}</button>
-            <button @click.stop="openWallet(c)" class="text-blue-600 text-xs">{{ $t('suppliers.wallet') }}</button>
+            <button @click.stop="openStatement(c)" class="theme-text text-xs">{{ $t('suppliers.statement') }}</button>
+            <button @click.stop="openWallet(c)" class="theme-text text-xs">{{ $t('suppliers.wallet') }}</button>
             <button @click.stop="openEdit(c)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
             <button @click.stop="confirmDelete(c)" class="text-red-600 text-xs">{{ $t('labels.delete') }}</button>
           </div>
@@ -157,27 +157,27 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <label class="sm:col-span-2 lg:col-span-3">
             <div class="text-sm mb-1">{{ $t('suppliers.name') }}</div>
-            <input v-model="form.name" :placeholder="$t('suppliers.placeholders.name')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.name" :placeholder="$t('suppliers.placeholders.name')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.phone') }}</div>
-            <input v-model="form.phone" :placeholder="$t('suppliers.placeholders.phone')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.phone" :placeholder="$t('suppliers.placeholders.phone')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.bankName') }}</div>
-            <input v-model="form.bankName" :placeholder="$t('suppliers.placeholders.bankName')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus;border-indigo-500" />
+            <input v-model="form.bankName" :placeholder="$t('suppliers.placeholders.bankName')" class="w-full px-3 py-2 border rounded theme-input-focus focus;theme-border-accent" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.accountNumber') }}</div>
-            <input v-model="form.accountNumber" :placeholder="$t('suppliers.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.accountNumber" :placeholder="$t('suppliers.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label v-if="!editing">
             <div class="text-sm mb-1">{{ $t('suppliers.openingBalance') || 'Opening Balance' }}</div>
-            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('suppliers.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('suppliers.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.notes') }}</div>
-            <input v-model="form.notes" :placeholder="$t('suppliers.placeholders.notes')" class="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <input v-model="form.notes" :placeholder="$t('suppliers.placeholders.notes')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           
         </div>
@@ -185,7 +185,7 @@
           <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
-          <button @click="saveContractor" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+          <button @click="saveContractor" class="px-4 py-2 theme-button rounded">
             {{ $t('labels.save') }}
           </button>
         </div>

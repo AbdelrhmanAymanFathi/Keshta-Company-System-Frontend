@@ -1,7 +1,7 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
     <!-- Header -->
-    <div class="app-page-header flex flex-col gap-3 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
+    <div class="app-page-header flex flex-col gap-3 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h2 class="text-2xl font-semibold text-slate-900">{{ $t('contractors.statementTitle') }}</h2>
       </div>
@@ -11,7 +11,7 @@
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport('xlsx')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl bg-indigo-600 px-3 py-2 text-xs sm:text-sm text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl theme-button px-3 py-2 text-xs sm:text-sm text-white shadow-sm  transition-colors  disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -19,7 +19,7 @@
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportExcel') }}
         </button>
         <button @click="downloadReport('csv')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl bg-sky-600 px-3 py-2 text-xs sm:text-sm text-white shadow-sm shadow-sky-200 transition-colors hover:bg-sky-700 disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl theme-button px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -45,7 +45,7 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('contractors.name') }}</label>
           <select v-model="selectedContractorId" @change="onContractorChange"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
             <option value="">{{ $t('contractors.selectContractor') }}</option>
             <option v-for="c in contractors" :key="c.id" :value="c.id">{{ (isRTL && c.arName) ? c.arName : c.name }}</option>
           </select>
@@ -55,20 +55,20 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
         </div>
 
         <!-- Load Button -->
         <div class="flex items-end">
           <button @click="loadReport" :disabled="loading || !selectedContractorId"
-            class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:opacity-50">
+            class="w-full rounded-xl theme-button px-4 py-2 text-sm font-medium text-white shadow-sm  transition-colors  disabled:opacity-50">
             {{ $t('contractors.loadStatement') }}
           </button>
         </div>
@@ -95,7 +95,7 @@
 
     <!-- Loading State -->
     <div v-else-if="loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 theme-border-accent"></div>
     </div>
 
     <!-- Summary Cards -->
@@ -110,11 +110,11 @@
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</p>
-        <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'text-blue-600')">{{ formatCurrency(totalCredits) }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'theme-text')">{{ formatCurrency(totalCredits) }}</p>
       </div>
       <!-- <div class="bg-white rounded-lg shadow p-4">
         <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalEarnings') }}</p>
-        <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
+        <p class="text-lg font-semibold theme-text">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
       </div> -->
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.paidToContractor', 'contractors.payments') }}</p>
@@ -122,7 +122,7 @@
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.owedToContractor', 'contractors.owedToCompany') }}</p>
-        <p class="text-lg font-semibold" :class="getAmountClass(owedToContractor, 'text-purple-600')">{{ formatCurrency(owedToContractor) }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(owedToContractor, 'theme-text')">{{ formatCurrency(owedToContractor) }}</p>
       </div>
       
     </div>
@@ -148,7 +148,7 @@
         </div>
         <div>
           <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}</p>
-          <p class="text-lg font-semibold" :class="getAmountClass(lastBalance, 'text-indigo-600')">
+          <p class="text-lg font-semibold" :class="getAmountClass(lastBalance, 'theme-text')">
             {{ formatCurrency(lastBalance) }}
           </p>
         </div>
@@ -166,7 +166,7 @@
       <div class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">{{ $t('contractors.statementDescription') }}</div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+          <thead class="theme-table-thead-gradient">
             <tr>
               <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap"
                 :class="isRTL ? 'text-right' : 'text-left'">
@@ -200,9 +200,9 @@
           </thead>
           <tbody class="divide-y divide-slate-200 bg-white">
               <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
-              isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'hover:bg-indigo-50/40',
+              isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'theme-table-row-hover',
               row.type === 'DEPOSIT' ? 'bg-emerald-50/70' : '',
-              row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'bg-sky-50/70' : '',
+              row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'theme-dashboard-bg-soft opacity-70' : '',
               row.type === 'OPENING' ? 'bg-slate-100' : '',
               isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
             ]">
@@ -220,10 +220,10 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
                   {{ formatCurrency(getRowDebit(row)) }}
                 </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'text-blue-600')">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'theme-text')">
                 {{ formatCurrency(getRowCredit(row)) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'text-indigo-600')">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'theme-text')">
                 {{ formatCurrency(getRowBalance(row)) }}
               </td>
             </tr>

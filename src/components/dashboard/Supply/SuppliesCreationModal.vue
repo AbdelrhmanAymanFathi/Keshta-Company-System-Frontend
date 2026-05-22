@@ -1,7 +1,7 @@
 <template>
   <!-- Button to open the Modal (you can remove or change it depending on the page) -->
   <button v-if="showTriggerButton" @click="openModal"
-    class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium shadow-md transition">
+    class="theme-button px-6 py-3 rounded-lg  font-medium shadow-md transition">
     {{ triggerText }}
   </button>
 
@@ -13,7 +13,7 @@
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-indigo-800">
+          <h2 class="text-2xl font-bold theme-text-muted">
             {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
           </h2>
           <button @click="closeModal"
@@ -41,7 +41,7 @@
                   <div class="relative">
                     <CalendarDaysIcon
                       class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    <DateField v-model="commonData.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                    <DateField v-model="commonData.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
                   </div>
                 </div>
 
@@ -54,7 +54,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonItemSearch" :items="exportItems" :allItems="exportItems"
                         :placeholder="$t('labels.item')"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }">
                         <template #prefix>
                           <ArchiveBoxIcon
@@ -62,7 +62,7 @@
                         </template>
                         <template #afterOptions>
                           <div @click="showAddExportItemDialog = true" style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('labels.addNew') }}
                           </div>
                         </template>
@@ -80,7 +80,7 @@
                     <CurrencyDollarIcon
                       class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                     <input type="number" v-model.number="commonData.price" step="0.01"
-                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+                      class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
                   </div>
                 </div>
 
@@ -93,7 +93,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
                         :placeholder="$t('labels.site')"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                         <template #prefix>
                           <MapPinIcon
@@ -101,7 +101,7 @@
                         </template>
                         <template #afterOptions>
                           <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('supply.addNewSite') }}
                           </div>
                         </template>
@@ -119,7 +119,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
                         :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!commonData.site"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
                         @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
                         <template #prefix>
                           <MapIcon
@@ -128,7 +128,7 @@
                         <template #afterOptions>
                           <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null"
                             style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('supply.addNewArea') }}
                           </div>
                         </template>
@@ -146,7 +146,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonContractorSearch" :items="contractors"
                         :allItems="contractors" :placeholder="$t('labels.contractor')"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }">
                         <template #prefix>
                           <UserGroupIcon
@@ -154,7 +154,7 @@
                         </template>
                         <template #afterOptions>
                           <div @click="showAddContractorDialog = true" style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('labels.addNew') }}
                           </div>
                         </template>
@@ -172,7 +172,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonCrusherSearch" :items="crushers" :allItems="crushers"
                         :placeholder="$t('labels.crusher')"
-                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                        :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
                         <template #prefix>
                           <WrenchScrewdriverIcon
@@ -180,7 +180,7 @@
                         </template>
                         <template #afterOptions>
                           <div @click="showAddCrusherDialog = true" style="color: #10b981;"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">
+                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
                             + {{ $t('labels.addNew') }}
                           </div>
                         </template>
@@ -196,7 +196,7 @@
                   <textarea
                     v-model="commonData.notes"
                     rows="3"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm theme-input-focus transition"
                   ></textarea>
                 </div>
               </div>
@@ -220,7 +220,7 @@
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
               <button @click="goBackToStep1"
-                class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition">
+                class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('labels.back') }}
               </button>
@@ -229,8 +229,8 @@
             </div>
 
             <!-- Summary Card of Common Data -->
-            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
-              <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
+            <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
+              <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                 <div class="flex flex-col">
                   <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
@@ -283,7 +283,7 @@
               p-2">
               <div class="overflow-x-auto overflow-y-visible w-full">
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
-                  <thead class="bg-indigo-50 sticky top-0 z-10">
+                  <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
                       <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
@@ -316,7 +316,7 @@
                         <div class="relative">
                           <!-- Field -->
                           <div
-                            class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:ring-1 focus-within:ring-indigo-500"
+                            class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:theme-input-focus"
                             @mousedown.prevent="toggleVehicleDropdown(row)">
                             <input v-model="row.search" type="text"
                               :placeholder="row.vehicle?.name || $t('labels.vehicle')"
@@ -338,7 +338,7 @@
                             </div>
                             <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id"
                               @mousedown.prevent="selectVehicle(row, v)" @mousemove="row.highlightedVehicleIndex = vi"
-                              :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50']">
+                              :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'theme-icon-bg' : 'theme-hover-soft']">
                               {{ v.name }}
                             </div>
 
@@ -355,27 +355,27 @@
                       <!-- Crusher Ticket -->
                       <td class="px-3 py-2">
                         <input type="text" v-model="row.crusherTicket" @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                       </td>
 
                       <!-- Company Ticket -->
                       <td class="px-3 py-2">
                         <input type="text" v-model="row.companyTicket" @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                       </td>
 
                       <!-- Discount -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.discount" step="0.01"
                           @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Company Cubic -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.companyCapacity" step="0.01"
                           @keydown.enter.prevent="handleEnterKey(index)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Crusher Cubic -->
@@ -383,18 +383,18 @@
                         <input type="number" v-model.number="row.crusherCapacity" step="0.01"
                           @keydown.enter.prevent="handleEnterKey(index)"
                           @keydown.tab="onCrusherCapacityTab(index, $event)"
-                          class="w-full border border-gray-300 rounded px-2 py-1 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 no-spinner" />
+                          class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Total per Row -->
-                      <td class="px-3 py-2 text-sm font-semibold text-indigo-600">
+                      <td class="px-3 py-2 text-sm font-semibold theme-text">
                         {{ formatNumber(totalPerRow(row)) }}
                       </td>
 
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="text-blue-600 hover:text-blue-800 transition"
+                          <button @click="duplicateRow(index)" class="theme-text hover:theme-text-muted transition"
                             title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
                           </button>
@@ -422,9 +422,9 @@
                 <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
               </div>
               <div
-                class="flex items-center justify-end gap-3 text-lg text-indigo-700 border-s-4 border-indigo-700 ps-6">
-                <span class="text-indigo-900">{{ $t('labels.grandTotal') }}:</span>
-                <span class="text-indigo-900 min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+                class="flex items-center justify-end gap-3 text-lg theme-text-strong border-s-4 theme-border-accent ps-6">
+                <span class="theme-text-muted">{{ $t('labels.grandTotal') }}:</span>
+                <span class="theme-text-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
               </div>
             </div>
 

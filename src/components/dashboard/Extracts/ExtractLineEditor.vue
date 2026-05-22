@@ -6,14 +6,14 @@
         :items="items"
         :allItems="items"
         :placeholder="$t ? $t('labels.item') : 'Item'"
-        :inputClass="'w-full p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'"
+        :inputClass="'w-full p-2 border rounded text-sm focus:outline-none theme-input-focus'"
         @select="selectItem"
       >
         <template #afterOptions>
           <div
             @click="emitAddItem"
             style="color: #10b981;"
-            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100"
+            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100"
           >
             + {{ $t ? $t('labels.addNew') : 'Add New' }}
           </div>

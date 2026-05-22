@@ -1,9 +1,9 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.items') || 'Items' }}</h2>
       <button @click="openCreateModal"
-        class="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-xl hover:from-indigo-500 hover:to-sky-500 transition inline-flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm">
+        class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl  transition inline-flex items-center gap-2 shadow-sm  text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
         {{ $t('dashboard.newItem') || 'Add Item' }} +
       </button>
@@ -12,7 +12,7 @@
     <!-- Table -->
     <div class="overflow-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
@@ -50,7 +50,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, idx) in items" :key="item.id" class="hover:bg-indigo-50/40"
+          <tr v-for="(item, idx) in items" :key="item.id" class="theme-table-row-hover"
             @contextmenu.prevent="openContextMenu($event, item)">
             <td
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
@@ -126,7 +126,7 @@
             <label class="block">
               <div class="text-sm font-medium mb-1">{{ $t('labels.itemName') || 'Item Name' }} *</div>
               <input v-model="form.name" type="text" required
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
                 :placeholder="$t('placeholders.enterItemName') || 'Enter item name'" />
               <div v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</div>
             </label>
@@ -135,7 +135,7 @@
             <label class="block">
               <div class="text-sm font-medium mb-1">{{ $t('labels.unit') || 'Unit' }}</div>
               <select v-model="form.unitId"
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus">
                 <option :value="null">-- {{ $t('placeholders.selectUnit') || 'Select unit' }} --</option>
                 <option v-for="u in unitOptions" :key="u.id" :value="u.id">{{ u.name }}</option>
               </select>
@@ -145,7 +145,7 @@
             <label class="block" v-if="mode === 'supply' || mode === 'all'">
               <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</div>
               <input v-model.number="form.defaultSupplyPrice" :required="mode === 'supply'" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
                 :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
 
               <!-- When in supply mode allow marking also available for transport -->
@@ -158,7 +158,7 @@
               <label class="block mt-2" v-if="form.availableForTransports">
                 <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }}</div>
                 <input v-model.number="form.defaultTransportPrice" :required="form.availableForTransports" type="number" step="0.01" min="0"
-                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
                   :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
               </label>
             </label>
@@ -166,7 +166,7 @@
             <label class="block" v-if="mode === 'transport' || mode === 'all'">
               <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }} {{ mode === 'transport' ? '*' : '' }}</div>
               <input v-model.number="form.defaultTransportPrice" :required="mode === 'transport'" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
                 :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
 
               <!-- When in transport mode allow marking also available for supply -->
@@ -179,7 +179,7 @@
               <label class="block mt-2" v-if="form.availableForSupplies">
                 <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }}</div>
                 <input v-model.number="form.defaultSupplyPrice" :required="form.availableForSupplies" type="number" step="0.01" min="0"
-                  class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
                   :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
               </label>
             </label>
@@ -188,14 +188,14 @@
             <label class="block" v-if="mode === 'extracts' || form.availableForExtracts">
               <div class="text-sm font-medium mb-1">{{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }} {{ mode === 'extracts' ? '*' : '' }}</div>
               <input v-model.number="form.defaultExtractPrice" :required="mode === 'extracts' || form.availableForExtracts" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
                 :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
             </label>
 
             <!-- Buttons -->
             <div class="flex gap-3 pt-4">
               <button type="submit" :disabled="submitting"
-                class="flex-1 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 transition">
+                class="flex-1 px-4 py-2 theme-button rounded disabled:opacity-50 transition">
                 {{ submitting ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
               </button>
               <button type="button" @click="closeModal"
@@ -220,7 +220,7 @@
     <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       class="fixed bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 min-w-[150px]" @click.stop>
       <button @click="() => { editItem(contextMenu.item); contextMenu.visible = false }"
-        class="w-full px-4 py-2 text-left text-sm hover:bg-blue-50 text-gray-700 flex items-center gap-2 transition">
+        class="w-full px-4 py-2 text-left text-sm theme-hover-soft theme-text-strong flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">

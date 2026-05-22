@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ $t('equipmentLog.report') }}</h3>
       <div>
-        <button @click="exportCsv" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded text-sm">
+        <button @click="exportCsv" class="theme-button px-3 py-2 rounded text-sm">
           {{ $t('equipmentLog.exportCsv') }}
         </button>
       </div>
@@ -31,7 +31,7 @@
     </div>
 
     <div v-if="loading" class="flex justify-center py-6">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 theme-border-accent"></div>
     </div>
 
     <div v-else>

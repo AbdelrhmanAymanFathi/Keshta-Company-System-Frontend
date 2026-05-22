@@ -47,7 +47,7 @@
               ref="contractorOptionItems"
               @click.prevent="selectContractor(c)"
               @mouseenter="contractorHighlightedIndex = i"
-              :class="i === contractorHighlightedIndex ? 'w-full text-left px-3 py-2 bg-indigo-100' : 'w-full text-left px-3 py-2 hover:bg-gray-100'"
+              :class="i === contractorHighlightedIndex ? 'w-full text-left px-3 py-2 theme-icon-bg' : 'w-full text-left px-3 py-2 hover:bg-gray-100'"
             >
               <div class="flex items-center justify-between">
                 <div class="truncate">{{ c.name }}</div>
@@ -98,7 +98,7 @@
               {{ c.name }}
             </button>
             <div class="border-t px-3 py-2">
-              <button @click.prevent="chooseAddNewCrusher" class="text-indigo-600 hover:underline">{{ $t('vehicles.addNewCrusher') }}</button>
+              <button @click.prevent="chooseAddNewCrusher" class="theme-text hover:underline">{{ $t('vehicles.addNewCrusher') }}</button>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@
       </div>
 
       <div class="flex items-center gap-3 justify-end sm:col-span-2 lg:col-span-3">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" :disabled="creating">
+        <button type="submit" class="theme-button px-4 py-2 rounded disabled:opacity-50" :disabled="creating">
           {{ creating ? $t('labels.saving') : $t('vehicles.createVehicle') }}
         </button>
       </div>

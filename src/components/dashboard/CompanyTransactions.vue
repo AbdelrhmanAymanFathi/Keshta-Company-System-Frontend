@@ -11,13 +11,13 @@
 
     <!-- Moved Summary Cards (Balance / Income / Expenses) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-      <div :class="['bg-white rounded-lg shadow p-4 border-l-4 border-indigo-600', isRTL ? 'text-end' : 'text-start']">
+      <div :class="['bg-white rounded-lg shadow p-4 border-l-4 theme-border-accent', isRTL ? 'text-end' : 'text-start']">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-gray-600">{{ $t('finance.currentBalance') }}</p>
-            <p class="text-2xl font-bold text-indigo-600 mt-1">{{ formatCurrency(summary.balance) }}</p>
+            <p class="text-2xl font-bold theme-text mt-1">{{ formatCurrency(summary.balance) }}</p>
           </div>
-          <svg class="w-10 h-10 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-10 h-10 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
             </path>
@@ -53,7 +53,7 @@
     </div>
 
     <div v-if="loading" class="py-10 flex items-center justify-center">
-      <svg class="animate-spin -ml-1 mr-3 h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="animate-spin -ml-1 mr-3 h-6 w-6 theme-text" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
       </svg>

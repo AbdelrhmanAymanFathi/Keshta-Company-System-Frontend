@@ -2,7 +2,7 @@
   <div v-if="isVisible" :dir="isRTL ? 'rtl' : 'ltr'" class="bg-white rounded shadow p-3 sm:p-4">
     <div class="mb-4">
       <div v-if="wallet && Array.isArray(wallet.accounts)" class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
-        <div v-for="acct in wallet.accounts" :key="acct.id" @click="selectAccount(acct)" :class="['p-2 sm:p-3 rounded cursor-pointer', selectedAccount && String(selectedAccount.id) === String(acct.id) ? 'ring-2 ring-indigo-300' : 'bg-gray-50']">
+        <div v-for="acct in wallet.accounts" :key="acct.id" @click="selectAccount(acct)" :class="['p-2 sm:p-3 rounded cursor-pointer', selectedAccount && String(selectedAccount.id) === String(acct.id) ? 'theme-ring-active' : 'bg-gray-50']">
           <div class="text-xs text-gray-500">{{ acct.accountType }}</div>
           <div class="font-semibold text-lg">{{ formatCurrency(acct.balance) }}</div>
         </div>
@@ -15,10 +15,10 @@
         </div>
         <div class="mr-6">
           <div class="text-sm text-gray-500">{{ $t('labels.totalDeposits') }}</div>
-          <div class="text-2xl font-semibold text-blue-600">{{ formatCurrency(wallet && wallet.totalDeposits) }}</div>
+          <div class="text-2xl font-semibold theme-text">{{ formatCurrency(wallet && wallet.totalDeposits) }}</div>
         </div>
         <div class="ml-auto flex items-center gap-2 px-2">
-          <button @click="openDepositModal" class="px-2 py-1 sm:px-3 sm:py-1 bg-indigo-600 text-white rounded text-xs sm:text-sm">{{ $t('labels.manualDeposit') }}</button>
+          <button @click="openDepositModal" class="px-2 py-1 sm:px-3 sm:py-1 theme-button rounded text-xs sm:text-sm">{{ $t('labels.manualDeposit') }}</button>
           <button @click="openWithdrawModal" class="px-2 py-1 sm:px-3 sm:py-1 border rounded text-xs sm:text-sm">{{ $t('labels.pay') || 'Pay' }}</button>
         </div>
       </div>
@@ -95,7 +95,7 @@
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <button @click="closeWithdrawModal" class="px-3 py-1 border rounded text-gray-700 text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
-          <button @click="submitWithdrawal" :disabled="withdrawalSubmitting" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-xs sm:text-sm">{{ withdrawalSubmitting ? $t('labels.saving') : ($t('labels.pay') || 'Pay') }}</button>
+          <button @click="submitWithdrawal" :disabled="withdrawalSubmitting" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ withdrawalSubmitting ? $t('labels.saving') : ($t('labels.pay') || 'Pay') }}</button>
         </div>
       </div>
     </div>
@@ -123,7 +123,7 @@
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <button @click="closeDepositModal" class="px-3 py-1 border rounded text-gray-700 text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
-          <button @click="confirmDeposit" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-xs sm:text-sm">{{ $t('labels.deposit') }}</button>
+          <button @click="confirmDeposit" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ $t('labels.deposit') }}</button>
         </div>
       </div>
     </div>

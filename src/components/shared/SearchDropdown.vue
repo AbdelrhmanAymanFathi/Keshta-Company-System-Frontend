@@ -13,30 +13,28 @@
       @blur="handleBlur"
       @keydown="handleKeydown"
     />
-
-    <template v-if="isOpen && !teleportTarget">
-      <div
-        ref="optionsRef"
-        class="absolute top-full left-0 right-0 z-50 mt-0 max-h-48 overflow-y-auto rounded-b-lg border border-gray-300 border-t-0 bg-white shadow-lg"
-        @mousedown.prevent
-      >
-        <div v-if="filteredItems.length">
-          <div
-            v-for="(item, index) in filteredItems"
-            :key="getKey(item, index)"
-            ref="optionItems"
-            :class="[
-              'cursor-pointer border-b border-gray-100 px-3 py-2 text-sm last:border-b-0',
-              index === highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
-            ]"
-            @mousedown.prevent="selectItem(item)"
-            @mouseenter="highlightedIndex = index"
-          >
-            {{ getLabel(item) }}
-          </div>
+    <div
+      v-if="isOpen"
+      ref="options"
+      class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
+      @mousedown.prevent
+    >
+      <div v-if="filteredItems.length">
+        <div
+          v-for="(item, i) in filteredItems"
+          :key="getKey(item, i)"
+          ref="optionItems"
+          @mousedown.prevent="selectItem(item)"
+          @mouseenter="highlightedIndex = i"
+          :class="[
+            'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
+            i === highlightedIndex ? 'theme-icon-bg' : 'theme-hover-soft'
+          ]"
+        >
+          {{ getLabel(item) }}
         </div>
       </div>
-    </template>
+    </div>
 
     <teleport v-else-if="isOpen" :to="teleportTarget">
       <div
@@ -100,8 +98,9 @@ export default {
       default: false
     },
     inputClass: {
-      type: [String, Array, Object],
-      default: ''
+      type: String,
+      default:
+        'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'
     },
     dir: {
       type: String,

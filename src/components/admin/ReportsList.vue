@@ -1,9 +1,9 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0" :dir="isRTL ? 'rtl' : 'ltr'" :class="{ 'direction-rtl': isRTL }">
-    <div class="app-page-header mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-lg sm:text-xl font-bold text-slate-900">{{ $t('admin.reports') }}</h2>
       <div class="flex gap-2">
-        <router-link :to="{ name: 'admin-reports-from-table' }" class="flex items-center gap-2 rounded-xl bg-indigo-600 px-3 py-2 text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700">
+        <router-link :to="{ name: 'admin-reports-from-table' }" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 text-white shadow-sm  transition ">
           <span>{{ $t('admin.newReport') }}</span>
         </router-link>
         <!-- <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition">
@@ -14,7 +14,7 @@
 
     <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <table class="min-w-full table-auto">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnKey') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
@@ -25,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in reports" :key="r.id" class="border-t border-slate-200 hover:bg-indigo-50/40">
+          <tr v-for="r in reports" :key="r.id" class="border-t border-slate-200 theme-table-row-hover">
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.key }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ (locale.value !== 'en' && r.arTitle) ? r.arTitle : r.title }}</td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.module }}</td>
@@ -48,7 +48,7 @@
                   :to="{ name: 'admin-reports-run', params: { id: r.id } }"
                   :title="$t('admin.run')"
                   :aria-label="$t('admin.run')"
-                  class="inline-flex items-center rounded-lg bg-indigo-600 p-2 text-white transition hover:bg-indigo-700"
+                  class="inline-flex items-center rounded-lg theme-button p-2 text-white transition "
                 >
                   <PlayIcon class="h-4 w-4" />
                 </router-link>

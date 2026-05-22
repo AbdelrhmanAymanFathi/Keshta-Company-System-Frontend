@@ -10,7 +10,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.dateFrom') || 'Date From' }} <span class="text-red-600">*</span></label>
             <div class="relative">
               <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              <DateField v-model="commonData.dateFrom" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+              <DateField v-model="commonData.dateFrom" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
             </div>
           </div>
 
@@ -18,7 +18,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.dateTo') || 'Date To' }} <span class="text-red-600">*</span></label>
             <div class="relative">
               <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              <DateField v-model="commonData.dateTo" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition" />
+              <DateField v-model="commonData.dateTo" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
             </div>
           </div>
 
@@ -27,13 +27,13 @@
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites" :placeholder="$t('labels.site')"
-                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                   @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                   <template #prefix>
                     <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </template>
                   <template #afterOptions>
-                    <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewSite') }}</div>
+                    <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewSite') }}</div>
                   </template>
                 </SearchDropdown>
               </div>
@@ -45,13 +45,13 @@
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas" :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!commonData.site"
-                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
+                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
                   @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
                   <template #prefix>
                     <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </template>
                   <template #afterOptions>
-                    <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewArea') }}</div>
+                    <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewArea') }}</div>
                   </template>
                 </SearchDropdown>
               </div>
@@ -63,13 +63,13 @@
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonContractorSearch" :items="contractors" :allItems="contractors" :placeholder="$t('labels.contractor')"
-                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                   @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }">
                   <template #prefix>
                     <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </template>
                   <template #afterOptions>
-                    <div @click="showAddContractorDialog = true" style="color: #10b981;" class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
+                    <div @click="showAddContractorDialog = true" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
                   </template>
                 </SearchDropdown>
               </div>
@@ -81,13 +81,13 @@
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonCrusherSearch" :items="crushers" :allItems="crushers" :placeholder="$t('labels.crusher')"
-                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+                  :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                   @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
                   <template #prefix>
                     <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   </template>
                   <template #afterOptions>
-                    <div @click="showAddCrusherDialog = true" style="color: #10b981;" class="px-3 py-2 hover:bg-indigo-50 cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
+                    <div @click="showAddCrusherDialog = true" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
                   </template>
                 </SearchDropdown>
               </div>
@@ -110,13 +110,13 @@
       <!-- Step 2: Lines -->
       <div v-else class="w-full">
         <div class="flex items-center justify-between mb-8">
-          <button @click="currentStep = 1" class="flex items-center gap-3 text-indigo-600 hover:text-indigo-800 font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+          <button @click="currentStep = 1" class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
           <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
           <div></div>
         </div>
 
-        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-5 mb-8">
-          <h4 class="text-sm font-bold text-indigo-900 mb-4">{{ $t('labels.summary') }}</h4>
+        <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
+          <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
           <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
             <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.dateFrom') || 'Date From' }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.dateFrom || '-' }}</dd></div>
             <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.dateTo') || 'Date To' }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.dateTo || '-' }}</dd></div>
@@ -661,5 +661,5 @@ export default {
 </script>
 
 <style scoped>
-.bg-primary { background-color: #1f2937; }
+.bg-primary { background-color: var(--theme-primary); }
 </style>

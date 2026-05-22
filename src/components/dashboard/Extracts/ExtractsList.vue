@@ -1,6 +1,6 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex flex-col gap-3 rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
+    <div class="app-page-header flex flex-col gap-3 rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.extractsList') || 'Extracts' }}</h2>
       <ExtractsCreationModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newExtract') + ' +'" @saved="onExtractSaved"/>
     </div>
@@ -12,13 +12,13 @@
         <div>
           <label class="block text-[11px] font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <div>
@@ -73,7 +73,7 @@
 
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <button @click="page = 1; loadExtracts()" :disabled="loading"
-          class="w-full sm:w-auto px-3 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm shadow-indigo-200">
+          class="w-full sm:w-auto px-3 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm ">
           {{ $t('labels.search') }}</button>
         <button @click="clearFilters"
           class="w-full sm:w-auto px-3 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition-colors text-xs sm:text-sm font-medium">{{ $t('labels.clear') }}</button>
@@ -83,7 +83,7 @@
     <!-- table -->
     <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateFrom') || 'Date From' }}</th>
@@ -101,10 +101,10 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(extract, idx) in extracts" :key="extract.rowKey || `extract-${extract.id}`" class="hover:bg-indigo-50/40">
+          <tr v-for="(extract, idx) in extracts" :key="extract.rowKey || `extract-${extract.id}`" class="theme-table-row-hover">
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateFrom || extract.date) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateTo || extract.date) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateFrom || extract.date) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateTo || extract.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               {{ formatItemWithUnit(extract.item) || extract.itemName || '-' }}
             </td>

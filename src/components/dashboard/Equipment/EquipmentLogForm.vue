@@ -14,7 +14,7 @@
           <DateField
             v-model="localForm.date"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
           />
         </div>
 
@@ -43,7 +43,7 @@
             min="0"
             step="0.01"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
           />
         </div>
       </div>
@@ -60,7 +60,7 @@
               type="number"
               min="0"
               step="0.1"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
             />
           </div>
 
@@ -83,7 +83,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">
               {{ $t('labels.location') || 'Location' }}
             </label>
-            <select v-model="localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select v-model="localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus">
               <option value="">{{ $t('labels.select') || 'Select location' }}</option>
               <option v-for="loc in topLocations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
             </select>
@@ -95,13 +95,13 @@
           <textarea
             v-model="localForm.notes"
             rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
           ></textarea>
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.area') || 'Area' }}</label>
-          <select v-model="localForm.areaId" :disabled="!localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100">
+          <select v-model="localForm.areaId" :disabled="!localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus disabled:bg-gray-100">
             <option value="">{{ $t('labels.select') || 'Select area' }}</option>
             <option v-for="a in availableAreas" :key="a.id" :value="a.id">{{ a.name }}</option>
           </select>
@@ -122,7 +122,7 @@
           v-if="currentStep === 1"
           type="submit"
           :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition"
+          class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition"
         >
           {{ $t('labels.next') || 'Next' }}
         </button>
@@ -138,7 +138,7 @@
           <button
             type="submit"
             :disabled="loading"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition"
+            class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition"
           >
             {{ loading ? $t('labels.saving') : (isEditing ? $t('labels.update') : $t('labels.save')) }}
           </button>

@@ -1,7 +1,7 @@
 <template>
   <div class="flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
-    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70" :class="headerGradient">
+    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile -->
         <button @click="toggleSidebar" class="sm:hidden p-2 rounded-lg hover:bg-white/12 hover:scale-105 transition-all duration-200">
@@ -36,7 +36,7 @@
           <button
             @click="switchLang('en')"
             :class="langBtnClass('en')"
-            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
+            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:theme-input-focus focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
             aria-label="Switch to English"
           >
             <img src="/flags/us.png" alt="English" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
@@ -44,7 +44,7 @@
           <button
             @click="switchLang('ar')"
             :class="langBtnClass('ar')"
-            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
+            class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:theme-input-focus focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
             aria-label="التبديل إلى العربية"
           >
             <img src="/flags/eg.png" alt="العربية" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
@@ -99,13 +99,13 @@
               </div>
             </transition>
           </div>
-          <button v-if="!isMobile" @click="toggleCollapsed" class="rounded-lg p-2 sm:p-3 hover:bg-indigo-100 hover:scale-105 transition-all duration-200">
+          <button v-if="!isMobile" @click="toggleCollapsed" class="theme-sidebar-collapse-btn rounded-lg p-2 sm:p-3 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
-            <svg v-if="!effectiveCollapsed" class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none"
+            <svg v-if="!effectiveCollapsed" class="w-5 h-5 theme-text-strong" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
-            <svg v-else class="w-5 h-5 text-indigo-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
+            <svg v-else class="w-5 h-5 theme-text-strong" viewBox="0 0 24 24" fill="none" stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
             </svg>
           </button>
@@ -119,7 +119,7 @@
             </div>
             <div class="truncate font-semibold text-base">{{ $t('appName') }}</div>
           </div>
-          <button @click="toggleSidebar" class="p-2 rounded-lg hover:bg-indigo-100 hover:scale-105 transition-all duration-200">
+          <button @click="toggleSidebar" class="theme-sidebar-collapse-btn p-2 rounded-lg hover:scale-105 transition-all duration-200">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -129,7 +129,7 @@
         <!-- Mobile Top Menu -->
         <div v-if="isMobile" class="mb-4 space-y-1 sm:hidden">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700']">
+            :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'theme-sidebar-item-active' : 'theme-sidebar-item']">
             {{ $t('navbar.' + key) }}
           </button>
         </div>
@@ -138,10 +138,10 @@
         <ul class="space-y-2.5">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
             <button @click="selectVertical(item.routeName)"
-              :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700') : (currentRouteName === item.routeName ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+              :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item') : (currentRouteName === item.routeName ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
               <div
-                class="sidebar-link-icon flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
-                :class="(item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName) ? 'bg-white/15 text-white scale-110' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 group-hover:text-indigo-700'"
+                class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
+                :class="(item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName) ? 'scale-110' : ''"
               >
                 <component :is="menuIconComponent(item.name)" class="h-5 w-5" />
               </div>
@@ -159,10 +159,10 @@
             </transition>
             <ul class=" space-y-2 ">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button @click="openReport(r.id)" :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 text-slate-700', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+                <button @click="openReport(r.id)" :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
                   <div
-                    class="sidebar-link-icon flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200"
-                    :class="isDynamicReportActive(r) ? 'bg-white/15 text-white scale-110' : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100 group-hover:text-indigo-700'"
+                    class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200"
+                    :class="isDynamicReportActive(r) ? 'scale-110' : ''"
                   >
                     <DocumentTextIcon class="h-5 w-6" />
                   </div>
@@ -182,7 +182,7 @@
       <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300" @click="toggleSidebar"></div>
 
       <!-- Main Content -->
-      <main class="dashboard-module-content app-scrollbar flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 via-indigo-50/40 to-slate-50 p-3 sm:p-4 lg:p-6">
+      <main class="dashboard-module-content app-scrollbar theme-main-gradient flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
         <transition name="fade" mode="out-in">
           <router-view v-slot="{ Component }">
@@ -293,7 +293,7 @@ export default {
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
     effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
-    headerGradient() { return this.isRTL ? 'bg-gradient-to-l from-indigo-700 via-indigo-700 to-indigo-900' : 'bg-gradient-to-r from-indigo-700 via-indigo-700 to-indigo-900' },
+    headerGradient() { return 'theme-dashboard-header' },
     userInitials() {
       if (!this.user || !this.user.name) return '??'
       const names = this.user.name.trim().split(' ')
@@ -303,11 +303,11 @@ export default {
     },
     langBtnClass() {
       return (lang) => this.$i18n.locale === lang
-        ? 'bg-white/90 ring-2 ring-sky-300 scale-105 shadow-sm'
+        ? 'bg-white/90 theme-ring-active scale-105 shadow-sm'
         : 'opacity-80 hover:opacity-100 hover:bg-white/10'
     },
     asideClasses() {
-      const base = 'app-scrollbar border-r border-indigo-100/80 bg-white/90 backdrop-blur-sm p-3 sm:p-4 transition-all duration-300 z-40 flex flex-col overflow-y-auto shadow-sm'
+      const base = 'app-scrollbar theme-sidebar border-r p-3 sm:p-4 transition-all duration-300 z-40 flex flex-col overflow-y-auto shadow-sm'
       if (this.isMobile) {
         const side = this.isRTL ? 'right-0' : 'left-0'
         const transform = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
@@ -609,7 +609,7 @@ export default {
 }
 
 .sidebar-link-collapsed:not(.sidebar-link-active):hover {
-  background: rgb(238 242 255 / 0.8);
+  background: rgba(var(--theme-primary-rgb), 0.08);
 }
 
 .sidebar-link-collapsed .sidebar-link-icon {
@@ -619,12 +619,12 @@ export default {
 
 .sidebar-link-collapsed:not(.sidebar-link-active) .sidebar-link-icon {
   background: transparent !important;
-  color: rgb(99 102 241) !important;
+  color: rgb(var(--theme-primary-600)) !important;
 }
 
 .sidebar-link-collapsed:not(.sidebar-link-active):hover .sidebar-link-icon {
-  background: rgb(224 231 255 / 0.7) !important;
-  color: rgb(67 56 202) !important;
+  background: rgba(var(--theme-primary-rgb), 0.12) !important;
+  color: rgb(var(--theme-primary-700)) !important;
 }
 
 .sidebar-link::before {
@@ -706,7 +706,7 @@ aside {
 /* Modern scrollbar style for dashboard scroll areas */
 .app-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.55) transparent;
+  scrollbar-color: rgba(var(--theme-primary-rgb), 0.55) transparent;
   scrollbar-gutter: stable;
 }
 
@@ -721,14 +721,14 @@ aside {
 }
 
 .app-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.68), rgba(79, 70, 229, 0.8));
+  background: linear-gradient(180deg, rgba(var(--theme-primary-rgb), 0.68), rgba(var(--theme-primary-rgb), 0.8));
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 .app-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.85), rgba(79, 70, 229, 0.95));
+  background: linear-gradient(180deg, rgba(var(--theme-primary-rgb), 0.85), rgba(var(--theme-primary-rgb), 0.95));
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -768,10 +768,10 @@ aside {
 @keyframes sidebar-active-glow {
   0%,
   100% {
-    box-shadow: 0 8px 18px rgb(99 102 241 / 0.18);
+    box-shadow: 0 8px 18px rgba(var(--theme-primary-rgb), 0.18);
   }
   50% {
-    box-shadow: 0 12px 26px rgb(99 102 241 / 0.3);
+    box-shadow: 0 12px 26px rgba(var(--theme-primary-rgb), 0.3);
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
-    <div class="app-page-header rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h1 class="mb-2 text-2xl font-semibold text-slate-900">{{ $t('changes.title') }}</h1>
       <p class="text-slate-600">{{ $t('changes.description') }}</p>
     </div>
@@ -14,11 +14,11 @@
             {{ $t('changes.selectDate') }}
           </label>
           <DateField v-model="selectedDate"
-            class="w-full rounded-xl border border-slate-200 px-4 py-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+            class="w-full rounded-xl border border-slate-200 px-4 py-2  theme-input-focus"
             @update:modelValue="loadChanges" />
         </div>
         <button @click="loadChanges" :disabled="loading || !selectedDate"
-          class="rounded-xl bg-indigo-600 px-6 py-2 text-white shadow-sm shadow-indigo-200 transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
+          class="rounded-xl theme-button px-6 py-2 text-white shadow-sm  transition-colors  disabled:cursor-not-allowed disabled:opacity-50">
           {{ $t('changes.loadChanges') }}
         </button>
       </div>
@@ -26,7 +26,7 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent"></div>
     </div>
 
     <!-- Error State -->
@@ -46,7 +46,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <div v-for="(module, key) in changes" :key="key"
           class="cursor-pointer rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-200/50"
-          :class="{ 'ring-2 ring-indigo-500 border-indigo-200': activeModule === key }" @click="activeModule = key">
+          :class="{ 'theme-ring-active theme-border': activeModule === key }" @click="activeModule = key">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-gray-600">{{ $t(`changes.modules.${key}`) }}</p>
@@ -55,9 +55,9 @@
               </p>
             </div>
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl"
-              :class="module.count > 0 ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'">
+              :class="module.count > 0 ? 'theme-icon-bg theme-text' : 'bg-slate-100 text-slate-400'">
               <div v-html="moduleIcon(key)" class="w-7 h-7"
-                :class="module.count > 0 ? 'text-indigo-600' : 'text-slate-400'"></div>
+                :class="module.count > 0 ? 'theme-text' : 'text-slate-400'"></div>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@
       <!-- Detailed View -->
       <div v-if="activeModule && changes[activeModule]?.items?.length > 0"
         class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-        <div class="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-indigo-50 px-6 py-4">
+        <div class="border-b border-slate-200 theme-table-thead-gradient px-6 py-4">
           <h2 class="text-lg font-semibold text-slate-900">
             {{ $t(`changes.modules.${activeModule}`) }} - {{ $t('changes.changesFor') }} {{ formatDate(selectedDate) }}
           </h2>
@@ -76,7 +76,7 @@
         </div>
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+            <thead class="theme-table-thead-gradient">
               <tr>
                 <th v-for="header in getHeadersForModule(activeModule)" :key="header"
                   class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -86,7 +86,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200 bg-white">
-              <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="hover:bg-indigo-50/40">
+              <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="theme-table-row-hover">
                 <td v-for="field in getFieldsForModule(activeModule)" :key="field"
                   class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {{ formatField(item, field, activeModule) }}

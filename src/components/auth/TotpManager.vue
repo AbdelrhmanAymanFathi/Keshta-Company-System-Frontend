@@ -8,7 +8,7 @@
         <p class="text-sm text-gray-600">{{ $t('profile.totpIntro') || 'Add an authenticator app to secure your account.' }}</p>
         <div class="flex gap-2">
           <input v-model="label" class="flex-1 border rounded px-3 py-2" :placeholder="$t('profile.deviceLabel') || 'Device label'" />
-          <button @click="startRegister" class="px-4 py-2 bg-indigo-600 text-white rounded">{{ $t('labels.start') || 'Start' }}</button>
+          <button @click="startRegister" class="px-4 py-2 theme-button rounded">{{ $t('labels.start') || 'Start' }}</button>
         </div>
       </div>
 
@@ -22,7 +22,7 @@
             <div class="mt-2 p-2 bg-gray-50 rounded">
               <div class="flex items-center justify-between">
                 <div class="font-mono text-sm break-all">{{ temp.secret }}</div>
-                <button @click="copySecret" class="text-indigo-600 text-sm">{{ $t('labels.copy') || 'Copy' }}</button>
+                <button @click="copySecret" class="theme-text text-sm">{{ $t('labels.copy') || 'Copy' }}</button>
               </div>
               <div class="mt-2 text-xs text-gray-500">{{ countdownText }}</div>
             </div>
@@ -43,7 +43,7 @@
     <div class="bg-white p-4 rounded shadow">
       <div class="flex justify-between items-center mb-2">
         <h4 class="font-medium">{{ $t('profile.devices') || 'Devices' }}</h4>
-        <button @click="loadDevices" class="text-sm text-indigo-600">{{ $t('labels.refresh') || 'Refresh' }}</button>
+        <button @click="loadDevices" class="text-sm theme-text">{{ $t('labels.refresh') || 'Refresh' }}</button>
       </div>
       <div v-if="loadingDevices" class="text-sm text-gray-500">{{ $t('labels.loading') || 'Loading...' }}</div>
       <ul v-else class="space-y-2">

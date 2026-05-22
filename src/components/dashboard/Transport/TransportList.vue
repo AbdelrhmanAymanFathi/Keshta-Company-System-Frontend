@@ -1,10 +1,10 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('transport.transportList') }}</h2>
 
       <button @click="showAddModal = true"
-        class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200">
+        class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm ">
         {{ $t('transport.addTransport') }} +
       </button>
     </div>
@@ -17,14 +17,14 @@
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- Contractor -->
@@ -35,7 +35,7 @@
             :items="contractors"
             :allItems="contractors"
             :placeholder="$t('placeholders.searchContractor')"
-            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'"
             @select="(contractor) => { filters.contractorId = contractor.id; filters.contractorSearch = contractor.name; filters.contractorSelected = contractor }"
           />
         </div>
@@ -48,7 +48,7 @@
             :items="locations.filter(l => !l.parentId)"
             :allItems="locations"
             :placeholder="$t('placeholders.searchLocation')"
-            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'"
             @select="(location) => { filters.locationId = location.id; filters.locationSearch = location.name; filters.locationSelected = location }"
           />
         </div>
@@ -61,7 +61,7 @@
             :items="(filters.locationSelected && Array.isArray(filters.locationSelected.children) && filters.locationSelected.children.length) ? filters.locationSelected.children : (filters.locationId ? (locations.find(l => l.id === filters.locationId)?.children || []) : [])"
             :allItems="locations"
             :placeholder="$t('placeholders.searchArea')"
-            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'"
             @select="(area) => { filters.areaId = area.id; filters.areaSearch = area.name; filters.areaSelected = area }"
           />
         </div>
@@ -74,7 +74,7 @@
             :items="items"
             :allItems="items"
             :placeholder="$t('placeholders.searchItem')"
-            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'"
             @select="(item) => { filters.itemId = item.id; filters.itemSearch = item.name; filters.itemSelected = item }"
           />
         </div>
@@ -88,7 +88,7 @@
             :allItems="vehicles"
             :itemLabel="(vehicle) => vehicle?.plateNumber || vehicle?.name || ''"
             :placeholder="$t('placeholders.searchVehicle')"
-            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm'"
+            :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'"
             @select="(vehicle) => { filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.vehicleSelected = vehicle }"
           />
         </div>
@@ -96,7 +96,7 @@
 
       <div class="flex gap-2">
         <button @click="page = 1; loadTransports()" :disabled="loading"
-          class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white rounded-xl transition-colors disabled:opacity-50 text-sm font-medium shadow-sm shadow-indigo-200">
+          class="px-4 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-sm font-medium shadow-sm ">
           {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
@@ -109,7 +109,7 @@
     <!-- table -->
     <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th
               class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
@@ -174,9 +174,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" class="hover:bg-indigo-50/40"
+          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" class="theme-table-row-hover"
               @contextmenu.prevent="onRowContextMenu($event, transport)">
-            <td class="px-6 py-3 text-start text-xs font-medium text-indigo-800 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
@@ -223,7 +223,7 @@
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <!-- <button @click.stop="editTransport(transport)" class="text-indigo-600 hover:text-indigo-900"
+                <!-- <button @click.stop="editTransport(transport)" class="theme-text hover:theme-text-muted"
                   :title="$t('common.edit')">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

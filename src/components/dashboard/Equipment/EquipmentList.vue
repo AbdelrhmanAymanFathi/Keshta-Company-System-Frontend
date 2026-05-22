@@ -1,9 +1,9 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-gray-800">{{ $t('equipment.title') || 'Equipment' }}</h2>
       <div>
-        <button @click="openCreateModal" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 inline-flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm"><PlusIcon class="w-5 h-5" />{{ $t('equipment.add') || 'Add Equipment' }}</button>
+        <button @click="openCreateModal" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl theme-button inline-flex items-center gap-2 shadow-sm  text-xs sm:text-sm"><PlusIcon class="w-5 h-5" />{{ $t('equipment.add') || 'Add Equipment' }}</button>
       </div>
     </div>
 
@@ -14,7 +14,7 @@
           @keyup.enter="search"
           type="search"
           :placeholder="$t('equipment.searchPlaceholder')"
-          class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+          class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm  theme-input-focus"
         />
         <button @click="clearSearch" class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
           {{ $t('labels.clear') || 'Clear' }}
@@ -24,7 +24,7 @@
 
     <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <table :dir="isRTL ? 'rtl' : 'ltr'" class="min-w-full w-full table-auto md:table-fixed text-sm">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('equipment.name') || 'Name' }}</th>
             <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.contractor') || 'Contractor' }}</th>
@@ -34,7 +34,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in equipments" :key="e.id" class="border-t hover:bg-indigo-50/40" @contextmenu.prevent="openContextMenu($event, e)">
+          <tr v-for="e in equipments" :key="e.id" class="border-t theme-table-row-hover" @contextmenu.prevent="openContextMenu($event, e)">
             <td class="px-3 py-3 font-medium text-gray-800 text-start">{{ e.name }}</td>
             <td class="px-3 py-3 text-gray-700 text-start">{{ e.contractor?.name || '—' }}</td>
             <td class="px-3 py-3 text-gray-700 text-start">
@@ -51,7 +51,7 @@
               <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-md"
+                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:theme-border theme-hover-soft hover:theme-text-strong hover:shadow-md"
                   :title="$t('labels.edit') || 'Edit'"
                   :aria-label="$t('labels.edit') || 'Edit'"
                   @click.stop="openEditModal(e)"
@@ -120,7 +120,7 @@
 
           <div class="flex justify-end gap-2">
             <button type="button" @click="closeModals" class="px-4 py-2 rounded border">{{ $t('labels.cancel') || 'Cancel' }}</button>
-            <button type="submit" :disabled="saving" class="px-4 py-2 rounded bg-indigo-600 text-white">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
+            <button type="submit" :disabled="saving" class="px-4 py-2 rounded theme-button">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
           </div>
         </form>
       </div>
@@ -140,7 +140,7 @@
     >
       <button
         type="button"
-        class="w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 flex items-center gap-2 transition"
+        class="w-full px-4 py-2 text-sm text-gray-700 theme-hover-soft flex items-center gap-2 transition"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
         @click="onContextEdit"
       >

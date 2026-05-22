@@ -9,7 +9,7 @@
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport" :disabled="downloading"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
+                class="theme-button px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
           </svg>
@@ -30,7 +30,7 @@
             @keyup.enter="loadReport"
             type="text"
             :placeholder="$t('placeholders.search')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           >
         </div>
 
@@ -39,7 +39,7 @@
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
           <DateField
             v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
 
@@ -48,7 +48,7 @@
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
           <DateField
             v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
 
@@ -57,7 +57,7 @@
           <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('expenses.category') }}</label>
           <select 
             v-model="filters.category"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           >
             <option value="">{{ $t('labels.all') }}</option>
             <option value="operational">Operational</option>
@@ -73,7 +73,7 @@
         <button 
           @click="loadReport"
           :disabled="loading"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
+          class="px-4 py-2 theme-button rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
         >
           {{ $t('labels.search') }}
         </button>
@@ -98,7 +98,7 @@
 
     <!-- Loading State -->
     <div v-else-if="loading" class="flex justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 theme-border-accent"></div>
     </div>
 
     <!-- Data Table -->
@@ -164,7 +164,7 @@
           </div>
           <div>
             <p class="text-xs text-gray-600">Average Expense</p>
-            <p class="text-lg font-semibold text-indigo-600">{{ formatCurrency(averageExpense) }}</p>
+            <p class="text-lg font-semibold theme-text">{{ formatCurrency(averageExpense) }}</p>
           </div>
           <div>
             <p class="text-xs text-gray-600">Highest Expense</p>

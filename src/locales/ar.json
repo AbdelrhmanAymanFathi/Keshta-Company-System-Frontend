@@ -394,6 +394,11 @@
     "noPayments": "لا توجد دفعات"
   },
   "profile": {
+    "themeDescription": "اختر بين الوضع الفاتح أو الداكن أو اتبع إعدادات النظام.",
+    "themeTitle": "المظهر",
+    "accentColor": "لون التمييز",
+    "resetTheme": "إعادة تعيين المظهر",
+    "themePreview": "معاينة المظهر",
     "title": "الملف الشخصي",
     "account": "الحساب",
     "security": "الأمان",

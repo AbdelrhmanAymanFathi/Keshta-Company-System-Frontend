@@ -9,5 +9,5 @@ import ExtractsList from '@/components/dashboard/Extracts/ExtractsList.vue'
 </script>
 
 <style scoped>
-.bg-primary { background-color: #1f2937; }
+.bg-primary { background-color: var(--theme-primary); }
 </style>

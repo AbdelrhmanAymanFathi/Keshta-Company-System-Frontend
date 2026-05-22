@@ -2,11 +2,11 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
 
     <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+    <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"
-        class="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-sky-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm shadow-indigo-200 text-xs sm:text-sm"
+        class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
       >
         <PlusIcon class="w-5 h-5" />
         {{ $t('crushers.add') }}
@@ -20,14 +20,14 @@
         @input="onSearchInput"
         type="search"
         :placeholder="$t('crushers.searchPlaceholder')"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
       />
     </div>
 
     <!-- Desktop Table -->
     <div class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
               {{ $t('labels.#') }}
@@ -44,7 +44,7 @@
           <tr
             v-for="(crusher, idx) in filtered"
             :key="crusher.id"
-            class="hover:bg-indigo-50/40 cursor-pointer transition-colors"
+            class="theme-table-row-hover cursor-pointer transition-colors"
             @click="openContextMenu($event, crusher)"
             @contextmenu.prevent="openContextMenu($event, crusher)"
           >
@@ -89,7 +89,7 @@
         <div class="flex items-center justify-between" :class="isRTL ? 'flex-row-reverse' : ''">
           <div class="flex items-center gap-4" :class="isRTL ? 'flex-row-reverse' : 'flex-row'">
             <div class="flex-shrink-0 h-12 w-12">
-              <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+              <div class="h-12 w-12 rounded-full bg-gradient-to-br theme-icon-bg flex items-center justify-center">
                 <CubeIcon class="h-7 w-7 text-white" />
               </div>
             </div>
@@ -164,7 +164,7 @@
           </label>
           <input
             v-model="form.name"
-            class="w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            class="w-full px-3 py-2 border rounded-md theme-input-focus "
             :placeholder="$t('crushers.namePlaceholder')"
           />
         </div>
@@ -175,7 +175,7 @@
           <button
             @click="saveCrusher"
             :disabled="loading"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+            class="px-4 py-2 theme-button rounded-md disabled:opacity-50"
           >
             {{ loading ? $t('labels.saving') : $t('labels.save') }}
           </button>

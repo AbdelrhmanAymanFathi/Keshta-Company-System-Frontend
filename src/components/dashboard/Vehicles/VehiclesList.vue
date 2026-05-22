@@ -1,12 +1,12 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl border border-indigo-100/80 bg-gradient-to-br from-white via-slate-50 to-indigo-50 p-3 sm:p-5 shadow-lg shadow-slate-200/50">
+    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold text-gray-800">{{ $t('vehicles.title') }}</h2>
       <div></div>
       <div>
         <button
           @click="openCreateModal"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 flex items-center gap-2 shadow-sm shadow-indigo-200 text-xs sm:text-sm"
+          class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl theme-button flex items-center gap-2 shadow-sm  text-xs sm:text-sm"
         >
           <PlusIcon class="w-5 h-5" />
           {{ $t('vehicles.createVehicle') }}
@@ -21,7 +21,7 @@
     <!-- Table view -->
     <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <table class="min-w-full text-sm">
-        <thead class="bg-gradient-to-r from-slate-50 to-indigo-50">
+        <thead class="theme-table-thead-gradient">
           <tr>
             <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
             <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
@@ -34,7 +34,7 @@
         </thead>
         <tbody>
           <tr v-for="v in vehicles" :key="v.id"
-              class="border-t hover:bg-indigo-50/40"
+              class="border-t theme-table-row-hover"
               @contextmenu.prevent="onRowContextMenu($event, v)"
           >
             <!-- <td class="px-3 py-3 text-gray-700">{{ v.id }}</td> -->
@@ -46,7 +46,7 @@
             <!-- driver cell removed -->
             <td class="px-3 py-3 flex gap-2">
               <button
-                class="px-3 py-1.5 text-sm rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white hover:from-indigo-500 hover:to-sky-500 inline-flex items-center gap-1.5 shadow-sm shadow-indigo-200"
+                class="px-3 py-1.5 text-sm rounded-xl theme-button inline-flex items-center gap-1.5 shadow-sm "
                 @click="openVehicleDetails(v)">
                 <ArrowsRightLeftIcon class="w-4 h-4" />
                 {{ $t('vehicles.changeOwner') }}
@@ -84,7 +84,7 @@
         <li>
           <button
             @click="onContextMenuSelectManage"
-            class="w-full text-left px-4 py-2 hover:bg-indigo-50 hover:text-indigo-700 text-gray-700">
+            class="w-full text-left px-4 py-2 theme-hover-soft hover:theme-text-strong text-gray-700">
             {{ $t('vehicles.changeOwner') }}
           </button>
         </li>
@@ -92,7 +92,7 @@
         <li>
           <button
             @click="onContextMenuSelectEdit"
-            class="w-full text-left px-4 py-2 hover:bg-blue-50 hover:text-blue-700 text-gray-700">
+            class="w-full text-left px-4 py-2 theme-hover-soft theme-link text-gray-700">
             {{ $t('labels.edit') || 'Edit' }}
           </button>
         </li>
@@ -149,7 +149,7 @@
           </div>
           <div class="flex gap-2 justify-end pt-4 sm:col-span-2">
             <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-            <button type="submit" :disabled="editLoading" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">{{ editLoading ? $t('labels.saving') : $t('labels.save') || 'Save' }}</button>
+            <button type="submit" :disabled="editLoading" class="theme-button px-4 py-2 rounded disabled:opacity-50">{{ editLoading ? $t('labels.saving') : $t('labels.save') || 'Save' }}</button>
           </div>
         </form>
       </div>
@@ -238,7 +238,7 @@
                 <DateTimeField v-model="changeOwnerForm.effectiveDate" class="border rounded px-2 py-1 text-sm" />
                 <button
                   type="submit"
-                  class="px-3 py-1.5 text-xs md:text-sm rounded bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
+                  class="px-3 py-1.5 text-xs md:text-sm rounded theme-button  disabled:opacity-50"
                   :disabled="changeOwnerLoading"
                 >
                   <span v-if="changeOwnerLoading">{{ $t('labels.saving') }}</span>
