@@ -5,8 +5,8 @@
     :dir="isRTL ? 'rtl' : 'ltr'"
     :class="{ 'direction-rtl': isRTL }"
   >
-    <header class="app-page-header relative mb-6 overflow-hidden rounded-2xl theme-page-header-bar px-5 py-6 sm:px-8 sm:py-7 shadow-lg shadow-slate-200/50">
-      <div
+    <header class="app-page-header relative mb-6 overflow-hidden rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
+      <!-- <div
         class="pointer-events-none absolute inset-0 opacity-60"
         aria-hidden="true"
         style="background-image: radial-gradient(circle at 1px 1px, rgba(var(--theme-primary-rgb), 0.09) 1px, transparent 0); background-size: 24px 24px;"
@@ -18,7 +18,7 @@
       <div
         class="pointer-events-none absolute -bottom-20 -start-10 h-56 w-56 rounded-full theme-icon-bg opacity-25 blur-3xl"
         aria-hidden="true"
-      />
+      /> -->
       <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div class="min-w-0 flex-1 space-y-2">
           <div class="inline-flex items-center gap-2 rounded-full border theme-border/80 bg-white/90 px-3 py-1 text-xs font-medium theme-text-strong backdrop-blur-sm">
@@ -890,8 +890,8 @@ export default {
 
 <style scoped>
 .report-page {
-  background: linear-gradient(160deg, #f8fafc 0%, rgba(var(--theme-primary-rgb), 0.06) 52%, #f8fafc 100%);
-  min-height: 100%;
+  /* background: linear-gradient(160deg, #f8fafc 0%, rgba(var(--theme-primary-rgb), 0.06) 52%, #f8fafc 100%); */
+  /* min-height: 100%; */
 }
 
 .report-fade-enter-active,

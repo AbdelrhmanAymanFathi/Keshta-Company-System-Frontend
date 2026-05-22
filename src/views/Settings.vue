@@ -1,5 +1,5 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-0 sm:p-0.5 md:p-1 lg:p-0">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0">
     <div class="max-w-5xl mx-auto">
       <div class="app-page-header theme-header theme-animated-surface theme-glow mb-6 rounded-2xl border border-gray-100 p-5 shadow-lg shadow-slate-200/50">
         <div>
@@ -23,11 +23,11 @@
             <p class="text-sm text-gray-600">{{ $t('profile.themeDescription') || 'Pick a primary accent color and animation style. Buttons, headers, and motion update instantly across the app.' }}</p>
             <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
+                <label class="block text-sm font-semibold mb-2">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
                 <input
                   type="color"
                   v-model="themeColor"
-                  class="w-full h-14 p-0 border border-gray-300 rounded-lg theme-input-focus cursor-pointer"
+                  class="h-14 w-14 rounded-lg p-0 theme-input-focus cursor-pointer"
                 />
               </div>
               <div class="flex items-center gap-3">
