@@ -283,7 +283,7 @@ const routes = [
         path: 'profile',
         name: 'profile',
         component: Profile,
-        meta: { title: 'profile.title' }
+        meta: { title: 'profile.title', module: 'profile' }
       },
 
       // ==================== Extracts Module ====================
