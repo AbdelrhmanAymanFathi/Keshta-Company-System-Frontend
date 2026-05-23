@@ -2,10 +2,10 @@
   <div class="space-y-6">
     <!-- Header -->
     <div class="flex justify-between items-center gap-4 flex-wrap">
-      <h3 class="text-lg font-semibold text-gray-900">{{ $t('expenses.reportTitle') }}</h3>
+      <h3 class="text-lg font-semibold theme-text-primary">{{ $t('expenses.reportTitle') }}</h3>
       <div class="flex items-center gap-2">
         <button @click="refresh" :disabled="loading"
-                class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-2 rounded-lg transition-colors disabled:opacity-50">
+                class="bg-gray-100 hover:bg-gray-200 theme-text-primary px-3 py-2 rounded-lg transition-colors disabled:opacity-50">
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport" :disabled="downloading"
@@ -20,11 +20,11 @@
 
     <!-- Filters Section -->
     <div class="bg-white rounded-lg shadow p-4 space-y-4">
-      <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') }}</h4>
+      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Search -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.search') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.search') }}</label>
           <input 
             v-model="filters.q"
             @keyup.enter="loadReport"
@@ -36,7 +36,7 @@
 
         <!-- Start Date -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField
             v-model="filters.startDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
@@ -45,7 +45,7 @@
 
         <!-- End Date -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField
             v-model="filters.endDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
@@ -54,7 +54,7 @@
 
         <!-- Category Filter -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('expenses.category') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.category') }}</label>
           <select 
             v-model="filters.category"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
@@ -79,7 +79,7 @@
         </button>
         <button 
           @click="clearFilters"
-          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors text-sm font-medium"
+          class="px-4 py-2 bg-gray-200 hover:bg-gray-300 theme-text-primary rounded-lg transition-colors text-sm font-medium"
         >
           {{ $t('labels.clear') }}
         </button>
@@ -103,49 +103,49 @@
 
     <!-- Data Table -->
     <div v-else class="bg-white shadow-sm rounded-lg overflow-hidden">
-      <div class="px-4 py-3 text-sm text-gray-600">{{ $t('expenses.reportDescription') }}</div>
+      <div class="px-4 py-3 text-sm theme-text-secondary">{{ $t('expenses.reportDescription') }}</div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 table-auto">
           <thead class="bg-gray-50">
             <tr>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">#</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.type') || 'Type' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') || 'Location' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.category') || 'Category' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') || 'Description' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') || 'Amount' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') || 'Notes' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.type') || 'Type' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') || 'Location' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.category') || 'Category' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') || 'Description' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') || 'Amount' }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') || 'Notes' }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
             <tr v-for="(expense, index) in items" :key="expense.ID || expense.id || index" class="hover:bg-gray-50">
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.id || expense.ID || index + 1 }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.type || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.settlementDate || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900" style="display: table-cell !important;">{{ expense.branch || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ expense.locationName || expense.location?.name || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.id || expense.ID || index + 1 }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.type || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.settlementDate || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary" style="display: table-cell !important;">{{ expense.branch || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.locationName || expense.location?.name || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">
                 <div class="flex flex-col gap-1 items-start">
-                  <span class="font-medium text-gray-900">
+                  <span class="font-medium theme-text-primary">
                     {{ expense.category || '-' }}
                   </span>
-                  <span class="text-xs text-gray-600">
+                  <span class="text-xs theme-text-secondary">
                     {{ expense.classification || '-' }}
                   </span>
                 </div>
               </td>
-              <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.description || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{{ formatCurrency(expense.amount || 0) }}</td>
-              <td class="table-cell px-6 py-4 text-sm text-gray-900">{{ expense.notes || '-' }}</td>
+              <td class="table-cell px-6 py-4 text-sm theme-text-primary">{{ expense.description || '-' }}</td>
+              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">{{ formatCurrency(expense.amount || 0) }}</td>
+              <td class="table-cell px-6 py-4 text-sm theme-text-primary">{{ expense.notes || '-' }}</td>
             </tr>
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="11" class="px-6 py-8 text-center text-sm text-gray-500">{{ $t('labels.noData') }}</td>
+              <td colspan="11" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
             </tr>
           </tbody>
         </table>
@@ -155,19 +155,19 @@
       <div v-if="items.length > 0" class="bg-gray-50 border-t border-gray-200 px-4 py-4">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p class="text-xs text-gray-600">{{ $t('labels.totalRecords') }}</p>
-            <p class="text-lg font-semibold text-gray-900">{{ items.length }}</p>
+            <p class="text-xs theme-text-secondary">{{ $t('labels.totalRecords') }}</p>
+            <p class="text-lg font-semibold theme-text-primary">{{ items.length }}</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">{{ $t('labels.total') }}</p>
+            <p class="text-xs theme-text-secondary">{{ $t('labels.total') }}</p>
             <p class="text-lg font-semibold text-red-600">{{ formatCurrency(totalAmount) }}</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">Average Expense</p>
+            <p class="text-xs theme-text-secondary">Average Expense</p>
             <p class="text-lg font-semibold theme-text">{{ formatCurrency(averageExpense) }}</p>
           </div>
           <div>
-            <p class="text-xs text-gray-600">Highest Expense</p>
+            <p class="text-xs theme-text-secondary">Highest Expense</p>
             <p class="text-lg font-semibold text-orange-600">{{ formatCurrency(highestExpense) }}</p>
           </div>
         </div>

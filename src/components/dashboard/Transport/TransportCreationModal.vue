@@ -11,12 +11,12 @@
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold theme-text-muted">
+          <h2 class="text-2xl font-bold theme-heading">
             {{ currentStep === 1 ? modalTitleComputed : ($t('transport.enterTransports') || 'إدخال النقل') }}
           </h2>
           <button
             @click="closeModal"
-            class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none"
+            class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none"
           >
             ×
           </button>
@@ -26,7 +26,7 @@
         <div class="flex-1 overflow-y-auto p-6 modal-body-container relative">
           <!-- STEP 1 -->
           <div v-if="currentStep === 1" class="w-full">
-            <h3 class="text-lg font-bold mb-8 text-center text-gray-800">
+            <h3 class="text-lg font-bold mb-8 text-center theme-text-primary">
               {{ $t('transport.step1BasicData') || 'الخطوة 1: البيانات الأساسية' }}
             </h3>
 
@@ -36,7 +36,7 @@
 
                 <!-- Item -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.item') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -46,7 +46,7 @@
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="selectCommonItem">
                         <template #prefix>
-                          <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                          <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @mousedown.prevent="showAddItemDialog = true"
@@ -61,7 +61,7 @@
 
                 <!-- From Location -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('transport.location') || $t('transport.fromLocation') }} <span class="text-red-600">*</span>
                     </label>
                   <div class="relative flex items-center gap-2">
@@ -71,7 +71,7 @@
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { commonData.location = sel; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = sel.name + (sel.parentName ? ' (' + sel.parentName + ')' : ''); }">
                         <template #prefix>
-                          <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                          <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @mousedown.prevent="(function(){ pendingField = 'location'; showAddLocation = true })()"
@@ -86,7 +86,7 @@
 
                 <!-- To Location -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('transport.area') || $t('transport.toLocation') }} <span class="text-red-600">*</span>
                     </label>
                   <div class="relative flex items-center gap-2">
@@ -96,7 +96,7 @@
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { commonData.area = sel; filters.commonToLocSearch = sel.name; try{ saveCommonDataToStorage() }catch(e){} }">
                         <template #prefix>
-                          <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                          <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @mousedown.prevent="(function(){ pendingField = 'area'; showAddLocation = true })()"
@@ -111,7 +111,7 @@
 
                 <!-- Contractor -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('transport.contractor') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -121,7 +121,7 @@
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="selectCommonContractor">
                         <template #prefix>
-                          <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                          <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @mousedown.prevent="showAddContractorDialog = true"
@@ -136,7 +136,7 @@
 
                 <!-- Vehicle (moved to header) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.vehicle') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -146,7 +146,7 @@
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="selectCommonVehicle">
                         <template #prefix>
-                          <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                          <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @mousedown.prevent="showAddVehicleDialog = true"
@@ -161,11 +161,11 @@
 
                 <!-- Vehicle Company Capacity (header) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('transport.vehicleCapacity') }}
                   </label>
                   <div class="relative">
-                    <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                     <input
                       type="number"
                       v-model.number="vehicleCompanyCapacity"
@@ -180,11 +180,11 @@
 
                 <!-- First Km Price -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('transport.firstKmPrice') }}
                   </label>
                   <div class="relative">
-                    <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                     <input
                       type="number"
                       v-model.number="commonData.firstKmPrice"
@@ -197,11 +197,11 @@
 
                 <!-- Per Km Price -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('transport.perKmPrice') }}
                   </label>
                   <div class="relative">
-                    <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <CurrencyDollarIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                     <input
                       type="number"
                       v-model.number="commonData.perKmPrice"
@@ -214,7 +214,7 @@
 
                 <!-- Notes (spans full row) -->
                 <div class="col-span-full">
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('transport.notes') }}
                   </label>
                   <textarea
@@ -230,14 +230,14 @@
             <div class="mt-10 flex justify-end gap-6">
               <button
                 @click="closeModal"
-                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition"
+                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition"
               >
                 {{ $t('common.cancel') || 'إلغاء' }}
               </button>
               <button
                 @click="goToStep2"
                 :disabled="!isStep1Valid()"
-                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
+                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3"
               >
                 {{ $t('common.next') || 'التالي' }}
                 <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
@@ -251,56 +251,56 @@
             <div class="flex items-center justify-between mb-8">
               <button
                 @click="goBackToStep1"
-                class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition"
+                class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"
               >
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('common.back') || 'عودة' }}
               </button>
-              <h3 class="text-lg font-bold text-gray-800">{{ $t('transport.step2Data') || 'الخطوة 2: بيانات الرحلات' }}</h3>
+              <h3 class="text-lg font-bold theme-text-primary">{{ $t('transport.step2Data') || 'الخطوة 2: بيانات الرحلات' }}</h3>
               <div></div> <!-- Placeholder -->
             </div>
 
             <!-- Summary Card -->
             <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
-              <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') || 'ملخص' }}</h4>
+              <h4 class="text-sm font-bold theme-accent-muted mb-4">{{ $t('labels.summary') || 'ملخص' }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                 <!-- Date removed from summary (handled per-row) -->
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.item') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.item?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.location') || $t('transport.fromLocation') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.location?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('transport.location') || $t('transport.fromLocation') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.location?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.area') || $t('transport.toLocation') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('transport.area') || $t('transport.toLocation') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.area?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.contractor') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('transport.contractor') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                 </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.vehicle') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.vehicle?.name || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.vehicle') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.vehicle?.name || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('transport.vehicleCapacity') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ formatNumber(vehicleCompanyCapacity || commonData.vehicle?.companyCapacity) }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('transport.vehicleCapacity') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ formatNumber(vehicleCompanyCapacity || commonData.vehicle?.companyCapacity) }}</dd>
                   </div>
                 <!-- Distance is shown per-row now -->
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.firstKmPrice') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.firstKmPrice) }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('transport.firstKmPrice') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ formatNumber(commonData.firstKmPrice) }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.perKmPrice') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.perKmPrice) }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('transport.perKmPrice') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ formatNumber(commonData.perKmPrice) }}</dd>
                 </div>
                 <div class="flex flex-col col-span-full">
-                  <dt class="font-semibold text-gray-700">{{ $t('transport.notes') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.notes || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('transport.notes') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.notes || '-' }}</dd>
                 </div>
               </dl>
             </div>
@@ -311,24 +311,24 @@
                 <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
-                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                      <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary w-12">{{ $t('#') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">
                         {{ $t('transport.date') || 'Date' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">
                           {{ $t('labels.discount') }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">
                           {{ $t('transport.count') || 'Count' }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">
                         {{ $t('transport.distanceKm') || 'Distance (Km)' }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">
                         {{ $t('transport.total') }}</th>
-                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}
+                      <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('labels.actions') }}
                       </th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200 bg-white">
                     <tr v-for="(row, index) in rows" :key="row.id">
-                      <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                      <td class="px-4 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
                       <!-- Row Date -->
                       <td class="px-3 py-2">
                         <DateField v-model="row.date"
@@ -359,7 +359,7 @@
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="theme-text hover:theme-text-muted transition"
+                          <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition"
                             title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
                           </button>
@@ -378,28 +378,28 @@
             <div
               class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold mt-8">
               <div class="flex items-center justify-end gap-3">
-                <span class="text-gray-700">{{ $t('transport.subtotal') }}:</span>
-                <span class="text-gray-900 min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
+                <span class="theme-text-secondary">{{ $t('transport.subtotal') }}:</span>
+                <span class="theme-text-primary min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
               </div>
               <div class="flex items-center justify-end gap-3">
-                <span class="text-gray-700">{{ $t('transport.totalDiscount') }}:</span>
+                <span class="theme-text-secondary">{{ $t('transport.totalDiscount') }}:</span>
                 <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
               </div>
               <div
-                class="flex items-center justify-end gap-3 text-lg theme-text-strong border-s-4 theme-border-accent ps-6">
-                <span class="theme-text-muted">{{ $t('transport.grandTotal') }}:</span>
-                <span class="theme-text-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+                class="flex items-center justify-end gap-3 text-lg theme-accent-strong border-s-4 theme-border-accent ps-6">
+                <span class="theme-accent-muted">{{ $t('transport.grandTotal') }}:</span>
+                <span class="theme-accent-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
               </div>
             </div>
             <!-- Save / Back Buttons -->
             <div class="mt-10 flex justify-end gap-6">
               <button @click="goBackToStep1"
-                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3">
+                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('common.back') }}
               </button>
               <button @click="saveData" :disabled="isSaving"
-                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">
+                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">
                 {{ isSaving ? $t('common.saving') : $t('common.save') }}
                 <CheckIcon class="w-6 h-6" />
               </button>
@@ -428,7 +428,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddLocation = false; pendingField = null" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
         <button @click="addLocation" :disabled="!newLocationName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -447,7 +447,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
         <button @click="addContractor" :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -473,7 +473,7 @@
         <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
         <button @click="addVehicle"
           :disabled="!newVehicleForm.name || !newVehicleForm.companyCapacity || creatingVehicle"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -490,7 +490,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddItemDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
         <button @click="addItem" :disabled="!newItemForm.name || creatingItem"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingItem ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>

@@ -26,20 +26,20 @@
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
           </div>
-          <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $t('auth.login.title') }}</h1>
-          <p class="text-gray-600">{{ $t('auth.login.subtitle') }}</p>
+          <h1 class="text-2xl font-bold theme-text-primary mb-2">{{ $t('auth.login.title') }}</h1>
+          <p class="theme-text-secondary">{{ $t('auth.login.subtitle') }}</p>
         </div>
 
         <!-- Form -->
         <form @submit.prevent="submit" class="space-y-6">
           <!-- Email Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium theme-text-secondary mb-2">
               {{ $t('auth.login.email') }}
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207">
                   </path>
@@ -54,12 +54,12 @@
 
           <!-- Password Field -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium theme-text-secondary mb-2">
               {{ $t('auth.login.password') }}
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                   </path>
@@ -71,13 +71,13 @@
                 :class="{ 'border-red-500': passwordError }" required />
               <button type="button" @click="showPassword = !showPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <svg v-if="showPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                <svg v-if="showPassword" class="h-5 w-5 theme-caption" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21">
                   </path>
                 </svg>
-                <svg v-else class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="h-5 w-5 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -94,7 +94,7 @@
             <label class="flex items-center">
               <input v-model="rememberMe" type="checkbox"
                 class="h-4 w-4 theme-text theme-input-focus border-gray-300 rounded" />
-              <span class="ml-2 text-sm text-gray-700">{{ $t('auth.login.rememberMe') }}</span>
+              <span class="ml-2 text-sm theme-text-secondary">{{ $t('auth.login.rememberMe') }}</span>
             </label>
             <a href="#" class="text-sm theme-link">
               {{ $t('auth.login.forgotPassword') }}
@@ -103,8 +103,8 @@
 
           <!-- Submit Button -->
           <button v-if="step === 'credentials'" type="submit" :disabled="loading"
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white theme-button  focus:outline-none focus:ring-2 focus:ring-offset-2 theme-input-focus disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-            <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium theme-text-light theme-button  focus:outline-none focus:ring-2 focus:ring-offset-2 theme-input-focus disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 theme-text-light" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
@@ -116,7 +116,7 @@
           <!-- TOTP submit (shown when server asks for 2FA) -->
           <div v-if="step === 'totp'" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('auth.login.totpLabel') || 'Authenticator code' }}</label>
+              <label class="block text-sm font-medium theme-text-secondary mb-2">{{ $t('auth.login.totpLabel') || 'Authenticator code' }}</label>
               <input v-model="totpCode" type="text" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
             </div>
             <div class="flex gap-3">
@@ -157,7 +157,7 @@
 
         <!-- Register Link -->
         <!-- <div class="mt-6 text-center">
-          <p class="text-sm text-gray-600">
+          <p class="text-sm theme-text-secondary">
             {{ $t('auth.login.noAccount') }}
             <a href="#" @click.prevent="$emit('switch-auth', 'register')"
               class="font-medium theme-link transition-colors">

@@ -4,7 +4,7 @@
 
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
-        <button @click="openAddModal" class="bg-green-600 text-white px-4 py-2 rounded">{{ $t('labels.add') }}</button>
+        <button @click="openAddModal" class="bg-green-600 theme-text-light px-4 py-2 rounded">{{ $t('labels.add') }}</button>
         <button @click="loadItems" class="px-3 py-2 border rounded">{{ $t('refresh') }}</button>
       </div>
       <div v-if="error" class="text-red-600">{{ error }}</div>

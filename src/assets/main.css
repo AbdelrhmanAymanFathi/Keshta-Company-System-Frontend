@@ -4,13 +4,23 @@
 
 body {
   overflow-y: hidden;
-  transition: background-color 0.45s ease;
+  font-family: var(--theme-font-family);
+  color: var(--theme-text-primary);
+  transition:
+    background-color 0.45s ease,
+    color 200ms ease,
+    border-color 250ms ease,
+    text-shadow 200ms ease;
 }
 
 html {
   --theme-motion-duration: 0.45s;
   --theme-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* =========================
+   Color Theme System
+   ========================= */
 :root {
   --theme-primary: #4f46e5;
   --theme-primary-rgb: 79, 70, 229;
@@ -31,7 +41,136 @@ html {
   --theme-on-primary: #ffffff;
 }
 
+/* =========================
+   Typography Theme System
+   ========================= */
+:root {
+  --theme-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --theme-text-primary: #111827;
+  --theme-text-secondary: #4b5563;
+  --theme-text-muted: #6b7280;
+
+  --theme-text-light: #ffffff;
+  --theme-text-light-secondary: #e5e7eb;
+  --theme-text-light-muted: #d1d5db;
+
+  --theme-heading-color: #0f172a;
+  --theme-link-color: #4f46e5;
+
+  --theme-sidebar-text: #334155;
+  --theme-card-text: #111827;
+}
+
 @layer components {
+/* =========================
+   Text Semantic Classes
+   ========================= */
+.theme-text-primary {
+  color: var(--theme-text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--theme-text-muted);
+}
+
+.theme-text-light {
+  color: var(--theme-text-light);
+}
+
+.theme-text-light-secondary {
+  color: var(--theme-text-light-secondary);
+}
+
+.theme-text-light-muted {
+  color: var(--theme-text-light-muted);
+}
+
+.theme-heading {
+  color: var(--theme-heading-color);
+}
+
+.theme-link {
+  color: var(--theme-link-color);
+}
+
+.theme-label {
+  color: var(--theme-text-secondary);
+  font-weight: 500;
+}
+
+.theme-caption {
+  color: var(--theme-text-muted);
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.theme-sidebar-text {
+  color: var(--theme-sidebar-text);
+}
+
+.theme-card-text {
+  color: var(--theme-card-text);
+}
+
+.theme-typography-transition {
+  transition:
+    color 200ms ease,
+    background-color 250ms ease,
+    border-color 250ms ease,
+    text-shadow 200ms ease;
+}
+
+/* Color picker — square, border matches selected color (--picker-color) */
+.theme-color-input {
+  --picker-color: #4f46e5;
+  box-sizing: border-box;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0;
+  border: 2px solid var(--picker-color);
+  border-radius: 0.5rem;
+  background-color: var(--picker-color);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  overflow: hidden;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.theme-color-input:hover {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--picker-color) 28%, transparent);
+}
+
+.theme-color-input:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--picker-color) 40%, transparent);
+}
+
+.theme-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.theme-color-input::-webkit-color-swatch {
+  border: none;
+  border-radius: calc(0.5rem - 2px);
+}
+
+.theme-color-input::-moz-color-swatch {
+  border: none;
+  border-radius: calc(0.5rem - 2px);
+}
+
 .theme-header {
   background: linear-gradient(135deg, #ffffff 0%, rgba(var(--theme-primary-100), 0.72) 24%, rgba(var(--theme-primary-rgb), 0.08) 42%, rgba(var(--theme-primary-rgb), 0.14) 100%);
 }
@@ -70,6 +209,7 @@ html {
 .theme-card {
   background-color: #ffffff;
   border: 1px solid rgba(var(--theme-primary-rgb), 0.08);
+  color: var(--theme-card-text);
 }
 
 .theme-dashboard-header {
@@ -102,7 +242,7 @@ html {
 }
 
 .theme-sidebar-item {
-  color: rgb(51 65 85);
+  color: var(--theme-sidebar-text);
 }
 
 .theme-sidebar-item:hover {
@@ -147,23 +287,32 @@ html {
   background-color: rgba(var(--theme-primary-rgb), 0.06);
 }
 
-.theme-text-strong {
+.theme-accent-strong {
   color: rgb(var(--theme-primary-700));
 }
 
-.theme-text-muted {
+.theme-accent-muted {
   color: rgb(var(--theme-primary-800));
+}
+
+/* Legacy aliases — accent-colored emphasis (prefer theme-text-* for body copy) */
+.theme-text-strong {
+  color: rgb(var(--theme-primary-700));
 }
 
 .theme-hover-soft:hover {
   background-color: rgba(var(--theme-primary-rgb), 0.08);
 }
 
-.theme-link {
+.theme-link:hover {
+  color: rgb(var(--theme-primary-700));
+}
+
+.theme-link-accent {
   color: var(--theme-primary);
 }
 
-.theme-link:hover {
+.theme-link-accent:hover {
   color: rgb(var(--theme-primary-700));
 }
 

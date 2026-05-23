@@ -4,7 +4,7 @@
     <div class="flex flex-col gap-4">
       <div class="app-page-header flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
         <div class="flex-1 w-full sm:w-auto">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('equipmentLog.list') }}</h2>
+          <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t('equipmentLog.list') }}</h2>
           <!-- Search bar removed -->
         </div>
 
@@ -18,7 +18,7 @@
           </button>
 
           <!-- <button @click="$emit('navigate-report')"
-            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
+            class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -30,48 +30,48 @@
 
       <!-- Filter Bar -->
       <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-lg shadow-slate-200/40">
-        <h4 class="text-sm font-semibold text-gray-700 mb-3">{{ $t('equipmentLog.filters') || 'Filters' }}</h4>
+        <h4 class="text-sm font-semibold theme-text-secondary mb-3">{{ $t('equipmentLog.filters') || 'Filters' }}</h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
             <DateField v-model="filters.startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
             <DateField v-model="filters.endDate" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('equipmentLog.equipment') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.equipment') }}</label>
             <SearchDropdown v-model="filters.equipmentSearch" :items="equipments" :allItems="equipments" :placeholder="$t('placeholders.searchEquipment')" @select="(sel) => { filters.equipmentId = sel.id; filters.equipmentSearch = sel.name }" />
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.driver') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.driver') }}</label>
             <SearchDropdown v-model="filters.driverSearch" :items="drivers" :allItems="drivers" :placeholder="$t('placeholders.searchDriver')" @select="(sel) => { filters.driverId = sel.id; filters.driverSearch = sel.name }" />
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.location') }}</label>
             <SearchDropdown v-model="filters.locationSearch" :items="topLocations" :allItems="topLocations" :placeholder="$t('placeholders.searchLocation')" @select="(sel) => { filters.locationId = sel.id; filters.locationSearch = sel.name; filters.areaId = ''; filters.areaSearch = '' }" />
           </div>
 
           <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.area') }}</label>
             <SearchDropdown v-model="filters.areaSearch" :items="availableAreas" :allItems="availableAreas" :placeholder="$t('placeholders.searchArea')" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" />
           </div>
 
           <div class="flex gap-2 items-center">
             <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'theme-button shadow-sm ' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.all') }}</button>
-              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'theme-dashboard-bg-soft0 text-white shadow-sm ' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.companyOwned') }}</button>
-              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-slate-600 text-white shadow-sm shadow-slate-200' : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.external') }}</button>
+              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'theme-button shadow-sm ' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.all') }}</button>
+              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'theme-dashboard-bg-soft0 theme-text-light shadow-sm ' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.companyOwned') }}</button>
+              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.external') }}</button>
             </div>
           </div>
 
           <div class="col-span-full flex gap-2">
             <button @click="applyFilters" class="px-4 py-2 theme-button rounded-xl text-sm shadow-sm ">{{ $t('labels.search') }}</button>
-            <button @click="clearFilters" class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-sm">{{ $t('labels.clear') }}</button>
+            <button @click="clearFilters" class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl text-sm">{{ $t('labels.clear') }}</button>
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@
     <!-- Stats Bar -->
     <!-- <div class="bg-gray-50 rounded-lg p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div class="flex flex-col gap-2 text-sm text-gray-600">
+        <div class="flex flex-col gap-2 text-sm theme-text-secondary">
           <div>
             {{ $t('equipmentLog.totalCount') }}: <span class="font-semibold">{{ filteredItems.length }}</span>
           </div>
@@ -88,7 +88,7 @@
             {{ $t('equipmentLog.totalSum') }}: <span class="font-semibold">{{ formatCurrency(totalSum) }}</span>
           </div>
         </div>
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+        <div class="flex items-center gap-2 text-sm theme-text-secondary">
           <label>{{ $t('equipmentLog.pageSize') }}:</label>
           <select :value="equipmentLogsStore.pageSize" @change="onPageSizeChange"
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none theme-input-focus">
@@ -122,12 +122,12 @@
     <div v-else class="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40 overflow-hidden">
       <!-- No Results Message -->
       <div v-if="equipmentLogsStore.items.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="mx-auto h-12 w-12 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
           </path>
         </svg>
-        <p class="mt-4 text-lg text-gray-500">{{ $t('equipmentLog.noResults') }}</p>
+        <p class="mt-4 text-lg theme-text-muted">{{ $t('equipmentLog.noResults') }}</p>
       </div>
 
       <!-- Table with Scroll Controls -->
@@ -150,66 +150,66 @@
             <thead class="theme-table-thead-gradient" :class="{ 'direction-rtl': isRTL }">
               <tr>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.date') }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.equipment') }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('labels.location') || 'Location' }}
                 </th>
                 
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('labels.area') || 'Area' }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('labels.contractor') || 'Contractor' }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('labels.driver') || 'Driver' }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.type') }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.hours') }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.hourlyRate') }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('labels.discount') || 'Discount' }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.total') }}
                 </th>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
                   {{ $t('equipmentLog.notes') }}
                 </th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 text-center text-xs font-medium theme-text-muted uppercase tracking-wider">
                   {{ $t('labels.actions') }}
                 </th>
               </tr>
@@ -217,23 +217,23 @@
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="rental in filteredItems" :key="rental.id" class="theme-table-row-hover"
                 @contextmenu.prevent="openContextMenu($event, rental)">
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ formatDate(rental.date) }}
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ rental.equipment.name }}
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.location?.name || '-' }}</div>
                 </td>
                 
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.area?.name || '-' }}</div>
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.driver?.name || rental.driverName || rental.driverLabel || '-' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -241,19 +241,19 @@
                     {{ !rental.isRental ? $t('equipmentLog.companyOwned') : $t('equipmentLog.external') }}
                   </Badge>
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ rental.hours }}
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ formatCurrency(rental.hourlyRate) }}
                 </td>
-                <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ formatCurrency(rental.discount || 0) }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">
                   {{ formatCurrency(rental.total ?? Math.max(0, (Number(rental.hours || 0) * Number(rental.hourlyRate || 0)) - Number(rental.discount || 0))) }}
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                <td class="px-6 py-4 text-sm theme-text-primary max-w-xs truncate">
                   {{ rental.notes || rental.note || '-' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -291,14 +291,14 @@
         <!-- Mobile Pagination -->
         <div class="flex-1 flex justify-between sm:hidden">
           <button @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.previous') }}
           </button>
-          <span class="text-sm text-gray-700 self-center">
+          <span class="text-sm theme-text-secondary self-center">
             {{ equipmentLogsStore.page }} / {{ equipmentLogsStore.totalPages }}
           </span>
           <button @click="changePage(equipmentLogsStore.page + 1)" :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.next') }}
           </button>
         </div>
@@ -306,7 +306,7 @@
         <!-- Desktop Pagination -->
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div class="flex items-center gap-4">
-            <p class="text-sm text-gray-700">
+            <p class="text-sm theme-text-secondary">
               {{ $t('labels.showing') }}
               <span class="font-medium">{{ ((equipmentLogsStore.page - 1) * equipmentLogsStore.pageSize) + 1 }}</span>
               {{ $t('labels.to') }}
@@ -322,7 +322,7 @@
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
               <button @click="changePage(1)" :disabled="equipmentLogsStore.page <= 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
@@ -331,7 +331,7 @@
               </button>
 
               <button @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
-                class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
@@ -344,7 +344,7 @@
                   'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
                   page === equipmentLogsStore.page
                     ? 'z-10 theme-dashboard-bg-soft theme-pagination-active'
-                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                    : 'bg-white border-gray-300 theme-text-muted hover:bg-gray-50'
                 ]">
                   {{ page }}
                 </button>
@@ -352,7 +352,7 @@
 
               <button @click="changePage(equipmentLogsStore.page + 1)"
                 :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
-                class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -362,7 +362,7 @@
 
               <button @click="changePage(equipmentLogsStore.totalPages)"
                 :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z"
@@ -426,10 +426,10 @@
           class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner"
           :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
           <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
-            <h3 class="text-lg font-medium text-gray-900">
+            <h3 class="text-lg font-medium theme-text-primary">
               {{ $t('equipmentLog.payouts') }} - {{ selectedRentalForPayouts?.name }}
             </h3>
-            <button @click="closePayoutsModal" class="text-gray-400 hover:text-gray-600">
+            <button @click="closePayoutsModal" class="theme-caption hover:theme-text-secondary">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -439,7 +439,7 @@
           <div class="p-5 space-y-6">
             <!-- Add Payout Form -->
             <div class="pb-6 border-b">
-              <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('equipmentLog.addPayout') }}</h4>
+              <h4 class="text-sm font-medium theme-text-secondary mb-3">{{ $t('equipmentLog.addPayout') }}</h4>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <input v-model="payoutForm.amount" type="number" placeholder="Amount"
                   class="border border-gray-300 rounded px-3 py-2 text-sm" />
@@ -448,15 +448,15 @@
                   class="border border-gray-300 rounded px-3 py-2 text-sm" />
               </div>
               <button @click="savePayout" :disabled="!payoutForm.amount || equipmentLogsStore.payoutsLoading"
-                class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm">
+                class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 theme-text-light px-4 py-2 rounded text-sm">
                 {{ equipmentLogsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
               </button>
             </div>
 
             <!-- Payouts List -->
             <div>
-              <h4 class="text-sm font-medium text-gray-700 mb-3">{{ $t('equipmentLog.payoutsList') }}</h4>
-              <div v-if="equipmentLogsStore.payouts.length === 0" class="text-center py-4 text-gray-500">
+              <h4 class="text-sm font-medium theme-text-secondary mb-3">{{ $t('equipmentLog.payoutsList') }}</h4>
+              <div v-if="equipmentLogsStore.payouts.length === 0" class="text-center py-4 theme-text-muted">
                 {{ $t('equipmentLog.noPayouts') }}
               </div>
               <div v-else class="space-y-2">
@@ -464,8 +464,8 @@
                   class="flex items-center justify-between bg-gray-50 p-3 rounded border">
                   <div>
                     <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
-                    <div class="text-xs text-gray-500">{{ formatDate(payout.date) }}</div>
-                    <div v-if="payout.notes" class="text-xs text-gray-600">{{ payout.notes }}</div>
+                    <div class="text-xs theme-text-muted">{{ formatDate(payout.date) }}</div>
+                    <div v-if="payout.notes" class="text-xs theme-text-secondary">{{ payout.notes }}</div>
                   </div>
                   <button @click="deletePayout(payout.id)" :disabled="equipmentLogsStore.payoutsLoading"
                     class="text-red-600 hover:text-red-900 text-sm">
@@ -477,7 +477,7 @@
 
             <div class="flex justify-end gap-2 border-t pt-6">
               <button @click="closePayoutsModal"
-                class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50">
+                class="px-4 py-2 border border-gray-300 rounded theme-text-secondary hover:bg-gray-50">
                 {{ $t('labels.close') }}
               </button>
             </div>

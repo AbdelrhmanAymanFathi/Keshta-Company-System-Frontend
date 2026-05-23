@@ -18,12 +18,12 @@
         >
           <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-            <h2 class="text-2xl font-bold theme-text-muted">
+            <h2 class="text-2xl font-bold theme-heading">
               {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterDetails') || 'Enter Details') }}
             </h2>
             <button
               @click="closeModal"
-              class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none"
+              class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none"
             >
               ×
             </button>
@@ -31,16 +31,16 @@
 
           <div class="flex-1 overflow-y-auto p-6 modal-body-container relative">
             <div v-if="currentStep === 1" class="w-full">
-              <h3 class="text-lg font-bold mb-8 text-center text-gray-800">{{ $t('labels.step1BasicData') }}</h3>
+              <h3 class="text-lg font-bold mb-8 text-center theme-text-primary">{{ $t('labels.step1BasicData') }}</h3>
 
               <div class="max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('labels.dateFrom') || 'Date From' }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative">
-                      <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                       <DateField
                         v-model="commonData.dateFrom"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition"
@@ -49,11 +49,11 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('labels.dateTo') || 'Date To' }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative">
-                      <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                       <DateField
                         v-model="commonData.dateTo"
                         class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition"
@@ -62,7 +62,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('labels.site') }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative flex items-center gap-2">
@@ -76,7 +76,7 @@
                           @select="selectSite"
                         >
                           <template #prefix>
-                            <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                           </template>
                           <template #afterOptions>
                             <div
@@ -93,7 +93,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.area') }}</label>
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.area') }}</label>
                     <div class="relative flex items-center gap-2">
                       <div class="flex-1 relative">
                         <SearchDropdown
@@ -106,7 +106,7 @@
                           @select="selectArea"
                         >
                           <template #prefix>
-                            <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                           </template>
                           <template #afterOptions>
                             <div
@@ -124,7 +124,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('labels.contractor') }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative flex items-center gap-2">
@@ -138,7 +138,7 @@
                           @select="selectContractor"
                         >
                           <template #prefix>
-                            <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                           </template>
                           <template #afterOptions>
                             <div
@@ -155,7 +155,7 @@
                   </div>
 
                   <!-- <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                       {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
                     </label>
                     <div class="relative flex items-center gap-2">
@@ -169,7 +169,7 @@
                           @select="selectCrusher"
                         >
                           <template #prefix>
-                            <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                           </template>
                           <template #afterOptions>
                             <div
@@ -186,7 +186,7 @@
                   </div> -->
 
                   <div class="col-span-full">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.notes') }}</label>
+                    <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.notes') }}</label>
                     <textarea
                       v-model="commonData.notes"
                       rows="3"
@@ -199,14 +199,14 @@
               <div class="mt-10 flex justify-end gap-6">
                 <button
                   @click="closeModal"
-                  class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition"
+                  class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition"
                 >
                   {{ $t('labels.cancel') }}
                 </button>
                 <button
                   @click="goToStep2"
                   :disabled="!isStep1Valid()"
-                  class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
+                  class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3"
                 >
                   {{ $t('labels.next') }}
                   <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
@@ -218,45 +218,45 @@
               <div class="flex items-center justify-between mb-8">
                 <button
                   @click="goBackToStep1"
-                  class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition"
+                  class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"
                 >
                   <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                   {{ $t('labels.back') }}
                 </button>
-                <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
+                <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2Data') }}</h3>
                 <div></div>
               </div>
 
               <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
-                <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
+                <h4 class="text-sm font-bold theme-accent-muted mb-4">{{ $t('labels.summary') }}</h4>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.dateFrom') || 'Date From' }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.dateFrom || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.dateFrom') || 'Date From' }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.dateFrom || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.dateTo') || 'Date To' }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.dateTo || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.dateTo') || 'Date To' }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.dateTo || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.site') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.site?.name || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.area') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.area?.name || '-' }}</dd>
                   </div>
                   <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.contractor') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                   </div>
                   <!-- <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.crusher') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.crusher?.name || '-' }}</dd>
                   </div> -->
                   <div class="flex flex-col col-span-full">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.notes') }}:</dt>
-                    <dd class="text-gray-900 mt-1">{{ commonData.notes || '-' }}</dd>
+                    <dt class="font-semibold theme-text-secondary">{{ $t('labels.notes') }}:</dt>
+                    <dd class="theme-text-primary mt-1">{{ commonData.notes || '-' }}</dd>
                   </div>
                 </dl>
               </div>
@@ -264,7 +264,7 @@
               <div class="mb-6">
                 <button
                   @click="addRow"
-                  class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition"
+                  class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition"
                 >
                   + {{ $t('labels.addRow') }}
                 </button>
@@ -275,18 +275,18 @@
                   <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                     <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                       <tr>
-                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.item') }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.quantity') || 'Quantity' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') || 'Discount' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
-                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary w-12">{{ $t('#') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.item') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.quantity') || 'Quantity' }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.price') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.discount') || 'Discount' }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.total') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('labels.actions') }}</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                       <tr v-for="(row, index) in rows" :key="row.id">
-                        <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                        <td class="px-4 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
                         <td class="px-3 py-2" :ref="el => row.itemCell = el">
                           <div class="relative">
                             <div
@@ -305,7 +305,7 @@
                                 @focus="row.itemOpen = true"
                                 @blur="row.itemOpen = false"
                               />
-                              <span class="text-gray-400">▾</span>
+                              <span class="theme-caption">▾</span>
                             </div>
 
                             <teleport to=".modal-body-container" v-if="row.itemOpen">
@@ -316,7 +316,7 @@
                               >
                                 <div
                                   v-if="filteredExtractItems(row).length === 0"
-                                  class="px-3 py-2 text-sm text-gray-500 text-start"
+                                  class="px-3 py-2 text-sm theme-text-muted text-start"
                                 >
                                   {{ $t('labels.noResults') || 'No items found' }}
                                 </div>
@@ -384,7 +384,7 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                           <div class="flex justify-center gap-3">
-                            <button @click="duplicateRow(index)" class="theme-text hover:theme-text-muted transition" title="Duplicate" tabindex="-1">
+                            <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition" title="Duplicate" tabindex="-1">
                               <DocumentDuplicateIcon class="w-5 h-5" />
                             </button>
                             <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition" title="Delete" tabindex="-1">
@@ -400,15 +400,15 @@
 
               <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
                 <div class="flex items-center justify-end gap-3">
-                  <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
-                  <span class="text-gray-900 min-w-32 text-end">{{ formatCurrency(subtotal) }}</span>
+                  <span class="theme-text-secondary">{{ $t('labels.subtotal') }}:</span>
+                  <span class="theme-text-primary min-w-32 text-end">{{ formatCurrency(subtotal) }}</span>
                 </div>
               </div>
 
               <div class="mt-10 flex justify-end gap-6">
                 <button
                   @click="goBackToStep1"
-                  class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3"
+                  class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"
                 >
                   <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                   {{ $t('labels.back') }}
@@ -416,7 +416,7 @@
                 <button
                   @click="saveData"
                   :disabled="isSaving"
-                  class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3"
+                  class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3"
                 >
                   {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
                   <CheckIcon class="w-6 h-6" />
@@ -439,7 +439,7 @@
         <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="addSite" :disabled="!newSiteName || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">
+          <button @click="addSite" :disabled="!newSiteName || addingLocation" class="bg-green-600 theme-text-light px-3 py-1 rounded">
             {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
           </button>
         </div>
@@ -453,7 +453,7 @@
         <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="addArea" :disabled="!newAreaName || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">
+          <button @click="addArea" :disabled="!newAreaName || addingLocation" class="bg-green-600 theme-text-light px-3 py-1 rounded">
             {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
           </button>
         </div>
@@ -467,7 +467,7 @@
         <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('contractors.name')" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor" class="bg-green-600 text-white px-3 py-1 rounded">
+          <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor" class="bg-green-600 theme-text-light px-3 py-1 rounded">
             {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
           </button>
         </div>
@@ -481,7 +481,7 @@
         <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
         <div class="flex gap-2 justify-end">
           <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher" class="bg-green-600 text-white px-3 py-1 rounded">
+          <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher" class="bg-green-600 theme-text-light px-3 py-1 rounded">
             {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
           </button>
         </div>
@@ -499,7 +499,7 @@
           <button
             @click="createNewExportItem"
             :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
-            class="bg-green-600 text-white px-3 py-1 rounded"
+            class="bg-green-600 theme-text-light px-3 py-1 rounded"
           >
             {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
           </button>

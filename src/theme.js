@@ -13,17 +13,112 @@ const ANIMATION_PRESETS = [
   'blueprint'
 ]
 
+/** @type {Record<string, { id: string, label: string, family: string, googleFamily: string, rtl?: boolean }>} */
+const FONT_PRESETS = {
+  inter: {
+    id: 'inter',
+    label: 'Inter',
+    family: "'Inter', system-ui, sans-serif",
+    googleFamily: 'Inter:wght@400;500;600;700'
+  },
+  poppins: {
+    id: 'poppins',
+    label: 'Poppins',
+    family: "'Poppins', system-ui, sans-serif",
+    googleFamily: 'Poppins:wght@400;500;600;700'
+  },
+  cairo: {
+    id: 'cairo',
+    label: 'Cairo',
+    family: "'Cairo', system-ui, sans-serif",
+    googleFamily: 'Cairo:wght@400;500;600;700',
+    rtl: true
+  },
+  tajawal: {
+    id: 'tajawal',
+    label: 'Tajawal',
+    family: "'Tajawal', system-ui, sans-serif",
+    googleFamily: 'Tajawal:wght@400;500;700',
+    rtl: true
+  },
+  'ibm-plex-sans': {
+    id: 'ibm-plex-sans',
+    label: 'IBM Plex Sans',
+    family: "'IBM Plex Sans', system-ui, sans-serif",
+    googleFamily: 'IBM+Plex+Sans:wght@400;500;600;700'
+  },
+  outfit: {
+    id: 'outfit',
+    label: 'Outfit',
+    family: "'Outfit', system-ui, sans-serif",
+    googleFamily: 'Outfit:wght@400;500;600;700'
+  },
+  'plus-jakarta-sans': {
+    id: 'plus-jakarta-sans',
+    label: 'Plus Jakarta Sans',
+    family: "'Plus Jakarta Sans', system-ui, sans-serif",
+    googleFamily: 'Plus+Jakarta+Sans:wght@400;500;600;700'
+  },
+  rubik: {
+    id: 'rubik',
+    label: 'Rubik',
+    family: "'Rubik', system-ui, sans-serif",
+    googleFamily: 'Rubik:wght@400;500;600;700'
+  },
+  geist: {
+    id: 'geist',
+    label: 'Geist',
+    family: "'Geist', 'Inter', system-ui, sans-serif",
+    googleFamily: 'Geist:wght@400;500;600;700'
+  }
+}
+
+const FONT_PRESET_IDS = Object.keys(FONT_PRESETS)
+const DEFAULT_FONT_PRESET = 'inter'
+
+const TYPOGRAPHY_DEFAULTS = {
+  fontPreset: DEFAULT_FONT_PRESET,
+  fontFamily: FONT_PRESETS[DEFAULT_FONT_PRESET].family,
+  textPrimary: '#111827',
+  textSecondary: '#4b5563',
+  textMuted: '#6b7280',
+  textLight: '#ffffff',
+  textLightSecondary: '#e5e7eb',
+  textLightMuted: '#d1d5db',
+  headingColor: '#0f172a',
+  linkColor: null,
+  sidebarText: '#334155',
+  cardText: '#111827'
+}
+
 const DEFAULT_THEME = {
   primary: '#4f46e5',
-  animation: DEFAULT_ANIMATION
+  animation: DEFAULT_ANIMATION,
+  ...TYPOGRAPHY_DEFAULTS
 }
+
+const TYPOGRAPHY_CSS_MAP = [
+  ['--theme-font-family', 'fontFamily'],
+  ['--theme-text-primary', 'textPrimary'],
+  ['--theme-text-secondary', 'textSecondary'],
+  ['--theme-text-muted', 'textMuted'],
+  ['--theme-text-light', 'textLight'],
+  ['--theme-text-light-secondary', 'textLightSecondary'],
+  ['--theme-text-light-muted', 'textLightMuted'],
+  ['--theme-heading-color', 'headingColor'],
+  ['--theme-link-color', 'linkColor'],
+  ['--theme-sidebar-text', 'sidebarText'],
+  ['--theme-card-text', 'cardText']
+]
+
+const loadedFontFamilies = new Set()
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
 }
 
-function normalizeHex(hex) {
-  if (!hex) return DEFAULT_THEME.primary
+function normalizeHex(hex, fallback = DEFAULT_THEME.primary) {
+  if (!hex) return fallback
   hex = hex.trim().toLowerCase()
   if (hex.startsWith('#')) hex = hex.slice(1)
   if (hex.length === 3) {
@@ -32,7 +127,7 @@ function normalizeHex(hex) {
   if (/^[0-9a-f]{6}$/.test(hex)) {
     return `#${hex}`
   }
-  return DEFAULT_THEME.primary
+  return fallback
 }
 
 function normalizeAnimation(animation) {
@@ -40,10 +135,48 @@ function normalizeAnimation(animation) {
   return ANIMATION_PRESETS.includes(value) ? value : DEFAULT_ANIMATION
 }
 
+function normalizeFontPreset(fontPreset, fontFamily) {
+  if (fontPreset && FONT_PRESET_IDS.includes(fontPreset)) {
+    return fontPreset
+  }
+  if (fontFamily) {
+    const match = FONT_PRESET_IDS.find((id) => FONT_PRESETS[id].family === fontFamily)
+    if (match) return match
+  }
+  return DEFAULT_FONT_PRESET
+}
+
+function normalizeFontFamily(fontPreset, fontFamily) {
+  const preset = normalizeFontPreset(fontPreset, fontFamily)
+  if (fontFamily && typeof fontFamily === 'string' && fontFamily.trim()) {
+    return fontFamily.trim()
+  }
+  return FONT_PRESETS[preset].family
+}
+
 function normalizeTheme(theme = {}) {
+  const fontPreset = normalizeFontPreset(theme.fontPreset, theme.fontFamily)
+  const fontFamily = normalizeFontFamily(fontPreset, theme.fontFamily)
+  const primary = normalizeHex(theme.primary)
+
   return {
-    primary: normalizeHex(theme.primary),
-    animation: normalizeAnimation(theme.animation)
+    primary,
+    animation: normalizeAnimation(theme.animation),
+    fontPreset,
+    fontFamily,
+    textPrimary: normalizeHex(theme.textPrimary, TYPOGRAPHY_DEFAULTS.textPrimary),
+    textSecondary: normalizeHex(theme.textSecondary, TYPOGRAPHY_DEFAULTS.textSecondary),
+    textMuted: normalizeHex(theme.textMuted, TYPOGRAPHY_DEFAULTS.textMuted),
+    textLight: normalizeHex(theme.textLight, TYPOGRAPHY_DEFAULTS.textLight),
+    textLightSecondary: normalizeHex(
+      theme.textLightSecondary,
+      TYPOGRAPHY_DEFAULTS.textLightSecondary
+    ),
+    textLightMuted: normalizeHex(theme.textLightMuted, TYPOGRAPHY_DEFAULTS.textLightMuted),
+    headingColor: normalizeHex(theme.headingColor, TYPOGRAPHY_DEFAULTS.headingColor),
+    linkColor: theme.linkColor ? normalizeHex(theme.linkColor, primary) : primary,
+    sidebarText: normalizeHex(theme.sidebarText, TYPOGRAPHY_DEFAULTS.sidebarText),
+    cardText: normalizeHex(theme.cardText, TYPOGRAPHY_DEFAULTS.cardText)
   }
 }
 
@@ -145,6 +278,22 @@ function getContrastColor(hex) {
   return lum > 0.5 ? '#111827' : '#ffffff'
 }
 
+function contrastRatio(hexA, hexB) {
+  const l1 = relativeLuminance(hexToRgb(hexA))
+  const l2 = relativeLuminance(hexToRgb(hexB))
+  const lighter = Math.max(l1, l2)
+  const darker = Math.min(l1, l2)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+function ensureReadableText(foreground, background, minRatio = 4.5) {
+  if (contrastRatio(foreground, background) >= minRatio) {
+    return foreground
+  }
+  const fgLum = relativeLuminance(hexToRgb(foreground))
+  return fgLum > relativeLuminance(hexToRgb(background)) ? '#111827' : '#ffffff'
+}
+
 function setThemeShadeVars(primary) {
   const shades = {
     50: adjustLightness(primary, 64),
@@ -166,6 +315,59 @@ function setThemeShadeVars(primary) {
   })
 
   return shades
+}
+
+function ensureGoogleFontLink(presetId) {
+  if (typeof document === 'undefined') return
+  const preset = FONT_PRESETS[presetId]
+  if (!preset?.googleFamily || loadedFontFamilies.has(preset.googleFamily)) return
+
+  const linkId = 'theme-google-fonts'
+  let link = document.getElementById(linkId)
+  if (!link) {
+    link = document.createElement('link')
+    link.id = linkId
+    link.rel = 'stylesheet'
+    document.head.appendChild(link)
+  }
+
+  const families = new Set()
+  FONT_PRESET_IDS.forEach((id) => {
+    const p = FONT_PRESETS[id]
+    if (p.googleFamily) families.add(p.googleFamily)
+  })
+
+  link.href = `https://fonts.googleapis.com/css2?${[...families]
+    .map((f) => `family=${f}`)
+    .join('&')}&display=swap`
+
+  loadedFontFamilies.add(preset.googleFamily)
+}
+
+function applyTypography(theme) {
+  if (typeof document === 'undefined') return theme
+
+  const normalized = theme.fontPreset
+    ? theme
+    : { ...theme, fontPreset: normalizeFontPreset(theme.fontPreset, theme.fontFamily) }
+
+  ensureGoogleFontLink(normalized.fontPreset)
+
+  const root = document.documentElement.style
+  const withLink = {
+    ...normalized,
+    linkColor: normalized.linkColor || normalized.primary
+  }
+
+  TYPOGRAPHY_CSS_MAP.forEach(([cssVar, key]) => {
+    if (withLink[key]) {
+      root.setProperty(cssVar, withLink[key])
+    }
+  })
+
+  document.documentElement.dataset.themeFont = normalized.fontPreset
+
+  return withLink
 }
 
 function clearAnimationClasses() {
@@ -220,9 +422,16 @@ function applyTheme(theme = {}) {
     root.setProperty('--theme-primary-dark', `rgb(${shade700.r}, ${shade700.g}, ${shade700.b})`)
   }
 
+  const typographyTheme = {
+    ...normalized,
+    linkColor: normalized.linkColor || primary
+  }
+  applyTypography(typographyTheme)
+  root.setProperty('--theme-link-color', typographyTheme.linkColor)
+
   applyAnimationPreset(normalized.animation)
 
-  return normalized
+  return { ...typographyTheme, linkColor: typographyTheme.linkColor }
 }
 
 function loadTheme() {
@@ -232,7 +441,7 @@ function loadTheme() {
     const saved = localStorage.getItem(THEME_STORAGE_KEY)
     if (!saved) return { ...DEFAULT_THEME }
     const parsed = JSON.parse(saved)
-    return normalizeTheme(parsed)
+    return normalizeTheme({ ...DEFAULT_THEME, ...parsed })
   } catch (error) {
     return { ...DEFAULT_THEME }
   }
@@ -249,6 +458,25 @@ function resetTheme() {
   return applyTheme(DEFAULT_THEME)
 }
 
+function getFontPresets() {
+  return FONT_PRESET_IDS.map((id) => ({
+    id,
+    label: FONT_PRESETS[id].label,
+    family: FONT_PRESETS[id].family,
+    rtl: Boolean(FONT_PRESETS[id].rtl)
+  }))
+}
+
+function applyThemePatch(patch = {}) {
+  const current = loadTheme()
+  return applyTheme({ ...current, ...patch })
+}
+
+/** Inline style for `input[type="color"].theme-color-input` — border matches swatch */
+function colorPickerStyle(color, fallback = DEFAULT_THEME.primary) {
+  return { '--picker-color': normalizeHex(color, fallback) }
+}
+
 // Apply the saved theme immediately on app load.
 if (typeof document !== 'undefined') {
   applyTheme(loadTheme())
@@ -258,10 +486,20 @@ export {
   ANIMATION_PRESETS,
   DEFAULT_ANIMATION,
   DEFAULT_THEME,
+  DEFAULT_FONT_PRESET,
+  FONT_PRESETS,
+  FONT_PRESET_IDS,
+  TYPOGRAPHY_DEFAULTS,
   applyTheme,
+  applyThemePatch,
+  applyTypography,
   loadTheme,
   saveTheme,
   resetTheme,
   normalizeTheme,
-  normalizeAnimation
+  normalizeAnimation,
+  getFontPresets,
+  ensureReadableText,
+  contrastRatio,
+  colorPickerStyle
 }

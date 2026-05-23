@@ -3,7 +3,7 @@
 
     <!-- Header -->
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
-      <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t('crushers.title') }}</h2>
+      <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t('crushers.title') }}</h2>
       <button
         @click="openAdd"
         class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
@@ -29,13 +29,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
               {{ $t('labels.#') }}
             </th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
               {{ $t('crushers.name') }}
             </th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-start">
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
               {{ $t('labels.actions') }}
             </th>
           </tr>
@@ -48,12 +48,12 @@
             @click="openContextMenu($event, crusher)"
             @contextmenu.prevent="openContextMenu($event, crusher)"
           >
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4">
               <div class="flex items-center gap-4" :class="isRTL ? 'flex-row-reverse justify-end' : 'flex-row justify-start'">
                 
                 <div :class="isRTL ? 'text-right' : 'text-left'">
-                  <div class="text-sm font-medium text-gray-900">{{ crusher.name }}</div>
+                  <div class="text-sm font-medium theme-text-primary">{{ crusher.name }}</div>
                 </div>
               </div>
             </td>
@@ -69,7 +69,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="3" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-gray-500">
+            <td colspan="3" class="px-3 py-2 sm:px-6 sm:py-3 text-start theme-text-muted">
               {{ $t('crushers.noResults') }}
             </td>
           </tr>
@@ -90,12 +90,12 @@
           <div class="flex items-center gap-4" :class="isRTL ? 'flex-row-reverse' : 'flex-row'">
             <div class="flex-shrink-0 h-12 w-12">
               <div class="h-12 w-12 rounded-full bg-gradient-to-br theme-icon-bg flex items-center justify-center">
-                <CubeIcon class="h-7 w-7 text-white" />
+                <CubeIcon class="h-7 w-7 theme-text-light" />
               </div>
             </div>
             <div :class="isRTL ? 'text-right' : 'text-left'">
-              <div class="font-semibold text-gray-900">{{ crusher.name }}</div>
-              <div class="text-sm text-gray-500">ID: {{ crusher.id }}</div>
+              <div class="font-semibold theme-text-primary">{{ crusher.name }}</div>
+              <div class="text-sm theme-text-muted">ID: {{ crusher.id }}</div>
             </div>
           </div>
           <div class="flex gap-4">
@@ -154,12 +154,12 @@
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('crushers.editCrusher') : $t('crushers.addCrusher') }}
           </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+          <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
             <XMarkIcon class="w-6 h-6" />
           </button>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium theme-text-secondary mb-1">
             {{ $t('crushers.name') }} <span class="text-red-500">*</span>
           </label>
           <input
@@ -169,7 +169,7 @@
           />
         </div>
         <div class="mt-6 flex justify-end gap-3">
-          <button @click="closeModal" class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+          <button @click="closeModal" class="px-4 py-2 border rounded-md theme-text-secondary hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
           <button
@@ -190,14 +190,14 @@
           <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
             <ExclamationTriangleIcon class="w-6 h-6 text-red-600" />
           </div>
-          <p class="text-gray-900 mb-6">
+          <p class="theme-text-primary mb-6">
             {{ $t('crushers.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
           </p>
           <div class="flex justify-center gap-3">
-            <button @click="cancelDelete" class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+            <button @click="cancelDelete" class="px-4 py-2 border rounded-md theme-text-secondary hover:bg-gray-50">
               {{ $t('labels.cancel') }}
             </button>
-            <button @click="doDelete" :disabled="loading" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50">
+            <button @click="doDelete" :disabled="loading" class="px-4 py-2 bg-red-600 theme-text-light rounded-md hover:bg-red-700 disabled:opacity-50">
               {{ loading ? $t('labels.deleting') : $t('labels.delete') }}
             </button>
           </div>

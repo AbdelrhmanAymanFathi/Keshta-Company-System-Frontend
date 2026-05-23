@@ -19,13 +19,13 @@
           </div>
         </template>
       </SearchDropdown>
-      <div v-if="displayUnitName" class="mt-1 text-xs text-gray-500">
+      <div v-if="displayUnitName" class="mt-1 text-xs theme-text-muted">
         {{ displayUnitName }}
       </div>
     </div>
     <div class="relative">
       <input type="number" step="0.01" v-model="internal.price" placeholder="Price" class="p-2 border rounded" />
-      <div v-if="showDefaultHint" class="text-xs text-gray-500 mt-1">Will use item default extract price</div>
+      <div v-if="showDefaultHint" class="text-xs theme-text-muted mt-1">Will use item default extract price</div>
     </div>
     <input type="number" v-model.number="internal.quantity" placeholder="Qty" class="p-2 border rounded" />
     <input type="number" min="0" step="0.01" v-model.number="internal.discount" placeholder="Discount" class="p-2 border rounded" />

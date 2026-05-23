@@ -8,18 +8,18 @@
 
     <!-- Filters Section -->
     <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
-      <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') }}</h4>
+      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
@@ -28,7 +28,7 @@
 
         <!-- Contractor -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.contractor') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.contractor') }}</label>
           <SearchDropdown
             v-model="filters.contractorSearch"
             :items="contractors"
@@ -40,7 +40,7 @@
 
         <!-- Location -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.location') }}</label>
           <SearchDropdown
             v-model="filters.locationSearch"
             :items="locations"
@@ -52,7 +52,7 @@
 
         <!-- Area -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.area') }}</label>
           <SearchDropdown
             v-model="filters.areaSearch"
             :items="availableAreas"
@@ -64,7 +64,7 @@
 
         <!-- Crusher -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.crusher') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.crusher') }}</label>
           <SearchDropdown
             v-model="filters.crusherSearch"
             :items="crushers"
@@ -76,7 +76,7 @@
 
         <!-- Item -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.item') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.item') }}</label>
           <SearchDropdown
             v-model="filters.itemSearch"
             :items="items"
@@ -88,7 +88,7 @@
 
         <!-- Vehicle -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.vehicle') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.vehicle') }}</label>
           <SearchDropdown
             v-model="filters.vehicleSearch"
             :items="vehicles"
@@ -106,7 +106,7 @@
           {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl transition-colors text-xs sm:text-sm font-medium">
+          class="px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">
           {{ $t('labels.clear') }}
         </button>
       </div>
@@ -118,57 +118,57 @@
         <thead class="theme-table-thead-gradient">
           <tr>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               #</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.date') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.item') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.contractor') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.crusher') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.location') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.area') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.vehicle') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.crusherTicket') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.companyTicket') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.companyCapacity') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.crusherCapacity') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-xs font-semibold theme-text-secondary uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.unitPrice') }}
             </th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.discount') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.total') }}</th>
 
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.notes') }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.actions') }}</th>
           </tr>
         </thead>
@@ -176,25 +176,25 @@
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
           <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="theme-table-row-hover" @contextmenu.prevent="onRowContextMenu($event, supply)">
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.contractor?.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.contractor?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ getAreaName(supply) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ getAreaName(supply) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.vehicle?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.crusherTicket || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.crusherTicket || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.companyTicket || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ supply.companyCapacity ?? '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.companyCapacity ?? '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusherCapacity ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-sm font-semibold theme-text-muted whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-sm font-semibold theme-accent-muted whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-gray-900 tracking-wider">
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
               <div class="max-w-xs truncate">{{ supply.notes || '-' }}</div>
             </td>
 
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               <button
                 @click.stop="openDeleteConfirm(supply)"
                 :title="$t('labels.delete')"
@@ -205,7 +205,7 @@
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :colspan="17">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="17">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
@@ -243,13 +243,13 @@
     <!-- Delete Confirm Modal -->
     <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 w-full max-w-sm">
-        <h3 class="text-lg font-bold mb-3 text-gray-900">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="text-gray-600 mb-6">{{ $t('supply.confirmDeleteExport') || 'Are you sure you want to delete this export?' }}</p>
+        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
+        <p class="theme-text-secondary mb-6">{{ $t('supply.confirmDeleteExport') || 'Are you sure you want to delete this export?' }}</p>
         <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50">
+          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl theme-text-secondary hover:bg-slate-50">
             {{ $t('labels.cancel') || 'Cancel' }}
           </button>
-          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50">
+          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 theme-text-light rounded-xl hover:bg-red-700 disabled:opacity-50">
             {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
           </button>
         </div>
@@ -289,7 +289,7 @@
         </div>
         <div class="mt-4 flex gap-2 justify-end">
           <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button @click="saveEdit" class="px-4 py-2 rounded-xl text-white theme-button">{{
+          <button @click="saveEdit" class="px-4 py-2 rounded-xl theme-text-light theme-button">{{
             $t('labels.save') }}</button>
         </div>
       </div>

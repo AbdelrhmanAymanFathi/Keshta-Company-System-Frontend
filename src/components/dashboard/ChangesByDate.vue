@@ -2,15 +2,15 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
     <div class="app-page-header rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h1 class="mb-2 text-2xl font-semibold text-slate-900">{{ $t('changes.title') }}</h1>
-      <p class="text-slate-600">{{ $t('changes.description') }}</p>
+      <h1 class="mb-2 text-2xl font-semibold theme-text-primary">{{ $t('changes.title') }}</h1>
+      <p class="theme-text-secondary">{{ $t('changes.description') }}</p>
     </div>
 
     <!-- Date Selector -->
     <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="flex flex-col sm:flex-row gap-4 items-end">
         <div class="flex-1">
-          <label class="mb-2 block text-sm font-medium text-slate-700">
+          <label class="mb-2 block text-sm font-medium theme-text-secondary">
             {{ $t('changes.selectDate') }}
           </label>
           <DateField v-model="selectedDate"
@@ -18,7 +18,7 @@
             @update:modelValue="loadChanges" />
         </div>
         <button @click="loadChanges" :disabled="loading || !selectedDate"
-          class="rounded-xl theme-button px-6 py-2 text-white shadow-sm  transition-colors  disabled:cursor-not-allowed disabled:opacity-50">
+          class="rounded-xl theme-button px-6 py-2 theme-text-light shadow-sm  transition-colors  disabled:cursor-not-allowed disabled:opacity-50">
           {{ $t('changes.loadChanges') }}
         </button>
       </div>
@@ -49,15 +49,15 @@
           :class="{ 'theme-ring-active theme-border': activeModule === key }" @click="activeModule = key">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-600">{{ $t(`changes.modules.${key}`) }}</p>
-              <p class="text-2xl font-semibold text-gray-900 mt-1">
+              <p class="text-sm theme-text-secondary">{{ $t(`changes.modules.${key}`) }}</p>
+              <p class="text-2xl font-semibold theme-text-primary mt-1">
                 {{ module.count || 0 }}
               </p>
             </div>
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl"
-              :class="module.count > 0 ? 'theme-icon-bg theme-text' : 'bg-slate-100 text-slate-400'">
+              :class="module.count > 0 ? 'theme-icon-bg theme-text' : 'bg-slate-100 theme-caption'">
               <div v-html="moduleIcon(key)" class="w-7 h-7"
-                :class="module.count > 0 ? 'theme-text' : 'text-slate-400'"></div>
+                :class="module.count > 0 ? 'theme-text' : 'theme-caption'"></div>
             </div>
           </div>
         </div>
@@ -67,10 +67,10 @@
       <div v-if="activeModule && changes[activeModule]?.items?.length > 0"
         class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
         <div class="border-b border-slate-200 theme-table-thead-gradient px-6 py-4">
-          <h2 class="text-lg font-semibold text-slate-900">
+          <h2 class="text-lg font-semibold theme-text-primary">
             {{ $t(`changes.modules.${activeModule}`) }} - {{ $t('changes.changesFor') }} {{ formatDate(selectedDate) }}
           </h2>
-          <p class="mt-1 text-sm text-slate-600">
+          <p class="mt-1 text-sm theme-text-secondary">
             {{ $t('changes.totalChanges') }}: {{ changes[activeModule].count }}
           </p>
         </div>
@@ -79,7 +79,7 @@
             <thead class="theme-table-thead-gradient">
               <tr>
                 <th v-for="header in getHeadersForModule(activeModule)" :key="header"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
                   :class="isRTL ? 'text-right' : 'text-left'">
                   {{ header }}
                 </th>
@@ -88,7 +88,7 @@
             <tbody class="divide-y divide-slate-200 bg-white">
               <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="theme-table-row-hover">
                 <td v-for="field in getFieldsForModule(activeModule)" :key="field"
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">
                   {{ formatField(item, field) }}
                 </td>
               </tr>
@@ -99,24 +99,24 @@
 
       <!-- No Changes Message -->
       <div v-else-if="selectedDate && !loading" class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
-        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-16 h-16 theme-caption mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
           </path>
         </svg>
-        <p class="text-lg text-slate-600">{{ $t('changes.noChanges') }}</p>
-        <p class="mt-2 text-sm text-slate-500">{{ $t('changes.noChangesDesc') }}</p>
+        <p class="text-lg theme-text-secondary">{{ $t('changes.noChanges') }}</p>
+        <p class="mt-2 text-sm theme-text-muted">{{ $t('changes.noChangesDesc') }}</p>
       </div>
     </div>
 
     <!-- Initial State -->
     <div v-else class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
-      <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-16 h-16 theme-caption mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
       </svg>
-      <p class="text-lg text-slate-600">{{ $t('changes.selectDatePrompt') }}</p>
-      <p class="mt-2 text-sm text-slate-500">{{ $t('changes.selectDateDesc') }}</p>
+      <p class="text-lg theme-text-secondary">{{ $t('changes.selectDatePrompt') }}</p>
+      <p class="mt-2 text-sm theme-text-muted">{{ $t('changes.selectDateDesc') }}</p>
     </div>
   </div>
 </template>

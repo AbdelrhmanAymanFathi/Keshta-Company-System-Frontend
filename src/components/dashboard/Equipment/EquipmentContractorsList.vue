@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
-      <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.contractorsList') || 'Contractors' }}</h2>
+      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('dashboard.contractorsList') || 'Contractors' }}</h2>
       <div class="flex items-center gap-3">
         <!-- Add Button -->
         <button @click="openAdd"
@@ -24,13 +24,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.#') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.name') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.phone') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.bankName') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.accountNumber') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.notes') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.#') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.name') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.phone') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.bankName') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.accountNumber') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('suppliers.notes') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -41,16 +41,16 @@
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-muted text-start">{{ idx + 1 }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-accent-muted text-start">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">
               <button @click.stop="goToDetail(c)" class="theme-text hover:underline">
                 {{ c.name }}
               </button>
             </td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.phone || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.bankName || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.accountNumber || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900 text-start">{{ c.notes || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ c.phone || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ c.bankName || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ c.accountNumber || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ c.notes || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
                 <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('suppliers.statement')">
@@ -66,7 +66,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="7" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-gray-500">
+            <td colspan="7" class="px-3 py-2 sm:px-6 sm:py-3 text-start theme-text-muted">
                 {{ $t('suppliers.noResults') }}
               </td>
           </tr>
@@ -85,12 +85,12 @@
       >
         <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
           <div :class="isRTL ? 'text-right' : 'text-left'">
-            <div class="font-semibold text-gray-900">
+            <div class="font-semibold theme-text-primary">
               <button @click.stop="goToDetail(c)" class="theme-text hover:underline text-left">
                 {{ c.name }}
               </button>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm theme-text-muted">
               {{ c.phone || '-' }}<br>
               <span v-if="c.bankName">{{ $t('suppliers.bankName') }}: {{ c.bankName }}</span><br>
               <span v-if="c.accountNumber">{{ $t('suppliers.accountNumber') }}: {{ c.accountNumber }}</span><br>
@@ -105,7 +105,7 @@
           </div>
         </div>
       </div>
-      <div v-if="filtered.length === 0" class="text-center py-12 text-gray-500">
+      <div v-if="filtered.length === 0" class="text-center py-12 theme-text-muted">
         {{ $t('suppliers.noResults') }}
       </div>
     </div>
@@ -150,7 +150,7 @@
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('suppliers.editContractor') : $t('suppliers.addContractor') }}
           </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+          <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
             <XMarkIcon class="w-6 h-6" />
           </button>
         </div>
@@ -182,7 +182,7 @@
           
         </div>
         <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
-          <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+          <button @click="closeModal" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
           <button @click="saveContractor" class="px-4 py-2 theme-button rounded">
@@ -199,10 +199,10 @@
           {{ $t('suppliers.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
         </p>
         <div class="flex justify-center gap-3">
-          <button @click="cancelDelete" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+          <button @click="cancelDelete" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
-          <button @click="doDelete" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          <button @click="doDelete" class="px-4 py-2 bg-red-600 theme-text-light rounded hover:bg-red-700">
             {{ $t('labels.delete') }}
           </button>
         </div>

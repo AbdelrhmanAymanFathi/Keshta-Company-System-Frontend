@@ -3,15 +3,15 @@
     <!-- Header -->
     <div class="app-page-header flex flex-col gap-3 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-2xl font-semibold text-slate-900">{{ $t('contractors.statementTitle') }}</h2>
+        <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('contractors.statementTitle') }}</h2>
       </div>
       <div class="flex flex-wrap items-center justify-end gap-2">
         <button @click="refresh" :disabled="loading"
-          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50">
+          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm theme-text-secondary shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50">
           {{ $t('labels.refresh') }}
         </button>
         <button @click="downloadReport('xlsx')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl theme-button px-3 py-2 text-xs sm:text-sm text-white shadow-sm  transition-colors  disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl theme-button px-3 py-2 text-xs sm:text-sm theme-text-light shadow-sm  transition-colors  disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -27,7 +27,7 @@
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportCSV') }}
         </button>
         <button @click="downloadReport('pdf')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs sm:text-sm text-white shadow-sm shadow-slate-200 transition-colors hover:bg-slate-800 disabled:opacity-50">
+          class="inline-flex items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs sm:text-sm theme-text-light shadow-sm shadow-slate-200 transition-colors hover:bg-slate-800 disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
@@ -39,11 +39,11 @@
 
     <!-- Filters Section -->
     <div class="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-      <h4 class="text-sm font-semibold text-slate-700">{{ $t('labels.filters') }}</h4>
+      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Contractor Selector -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('contractors.name') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.name') }}</label>
           <select v-model="selectedContractorId" @change="onContractorChange"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
             <option value="">{{ $t('contractors.selectContractor') }}</option>
@@ -53,14 +53,14 @@
 
         <!-- Start Date -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.startDate') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
         </div>
 
         <!-- End Date -->
         <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.endDate') }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
         </div>
@@ -68,7 +68,7 @@
         <!-- Load Button -->
         <div class="flex items-end">
           <button @click="loadReport" :disabled="loading || !selectedContractorId"
-            class="w-full rounded-xl theme-button px-4 py-2 text-sm font-medium text-white shadow-sm  transition-colors  disabled:opacity-50">
+            class="w-full rounded-xl theme-button px-4 py-2 text-sm font-medium theme-text-light shadow-sm  transition-colors  disabled:opacity-50">
             {{ $t('contractors.loadStatement') }}
           </button>
         </div>
@@ -76,7 +76,7 @@
 
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <button @click="clearFilters"
-          class="w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs sm:text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200">
+          class="w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs sm:text-sm font-medium theme-text-secondary transition-colors hover:bg-slate-200">
           {{ $t('labels.clear') }}
         </button>
       </div>
@@ -101,27 +101,27 @@
     <!-- Summary Cards -->
     <div v-else-if="report && report.contractorName" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.contractorName') }}</p>
-        <p class="text-lg font-semibold text-gray-900">{{ getContractorDisplayName(report) }}</p>
+        <p class="text-xs theme-text-secondary mb-1">{{ $t('contractors.contractorName') }}</p>
+        <p class="text-lg font-semibold theme-text-primary">{{ getContractorDisplayName(report) }}</p>
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</p>
+        <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(totalDebits, 'text-green-600')">{{ formatCurrency(totalDebits) }}</p>
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</p>
+        <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'theme-text')">{{ formatCurrency(totalCredits) }}</p>
       </div>
       <!-- <div class="bg-white rounded-lg shadow p-4">
-        <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.totalEarnings') }}</p>
+        <p class="text-xs theme-text-secondary mb-1">{{ $t('contractors.totalEarnings') }}</p>
         <p class="text-lg font-semibold theme-text">{{ formatCurrency(report.totals?.earnings || 0) }}</p>
       </div> -->
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.paidToContractor', 'contractors.payments') }}</p>
+        <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.paidToContractor', 'contractors.payments') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(paidToContractor, 'text-teal-600')">{{ formatCurrency(paidToContractor) }}</p>
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-        <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.owedToContractor', 'contractors.owedToCompany') }}</p>
+        <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.owedToContractor', 'contractors.owedToCompany') }}</p>
         <p class="text-lg font-semibold" :class="getAmountClass(owedToContractor, 'theme-text')">{{ formatCurrency(owedToContractor) }}</p>
       </div>
       
@@ -131,29 +131,29 @@
     <div v-if="report && report.rows && report.rows.length > 0" class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.openingBalance') }}</p>
-          <p class="text-lg font-semibold" :class="report.openingBalance >= 0 ? 'text-gray-900' : 'text-red-600'">
+          <p class="text-xs theme-text-secondary mb-1">{{ $t('contractors.openingBalance') }}</p>
+          <p class="text-lg font-semibold" :class="report.openingBalance >= 0 ? 'theme-text-primary' : 'text-red-600'">
             {{ formatCurrency(Math.abs(report.openingBalance || 0)) }}
             <span class="text-sm">({{ report.openingBalance >= 0 ? $t('contractors.owedByCompany') :
               $t('contractors.owedToCompany') }})</span>
           </p>
         </div>
         <div>
-          <p class="text-xs text-gray-600 mb-1">{{ $t('contractors.closingBalance') }}</p>
-          <p class="text-lg font-semibold" :class="report.closingBalance >= 0 ? 'text-gray-900' : 'text-red-600'">
+          <p class="text-xs theme-text-secondary mb-1">{{ $t('contractors.closingBalance') }}</p>
+          <p class="text-lg font-semibold" :class="report.closingBalance >= 0 ? 'theme-text-primary' : 'text-red-600'">
             {{ formatCurrency(Math.abs(report.closingBalance || 0)) }}
             <span class="text-sm">({{ report.closingBalance >= 0 ? $t('contractors.owedByCompany') :
               $t('contractors.owedToCompany') }})</span>
           </p>
         </div>
         <div>
-          <p class="text-xs text-gray-600 mb-1">{{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}</p>
+          <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}</p>
           <p class="text-lg font-semibold" :class="getAmountClass(lastBalance, 'theme-text')">
             {{ formatCurrency(lastBalance) }}
           </p>
         </div>
       </div>
-      <div v-if="filters.startDate || filters.endDate" class="mt-2 text-xs text-gray-500">
+      <div v-if="filters.startDate || filters.endDate" class="mt-2 text-xs theme-text-muted">
         {{ $t('contractors.dateRange') }}:
         {{ filters.startDate || $t('contractors.startOfTime') }}
         {{ $t('labels.to') }}
@@ -163,37 +163,37 @@
 
     <!-- Statement Table -->
     <div v-if="report && report.rows && report.rows.length > 0" class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <div class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">{{ $t('contractors.statementDescription') }}</div>
+      <div class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm theme-text-secondary">{{ $t('contractors.statementDescription') }}</div>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="theme-table-thead-gradient">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap"
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
                 :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.date') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap"
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
                 :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.type') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap"
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
                 :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('contractors.refId') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap"
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
                 :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.description') }}
               </th>
               <th
-                class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
+                class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
                 {{ translateWithFallback('contractors.debit', 'contractors.earnings') }}
               </th>
               <th
-                class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
+                class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
                 {{ translateWithFallback('contractors.credit', 'contractors.payments') }}
               </th>
               <th
-                class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider  whitespace-nowrap text-right">
+                class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
                 {{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}
               </th>
             </tr>
@@ -206,7 +206,7 @@
               row.type === 'OPENING' ? 'bg-slate-100' : '',
               isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
             ]">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row.date }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.date }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <span v-if="isTotalsRow(row)" class="font-bold text-amber-900">
                     {{ getTypeLabel(row.type) }}
@@ -215,8 +215,8 @@
                     {{ getTypeLabel(row.type) }}
                   </Badge>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
+                <td class="px-6 py-4 text-sm theme-text-primary">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
                   {{ formatCurrency(getRowDebit(row)) }}
                 </td>
@@ -240,7 +240,7 @@
     <!-- Empty State -->
     <div v-else-if="report && (!report.rows || report.rows.length === 0)"
       class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
-      <p class="text-gray-500">{{ $t('contractors.noStatementData') }}</p>
+      <p class="theme-text-muted">{{ $t('contractors.noStatementData') }}</p>
     </div>
   </div>
 </template>
@@ -450,7 +450,7 @@ export default {
       return en || ar || '-'
     }
 
-    const getAmountClass = (value, positiveClass = 'text-gray-900') => {
+    const getAmountClass = (value, positiveClass = 'theme-text-primary') => {
       return Number(value || 0) < 0 ? 'text-red-600' : positiveClass
     }
 

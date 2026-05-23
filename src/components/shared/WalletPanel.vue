@@ -3,18 +3,18 @@
     <div class="mb-4">
       <div v-if="wallet && Array.isArray(wallet.accounts)" class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
         <div v-for="acct in wallet.accounts" :key="acct.id" @click="selectAccount(acct)" :class="['p-2 sm:p-3 rounded cursor-pointer', selectedAccount && String(selectedAccount.id) === String(acct.id) ? 'theme-ring-active' : 'bg-gray-50']">
-          <div class="text-xs text-gray-500">{{ acct.accountType }}</div>
+          <div class="text-xs theme-text-muted">{{ acct.accountType }}</div>
           <div class="font-semibold text-lg">{{ formatCurrency(acct.balance) }}</div>
         </div>
       </div>
 
       <div class="flex items-center">
         <div class="mr-4">
-          <div class="text-sm text-gray-500">{{ $t('labels.balance') }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('labels.balance') }}</div>
           <div class="text-2xl font-semibold" :class="(displayBalance) < 0 ? 'text-red-600' : 'text-green-600'">{{ formatCurrency(displayBalance) }}</div>
         </div>
         <div class="mr-6">
-          <div class="text-sm text-gray-500">{{ $t('labels.totalDeposits') }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('labels.totalDeposits') }}</div>
           <div class="text-2xl font-semibold theme-text">{{ formatCurrency(wallet && wallet.totalDeposits) }}</div>
         </div>
         <div class="ml-auto flex items-center gap-2 px-2">
@@ -25,10 +25,10 @@
     </div>
 
     <!-- <div class="mb-4">
-      <div class="text-sm text-gray-500 mb-1">{{ $t('labels.breakdown') }}</div>
+      <div class="text-sm theme-text-muted mb-1">{{ $t('labels.breakdown') }}</div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <div v-for="(v, k) in (wallet && wallet.sources) || {}" :key="k" class="p-2 bg-gray-50 rounded">
-          <div class="text-xs text-gray-500">{{ $t('labels.' + k) || k }}</div>
+          <div class="text-xs theme-text-muted">{{ $t('labels.' + k) || k }}</div>
           <div class="font-semibold">{{ formatCurrency(v) }}</div>
         </div>
       </div>
@@ -37,7 +37,7 @@
     <!-- <div class="grid md:grid-cols-2 gap-4"> -->
       <div>
         <h4 class="font-semibold mb-2">{{ $t('labels.history') }}</h4>
-        <div v-if="loadingHistory" class="text-gray-500">{{ $t('labels.loading') }}</div>
+        <div v-if="loadingHistory" class="theme-text-muted">{{ $t('labels.loading') }}</div>
         <div v-else class="overflow-auto max-h-64 border rounded bg-white">
           <table class="min-w-full text-sm">
             <thead class="bg-gray-50">
@@ -58,7 +58,7 @@
                     <td :class="['px-2 py-2 text-sm sm:px-3 sm:py-2', isRTL ? 'text-left' : 'text-right']">{{ entry.description || '-' }}</td>
                   </tr>
               <tr v-if="!history || history.length === 0">
-                <td colspan="5" class="p-4 text-center text-gray-500">{{ $t('payments.noPayments') || $t('contractors.noTransactions') }}</td>
+                <td colspan="5" class="p-4 text-center theme-text-muted">{{ $t('payments.noPayments') || $t('contractors.noTransactions') }}</td>
               </tr>
             </tbody>
           </table>
@@ -67,7 +67,7 @@
 
       <!-- <div>
         <h4 class="font-semibold mb-2">{{ $t('labels.manualDeposit') }}</h4>
-        <div class="p-4 bg-gray-50 rounded text-sm text-gray-600">{{ $t('labels.manualDepositDesc') || '' }}</div>
+        <div class="p-4 bg-gray-50 rounded text-sm theme-text-secondary">{{ $t('labels.manualDepositDesc') || '' }}</div>
       </div> -->
     <!-- </div> -->
 
@@ -76,7 +76,7 @@
       <div class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.withdraw') || 'Withdraw' }}</h3>
-          <button @click="closeWithdrawModal" class="text-gray-400 hover:text-gray-600">✕</button>
+          <button @click="closeWithdrawModal" class="theme-caption hover:theme-text-secondary">✕</button>
         </div>
         <div class="grid gap-3">
           <label>
@@ -94,7 +94,7 @@
           <div v-if="withdrawalError" class="text-red-600">{{ withdrawalError }}</div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button @click="closeWithdrawModal" class="px-3 py-1 border rounded text-gray-700 text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
+          <button @click="closeWithdrawModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
           <button @click="submitWithdrawal" :disabled="withdrawalSubmitting" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ withdrawalSubmitting ? $t('labels.saving') : ($t('labels.pay') || 'Pay') }}</button>
         </div>
       </div>
@@ -105,7 +105,7 @@
       <div class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.manualDeposit') }}</h3>
-          <button @click="closeDepositModal" class="text-gray-400 hover:text-gray-600">✕</button>
+          <button @click="closeDepositModal" class="theme-caption hover:theme-text-secondary">✕</button>
         </div>
         <div class="grid gap-3">
           <label>
@@ -122,7 +122,7 @@
           </label>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button @click="closeDepositModal" class="px-3 py-1 border rounded text-gray-700 text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
+          <button @click="closeDepositModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
           <button @click="confirmDeposit" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ $t('labels.deposit') }}</button>
         </div>
       </div>

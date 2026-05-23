@@ -5,8 +5,8 @@
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold theme-text-muted">{{ modalHeaderTitle }}</h2>
-          <button @click="closeModal" class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">×</button>
+          <h2 class="text-2xl font-bold theme-heading">{{ modalHeaderTitle }}</h2>
+          <button @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</button>
         </div>
 
         <!-- Body -->
@@ -14,16 +14,16 @@
 
           <!-- ============================================ STEP 0 ============================================ -->
           <div v-if="currentStep === 0" class="w-full">
-            <h3 class="text-lg font-bold mb-6 text-center text-gray-800">{{ $t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type' }}</h3>
+            <h3 class="text-lg font-bold mb-6 text-center theme-text-primary">{{ $t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type' }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
               <button @click="chooseOwnership(false)" type="button"
                 class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
                 <div class="flex items-center justify-between gap-4">
                   <div>
-                    <p class="text-lg font-semibold text-gray-900">{{ $t('equipmentLog.companyOwned') || 'Company-owned Equipment' }}</p>
-                    <p class="mt-2 text-sm text-gray-600">{{ $t('equipmentLog.addCompanyOwnedEntry') || 'Add a log for equipment owned by the company.' }}</p>
+                    <p class="text-lg font-semibold theme-text-primary">{{ $t('equipmentLog.companyOwned') || 'Company-owned Equipment' }}</p>
+                    <p class="mt-2 text-sm theme-text-secondary">{{ $t('equipmentLog.addCompanyOwnedEntry') || 'Add a log for equipment owned by the company.' }}</p>
                   </div>
-                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-text-strong">1</span>
+                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">1</span>
                 </div>
               </button>
 
@@ -31,27 +31,27 @@
                 class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
                 <div class="flex items-center justify-between gap-4">
                   <div>
-                    <p class="text-lg font-semibold text-gray-900">{{ $t('equipmentLog.external') || 'Rented Equipment' }}</p>
-                    <p class="mt-2 text-sm text-gray-600">{{ $t('equipmentLog.addRentalEntry') || 'Add a log for rented equipment.' }}</p>
+                    <p class="text-lg font-semibold theme-text-primary">{{ $t('equipmentLog.external') || 'Rented Equipment' }}</p>
+                    <p class="mt-2 text-sm theme-text-secondary">{{ $t('equipmentLog.addRentalEntry') || 'Add a log for rented equipment.' }}</p>
                   </div>
-                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-text-strong">2</span>
+                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">2</span>
                 </div>
               </button>
             </div>
             <div class="mt-10 flex justify-center">
-              <button @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition">{{ $t('labels.cancel') }}</button>
+              <button @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">{{ $t('labels.cancel') }}</button>
             </div>
           </div>
 
           <!-- ============================================ STEP 1 ============================================ -->
           <div v-if="currentStep === 1" class="w-full">
-            <h3 class="text-lg font-bold mb-8 text-center text-gray-800">{{ $t('labels.step1BasicData') }}</h3>
+            <h3 class="text-lg font-bold mb-8 text-center theme-text-primary">{{ $t('labels.step1BasicData') }}</h3>
 
             <div class="max-w-6xl mx-auto">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 <!-- Equipment -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" />
@@ -61,7 +61,7 @@
 
                 <!-- Hourly Rate -->
                 <div v-if="!isCompanyOwnedEquipment">
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.price') }} <span class="text-red-600">*</span></label>
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.price') }} <span class="text-red-600">*</span></label>
                   <div class="relative">
                     <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
                   </div>
@@ -69,7 +69,7 @@
 
                 <!-- Driver -->
                 <div v-if="isCompanyOwnedEquipment">
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.driver') }}</label>
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.driver') }}</label>
                   <SearchDropdown
                     v-model="form.driverLabel"
                     :items="drivers"
@@ -82,16 +82,16 @@
 
                 <!-- Contractor (readonly, auto-populated from equipment selection) -->
                 <div v-if="showContractorField">
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('vehicles.contractor') }}</label>
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('vehicles.contractor') }}</label>
                   <div class="relative">
-                    <input type="text" :value="form.contractorLabel || ($t('vehicles.contractor') || 'Contractor')" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed text-gray-600" />
+                    <input type="text" :value="form.contractorLabel || ($t('vehicles.contractor') || 'Contractor')" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-4 pe-4 text-sm bg-gray-100 cursor-not-allowed theme-text-secondary" />
                   </div>
                   <p class="mt-2 text-xs theme-text">{{ $t('equipmentLog.contractorReadonlyNote') || 'Contractor is auto-selected and cannot be edited.' }}</p>
                 </div>
 
                 <!-- Site (الموقع) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.site') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -102,7 +102,7 @@
                         @select="(sel) => { form.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                         <template #prefix>
                           <MapPinIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
@@ -117,7 +117,7 @@
 
                 <!-- Area (المنطقة) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.area') }}
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -128,7 +128,7 @@
                         @select="(sel) => { form.area = sel; filters.commonAreaSearch = sel.name }">
                         <template #prefix>
                           <MapIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div v-if="form.site" @click="showAddArea = true; pendingRow = null"
@@ -146,8 +146,8 @@
 
             <!-- Back / Next Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="goBackToStep0" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-              <button @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></button>
+              <button @click="goBackToStep0" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+              <button @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></button>
             </div>
           </div>
 
@@ -155,38 +155,38 @@
           <div v-if="currentStep === 2" class="w-full">
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
-              <button @click="goBackToStep1" class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-              <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2DataEquipment') }}</h3>
+              <button @click="goBackToStep1" class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+              <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2DataEquipment') }}</h3>
               <div></div>
             </div>
 
             <!-- Summary Card of Common Data -->
             <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
-              <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
+              <h4 class="text-sm font-bold theme-accent-muted mb-4">{{ $t('labels.summary') }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.equipment') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ selectedEquipmentName || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('equipmentLog.equipment') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ selectedEquipmentName || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('vehicles.contractor') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ form.contractorLabel || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('vehicles.contractor') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ form.contractorLabel || '-' }}</dd>
                 </div>
                 <div v-if="isCompanyOwnedEquipment" class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.driver') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ form.driverLabel || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.driver') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ form.driverLabel || '-' }}</dd>
                 </div>
                 <div v-if="!isCompanyOwnedEquipment" class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('equipmentLog.hourlyRate') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('equipmentLog.hourlyRate') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ formatNumber(form.hourlyRate) }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ form.site?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.site') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ form.site?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ form.area?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.area') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ form.area?.name || '-' }}</dd>
                 </div>
               </dl>
             </div>
@@ -201,18 +201,18 @@
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
-                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.date') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.hours') }}</th>
-                      <th v-if="!isCompanyOwnedEquipment" class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.discount') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.notes') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.total') }}</th>
-                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}</th>
+                      <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary w-12">{{ $t('#') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.date') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.hours') }}</th>
+                      <th v-if="!isCompanyOwnedEquipment" class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.discount') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.notes') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.total') }}</th>
+                      <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('labels.actions') }}</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200 bg-white">
                     <tr v-for="(row, index) in rows" :key="row.id">
-                      <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                      <td class="px-4 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
 
                       <!-- Date -->
                       <td class="px-3 py-2">
@@ -245,7 +245,7 @@
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="theme-text hover:theme-text-muted transition" title="Duplicate" tabindex="-1">
+                          <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition" title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
                           </button>
                           <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition" title="Delete" tabindex="-1">
@@ -263,15 +263,15 @@
             <!-- Totals -->
             <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
               <div class="flex items-center justify-end gap-3">
-                <span class="text-gray-700">{{ $t('labels.total') }}:</span>
-                <span class="text-gray-900 min-w-32 text-end">{{ formatNumber(rowsTotal) }}</span>
+                <span class="theme-text-secondary">{{ $t('labels.total') }}:</span>
+                <span class="theme-text-primary min-w-32 text-end">{{ formatNumber(rowsTotal) }}</span>
               </div>
             </div>
 
             <!-- Save / Back Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="goBackToStep1" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-              <button @click="save" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></button>
+              <button @click="goBackToStep1" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+              <button @click="save" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></button>
             </div>
 
             <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">{{ saveError }}</p>
@@ -290,7 +290,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="addSite" :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -306,7 +306,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="addArea" :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>

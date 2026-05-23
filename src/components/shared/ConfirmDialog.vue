@@ -11,19 +11,19 @@
           </svg>
         </div>
         <div class="mt-2 text-center">
-          <h3 class="text-lg font-medium text-gray-900">{{ title }}</h3>
+          <h3 class="text-lg font-medium theme-text-primary">{{ title }}</h3>
           <div class="mt-2 px-7 py-3">
-            <p class="text-sm text-gray-500">{{ message }}</p>
+            <p class="text-sm theme-text-muted">{{ message }}</p>
           </div>
         </div>
         <div class="flex justify-center gap-3 pt-4">
           <button @click="handleCancel"
-            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+            class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
             {{ cancelText }}
           </button>
           <button @click="handleConfirm" :disabled="loading"
             :class="[
-              'px-4 py-2 rounded-md text-white transition disabled:opacity-50',
+              'px-4 py-2 rounded-md theme-text-light transition disabled:opacity-50',
               type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'theme-button '
             ]">
             {{ loading ? loadingText : confirmText }}

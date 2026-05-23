@@ -6,7 +6,27 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          'var(--theme-font-family)',
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'sans-serif'
+        ],
+        theme: ['var(--theme-font-family)', 'system-ui', 'sans-serif']
+      },
       colors: {
+        'theme-text': {
+          primary: 'var(--theme-text-primary)',
+          secondary: 'var(--theme-text-secondary)',
+          muted: 'var(--theme-text-muted)',
+          light: 'var(--theme-text-light)',
+          'light-secondary': 'var(--theme-text-light-secondary)',
+          'light-muted': 'var(--theme-text-light-muted)',
+          heading: 'var(--theme-heading-color)'
+        },
+        'theme-link': 'var(--theme-link-color)',
         indigo: {
           50: 'rgb(var(--theme-primary-50) / <alpha-value>)',
           100: 'rgb(var(--theme-primary-100) / <alpha-value>)',

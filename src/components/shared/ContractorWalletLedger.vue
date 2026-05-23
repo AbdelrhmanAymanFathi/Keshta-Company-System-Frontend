@@ -10,15 +10,15 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
         <div>
-          <label class="text-xs text-gray-600">{{ $t('labels.startDate') }}</label>
+          <label class="text-xs theme-text-secondary">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.start" class="w-full px-2 py-1 border rounded" />
         </div>
         <div>
-          <label class="text-xs text-gray-600">{{ $t('labels.endDate') }}</label>
+          <label class="text-xs theme-text-secondary">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.end" class="w-full px-2 py-1 border rounded" />
         </div>
         <div>
-          <label class="text-xs text-gray-600">{{ $t('labels.type') }}</label>
+          <label class="text-xs theme-text-secondary">{{ $t('labels.type') }}</label>
           <select v-model="filters.type" class="w-full px-2 py-1 border rounded">
             <option value="">{{ $t('labels.all') || 'All' }}</option>
             <option value="EXPORT">EXPORT</option>
@@ -68,7 +68,7 @@
                 <td class="px-3 py-2 text-right">{{ formatCurrency(tx.balanceAfter ?? tx.balance) }}</td>
               </tr>
               <tr v-if="items.length === 0">
-                <td class="p-4 text-center text-gray-500" :colspan="7">{{ $t('payments.noPayments') || 'No transactions found' }}</td>
+                <td class="p-4 text-center theme-text-muted" :colspan="7">{{ $t('payments.noPayments') || 'No transactions found' }}</td>
               </tr>
             </tbody>
           </table>
@@ -76,7 +76,7 @@
 
         <div class="mt-4 flex items-center justify-between">
           <div>
-            <small class="text-sm text-gray-600">{{ $t('labels.page') || 'Page' }} {{ page }} / {{ totalPages }}</small>
+            <small class="text-sm theme-text-secondary">{{ $t('labels.page') || 'Page' }} {{ page }} / {{ totalPages }}</small>
           </div>
           <div class="flex items-center gap-2">
             <button @click="changePage(page - 1)" :disabled="page <= 1" class="px-2 py-1 border rounded">&lt;</button>

@@ -18,12 +18,12 @@
   <form class="space-y-4" @submit.prevent="onCreate">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div class="sm:col-span-2 lg:col-span-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.truckName') }}</label>
+        <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.truckName') }}</label>
         <input v-model="form.name" type="text" :placeholder="$t('vehicles.truckName')" class="w-full border rounded px-3 py-2" required />
       </div>
 
       <div class="sm:col-span-2 lg:col-span-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.contractor') }}</label>
+        <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.contractor') }}</label>
         <div class="relative">
           <input
             type="text"
@@ -54,13 +54,13 @@
                 <div class="flex items-center gap-2 ml-4">
                   <span
                     v-if="c.availableForSupplies || c.availableForExports || c.isSupplier"
-                    class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded"
+                    class="text-xs bg-gray-100 theme-text-secondary px-2 py-0.5 rounded"
                   >
                     {{ $t('labels.supplies') }}
                   </span>
                   <span
                     v-if="c.availableForTransports || c.isTransporter"
-                    class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded"
+                    class="text-xs bg-gray-100 theme-text-secondary px-2 py-0.5 rounded"
                   >
                     {{ $t('labels.transport') }}
                   </span>
@@ -73,7 +73,7 @@
       </div>
 
       <div class="sm:col-span-2 lg:col-span-3">
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.crusherNumber') }}</label>
+        <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.crusherNumber') }}</label>
         <div class="relative">
           <input
             type="text"
@@ -107,7 +107,7 @@
       <!-- driver field removed -->
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.companyCapacity') }}</label>
+        <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.companyCapacity') }}</label>
         <input v-model="form.companyCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('vehicles.companyCapacityPlaceholder')" class="w-full border rounded px-3 py-2" />
         <p v-if="form.companyCapacity && Number(form.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
           {{ $t('vehicles.validationPositiveNumber') }}
@@ -115,7 +115,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCapacity') }}</label>
+        <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.crusherCapacity') }}</label>
         <input v-model="form.crusherCapacity" type="number" min="0.01" step="0.01" required :placeholder="$t('labels.crusherCapacity')" class="w-full border rounded px-3 py-2" />
         <p v-if="form.crusherCapacity && Number(form.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
           {{ $t('vehicles.validationPositiveNumber') }}

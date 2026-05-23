@@ -12,9 +12,9 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle || $t('dashboard.newSupply') }}</h2>
+          <h2 class="text-2xl font-bold theme-text-primary">{{ modalTitle || $t('dashboard.newSupply') }}</h2>
           <button @click="closeModal"
-            class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">
+            class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">
             ×
           </button>
         </div>
@@ -46,7 +46,7 @@
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
                 <tr v-for="(row, index) in rows" :key="row.id">
-                  <td class="px-3 py-2 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                  <td class="px-3 py-2 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
 
                   <!-- Date -->
                   <td class="px-3 py-2">
@@ -67,7 +67,7 @@
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
                       <button v-if="row.item === '__new__'" @click="showAddExportItemDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        class="bg-green-600 hover:bg-green-700 theme-text-light px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -84,7 +84,7 @@
                         <option value="__new__" style="color: #10b981;">+ {{ $t('supply.addNewSite') }}</option>
                       </select>
                       <button v-if="row.site === '__new__'" @click="showAddSite = true; pendingRow = row"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        class="bg-green-600 hover:bg-green-700 theme-text-light px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -104,7 +104,7 @@
                         </option>
                       </select>
                       <button v-if="row.area === '__new__'" @click="showAddArea = true; pendingRow = row"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        class="bg-green-600 hover:bg-green-700 theme-text-light px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -121,7 +121,7 @@
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
                       <button v-if="row.contractor === '__new__'" @click="showAddContractorDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        class="bg-green-600 hover:bg-green-700 theme-text-light px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -138,7 +138,7 @@
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
                       <button v-if="row.crusher === '__new__'" @click="showAddCrusherDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        class="bg-green-600 hover:bg-green-700 theme-text-light px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -155,7 +155,7 @@
                         <option value="__new__" style="color: #10b981;">+ {{ $t('labels.addNew') }}</option>
                       </select>
                       <button v-if="row.vehicle === '__new__'" @click="showAddVehicleDialog = true"
-                        class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm min-w-[32px]">
+                        class="bg-green-600 hover:bg-green-700 theme-text-light px-2 py-1 rounded text-sm min-w-[32px]">
                         +
                       </button>
                     </div>
@@ -216,7 +216,7 @@
                         ⤷
                       </button>
                       <button @click="removeRow(index)"
-                        class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" title="حذف الصف">
+                        class="px-2 py-1 bg-red-500 hover:bg-red-600 theme-text-light rounded text-sm" title="حذف الصف">
                         ✕
                       </button>
                     </div>
@@ -229,23 +229,23 @@
           <!-- Totals -->
           <div class="mt-8 text-start space-y-1 text-sm">
             <div class="flex justify-end gap-8">
-              <span class="text-gray-600">{{ $t('supply.subtotal') }}:</span>
-              <span class="font-semibold theme-text-strong w-24">{{ formatNumber(subtotal) }}</span>
+              <span class="theme-text-secondary">{{ $t('supply.subtotal') }}:</span>
+              <span class="font-semibold theme-accent-strong w-24">{{ formatNumber(subtotal) }}</span>
             </div>
             <div class="flex justify-end gap-8">
-              <span class="text-gray-600">{{ $t('supply.totalDiscount') }}:</span>
+              <span class="theme-text-secondary">{{ $t('supply.totalDiscount') }}:</span>
               <span class="font-semibold text-red-600 w-24">-{{ formatNumber(totalDiscount) }}</span>
             </div>
             <div class="flex justify-end gap-8 pt-2 border-t border-gray-300">
-              <span class="text-gray-700 font-medium">{{ $t('supply.grandTotal') }}:</span>
-              <span class="font-bold theme-text-muted w-24">{{ formatNumber(grandTotal) }}</span>
+              <span class="theme-text-secondary font-medium">{{ $t('supply.grandTotal') }}:</span>
+              <span class="font-bold theme-accent-muted w-24">{{ formatNumber(grandTotal) }}</span>
             </div>
           </div>
 
           <!-- Save Button -->
           <div class="mt-10 flex justify-end">
             <button @click="saveData" :disabled="isSaving"
-              class="bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl text-xl font-medium shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+              class="bg-green-600 hover:bg-green-700 theme-text-light px-12 py-4 rounded-xl text-xl font-medium shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
               {{ isSaving ? $t('labels.saving') : $t('labels.saveSupply') }}
             </button>
           </div>
@@ -265,7 +265,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="addSite" :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -281,7 +281,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="addArea" :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -299,7 +299,7 @@
         <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
         <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -316,7 +316,7 @@
         <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
         <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -344,7 +344,7 @@
         }}</button>
         <button @click="createNewVehicle"
           :disabled="!newVehicleForm.name || !newVehicleForm.cubicCapacity || !newVehicleForm.crusherCapacity || creatingVehicle"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -365,7 +365,7 @@
         }}</button>
         <button @click="createNewExportItem"
           :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>

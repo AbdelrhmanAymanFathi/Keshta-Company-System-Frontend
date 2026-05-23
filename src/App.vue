@@ -4,7 +4,7 @@
     <div v-if="isLoading" class="min-h-screen flex items-center justify-center">
       <div class="text-center">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent mx-auto mb-4"></div>
-        <p class="text-gray-600">{{ $t('auth.login.loading') }}</p>
+        <p class="theme-text-secondary">{{ $t('auth.login.loading') }}</p>
       </div>
     </div>
 

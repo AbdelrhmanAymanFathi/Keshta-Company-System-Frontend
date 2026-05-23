@@ -3,34 +3,34 @@
     <div class="max-w-6xl mx-auto">
       <!-- Step 1: Basic Data -->
       <div v-if="currentStep === 1" class="w-full">
-        <h3 class="text-lg font-bold mb-8 text-center text-gray-800">{{ $t('labels.step1BasicData') }}</h3>
+        <h3 class="text-lg font-bold mb-8 text-center theme-text-primary">{{ $t('labels.step1BasicData') }}</h3>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.dateFrom') || 'Date From' }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.dateFrom') || 'Date From' }} <span class="text-red-600">*</span></label>
             <div class="relative">
-              <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
               <DateField v-model="commonData.dateFrom" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.dateTo') || 'Date To' }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.dateTo') || 'Date To' }} <span class="text-red-600">*</span></label>
             <div class="relative">
-              <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              <CalendarDaysIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
               <DateField v-model="commonData.dateTo" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.site') }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.site') }} <span class="text-red-600">*</span></label>
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites" :placeholder="$t('labels.site')"
                   :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                   @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                   <template #prefix>
-                    <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                   </template>
                   <template #afterOptions>
                     <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewSite') }}</div>
@@ -41,14 +41,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.area') }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.area') }}</label>
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas" :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!commonData.site"
                   :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
                   @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
                   <template #prefix>
-                    <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                   </template>
                   <template #afterOptions>
                     <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewArea') }}</div>
@@ -59,14 +59,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.contractor') }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.contractor') }} <span class="text-red-600">*</span></label>
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonContractorSearch" :items="contractors" :allItems="contractors" :placeholder="$t('labels.contractor')"
                   :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                   @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }">
                   <template #prefix>
-                    <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                   </template>
                   <template #afterOptions>
                     <div @click="showAddContractorDialog = true" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
@@ -77,14 +77,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ $t('labels.crusher') }} <span class="text-red-600">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.crusher') }} <span class="text-red-600">*</span></label>
             <div class="relative flex items-center gap-2">
               <div class="flex-1 relative">
                 <SearchDropdown v-model="filters.commonCrusherSearch" :items="crushers" :allItems="crushers" :placeholder="$t('labels.crusher')"
                   :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                   @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
                   <template #prefix>
-                    <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                   </template>
                   <template #afterOptions>
                     <div @click="showAddCrusherDialog = true" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
@@ -95,40 +95,40 @@
           </div>
 
           <div class="md:col-span-full">
-            <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.notes') }}</label>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.notes') }}</label>
             <textarea v-model="commonData.notes" rows="3" class="w-full px-3 py-2 border rounded text-sm"></textarea>
           </div>
         </div>
 
         <!-- Next / Cancel Buttons -->
         <div class="mt-10 flex justify-end gap-6">
-          <button @click="onCancel" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition">{{ $t('labels.cancel') }}</button>
-          <button @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></button>
+          <button @click="onCancel" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">{{ $t('labels.cancel') }}</button>
+          <button @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></button>
         </div>
       </div>
 
       <!-- Step 2: Lines -->
       <div v-else class="w-full">
         <div class="flex items-center justify-between mb-8">
-          <button @click="currentStep = 1" class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-          <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
+          <button @click="currentStep = 1" class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+          <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2Data') }}</h3>
           <div></div>
         </div>
 
         <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
-          <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
+          <h4 class="text-sm font-bold theme-accent-muted mb-4">{{ $t('labels.summary') }}</h4>
           <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.dateFrom') || 'Date From' }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.dateFrom || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.dateTo') || 'Date To' }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.dateTo || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd></div>
-            <div class="flex flex-col"><dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd></div>
-            <div class="flex flex-col col-span-full"><dt class="font-semibold text-gray-700">{{ $t('labels.notes') }}:</dt><dd class="text-gray-900 mt-1">{{ commonData.notes || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold theme-text-secondary">{{ $t('labels.dateFrom') || 'Date From' }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.dateFrom || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold theme-text-secondary">{{ $t('labels.dateTo') || 'Date To' }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.dateTo || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold theme-text-secondary">{{ $t('labels.site') }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.site?.name || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold theme-text-secondary">{{ $t('labels.area') }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.area?.name || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold theme-text-secondary">{{ $t('labels.contractor') }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.contractor?.name || '-' }}</dd></div>
+            <div class="flex flex-col"><dt class="font-semibold theme-text-secondary">{{ $t('labels.crusher') }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.crusher?.name || '-' }}</dd></div>
+            <div class="flex flex-col col-span-full"><dt class="font-semibold theme-text-secondary">{{ $t('labels.notes') }}:</dt><dd class="theme-text-primary mt-1">{{ commonData.notes || '-' }}</dd></div>
           </dl>
         </div>
 
-        <div class="mb-6"><button @click="addRow" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">+ {{ $t('labels.addRow') }}</button></div>
+        <div class="mb-6"><button @click="addRow" class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">+ {{ $t('labels.addRow') }}</button></div>
 
         <div class="mb-8 relative border border-gray-200 rounded-lg overflow-visible p-2">
           <div class="overflow-x-auto w-full">
@@ -146,8 +146,8 @@
         </div>
 
         <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
-          <div class="flex items-center justify-end gap-3"><span class="text-gray-700">{{ $t('labels.subtotal') }}:</span><span class="text-gray-900 min-w-32 text-end">{{ formatCurrency(subtotal) }}</span></div>
-          <div class="mt-4 sm:mt-0"><button @click="saveData" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></button></div>
+          <div class="flex items-center justify-end gap-3"><span class="theme-text-secondary">{{ $t('labels.subtotal') }}:</span><span class="theme-text-primary min-w-32 text-end">{{ formatCurrency(subtotal) }}</span></div>
+          <div class="mt-4 sm:mt-0"><button @click="saveData" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></button></div>
         </div>
 
         <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">{{ saveError }}</p>
@@ -155,15 +155,15 @@
     </div>
 
     <!-- Dialogs: Add Site / Area / Contractor / Crusher / Export Item -->
-    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3><input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" /><div class="flex gap-2 justify-end"><button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="addSite" :disabled="!newSiteName || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">{{ addingLocation ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div></div></div>
+    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3><input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" /><div class="flex gap-2 justify-end"><button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="addSite" :disabled="!newSiteName || addingLocation" class="bg-green-600 theme-text-light px-3 py-1 rounded">{{ addingLocation ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div></div></div>
 
-    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3><input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" /><div class="flex gap-2 justify-end"><button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="addArea" :disabled="!newAreaName || addingLocation" class="bg-green-600 text-white px-3 py-1 rounded">{{ addingLocation ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div></div></div>
+    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3><input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" /><div class="flex gap-2 justify-end"><button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="addArea" :disabled="!newAreaName || addingLocation" class="bg-green-600 theme-text-light px-3 py-1 rounded">{{ addingLocation ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div></div></div>
 
-    <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3><input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('contractors.name')" /><div class="flex gap-2 justify-end"><button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="createNewContractor" :disabled="!newContractorName || creatingContractor" class="bg-green-600 text-white px-3 py-1 rounded">{{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div></div></div>
+    <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3><input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('contractors.name')" /><div class="flex gap-2 justify-end"><button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="createNewContractor" :disabled="!newContractorName || creatingContractor" class="bg-green-600 theme-text-light px-3 py-1 rounded">{{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div></div></div>
 
-    <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3><input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" /><div class="flex gap-2 justify-end"><button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher" class="bg-green-600 text-white px-3 py-1 rounded">{{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div></div></div>
+    <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3><input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" /><div class="flex gap-2 justify-end"><button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher" class="bg-green-600 theme-text-light px-3 py-1 rounded">{{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div></div></div>
 
-    <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3><input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'" class="w-full border rounded px-2 py-1 mb-3" /><input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')" class="w-full border rounded px-2 py-1 mb-3" /><div class="flex gap-2 justify-end"><button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem" class="bg-green-600 text-white px-3 py-1 rounded">{{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div></div></div>
+    <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3><input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'" class="w-full border rounded px-2 py-1 mb-3" /><input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')" class="w-full border rounded px-2 py-1 mb-3" /><div class="flex gap-2 justify-end"><button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button><button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem" class="bg-green-600 theme-text-light px-3 py-1 rounded">{{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}</button></div><div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div></div></div>
   </div>
 </template>
 

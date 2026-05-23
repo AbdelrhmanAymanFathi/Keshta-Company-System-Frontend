@@ -5,7 +5,7 @@
     <!-- Start registration -->
     <div class="bg-white p-4 rounded shadow">
       <div v-if="!registering && !temp" class="space-y-2">
-        <p class="text-sm text-gray-600">{{ $t('profile.totpIntro') || 'Add an authenticator app to secure your account.' }}</p>
+        <p class="text-sm theme-text-secondary">{{ $t('profile.totpIntro') || 'Add an authenticator app to secure your account.' }}</p>
         <div class="flex gap-2">
           <input v-model="label" class="flex-1 border rounded px-3 py-2" :placeholder="$t('profile.deviceLabel') || 'Device label'" />
           <button @click="startRegister" class="px-4 py-2 theme-button rounded">{{ $t('labels.start') || 'Start' }}</button>
@@ -18,17 +18,17 @@
             <img :src="qrSrc" alt="QR Code" v-if="qrSrc" class="w-40 h-40 bg-white border" />
           </div>
           <div class="flex-1">
-            <p class="text-sm text-gray-600">{{ $t('profile.scanQr') || 'Scan the QR using your authenticator app or copy the secret.' }}</p>
+            <p class="text-sm theme-text-secondary">{{ $t('profile.scanQr') || 'Scan the QR using your authenticator app or copy the secret.' }}</p>
             <div class="mt-2 p-2 bg-gray-50 rounded">
               <div class="flex items-center justify-between">
                 <div class="font-mono text-sm break-all">{{ temp.secret }}</div>
                 <button @click="copySecret" class="theme-text text-sm">{{ $t('labels.copy') || 'Copy' }}</button>
               </div>
-              <div class="mt-2 text-xs text-gray-500">{{ countdownText }}</div>
+              <div class="mt-2 text-xs theme-text-muted">{{ countdownText }}</div>
             </div>
             <div class="mt-3 flex gap-2">
               <input v-model="confirmToken" placeholder="123456" class="border rounded px-3 py-2 w-40" />
-              <button @click="confirmRegister" :disabled="confirming" class="px-4 py-2 bg-green-600 text-white rounded">{{ $t('labels.confirm') || 'Confirm' }}</button>
+              <button @click="confirmRegister" :disabled="confirming" class="px-4 py-2 bg-green-600 theme-text-light rounded">{{ $t('labels.confirm') || 'Confirm' }}</button>
               <button @click="cancelTemp" class="px-4 py-2 border rounded">{{ $t('labels.cancel') || 'Cancel' }}</button>
             </div>
             <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div v-if="registering" class="text-sm text-gray-500">{{ $t('labels.loading') || 'Loading...' }}</div>
+      <div v-if="registering" class="text-sm theme-text-muted">{{ $t('labels.loading') || 'Loading...' }}</div>
     </div>
 
     <!-- Devices list -->
@@ -45,18 +45,18 @@
         <h4 class="font-medium">{{ $t('profile.devices') || 'Devices' }}</h4>
         <button @click="loadDevices" class="text-sm theme-text">{{ $t('labels.refresh') || 'Refresh' }}</button>
       </div>
-      <div v-if="loadingDevices" class="text-sm text-gray-500">{{ $t('labels.loading') || 'Loading...' }}</div>
+      <div v-if="loadingDevices" class="text-sm theme-text-muted">{{ $t('labels.loading') || 'Loading...' }}</div>
       <ul v-else class="space-y-2">
         <li v-for="d in devices" :key="d.id" class="flex items-center justify-between border rounded p-2">
           <div>
             <div class="font-medium">{{ d.label || ('Device ' + d.id) }}</div>
-            <div class="text-xs text-gray-500">{{ formatDate(d.createdAt) }}</div>
+            <div class="text-xs theme-text-muted">{{ formatDate(d.createdAt) }}</div>
           </div>
           <div class="flex gap-2 items-center">
             <button @click="removeDevice(d.id)" class="text-red-600 text-sm">{{ $t('labels.delete') || 'Delete' }}</button>
           </div>
         </li>
-        <li v-if="devices.length === 0" class="text-sm text-gray-500">{{ $t('profile.noDevices') || 'No TOTP devices configured' }}</li>
+        <li v-if="devices.length === 0" class="text-sm theme-text-muted">{{ $t('profile.noDevices') || 'No TOTP devices configured' }}</li>
       </ul>
     </div>
   </div>

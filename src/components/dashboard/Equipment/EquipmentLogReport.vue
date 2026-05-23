@@ -25,7 +25,7 @@
 
       <div class="mt-4 flex gap-2">
         <button @click="runReport" :disabled="loading"
-          class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">{{ loading ? $t('labels.running') : $t('labels.run') }}</button>
+          class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded">{{ loading ? $t('labels.running') : $t('labels.run') }}</button>
         <button @click="clearFilters" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</button>
       </div>
     </div>
@@ -35,25 +35,25 @@
     </div>
 
     <div v-else>
-      <div v-if="report.rows.length === 0" class="text-center py-8 text-gray-500">{{ $t('equipmentLog.noReportData') }}</div>
+      <div v-if="report.rows.length === 0" class="text-center py-8 theme-text-muted">{{ $t('equipmentLog.noReportData') }}</div>
       <div v-else class="bg-white rounded-lg p-4 border overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('equipmentLog.date') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('equipmentLog.equipment') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('equipmentLog.hours') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('equipmentLog.hourlyRate') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $t('equipmentLog.total') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.date') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.equipment') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.hours') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.hourlyRate') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.total') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="row in report.rows" :key="row.id">
-              <td class="px-6 py-4 text-sm text-gray-900">{{ formatDate(row.date) }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ row.equipment }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ row.hours }}</td>
-              <td class="px-6 py-4 text-sm text-gray-900">{{ formatCurrency(row.hourlyRate) }}</td>
-              <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ formatCurrency(row.total) }}</td>
+              <td class="px-6 py-4 text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
+              <td class="px-6 py-4 text-sm theme-text-primary">{{ row.equipment }}</td>
+              <td class="px-6 py-4 text-sm theme-text-primary">{{ row.hours }}</td>
+              <td class="px-6 py-4 text-sm theme-text-primary">{{ formatCurrency(row.hourlyRate) }}</td>
+              <td class="px-6 py-4 text-sm font-semibold theme-text-primary">{{ formatCurrency(row.total) }}</td>
             </tr>
           </tbody>
         </table>

@@ -1,9 +1,9 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-xl sm:text-2xl font-bold text-slate-900">{{ $t('locations.title') || 'Locations' }}</h2>
+      <h2 class="text-xl sm:text-2xl font-bold theme-text-primary">{{ $t('locations.title') || 'Locations' }}</h2>
       <div class="flex items-center gap-3">
-        <button @click="openAddSite()" class="rounded-xl theme-button px-4 py-2 text-white shadow-sm  transition ">+ {{ $t('locations.addLocation') || 'Add Location' }}</button>
+        <button @click="openAddSite()" class="rounded-xl theme-button px-4 py-2 theme-text-light shadow-sm  transition ">+ {{ $t('locations.addLocation') || 'Add Location' }}</button>
       </div>
     </div>
 
@@ -24,8 +24,8 @@
               <td :class="['px-4 py-3 font-medium', isRTL ? 'text-right' : 'text-left']">{{ loc.name }}</td>
               <td class="px-4 py-3">{{ $t('locations.site') || 'Site' }}</td>
               <td :class="['px-4 py-3', isRTL ? 'text-right' : 'text-left']">
-                <button @click="openAddArea(loc)" :class="['theme-text hover:theme-text-muted transition', isRTL ? 'ml-3' : 'mr-3']" :title="$t('locations.addArea')">{{ $t('locations.addArea') || 'Add Area' }}</button>
-                <button @click="openEdit(loc)" :class="['theme-text hover:theme-text-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
+                <button @click="openAddArea(loc)" :class="['theme-text hover:theme-accent-muted transition', isRTL ? 'ml-3' : 'mr-3']" :title="$t('locations.addArea')">{{ $t('locations.addArea') || 'Add Area' }}</button>
+                <button @click="openEdit(loc)" :class="['theme-text hover:theme-accent-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
                   <PencilIcon class="w-4 h-4" />
                 </button>
                 <button @click="confirmDelete(loc)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
@@ -39,7 +39,7 @@
               <td :class="['px-4 py-2 ps-8', isRTL ? 'text-right' : 'text-left']">— {{ child.name }}</td>
               <td class="px-4 py-2">{{ $t('locations.area') || 'Area' }}</td>
               <td :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">
-                <button @click="openEdit(child, loc)" :class="['theme-text hover:theme-text-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
+                <button @click="openEdit(child, loc)" :class="['theme-text hover:theme-accent-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
                   <PencilIcon class="w-4 h-4" />
                 </button>
                 <button @click="confirmDelete(child)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
@@ -50,7 +50,7 @@
           </template>
         </tbody>
       </table>
-      <div v-if="!sites.length" class="p-6 text-center text-gray-500">{{ $t('locations.noData') || 'No locations yet' }}</div>
+      <div v-if="!sites.length" class="p-6 text-center theme-text-muted">{{ $t('locations.noData') || 'No locations yet' }}</div>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -64,12 +64,12 @@
           }}
         </h3>
         <div class="mb-4">
-          <label class="block text-sm text-gray-700 mb-1">{{ $t(form.parentId ? 'locations.areaName' : 'locations.locationName') || (form.parentId ? 'Area' : 'Name') }}</label>
+          <label class="block text-sm theme-text-secondary mb-1">{{ $t(form.parentId ? 'locations.areaName' : 'locations.locationName') || (form.parentId ? 'Area' : 'Name') }}</label>
           <input v-model="form.name" class="w-full rounded-xl border border-slate-200 px-3 py-2  theme-input-focus" />
         </div>
         <div class="flex justify-end gap-3">
-          <button @click="closeModal" class="rounded-xl border border-slate-200 px-3 py-2 text-slate-700 hover:bg-slate-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-          <button @click="save()" :disabled="saving || !form.name.trim()" class="rounded-xl theme-button px-4 py-2 text-white ">{{ saving ? ($t('labels.saving')||'Saving') : ($t('labels.save')||'Save') }}</button>
+          <button @click="closeModal" class="rounded-xl border border-slate-200 px-3 py-2 theme-text-secondary hover:bg-slate-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
+          <button @click="save()" :disabled="saving || !form.name.trim()" class="rounded-xl theme-button px-4 py-2 theme-text-light ">{{ saving ? ($t('labels.saving')||'Saving') : ($t('labels.save')||'Save') }}</button>
         </div>
         <p v-if="error" class="text-red-600 mt-3">{{ error }}</p>
       </div>
@@ -78,13 +78,13 @@
     <!-- Delete Confirm Modal -->
     <div v-if="deleteConfirmModal.show" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
       <div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
-        <h3 class="text-lg font-bold mb-3 text-gray-900">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="text-gray-600 mb-6">{{ deleteConfirmModal.message }}</p>
+        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
+        <p class="theme-text-secondary mb-6">{{ deleteConfirmModal.message }}</p>
         <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="rounded-xl border border-slate-200 px-4 py-2 text-slate-700 hover:bg-slate-50">
+          <button @click="closeDeleteConfirm" class="rounded-xl border border-slate-200 px-4 py-2 theme-text-secondary hover:bg-slate-50">
             {{ $t('labels.cancel') || 'Cancel' }}
           </button>
-          <button @click="doDelete(deleteConfirmModal.id)" :disabled="deleting" class="rounded-xl bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:opacity-50">
+          <button @click="doDelete(deleteConfirmModal.id)" :disabled="deleting" class="rounded-xl bg-red-600 px-4 py-2 theme-text-light hover:bg-red-700 disabled:opacity-50">
             {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
           </button>
         </div>
