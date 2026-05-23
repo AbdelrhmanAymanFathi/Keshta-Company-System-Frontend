@@ -12,7 +12,7 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-gray-700"
+            class="h-5 w-5 theme-text-secondary"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -30,11 +30,11 @@
         <div v-else>
           <div v-if="report">
             <h4 class="font-semibold">{{ report.title }}</h4>
-            <p class="text-sm text-gray-600">{{ report.description }}</p>
+            <p class="text-sm theme-text-secondary">{{ report.description }}</p>
 
             <div class="mt-4 space-y-4">
               <div v-for="p in report.params || []" :key="p.name" class="mb-2">
-                <label class="block text-sm font-medium text-gray-700">{{
+                <label class="block text-sm font-medium theme-text-secondary">{{
                   p.label || (locale !== "en" && p.arName ? p.arName : p.name)
                 }}</label>
                 <div v-if="!p.type || p.type === 'TEXT'">
@@ -70,7 +70,7 @@
                 <div v-else-if="p.type === 'DROPDOWN'">
                   <div
                     v-if="paramLoading[p.name]"
-                    class="text-sm text-gray-500"
+                    class="text-sm theme-text-muted"
                   >
                     {{ $t("reports.loadingOptions") }}
                   </div>
@@ -85,7 +85,7 @@
                     @update:modelValue="(q) => onOptionSearch(p.name, q)"
                     @select="(item) => onSelectOption(p.name, item)"
                   />
-                  <div v-if="values[p.name]" class="mt-1 text-sm text-gray-700">
+                  <div v-if="values[p.name]" class="mt-1 text-sm theme-text-secondary">
                     {{ $t("reports.selected") }} {{ values[p.name].label }}
                   </div>
                 </div>
@@ -93,7 +93,7 @@
                 <div v-else-if="p.type === 'MULTISELECT'">
                   <div
                     v-if="paramLoading[p.name]"
-                    class="text-sm text-gray-500"
+                    class="text-sm theme-text-muted"
                   >
                     {{ $t("reports.loadingOptions") }}
                   </div>
@@ -112,7 +112,7 @@
                     <span
                       v-for="it in values[p.name] || []"
                       :key="it.id"
-                      class="flex items-center gap-2 rounded-full bg-slate-100 px-2 py-1 text-sm text-slate-700"
+                      class="flex items-center gap-2 rounded-full bg-slate-100 px-2 py-1 text-sm theme-text-secondary"
                     >
                       <span>{{ it.label }}</span>
                       <button
@@ -129,14 +129,14 @@
                 <button
                   @click="execute"
                   :disabled="executing"
-                  class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 text-white transition "
+                  class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 theme-text-light transition "
                 >
                   <span>{{ executing ? ($t('labels.loading') || 'Loading...') : $t("admin.run") }}</span>
                 </button>
                 <button
                   @click="downloadCsv"
                   :disabled="!report || !hasExportableRows || !!exportingFormat"
-                  class="flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-2 text-white transition hover:bg-slate-800 disabled:opacity-50"
+                  class="flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-2 theme-text-light transition hover:bg-slate-800 disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'csv' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadCsv') || 'Download CSV') }}</span>
                 </button>
@@ -150,7 +150,7 @@
                 <button
                   @click="downloadPdf"
                   :disabled="!report || !hasExportableRows || !!exportingFormat"
-                  class="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:opacity-50"
+                  class="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 theme-text-light transition hover:bg-red-700 disabled:opacity-50"
                 >
                   <span>{{ exportingFormat === 'pdf' ? ($t('labels.loading') || 'Loading...') : ($t('reports.downloadPdf') || 'Download PDF') }}</span>
                 </button>

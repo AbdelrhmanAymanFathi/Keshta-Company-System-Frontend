@@ -12,8 +12,8 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">{{ $t('expenses.title') }}</h1>
-        <p class="text-gray-600 mt-1">{{ $t('expenses.searchBy') }}</p>
+        <h1 class="text-2xl font-semibold theme-text-primary">{{ $t('expenses.title') }}</h1>
+        <p class="theme-text-secondary mt-1">{{ $t('expenses.searchBy') }}</p>
       </div>
 
       <button 
@@ -41,7 +41,7 @@
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg theme-input-focus"
               :class="isRTL ? 'text-right' : 'text-left'"
             />
-            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" :class="isRTL ? 'left-auto right-3' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-3 top-2.5 w-5 h-5 theme-caption" :class="isRTL ? 'left-auto right-3' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </div>
@@ -93,7 +93,7 @@
           <button 
             v-if="searchQuery || selectedCategoryId"
             @click="clearFilters"
-            class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            class="px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             {{ $t('expenses.clearSearch') }}
           </button>
@@ -122,56 +122,56 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.#') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.date') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.type') || 'Type' }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider"
                   :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.category') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider"
                   :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.description') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.branch') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.location') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.amount') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.signedAmount') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.flow') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.notes') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.actions') }}
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ (currentPage - 1) * pageSize + index + 1 }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatDate(expense.date) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'theme-icon-bg theme-text-muted'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'theme-icon-bg theme-accent-muted'">
                   {{ expense.kind === 'ADVANCE' ? ( $t('expenses.kind.advance') || 'عهدة' ) : ( $t('expenses.kind.expense') || 'مصروف' ) }}
                 </span>
               </td>
@@ -184,28 +184,28 @@
                   </span>
 
                   <!-- Subcategory line -->
-                  <span class="text-xs text-gray-600">
+                  <span class="text-xs theme-text-secondary">
                     {{ getSubcategoryLabel(expense) }}
                   </span>
                 </div>
               </td>
 
-              <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 text-sm theme-text-primary max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.description }}
               </td>
-              <td class="px-6 py-4 text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 <span v-if="expense.branch" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                   {{ expense.branch.name }}
                 </span>
-                <span v-else class="text-gray-400">-</span>
+                <span v-else class="theme-caption">-</span>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 <span v-if="expense.location" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                   {{ expense.location.name }}
                 </span>
-                <span v-else class="text-gray-400">-</span>
+                <span v-else class="theme-caption">-</span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatCurrency(expense.amount) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="[isRTL ? 'text-right' : 'text-left', expense.signedAmount < 0 ? 'text-red-600' : 'text-green-600']">
@@ -216,14 +216,14 @@
                   {{ expense.flow === 'IN' ? $t('expenses.flowIn') : $t('expenses.flowOut') }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-6 py-4 text-sm theme-text-muted max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.notes || '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
                   <button 
                     @click="openEditModal(expense)" 
-                    class="theme-text hover:theme-text-muted transition-colors"
+                    class="theme-text hover:theme-accent-muted transition-colors"
                     :title="$t('labels.edit')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,13 +243,13 @@
               </td>
             </tr>
             <tr v-if="filteredExpenses.length === 0">
-              <td colspan="12" class="px-6 py-12 text-center text-gray-500">
+              <td colspan="12" class="px-6 py-12 text-center theme-text-muted">
                 <div class="flex flex-col items-center">
                   <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
                   <p class="text-lg font-medium">{{ $t('expenses.noResults') }}</p>
-                  <p class="text-sm text-gray-400 mt-1">{{ $t('expenses.searchBy') }}</p>
+                  <p class="text-sm theme-caption mt-1">{{ $t('expenses.searchBy') }}</p>
                 </div>
               </td>
             </tr>
@@ -267,8 +267,8 @@
       >
         <div class="flex justify-between items-start mb-3">
           <div :class="isRTL ? 'text-right' : 'text-left'">
-            <h3 class="font-semibold text-gray-900">{{ expense.description }}</h3>
-            <p class="text-sm text-gray-500">{{ formatDate(expense.date) }}</p>
+            <h3 class="font-semibold theme-text-primary">{{ expense.description }}</h3>
+            <p class="text-sm theme-text-muted">{{ formatDate(expense.date) }}</p>
           </div>
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="getCategoryColor(expense.category)">
             {{ getCategoryLabel(expense.category) }}
@@ -276,7 +276,7 @@
         </div>
         
         <div class="flex justify-between items-center mb-3">
-          <span class="text-lg font-semibold text-gray-900">{{ formatCurrency(expense.amount) }}</span>
+          <span class="text-lg font-semibold theme-text-primary">{{ formatCurrency(expense.amount) }}</span>
           <div class="flex gap-2">
             <button 
               @click="openEditModal(expense)" 
@@ -297,7 +297,7 @@
           </div>
         </div>
         
-        <p v-if="expense.notes" class="text-sm text-gray-600" :class="isRTL ? 'text-right' : 'text-left'">
+        <p v-if="expense.notes" class="text-sm theme-text-secondary" :class="isRTL ? 'text-right' : 'text-left'">
           {{ expense.notes }}
         </p>
       </div>
@@ -306,20 +306,20 @@
         <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
         </svg>
-        <p class="text-lg font-medium text-gray-500">{{ $t('expenses.noResults') }}</p>
+        <p class="text-lg font-medium theme-text-muted">{{ $t('expenses.noResults') }}</p>
       </div>
     </div>
 
     <!-- Pagination -->
     <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between bg-gray-50 p-4 rounded-lg">
       <div class="flex items-center gap-4">
-        <div class="text-sm text-gray-700">
+        <div class="text-sm theme-text-secondary">
           {{ $t('supply.showing') }} {{ (currentPage - 1) * pageSize + 1 }} {{ $t('supply.to') }} 
           {{ Math.min(currentPage * pageSize, totalItems) }} {{ $t('supply.of') }} {{ totalItems }} {{ $t('supply.results') }}
         </div>
         
         <div class="flex items-center gap-2">
-          <label class="text-sm text-gray-700">{{ $t('expenses.pageSize') }}:</label>
+          <label class="text-sm theme-text-secondary">{{ $t('expenses.pageSize') }}:</label>
           <select 
             v-model="pageSize" 
             @change="onPageSizeChange"
@@ -372,10 +372,10 @@
       <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto">
         <div class="p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
+            <h3 class="text-lg font-semibold theme-text-primary">
               {{ editing ? $t('expenses.editExpense') : $t('expenses.addExpense') }}
             </h3>
-            <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+            <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -385,7 +385,7 @@
           <form @submit.prevent="saveExpense" class="grid gap-4 grid-cols-1 md:grid-cols-2">
             <!-- Date - Column 1 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.date') }} <span class="text-red-500">*</span>
               </label>
               <DateField
@@ -398,7 +398,7 @@
 
             <!-- Category - Column 2 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.category') }} <span class="text-red-500">*</span>
               </label>
               <div class="flex gap-2">
@@ -417,7 +417,7 @@
 
             <!-- Subcategory (optional) - Column 2 -->
             <div v-if="form.categoryId">
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.subcategory') }}
               </label>
 
@@ -433,7 +433,7 @@
 
             <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.kindLabel') }}</label>
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.kindLabel') }}</label>
               <select v-model="form.kind" class="w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
                 <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
                 <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
@@ -442,7 +442,7 @@
 
             <!-- Description - Full Width -->
             <div class="col-span-1 md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.description') }} <span class="text-red-500">*</span>
               </label>
               <input 
@@ -457,7 +457,7 @@
 
             <!-- Flow Type - Column 1 -->
             <!-- <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.flow') }} <span class="text-red-500">*</span>
               </label>
               <div class="flex gap-2">
@@ -467,8 +467,8 @@
                   :class="[
                     'flex-1 px-3 py-2 rounded-lg font-medium transition',
                     form.flow === 'OUT' 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-red-600 theme-text-light' 
+                      : 'bg-gray-100 theme-text-secondary hover:bg-gray-200'
                   ]"
                 >
                   {{ $t('expenses.flowOut') }}
@@ -479,8 +479,8 @@
                   :class="[
                     'flex-1 px-3 py-2 rounded-lg font-medium transition',
                     form.flow === 'IN' 
-                      ? 'bg-green-600 text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-green-600 theme-text-light' 
+                      : 'bg-gray-100 theme-text-secondary hover:bg-gray-200'
                   ]"
                 >
                   {{ $t('expenses.flowIn') }}
@@ -490,7 +490,7 @@
 
             <!-- Settlement Date - Column 2 (for all flows as status/closing date) -->
             <div class="animate-in fade-in">
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.settlementDate') }}
               </label>
               <DateField
@@ -499,12 +499,12 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
                 :class="isRTL ? 'text-right' : 'text-left'"
               />
-              <p class="text-xs text-gray-500 mt-1">{{ $t('expenses.settlementDateHint') }}</p>
+              <p class="text-xs theme-text-muted mt-1">{{ $t('expenses.settlementDateHint') }}</p>
             </div>
 
             <!-- Branch - Column 1 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.branch') }}
               </label>
               <div class="flex gap-2">
@@ -522,7 +522,7 @@
 
             <!-- Location - Column 2 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.location') || 'Location' }} <span class="text-red-500">*</span>
               </label>
               <div class="flex gap-2">
@@ -541,7 +541,7 @@
 
             <!-- Amount - Column 2 -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.amount') }} <span class="text-red-500">*</span>
               </label>
               <input 
@@ -558,7 +558,7 @@
 
             <!-- Notes - Full Width -->
             <div class="col-span-1 md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
+              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.notes') }}
               </label>
               <textarea 
@@ -575,7 +575,7 @@
               <button 
                 type="button" 
                 @click="closeModal"
-                class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 {{ $t('labels.cancel') }}
               </button>
@@ -605,25 +605,25 @@
               </svg>
             </div>
             <div class="ml-3" :class="isRTL ? 'ml-0 mr-3' : ''">
-              <h3 class="text-lg font-medium text-gray-900">{{ $t('expenses.deleteExpense') }}</h3>
+              <h3 class="text-lg font-medium theme-text-primary">{{ $t('expenses.deleteExpense') }}</h3>
             </div>
           </div>
           
-          <p class="text-sm text-gray-500 mb-6" :class="isRTL ? 'text-right' : 'text-left'">
+          <p class="text-sm theme-text-muted mb-6" :class="isRTL ? 'text-right' : 'text-left'">
             {{ $t('expenses.deleteConfirmation') }}
           </p>
           
           <div class="flex gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
             <button 
               @click="cancelDelete"
-              class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               {{ $t('labels.cancel') }}
             </button>
             <button 
               @click="doDelete"
               :disabled="deleting"
-              class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              class="flex-1 px-4 py-2 bg-red-600 theme-text-light rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               <div v-if="deleting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               {{ deleting ? $t('labels.deleting') : $t('labels.delete') }}
@@ -638,8 +638,8 @@
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md animate-in fade-in duration-200" :class="isRTL ? 'direction-rtl' : ''">
         <!-- Modal Header -->
         <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 flex items-center justify-between rounded-t-lg" :class="isRTL ? 'flex-row-reverse' : ''">
-          <h3 class="text-lg font-semibold text-white">{{ $t('expenses.selectSaveLocation') }}</h3>
-          <button @click="showLocationDialog = false" class="text-white hover:text-green-100 transition">
+          <h3 class="text-lg font-semibold theme-text-light">{{ $t('expenses.selectSaveLocation') }}</h3>
+          <button @click="showLocationDialog = false" class="theme-text-light hover:text-green-100 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -648,7 +648,7 @@
 
         <!-- Modal Content -->
         <div class="px-6 py-6 space-y-4">
-          <p class="text-sm text-gray-600" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.chooseLocationHint') }}</p>
+          <p class="text-sm theme-text-secondary" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.chooseLocationHint') }}</p>
           
           <!-- Quick Select Options -->
           <div class="space-y-2">
@@ -666,8 +666,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
               </svg>
               <div>
-                <div class="font-medium text-gray-800">{{ $t('expenses.downloads') }}</div>
-                <div class="text-xs text-gray-500">~/Downloads</div>
+                <div class="font-medium theme-text-primary">{{ $t('expenses.downloads') }}</div>
+                <div class="text-xs theme-text-muted">~/Downloads</div>
               </div>
             </button>
 
@@ -685,8 +685,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
               <div>
-                <div class="font-medium text-gray-800">{{ $t('expenses.documents') }}</div>
-                <div class="text-xs text-gray-500">~/Documents</div>
+                <div class="font-medium theme-text-primary">{{ $t('expenses.documents') }}</div>
+                <div class="text-xs theme-text-muted">~/Documents</div>
               </div>
             </button>
 
@@ -704,15 +704,15 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <div>
-                <div class="font-medium text-gray-800">{{ $t('expenses.desktop') }}</div>
-                <div class="text-xs text-gray-500">~/Desktop</div>
+                <div class="font-medium theme-text-primary">{{ $t('expenses.desktop') }}</div>
+                <div class="text-xs theme-text-muted">~/Desktop</div>
               </div>
             </button>
           </div>
 
           <!-- Custom Path -->
           <div class="border-t pt-4">
-            <label class="text-sm font-medium text-gray-700 mb-2 block" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.customPath') }}</label>
+            <label class="text-sm font-medium theme-text-secondary mb-2 block" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.customPath') }}</label>
             <input 
               v-model="selectedLocation"
               type="text"
@@ -727,14 +727,14 @@
         <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 rounded-b-lg border-t" :class="isRTL ? 'flex-row-reverse' : ''">
           <button 
             @click="showLocationDialog = false"
-            class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+            class="px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
           >
             {{ $t('labels.cancel') }}
           </button>
           <button 
             @click="downloadReport"
             :disabled="downloading"
-            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+            class="px-4 py-2 bg-green-600 theme-text-light rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
           >
             <div v-if="downloading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
@@ -1327,9 +1327,9 @@ export default {
         'Maintenance': 'bg-red-100 text-red-800',
         'Utilities': 'bg-yellow-100 text-yellow-800',
         'Marketing': 'bg-pink-100 text-pink-800',
-        'Other': 'bg-gray-100 text-gray-800'
+        'Other': 'bg-gray-100 theme-text-primary'
       }
-      return colors[actualCategory] || 'bg-gray-100 text-gray-800'
+      return colors[actualCategory] || 'bg-gray-100 theme-text-primary'
     },
 
     getSubcategoryLabel(expense) {

@@ -2,13 +2,13 @@
   <div class="space-y-4">
     <form @submit.prevent="onFormSubmit" class="space-y-4">
       <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-600">{{ $t('labels.step') || 'Step' }} {{ currentStep }} / 2</div>
+        <div class="text-sm theme-text-secondary">{{ $t('labels.step') || 'Step' }} {{ currentStep }} / 2</div>
       </div>
 
       <!-- Stage 1: date, equipment, hourlyRate -->
       <div v-if="currentStep === 1" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium theme-text-secondary mb-1">
             {{ $t('equipmentLog.date') }} *
           </label>
           <DateField
@@ -19,7 +19,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium theme-text-secondary mb-1">
             {{ $t('equipmentLog.equipment') }} *
           </label>
           <SearchDropdown
@@ -34,7 +34,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-sm font-medium theme-text-secondary mb-1">
             {{ $t('equipmentLog.hourlyRate') }} *
           </label>
           <input
@@ -52,7 +52,7 @@
       <div v-if="currentStep === 2" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
               {{ $t('equipmentLog.hours') }}
             </label>
             <input
@@ -65,7 +65,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
               {{ $t('equipmentLog.driver') }}
             </label>
             <SearchDropdown
@@ -80,7 +80,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
               {{ $t('labels.location') || 'Location' }}
             </label>
             <select v-model="localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus">
@@ -91,7 +91,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('equipmentLog.notes') }}</label>
+          <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.notes') }}</label>
           <textarea
             v-model="localForm.notes"
             rows="3"
@@ -100,12 +100,12 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.area') || 'Area' }}</label>
+          <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.area') || 'Area' }}</label>
           <select v-model="localForm.areaId" :disabled="!localForm.locationId" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus disabled:bg-gray-100">
             <option value="">{{ $t('labels.select') || 'Select area' }}</option>
             <option v-for="a in availableAreas" :key="a.id" :value="a.id">{{ a.name }}</option>
           </select>
-          <p class="text-xs text-gray-400 mt-1">Optional — choose location and area where the work occurred</p>
+          <p class="text-xs theme-caption mt-1">Optional — choose location and area where the work occurred</p>
         </div>
       </div>
 
@@ -113,7 +113,7 @@
         <button
           type="button"
           @click="$emit('cancel')"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+          class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition"
         >
           {{ $t('labels.cancel') }}
         </button>
@@ -131,7 +131,7 @@
           <button
             type="button"
             @click="currentStep = 1"
-            class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
+            class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition"
           >
             {{ $t('labels.back') || 'Back' }}
           </button>

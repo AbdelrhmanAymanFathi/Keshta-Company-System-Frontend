@@ -21,16 +21,16 @@
       /> -->
       <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div class="min-w-0 flex-1 space-y-2">
-          <div class="inline-flex items-center gap-2 rounded-full border theme-border/80 bg-white/90 px-3 py-1 text-xs font-medium theme-text-strong backdrop-blur-sm">
+          <div class="inline-flex items-center gap-2 rounded-full border theme-border/80 bg-white/90 px-3 py-1 text-xs font-medium theme-accent-strong backdrop-blur-sm">
             <ChartBarSquareIcon class="h-3.5 w-3.5 shrink-0" />
             <span>{{ $t('admin.runReport') }}</span>
           </div>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 class="text-2xl font-bold tracking-tight theme-text-primary sm:text-3xl">
             {{ reportTitle }}
           </h1>
           <p
             v-if="report?.description"
-            class="max-w-2xl text-sm leading-relaxed text-slate-600"
+            class="max-w-2xl text-sm leading-relaxed theme-text-secondary"
           >
             {{ report.description }}
           </p>
@@ -50,7 +50,7 @@
           <button
             type="button"
             @click="clear"
-            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-medium text-slate-700 backdrop-blur-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 theme-input-focus"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-medium theme-text-secondary backdrop-blur-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 theme-input-focus"
           >
             <ArrowUturnLeftIcon class="h-4 w-4" />
             {{ $t('labels.clear') }}
@@ -79,10 +79,10 @@
           <FunnelIcon class="h-5 w-5" />
         </div>
         <div>
-          <h2 class="text-sm font-semibold text-slate-900">
+          <h2 class="text-sm font-semibold theme-text-primary">
             {{ $t('admin.parameters') || $t('labels.filters') }}
           </h2>
-          <p class="text-xs text-slate-500">
+          <p class="text-xs theme-text-muted">
             {{ locale === 'ar' ? 'حدّد المعايير ثم اضغط بحث' : 'Set criteria, then run search' }}
           </p>
         </div>
@@ -94,7 +94,7 @@
           class="relative overflow-visible"
           :class="activeDropdown === p.name ? 'z-[9999]' : 'z-0'"
         >
-          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-muted">
             {{ (locale === 'ar' && p.arName) ? p.arName : (p.label || p.name) }}
           </label>
 
@@ -131,7 +131,7 @@
                 <span class="block h-6 w-11 rounded-full bg-slate-200 transition peer-checked:[background-color:var(--theme-primary)] peer-focus-visible:theme-input-focus" />
                 <span class="absolute start-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-5 rtl:peer-checked:-translate-x-5" />
               </span>
-              <span class="text-sm text-slate-600 group-hover:text-slate-900">
+              <span class="text-sm theme-text-secondary group-hover:theme-text-primary">
                 {{ values[p.name] ? ($t('labels.active') || 'Yes') : ($t('labels.inactive') || 'No') }}
               </span>
             </label>
@@ -145,7 +145,7 @@
           >
             <div
               v-if="paramLoading[p.name]"
-              class="flex items-center gap-2 py-2 text-xs text-slate-500"
+              class="flex items-center gap-2 py-2 text-xs theme-text-muted"
             >
               <ArrowPathIcon class="h-3.5 w-3.5 animate-spin theme-text" />
               {{ $t('reports.loadingOptions') || $t('labels.loading') }}
@@ -165,7 +165,7 @@
 
             <div
               v-else
-              :class="[inputClass, 'flex items-center gap-2 bg-slate-100/80 text-slate-500']"
+              :class="[inputClass, 'flex items-center gap-2 bg-slate-100/80 theme-text-muted']"
             >
               <InformationCircleIcon class="h-4 w-4 shrink-0 theme-text" />
               <span class="text-xs leading-snug">
@@ -184,11 +184,11 @@
       <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
         <div class="flex flex-wrap items-center gap-2">
           <TableCellsIcon class="h-5 w-5 theme-text" />
-          <span class="text-sm font-semibold text-slate-800">{{ locale === 'ar' ? 'النتائج' : 'Results' }}</span>
-          <span v-if="hasResults && !executing" class="inline-flex items-center rounded-full theme-icon-bg px-2.5 py-0.5 text-xs font-medium theme-text-muted">
+          <span class="text-sm font-semibold theme-text-primary">{{ locale === 'ar' ? 'النتائج' : 'Results' }}</span>
+          <span v-if="hasResults && !executing" class="inline-flex items-center rounded-full theme-icon-bg px-2.5 py-0.5 text-xs font-medium theme-accent-muted">
             {{ dataRowCount }} {{ locale === 'ar' ? 'صف' : 'rows' }}
           </span>
-          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium theme-text-secondary">
             {{ columns.length }} {{ locale === 'ar' ? 'عمود' : 'cols' }}
           </span>
         </div>
@@ -212,7 +212,7 @@
         v-if="reportSelectFields.length"
         class="mb-4 rounded theme-info-panel p-3"
       >
-        <div class="text-sm font-medium theme-text-strong">
+        <div class="text-sm font-medium theme-accent-strong">
           {{ $t('reports.selectFields') || 'Output fields' }}
         </div>
 
@@ -251,7 +251,7 @@
           <div class="absolute inset-0 rounded-full border-4 theme-border" />
           <div class="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-[var(--theme-primary)]" />
         </div>
-        <p class="text-sm font-medium text-slate-500">{{ $t('labels.loading') }}</p>
+        <p class="text-sm font-medium theme-text-muted">{{ $t('labels.loading') }}</p>
       </div>
 
       <div v-else class="overflow-hidden rounded-xl border border-slate-200/80">
@@ -262,7 +262,7 @@
                 <th
                   v-for="col in columns"
                   :key="col"
-                  class="whitespace-nowrap px-4 py-3.5 text-start text-xs font-semibold uppercase tracking-wider text-slate-500 sm:px-6"
+                  class="whitespace-nowrap px-4 py-3.5 text-start text-xs font-semibold uppercase tracking-wider theme-text-muted sm:px-6"
                 >
                   {{ getHeaderLabel(col) }}
                 </th>
@@ -273,13 +273,13 @@
               <tr v-if="!(tableData && tableData.length)">
                 <td :colspan="(columns && columns.length) || 1" class="px-6 py-16 text-center">
                   <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 theme-caption">
                       <TableCellsIcon class="h-7 w-7" />
                     </div>
-                    <p class="text-sm font-medium text-slate-600">
+                    <p class="text-sm font-medium theme-text-secondary">
                       {{ $t('reports.noResults') || 'No results' }}
                     </p>
-                    <p class="text-xs text-slate-400">
+                    <p class="text-xs theme-caption">
                       {{ locale === 'ar' ? 'اضبط الفلاتر واضغط بحث لعرض البيانات' : 'Adjust filters and run search to view data' }}
                     </p>
                   </div>
@@ -299,7 +299,7 @@
                   v-for="col in columns"
                   :key="col"
                   class="whitespace-nowrap px-4 py-3 text-sm sm:px-6"
-                  :class="isTotalsRow(row) ? 'border-t-2 theme-border text-slate-900' : 'text-slate-700'"
+                  :class="isTotalsRow(row) ? 'border-t-2 theme-border theme-text-primary' : 'theme-text-secondary'"
                 >
                   <div class="max-w-[20rem] truncate" :title="getValue(row, col)">
                     {{ getValue(row, col) }}
@@ -343,7 +343,7 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const INPUT_CLASS =
-  'w-full px-4 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none theme-input-focus/30 focus:theme-border-accent focus:bg-white transition-all duration-200'
+  'w-full px-4 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-sm theme-text-primary placeholder:theme-caption focus:outline-none theme-input-focus/30 focus:theme-border-accent focus:bg-white transition-all duration-200'
 
 export default {
   components: {
@@ -910,19 +910,19 @@ export default {
 }
 
 .report-export-btn--csv {
-  @apply border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 focus:ring-slate-300;
+  @apply border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 focus:ring-slate-300;
 }
 
 .report-export-btn--xlsx {
-  @apply theme-border theme-dashboard-bg-soft theme-text-strong hover:theme-icon-bg theme-input-focus;
+  @apply border-slate-200 bg-slate-100 text-slate-800 hover:bg-slate-200;
 }
 
 .report-export-btn--pdf {
-  @apply theme-border theme-dashboard-bg-soft theme-text-strong hover:theme-icon-bg theme-input-focus;
+  @apply border-slate-200 bg-slate-100 text-slate-800 hover:bg-slate-200;
 }
 
 .report-table thead {
-  @apply theme-table-thead-gradient;
+  @apply bg-slate-50;
 }
 
 .report-table tbody tr + tr td {

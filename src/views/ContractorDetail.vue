@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-bold">{{ contractor?.name || $t('contractors.title') }}</h1>
-        <div class="text-sm text-gray-500">{{ contractor?.phone || '' }}</div>
+        <div class="text-sm theme-text-muted">{{ contractor?.phone || '' }}</div>
       </div>
       <div>
         <button @click="$router.back()" class="px-3 py-1 border rounded">{{ $t('labels.back') }}</button>

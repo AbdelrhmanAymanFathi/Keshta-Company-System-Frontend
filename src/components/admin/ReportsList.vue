@@ -1,12 +1,12 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0" :dir="isRTL ? 'rtl' : 'ltr'" :class="{ 'direction-rtl': isRTL }">
     <div class="app-page-header mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-lg sm:text-xl font-bold text-slate-900">{{ $t('admin.reports') }}</h2>
+      <h2 class="text-lg sm:text-xl font-bold theme-text-primary">{{ $t('admin.reports') }}</h2>
       <div class="flex gap-2">
-        <router-link :to="{ name: 'admin-reports-from-table' }" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 text-white shadow-sm  transition ">
+        <router-link :to="{ name: 'admin-reports-from-table' }" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light shadow-sm  transition ">
           <span>{{ $t('admin.newReport') }}</span>
         </router-link>
-        <!-- <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-blue-600 text-white rounded flex items-center gap-2 hover:bg-blue-500 transition">
+        <!-- <router-link :to="{ name: 'admin-reports-from-table' }" class="px-3 py-2 bg-blue-600 theme-text-light rounded flex items-center gap-2 hover:bg-blue-500 transition">
           <span>{{ $t('admin.newReportFromTable') || 'From Table' }}</span>
         </router-link> -->
       </div>
@@ -39,7 +39,7 @@
                   {{ column }}
                 </span>
               </div>
-              <span v-else class="text-sm text-gray-400">-</span>
+              <span v-else class="text-sm theme-caption">-</span>
             </td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.active ? $t('labels.active') : $t('labels.inactive') }}</td>
             <td :class="isRTL ? 'text-left p-2' : 'text-right p-2'">
@@ -48,7 +48,7 @@
                   :to="{ name: 'admin-reports-run', params: { id: r.id } }"
                   :title="$t('admin.run')"
                   :aria-label="$t('admin.run')"
-                  class="inline-flex items-center rounded-lg theme-button p-2 text-white transition "
+                  class="inline-flex items-center rounded-lg theme-button p-2 theme-text-light transition "
                 >
                   <PlayIcon class="h-4 w-4" />
                 </router-link>
@@ -56,7 +56,7 @@
                   :to="{ name: 'admin-reports-from-table', params: { id: r.id } }"
                   :title="$t('labels.edit')"
                   :aria-label="$t('labels.edit')"
-                  class="inline-flex items-center rounded-lg bg-slate-700 p-2 text-white transition hover:bg-slate-800"
+                  class="inline-flex items-center rounded-lg bg-slate-700 p-2 theme-text-light transition hover:bg-slate-800"
                 >
                   <PencilSquareIcon class="h-4 w-4" />
                 </router-link>
@@ -64,7 +64,7 @@
                   @click="remove(r.id)"
                   :title="$t('labels.delete')"
                   :aria-label="$t('labels.delete')"
-                  class="inline-flex items-center rounded-lg bg-red-600 p-2 text-white transition hover:bg-red-700"
+                  class="inline-flex items-center rounded-lg bg-red-600 p-2 theme-text-light transition hover:bg-red-700"
                 >
                   <TrashIcon class="h-4 w-4" />
                 </button>

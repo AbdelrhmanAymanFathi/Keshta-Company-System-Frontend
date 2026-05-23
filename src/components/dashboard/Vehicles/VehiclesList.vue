@@ -1,7 +1,7 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-2xl font-semibold text-gray-800">{{ $t('vehicles.title') }}</h2>
+      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('vehicles.title') }}</h2>
       <div></div>
       <div>
         <button
@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <!-- <div v-if="vehicles.length === 0" class="p-4 bg-white rounded border text-gray-500">
+    <!-- <div v-if="vehicles.length === 0" class="p-4 bg-white rounded border theme-text-muted">
       {{ $t('vehicles.noResults') }}
     </div> -->
 
@@ -23,13 +23,13 @@
       <table class="min-w-full text-sm">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <!-- <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-start">ID</th> -->
-            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
-            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.contractor') }}</th>
-            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.crusherNumber') }}</th>
-            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.companyCapacity') }}</th>
-            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.crusherCapacity') }}</th>
-            <th :class="['px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.actions') || 'Actions' }}</th>
+            <!-- <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider text-start">ID</th> -->
+            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.contractor') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.crusherNumber') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.companyCapacity') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.crusherCapacity') }}</th>
+            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.actions') || 'Actions' }}</th>
           </tr>
         </thead>
         <tbody>
@@ -37,12 +37,12 @@
               class="border-t theme-table-row-hover"
               @contextmenu.prevent="onRowContextMenu($event, v)"
           >
-            <!-- <td class="px-3 py-3 text-gray-700">{{ v.id }}</td> -->
-            <td class="px-3 py-3 font-medium text-gray-800">{{ v.name }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.contractor?.name || '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.crusherNumber || '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.companyCapacity != null && v.companyCapacity !== '' ? v.companyCapacity : '—' }}</td>
-            <td class="px-3 py-3 text-gray-700">{{ v.crusherCapacity != null && v.crusherCapacity !== '' ? v.crusherCapacity : '—' }}</td>
+            <!-- <td class="px-3 py-3 theme-text-secondary">{{ v.id }}</td> -->
+            <td class="px-3 py-3 font-medium theme-text-primary">{{ v.name }}</td>
+            <td class="px-3 py-3 theme-text-secondary">{{ v.contractor?.name || '—' }}</td>
+            <td class="px-3 py-3 theme-text-secondary">{{ v.crusherNumber || '—' }}</td>
+            <td class="px-3 py-3 theme-text-secondary">{{ v.companyCapacity != null && v.companyCapacity !== '' ? v.companyCapacity : '—' }}</td>
+            <td class="px-3 py-3 theme-text-secondary">{{ v.crusherCapacity != null && v.crusherCapacity !== '' ? v.crusherCapacity : '—' }}</td>
             <!-- driver cell removed -->
             <td class="px-3 py-3 flex gap-2">
               <button
@@ -67,7 +67,7 @@
           </tr>
 
           <tr v-if="vehicles.length === 0">
-            <td class="px-3 py-2 text-start text-gray-500" colspan="6">
+            <td class="px-3 py-2 text-start theme-text-muted" colspan="6">
               {{ $t('vehicles.noResults') }}
             </td>
           </tr>
@@ -84,7 +84,7 @@
         <li>
           <button
             @click="onContextMenuSelectManage"
-            class="w-full text-left px-4 py-2 theme-hover-soft hover:theme-text-strong text-gray-700">
+            class="w-full text-left px-4 py-2 theme-hover-soft hover:theme-accent-strong theme-text-secondary">
             {{ $t('vehicles.changeOwner') }}
           </button>
         </li>
@@ -92,14 +92,14 @@
         <li>
           <button
             @click="onContextMenuSelectEdit"
-            class="w-full text-left px-4 py-2 theme-hover-soft theme-link text-gray-700">
+            class="w-full text-left px-4 py-2 theme-hover-soft theme-link theme-text-secondary">
             {{ $t('labels.edit') || 'Edit' }}
           </button>
         </li>
         <li>
           <!-- <button
             @click="onContextMenuSelectDelete"
-            class="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 text-gray-700">
+            class="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 theme-text-secondary">
             {{ $t('labels.delete') || 'Delete' }}
           </button> -->
         </li>
@@ -111,8 +111,8 @@
       <div class="relative w-full max-w-sm sm:max-w-2xl lg:max-w-3xl z-50 mx-auto">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
           <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b">
-            <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
-            <button class="text-gray-500 hover:text-gray-700" @click="closeCreateModal"><XMarkIcon class="w-5 h-5" /></button>
+            <h3 class="text-lg font-semibold theme-text-primary">{{ $t('vehicles.createVehicle') }}</h3>
+            <button class="theme-text-muted hover:theme-text-secondary" @click="closeCreateModal"><XMarkIcon class="w-5 h-5" /></button>
           </div>
           <div class="p-4 sm:p-6 overflow-y-auto">
             <CreateVehicle :mode="mode" @created="onCreatedFromModal" />
@@ -126,29 +126,29 @@
       <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm sm:max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.edit') || 'Edit' }} {{ editingVehicle.name }}</h3>
-          <button class="text-gray-400 hover:text-gray-600" @click="closeEditModal"><XMarkIcon class="w-5 h-5" /></button>
+          <button class="theme-caption hover:theme-text-secondary" @click="closeEditModal"><XMarkIcon class="w-5 h-5" /></button>
         </div>
         <form @submit.prevent="onSaveEdit" class="grid grid-cols-1 sm:grid-cols-2 gap-4 space-y-4 sm:space-y-0">
           <div class="sm:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.truckName') || 'Truck Name' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.truckName') || 'Truck Name' }}</label>
             <input v-model="editForm.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('vehicles.companyCapacity') }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.companyCapacity') }}</label>
             <input v-model="editForm.companyCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
             <p v-if="editForm.companyCapacity && Number(editForm.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
               {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
             </p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.crusherCapacity') }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.crusherCapacity') }}</label>
             <input v-model="editForm.crusherCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
             <p v-if="editForm.crusherCapacity && Number(editForm.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
               {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
             </p>
           </div>
           <div class="flex gap-2 justify-end pt-4 sm:col-span-2">
-            <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
+            <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 theme-text-secondary hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
             <button type="submit" :disabled="editLoading" class="theme-button px-4 py-2 rounded disabled:opacity-50">{{ editLoading ? $t('labels.saving') : $t('labels.save') || 'Save' }}</button>
           </div>
         </form>
@@ -159,10 +159,10 @@
     <div v-if="deleteConfirmVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
       <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="text-gray-700 mb-6">{{ $t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete' }} "{{ deleteConfirmVehicle.name }}"?</p>
+        <p class="theme-text-secondary mb-6">{{ $t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete' }} "{{ deleteConfirmVehicle.name }}"?</p>
         <div class="flex gap-2 justify-end">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-          <button @click="onConfirmDelete" :disabled="deleteLoading" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">{{ deleteLoading ? $t('labels.deleting') : $t('labels.delete') || 'Delete' }}</button>
+          <button @click="closeDeleteConfirm" class="px-4 py-2 rounded border border-gray-300 theme-text-secondary hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
+          <button @click="onConfirmDelete" :disabled="deleteLoading" class="px-4 py-2 rounded bg-red-600 theme-text-light hover:bg-red-700 disabled:opacity-50">{{ deleteLoading ? $t('labels.deleting') : $t('labels.delete') || 'Delete' }}</button>
         </div>
       </div>
     </div>
@@ -191,11 +191,11 @@
             <h3 class="text-lg font-semibold">
               {{ selectedVehicle.name }}
             </h3>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm theme-text-muted">
               {{ $t('vehicles.detailsSubtitle') }}
             </p>
           </div>
-          <button class="text-gray-400 hover:text-gray-600" @click="closeVehicleDetails">
+          <button class="theme-caption hover:theme-text-secondary" @click="closeVehicleDetails">
             <XMarkIcon class="w-5 h-5" />
           </button>
         </div>
@@ -203,11 +203,11 @@
         <div class="px-5 pt-4 pb-5 overflow-y-auto space-y-6 max-h-[80vh]">
           <!-- Current contractor + change owner -->
           <section class="space-y-3">
-            <h4 class="text-sm font-semibold text-gray-800">
+            <h4 class="text-sm font-semibold theme-text-primary">
               {{ $t('vehicles.currentOwner') }}
             </h4>
             <div class="p-3 rounded border bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-              <div class="text-sm text-gray-700">
+              <div class="text-sm theme-text-secondary">
                 <div>
                   <span class="font-medium">{{ $t('vehicles.contractor') }}:</span>
                   <span class="ml-1">
@@ -250,32 +250,32 @@
 
           <!-- Ownership history -->
           <section class="space-y-2">
-            <h4 class="text-sm font-semibold text-gray-800">
+            <h4 class="text-sm font-semibold theme-text-primary">
               {{ $t('vehicles.ownershipHistory') }}
             </h4>
             <div class="border rounded overflow-hidden bg-white">
               <table class="min-w-full text-sm">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                       {{ $t('vehicles.owner') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                       {{ $t('labels.startDate') }}
                     </th>
-                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                       {{ $t('labels.endDate') }}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-if="ownershipLoading">
-                    <td class="px-3 py-3 text-center text-gray-500" colspan="3">
+                    <td class="px-3 py-3 text-center theme-text-muted" colspan="3">
                       {{ $t('labels.loading') }}
                     </td>
                   </tr>
                   <tr v-else-if="ownershipHistory.length === 0">
-                    <td class="px-3 py-3 text-center text-gray-500" colspan="3">
+                    <td class="px-3 py-3 text-center theme-text-muted" colspan="3">
                       {{ $t('vehicles.noOwnershipHistory') }}
                     </td>
                   </tr>

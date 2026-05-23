@@ -1,7 +1,7 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-4">
     <div class="app-page-header rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-xl font-bold text-slate-900">{{ isEdit ? $t('admin.editReport') : $t('admin.createReport') }}</h2>
+      <h2 class="text-xl font-bold theme-text-primary">{{ isEdit ? $t('admin.editReport') : $t('admin.createReport') }}</h2>
     </div>
 
     <div class="mb-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
@@ -45,7 +45,7 @@
           <textarea v-model="form.description" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2"></textarea>
         </div>
       <div class="flex items-end justify-end mt-3">
-            <button @click="generate" class="rounded-xl theme-button px-4 py-2 text-white " :disabled="busy">
+            <button @click="generate" class="rounded-xl theme-button px-4 py-2 theme-text-light " :disabled="busy">
               {{ isEdit ? $t('common.update') : $t('common.generate') || 'Generate' }}
             </button>
           </div>
@@ -53,7 +53,7 @@
 
       <div v-if="params.length" class="mb-4 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <div class="flex justify-between items-center mb-2">
-          <div class="text-sm text-gray-600">{{ $t('reports.fieldSelectorHelp') || 'Choose output fields and filter fields independently.' }}</div>
+          <div class="text-sm theme-text-secondary">{{ $t('reports.fieldSelectorHelp') || 'Choose output fields and filter fields independently.' }}</div>
           <div class="flex gap-2">
             <button @click="selectAllOutput" class="rounded-lg border border-slate-200 px-2 py-1 hover:bg-slate-50">{{ $t('labels.selectAll') || 'Select Output' }}</button>
             <button @click="clearAllOutput" class="rounded-lg border border-slate-200 px-2 py-1 hover:bg-slate-50">{{ $t('labels.clear') || 'Clear Output' }}</button>
@@ -74,7 +74,7 @@
             </label>
             <div class="text-sm">
               <div class="font-medium">{{ displayLabel(f) }}</div>
-              <div class="text-xs text-gray-500">{{ f.dataType }}</div>
+              <div class="text-xs theme-text-muted">{{ f.dataType }}</div>
             </div>
           </div>
 
@@ -134,11 +134,11 @@
     <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <h4 class="font-semibold mb-2">{{ $t('reports.preview') || 'Preview' }}</h4>
       <div class="mb-2">
-        <label class="text-sm text-gray-600">{{ $t('reports.sqlPreview') || 'SQL Preview' }}</label>
+        <label class="text-sm theme-text-secondary">{{ $t('reports.sqlPreview') || 'SQL Preview' }}</label>
         <pre class="overflow-auto rounded-xl bg-slate-100 p-3 text-xs" style="direction:ltr; unicode-bidi:embed;">{{ sqlPreview }}</pre>
       </div>
       <div>
-        <label class="text-sm text-gray-600">{{ $t('reports.paramsPreview') || 'Parameters' }}</label>
+        <label class="text-sm theme-text-secondary">{{ $t('reports.paramsPreview') || 'Parameters' }}</label>
         <pre class="overflow-auto rounded-xl bg-slate-100 p-3 text-xs">{{ paramsPreview }}</pre>
       </div>
     </div>

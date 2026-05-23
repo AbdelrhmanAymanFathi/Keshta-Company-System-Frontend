@@ -17,7 +17,7 @@
           <div>
             <strong>{{ $t('labels.item') }}:</strong>
             <span>{{ exportData.item?.name || '-' }}</span>
-            <!-- <small class="text-sm text-gray-500 ml-2">{{ exportData.item?.defaultExportPrice ? '(' + formatCurrency(exportData.item.defaultExportPrice) + ')' : '' }}</small> -->
+            <!-- <small class="text-sm theme-text-muted ml-2">{{ exportData.item?.defaultExportPrice ? '(' + formatCurrency(exportData.item.defaultExportPrice) + ')' : '' }}</small> -->
           </div>
           <div><strong>{{ $t('labels.contractor') }}:</strong> {{ exportData.contractor?.name || '-' }}</div>
           <div><strong>{{ $t('labels.location') }}:</strong> {{ exportData.location?.name || '-' }}</div>
@@ -31,16 +31,16 @@
           <table class="min-w-max divide-y divide-gray-200 whitespace-nowrap">
             <thead class="bg-gray-100">
               <tr>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">#</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.vehicle') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.crusher') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.crusherTicket') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.companyTicket') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.unitPrice') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.discount') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.companyCapacity') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.crusherCapacity') }}</th>
-                <th class="px-4 py-2 text-start text-xs text-gray-600">{{ $t('labels.total') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">#</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.vehicle') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.crusher') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.crusherTicket') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.companyTicket') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.unitPrice') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.discount') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.companyCapacity') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.crusherCapacity') }}</th>
+                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.total') }}</th>
               </tr>
             </thead>
             <tbody>

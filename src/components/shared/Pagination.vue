@@ -8,17 +8,17 @@
       <button
         @click="changePage(currentPage - 1)"
         :disabled="currentPage <= 1"
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Previous
       </button>
-      <span class="text-sm text-gray-700 self-center">
+      <span class="text-sm theme-text-secondary self-center">
         {{ currentPage }} / {{ totalPages }}
       </span>
       <button
         @click="changePage(currentPage + 1)"
         :disabled="currentPage >= totalPages"
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Next
       </button>
@@ -27,7 +27,7 @@
     <!-- Desktop: summary + page size + page numbers -->
     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
       <div class="flex items-center gap-4">
-        <p class="text-sm text-gray-700">
+        <p class="text-sm theme-text-secondary">
           Showing
           <span class="font-medium">{{ startItem }}</span>
           to
@@ -37,7 +37,7 @@
           results
         </p>
         <div class="flex items-center gap-2">
-          <label class="text-sm text-gray-700">
+          <label class="text-sm theme-text-secondary">
             Page size:
           </label>
           <select
@@ -58,7 +58,7 @@
           <button
             @click="changePage(1)"
             :disabled="currentPage <= 1"
-            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -72,7 +72,7 @@
           <button
             @click="changePage(currentPage - 1)"
             :disabled="currentPage <= 1"
-            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -91,10 +91,10 @@
             :class="[
               'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
               p.isEllipsis
-                ? 'bg-white border-gray-300 text-gray-400 cursor-default'
+                ? 'bg-white border-gray-300 theme-caption cursor-default'
                 : p.number === currentPage
                 ? 'z-10 theme-dashboard-bg-soft theme-pagination-active'
-                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                : 'bg-white border-gray-300 theme-text-muted hover:bg-gray-50'
             ]"
           >
             <span v-if="p.isEllipsis">…</span>
@@ -104,7 +104,7 @@
           <button
             @click="changePage(currentPage + 1)"
             :disabled="currentPage >= totalPages"
-            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -118,7 +118,7 @@
           <button
             @click="changePage(totalPages)"
             :disabled="currentPage >= totalPages"
-            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path

@@ -1,7 +1,7 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.driversList') || 'Drivers' }}</h2>
+      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('dashboard.driversList') || 'Drivers' }}</h2>
       <button @click="openAdd" class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 shadow-sm  text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
         {{ $t('labels.add') || 'Add' }}
@@ -21,19 +21,19 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="theme-table-thead-gradient">
             <tr>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">#</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.name') || 'Name' }}</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.phone') || 'Phone' }}</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.nationalId') || 'National ID' }}</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">#</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.name') || 'Name' }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.phone') || 'Phone' }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.nationalId') || 'National ID' }}</th>
+              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="(d, idx) in drivers" :key="d.id" class="theme-table-row-hover">
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-muted text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.name || '-' }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.phone || '-' }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900">{{ d.nationalId || '-' }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-accent-muted text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.name || '-' }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.phone || '-' }}</td>
+              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.nationalId || '-' }}</td>
               <td class="px-3 py-2 sm:px-6 sm:py-4">
                 <div class="flex gap-3 justify-end">
                   <button @click.stop="openEdit(d)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" title="Edit">
@@ -46,7 +46,7 @@
               </td>
             </tr>
             <tr v-if="drivers.length === 0">
-              <td colspan="5" class="px-3 py-2 text-start text-gray-500">{{ $t('labels.noData') || 'No drivers found' }}</td>
+              <td colspan="5" class="px-3 py-2 text-start theme-text-muted">{{ $t('labels.noData') || 'No drivers found' }}</td>
             </tr>
           </tbody>
         </table>
@@ -58,9 +58,9 @@
       <div v-for="d in drivers" :key="d.id" class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4">
         <div class="flex justify-between">
           <div>
-            <div class="font-semibold text-gray-900">{{ d.name }}</div>
-            <div class="text-sm text-gray-500">{{ d.phone || '-' }}</div>
-            <div class="text-sm text-gray-500">{{ d.nationalId || '-' }}</div>
+            <div class="font-semibold theme-text-primary">{{ d.name }}</div>
+            <div class="text-sm theme-text-muted">{{ d.phone || '-' }}</div>
+            <div class="text-sm theme-text-muted">{{ d.nationalId || '-' }}</div>
           </div>
           <div class="flex flex-col gap-2">
             <button @click.stop="openEdit(d)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
@@ -77,23 +77,23 @@
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">{{ editing ? $t('labels.update') : $t('labels.add') }} {{ $t('drivers.singular') || 'Driver' }}</h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600"><XMarkIcon class="w-5 h-5" /></button>
+          <button @click="closeModal" class="theme-caption hover:theme-text-secondary"><XMarkIcon class="w-5 h-5" /></button>
         </div>
         <form @submit.prevent="saveDriver" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('drivers.name') || 'Name' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.name') || 'Name' }}</label>
             <input v-model="form.name" type="text" required class="w-full px-3 py-2 border rounded" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('drivers.phone') || 'Phone' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.phone') || 'Phone' }}</label>
             <input v-model="form.phone" type="tel" class="w-full px-3 py-2 border rounded" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('drivers.nationalId') || 'National ID' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.nationalId') || 'National ID' }}</label>
             <input v-model="form.nationalId" type="text" class="w-full px-3 py-2 border rounded" />
           </div>
           <div class="flex gap-3 pt-4">
-            <button type="button" @click="closeModal" class="flex-1 px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
+            <button type="button" @click="closeModal" class="flex-1 px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
             <button type="submit" :disabled="saving" class="flex-1 px-4 py-2 theme-button rounded">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
           </div>
         </form>
@@ -104,10 +104,10 @@
     <div v-if="deleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6">
         <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') }}</h3>
-        <p class="text-gray-600 mb-6">{{ $t('messages.confirmDeleteItem') || 'Confirm delete?' }}</p>
+        <p class="theme-text-secondary mb-6">{{ $t('messages.confirmDeleteItem') || 'Confirm delete?' }}</p>
         <div class="flex gap-3">
           <button @click="deleteModalOpen = false" class="flex-1 px-4 py-2 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="deleteDriver" :disabled="deleting" class="flex-1 px-4 py-2 bg-red-600 text-white rounded">{{ deleting ? $t('labels.deleting') : $t('labels.delete') }}</button>
+          <button @click="deleteDriver" :disabled="deleting" class="flex-1 px-4 py-2 bg-red-600 theme-text-light rounded">{{ deleting ? $t('labels.deleting') : $t('labels.delete') }}</button>
         </div>
       </div>
     </div>

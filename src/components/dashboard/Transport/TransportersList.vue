@@ -2,7 +2,7 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
-      <h2 class="text-2xl font-semibold text-gray-900">{{ $t('transporters.title') }}</h2>
+      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('transporters.title') }}</h2>
       <div class="flex items-center gap-3">
         <!-- Import Excel -->
         <!-- <label class="theme-button px-4 py-2 rounded  inline-flex items-center cursor-pointer transition-colors">
@@ -34,13 +34,13 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.name') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.phone') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.bankName') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.accountNumber') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.notes') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.actions') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.name') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.phone') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.bankName') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.accountNumber') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('transporters.notes') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -51,20 +51,20 @@
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-muted" :class="textAlign">{{ idx + 1 }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">
-              <button @click.stop="goToDetail(c)" class="theme-text-muted hover:underline">{{ c.name }}</button>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-accent-muted" :class="textAlign">{{ idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">
+              <button @click.stop="goToDetail(c)" class="theme-accent-muted hover:underline">{{ c.name }}</button>
             </td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.phone || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.bankName || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.accountNumber || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm text-gray-900" :class="textAlign">{{ c.notes || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">{{ c.phone || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">{{ c.bankName || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">{{ c.accountNumber || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">{{ c.notes || '-' }}</td>
             <td class="px-6 py-4">
               <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
                 <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('transporters.statement')">
                   <DocumentTextIcon class="h-5 w-5" />
                 </button>
-                <button @click.stop="openWallet(c)" class="rounded-lg border theme-border theme-dashboard-bg-soft p-2 theme-text-strong hover:theme-icon-bg" :title="$t('transporters.wallet')">
+                <button @click.stop="openWallet(c)" class="rounded-lg border theme-border theme-dashboard-bg-soft p-2 theme-accent-strong hover:theme-icon-bg" :title="$t('transporters.wallet')">
                   <WalletIcon class="h-5 w-5" />
                 </button>
                 <button @click.stop="openEdit(c)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" :title="$t('labels.edit')">
@@ -77,7 +77,7 @@
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
-            <td colspan="7" class="px-6 py-2 text-start text-gray-500">
+            <td colspan="7" class="px-6 py-2 text-start theme-text-muted">
                 {{ $t('transporters.noResults') }}
               </td>
           </tr>
@@ -96,10 +96,10 @@
       >
         <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
           <div :class="isRTL ? 'text-right' : 'text-left'">
-            <div class="font-semibold text-gray-900">
+            <div class="font-semibold theme-text-primary">
               <button @click.stop="goToDetail(c)" class="hover:underline">{{ c.name }}</button>
             </div>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm theme-text-muted">
               {{ c.phone || '-' }}<br>
               <span v-if="c.bankName">{{ $t('transporters.bankName') }}: {{ c.bankName }}</span><br>
               <span v-if="c.accountNumber">{{ $t('transporters.accountNumber') }}: {{ c.accountNumber }}</span><br>
@@ -114,7 +114,7 @@
           </div>
         </div>
       </div>
-      <div v-if="filtered.length === 0" class="text-center py-12 text-gray-500">
+      <div v-if="filtered.length === 0" class="text-center py-12 theme-text-muted">
         {{ $t('transporters.noResults') }}
       </div>
     </div>
@@ -163,7 +163,7 @@
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('transporters.editTransporter') : $t('transporters.addTransporter') }}
           </h3>
-          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+          <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
             <XMarkIcon class="w-6 h-6" />
           </button>
         </div>
@@ -195,7 +195,7 @@
           
         </div>
         <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
-          <button @click="closeModal" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+          <button @click="closeModal" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
           <button @click="saveContractor" class="px-4 py-2 theme-button rounded">
@@ -212,21 +212,21 @@
           <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">
             {{ selectedContractor ? selectedContractor.name : $t('transporters.wallet') }}
           </h3>
-          <button @click="walletModalOpen = false" class="text-gray-500 hover:text-gray-700">✕</button>
+          <button @click="walletModalOpen = false" class="theme-text-muted hover:theme-text-secondary">✕</button>
         </div>
         <div v-if="walletLoading" class="text-center py-8">{{ $t('labels.loading') || 'Loading...' }}</div>
         <div v-else>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div class="p-4 bg-gray-50 rounded">
-              <div class="text-sm text-gray-500">{{ $t('transporters.balance') || 'Balance' }}</div>
+              <div class="text-sm theme-text-muted">{{ $t('transporters.balance') || 'Balance' }}</div>
               <div class="text-2xl font-semibold text-red-600">{{ wallet ? wallet.balance : '-' }}</div>
             </div>
             <div class="p-4 bg-gray-50 rounded">
-              <div class="text-sm text-gray-500">{{ $t('transporters.totalDeposits') || 'Total Deposits' }}</div>
+              <div class="text-sm theme-text-muted">{{ $t('transporters.totalDeposits') || 'Total Deposits' }}</div>
               <div class="text-lg font-semibold text-green-600">{{ wallet ? wallet.totalDeposits : '-' }}</div>
             </div>
             <div class="p-4 bg-gray-50 rounded">
-              <div class="text-sm text-gray-500">{{ $t('transporters.sources') || 'Sources' }}</div>
+              <div class="text-sm theme-text-muted">{{ $t('transporters.sources') || 'Sources' }}</div>
               <div class="text-sm">
                 <div>{{ $t('transporters.exports') || 'Exports' }}: {{ wallet && wallet.sources ? wallet.sources.exports : 0 }}</div>
                 <div>{{ $t('transporters.transport') || 'Transport' }}: {{ wallet && wallet.sources ? wallet.sources.transport : 0 }}</div>
@@ -294,10 +294,10 @@
           {{ $t('transporters.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
         </p>
         <div class="flex justify-center gap-3">
-          <button @click="cancelDelete" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+          <button @click="cancelDelete" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">
             {{ $t('labels.cancel') }}
           </button>
-          <button @click="doDelete" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          <button @click="doDelete" class="px-4 py-2 bg-red-600 theme-text-light rounded hover:bg-red-700">
             {{ $t('labels.delete') }}
           </button>
         </div>

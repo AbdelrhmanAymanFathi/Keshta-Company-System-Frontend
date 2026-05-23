@@ -1,7 +1,7 @@
 <template>
   <div class="flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
-    <header class="flex items-center justify-between gap-2 px-3 py-2.5 text-white shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header">
+    <header class="flex items-center justify-between gap-2 px-3 py-2.5 theme-text-light shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile -->
         <button @click="toggleSidebar" class="sm:hidden p-2 rounded-lg hover:bg-white/12 hover:scale-105 transition-all duration-200">
@@ -19,7 +19,7 @@
         <!-- Top menus (desktop) -->
         <nav class="hidden sm:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white text-slate-900 shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200']">
+            :class="['rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white theme-text-primary shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200']">
             {{ $t('navbar.' + key) }}
           </button>
         </nav>
@@ -54,26 +54,26 @@
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
           <button @click="toggleUserMenu"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/16 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10 sm:text-lg">
+            class="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm font-semibold theme-text-light transition-all duration-200 hover:bg-white/16 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10 sm:text-lg">
             {{ userInitials }}
           </button>
           <!-- User Dropdown Menu -->
           <div v-if="userMenuOpen" class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100" :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
             <div class="min-w-[160px] animate-fade-in rounded-xl border border-slate-200 bg-white py-2 shadow-xl shadow-slate-200/60">
               <button @click="goToProfile(); userMenuOpen = false"
-                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.824.645 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {{ $t('profile.title') || 'Profile' }}
               </button>
               <button @click="goToSettings(); userMenuOpen = false"
-                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <WrenchScrewdriverIcon class="w-4 h-4" />
                 {{ $t('settings') || 'Settings' }}
               </button>
               <button @click="showLogoutDialog = true; userMenuOpen = false"
-                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 text-gray-800 transition-colors duration-200">
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
@@ -106,11 +106,11 @@
           </div>
           <button v-if="!isMobile" @click="toggleCollapsed" class="theme-sidebar-collapse-btn rounded-lg p-2 sm:p-3 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
-            <svg v-if="!effectiveCollapsed" class="w-5 h-5 theme-text-strong" viewBox="0 0 24 24" fill="none"
+            <svg v-if="!effectiveCollapsed" class="w-5 h-5 theme-accent-strong" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
             </svg>
-            <svg v-else class="w-5 h-5 theme-text-strong" viewBox="0 0 24 24" fill="none" stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
+            <svg v-else class="w-5 h-5 theme-accent-strong" viewBox="0 0 24 24" fill="none" stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
             </svg>
           </button>
@@ -160,7 +160,7 @@
           <!-- Transport module: show dynamic reports inline under the transport menu -->
           <li v-if="reportsForModule && reportsForModule.length">
             <transition name="sidebar-label">
-              <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase text-gray-500 tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
+              <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase theme-text-muted tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
             </transition>
             <ul class=" space-y-2 ">
               <li v-for="r in reportsForModule" :key="r.id">
@@ -188,7 +188,7 @@
 
       <!-- Main Content -->
       <main class="dashboard-module-content app-scrollbar theme-main-gradient flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
-        <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
+        <!-- <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t(currentLabel) }}</h2> -->
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component

@@ -1,7 +1,7 @@
 <template>
   <div class="relative z-20 mx-auto max-w-4xl p-6">
     <div class="app-page-header mb-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-xl font-bold text-slate-900">{{ isNew ? $t('admin.createReport') : $t('admin.editReport') }}</h2>
+      <h2 class="text-xl font-bold theme-text-primary">{{ isNew ? $t('admin.createReport') : $t('admin.editReport') }}</h2>
     </div>
     <div class="relative z-20 overflow-visible rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <div class="grid grid-cols-2 gap-4 overflow-visible">
@@ -45,13 +45,13 @@
         <div class="col-span-2">
           <label class="block text-sm font-medium">{{ $t('reports.queryText') }}</label>
           <textarea v-model="form.queryText" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-left font-mono text-sm" rows="8" :dir="ltr" style="direction:ltr; unicode-bidi:embed; text-align: start;"></textarea>
-          <p class="text-xs text-gray-500 mt-1">{{ $t('reports.queryHelp') }}</p>
+          <p class="text-xs theme-text-muted mt-1">{{ $t('reports.queryHelp') }}</p>
         </div>
       </div>
 
       <div class="mt-4 rounded-2xl border theme-border theme-dashboard-bg-soft/70 p-4">
-        <div class="text-sm font-medium theme-text-strong">{{ $t('reports.selectFields') || 'Output fields' }}</div>
-        <div class="text-xs theme-text-muted mt-1">
+        <div class="text-sm font-medium theme-accent-strong">{{ $t('reports.selectFields') || 'Output fields' }}</div>
+        <div class="text-xs theme-accent-muted mt-1">
           {{ $t('reports.selectFieldsHelp') || 'Choose which fields appear in the result table and exports.' }}
         </div>
         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -70,7 +70,7 @@
           <router-link to="/dashboard/admin/reports" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </router-link>
-          <button @click="save" class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 text-white transition ">
+          <button @click="save" class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 theme-text-light transition ">
             <span>{{ $t('labels.save') }}</span>
           </button>
         </div>
@@ -81,9 +81,9 @@
     <h3 class="font-semibold mb-2">{{ $t('admin.parameters') }}</h3>
     <div class="rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg shadow-slate-200/40">
       <div class="flex justify-between mb-2">
-          <div class="text-sm text-gray-600">{{ $t('reports.parametersHelp') || '' }}</div>
+          <div class="text-sm theme-text-secondary">{{ $t('reports.parametersHelp') || '' }}</div>
         <div>
-          <button @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 text-white transition ">
+          <button @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light transition ">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
             </svg>
@@ -101,15 +101,15 @@
             </svg>
             <div>
               <strong class="block">{{ (locale !== 'en' && p.arName) ? p.arName : p.name }}</strong>
-              <span class="text-sm text-gray-600">{{ p.label || p.type }}</span>
+              <span class="text-sm theme-text-secondary">{{ p.label || p.type }}</span>
             </div>
           </div>
           <div class="flex gap-2">
-            <button @click="startEditParam(p, idx)" class="flex items-center gap-1 rounded-lg bg-slate-700 px-2 py-1 text-white transition hover:bg-slate-800">
+            <button @click="startEditParam(p, idx)" class="flex items-center gap-1 rounded-lg bg-slate-700 px-2 py-1 theme-text-light transition hover:bg-slate-800">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /></svg>
               <span class="text-sm">{{ $t('labels.edit') }}</span>
             </button>
-            <button @click="removeParam(idx)" class="flex items-center gap-1 rounded-lg bg-red-600 px-2 py-1 text-white transition hover:bg-red-700">
+            <button @click="removeParam(idx)" class="flex items-center gap-1 rounded-lg bg-red-600 px-2 py-1 theme-text-light transition hover:bg-red-700">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 011 1v6a1 1 0 11-2 0V9a1 1 0 011-1z" clip-rule="evenodd" /></svg>
               <span class="text-sm">{{ $t('labels.delete') }}</span>
             </button>
@@ -156,7 +156,7 @@
           <button @click="cancelEditParam" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </button>
-          <button @click="saveParam" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 text-white transition ">
+          <button @click="saveParam" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light transition ">
             <span>{{ $t('reports.saveParam') }}</span>
           </button>
           <button v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 transition">

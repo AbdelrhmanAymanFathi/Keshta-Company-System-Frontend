@@ -2,12 +2,12 @@
   <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6">
     <div class="bg-white rounded-lg p-8 max-w-3xl w-full text-center shadow-lg">
       <div class="text-6xl font-bold text-red-600 mb-4">{{ code }}</div>
-      <div class="text-xl text-gray-700 mb-6">{{ message || $t('common.error') }}</div>
+      <div class="text-xl theme-text-secondary mb-6">{{ message || $t('common.error') }}</div>
 
       <div class="flex justify-center gap-3">
         <button @click="retry" class="px-4 py-2 theme-button rounded">{{ $t('labels.retry') || 'Retry' }}</button>
-        <a :href="staticPageHref" target="_blank" rel="noopener" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Open static page</a>
-        <button @click="dismiss" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Close</button>
+        <a :href="staticPageHref" target="_blank" rel="noopener" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-100">Open static page</a>
+        <button @click="dismiss" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-100">Close</button>
       </div>
     </div>
   </div>

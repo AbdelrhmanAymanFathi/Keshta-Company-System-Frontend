@@ -5,7 +5,7 @@
       <h3 class="text-lg font-semibold mb-4">{{ $t('company.wallet.branches') || 'Branches' }}</h3>
       <ul>
         <li
-          :class="['mb-2', selectedBranchId === null ? 'font-bold theme-text-strong' : 'text-gray-700', 'cursor-pointer', 'theme-hover-soft', 'rounded', 'px-2', 'py-1']"
+          :class="['mb-2', selectedBranchId === null ? 'font-bold theme-accent-strong' : 'theme-text-secondary', 'cursor-pointer', 'theme-hover-soft', 'rounded', 'px-2', 'py-1']"
           @click="selectBranch(null)"
         >
           <span>{{ $t('company.wallet.mainCompany') || 'Main Company' }}</span>
@@ -13,11 +13,11 @@
         <li
           v-for="branch in branches"
           :key="branch.id"
-          :class="['mb-2', selectedBranchId === branch.id ? 'font-bold theme-text-strong' : 'text-gray-700', 'cursor-pointer', 'theme-hover-soft', 'rounded', 'px-2', 'py-1', 'flex', 'justify-between', 'items-center']"
+          :class="['mb-2', selectedBranchId === branch.id ? 'font-bold theme-accent-strong' : 'theme-text-secondary', 'cursor-pointer', 'theme-hover-soft', 'rounded', 'px-2', 'py-1', 'flex', 'justify-between', 'items-center']"
           @click="selectBranch(branch.id)"
         >
           <span>{{ branch.name }}</span>
-          <span v-if="branchSummaries[branch.id]" class="text-xs text-gray-500">{{ formatCurrency(branchSummaries[branch.id].balance) }}</span>
+          <span v-if="branchSummaries[branch.id]" class="text-xs theme-text-muted">{{ formatCurrency(branchSummaries[branch.id].balance) }}</span>
         </li>
       </ul>
     </aside>
@@ -29,10 +29,10 @@
     <!-- Stats Bar -->
     <div class="bg-gray-50 rounded-lg p-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div class="text-sm text-gray-600">
+        <div class="text-sm theme-text-secondary">
           {{ $t('company.wallet.totalTransactions') }}: <span class="font-semibold">{{ companyStore.transactions.total }}</span>
         </div>
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+        <div class="flex items-center gap-2 text-sm theme-text-secondary">
           <label>{{ $t('company.wallet.pageSize') }}:</label>
           <select :value="companyStore.transactions.pageSize" @change="onPageSizeChange" 
             class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none theme-input-focus">
@@ -64,11 +64,11 @@
     <div v-else class="bg-white rounded-lg shadow overflow-hidden">
       <!-- No Results Message -->
       <div v-if="companyStore.transactions.items.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="mx-auto h-12 w-12 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">{{ $t('company.wallet.noTransactions') }}</h3>
-        <p class="mt-1 text-sm text-gray-500">
+        <h3 class="mt-2 text-sm font-medium theme-text-primary">{{ $t('company.wallet.noTransactions') }}</h3>
+        <p class="mt-1 text-sm theme-text-muted">
           {{ $t('company.wallet.noTransactionsDesc') }}
         </p>
       </div>
@@ -78,26 +78,26 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                 {{ $t('company.wallet.date') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                 {{ $t('company.wallet.type') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                 {{ $t('company.wallet.amount') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                 {{ $t('company.wallet.description') }}
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                 {{ $t('company.wallet.reference') }}
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="transaction in companyStore.transactions.items" :key="transaction.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">
                 {{ formatDate(transaction.date) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -108,10 +108,10 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold" :class="transaction.type === 'DEPOSIT' ? 'text-green-600' : 'text-red-600'">
                 {{ formatCurrency(transaction.amount) }}
               </td>
-              <td class="px-6 py-4 text-sm text-gray-900">
+              <td class="px-6 py-4 text-sm theme-text-primary">
                 {{ transaction.description || '-' }}
               </td>
-              <td class="px-6 py-4 text-sm text-gray-500">
+              <td class="px-6 py-4 text-sm theme-text-muted">
                 <span v-if="transaction.refType && transaction.refType !== 'NONE'">
                   {{ transaction.refType }}: {{ transaction.refId || '-' }}
                 </span>
@@ -127,22 +127,22 @@
         <div class="flex-1 flex justify-between sm:hidden">
           <button @click="changePage(companyStore.transactions.page - 1)" 
             :disabled="companyStore.transactions.page <= 1"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.previous') }}
           </button>
-          <span class="text-sm text-gray-700 self-center">
+          <span class="text-sm theme-text-secondary self-center">
             {{ companyStore.transactions.page }} / {{ companyStore.totalPages }}
           </span>
           <button @click="changePage(companyStore.transactions.page + 1)" 
             :disabled="companyStore.transactions.page >= companyStore.totalPages"
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.next') }}
           </button>
         </div>
 
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
-            <p class="text-sm text-gray-700">
+            <p class="text-sm theme-text-secondary">
               {{ $t('labels.showing') }} 
               <span class="font-medium">{{ ((companyStore.transactions.page - 1) * companyStore.transactions.pageSize) + 1 }}</span>
               {{ $t('labels.to') }}
@@ -156,14 +156,14 @@
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
               <button @click="changePage(companyStore.transactions.page - 1)" 
                 :disabled="companyStore.transactions.page <= 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
               </button>
               <button @click="changePage(companyStore.transactions.page + 1)" 
                 :disabled="companyStore.transactions.page >= companyStore.totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                 </svg>
@@ -178,10 +178,10 @@
     <div v-if="showDepositModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeDepositModal">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('company.wallet.deposit') }}</h3>
+          <h3 class="text-lg font-medium theme-text-primary mb-4">{{ $t('company.wallet.deposit') }}</h3>
           <form @submit.prevent="handleDeposit" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.amount') }} *
               </label>
               <input
@@ -194,7 +194,7 @@
               >
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.description') }}
               </label>
               <input
@@ -204,7 +204,7 @@
               >
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.date') }} *
               </label>
               <DateField
@@ -215,11 +215,11 @@
             </div>
             <div class="flex justify-end gap-3 pt-4">
               <button type="button" @click="closeDepositModal"
-                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
                 {{ $t('labels.cancel') }}
               </button>
               <button type="submit" :disabled="processing"
-                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition">
+                class="px-4 py-2 bg-green-600 theme-text-light rounded-md hover:bg-green-700 disabled:opacity-50 transition">
                 {{ processing ? $t('labels.processing') : $t('company.wallet.deposit') }}
               </button>
             </div>
@@ -232,10 +232,10 @@
     <div v-if="showWithdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeWithdrawModal">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('company.wallet.withdraw') }}</h3>
+          <h3 class="text-lg font-medium theme-text-primary mb-4">{{ $t('company.wallet.withdraw') }}</h3>
           <form @submit.prevent="handleWithdraw" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.amount') }} *
               </label>
               <input
@@ -248,7 +248,7 @@
               >
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.description') }}
               </label>
               <input
@@ -258,7 +258,7 @@
               >
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.date') }} *
               </label>
               <DateField
@@ -269,11 +269,11 @@
             </div>
             <div class="flex justify-end gap-3 pt-4">
               <button type="button" @click="closeWithdrawModal"
-                class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
                 {{ $t('labels.cancel') }}
               </button>
               <button type="submit" :disabled="processing"
-                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition">
+                class="px-4 py-2 bg-red-600 theme-text-light rounded-md hover:bg-red-700 disabled:opacity-50 transition">
                 {{ processing ? $t('labels.processing') : $t('company.wallet.withdraw') }}
               </button>
             </div>

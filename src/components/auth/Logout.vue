@@ -8,8 +8,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
           </svg>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $t('auth.logout.title') }}</h2>
-        <p class="text-gray-600">{{ $t('auth.logout.message') }}</p>
+        <h2 class="text-2xl font-bold theme-text-primary mb-2">{{ $t('auth.logout.title') }}</h2>
+        <p class="theme-text-secondary">{{ $t('auth.logout.message') }}</p>
       </div>
 
       <!-- User Info -->
@@ -21,8 +21,8 @@
             </svg>
           </div>
           <div>
-            <p class="font-medium text-gray-900">{{ user.name || user.email }}</p>
-            <p class="text-sm text-gray-500">{{ user.email }}</p>
+            <p class="font-medium theme-text-primary">{{ user.name || user.email }}</p>
+            <p class="text-sm theme-text-muted">{{ user.email }}</p>
           </div>
         </div>
       </div>
@@ -32,16 +32,16 @@
         <button
           @click="$emit('cancel')"
           :disabled="loading"
-          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 transition-colors"
+          class="flex-1 px-4 py-3 border border-gray-300 rounded-lg theme-text-secondary hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 transition-colors"
         >
           {{ $t('auth.logout.cancel') }}
         </button>
         <button
           @click="handleLogout"
           :disabled="loading"
-          class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 transition-colors"
+          class="flex-1 px-4 py-3 bg-red-600 theme-text-light rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 transition-colors"
         >
-          <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" fill="none" viewBox="0 0 24 24">
+          <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 theme-text-light inline" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>

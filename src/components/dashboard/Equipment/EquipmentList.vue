@@ -1,7 +1,7 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-2xl font-semibold text-gray-800">{{ $t('equipment.title') || 'Equipment' }}</h2>
+      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('equipment.title') || 'Equipment' }}</h2>
       <div>
         <button @click="openCreateModal" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl theme-button inline-flex items-center gap-2 shadow-sm  text-xs sm:text-sm"><PlusIcon class="w-5 h-5" />{{ $t('equipment.add') || 'Add Equipment' }}</button>
       </div>
@@ -16,7 +16,7 @@
           :placeholder="$t('equipment.searchPlaceholder')"
           class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm  theme-input-focus"
         />
-        <button @click="clearSearch" class="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+        <button @click="clearSearch" class="rounded-xl border border-slate-200 px-3 py-2 text-sm theme-text-secondary hover:bg-slate-50">
           {{ $t('labels.clear') || 'Clear' }}
         </button>
       </div>
@@ -26,18 +26,18 @@
       <table :dir="isRTL ? 'rtl' : 'ltr'" class="min-w-full w-full table-auto md:table-fixed text-sm">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('equipment.name') || 'Name' }}</th>
-            <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.contractor') || 'Contractor' }}</th>
-            <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.isCompanyOwned') || 'Company Owned' }}</th>
-            <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</th>
-            <th class="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.actions') || 'Actions' }}</th>
+            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('equipment.name') || 'Name' }}</th>
+            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.contractor') || 'Contractor' }}</th>
+            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.isCompanyOwned') || 'Company Owned' }}</th>
+            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</th>
+            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.actions') || 'Actions' }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="e in equipments" :key="e.id" class="border-t theme-table-row-hover" @contextmenu.prevent="openContextMenu($event, e)">
-            <td class="px-3 py-3 font-medium text-gray-800 text-start">{{ e.name }}</td>
-            <td class="px-3 py-3 text-gray-700 text-start">{{ e.contractor?.name || '—' }}</td>
-            <td class="px-3 py-3 text-gray-700 text-start">
+            <td class="px-3 py-3 font-medium theme-text-primary text-start">{{ e.name }}</td>
+            <td class="px-3 py-3 theme-text-secondary text-start">{{ e.contractor?.name || '—' }}</td>
+            <td class="px-3 py-3 theme-text-secondary text-start">
               <span
                 :title="e.isCompanyOwned ? ($t('labels.yes') || 'Yes') : ($t('labels.no') || 'No')"
                 class="inline-flex items-center"
@@ -46,12 +46,12 @@
                 <span class="sr-only">{{ e.isCompanyOwned ? ($t('labels.yes') || 'Yes') : ($t('labels.no') || 'No') }}</span>
               </span>
             </td>
-            <td class="px-3 py-3 text-gray-700 text-start">{{ e.hourlyRate != null ? e.hourlyRate : '—' }}</td>
+            <td class="px-3 py-3 theme-text-secondary text-start">{{ e.hourlyRate != null ? e.hourlyRate : '—' }}</td>
             <td class="px-3 py-3">
               <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-sm transition-all hover:-translate-y-0.5 hover:theme-border theme-hover-soft hover:theme-text-strong hover:shadow-md"
+                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 theme-text-secondary shadow-sm transition-all hover:-translate-y-0.5 hover:theme-border theme-hover-soft hover:theme-accent-strong hover:shadow-md"
                   :title="$t('labels.edit') || 'Edit'"
                   :aria-label="$t('labels.edit') || 'Edit'"
                   @click.stop="openEditModal(e)"
@@ -71,7 +71,7 @@
             </td>
           </tr>
           <tr v-if="equipments.length === 0">
-            <td class="px-3 py-2 text-start text-gray-500" colspan="5">{{ $t('equipment.noResults') || 'No equipment found' }}</td>
+            <td class="px-3 py-2 text-start theme-text-muted" colspan="5">{{ $t('equipment.noResults') || 'No equipment found' }}</td>
           </tr>
         </tbody>
       </table>
@@ -84,11 +84,11 @@
       <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ editingEquipment ? $t('equipment.edit') : $t('equipment.add') }}</h3>
-          <button class="text-gray-400 hover:text-gray-600" @click="closeModals"><XMarkIcon class="w-5 h-5" /></button>
+          <button class="theme-caption hover:theme-text-secondary" @click="closeModals"><XMarkIcon class="w-5 h-5" /></button>
         </div>
         <form @submit.prevent="onSave" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('equipment.name') || 'Name' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('equipment.name') || 'Name' }}</label>
             <input v-model="form.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
           </div>
           <div>
@@ -98,7 +98,7 @@
             </label>
           </div>
           <div v-if="!form.isCompanyOwned">
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('labels.contractor') || 'Contractor' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.contractor') || 'Contractor' }}</label>
             <SearchDropdown
               v-model="form.contractorLabel"
               :items="contractors"
@@ -113,7 +113,7 @@
           <div class="flex items-center gap-3">
             
             <div class="flex-1">
-              <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</label>
+              <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</label>
               <input v-model.number="form.hourlyRate" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
             </div>
           </div>
@@ -140,7 +140,7 @@
     >
       <button
         type="button"
-        class="w-full px-4 py-2 text-sm text-gray-700 theme-hover-soft flex items-center gap-2 transition"
+        class="w-full px-4 py-2 text-sm theme-text-secondary theme-hover-soft flex items-center gap-2 transition"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
         @click="onContextEdit"
       >

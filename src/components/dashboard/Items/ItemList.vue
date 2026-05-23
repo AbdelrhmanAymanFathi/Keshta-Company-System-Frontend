@@ -15,37 +15,37 @@
         <thead class="theme-table-thead-gradient">
           <tr>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               #</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.itemName') || 'Item Name' }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.unit') || 'Unit' }}</th>
             <th v-if="mode === 'supply' || mode === 'all'"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultSupplyPrice') || 'Supply Price' }}</th>
             <th v-if="mode === 'transport' || mode === 'all'"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultTransportPrice') || 'Transport Price' }}</th>
             <th v-if="mode === 'extracts' || mode === 'all'"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }}</th>
             <!-- <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.exports') || 'For Exports' }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.transport') || 'For Transports' }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.isActive') || 'Active' }}</th> -->
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.createdAt') || 'Created At' }}</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.actions') }}</th>
           </tr>
         </thead>
@@ -53,20 +53,20 @@
           <tr v-for="(item, idx) in items" :key="item.id" class="theme-table-row-hover"
             @contextmenu.prevent="openContextMenu($event, item)">
             <td
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start">
               {{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap text-start">
               {{ item.name }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start">
               {{ item.unit?.name || getUnitName(item.unitId) || '-' }}</td>
             <td v-if="mode === 'supply' || mode === 'all'"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatPrice(item.defaultSupplyPrice) }}</td>
             <td v-if="mode === 'transport' || mode === 'all'"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatPrice(item.defaultTransportPrice) }}</td>
             <td v-if="mode === 'extracts' || mode === 'all'"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatPrice(item.defaultExtractPrice ?? item.currentPrice) }}</td>
             <!-- <td class="px-6 py-3 text-xs font-medium text-black uppercase tracking-wider  whitespace-nowrap text-start">
               <span v-if="item.availableForSupplies">✓</span><span v-else>-</span></td>
@@ -77,7 +77,7 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap text-start">
               {{ formatDate(item.createdAt) }}</td>
             <td
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start flex gap-2">
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start flex gap-2">
               <button @click="editItem(item)"
                 class="px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm">
                 <PencilIcon class="w-5 h-5" />
@@ -90,14 +90,14 @@
           </tr>
           <tr v-if="items.length === 0 && !loading">
             <td
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap text-start"
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start"
               :colspan="columnsCount">
               {{ $t('labels.noDataFound') || 'No items found' }}
             </td>
           </tr>
           <tr v-if="loading">
             <td
-              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium text-gray-800 uppercase tracking-wider whitespace-nowrap text-start"
+              class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start"
               :colspan="columnsCount">
               {{ $t('labels.loading') || 'Loading...' }}
             </td>
@@ -199,7 +199,7 @@
                 {{ submitting ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
               </button>
               <button type="button" @click="closeModal"
-                class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">
+                class="flex-1 px-4 py-2 bg-gray-300 theme-text-secondary rounded hover:bg-gray-400 transition">
                 {{ $t('labels.cancel') || 'Cancel' }}
               </button>
             </div>
@@ -220,7 +220,7 @@
     <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       class="fixed bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 min-w-[150px]" @click.stop>
       <button @click="() => { editItem(contextMenu.item); contextMenu.visible = false }"
-        class="w-full px-4 py-2 text-left text-sm theme-hover-soft theme-text-strong flex items-center gap-2 transition">
+        class="w-full px-4 py-2 text-left text-sm theme-hover-soft theme-accent-strong flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">

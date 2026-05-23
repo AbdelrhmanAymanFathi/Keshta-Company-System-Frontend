@@ -6,7 +6,7 @@
         
         <form @submit.prevent="onSubmit" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
               {{ $t('vehicles.crusherName') || 'Crusher Name' }}
             </label>
             <input 
@@ -24,7 +24,7 @@
             <button 
               type="button" 
               @click="onCancel"
-              class="px-4 py-2 text-gray-700 border rounded hover:bg-gray-100"
+              class="px-4 py-2 theme-text-secondary border rounded hover:bg-gray-100"
               :disabled="loading"
             >
               {{ $t('labels.cancel') }}

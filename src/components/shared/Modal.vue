@@ -13,11 +13,11 @@
       >
         <!-- Header -->
         <header class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-          <h3 :id="titleId" class="text-lg font-semibold text-gray-900">{{ title }}</h3>
+          <h3 :id="titleId" class="text-lg font-semibold theme-text-primary">{{ title }}</h3>
           <button
             @click="closeModal"
             :aria-label="$t('labels.close')"
-            class="text-gray-400 hover:text-gray-600 transition-colors"
+            class="theme-caption hover:theme-text-secondary transition-colors"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

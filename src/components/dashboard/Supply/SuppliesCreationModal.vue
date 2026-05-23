@@ -13,11 +13,11 @@
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-          <h2 class="text-2xl font-bold theme-text-muted">
+          <h2 class="text-2xl font-bold theme-heading">
             {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
           </h2>
           <button @click="closeModal"
-            class="text-gray-500 hover:text-gray-800 text-3xl leading-none focus:outline-none">
+            class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">
             ×
           </button>
         </div>
@@ -27,7 +27,7 @@
 
           <!-- ============================================ STEP 1 ============================================ -->
           <div v-if="currentStep === 1" class="w-full">
-            <h3 class="text-lg font-bold mb-8 text-center text-gray-800">
+            <h3 class="text-lg font-bold mb-8 text-center theme-text-primary">
               {{ $t('labels.step1BasicData') }}
             </h3>
 
@@ -35,19 +35,19 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 <!-- Date -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.date') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative">
                     <CalendarDaysIcon
-                      class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                     <DateField v-model="commonData.date" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
                   </div>
                 </div>
 
                 <!-- Item (صنف) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.item') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -58,7 +58,7 @@
                         @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }">
                         <template #prefix>
                           <ArchiveBoxIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @click="showAddExportItemDialog = true" style="color: #10b981;"
@@ -73,12 +73,12 @@
 
                 <!-- Price (السعر) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.price') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative">
                     <CurrencyDollarIcon
-                      class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                      class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                     <input type="number" v-model.number="commonData.price" step="0.01"
                       class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
                   </div>
@@ -86,7 +86,7 @@
 
                 <!-- Site (الموقع) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.site') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -97,7 +97,7 @@
                         @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
                         <template #prefix>
                           <MapPinIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
@@ -112,7 +112,7 @@
 
                 <!-- Area (المنطقة) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.area') }}
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -123,7 +123,7 @@
                         @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
                         <template #prefix>
                           <MapIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null"
@@ -139,7 +139,7 @@
 
                 <!-- Contractor (المقاول) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.contractor') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -150,7 +150,7 @@
                         @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }">
                         <template #prefix>
                           <UserGroupIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @click="showAddContractorDialog = true" style="color: #10b981;"
@@ -165,7 +165,7 @@
 
                 <!-- Crusher (الكسارة) -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
@@ -176,7 +176,7 @@
                         @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
                         <template #prefix>
                           <WrenchScrewdriverIcon
-                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                            class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
                         <template #afterOptions>
                           <div @click="showAddCrusherDialog = true" style="color: #10b981;"
@@ -190,7 +190,7 @@
                 </div>
 
                 <div class="col-span-full">
-                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.notes') }}
                   </label>
                   <textarea
@@ -205,11 +205,11 @@
             <!-- Next / Cancel Buttons -->
             <div class="mt-10 flex justify-end gap-6">
               <button @click="closeModal"
-                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition">
+                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">
                 {{ $t('labels.cancel') }}
               </button>
               <button @click="goToStep2" :disabled="!isStep1Valid()"
-                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">
+                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">
                 {{ $t('labels.next') }}
                 <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
               </button>
@@ -220,49 +220,49 @@
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
               <button @click="goBackToStep1"
-                class="flex items-center gap-3 theme-text hover:theme-text-muted font-medium transition">
+                class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('labels.back') }}
               </button>
-              <h3 class="text-lg font-bold text-gray-800">{{ $t('labels.step2Data') }}</h3>
+              <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2Data') }}</h3>
               <div></div> <!-- Placeholder to balance flex -->
             </div>
 
             <!-- Summary Card of Common Data -->
             <div class="theme-dashboard-bg-soft border theme-border rounded-lg p-5 mb-8">
-              <h4 class="text-sm font-bold theme-text-muted mb-4">{{ $t('labels.summary') }}</h4>
+              <h4 class="text-sm font-bold theme-accent-muted mb-4">{{ $t('labels.summary') }}</h4>
               <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-4 text-sm">
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.date') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.date || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.date') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.date || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.item') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.item?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.item') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.item?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.price') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ formatNumber(commonData.price) }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.price') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ formatNumber(commonData.price) }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.site') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.site?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.site') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.site?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.area') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.area?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.area') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.area?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.contractor') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.contractor?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.contractor') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.crusher') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.crusher?.name || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.crusher') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.crusher?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col col-span-full">
-                  <dt class="font-semibold text-gray-700">{{ $t('labels.notes') }}:</dt>
-                  <dd class="text-gray-900 mt-1">{{ commonData.notes || '-' }}</dd>
+                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.notes') }}:</dt>
+                  <dd class="theme-text-primary mt-1">{{ commonData.notes || '-' }}</dd>
                 </div>
               </dl>
             </div>
@@ -270,7 +270,7 @@
             <!-- Add New Vehicle Button -->
             <div class="mb-6" >
               <button @click="showAddVehicleDialog = true"
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">
+                class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">
                 + {{ $t('vehicles.addVehicle') || 'Add New Vehicle' }}
               </button>
             </div>
@@ -285,29 +285,29 @@
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
-                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 w-12">{{ $t('#') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary w-12">{{ $t('#') }}</th>
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.vehicle') }}</th>
-                      <!-- <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{ $t('labels.price') }}</th> -->
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <!-- <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.price') }}</th> -->
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.crusherTicket') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.companyTicket') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.discount') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.companyCapacity') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.crusherCapacity') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium text-gray-700 whitespace-nowrap">{{
+                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
                         $t('labels.total') }}</th>
-                      <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') }}
+                      <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('labels.actions') }}
                       </th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-200 bg-white">
                     <tr v-for="(row, index) in rows" :key="row.id">
-                      <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+                      <td class="px-4 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
 
                       <!-- ======================== first column 
                      in step 2 ================ -->
@@ -324,7 +324,7 @@
                               @keydown.escape="row.open = false"
                               @keydown="onDropdownKeydown($event, row, filteredVehicles(row), (sel) => selectVehicle(row, sel))"
                               @mousedown.prevent="" @focus="row.open = true" @blur="row.open = false" />
-                            <span class="text-gray-400">▾</span>
+                            <span class="theme-caption">▾</span>
                           </div>
 
                           <!-- Dropdown -->
@@ -333,7 +333,7 @@
                             class="vehicle-dropdown absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl"
                             :class="getVehicleDropdownClasses(row)" :style="getVehicleDropdownStyle(row)" @click.stop>
                             <div v-if="filteredVehicles(row).length === 0"
-                              class="px-3 py-2 text-sm text-gray-500 text-start">
+                              class="px-3 py-2 text-sm theme-text-muted text-start">
                               {{ $t('vehicles.noResults') || 'No vehicles found' }}
                             </div>
                             <div v-for="(v, vi) in filteredVehicles(row)" :key="v.id"
@@ -394,7 +394,7 @@
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="theme-text hover:theme-text-muted transition"
+                          <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition"
                             title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
                           </button>
@@ -414,29 +414,29 @@
             <div
               class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
               <div class="flex items-center justify-end gap-3">
-                <span class="text-gray-700">{{ $t('labels.subtotal') }}:</span>
-                <span class="text-gray-900 min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
+                <span class="theme-text-secondary">{{ $t('labels.subtotal') }}:</span>
+                <span class="theme-text-primary min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
               </div>
               <div class="flex items-center justify-end gap-3">
-                <span class="text-gray-700">{{ $t('labels.totalDiscount') }}:</span>
+                <span class="theme-text-secondary">{{ $t('labels.totalDiscount') }}:</span>
                 <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
               </div>
               <div
-                class="flex items-center justify-end gap-3 text-lg theme-text-strong border-s-4 theme-border-accent ps-6">
-                <span class="theme-text-muted">{{ $t('labels.grandTotal') }}:</span>
-                <span class="theme-text-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+                class="flex items-center justify-end gap-3 text-lg theme-accent-strong border-s-4 theme-border-accent ps-6">
+                <span class="theme-accent-muted">{{ $t('labels.grandTotal') }}:</span>
+                <span class="theme-accent-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
               </div>
             </div>
 
             <!-- Save / Back Buttons -->
             <div class="mt-10 flex justify-end gap-6">
               <button @click="goBackToStep1"
-                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium text-gray-700 transition flex items-center gap-3">
+                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('labels.back') }}
               </button>
               <button @click="saveData" :disabled="isSaving"
-                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-3">
+                class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">
                 {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
                 <CheckIcon class="w-6 h-6" />
               </button>
@@ -460,7 +460,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="addSite" :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -476,7 +476,7 @@
       <div class="flex gap-2 justify-end">
         <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
         <button @click="addArea" :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -494,7 +494,7 @@
         <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
         <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -511,7 +511,7 @@
         <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
         }}</button>
         <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>
@@ -525,8 +525,8 @@
     <div class="relative w-full max-w-3xl z-[1002] mx-auto">
       <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
         <div class="flex items-center justify-between px-4 py-3 border-b">
-          <h3 class="text-lg font-semibold text-gray-800">{{ $t('vehicles.createVehicle') }}</h3>
-          <button class="text-gray-500 hover:text-gray-700" @click="showAddVehicleDialog = false">✕</button>
+          <h3 class="text-lg font-semibold theme-text-primary">{{ $t('vehicles.createVehicle') }}</h3>
+          <button class="theme-text-muted hover:theme-text-secondary" @click="showAddVehicleDialog = false">✕</button>
         </div>
         <div class="p-4 overflow-y-auto">
           <CreateVehicle :mode="'supply'" @created="onCreatedFromVehicleModal" :prefilledContractorId="commonData.contractor?.id"
@@ -549,7 +549,7 @@
         }}</button>
         <button @click="createNewExportItem"
           :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
-          class="bg-green-600 text-white px-3 py-1 rounded">
+          class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
         </button>
       </div>

@@ -4,21 +4,21 @@
       <h3 class="text-lg font-semibold mb-4">{{ title }}</h3>
       <div class="space-y-3">
         <div>
-          <label class="block text-sm text-gray-700">{{ $t('payments.amount') }}</label>
+          <label class="block text-sm theme-text-secondary">{{ $t('payments.amount') }}</label>
           <input v-model="form.amount" type="number" step="0.01" class="w-full border rounded px-2 py-1" />
         </div>
         <div>
-          <label class="block text-sm text-gray-700">{{ $t('payments.date') }}</label>
+          <label class="block text-sm theme-text-secondary">{{ $t('payments.date') }}</label>
           <DateTimeField v-model="form.date" class="w-full border rounded px-2 py-1" />
         </div>
         <div>
-          <label class="block text-sm text-gray-700">{{ $t('payments.notes') }}</label>
+          <label class="block text-sm theme-text-secondary">{{ $t('payments.notes') }}</label>
           <textarea v-model="form.notes" class="w-full border rounded px-2 py-1"></textarea>
         </div>
       </div>
       <div class="mt-4 flex justify-end gap-2">
         <button @click="$emit('close')" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="submit" :disabled="submitting" class="bg-green-600 text-white px-3 py-1 rounded">
+        <button @click="submit" :disabled="submitting" class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ submitting ? $t('labels.saving') : $t('payments.savePayment') }}
         </button>
       </div>

@@ -7,7 +7,7 @@
         <form @submit.prevent="onSubmit" class="space-y-4">
           <!-- Name field - full width -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
               {{ $t('vehicles.contractorName') || 'Contractor Name' }}
             </label>
             <input 
@@ -24,7 +24,7 @@
           <!-- Phone, Bank Name, Account Number - 3 columns on large screens -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('contractors.phone') || 'Phone' }}
               </label>
               <input 
@@ -36,7 +36,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('contractors.bankName') || 'Bank Name' }}
               </label>
               <input 
@@ -48,7 +48,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('contractors.accountNumber') || 'Account Number' }}
               </label>
               <input 
@@ -63,7 +63,7 @@
           <!-- Opening Balance and Notes - 2 columns on large screens -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('contractors.openingBalance') || 'Opening Balance' }}
               </label>
               <input 
@@ -76,7 +76,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('labels.notes') || 'Notes' }}
               </label>
               <textarea 
@@ -92,7 +92,7 @@
             <button 
               type="button" 
               @click="onCancel"
-              class="px-4 py-2 text-gray-700 border rounded hover:bg-gray-100"
+              class="px-4 py-2 theme-text-secondary border rounded hover:bg-gray-100"
               :disabled="loading"
             >
               {{ $t('labels.cancel') }}

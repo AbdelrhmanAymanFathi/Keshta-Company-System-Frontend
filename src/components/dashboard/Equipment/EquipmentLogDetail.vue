@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ $t('equipmentLog.detail') }}</h3>
       <div class="flex items-center gap-2">
-        <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700">
+        <button @click="$emit('close')" class="theme-text-muted hover:theme-text-secondary">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -22,54 +22,54 @@
     <div v-else>
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('equipmentLog.date') }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ formatDate(rental.date) }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('equipmentLog.date') }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ formatDate(rental.date) }}</div>
         </div>
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('equipmentLog.equipment') }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ rental.equipment || rental.equipmentLog || '-' }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('equipmentLog.equipment') }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ rental.equipment || rental.equipmentLog || '-' }}</div>
         </div>
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('equipmentLog.total') }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ formatCurrency(rental.total || 0) }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('equipmentLog.total') }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ formatCurrency(rental.total || 0) }}</div>
         </div>
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('labels.discount') || 'Discount' }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ formatCurrency(rental.discount || 0) }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('labels.discount') || 'Discount' }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ formatCurrency(rental.discount || 0) }}</div>
         </div>
       </div>
 
       <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('labels.location') || 'Location' }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ rental.location?.name || '-' }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('labels.location') || 'Location' }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ rental.location?.name || '-' }}</div>
         </div>
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('labels.area') || 'Area' }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ rental.area?.name || '-' }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('labels.area') || 'Area' }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ rental.area?.name || '-' }}</div>
         </div>
         <div class="bg-white rounded-lg p-4 border">
-          <div class="text-sm text-gray-500">{{ $t('equipmentLog.driver') }}</div>
-          <div class="mt-2 font-medium text-gray-900">{{ rental.driver?.name || rental.driverLabel || '-' }}</div>
+          <div class="text-sm theme-text-muted">{{ $t('equipmentLog.driver') }}</div>
+          <div class="mt-2 font-medium theme-text-primary">{{ rental.driver?.name || rental.driverLabel || '-' }}</div>
         </div>
       </div>
 
       <div class="mt-4 bg-white rounded-lg p-4 border">
         <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.jobEntries') }}</h4>
-        <div v-if="jobs.length === 0" class="text-gray-500 py-6 text-center">
+        <div v-if="jobs.length === 0" class="theme-text-muted py-6 text-center">
           {{ $t('equipmentLog.noJobs') }}
         </div>
         <div v-else class="space-y-3">
           <div v-for="job in jobs" :key="job.id" class="flex items-center justify-between p-3 border rounded">
             <div>
               <div class="text-sm font-medium">{{ job.name || job.notes || job.note || '-' }}</div>
-              <div class="text-xs text-gray-500">
+              <div class="text-xs theme-text-muted">
                 {{ formatDate(job.date) }} • {{ job.hours }} {{ $t('equipmentLog.hours') }} • {{ $t('labels.discount') || 'Discount' }}: {{ formatCurrency(job.discount || 0) }}
               </div>
             </div>
             <div class="flex items-center gap-3">
               <div class="text-sm font-semibold">{{ formatCurrency(job.total ?? Math.max(0, (Number(job.hours || 0) * Number(job.hourlyRate || rental.hourlyRate || 0)) - Number(job.discount || 0))) }}</div>
-              <button @click="editJob(job)" class="theme-text hover:theme-text-muted text-sm">{{ $t('labels.edit') }}</button>
+              <button @click="editJob(job)" class="theme-text hover:theme-accent-muted text-sm">{{ $t('labels.edit') }}</button>
               <button @click="deleteJob(job)" class="text-red-600 hover:text-red-900 text-sm">{{ $t('labels.delete') }}</button>
             </div>
           </div>
@@ -100,7 +100,7 @@
         <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.notes') }}</h4>
         <textarea v-model="rental.notes" rows="4" class="w-full border rounded px-3 py-2 text-sm"></textarea>
         <div class="mt-3 flex justify-end">
-          <button @click="saveNotes" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">{{ $t('labels.save') }}</button>
+          <button @click="saveNotes" class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded">{{ $t('labels.save') }}</button>
         </div>
       </div>
     </div>

@@ -5,20 +5,20 @@
     <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
       <div class="p-6">
         <div class="mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">
+          <h3 class="text-lg font-semibold theme-text-primary">
             <span v-if="type === 'category'">{{ $t('expenses.addCategory') || 'Add Category' }}</span>
             <span v-else-if="type === 'subcategory'">{{ $t('expenses.addSubcategory') || 'Add Subcategory' }}</span>
             <span v-else-if="type === 'branch'">{{ $t('expenses.addBranch') || 'Add Branch' }}</span>
             <span v-else-if="type === 'location'">{{ $t('expenses.addLocation') || 'Add Location' }}</span>
           </h3>
-          <p v-if="type === 'subcategory' && parentCategoryName" class="text-sm text-gray-500 mt-1">
+          <p v-if="type === 'subcategory' && parentCategoryName" class="text-sm theme-text-muted mt-1">
             <!-- Use a simple label: "Under {parent}" -->
             {{ $t('expenses.parentCategoryLabel') || 'Under' }}: <strong>{{ parentCategoryName }}</strong>
           </p>
         </div>
         <form @submit.prevent="handleSave">
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
               <span v-if="type === 'category'">{{ $t('expenses.enterCategoryName') || 'Category Name' }}</span>
               <span v-else-if="type === 'subcategory'">{{ $t('expenses.enterSubcategoryName') || 'Subcategory Name' }}</span>
               <span v-else-if="type === 'branch'">{{ $t('expenses.enterBranchName') || 'Branch Name' }}</span>
@@ -27,11 +27,11 @@
             <input v-model="localName" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus" />
           </div>
           <div v-if="type === 'branch'" class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.enterBranchCategory') || 'Branch Category (optional)' }}</label>
             <input v-model="localBranchCategory" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus" />
           </div>
           <div class="flex gap-2 mt-6">
-            <button type="button" @click="handleClose" class="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
+            <button type="button" @click="handleClose" class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
             <button type="submit" class="flex-1 px-4 py-2 theme-button rounded-lg">{{ $t('labels.save') }}</button>
           </div>
         </form>
