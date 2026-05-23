@@ -3,8 +3,14 @@
     <!-- Top horizontal navbar -->
     <header class="flex items-center justify-between gap-2 px-3 py-2.5 theme-text-light shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
-        <!-- Hamburger for mobile -->
-        <button @click="toggleSidebar" class="sm:hidden p-2 rounded-lg hover:bg-white/12 hover:scale-105 transition-all duration-200">
+        <!-- Hamburger for mobile and overlay/drawer/reveal desktop layouts -->
+        <button
+          @click="toggleSidebar"
+          :class="[
+            'p-2 rounded-lg hover:bg-white/12 hover:scale-105 transition-all duration-200',
+            !isMobile && !['overlay', 'drawer', 'reveal'].includes(sidebarType) ? 'sm:hidden' : ''
+          ]"
+        >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
@@ -87,9 +93,31 @@
       </div>
     </header>
 
+    <div v-if="isHorizontal" class="border-b border-slate-200 bg-slate-50 px-3 py-2 sm:px-4 lg:px-6">
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          v-for="item in filteredVerticalMenu"
+          :key="item.routeName"
+          type="button"
+          @click="selectVertical(item.routeName)"
+          :class="[
+            'rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md hover:scale-[1.02]',
+            currentRouteName === item.routeName ? 'theme-sidebar-item-active' : 'theme-sidebar-item'
+          ]"
+        >
+          {{ $t(item.label) }}
+        </button>
+      </div>
+    </div>
+
     <div class="flex flex-1 min-h-0 overflow-hidden">
       <!-- Sidebar -->
-      <aside role="navigation" :class="asideClasses">
+      <aside
+        role="navigation"
+        :class="asideClasses"
+        @mouseenter="sidebarHovered = true"
+        @mouseleave="sidebarHovered = false"
+      >
         <!-- Desktop Brand + Collapse -->
         <div class="mb-4 hidden items-center justify-between sm:flex">
           <div class="flex items-center gap-3">
@@ -184,7 +212,7 @@
       </aside>
 
       <!-- Mobile Overlay -->
-      <div v-if="sidebarOpen && isMobile" class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300" @click="toggleSidebar"></div>
+      <div v-if="showSidebarOverlay" class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300" @click="toggleSidebar"></div>
 
       <!-- Main Content -->
       <main class="dashboard-module-content app-scrollbar theme-main-gradient flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
@@ -209,30 +237,23 @@
 
 <script>
 import AuthLogout from '@/components/auth/Logout.vue'
+import ThemeIcon from '@/components/shared/ThemeIcon.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { getReportDefs } from '@/api'
+import { DocumentTextIcon, WrenchScrewdriverIcon } from '@/theme/icons/legacy'
+import { iconRevision, getMenuIcon } from '@/theme/icons'
+import { themeRevision } from '@/theme/state'
+import { loadTheme } from '@/theme'
 import {
-  ArchiveBoxIcon,
-  BanknotesIcon,
-  BuildingOffice2Icon,
-  ChartBarIcon,
-  ClipboardDocumentListIcon,
-  ClockIcon,
-  DocumentTextIcon,
-  IdentificationIcon,
-  MapPinIcon,
-  Squares2X2Icon,
-  TruckIcon,
-  UserGroupIcon,
-  UsersIcon,
-  WalletIcon,
-  WrenchScrewdriverIcon
-} from '@heroicons/vue/24/outline'
+  getSidebarAsideClasses,
+  shouldShowSidebarOverlay,
+  isSidebarCollapsedByDefault
+} from '@/theme/sidebar/layouts'
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon },
+  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
@@ -294,6 +315,7 @@ export default {
       },
       sidebarOpen: false,
       collapsedSidebar: JSON.parse(localStorage.getItem('sidebarCollapsed') || 'false'),
+      sidebarHovered: false,
       showLogoutDialog: false,
       userMenuOpen: false,
       isMobile: window.innerWidth < 640,
@@ -302,7 +324,28 @@ export default {
   },
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
-    effectiveCollapsed() { return this.isMobile ? false : this.collapsedSidebar },
+    iconTick() {
+      return iconRevision.value
+    },
+    themeTick() {
+      return themeRevision.value
+    },
+    sidebarType() {
+      void this.themeTick
+      return loadTheme().sidebarType || 'static'
+    },
+    showSidebarOverlay() {
+      return shouldShowSidebarOverlay({
+        sidebarType: this.sidebarType,
+        isMobile: this.isMobile,
+        sidebarOpen: this.sidebarOpen
+      })
+    },
+    effectiveCollapsed() {
+      if (this.isMobile) return false
+      if (this.sidebarType === 'reveal') return !this.sidebarHovered
+      return this.sidebarType === 'slim' || this.sidebarType === 'slim-plus' ? true : this.collapsedSidebar
+    },
     headerGradient() { return 'theme-dashboard-header' },
     userInitials() {
       if (!this.user || !this.user.name) return '??'
@@ -317,18 +360,21 @@ export default {
         : 'opacity-80 hover:opacity-100 hover:bg-white/10'
     },
     asideClasses() {
-      const base = 'app-scrollbar theme-sidebar border-r p-3 sm:p-4 transition-all duration-300 z-40 flex flex-col overflow-y-auto shadow-sm'
-      if (this.isMobile) {
-        const side = this.isRTL ? 'right-0' : 'left-0'
-        const transform = this.sidebarOpen ? 'translate-x-0' : (this.isRTL ? 'translate-x-full' : '-translate-x-full')
-        return `${base} fixed top-0 bottom-0 w-[17rem] max-w-[90vw] ${side} ${transform}`
-      }
-      const width = this.effectiveCollapsed ? 'w-20' : 'w-[17rem] lg:w-[18rem]'
-      return `${base} ${width} relative`
+      void this.themeTick
+      return getSidebarAsideClasses({
+        sidebarType: this.sidebarType,
+        isMobile: this.isMobile,
+        isRTL: this.isRTL,
+        sidebarOpen: this.sidebarOpen,
+        effectiveCollapsed: this.effectiveCollapsed
+      })
     },
     isAdmin() {
       if (!this.user || !this.user.roles) return false
       return this.user.roles.some(role => role.roleId === 1)
+    },
+    isHorizontal() {
+      return this.sidebarType === 'horizontal'
     },
     filteredTopMenus() {
       const menus = { ...this.topMenus }
@@ -340,11 +386,12 @@ export default {
     },
     filteredVerticalMenu() {
       // When viewing profile-related pages, show a small profile menu
-      const profileRoutes = ['profile', 'settings']
+      const profileRoutes = ['profile', 'settings', 'theme-studio']
       if (profileRoutes.includes(this.currentRouteName) || ['profile', 'settings'].includes(this.$route?.meta?.module)) {
         return [
           { name: 'profile', label: 'profile.title', routeName: 'profile' },
           { name: 'settings', label: 'profile.settings', routeName: 'settings' },
+          { name: 'themeStudio', label: 'themeStudio.title', routeName: 'theme-studio' },
           { name: 'signout', label: 'labels.signOut', routeName: 'signout' }
         ]
       }
@@ -372,6 +419,9 @@ export default {
     currentLabel() { return this.currentItem ? this.currentItem.label : '' },
     isReportsListActive() {
       return this.currentRouteName === 'admin-reports-list' || String(this.currentRouteName || '').startsWith('admin-reports-')
+    },
+    isHorizontal() {
+      return this.sidebarType === 'horizontal'
     },
     selectedTop() {
       const routeName = this.currentRouteName
@@ -494,6 +544,7 @@ export default {
     },
     toggleSidebar() { this.sidebarOpen = !this.sidebarOpen },
     toggleCollapsed() { if (!this.isMobile) this.collapsedSidebar = !this.collapsedSidebar },
+    resetSidebarHover() { this.sidebarHovered = false },
     toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
     navigateToReport() { 
       this.router.push({ name: 'equipment-report' })
@@ -522,58 +573,8 @@ export default {
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
     },
     menuIconComponent(name) {
-      const iconTypes = {
-        records: ClipboardDocumentListIcon,
-        contractors: UsersIcon,
-        crushers: BuildingOffice2Icon,
-        items: Squares2X2Icon,
-        vehicles: TruckIcon,
-        statement: DocumentTextIcon,
-        drivers: IdentificationIcon,
-        equipment: WrenchScrewdriverIcon,
-        extract: ArchiveBoxIcon,
-        wallet: WalletIcon,
-        money: BanknotesIcon,
-        users: UserGroupIcon,
-        locations: MapPinIcon,
-        reports: ChartBarIcon,
-        changes: ClockIcon,
-        default: ClipboardDocumentListIcon
-      }
-      const aliases = {
-        suppliesList: 'records',
-        transportList: 'records',
-        extractsList: 'records',
-        equipmentLogList: 'records',
-        suppliersList: 'contractors',
-        transportContractorsList: 'contractors',
-        contractorsList: 'contractors',
-        crushersList: 'crushers',
-        suppliesItemList: 'items',
-        transportItemsList: 'items',
-        extractItems: 'extract',
-        vehiclesList: 'vehicles',
-        contractorStatement: 'statement',
-        contractorSupplyStatement: 'statement',
-        contractorTransportStatement: 'statement',
-        contractorRentals: 'statement',
-        driversList: 'drivers',
-        equipmentList: 'equipment',
-        treasury: 'wallet',
-        companyWallet: 'wallet',
-        companyTransactions: 'wallet',
-        expensesList: 'money',
-        expensesReport: 'reports',
-        changesByDate: 'changes',
-        reportsList: 'reports',
-        usersList: 'users',
-        locations: 'locations',
-        payments: 'money',
-        profile: 'users',
-        settings: 'equipment',
-        signout: 'users'
-      }
-      return iconTypes[aliases[name]] || iconTypes.default
+      void this.iconTick
+      return getMenuIcon(name)
     },
     onResize() {
       this.isMobile = window.innerWidth < 640
@@ -605,6 +606,9 @@ export default {
   mounted() {
     document.documentElement.lang = this.$i18n.locale || 'en'
     document.documentElement.dir = this.isRTL ? 'rtl' : 'ltr'
+    if (isSidebarCollapsedByDefault(loadTheme().sidebarType) && !this.isMobile) {
+      this.collapsedSidebar = true
+    }
     window.addEventListener('resize', this.onResize)
     this.onResize()
     this.loadReports()

@@ -313,7 +313,7 @@ import DateField from '@/components/shared/DateField.vue'
 // import PaymentModal from '../../shared/PaymentModal.vue'
 // import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
-import { TrashIcon } from '@heroicons/vue/24/outline'
+import { TrashIcon } from '@/theme/icons/legacy'
 
 export default {
   name: 'SuppliesList',

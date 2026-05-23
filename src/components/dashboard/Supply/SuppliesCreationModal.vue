@@ -590,7 +590,7 @@ import {
   TrashIcon,
   CheckIcon,
   ArrowRightIcon
-} from '@heroicons/vue/24/outline'
+} from '@/theme/icons/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
 import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'

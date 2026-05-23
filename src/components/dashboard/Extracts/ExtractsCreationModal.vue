@@ -522,7 +522,7 @@ import {
   CheckIcon,
   DocumentDuplicateIcon,
   TrashIcon
-} from '@heroicons/vue/24/outline'
+} from '@/theme/icons/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import normalizeItem from '@/utils/normalizeItem'

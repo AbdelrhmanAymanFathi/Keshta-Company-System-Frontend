@@ -318,7 +318,7 @@ import {
 import CreateVehicle from './CreateVehicle.vue'
 import Pagination from '../../shared/Pagination.vue'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
-import { ArrowsRightLeftIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { ArrowsRightLeftIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@/theme/icons/legacy'
 
 export default {
   name: 'VehiclesList',

@@ -117,7 +117,7 @@
 <script>
 import Pagination from '@/components/shared/Pagination.vue'
 import { getDrivers, createDriver, updateDriver, deleteDriver as apiDeleteDriver } from '@/api'
-import { PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@/theme/icons/legacy'
 
 export default {
   name: 'DriversList',

@@ -187,7 +187,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon
-} from '@heroicons/vue/24/outline'
+} from '@/theme/icons/legacy'
 
 export default {
   name: 'CreateExtractView',
