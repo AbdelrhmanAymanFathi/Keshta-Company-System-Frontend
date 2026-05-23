@@ -1,3 +1,21 @@
+import { normalizeIconPack, setIconPack } from './theme/icons'
+import { bumpThemeRevision } from './theme/state'
+import {
+  normalizeSidebarType,
+  normalizeRadius,
+  normalizeDensity,
+  normalizeShadows,
+  applySurfaceTokens
+} from './theme/tokens'
+import { applySidebarLayout } from './theme/sidebar/layouts'
+import {
+  PRESET_THEMES,
+  getPresetTheme,
+  getPresetThemeList,
+  PERSONALITY_TO_PRESET
+} from './theme/presets'
+import { recommendThemes, recommendThemesWithAI } from './theme/intelligence/themeBot'
+
 const THEME_STORAGE_KEY = 'app-theme'
 const DEFAULT_ANIMATION = 'bubbles'
 const ANIMATION_PRESETS = [
@@ -91,9 +109,34 @@ const TYPOGRAPHY_DEFAULTS = {
   cardText: '#111827'
 }
 
+const DEFAULT_ICON_PACK = 'heroicons'
+const DEFAULT_SIDEBAR_TYPE = 'static'
+const DEFAULT_RADIUS = 'md'
+const DEFAULT_DENSITY = 'comfortable'
+const DEFAULT_SHADOWS = 'soft'
+
+/** @deprecated Use PRESET_THEMES — kept for Settings backward compatibility */
+const THEME_PERSONALITIES = {
+  corporate: { ...PRESET_THEMES['corporate-erp'], label: 'Corporate' },
+  creative: {
+    ...PRESET_THEMES['modern-startup'],
+    label: 'Creative',
+    iconPack: 'phosphor'
+  },
+  cyber: { ...PRESET_THEMES['cyber-futuristic'], label: 'Cyber' },
+  minimal: { ...PRESET_THEMES['modern-startup'], label: 'Minimal' }
+}
+
 const DEFAULT_THEME = {
+  id: 'default',
+  name: 'Default',
   primary: '#4f46e5',
   animation: DEFAULT_ANIMATION,
+  iconPack: DEFAULT_ICON_PACK,
+  sidebarType: DEFAULT_SIDEBAR_TYPE,
+  radius: DEFAULT_RADIUS,
+  density: DEFAULT_DENSITY,
+  shadows: DEFAULT_SHADOWS,
   ...TYPOGRAPHY_DEFAULTS
 }
 
@@ -160,8 +203,15 @@ function normalizeTheme(theme = {}) {
   const primary = normalizeHex(theme.primary)
 
   return {
+    id: theme.id || theme.presetId || 'custom',
+    name: theme.name || 'Custom',
     primary,
     animation: normalizeAnimation(theme.animation),
+    iconPack: normalizeIconPack(theme.iconPack),
+    sidebarType: normalizeSidebarType(theme.sidebarType),
+    radius: normalizeRadius(theme.radius),
+    density: normalizeDensity(theme.density),
+    shadows: normalizeShadows(theme.shadows),
     fontPreset,
     fontFamily,
     textPrimary: normalizeHex(theme.textPrimary, TYPOGRAPHY_DEFAULTS.textPrimary),
@@ -431,7 +481,18 @@ function applyTheme(theme = {}) {
 
   applyAnimationPreset(normalized.animation)
 
-  return { ...typographyTheme, linkColor: typographyTheme.linkColor }
+  setIconPack(normalized.iconPack)
+
+  applySurfaceTokens(normalized)
+  applySidebarLayout(normalized.sidebarType)
+
+  if (typeof document !== 'undefined') {
+    document.documentElement.dataset.themePreset = normalized.id || 'custom'
+  }
+
+  const applied = { ...typographyTheme, linkColor: typographyTheme.linkColor }
+  bumpThemeRevision(applied)
+  return applied
 }
 
 function loadTheme() {
@@ -477,6 +538,40 @@ function colorPickerStyle(color, fallback = DEFAULT_THEME.primary) {
   return { '--picker-color': normalizeHex(color, fallback) }
 }
 
+function applyThemePreset(presetId) {
+  const preset = getPresetTheme(presetId)
+  if (!preset) return applyTheme(loadTheme())
+  const next = normalizeTheme({ ...DEFAULT_THEME, ...preset })
+  saveTheme(next)
+  return applyTheme(next)
+}
+
+function applyThemePersonality(personalityId) {
+  const mapped = PERSONALITY_TO_PRESET[personalityId] || personalityId
+  if (PRESET_THEMES[mapped]) return applyThemePreset(mapped)
+  const preset = THEME_PERSONALITIES[personalityId]
+  if (!preset) return applyTheme(loadTheme())
+  const current = loadTheme()
+  const next = normalizeTheme({ ...current, ...preset })
+  saveTheme(next)
+  return applyTheme(next)
+}
+
+function getThemePersonalities() {
+  return getPresetThemeList()
+}
+
+function exportThemePreset(theme = loadTheme()) {
+  return JSON.stringify(normalizeTheme(theme), null, 2)
+}
+
+function importThemePreset(json) {
+  const parsed = typeof json === 'string' ? JSON.parse(json) : json
+  const next = normalizeTheme({ ...DEFAULT_THEME, ...parsed })
+  saveTheme(next)
+  return applyTheme(next)
+}
+
 // Apply the saved theme immediately on app load.
 if (typeof document !== 'undefined') {
   applyTheme(loadTheme())
@@ -486,12 +581,18 @@ export {
   ANIMATION_PRESETS,
   DEFAULT_ANIMATION,
   DEFAULT_THEME,
+  DEFAULT_ICON_PACK,
   DEFAULT_FONT_PRESET,
+  DEFAULT_SIDEBAR_TYPE,
   FONT_PRESETS,
   FONT_PRESET_IDS,
+  THEME_PERSONALITIES,
+  PRESET_THEMES,
   TYPOGRAPHY_DEFAULTS,
   applyTheme,
   applyThemePatch,
+  applyThemePreset,
+  applyThemePersonality,
   applyTypography,
   loadTheme,
   saveTheme,
@@ -499,7 +600,23 @@ export {
   normalizeTheme,
   normalizeAnimation,
   getFontPresets,
+  getThemePersonalities,
+  getPresetThemeList,
+  recommendThemes,
+  recommendThemesWithAI,
+  exportThemePreset,
+  importThemePreset,
   ensureReadableText,
   contrastRatio,
   colorPickerStyle
 }
+
+export { getThemeIcon, getMenuIcon, getIconPackOptions, iconRevision, ICON_REVISION_KEY } from './theme/icons'
+export { themeRevision, currentTheme, THEME_REVISION_KEY } from './theme/state'
+export { getSidebarOptions } from './theme/sidebar/layouts'
+export {
+  SIDEBAR_TYPES,
+  RADIUS_PRESETS,
+  DENSITY_PRESETS,
+  SHADOW_PRESETS
+} from './theme/tokens'

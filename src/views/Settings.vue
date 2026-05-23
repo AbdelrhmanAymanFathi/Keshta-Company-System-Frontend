@@ -236,7 +236,143 @@
 
         </div>
 
+        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <div class="flex items-center gap-3">
+              <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                <ThemeIcon name="grid" class="w-5 h-5 theme-text-light" />
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.iconPackTitle') || 'Icon Pack' }}</h2>
+            </div>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.iconPackDescription') || 'Switch the entire app icon style instantly — sidebar, tables, and actions.' }}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <button
+                v-for="pack in iconPackOptions"
+                :key="pack.id"
+                type="button"
+                @click="themeIconPack = pack.id"
+                :class="[
+                  'rounded-xl border px-3 py-3 text-start transition theme-motion-soft',
+                  themeIconPack === pack.id
+                    ? 'theme-selected border-transparent shadow-sm'
+                    : 'border-gray-200 bg-white hover:theme-hover-soft'
+                ]"
+              >
+                <span class="flex items-center gap-3">
+                  <span class="theme-icon-container theme-dashboard-bg-soft h-10 w-10">
+                    <ThemeIcon name="vehicle" class="h-5 w-5 theme-accent-strong" />
+                  </span>
+                  <span>
+                    <span class="block text-sm font-semibold theme-text-primary">{{ getIconPackLabel(pack.id) }}</span>
+                    <span class="block text-xs theme-caption">{{ getIconPackDescription(pack.id) }}</span>
+                  </span>
+                </span>
+              </button>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.themePersonality') || 'UI personalities' }}</label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  v-for="personality in themePersonalities"
+                  :key="personality.id"
+                  type="button"
+                  @click="applyPersonality(personality.id)"
+                  class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium theme-text-secondary hover:theme-hover-soft transition theme-motion-soft text-start"
+                >
+                  <span class="block font-semibold theme-text-primary">{{ getPersonalityLabel(personality.id) }}</span>
+                  <span class="block text-xs theme-caption">{{ personality.description }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.themeBotTitle') }}</h2>
+          </div>
+          <div class="p-6 sm:p-8 space-y-4">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.themeBotDescription') }}</p>
+            <form class="flex flex-col sm:flex-row gap-2" @submit.prevent="runThemeBot">
+              <input
+                v-model="themeBotQuery"
+                type="text"
+                class="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus"
+                :placeholder="$t('profile.themeBotPlaceholder')"
+              />
+              <button type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">{{ $t('profile.themeBotApply') }}</button>
+            </form>
+            <div v-if="botSuggestions.length" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                v-for="s in botSuggestions"
+                :key="s.presetId"
+                type="button"
+                @click="applyBotSuggestion(s)"
+                class="rounded-xl border border-gray-200 px-3 py-2 text-start hover:theme-hover-soft transition text-sm"
+              >
+                <span class="font-semibold theme-text-primary">{{ s.name }}</span>
+                <span class="block text-xs theme-caption">{{ Math.round(s.confidence * 100) }}% — {{ s.preview.iconPack }}</span>
+              </button>
+            </div>
+            <router-link
+              :to="{ name: 'theme-studio' }"
+              class="inline-flex theme-link text-sm font-medium"
+            >
+              {{ $t('profile.openThemeStudio') }} →
+            </router-link>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.sidebarLayoutTitle') }}</h2>
+          </div>
+          <div class="p-6 sm:p-8 space-y-4">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.sidebarLayoutDescription') }}</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              <button
+                v-for="opt in sidebarOptions"
+                :key="opt.id"
+                type="button"
+                @click="themeSidebarType = opt.id"
+                :class="[
+                  'rounded-xl border px-3 py-2 text-sm font-medium transition theme-motion-soft text-start',
+                  themeSidebarType === opt.id ? 'theme-selected border-transparent' : 'border-gray-200 bg-white theme-text-secondary hover:theme-hover-soft'
+                ]"
+              >
+                {{ opt.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.surfaceTokensTitle') }}</h2>
+          </div>
+          <div class="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.radius') }}</label>
+              <select v-model="themeRadius" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+                <option v-for="r in radiusPresets" :key="r" :value="r">{{ r }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.density') }}</label>
+              <select v-model="themeDensity" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+                <option v-for="d in densityPresets" :key="d" :value="d">{{ d }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.shadows') }}</label>
+              <select v-model="themeShadows" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+                <option v-for="s in shadowPresets" :key="s" :value="s">{{ s }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
         <div class="flex flex-col sm:flex-row gap-3 px-1 pb-2">
 
@@ -282,16 +418,24 @@ import {
 
   getFontPresets,
 
-  colorPickerStyle
-
+  colorPickerStyle,
+  applyThemePersonality,
+  applyThemePreset,
+  getThemePersonalities,
+  recommendThemes,
+  RADIUS_PRESETS,
+  DENSITY_PRESETS,
+  SHADOW_PRESETS
 } from '@/theme'
+import { getIconPackOptions } from '@/theme/icons'
+import { getSidebarOptions } from '@/theme/sidebar/layouts'
+import ThemeIcon from '@/components/shared/ThemeIcon.vue'
 
 
 
 export default {
-
   name: 'ProfileSettingsView',
-
+  components: { ThemeIcon },
   setup() {
 
     const { t, locale } = useI18n()
@@ -303,10 +447,22 @@ export default {
     const themeAnimation = ref(savedTheme.animation || DEFAULT_THEME.animation)
 
     const themeFontPreset = ref(savedTheme.fontPreset || DEFAULT_THEME.fontPreset)
+    const themeIconPack = ref(savedTheme.iconPack || DEFAULT_THEME.iconPack)
+    const themeSidebarType = ref(savedTheme.sidebarType || DEFAULT_THEME.sidebarType)
+    const themeRadius = ref(savedTheme.radius || DEFAULT_THEME.radius)
+    const themeDensity = ref(savedTheme.density || DEFAULT_THEME.density)
+    const themeShadows = ref(savedTheme.shadows || DEFAULT_THEME.shadows)
+    const themeBotQuery = ref('')
+    const botSuggestions = ref([])
 
     const animationPresets = ANIMATION_PRESETS
-
     const fontPresets = getFontPresets()
+    const iconPackOptions = getIconPackOptions()
+    const sidebarOptions = getSidebarOptions()
+    const themePersonalities = getThemePersonalities()
+    const radiusPresets = RADIUS_PRESETS
+    const densityPresets = DENSITY_PRESETS
+    const shadowPresets = SHADOW_PRESETS
 
     const isRTL = computed(() => locale.value === 'ar')
 
@@ -408,6 +564,12 @@ export default {
 
         animation: themeAnimation.value || DEFAULT_THEME.animation,
 
+        iconPack: themeIconPack.value || DEFAULT_THEME.iconPack,
+        sidebarType: themeSidebarType.value || DEFAULT_THEME.sidebarType,
+        radius: themeRadius.value || DEFAULT_THEME.radius,
+        density: themeDensity.value || DEFAULT_THEME.density,
+        shadows: themeShadows.value || DEFAULT_THEME.shadows,
+
         fontPreset: themeFontPreset.value,
 
         fontFamily: FONT_PRESETS[themeFontPreset.value]?.family || DEFAULT_THEME.fontFamily,
@@ -448,7 +610,45 @@ export default {
 
 
 
-    watch([themeColor, themeAnimation, themeFontPreset], persistTheme, { immediate: true })
+    function syncFromTheme(next) {
+      themeColor.value = next.primary
+      themeAnimation.value = next.animation
+      themeFontPreset.value = next.fontPreset
+      themeIconPack.value = next.iconPack
+      themeSidebarType.value = next.sidebarType
+      themeRadius.value = next.radius
+      themeDensity.value = next.density
+      themeShadows.value = next.shadows
+      typographyColors.textPrimary = next.textPrimary
+      typographyColors.textSecondary = next.textSecondary
+      typographyColors.textMuted = next.textMuted
+      typographyColors.headingColor = next.headingColor
+      typographyColors.textLight = next.textLight
+      typographyColors.sidebarText = next.sidebarText
+      typographyColors.cardText = next.cardText
+    }
+
+    function applyPersonality(personalityId) {
+      const next = applyThemePreset(personalityId) || applyThemePersonality(personalityId)
+      syncFromTheme(next)
+    }
+
+    function runThemeBot() {
+      const q = themeBotQuery.value.trim()
+      if (!q) return
+      botSuggestions.value = recommendThemes(q)
+    }
+
+    function applyBotSuggestion(s) {
+      if (s.presetId) applyThemePreset(s.presetId)
+      syncFromTheme(loadTheme())
+    }
+
+    watch(
+      [themeColor, themeAnimation, themeFontPreset, themeIconPack, themeSidebarType, themeRadius, themeDensity, themeShadows],
+      persistTheme,
+      { immediate: true }
+    )
 
     watch(typographyColors, persistTheme, { deep: true })
 
@@ -463,6 +663,12 @@ export default {
       themeAnimation.value = reset.animation
 
       themeFontPreset.value = reset.fontPreset
+
+      themeIconPack.value = reset.iconPack
+      themeSidebarType.value = reset.sidebarType
+      themeRadius.value = reset.radius
+      themeDensity.value = reset.density
+      themeShadows.value = reset.shadows
 
       typographyColors.textPrimary = reset.textPrimary
 
@@ -480,7 +686,17 @@ export default {
 
     }
 
+    function getIconPackLabel(packId) {
+      return t(`profile.iconPack_${packId}`) || packId
+    }
 
+    function getIconPackDescription(packId) {
+      return t(`profile.iconPackDesc_${packId}`) || ''
+    }
+
+    function getPersonalityLabel(personalityId) {
+      return t(`profile.preset_${personalityId}`) || t(`profile.personality_${personalityId}`) || personalityId
+    }
 
     return {
 
@@ -489,6 +705,26 @@ export default {
       themeAnimation,
 
       themeFontPreset,
+
+      themeIconPack,
+      themeSidebarType,
+      themeRadius,
+      themeDensity,
+      themeShadows,
+      themeBotQuery,
+      botSuggestions,
+
+      iconPackOptions,
+      sidebarOptions,
+      radiusPresets,
+      densityPresets,
+      shadowPresets,
+
+      themePersonalities,
+
+      applyPersonality,
+      runThemeBot,
+      applyBotSuggestion,
 
       typographyColors,
 
@@ -510,7 +746,13 @@ export default {
 
       isRTL,
 
-      t
+      t,
+
+      getIconPackLabel,
+
+      getIconPackDescription,
+
+      getPersonalityLabel
 
     }
 

@@ -6,6 +6,9 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import './theme'
+import ThemeIcon from './components/shared/ThemeIcon.vue'
+import { iconRevision, ICON_REVISION_KEY } from './theme/icons'
+import { themeRevision, THEME_REVISION_KEY } from './theme/state'
 import i18n from './i18n'
 import authManager from './auth'
 import { initializeAuthStore } from './composables/authStore'
@@ -17,6 +20,10 @@ initializeAuthStore()
 
 const app = createApp(App)
 const pinia = createPinia()
+
+app.component('ThemeIcon', ThemeIcon)
+app.provide(ICON_REVISION_KEY, iconRevision)
+app.provide(THEME_REVISION_KEY, themeRevision)
 
 // Register TanStack Vue Query plugin (optional - install @tanstack/vue-query)
 const queryClient = new QueryClient()

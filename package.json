@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
+    "@lucide/vue": "^1.16.0",
+    "@phosphor-icons/vue": "^2.2.1",
     "@tanstack/vue-query": "^5.99.2",
     "axios": "^1.12.2",
     "core-js": "^3.8.3",

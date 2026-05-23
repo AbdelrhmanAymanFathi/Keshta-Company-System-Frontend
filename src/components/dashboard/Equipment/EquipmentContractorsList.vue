@@ -216,7 +216,7 @@ import * as XLSX from 'xlsx'
 import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
 import normalizeItem from '@/utils/normalizeItem'
-import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@/theme/icons/legacy'
 
 export default {
   name: 'EquipmentContractorsList',

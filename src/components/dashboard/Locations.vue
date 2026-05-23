@@ -95,7 +95,7 @@
 
 <script>
 import { getLocations, createLocation, updateLocation, deleteLocation } from '@/api'
-import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { PencilIcon, TrashIcon } from '@/theme/icons/legacy'
 
 export default {
   name: 'Location-List',

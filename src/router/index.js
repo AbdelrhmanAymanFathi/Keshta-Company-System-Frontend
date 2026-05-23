@@ -38,6 +38,7 @@ const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
 const Profile = () => import('@/views/Profile.vue')
 const Settings = () => import('@/views/Settings.vue')
+const ThemeStudio = () => import('@/views/ThemeStudio.vue')
 const ExtractsPage = () => import('@/views/extracts/ExtractsPage.vue')
 const CreateExtract = () => import('@/views/extracts/CreateExtract.vue')
 const ExtractDetail = () => import('@/views/extracts/ExtractDetail.vue')
@@ -291,6 +292,12 @@ const routes = [
         name: 'settings',
         component: Settings,
         meta: { title: 'settings', module: 'settings' }
+      },
+      {
+        path: 'theme-studio',
+        name: 'theme-studio',
+        component: ThemeStudio,
+        meta: { title: 'themeStudio.title', module: 'settings' }
       },
 
       // ==================== Extracts Module ====================
