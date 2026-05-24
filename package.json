@@ -1,13 +1,20 @@
 {
-  "name": "my-vue-app",
+  "name": "keshta-ui-platform",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "demo": "npm run dev -w demo-dashboard",
+    "docs": "npm run dev -w docs-site"
   },
   "dependencies": {
+    "@acme/platform": "0.1.0",
     "@heroicons/vue": "^2.2.0",
     "@lucide/vue": "^1.16.0",
     "@phosphor-icons/vue": "^2.2.1",
@@ -26,6 +33,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@babel/preset-typescript": "^7.28.5",
     "@vue/cli-plugin-babel": "^5.0.9",
     "@vue/cli-plugin-eslint": "^5.0.9",
     "@vue/cli-service": "~5.0.0",
@@ -34,7 +42,8 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.4.0"
   },
   "eslintConfig": {
     "root": true,

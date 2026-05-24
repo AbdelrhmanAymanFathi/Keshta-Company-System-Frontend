@@ -1,10 +1,10 @@
 <template>
 
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 theme-typography-transition">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="settings-shell theme-typography-transition">
 
-    <div class="max-w-5xl mx-auto">
+    <div class="settings-panel responsive-stack">
 
-      <div class="app-page-header theme-header theme-animated-surface theme-glow mb-6 rounded-2xl border border-gray-100 p-5 shadow-lg shadow-slate-200/50">
+      <div class="app-page-header theme-header theme-animated-surface theme-glow rounded-2xl border border-gray-100 p-5 shadow-lg shadow-slate-200/50">
 
         <div>
 
@@ -18,9 +18,9 @@
 
 
 
-      <div class="grid grid-cols-1 gap-6">
+      <div class="responsive-stack">
 
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+        <div class="settings-card">
 
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
 
@@ -40,13 +40,13 @@
 
 
 
-          <div class="p-6 sm:p-8 space-y-4">
+          <div class="settings-card__body space-y-4">
 
             <p class="text-sm theme-text-secondary">{{ $t('profile.themeDescription') || 'Pick a primary accent color and animation style. Buttons, headers, and motion update instantly across the app.' }}</p>
 
-            <div class="rounded-2xl border border-gray-200 bg-slate-50 p-4">
+            <div class="theme-surface">
               <label class="block text-sm font-semibold mb-3 theme-label">{{ $t('profile.accentColor') || 'Accent Color' }}</label>
-              <div class="flex items-center gap-3">
+              <div class="settings-control-row">
                 <input
                   type="color"
                   v-model="themeColor"
@@ -64,7 +64,7 @@
 
               <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.animationPreset') || 'Animation Style' }}</label>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+              <div class="settings-option-grid settings-option-grid--compact">
 
                 <button
 
@@ -100,7 +100,7 @@
 
             </div>
 
-            <div class="rounded-3xl border theme-border theme-dashboard-bg-soft p-4 overflow-hidden">
+            <div class="theme-surface overflow-hidden">
 
               <p class="text-xs font-semibold theme-text-muted uppercase tracking-wide mb-2">{{ $t('profile.headerPreview') || 'Header preview' }}</p>
 
@@ -118,7 +118,7 @@
 
 
 
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+        <div class="settings-card">
 
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
 
@@ -138,7 +138,7 @@
 
 
 
-          <div class="p-6 sm:p-8 space-y-6">
+          <div class="settings-card__body space-y-6">
 
             <p class="text-sm theme-text-secondary">{{ $t('profile.typographyDescription') || 'Customize fonts and text colors across the entire application. Changes apply instantly.' }}</p>
 
@@ -148,7 +148,7 @@
 
               <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.fontFamily') || 'Font Family' }}</label>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <div class="settings-option-grid">
 
                 <button
 
@@ -188,7 +188,7 @@
 
 
 
-            <div class="rounded-3xl border theme-border theme-dashboard-bg-soft p-5 space-y-3">
+            <div class="theme-surface space-y-3">
 
               <p class="text-xs font-semibold theme-text-muted uppercase tracking-wide">{{ $t('profile.typographyPreview') || 'Typography preview' }}</p>
 
@@ -212,13 +212,13 @@
 
 
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="settings-control-grid">
 
               <div v-for="field in typographyColorFields" :key="field.key">
 
                 <label class="block text-sm font-semibold theme-label mb-2">{{ field.label }}</label>
 
-                <div class="flex items-center gap-3">
+                <div class="settings-control-row">
                   <input
                     type="color"
                     v-model="typographyColors[field.key]"
@@ -236,7 +236,7 @@
 
         </div>
 
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+        <div class="settings-card">
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <div class="flex items-center gap-3">
               <div class="bg-white bg-opacity-20 rounded-lg p-2">
@@ -245,9 +245,9 @@
               <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.iconPackTitle') || 'Icon Pack' }}</h2>
             </div>
           </div>
-          <div class="p-6 sm:p-8 space-y-6">
+          <div class="settings-card__body space-y-6">
             <p class="text-sm theme-text-secondary">{{ $t('profile.iconPackDescription') || 'Switch the entire app icon style instantly — sidebar, tables, and actions.' }}</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div class="settings-option-grid">
               <button
                 v-for="pack in iconPackOptions"
                 :key="pack.id"
@@ -273,7 +273,7 @@
             </div>
             <div>
               <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.themePersonality') || 'UI personalities' }}</label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div class="settings-option-grid">
                 <button
                   v-for="personality in themePersonalities"
                   :key="personality.id"
@@ -289,13 +289,13 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+        <div class="settings-card">
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.themeBotTitle') }}</h2>
           </div>
-          <div class="p-6 sm:p-8 space-y-4">
+          <div class="settings-card__body space-y-4">
             <p class="text-sm theme-text-secondary">{{ $t('profile.themeBotDescription') }}</p>
-            <form class="flex flex-col sm:flex-row gap-2" @submit.prevent="runThemeBot">
+            <form class="settings-control-row" @submit.prevent="runThemeBot">
               <input
                 v-model="themeBotQuery"
                 type="text"
@@ -304,7 +304,7 @@
               />
               <button type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">{{ $t('profile.themeBotApply') }}</button>
             </form>
-            <div v-if="botSuggestions.length" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div v-if="botSuggestions.length" class="settings-option-grid">
               <button
                 v-for="s in botSuggestions"
                 :key="s.presetId"
@@ -325,13 +325,13 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+        <div class="settings-card">
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.sidebarLayoutTitle') }}</h2>
           </div>
-          <div class="p-6 sm:p-8 space-y-4">
+          <div class="settings-card__body space-y-4">
             <p class="text-sm theme-text-secondary">{{ $t('profile.sidebarLayoutDescription') }}</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div class="settings-option-grid settings-option-grid--compact">
               <button
                 v-for="opt in sidebarOptions"
                 :key="opt.id"
@@ -348,11 +348,11 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+        <div class="settings-card">
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.surfaceTokensTitle') }}</h2>
           </div>
-          <div class="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="settings-card__body settings-control-grid">
             <div>
               <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.radius') }}</label>
               <select v-model="themeRadius" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
@@ -374,7 +374,7 @@
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 px-1 pb-2">
+        <div class="settings-actions px-1 pb-2">
 
           <button type="button" @click="resetThemeColor" class="theme-button w-full sm:w-auto px-4 py-3 font-medium rounded-lg transition shadow-sm hover:shadow-md">
 
@@ -426,10 +426,9 @@ import {
   RADIUS_PRESETS,
   DENSITY_PRESETS,
   SHADOW_PRESETS
-} from '@/theme'
-import { getIconPackOptions } from '@/theme/icons'
-import { getSidebarOptions } from '@/theme/sidebar/layouts'
-import ThemeIcon from '@/components/shared/ThemeIcon.vue'
+} from '@acme/platform'
+import { getIconPackOptions, ThemeIcon } from '@acme/icon-packs'
+import { getSidebarOptions } from '@acme/layout-engine'
 
 
 

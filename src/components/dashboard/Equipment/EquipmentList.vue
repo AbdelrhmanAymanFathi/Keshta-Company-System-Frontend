@@ -165,7 +165,7 @@ import { getEquipments, createEquipment, updateEquipment, deleteEquipment, getCo
 import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
-import { PencilIcon, PlusIcon, TrashIcon, XMarkIcon } from '@/theme/icons/legacy'
+import { PencilIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'EquipmentList',

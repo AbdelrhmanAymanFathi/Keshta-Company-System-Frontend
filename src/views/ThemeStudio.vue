@@ -1,6 +1,6 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-1 theme-typography-transition">
-    <div class="max-w-6xl mx-auto space-y-6">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="settings-shell theme-typography-transition">
+    <div class="settings-panel responsive-stack">
       <div class="app-page-header theme-header theme-animated-surface theme-glow rounded-2xl border border-gray-100 p-5 shadow-lg">
         <div>
           <h1 class="text-2xl font-semibold theme-heading mb-2">{{ $t('themeStudio.title') }}</h1>
@@ -8,13 +8,13 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="responsive-grid">
         <!-- Theme Bot chat -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden">
+        <div class="settings-card">
           <div class="theme-card-header px-6 py-4">
             <h2 class="text-lg font-bold theme-text-light">{{ $t('themeStudio.botTitle') }}</h2>
           </div>
-          <div class="p-4 flex flex-col h-[28rem]">
+          <div class="settings-card__body flex min-h-[24rem] max-h-[min(34rem,70dvh)] flex-col">
             <div ref="chatScroll" class="flex-1 overflow-y-auto space-y-3 mb-3 app-scrollbar">
               <div
                 v-for="(msg, idx) in messages"
@@ -33,7 +33,7 @@
                 </div>
               </div>
             </div>
-            <form class="flex gap-2" @submit.prevent="sendPrompt">
+            <form class="settings-control-row" @submit.prevent="sendPrompt">
               <input
                 v-model="prompt"
                 type="text"
@@ -48,8 +48,8 @@
         </div>
 
         <!-- Suggestions & preview -->
-        <div class="space-y-4">
-          <div v-if="suggestions.length" class="bg-white rounded-xl border border-gray-100 shadow-md p-4 space-y-3">
+        <div class="responsive-stack">
+          <div v-if="suggestions.length" class="settings-card settings-card__body space-y-3">
             <h3 class="text-sm font-semibold theme-label">{{ $t('themeStudio.suggestions') }}</h3>
             <article
               v-for="s in suggestions"
@@ -86,9 +86,9 @@
             </article>
           </div>
 
-          <div class="bg-white rounded-xl border border-gray-100 shadow-md p-4">
+          <div class="settings-card settings-card__body">
             <h3 class="text-sm font-semibold theme-label mb-3">{{ $t('themeStudio.compare') }}</h3>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="settings-option-grid">
               <button
                 v-for="preset in presetThemes"
                 :key="preset.id"
@@ -103,7 +103,7 @@
             </div>
           </div>
 
-          <div class="flex flex-wrap gap-2">
+          <div class="settings-actions">
             <button type="button" class="theme-button rounded-lg px-4 py-2 text-sm" @click="exportPreset">
               {{ $t('themeStudio.export') }}
             </button>
@@ -128,7 +128,7 @@ import {
   exportThemePreset,
   importThemePreset,
   loadTheme
-} from '@/theme'
+} from '@acme/platform'
 
 export default {
   name: 'ThemeStudioView',

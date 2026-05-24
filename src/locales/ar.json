@@ -414,6 +414,7 @@
     "importError": "تعذر قراءة ملف المظهر."
   },
   "profile": {
+    "preset_minimal": "الوضع البسيط",
     "settingsDescription": "قم بتخصيص ملفك الشخصي وتفضيلاتك هنا.",
     "settings": "الإعدادات",
 

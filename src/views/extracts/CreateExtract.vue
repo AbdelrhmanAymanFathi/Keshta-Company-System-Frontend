@@ -187,7 +187,7 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon
-} from '@/theme/icons/legacy'
+} from '@acme/icon-packs/legacy'
 
 export default {
   name: 'CreateExtractView',

@@ -340,7 +340,7 @@ import {
   InformationCircleIcon,
   MagnifyingGlassIcon,
   TableCellsIcon
-} from '@/theme/icons/legacy'
+} from '@acme/icon-packs/legacy'
 
 const INPUT_CLASS =
   'w-full px-4 py-2.5 bg-slate-50/80 border border-slate-200/80 rounded-xl text-sm theme-text-primary placeholder:theme-caption focus:outline-none theme-input-focus/30 focus:theme-border-accent focus:bg-white transition-all duration-200'

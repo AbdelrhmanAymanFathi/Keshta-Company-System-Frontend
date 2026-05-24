@@ -313,7 +313,7 @@ import { getContractors, createContractor, updateContractor, deleteContractor, g
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import normalizeItem from '@/utils/normalizeItem'
-import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@/theme/icons/legacy'
+import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'ExtractContractorsList',

@@ -1,14 +1,14 @@
 <template>
   <div class="flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
-    <header class="flex items-center justify-between gap-2 px-3 py-2.5 theme-text-light shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header">
+    <header :class="headerClasses">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile and overlay/drawer/reveal desktop layouts -->
         <button
           @click="toggleSidebar"
           :class="[
-            'p-2 rounded-lg hover:bg-white/12 hover:scale-105 transition-all duration-200',
-            !isMobile && !['overlay', 'drawer', 'reveal'].includes(sidebarType) ? 'sm:hidden' : ''
+            'p-2 theme-rounded hover:bg-white/12 transition-all',
+            showDesktopMenuToggle ? '' : 'sm:hidden'
           ]"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,7 +23,7 @@
           <div class="truncate text-sm font-bold whitespace-nowrap sm:text-base lg:text-lg">{{ $t('appName') }}</div>
         </div>
         <!-- Top menus (desktop) -->
-        <nav class="hidden sm:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2">
+        <nav class="hidden md:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
             :class="['rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white theme-text-primary shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200']">
             {{ $t('navbar.' + key) }}
@@ -110,9 +110,10 @@
       </div>
     </div>
 
-    <div class="flex flex-1 min-h-0 overflow-hidden">
+    <div class="layout-shell">
       <!-- Sidebar -->
       <aside
+        v-if="!isHorizontal"
         role="navigation"
         :class="asideClasses"
         @mouseenter="sidebarHovered = true"
@@ -127,12 +128,12 @@
             </div> -->
             <!-- App name visible only when expanded -->
             <transition name="sidebar-label">
-              <div v-if="!effectiveCollapsed" class="font-semibold text-base lg:text-lg">
+              <div v-if="showSidebarLabels" class="sidebar-label-text font-semibold text-base lg:text-lg">
                 {{ $t('appName') }}
               </div>
             </transition>
           </div>
-          <button v-if="!isMobile" @click="toggleCollapsed" class="theme-sidebar-collapse-btn rounded-lg p-2 sm:p-3 hover:scale-105 transition-all duration-200">
+          <button v-if="showCollapseControl" @click="toggleCollapsed" class="theme-sidebar-collapse-btn theme-rounded p-2 sm:p-3 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
             <svg v-if="!effectiveCollapsed" class="w-5 h-5 theme-accent-strong" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
@@ -145,7 +146,7 @@
         </div>
 
         <!-- Mobile Header -->
-        <div v-if="isMobile" class="mb-4 flex items-center justify-between sm:hidden">
+        <div v-if="isMobile" class="mb-4 flex items-center justify-between md:hidden">
           <div class="flex min-w-0 items-center gap-3">
             <div class="w-9 h-9 rounded-md overflow-hidden shadow-md">
               <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
@@ -160,7 +161,7 @@
         </div>
 
         <!-- Mobile Top Menu -->
-        <div v-if="isMobile" class="mb-4 space-y-1 sm:hidden">
+        <div v-if="isMobile" class="mb-4 space-y-1 md:hidden">
           <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
             :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'theme-sidebar-item-active' : 'theme-sidebar-item']">
             {{ $t('navbar.' + key) }}
@@ -170,38 +171,37 @@
         <!-- Vertical Menu -->
         <ul class="space-y-2.5">
           <li v-for="item in filteredVerticalMenu" :key="item.name">
-            <button @click="selectVertical(item.routeName)"
-              :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item') : (currentRouteName === item.routeName ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+            <button
+              @click="selectVertical(item.routeName)"
+              :title="effectiveCollapsed ? $t(item.label) : undefined"
+              :class="['sidebar-link group flex w-full items-center gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item') : (currentRouteName === item.routeName ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
               <div
-                class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
+                class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 flex-shrink-0 items-center justify-center theme-rounded transition-all duration-200"
                 :class="(item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName) ? 'scale-110' : ''"
               >
                 <component :is="menuIconComponent(item.name)" class="h-5 w-5" />
               </div>
-              <transition name="sidebar-label">
-                <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">
-                  {{ $t(item.label) }}
-                </span>
-              </transition>
+              <span v-if="showSidebarLabels" class="sidebar-label-text truncate text-sm font-medium">
+                {{ $t(item.label) }}
+              </span>
             </button>
           </li>
           <!-- Transport module: show dynamic reports inline under the transport menu -->
           <li v-if="reportsForModule && reportsForModule.length">
-            <transition name="sidebar-label">
-              <h4 v-if="!effectiveCollapsed" class="px-4 text-xs uppercase theme-text-muted tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
-            </transition>
+            <h4 v-if="showSidebarLabels" class="sidebar-label-text px-4 text-xs uppercase theme-text-muted tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
             <ul class=" space-y-2 ">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button @click="openReport(r.id)" :class="['sidebar-link group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+                <button
+                  @click="openReport(r.id)"
+                  :title="effectiveCollapsed ? ($i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle)) : undefined"
+                  :class="['sidebar-link group flex w-full items-center gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
                   <div
-                    class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200"
+                    class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 items-center justify-center theme-rounded transition-all duration-200"
                     :class="isDynamicReportActive(r) ? 'scale-110' : ''"
                   >
                     <DocumentTextIcon class="h-5 w-6" />
                   </div>
-                  <transition name="sidebar-label">
-                    <span v-if="!effectiveCollapsed" class="truncate text-sm font-medium">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
-                  </transition>
+                  <span v-if="showSidebarLabels" class="sidebar-label-text truncate text-sm font-medium">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
                 </button>
               </li>
             </ul>
@@ -211,11 +211,16 @@
         
       </aside>
 
-      <!-- Mobile Overlay -->
-      <div v-if="showSidebarOverlay" class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300" @click="toggleSidebar"></div>
+      <div
+        v-if="showSidebarOverlay"
+        class="layout-backdrop"
+        role="presentation"
+        aria-hidden="true"
+        @click="toggleSidebar"
+      />
 
       <!-- Main Content -->
-      <main class="dashboard-module-content app-scrollbar theme-main-gradient flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
+      <main :class="mainClasses">
         <!-- <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t(currentLabel) }}</h2> -->
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
@@ -237,19 +242,24 @@
 
 <script>
 import AuthLogout from '@/components/auth/Logout.vue'
-import ThemeIcon from '@/components/shared/ThemeIcon.vue'
+import { ThemeIcon } from '@acme/icon-packs'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { getReportDefs } from '@/api'
-import { DocumentTextIcon, WrenchScrewdriverIcon } from '@/theme/icons/legacy'
-import { iconRevision, getMenuIcon } from '@/theme/icons'
-import { themeRevision } from '@/theme/state'
-import { loadTheme } from '@/theme'
+import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
+import { iconRevision, getMenuIcon } from '@acme/icon-packs'
+import { themeRevision, loadTheme } from '@acme/theme-engine'
 import {
   getSidebarAsideClasses,
-  shouldShowSidebarOverlay,
-  isSidebarCollapsedByDefault
-} from '@/theme/sidebar/layouts'
+  shouldShowBackdrop,
+  resolveEffectiveCollapsed,
+  shouldShowSidebarLabels,
+  startsClosedOnDesktop,
+  showDesktopToggle,
+  showCollapseControl,
+  isSidebarCollapsedByDefault,
+  lockBodyScroll
+} from '@acme/layout-engine'
 
 export default {
   name: 'DashboardLayout',
@@ -318,7 +328,7 @@ export default {
       sidebarHovered: false,
       showLogoutDialog: false,
       userMenuOpen: false,
-      isMobile: window.innerWidth < 640,
+      isMobile: window.innerWidth < 768,
       reports: []
     }
   },
@@ -335,16 +345,43 @@ export default {
       return loadTheme().sidebarType || 'static'
     },
     showSidebarOverlay() {
-      return shouldShowSidebarOverlay({
+      return shouldShowBackdrop(this.sidebarControllerState)
+    },
+    sidebarControllerState() {
+      return {
         sidebarType: this.sidebarType,
         isMobile: this.isMobile,
-        sidebarOpen: this.sidebarOpen
-      })
+        isRTL: this.isRTL,
+        sidebarOpen: this.sidebarOpen,
+        effectiveCollapsed: false,
+        collapsedSidebar: this.collapsedSidebar,
+        sidebarHovered: this.sidebarHovered,
+        sidebarPinned: !this.collapsedSidebar
+      }
+    },
+    showDesktopMenuToggle() {
+      return this.isMobile || showDesktopToggle(this.sidebarType)
     },
     effectiveCollapsed() {
-      if (this.isMobile) return false
-      if (this.sidebarType === 'reveal') return !this.sidebarHovered
-      return this.sidebarType === 'slim' || this.sidebarType === 'slim-plus' ? true : this.collapsedSidebar
+      return resolveEffectiveCollapsed(this.sidebarControllerState)
+    },
+    headerClasses() {
+      return [
+        'flex items-center justify-between gap-2 px-3 py-2.5 theme-text-light shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header',
+        this.isMobile ? 'fixed inset-x-0 top-0 z-50 w-full' : 'relative'
+      ]
+    },
+    mainClasses() {
+      return [
+        'layout-main dashboard-module-content app-scrollbar theme-main-gradient overflow-y-auto p-3 sm:p-4 lg:p-6',
+        this.isMobile ? 'pt-16' : ''
+      ]
+    },
+    showSidebarLabels() {
+      return shouldShowSidebarLabels(this.sidebarControllerState)
+    },
+    showCollapseControl() {
+      return !this.isMobile && showCollapseControl(this.sidebarType)
     },
     headerGradient() { return 'theme-dashboard-header' },
     userInitials() {
@@ -361,13 +398,7 @@ export default {
     },
     asideClasses() {
       void this.themeTick
-      return getSidebarAsideClasses({
-        sidebarType: this.sidebarType,
-        isMobile: this.isMobile,
-        isRTL: this.isRTL,
-        sidebarOpen: this.sidebarOpen,
-        effectiveCollapsed: this.effectiveCollapsed
-      })
+      return getSidebarAsideClasses(this.sidebarControllerState)
     },
     isAdmin() {
       if (!this.user || !this.user.roles) return false
@@ -419,9 +450,6 @@ export default {
     currentLabel() { return this.currentItem ? this.currentItem.label : '' },
     isReportsListActive() {
       return this.currentRouteName === 'admin-reports-list' || String(this.currentRouteName || '').startsWith('admin-reports-')
-    },
-    isHorizontal() {
-      return this.sidebarType === 'horizontal'
     },
     selectedTop() {
       const routeName = this.currentRouteName
@@ -475,8 +503,14 @@ export default {
   },
   watch: {
     collapsedSidebar(v) { localStorage.setItem('sidebarCollapsed', JSON.stringify(v)) },
-    sidebarOpen(v) {
-      if (this.isMobile) document.body.style.overflow = v ? 'hidden' : ''
+    showSidebarOverlay(visible) {
+      lockBodyScroll(this.isMobile && visible)
+    },
+    sidebarType() {
+      this.syncSidebarOpenState()
+    },
+    isMobile() {
+      this.syncSidebarOpenState()
     }
   },
   methods: {
@@ -543,7 +577,25 @@ export default {
       if (this.isMobile) this.sidebarOpen = false
     },
     toggleSidebar() { this.sidebarOpen = !this.sidebarOpen },
-    toggleCollapsed() { if (!this.isMobile) this.collapsedSidebar = !this.collapsedSidebar },
+    toggleCollapsed() {
+      if (this.isMobile) return
+      this.collapsedSidebar = !this.collapsedSidebar
+    },
+    syncSidebarOpenState() {
+      if (this.isMobile) {
+        if (!this.sidebarOpen) lockBodyScroll(false)
+        return
+      }
+      lockBodyScroll(false)
+      if (startsClosedOnDesktop(this.sidebarType)) {
+        this.sidebarOpen = false
+      } else {
+        this.sidebarOpen = true
+      }
+    },
+    onSidebarEscape(e) {
+      if (e.key === 'Escape' && this.sidebarOpen) this.sidebarOpen = false
+    },
     resetSidebarHover() { this.sidebarHovered = false },
     toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
     navigateToReport() { 
@@ -577,11 +629,7 @@ export default {
       return getMenuIcon(name)
     },
     onResize() {
-      this.isMobile = window.innerWidth < 640
-      if (!this.isMobile) {
-        document.body.style.overflow = ''
-        this.sidebarOpen = false
-      }
+      this.isMobile = window.innerWidth < 768
     }
     ,
     async loadReports() {
@@ -609,8 +657,10 @@ export default {
     if (isSidebarCollapsedByDefault(loadTheme().sidebarType) && !this.isMobile) {
       this.collapsedSidebar = true
     }
+    this.syncSidebarOpenState()
     window.addEventListener('resize', this.onResize)
     this.onResize()
+    document.addEventListener('keydown', this.onSidebarEscape)
     this.loadReports()
     document.addEventListener('click', (e) => {
       if (!this.$el.querySelector('.relative')?.contains(e.target)) this.userMenuOpen = false
@@ -618,7 +668,8 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.onResize)
-    document.body.style.overflow = ''
+    document.removeEventListener('keydown', this.onSidebarEscape)
+    lockBodyScroll(false)
   }
 }
 </script>
@@ -738,37 +789,40 @@ export default {
 }
 
 /* Sidebar transition */
-aside {
-  transition: width 0.3s ease, transform 0.3s ease;
+.layout-sidebar {
+  transition:
+    width var(--layout-motion-duration) var(--layout-motion-ease),
+    transform var(--layout-motion-duration) var(--layout-motion-ease),
+    box-shadow var(--layout-motion-duration) var(--layout-motion-ease);
 }
 
 /* Modern scrollbar style for dashboard scroll areas */
 .app-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(var(--theme-primary-rgb), 0.55) transparent;
+  scrollbar-color: var(--theme-scrollbar-thumb-color) var(--theme-scrollbar-track-bg);
   scrollbar-gutter: stable;
 }
 
 .app-scrollbar::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
+  width: var(--theme-scrollbar-size);
+  height: var(--theme-scrollbar-size);
 }
 
 .app-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--theme-scrollbar-track-bg);
   border-radius: 9999px;
 }
 
 .app-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(var(--theme-primary-rgb), 0.68), rgba(var(--theme-primary-rgb), 0.8));
+  background: linear-gradient(180deg, var(--theme-scrollbar-thumb-start), var(--theme-scrollbar-thumb-end));
   border-radius: 9999px;
-  border: 2px solid transparent;
+  border: 2px solid var(--theme-scrollbar-thumb-border);
   background-clip: padding-box;
 }
 
 .app-scrollbar:hover::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(var(--theme-primary-rgb), 0.85), rgba(var(--theme-primary-rgb), 0.95));
-  border: 2px solid transparent;
+  background: linear-gradient(180deg, var(--theme-scrollbar-thumb-hover-start), var(--theme-scrollbar-thumb-hover-end));
+  border: 2px solid var(--theme-scrollbar-thumb-border);
   background-clip: padding-box;
 }
 

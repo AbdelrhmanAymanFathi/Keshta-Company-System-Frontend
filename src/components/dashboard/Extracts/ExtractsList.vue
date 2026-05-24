@@ -162,7 +162,7 @@ import ExtractsCreationModal from './ExtractsCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
-import { TrashIcon } from '@/theme/icons/legacy'
+import { TrashIcon } from '@acme/icon-packs/legacy'
 import DateField from '../../shared/DateField.vue'
 
 export default {

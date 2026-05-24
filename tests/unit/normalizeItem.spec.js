@@ -1,3 +1,4 @@
+/* global test, expect */
 import normalizeItem from '../../src/utils/normalizeItem'
 
 test('normalizeItem preserves defaultExtractPrice and converts to number', () => {

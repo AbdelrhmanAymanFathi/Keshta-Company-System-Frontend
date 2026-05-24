@@ -1,3 +1,4 @@
+/* global test, expect */
 import { extractLineSchema, createExtractSchema } from '../../src/validators/extracts'
 
 test('extractLineSchema allows missing price when total provided', () => {
