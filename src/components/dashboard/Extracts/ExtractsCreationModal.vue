@@ -169,7 +169,7 @@
                           @select="selectCrusher"
                         >
                           <template #prefix>
-                            <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
+                            <ThemeIcon name="settings" class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                           </template>
                           <template #afterOptions>
                             <div
@@ -516,13 +516,12 @@ import {
   MapPinIcon,
   MapIcon,
   UserGroupIcon,
-  WrenchScrewdriverIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   CheckIcon,
   DocumentDuplicateIcon,
   TrashIcon
-} from '@/theme/icons/legacy'
+} from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import normalizeItem from '@/utils/normalizeItem'
@@ -548,7 +547,6 @@ export default {
     MapPinIcon,
     MapIcon,
     UserGroupIcon,
-    WrenchScrewdriverIcon,
     ArrowLeftIcon,
     ArrowRightIcon,
     CheckIcon,
@@ -943,7 +941,7 @@ export default {
       this.rows.splice(index, 1)
       if (!this.rows.length) this.addRow()
     },
-    handleEnterKey(index) {
+    handleEnterKey() {
       const newRowIndex = this.rows.length
       this.addRow()
       this.$nextTick(() => {

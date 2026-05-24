@@ -1,0 +1,5 @@
+export * from './registry'
+export * from './resolver'
+export * from './helpers'
+export { ThemeIcon } from './ThemeIcon'
+export { iconPlugin, getThemeIcon, getMenuIcon, setIconPack, iconRevision, ICON_REVISION_KEY } from './resolver'

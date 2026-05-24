@@ -95,7 +95,7 @@
 
 <script>
 import { getLocations, createLocation, updateLocation, deleteLocation } from '@/api'
-import { PencilIcon, TrashIcon } from '@/theme/icons/legacy'
+import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'Location-List',

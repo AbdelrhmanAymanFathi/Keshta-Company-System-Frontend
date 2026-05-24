@@ -319,7 +319,7 @@
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
-import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@/theme/icons/legacy'
+import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@acme/icon-packs/legacy'
 import { getLocations, createLocation } from '@/api'
 
 export default {

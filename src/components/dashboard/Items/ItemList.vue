@@ -250,7 +250,7 @@ import normalizeItem from '@/utils/normalizeItem'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
-import { PencilIcon, PlusIcon, TrashIcon } from '@/theme/icons/legacy'
+import { PencilIcon, PlusIcon, TrashIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'ItemList',

@@ -5,10 +5,10 @@ import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
-import './theme'
-import ThemeIcon from './components/shared/ThemeIcon.vue'
-import { iconRevision, ICON_REVISION_KEY } from './theme/icons'
-import { themeRevision, THEME_REVISION_KEY } from './theme/state'
+import { initThemePlatform } from '@acme/platform'
+import { ThemeIcon } from '@acme/icon-packs'
+import { iconRevision, ICON_REVISION_KEY } from '@acme/icon-packs'
+import { themeRevision, THEME_REVISION_KEY } from '@acme/theme-engine'
 import i18n from './i18n'
 import authManager from './auth'
 import { initializeAuthStore } from './composables/authStore'
@@ -17,6 +17,7 @@ import { installHeaderMotion } from './utils/headerMotionMount'
 
 // Initialize auth store immediately on app load
 initializeAuthStore()
+initThemePlatform()
 
 const app = createApp(App)
 const pinia = createPinia()

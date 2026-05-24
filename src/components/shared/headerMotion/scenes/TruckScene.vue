@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { computed, useId } from 'vue'
+import { useId } from 'vue'
 
 export default {
   name: 'TruckScene',

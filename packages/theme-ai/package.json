@@ -1,0 +1,23 @@
+{
+  "name": "@acme/theme-ai",
+  "version": "0.1.0",
+  "description": "Rule-based theme recommendation engine with AI-ready pipeline",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "sideEffects": false,
+  "peerDependencies": {
+    "@acme/ui-presets": "0.1.0",
+    "@acme/icon-packs": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

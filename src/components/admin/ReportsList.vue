@@ -81,7 +81,7 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PencilSquareIcon, PlayIcon, TrashIcon } from '@/theme/icons/legacy'
+import { PencilSquareIcon, PlayIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import { getReportDefs, deleteReportDef } from '@/api'
 import { normalizeReportTotals } from '@/utils/reportDefinitions'
 

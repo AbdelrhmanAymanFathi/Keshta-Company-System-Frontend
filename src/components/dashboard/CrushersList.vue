@@ -210,7 +210,7 @@
 <script>
 import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../api'
 import Pagination from '@/components/shared/Pagination.vue'
-import { CubeIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@/theme/icons/legacy'
+import { CubeIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'CrushersList',
