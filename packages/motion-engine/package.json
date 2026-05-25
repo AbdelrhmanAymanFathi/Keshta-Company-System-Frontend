@@ -1,0 +1,22 @@
+{
+  "name": "@acme/motion-engine",
+  "version": "0.1.0",
+  "description": "Animation and motion preset engine",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "sideEffects": false,
+  "peerDependencies": {
+    "@acme/theme-engine": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

@@ -373,6 +373,7 @@
     "importError": "Could not parse theme file."
   },
   "profile": {
+    "preset_minimal": "Minimal",
     "settingsDescription": "Customize your profile and preferences here.",
     "settings": "Settings",
     "animationHint": "Choose an animation preset to add some motion to your profile background.",

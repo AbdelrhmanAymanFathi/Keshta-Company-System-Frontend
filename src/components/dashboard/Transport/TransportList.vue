@@ -310,7 +310,7 @@ import DateField from '@/components/shared/DateField.vue'
 import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
-import { TrashIcon } from '@/theme/icons/legacy'
+import { TrashIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'TransportList',

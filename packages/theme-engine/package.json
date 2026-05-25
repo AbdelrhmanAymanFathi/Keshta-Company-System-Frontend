@@ -1,0 +1,28 @@
+{
+  "name": "@acme/theme-engine",
+  "version": "0.1.0",
+  "description": "Runtime UI theme engine for Vue 3 dashboards",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./vue": {
+      "types": "./src/vue.ts",
+      "import": "./src/vue.ts"
+    }
+  },
+  "files": ["dist", "src"],
+  "sideEffects": false,
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vue": "^3.2.13"
+  }
+}

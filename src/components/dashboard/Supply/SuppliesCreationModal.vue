@@ -205,7 +205,7 @@
             <!-- Next / Cancel Buttons -->
             <div class="mt-10 flex justify-end gap-6">
               <button @click="closeModal"
-                class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">
+                class="px-10 py-3 sm:px-2 md:px-3 lg:px-8  border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">
                 {{ $t('labels.cancel') }}
               </button>
               <button @click="goToStep2" :disabled="!isStep1Valid()"
@@ -590,7 +590,7 @@ import {
   TrashIcon,
   CheckIcon,
   ArrowRightIcon
-} from '@/theme/icons/legacy'
+} from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
 import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'

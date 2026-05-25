@@ -142,7 +142,7 @@ import { useAuth } from '@/composables/useAuth'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { changePassword } from '@/api'
-import { InformationCircleIcon, EnvelopeIcon, UserIcon, XMarkIcon, ShieldCheckIcon, KeyIcon, DevicePhoneMobileIcon } from '@/theme/icons/legacy'
+import { InformationCircleIcon, EnvelopeIcon, UserIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'ProfileView',
@@ -151,9 +151,6 @@ export default {
     InformationCircleIcon,
     EnvelopeIcon,
     UserIcon,
-    ShieldCheckIcon,
-    KeyIcon,
-    DevicePhoneMobileIcon,
     XMarkIcon
   },
   setup() {

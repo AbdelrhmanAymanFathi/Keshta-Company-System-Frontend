@@ -522,7 +522,7 @@ import {
   TrashIcon,
   CheckIcon,
   ArrowRightIcon
-} from '@/theme/icons/legacy'
+} from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { getTodayISO, formatToISODate } from '@/utils/dateUtils'
