@@ -380,6 +380,8 @@ export const updateContractor = (id, data) => {
   console.log('[API] Updating contractor:', id, 'Data:', data, 'URL:', `${BASE_URL}/api/contractors/${id}`);
   return axios.patch(`${BASE_URL}/api/contractors/${id}`, data);
 };
+// Fetch single contractor by id
+export const getContractor = (id) => axios.get(`${BASE_URL}/api/contractors/${id}`);
 // Delete contractor by id — backend expects RESTful resource path (/api/contractors/:id)
 // Note: many backends return 204 No Content for successful deletes; axios will resolve
 // with response.status === 204 and an empty body.
