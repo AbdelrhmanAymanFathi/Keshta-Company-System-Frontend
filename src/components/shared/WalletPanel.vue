@@ -164,6 +164,7 @@ export default {
     const withdrawModalOpen = ref(false)
     const withdrawalSubmitting = ref(false)
     const withdrawalError = ref('')
+    const selectedAccountType = computed(() => normalizeContractorAccountType(selectedAccount.value?.accountType))
 
     const loadSummary = async () => {
       if (!props.contractorId) return

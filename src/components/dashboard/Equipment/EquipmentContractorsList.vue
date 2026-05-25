@@ -432,7 +432,7 @@ export default {
         const payload = {
           amount,
           description: this.depositForm.description || '',
-           date: this.depositForm.date || undefined,
+          date: this.depositForm.date || undefined,
           accountType: normalizeContractorAccountType(this.mode)
         }
         const res = await depositToContractorWallet(this.selectedContractor.id, payload)

@@ -448,7 +448,7 @@ const withContractorAccountContext = (data = {}) => {
 // but fall back to legacy `wallet` endpoints if the server hasn't migrated yet.
 export const getContractorWallet = async (contractorId, opts = {}) => {
   // opts: { accountType?: 'EXPORT'|'TRANSPORT'|..., accountId?: string }
-   const { accountId } = opts || {}
+  const { accountId } = opts || {}
   const accountType = normalizeContractorAccountType(opts?.accountType)
 
   // If specific accountId requested, fetch that account directly
@@ -496,7 +496,7 @@ export const getContractorWallet = async (contractorId, opts = {}) => {
 
 export const getContractorWalletHistory = async (contractorId, opts = {}) => {
   // opts: { accountType?, accountId?, params? }
-   const { accountId } = opts || {}
+  const { accountId } = opts || {}
   const accountType = normalizeContractorAccountType(opts?.accountType)
 
   // If accountId provided, fetch account transactions
@@ -559,7 +559,7 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
 };
 
 export const depositToContractorWallet = async (contractorId, data) => {
-    const payload = withContractorAccountContext(data);
+  const payload = withContractorAccountContext(data);
   // If caller provided accountId, use it
   if (payload && payload.accountId) {
     const accountPayload = { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date };
@@ -570,7 +570,7 @@ export const depositToContractorWallet = async (contractorId, data) => {
     try {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
-     const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
+      const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
       if (acct) return postAccountTransaction(acct.id, { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date });
     } catch (e) {
       // fallthrough
@@ -578,22 +578,22 @@ export const depositToContractorWallet = async (contractorId, data) => {
   }
 
   // Fallback: wallet deposit endpoint
- return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
+  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
 };
 
 export const withdrawFromContractorWallet = async (contractorId, data) => {
-    const normalized = withContractorAccountContext(data);
+  const normalized = withContractorAccountContext(data);
   const amount = Math.abs(Number(normalized?.amount || 0));
   const payload = { ...normalized, amount };
 
- if (payload && payload.accountId) {
+  if (payload && payload.accountId) {
     return postAccountTransaction(payload.accountId, { amount, type: 'DEBIT', description: payload.description, date: payload.date });
   }
   if (payload && payload.accountType) {
     try {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
-        const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
+      const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
       if (acct) return postAccountTransaction(acct.id, { amount, type: 'DEBIT', description: payload.description, date: payload.date });
     } catch (e) {console.error('Error withdrawing contractor wallet with accountType:', e)}
   }
@@ -605,8 +605,8 @@ export const withdrawFromContractorWallet = async (contractorId, data) => {
 export const getContractorReportData = async (contractorId, params = {}, format = 'json', mode = null) => {
   const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
   let axiosParams = { ...params };
+  const normalizedMode = normalizeContractorAccountType(mode || params.mode || params.transaction_type);
 
-   const normalizedMode = normalizeContractorAccountType(mode || params.mode || params.transaction_type);
   // Add transaction_type if provided (either from params or as separate parameter)
   if (normalizedMode) {
     axiosParams.mode = normalizedMode;
