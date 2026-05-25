@@ -134,7 +134,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
-import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions, getContractorAccounts } from '@/api'
+import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions, getContractorAccounts, normalizeContractorAccountType } from '@/api'
 
 export default {
   name: 'WalletPanel',
@@ -158,6 +158,7 @@ export default {
     const loadingHistory = ref(false)
     const deposit = ref({ amount: '', description: '', date: '' })
     const selectedAccount = ref(null)
+    const selectedAccountType = computed(() => normalizeContractorAccountType(selectedAccount.value?.accountType))
     const depositModalOpen = ref(false)
     const withdrawal = ref({ amount: '', description: '', date: '' })
     const withdrawModalOpen = ref(false)
@@ -229,7 +230,13 @@ export default {
         return false
       }
       try {
-        const payload = { amount, description: deposit.value.description || undefined, date: deposit.value.date || undefined }
+        const payload = {
+          amount,
+          description: deposit.value.description || undefined,
+          date: deposit.value.date || undefined,
+          accountId: selectedAccount.value?.id || undefined,
+          accountType: selectedAccountType.value
+        }
         const res = await depositToContractorWallet(props.contractorId, payload)
         if (!res) throw new Error('No response from deposit request')
         if (res?.data) {
@@ -268,7 +275,13 @@ export default {
 
       withdrawalSubmitting.value = true
       try {
-        const payload = { amount, description: withdrawal.value.description || undefined, date: withdrawal.value.date || undefined }
+        const payload = {
+          amount,
+          description: withdrawal.value.description || undefined,
+          date: withdrawal.value.date || undefined,
+          accountId: selectedAccount.value?.id || undefined,
+          accountType: selectedAccountType.value
+        }
         const res = await withdrawFromContractorWallet(props.contractorId, payload)
         if (res && res.data) {
           wallet.value = res.data
@@ -328,7 +341,7 @@ export default {
 
     return { wallet, history, loading, loadingHistory, deposit, loadSummary, loadHistory, doDeposit, clearDeposit, formatCurrency, formatDate, depositModalOpen, openDepositModal, closeDepositModal, confirmDeposit, isVisible, isRTL,
       withdrawal, withdrawModalOpen, openWithdrawModal, closeWithdrawModal, submitWithdrawal, withdrawalSubmitting, withdrawalError,
-      selectedAccount, selectAccount, displayBalance }
+      selectedAccount, selectedAccountType, selectAccount, displayBalance }
   }
 }
 </script>

@@ -245,7 +245,7 @@
 
 <script>
 import { ref, computed, onMounted, getCurrentInstance } from 'vue'
-import { getContractorReportData, getContractors } from '@/api'
+import { getContractorReportData, getContractors, normalizeContractorAccountType } from '@/api'
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
@@ -298,21 +298,20 @@ export default {
       }
     }
 
-    const parseModeInput = (input) => {
+      const parseModeInput = (input) => {
       if (!input) return ''
       const s = String(input).trim()
       if (!s) return ''
       const low = s.toLowerCase()
-      if (low === 'export') return 'SUPPLY'
-      if (low === 'supply') return 'SUPPLY'
-      if (low === 'transport') return 'TRANSPORT'
-      if (low === 'extract' || low === 'extracts') return 'EXTRACT'
-      if (low === 'rental' || low === 'rentals' || low === 'equipmentlogs' || low === 'equipment_logs' || low === 'equipment-logs') return 'RENTALS'
+      if (low === 'equipmentlogs' || low === 'equipment_logs' || low === 'equipment-logs') return 'RENTAL'
+      const normalized = normalizeContractorAccountType(s)
+      if (normalized) return normalized
       if (low === 'expense') return 'EXPENSE'
       if (low === 'deposit') return 'DEPOSIT'
       if (low === 'withdrawal') return 'WITHDRAWAL'
       return s.toUpperCase()
     }
+
 
     // statementMode: uppercase mode for report APIs (e.g. SUPPLY, TRANSPORT)
     const statementMode = computed(() => parseModeInput(mode.value || props.mode || ''))
@@ -501,7 +500,10 @@ export default {
         if (filters.value.endDate) p.endDate = filters.value.endDate
         p.format = 'json'
         if (currentLang.value) p.lang = currentLang.value
-        if (statementMode.value) p.mode = statementMode.value
+        if (statementMode.value) {
+          p.mode = statementMode.value
+          p.transaction_type = statementMode.value
+        }
 
         const params = buildQueryParams(p)
 
@@ -533,7 +535,10 @@ export default {
         if (filters.value.endDate) p.endDate = filters.value.endDate
         p.format = format
         if (currentLang.value) p.lang = currentLang.value
-        if (statementMode.value) p.mode = statementMode.value
+        if (statementMode.value) {
+          p.mode = statementMode.value
+          p.transaction_type = statementMode.value
+        }
 
         const params = buildQueryParams(p)
 

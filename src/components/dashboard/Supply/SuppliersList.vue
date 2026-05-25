@@ -332,7 +332,7 @@
 
 <script>
 import * as XLSX from 'xlsx'
-import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet } from '../../../api'
+import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
 
 export default {
@@ -514,9 +514,10 @@ export default {
     async fetchWallet(contractorId) {
       this.walletLoading = true
       try {
+        const accountType = normalizeContractorAccountType(this.mode)
         const [wRes, hRes] = await Promise.all([
-          getContractorWallet(contractorId),
-          getContractorWalletHistory(contractorId)
+          getContractorWallet(contractorId, { accountType }),
+          getContractorWalletHistory(contractorId, { accountType })
         ])
         this.wallet = wRes.data || null
         // history response for accounts APIs may return items or data structure
@@ -542,7 +543,8 @@ export default {
         const payload = {
           amount,
           description: this.depositForm.description || '',
-          date: this.depositForm.date || undefined
+          date: this.depositForm.date || undefined,
+          accountType: normalizeContractorAccountType(this.mode)
         }
         const res = await depositToContractorWallet(this.selectedContractor.id, payload)
         if (res?.data) this.wallet = res.data

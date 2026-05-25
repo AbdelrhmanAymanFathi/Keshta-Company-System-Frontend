@@ -409,11 +409,44 @@ export const getAccountTransactions = (accountId, params = {}) => {
 export const postAccountTransaction = (accountId, payload) =>
   axios.post(`${BASE_URL}/api/accounts/${accountId}/transactions`, payload);
 
+export const normalizeContractorAccountType = (value) => {
+  if (!value) return undefined;
+  const normalized = String(value).trim().toUpperCase();
+  if (!normalized) return undefined;
+
+  const aliases = {
+    EXPORT: 'SUPPLY',
+    SUPPLY: 'SUPPLY',
+    TRANSPORT: 'TRANSPORT',
+    RENTAL: 'RENTAL',
+    RENTALS: 'RENTAL',
+    EXTRACT: 'EXTRACT',
+    EXPENSE: 'EXPENSE',
+    GENERAL: 'GENERAL',
+    OTHER: 'OTHER'
+  };
+
+  return aliases[normalized] || normalized;
+};
+
+const withContractorAccountContext = (data = {}) => {
+  const payload = { ...data };
+  const normalizedAccountType = normalizeContractorAccountType(payload.accountType || payload.mode);
+
+  if (normalizedAccountType) {
+    payload.accountType = normalizedAccountType;
+    payload.mode = normalizedAccountType;
+  }
+
+  return payload;
+};
+
 // Compatibility: old wallet-style helpers. These try to use `accounts` responses when available,
 // but fall back to legacy `wallet` endpoints if the server hasn't migrated yet.
 export const getContractorWallet = async (contractorId, opts = {}) => {
   // opts: { accountType?: 'EXPORT'|'TRANSPORT'|..., accountId?: string }
-  const { accountType, accountId } = opts || {}
+   const { accountId } = opts || {}
+  const accountType = normalizeContractorAccountType(opts?.accountType)
 
   // If specific accountId requested, fetch that account directly
   if (accountId) {
@@ -460,7 +493,8 @@ export const getContractorWallet = async (contractorId, opts = {}) => {
 
 export const getContractorWalletHistory = async (contractorId, opts = {}) => {
   // opts: { accountType?, accountId?, params? }
-  const { accountType, accountId } = opts || {}
+   const { accountId } = opts || {}
+  const accountType = normalizeContractorAccountType(opts?.accountType)
 
   // If accountId provided, fetch account transactions
   if (accountId) {
@@ -522,41 +556,42 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
 };
 
 export const depositToContractorWallet = async (contractorId, data) => {
+    const payload = withContractorAccountContext(data);
   // If caller provided accountId, use it
-  if (data && data.accountId) {
-    const payload = { amount: data.amount, type: 'CREDIT', description: data.description, date: data.date };
-    return postAccountTransaction(data.accountId, payload);
+  if (payload && payload.accountId) {
+    const accountPayload = { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date };
+    return postAccountTransaction(payload.accountId, accountPayload);
   }
-
   // If caller provided accountType, try to find account
-  if (data && data.accountType) {
+  if (payload && payload.accountType) {
     try {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
-      const acct = accounts.find(a => a.accountType === data.accountType) || accounts[0];
-      if (acct) return postAccountTransaction(acct.id, { amount: data.amount, type: 'CREDIT', description: data.description, date: data.date });
+     const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
+      if (acct) return postAccountTransaction(acct.id, { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date });
     } catch (e) {
       // fallthrough
     }
   }
 
   // Fallback: wallet deposit endpoint
-  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, data);
+ return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
 };
 
 export const withdrawFromContractorWallet = async (contractorId, data) => {
-  const amount = Math.abs(Number(data?.amount || 0));
-  const payload = { ...data, amount };
+    const normalized = withContractorAccountContext(data);
+  const amount = Math.abs(Number(normalized?.amount || 0));
+  const payload = { ...normalized, amount };
 
-  if (data && data.accountId) {
-    return postAccountTransaction(data.accountId, { amount, type: 'DEBIT', description: data.description, date: data.date });
+ if (payload && payload.accountId) {
+    return postAccountTransaction(payload.accountId, { amount, type: 'DEBIT', description: payload.description, date: payload.date });
   }
-  if (data && data.accountType) {
+  if (payload && payload.accountType) {
     try {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
-      const acct = accounts.find(a => a.accountType === data.accountType) || accounts[0];
-      if (acct) return postAccountTransaction(acct.id, { amount, type: 'DEBIT', description: data.description, date: data.date });
+        const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
+      if (acct) return postAccountTransaction(acct.id, { amount, type: 'DEBIT', description: payload.description, date: payload.date });
     } catch (e) {console.error('Error withdrawing contractor wallet with accountType:', e)}
   }
 
@@ -568,11 +603,11 @@ export const getContractorReportData = async (contractorId, params = {}, format 
   const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
   let axiosParams = { ...params };
 
+   const normalizedMode = normalizeContractorAccountType(mode || params.mode || params.transaction_type);
   // Add transaction_type if provided (either from params or as separate parameter)
-  if (mode) {
-    axiosParams.mode = mode;
-  } else if (params.mode) {
-    axiosParams.mode = params.mode;
+  if (normalizedMode) {
+    axiosParams.mode = normalizedMode;
+    axiosParams.transaction_type = normalizedMode;
   }
 
   // Normalize format param and request accordingly
