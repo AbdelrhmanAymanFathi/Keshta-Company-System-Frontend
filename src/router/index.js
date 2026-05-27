@@ -327,6 +327,12 @@ const routes = [
         meta: { title: 'extracts.detail' },
         props: true
       },
+      {
+        path: 'payments',
+        name: 'payments',
+        component: () => import('@/components/dashboard/payment/PaymentsPage.vue'),
+        meta: { title: 'dashboard.payments' }
+      },
 
       // ==================== Default Redirect ====================
       { path: '', redirect: 'supplies/new' }

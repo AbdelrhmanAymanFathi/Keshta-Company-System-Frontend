@@ -196,14 +196,13 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts',  admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', payments: 'payments', admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
           { name: 'suppliesList', label: 'dashboard.suppliesList', routeName: 'supplies-list' },
           { name: 'suppliersList', label: 'dashboard.suppliersList', routeName: 'suppliers-list' },
           { name: 'crushersList', label: 'dashboard.crushersList', routeName: 'crushers-list' },
-          
           { name:'suppliesItemList', label: 'dashboard.itemsList', routeName: 'supplies-items-list' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', routeName: 'vehicles-list' },
           { name: 'contractorSupplyStatement', label: 'dashboard.contractorSupplyStatement', routeName: 'contractor-supply-statement' },
@@ -238,7 +237,9 @@ export default {
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'extracts-contractors-list' },
           { name: 'extractItems', label: 'dashboard.extractItems', routeName: 'extracts-items' },
           { name: 'contractorStatement', label: 'dashboard.contractorStatement', routeName: 'contractor-extract-statement' },
-          
+        ],
+        payments: [
+          { name: 'payments', label: 'dashboard.payments', routeName: 'payments' }
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -349,10 +350,12 @@ export default {
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
       const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
+      const paymentRoutes = ['payments']
       const adminRoutes = ['changes-by-date', 'users-list', 'locations', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
       if (equipmentRoutes.includes(routeName)) return 'equipmentLog'
+      if (paymentRoutes.includes(routeName)) return 'payments'
       if (walletRoutes.includes(routeName)) return 'companyWallet'
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'
@@ -393,6 +396,7 @@ export default {
         'companytransactions'
       ].includes(norm)) return 'companyWallet'
       if (['extract', 'extracts'].includes(norm)) return 'extracts'
+      if (['payment', 'payments'].includes(norm)) return 'payments'
       if (['admin', 'administration'].includes(norm)) return 'admin'
       return norm
     },
@@ -493,7 +497,8 @@ export default {
         changesByDate: 'reports',
         reportsList: 'reports',
         usersList: 'users',
-        locations: 'locations'
+        locations: 'locations',
+        payments: 'money'
       }
       return iconTypes[aliases[name]] || iconTypes.default
     },

@@ -353,13 +353,14 @@ function filterContractorsPayload(payload, mode = '') {
 }
 
 export const getContractors = (params = {}) => {
-  const { page = 1, pageSize = 20, q = '', mode = '' } = params;
+  const { page = 1, pageSize = 20, q = '', mode = '', unitId = '' } = params;
   const normalizedMode = normalizeContractorMode(mode);
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString(),
   });
   if (normalizedMode) queryParams.append('mode', normalizedMode);
+  if (unitId !== undefined && unitId !== null && unitId !== '') queryParams.append('unitId', unitId.toString());
   if (q) queryParams.append('q', q);
   return axios.get(`${BASE_URL}/api/contractors?${queryParams.toString()}`).then(res => {
     res.data = filterContractorsPayload(res.data, normalizedMode);
