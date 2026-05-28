@@ -169,8 +169,9 @@
       <main class="dashboard-module-content app-scrollbar flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-4 lg:p-6">
         <!-- <h2 class="text-2xl font-semibold mb-6 text-gray-800">{{ $t(currentLabel) }}</h2> -->
         <transition name="fade" mode="out-in">
-          <router-view @navigate-report="navigateToReport"
-            @navigate-statement="navigateToStatement" />
+          <router-view v-slot="{ Component }">
+            <component :is="Component" @navigate-report="navigateToReport" @navigate-statement="navigateToStatement" />
+          </router-view>
         </transition>
       </main>
     </div>

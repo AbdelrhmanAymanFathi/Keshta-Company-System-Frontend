@@ -1,12 +1,11 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
+    <div :class="['flex flex-col gap-4 md:flex-row md:items-center md:justify-between', isRTL ? 'md:text-right' : 'md:text-left']">
+      <div :class="isRTL ? 'md:order-last' : 'md:order-first'">
         <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.payments') || 'Payments' }}</h2>
-        <p class="text-sm text-gray-500">{{ $t('dashboard.paymentsDescription') || 'Filter and review payment records.' }}</p>
       </div>
       <button @click="onPay"
-        class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-indigo-700">
+        :class="['inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-indigo-700', isRTL ? 'md:order-first' : 'md:order-last']">
         {{ $t('dashboard.pay') || 'Pay' }}
       </button>
     </div>
@@ -100,6 +99,7 @@
 
 <script>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getPayments } from '@/api'
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
 
@@ -109,7 +109,8 @@ export default {
     PaymentCreationModal
   },
   setup() {
-    const isRTL = ref(false)
+    const { locale } = useI18n()
+    const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const paymentModalVisible = ref(false)
     const payments = ref([])
     const loading = ref(false)
@@ -223,7 +224,6 @@ export default {
     }
   },
   mounted() {
-    this.isRTL = this.$i18n?.locale === 'ar'
     this.applyFilters()
   }
 }

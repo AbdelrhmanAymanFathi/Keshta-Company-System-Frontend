@@ -32,32 +32,44 @@
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                      <MapPinIcon class="w-4 h-4 inline-block mr-1 text-gray-500" />
                       {{ $t('labels.site') || 'Site' }}
                     </label>
-                    <SearchDropdown
-                      v-model="filters.siteSearch"
-                      :items="sites"
-                      :all-items="sites"
-                      itemLabel="name"
-                      :placeholder="$t('labels.site') || 'Site'"
-                      :inputClass="fieldClass"
-                      @select="handleSiteSelect"
-                    />
+                    <div class="flex items-center gap-2">
+                      <SearchDropdown
+                        v-model="filters.siteSearch"
+                        :items="sites"
+                        :all-items="sites"
+                        itemLabel="name"
+                        :placeholder="$t('labels.site') || 'Site'"
+                        :inputClass="fieldClass"
+                        @select="handleSiteSelect"
+                      />
+                      <button type="button" @click="addSitePrompt" class="text-indigo-600 text-sm">
+                        {{ isRTL ? (($t('labels.add') || 'Add') + ' +') : ('+ ' + ($t('labels.add') || 'Add')) }}
+                      </button>
+                    </div>
                   </div>
 
                   <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                      <BuildingLibraryIcon class="w-4 h-4 inline-block mr-1 text-gray-500" />
                       {{ $t('labels.area') || 'Area' }} <span class="text-red-600">*</span>
                     </label>
-                    <SearchDropdown
-                      v-model="filters.areaSearch"
-                      :items="availableAreas"
-                      :all-items="areas"
-                      :itemLabel="areaLabel"
-                      :placeholder="$t('placeholders.searchArea') || 'Search area...'"
-                      :inputClass="fieldClass"
-                      @select="handleAreaSelect"
-                    />
+                    <div class="flex items-center gap-2">
+                      <SearchDropdown
+                        v-model="filters.areaSearch"
+                        :items="availableAreas"
+                        :all-items="areas"
+                        :itemLabel="areaLabel"
+                        :placeholder="$t('placeholders.searchArea') || 'Search area...'"
+                        :inputClass="fieldClass"
+                        @select="handleAreaSelect"
+                      />
+                      <button type="button" @click="addAreaPrompt" class="text-indigo-600 text-sm">
+                        {{ isRTL ? (($t('labels.add') || 'Add') + ' +') : ('+ ' + ($t('labels.add') || 'Add')) }}
+                      </button>
+                    </div>
                   </div>
 
                 </div>
@@ -78,7 +90,7 @@
                   class="flex items-center gap-3 rounded-lg bg-green-600 px-10 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                 >
                   {{ $t('labels.next') || 'Next' }}
-                  <span class="text-xl rtl:rotate-180">-></span>
+                  <ArrowRightIcon :class="['w-5 h-5 transition-transform', isRTL ? 'rotate-180' : '']" />
                 </button>
               </div>
             </div>
@@ -90,7 +102,7 @@
                   @click="prevStep"
                   class="flex items-center gap-3 font-medium text-indigo-600 transition hover:text-indigo-800"
                 >
-                  <span class="text-xl rtl:rotate-180">&lt;-</span>
+                  <ArrowLeftIcon :class="['w-5 h-5 transition-transform', isRTL ? 'rotate-180' : '']" />
                   {{ $t('labels.back') || 'Back' }}
                 </button>
                 <h3 class="text-lg font-bold text-gray-800">
@@ -152,20 +164,20 @@
                           </select>
                         </td>
                         <td class="px-3 py-2">
-                          <select
-                            v-model="row.contractor"
-                            :disabled="!row.module || !row.contractors.length"
-                            class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                          >
-                            <option value="" disabled>{{ row.module ? ($t('placeholders.select') || 'Select') : ($t('payments.selectModuleFirst') || 'Select module first') }}</option>
-                            <option
-                              v-for="contractor in row.contractors"
-                              :key="contractor.id || contractor.name"
-                              :value="contractor"
-                            >
-                              {{ contractor.name }}
-                            </option>
-                          </select>
+                          <div class="flex items-center gap-2">
+                            <SearchDropdown
+                              v-model="row._contractorSearch"
+                              :items="row.contractors"
+                              itemLabel="name"
+                              :placeholder="row.module ? ($t('placeholders.searchContractor') || 'Search contractor') : ($t('payments.selectModuleFirst') || 'Select module first')"
+                              :inputClass="fieldClass"
+                              :disabled="!row.module || !row.contractors.length"
+                              @select="(c) => { row.contractor = c; row._contractorSearch = c?.name || '' }"
+                            />
+                            <button type="button" @click="addContractorPrompt(row)" class="text-indigo-600 text-sm">
+                              {{ isRTL ? (($t('labels.add') || 'Add') + ' +') : ('+ ' + ($t('labels.add') || 'Add')) }}
+                            </button>
+                          </div>
                         </td>
                         <td class="px-3 py-2">
                           <input
@@ -175,6 +187,7 @@
                             step="0.01"
                             :placeholder="$t('labels.amount') || 'Amount'"
                             class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            @keydown="(e) => handleAmountKeydown(e, index)"
                           />
                         </td>
                         <td class="px-3 py-2">
@@ -250,7 +263,7 @@
                   @click="prevStep"
                   class="flex items-center gap-3 rounded-lg border border-gray-300 px-10 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
                 >
-                  <span class="text-xl rtl:rotate-180">&lt;-</span>
+                  <ArrowLeftIcon class="w-5 h-5" />
                   {{ $t('labels.back') || 'Back' }}
                 </button>
                 <button
@@ -272,10 +285,11 @@
 </template>
 
 <script>
-import { ref, reactive, watch, computed, onMounted, defineExpose } from 'vue'
+import { ref, reactive, watch, computed, onMounted } from 'vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getLocations, getContractors } from '@/api'
+import { ArrowRightIcon, ArrowLeftIcon, MapPinIcon, BuildingLibraryIcon } from '@heroicons/vue/24/outline'
 
 const normalizeList = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -288,7 +302,7 @@ const idsEqual = (left, right) => String(left ?? '') === String(right ?? '')
 
 export default {
   name: 'PaymentCreationModal',
-  components: { DateField, SearchDropdown },
+  components: { DateField, SearchDropdown, ArrowRightIcon, ArrowLeftIcon, MapPinIcon, BuildingLibraryIcon },
   props: {
     visible: {
       type: Boolean,
@@ -308,6 +322,7 @@ export default {
       date: '',
       module: '',
       contractor: null,
+      _contractorSearch: '',
       amount: '',
       paymentMethod: 'cash',
       treasury: '',
@@ -422,6 +437,7 @@ export default {
           mode: row.module
         })
         row.contractors = normalizeList(res?.data)
+        if (row.contractor) row._contractorSearch = row.contractor.name
       } catch (error) {
         console.error('Failed to load contractors', error)
         row.contractors = []
@@ -482,8 +498,69 @@ export default {
       rows.value = [createRow()]
     }
 
+    const STORAGE_KEY = 'paymentCreationModalCommonData'
+
     const closeModal = () => {
       internalVisible.value = false
+    }
+
+    function saveToStorage() {
+      try {
+        const payload = { selectedSite: selectedSite.value, selectedArea: selectedArea.value, rows: rows.value.map(r => ({ id: r.id, date: r.date, module: r.module, contractor: r.contractor, amount: r.amount, paymentMethod: r.paymentMethod, treasury: r.treasury, notes: r.notes })) }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+      } catch (e) { console.warn('save storage failed', e) }
+    }
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY)
+        if (!raw) return
+        const p = JSON.parse(raw)
+        if (p.selectedSite) selectedSite.value = p.selectedSite
+        if (p.selectedArea) selectedArea.value = p.selectedArea
+        if (Array.isArray(p.rows) && p.rows.length) rows.value = p.rows.map(r => createRow({ id: r.id, date: r.date, module: r.module, contractor: r.contractor, amount: r.amount, paymentMethod: r.paymentMethod, treasury: r.treasury, notes: r.notes }))
+      } catch (e) { console.warn('load storage failed', e) }
+    }
+
+    function addSitePrompt() {
+      const name = window.prompt('New site name')
+      if (!name) return
+      const s = { id: Date.now(), name }
+      locations.value.push(s)
+      selectedSite.value = s
+      filters.siteSearch = s.name
+      saveToStorage()
+    }
+
+    function addAreaPrompt() {
+      if (!selectedSite.value) { window.alert('Select a site first'); return }
+      const name = window.prompt('New area name')
+      if (!name) return
+      const a = { id: Date.now(), name, parentId: selectedSite.value.id }
+      locations.value.push(a)
+      selectedArea.value = a
+      filters.areaSearch = a.name
+      saveToStorage()
+    }
+
+    function addContractorPrompt(row) {
+      const name = window.prompt('New contractor name')
+      if (!name) return
+      const c = { id: Date.now(), name }
+      row.contractors = row.contractors || []
+      row.contractors.push(c)
+      row.contractor = c
+      row._contractorSearch = c.name
+      saveToStorage()
+    }
+
+    function isRowEmpty(row) {
+      return !row.date && !row.module && !row.contractor && !row.amount && !row.treasury && !row.notes
+    }
+
+    function handleAmountKeydown(e, index) {
+      if (e.key === 'Enter') { e.preventDefault(); if (index === rows.value.length - 1) { rows.value.push(createRow()); saveToStorage() } }
+      if (e.key === 'Tab' && !e.shiftKey && index === rows.value.length - 1) { rows.value.push(createRow()); saveToStorage() }
     }
 
     const prevStep = () => {
@@ -496,7 +573,11 @@ export default {
     }
 
     const savePayment = () => {
-      if (isSubmitDisabled.value) return
+      // filter out completely empty rows
+      const filtered = rows.value.filter(r => !isRowEmpty(r))
+      if (!filtered.length) return
+      // basic validation on remaining rows
+      if (filtered.some(r => !r.date || !r.module || !r.amount || !r.contractor || !r.paymentMethod || !r.treasury)) return
       const payload = {
         site: selectedSite.value,
         location: selectedSite.value,
@@ -504,7 +585,7 @@ export default {
         areaObject: selectedArea.value,
         areaId: selectedArea.value?.id,
         siteId: selectedSite.value?.id,
-        rows: rows.value.map(row => ({
+        rows: filtered.map(row => ({
           date: row.date,
           module: row.module,
           amount: Number(row.amount) || 0,
@@ -515,28 +596,17 @@ export default {
           notes: row.notes
         }))
       }
+      // clear persisted draft
+      try { localStorage.removeItem(STORAGE_KEY) } catch (e) { console.warn('remove storage failed', e) }
       emit('saved', payload)
       closeModal()
     }
 
-    watch(
-      () => props.visible,
-      (value) => {
-        internalVisible.value = value
-        if (value) currentStep.value = 1
-      }
-    )
+    watch(() => props.visible, (value) => { internalVisible.value = value; if (value) currentStep.value = 1 })
+    watch(internalVisible, (value) => { emit('update:visible', value); if (!value) resetForm() })
+    watch([selectedSite, selectedArea, rows], () => saveToStorage(), { deep: true })
 
-    watch(internalVisible, (value) => {
-      emit('update:visible', value)
-      if (!value) resetForm()
-    })
-
-    onMounted(async () => {
-      await loadLocations()
-    })
-
-    defineExpose({ closeModal })
+    onMounted(async () => { await loadLocations(); loadFromStorage() })
 
     return {
       isVisible: internalVisible,
@@ -563,7 +633,11 @@ export default {
       goToStep2,
       prevStep,
       savePayment,
-      closeModal
+      closeModal,
+      addSitePrompt,
+      addAreaPrompt,
+      addContractorPrompt,
+      handleAmountKeydown
     }
   }
 }
