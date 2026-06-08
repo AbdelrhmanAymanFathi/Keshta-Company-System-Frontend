@@ -53,7 +53,7 @@ export interface Payment {
   transportId?: string | number;
 }
 
-export type ContractorAccountType = 'EXPORT' | 'SUPPLY' | 'TRANSPORT' | 'GENERAL' | 'EXPENSE' | 'OTHER';
+export type ContractorAccountType = 'EXPORT' | 'SUPPLY' | 'TRANSPORT' | 'RENTAL' | 'EXTRACT' | 'GENERAL' | 'EXPENSE' | 'OTHER';
 
 export interface ContractorAccount {
   id: string;

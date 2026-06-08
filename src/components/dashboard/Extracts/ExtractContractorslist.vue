@@ -646,6 +646,9 @@ export default {
     ,
     goToDetail(c) {
       if (!c || !c.id) return
+      try {
+        localStorage.setItem(`contractor-detail-${c.id}`, JSON.stringify(c))
+      } catch (e) { /* ignore */ }
       this.$router.push({ name: 'contractor-detail', params: { id: c.id }, query: { from: 'extracts' } }).catch(() => {})
     }
   }
