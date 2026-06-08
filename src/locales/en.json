@@ -42,6 +42,7 @@
   "navbar": {
     "supplies": "Supplies",
     "extracts": "Extracts",
+    "payments": "Payments",
     "transport": "Transport",
     "expenses": "Expenses",
     "equipmentLog": "Equipment Log",
@@ -50,6 +51,11 @@
   },
   "dashboard": {
     "newItem": "New Item",
+    "payments": "Payments",
+    "pay": "Pay",
+    "paymentsDescription": "Filter and review payment records.",
+    "treasury": "Treasury",
+    "treasuryPlaceholder": "Source treasury",
     "itemsList": "Items List",
     "items": "Items",
     "newSupply": "New Supply",
@@ -134,6 +140,7 @@
     "noResults": "No drivers found"
   },
   "transport": {
+    "transport": "Transport",
     "step1BasicData": "Step 1: Basic Data",
     "step2Data": "Step 2: Enter Transports",
     "transportList": "Transport List",
@@ -210,6 +217,9 @@
     "update": "Update",
     "delete": "Delete",
     "edit": "Edit",
+    "rows": "Rows",
+    "duplicate": "Duplicate",
+    "remove": "Remove",
     "saving": "Saving...",
     "retry": "Retry",
     "deleting": "Deleting...",
@@ -228,6 +238,8 @@
     "failedSaveItem": "Failed to save item",
     "date": "Date",
     "contractor": "Contractor",
+    "paymentMethod": "Payment Method",
+    "treasury": "Treasury",
     "crusher": "Crusher",
     "vehicle": "Vehicle",
     "crusherBon": "Crusher Bon",
@@ -339,10 +351,22 @@
     "paymentSaved": "Payment saved",
     "addPaymentExport": "Add Payment (Export)",
     "addPaymentTransport": "Add Payment (Transport)",
+    "step1": "Step 1",
+    "step1Description": "Select location and area.",
+    "step2": "Step 2",
+    "step2Description": "Enter payment details.",
+    "module": "Module",
+    "methods": {
+      "cash": "Cash",
+      "bank": "Bank"
+    },
     "amount": "Amount",
     "date": "Date",
     "method": "Method",
+    "methodPlaceholder": "Payment method",
     "notes": "Notes",
+    "enterPayment": "Enter payment",
+    "selectModuleFirst": "Select module first",
     "savePayment": "Save Payment",
     "invalidAmount": "Amount must be greater than zero",
     "confirmWithdrawal": "This will reduce contractor balance. Continue?",
@@ -569,6 +593,7 @@
     }
   },
   "supply": {
+    "title": "Supplies",
     "exportTableTitle": "Exports / Supplies Report",
     "suppliersList": "Suppliers List",
     "supplierAdd": "Add Supplier",
@@ -1053,6 +1078,9 @@
     ,
     "billingConfirmTitle": "Confirm Billing",
     "billingConfirmMessage": "This job will bill the contractor. Hours: {hours}, Rate: {rate}, Estimated charge: {estimated}. Proceed?"
+  },
+  "rentals": {
+    "rentalList": "Equipment Logs"
   },
   "equipment": {
     "title": "Equipment",

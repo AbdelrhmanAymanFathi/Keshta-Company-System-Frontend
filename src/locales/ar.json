@@ -42,6 +42,7 @@
   "navbar": {
     "supplies": "التوريدات",
     "extracts": "المستخلصات",
+    "payments": "المدفوعات",
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentLog": "سجل المعدات",
@@ -50,6 +51,11 @@
   },
   "dashboard": {
     "newSupply": "توريدة جديدة",
+    "payments": "المدفوعات",
+    "pay": "سداد",
+    "paymentsDescription": "صفحة عرض الفواتير مع فلاتر للبحث.",
+    "treasury": "الخزينة",
+    "treasuryPlaceholder": "الخزينة التي اتُسحب منها",
     "suppliesList": "قائمة التوريدات",
     "crushersList": "قائمة الكسارات",
     "suppliersList": "قائمة الموردين",
@@ -135,6 +141,7 @@
     "noResults": "لم يتم العثور على سائقين"
   },
   "transport": {
+    "transport": "النقل",
     "step1BasicData": "الخطوة 1: البيانات الأساسية",
     "step2Data": "الخطوة 2: إدخال النقلات",
     "enterTransports": "إدخال النقلات",
@@ -211,6 +218,9 @@
     "update": "تحديث",
     "delete": "حذف",
     "edit": "تعديل",
+    "rows": "الصفوف",
+    "duplicate": "تكرار",
+    "remove": "حذف",
     "saving": "جاري الحفظ...",
     "retry": "إعادة المحاولة",
     "deleting": "جاري الحذف...",
@@ -229,6 +239,8 @@
     "failedSaveItem": "فشل حفظ الصنف",
     "date": "التاريخ",
     "contractor": "المقاول",
+    "paymentMethod": "طريقة الدفع",
+    "treasury": "الخزينة",
     "crusher": "الكسارة",
     "vehicle": "المركبة",
     "crusherBon": "بون الكسارة",
@@ -341,10 +353,22 @@
     "unpaid": "غير مدفوع",
     "addPaymentExport": "إضافة دفعة (تصدير)",
     "addPaymentTransport": "إضافة دفعة (نقل)",
+    "step1": "الخطوة 1",
+    "step1Description": "اختر الموقع والمنطقة.",
+    "step2": "الخطوة 2",
+    "step2Description": "أدخل تفاصيل السداد.",
+    "module": "الوحدة",
+    "methods": {
+      "cash": "نقداً",
+      "bank": "بنك"
+    },
     "amount": "المبلغ",
     "date": "التاريخ",
     "method": "الطريقة",
+    "methodPlaceholder": "طريقة الدفع",
     "notes": "ملاحظات",
+    "enterPayment": "أدخل الدفعة",
+    "selectModuleFirst": "اختر الوحدة أولاً",
     "savePayment": "حفظ الدفعة",
     "invalidAmount": "يجب أن يكون المبلغ أكبر من صفر",
     "confirmWithdrawal": "سيؤدي ذلك إلى تخفيض رصيد المقاول. هل تود المتابعة؟",
@@ -570,6 +594,7 @@
     }
   },
   "supply": {
+    "title": "التوريدات",
     "exportTableTitle": "تقرير التوريدات / الصادرات",
     "suppliersList": "قائمة الموردين",
     "suppliers": "الموردين",
@@ -1052,6 +1077,9 @@
     ,
     "billingConfirmTitle": "تأكيد الفوترة",
     "billingConfirmMessage": "سيتم إصدار فاتورة للمقاول. الساعات: {hours}, السعر: {rate}, المبلغ المقدر: {estimated}. هل تتابع؟"
+  },
+  "rentals": {
+    "rentalList": "سجلات المعدات"
   },
   "equipment": {
     "title": "المعدات",
