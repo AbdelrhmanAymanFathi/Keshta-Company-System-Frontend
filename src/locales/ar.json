@@ -141,6 +141,7 @@
     "noResults": "لم يتم العثور على سائقين"
   },
   "transport": {
+    "transport": "النقل",
     "step1BasicData": "الخطوة 1: البيانات الأساسية",
     "step2Data": "الخطوة 2: إدخال النقلات",
     "enterTransports": "إدخال النقلات",
@@ -593,6 +594,7 @@
     }
   },
   "supply": {
+    "title": "التوريدات",
     "exportTableTitle": "تقرير التوريدات / الصادرات",
     "suppliersList": "قائمة الموردين",
     "suppliers": "الموردين",
@@ -1075,6 +1077,9 @@
     ,
     "billingConfirmTitle": "تأكيد الفوترة",
     "billingConfirmMessage": "سيتم إصدار فاتورة للمقاول. الساعات: {hours}, السعر: {rate}, المبلغ المقدر: {estimated}. هل تتابع؟"
+  },
+  "rentals": {
+    "rentalList": "سجلات المعدات"
   },
   "equipment": {
     "title": "المعدات",

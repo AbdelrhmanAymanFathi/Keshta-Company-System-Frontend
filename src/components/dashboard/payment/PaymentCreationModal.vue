@@ -122,10 +122,10 @@
                     <dt class="font-semibold text-gray-700">{{ $t('labels.area') || 'Area' }}:</dt>
                     <dd class="mt-1 text-gray-900">{{ selectedArea?.name || '-' }}</dd>
                   </div>
-                  <div class="flex flex-col">
+                  <!-- <div class="flex flex-col">
                     <dt class="font-semibold text-gray-700">{{ $t('labels.rows') || 'Rows' }}:</dt>
                     <dd class="mt-1 text-gray-900">{{ rows.length }}</dd>
-                  </div>
+                  </div> -->
                   <div class="flex flex-col">
                     <dt class="font-semibold text-gray-700">{{ $t('labels.total') || 'Total' }}:</dt>
                     <dd class="mt-1 text-gray-900">{{ totalAmountDisplay }}</dd>
@@ -238,18 +238,18 @@
 
               <div class="mt-6 rounded-lg bg-gray-50 p-6">
                 <div class="flex flex-wrap items-center gap-6 text-sm">
-                  <div class="flex items-center gap-3">
+                  <!-- <div class="flex items-center gap-3">
                     <span class="font-semibold text-indigo-800">{{ $t('labels.site') || 'Site' }}:</span>
                     <span class="text-gray-900">{{ selectedSite?.name || '-' }}</span>
                   </div>
                   <div class="flex items-center gap-3">
                     <span class="font-semibold text-indigo-800">{{ $t('labels.area') || 'Area' }}:</span>
                     <span class="text-gray-900">{{ selectedArea?.name || '-' }}</span>
-                  </div>
-                  <div class="flex items-center gap-3">
+                  </div> -->
+                  <!-- <div class="flex items-center gap-3">
                     <span class="font-semibold text-indigo-800">{{ $t('labels.rows') || 'Rows' }}:</span>
                     <span class="text-gray-900">{{ rows.length }}</span>
-                  </div>
+                  </div> -->
                   <div class="ml-auto flex items-center gap-3 text-base font-semibold text-indigo-900">
                     <span>{{ $t('labels.total') || 'Total' }}:</span>
                     <span>{{ totalAmountDisplay }}</span>
@@ -276,6 +276,7 @@
                   {{ $t('labels.save') || 'Save' }}
                 </button>
               </div>
+              <p v-if="submitError" class="mt-4 text-sm text-red-600">{{ submitError }}</p>
             </div>
           </div>
         </div>
@@ -288,8 +289,9 @@
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import { getLocations, getContractors } from '@/api'
+import { getLocations, getContractors, createPayment } from '@/api'
 import { ArrowRightIcon, ArrowLeftIcon, MapPinIcon, BuildingLibraryIcon } from '@heroicons/vue/24/outline'
+import { useI18n } from 'vue-i18n'
 
 const normalizeList = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -311,11 +313,13 @@ export default {
   },
   emits: ['update:visible', 'saved'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const internalVisible = ref(props.visible)
     const currentStep = ref(1)
     const locations = ref([])
     const selectedSite = ref(null)
     const selectedArea = ref(null)
+    const submitError = ref('')
 
     const createRow = (overrides = {}) => ({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
@@ -338,12 +342,12 @@ export default {
       areaSearch: ''
     })
 
-    const moduleOptions = [
-      { value: 'supply', label: 'Supplies' },
-      { value: 'transport', label: 'Transport' },
-      { value: 'rentals', label: 'Equipment' },
-      { value: 'extract', label: 'Extracts' }
-    ]
+    const moduleOptions = computed(() => ([
+      { value: 'supply', label: t('supply.title') || 'Supply' },
+      { value: 'transport', label: t('transport.transport') || 'Transport' },
+      { value: 'rentals', label: t('rentals.rentalList') || 'Equipment Logs' },
+      { value: 'extract', label: t('extracts.title') || 'Extracts' }
+    ]))
 
     const fieldClass = 'w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200'
 
@@ -493,6 +497,7 @@ export default {
       currentStep.value = 1
       selectedSite.value = null
       selectedArea.value = null
+      submitError.value = ''
       filters.siteSearch = ''
       filters.areaSearch = ''
       rows.value = [createRow()]
@@ -572,7 +577,8 @@ export default {
       currentStep.value = 2
     }
 
-    const savePayment = () => {
+    const savePayment = async () => {
+      submitError.value = ''
       // filter out completely empty rows
       const filtered = rows.value.filter(r => !isRowEmpty(r))
       if (!filtered.length) return
@@ -596,10 +602,16 @@ export default {
           notes: row.notes
         }))
       }
-      // clear persisted draft
-      try { localStorage.removeItem(STORAGE_KEY) } catch (e) { console.warn('remove storage failed', e) }
-      emit('saved', payload)
-      closeModal()
+
+      try {
+        const res = await createPayment(payload)
+        try { localStorage.removeItem(STORAGE_KEY) } catch (e) { console.warn('remove storage failed', e) }
+        emit('saved', res?.data || payload)
+        closeModal()
+      } catch (error) {
+        console.error('Failed to create payments', error)
+        submitError.value = error?.response?.data?.message || 'Failed to save payments'
+      }
     }
 
     watch(() => props.visible, (value) => { internalVisible.value = value; if (value) currentStep.value = 1 })
@@ -634,6 +646,7 @@ export default {
       prevStep,
       savePayment,
       closeModal,
+      submitError,
       addSitePrompt,
       addAreaPrompt,
       addContractorPrompt,

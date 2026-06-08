@@ -140,6 +140,7 @@
     "noResults": "No drivers found"
   },
   "transport": {
+    "transport": "Transport",
     "step1BasicData": "Step 1: Basic Data",
     "step2Data": "Step 2: Enter Transports",
     "transportList": "Transport List",
@@ -592,6 +593,7 @@
     }
   },
   "supply": {
+    "title": "Supplies",
     "exportTableTitle": "Exports / Supplies Report",
     "suppliersList": "Suppliers List",
     "supplierAdd": "Add Supplier",
@@ -1076,6 +1078,9 @@
     ,
     "billingConfirmTitle": "Confirm Billing",
     "billingConfirmMessage": "This job will bill the contractor. Hours: {hours}, Rate: {rate}, Estimated charge: {estimated}. Proceed?"
+  },
+  "rentals": {
+    "rentalList": "Equipment Logs"
   },
   "equipment": {
     "title": "Equipment",
