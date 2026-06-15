@@ -652,6 +652,7 @@ export const getReportModules = () => axios.get(`${BASE_URL}/api/report-defs/mod
 
 export const getReportParamOptions = (id, paramName, paramsObj = {}) => {
   const qs = new URLSearchParams()
+  qs.append('lang', getCurrentApiLang())
   
   // Handle legacy string parameter (q) or new object format
   if (typeof paramsObj === 'string') {
@@ -766,6 +767,58 @@ export const deleteBranch = (id) =>
   axios.delete(`${BASE_URL}/api/branches/${id}`);
 export const saveBranchesOrder = (data) =>
   axios.post(`${BASE_URL}/api/branches/save-order`, data);
+
+// Treasuries
+export const getTreasuries = (params = {}) => {
+  const { includeArchived = false } = params;
+  const query = includeArchived ? `?includeArchived=true` : '';
+  const url = includeArchived ? `${BASE_URL}/api/treasuries${query}` : `${BASE_URL}/api/treasuries/active`;
+  return axios.get(url);
+};
+export const createTreasury = (data) =>
+  axios.post(`${BASE_URL}/api/treasuries`, data);
+export const updateTreasury = (id, data) =>
+  axios.patch(`${BASE_URL}/api/treasuries/${id}`, data);
+export const archiveTreasury = (id) =>
+  axios.post(`${BASE_URL}/api/treasuries/${id}/archive`);
+export const unarchiveTreasury = (id) =>
+  axios.post(`${BASE_URL}/api/treasuries/${id}/unarchive`);
+export const deleteTreasury = (id) =>
+  archiveTreasury(id);
+export const restoreTreasury = (id) =>
+  unarchiveTreasury(id);
+export const saveTreasuriesOrder = (data) =>
+  axios.post(`${BASE_URL}/api/treasuries/save-order`, data);
+export const getTreasurySummary = (treasuryId) =>
+  axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/summary`);
+export const getTreasuryTransactions = (treasuryId, params = {}) => {
+  const { page = 1, pageSize = 20, startDate = '', endDate = '', type = '', search = '', amountMin = '', amountMax = '' } = params;
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString()
+  });
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (type) queryParams.append('type', type);
+  if (search) queryParams.append('search', search);
+  if (amountMin !== '' && amountMin !== null && amountMin !== undefined) queryParams.append('amountMin', String(amountMin));
+  if (amountMax !== '' && amountMax !== null && amountMax !== undefined) queryParams.append('amountMax', String(amountMax));
+  return axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/transactions?${queryParams.toString()}`);
+};
+export const downloadTreasuryTransactions = (treasuryId, params = {}, format = 'xlsx') => {
+  const { page = 1, pageSize = 20, ...rest } = params || {};
+  const sanitized = Object.fromEntries(
+    Object.entries({ ...rest, format }).filter(([, value]) => value !== '' && value !== null && value !== undefined)
+  );
+  const queryParams = appendLangParam(sanitized);
+  const search = new URLSearchParams(queryParams).toString();
+  return axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/transactions/export${search ? `?${search}` : ''}`, {
+    responseType: 'arraybuffer',
+    withCredentials: true
+  });
+};
+export const depositToTreasury = (treasuryId, data) =>
+  axios.post(`${BASE_URL}/api/treasuries/${treasuryId}/deposit`, data);
 
 // Branch Wallet APIs
 export const getBranchWalletSummary = (branchId) =>
@@ -1177,11 +1230,22 @@ export const downloadEquipmentLogsReport = async (params = {}, format = 'xlsx') 
 
 // Company Wallet & Finance
 export const getCompanyTransactions = (params = {}) => {
-  const { page = 1, pageSize = 10 } = params;
+  const {
+    page = 1,
+    pageSize = 10,
+    startDate = '',
+    endDate = '',
+    type = '',
+    search = '',
+  } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+  if (startDate) queryParams.append('startDate', startDate);
+  if (endDate) queryParams.append('endDate', endDate);
+  if (type) queryParams.append('type', type);
+  if (search) queryParams.append('search', search);
   return axios.get(`${BASE_URL}/api/company/wallet/transactions?${queryParams.toString()}`);
 };
 export const depositToCompanyWallet = (data) =>
@@ -1419,9 +1483,14 @@ export const getEquipmentLogsChanges = (date) => {
   return axios.get(withLangQuery(`${BASE_URL}/api/equipment-logs/changes`, Object.fromEntries(queryParams.entries())));
 };
 
-export const getExpensesChanges = (date) => {
+export const getPaymentsChanges = (date) => {
   const queryParams = new URLSearchParams({ date });
-  return axios.get(`${BASE_URL}/api/expenses/changes?${queryParams.toString()}`);
+  return axios.get(`${BASE_URL}/api/payments/changes?${queryParams.toString()}`);
+};
+
+export const getExtractsChanges = (date) => {
+  const queryParams = new URLSearchParams({ date });
+  return axios.get(`${BASE_URL}/api/extracts/changes?${queryParams.toString()}`);
 };
 
 export const getVehiclesChanges = (date) => {

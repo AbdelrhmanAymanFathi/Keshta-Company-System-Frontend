@@ -197,7 +197,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', payments: 'payments', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', payments: 'payments', treasury: 'treasury', admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
@@ -227,12 +227,6 @@ export default {
           { name: 'driversList', label: 'dashboard.driversList', routeName: 'equipment-drivers-list' },
           { name: 'contractorRentals', label: 'dashboard.contractorStatement', routeName: 'equipment-contractor-statement' }
         ],
-        // companyWallet: [
-        //   { name: 'companyWallet', label: 'dashboard.companyWallet', routeName: 'company-wallet' },
-        //   { name: 'companyTransactions', label: 'transactions', routeName: 'company-transactions' },
-        //   { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
-        //   { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
-        // ],
         extracts: [
           { name: 'extractsList', label: 'extracts.title', routeName: 'extracts-list' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'extracts-contractors-list' },
@@ -241,6 +235,12 @@ export default {
         ],
         payments: [
           { name: 'payments', label: 'dashboard.payments', routeName: 'payments' }
+        ],
+        treasury: [
+          { name: 'treasury', label: 'dashboard.treasury', routeName: 'treasury' },
+          { name: 'companyTransactions', label: 'dashboard.report', routeName: 'company-transactions' },
+          // { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
+          // { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -290,6 +290,7 @@ export default {
     filteredTopMenus() {
       const menus = { ...this.topMenus }
       if (!this.isAdmin) {
+        delete menus.treasury
         delete menus.admin
       }
       return menus
@@ -350,14 +351,16 @@ export default {
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
-      const walletRoutes = ['company-wallet', 'company-transactions', 'expenses-list', 'expenses-report']
+      const walletRoutes = ['treasury', 'company-transactions', 'expenses-report']
+      // const walletRoutes = ['treasury', 'company-transactions', 'expenses-list', 'expenses-report']
+
       const paymentRoutes = ['payments']
       const adminRoutes = ['changes-by-date', 'users-list', 'locations', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
       if (equipmentRoutes.includes(routeName)) return 'equipmentLog'
       if (paymentRoutes.includes(routeName)) return 'payments'
-      if (walletRoutes.includes(routeName)) return 'companyWallet'
+      if (walletRoutes.includes(routeName)) return 'treasury'
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'
     },
@@ -391,6 +394,7 @@ export default {
         'wallet',
         'companyfinance',
         'finance',
+        'treasury',
         'expenses',
         'expense',
         'transactions',
@@ -491,6 +495,7 @@ export default {
         contractorRentals: 'statement',
         driversList: 'drivers',
         equipmentList: 'equipment',
+        treasury: 'wallet',
         companyWallet: 'wallet',
         companyTransactions: 'wallet',
         expensesList: 'money',

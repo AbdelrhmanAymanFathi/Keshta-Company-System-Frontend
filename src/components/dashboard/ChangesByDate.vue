@@ -89,7 +89,7 @@
               <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="hover:bg-gray-50">
                 <td v-for="field in getFieldsForModule(activeModule)" :key="field"
                   class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ formatField(item, field) }}
+                  {{ formatField(item, field, activeModule) }}
                 </td>
               </tr>
             </tbody>
@@ -130,7 +130,8 @@ import {
   getCrushersChanges,
   getTransportsChanges,
   getEquipmentLogsChanges,
-  getExpensesChanges,
+  getPaymentsChanges,
+  getExtractsChanges,
   getVehiclesChanges,
   getCompanyWalletTransactionsChanges
 } from '@/api'
@@ -157,7 +158,8 @@ export default {
         crushers: { count: 0, items: [] },
         transports: { count: 0, items: [] },
         rentals: { count: 0, items: [] },
-        expenses: { count: 0, items: [] },
+        payments: { count: 0, items: [] },
+        extracts: { count: 0, items: [] },
         vehicles: { count: 0, items: [] },
         companyWallet: { count: 0, items: [] }
       }
@@ -186,7 +188,8 @@ export default {
           this.loadModuleChanges('crushers', () => getCrushersChanges(dateStr)),
           this.loadModuleChanges('transports', () => getTransportsChanges(dateStr)),
           this.loadModuleChanges('rentals', () => getEquipmentLogsChanges(dateStr)),
-          this.loadModuleChanges('expenses', () => getExpensesChanges(dateStr)),
+          this.loadModuleChanges('payments', () => getPaymentsChanges(dateStr)),
+          this.loadModuleChanges('extracts', () => getExtractsChanges(dateStr)),
           this.loadModuleChanges('vehicles', () => getVehiclesChanges(dateStr)),
           this.loadModuleChanges('companyWallet', () => getCompanyWalletTransactionsChanges(dateStr))
         ]
@@ -224,7 +227,8 @@ export default {
         crushers: ['ID', 'Name', 'Created By'],
         transports: ['ID', 'Date', 'Contractor', 'From', 'To', 'Trips', 'Total', 'Created By'],
         rentals: ['ID', 'Date', 'Equipment', 'Name', 'Hours', 'Total', 'Created By'],
-        expenses: ['ID', 'Date', 'Category', 'Description', 'Amount', 'Branch', 'Location', 'Created By'],
+        payments: ['ID', 'Date', 'Site', 'Area', 'Module', 'Contractor', 'Amount', 'Payment Method', 'Treasury', 'Notes', 'Actor', 'Updated At'],
+        extracts: ['ID', 'Date From', 'Date To', 'Contractor', 'Location', 'Area', 'Total', 'Notes', 'Actor', 'Updated At'],
         vehicles: ['ID', 'Name', 'Contractor', 'Company Capacity', 'Crusher Capacity', 'Created By'],
         companyWallet: ['ID', 'Date', 'Type', 'Amount', 'Description', 'Created By']
       }
@@ -238,19 +242,52 @@ export default {
         crushers: ['id', 'name', 'createdBy.name'],
         transports: ['id', 'date', 'contractor.name', 'fromLoc', 'toLoc', 'numTrips', 'total', 'createdBy.name'],
         rentals: ['id', 'date', 'equipment', 'name', 'hours', 'total', 'createdBy.name'],
-        expenses: ['id', 'date', 'category', 'description', 'amount', 'branch.name', 'location.name', 'createdBy.name'],
+        payments: ['id', 'paidAt', 'site.name', 'area.name', 'accountType', 'contractor.name', 'amount', 'paymentMethod', 'treasury', 'notes', 'actor', 'updatedAt'],
+        extracts: ['id', 'dateFrom', 'dateTo', 'contractor.name', 'location.name', 'area.name', 'total', 'notes', 'actor', 'updatedAt'],
         vehicles: ['id', 'name', 'contractor.name', 'companyCapacity', 'crusherCapacity', 'createdBy.name'],
         companyWallet: ['id', 'date', 'type', 'amount', 'description', 'createdBy.name']
       }
       return configs[moduleKey] || []
     },
-    formatField(item, field) {
+    formatPaymentModule(value) {
+      const raw = String(value || '').trim().toLowerCase()
+      const normalized = raw === 'rental' ? 'rentals' : raw
+      const key = `payments.modules.${normalized}`
+      const translated = this.$t(key)
+      return translated && translated !== key ? translated : (normalized || '-')
+    },
+    formatPaymentMethod(value) {
+      const raw = String(value || '').trim().toLowerCase()
+      const key = `payments.methods.${raw}`
+      const translated = this.$t(key)
+      return translated && translated !== key ? translated : (raw || '-')
+    },
+    formatActor(item) {
+      const actor = item?.actor?.name || item?.updatedBy?.name || item?.createdBy?.name || item?.actorName
+      if (actor) return actor
+      return this.$t('labels.system') || 'System'
+    },
+    formatField(item, field, moduleKey) {
       const value = this.getNestedValue(item, field)
+      if ((moduleKey === 'payments' || moduleKey === 'extracts') && field === 'actor') {
+        return this.formatActor(item)
+      }
       if (value === null || value === undefined) return '-'
       if (typeof value === 'object') {
         if (value.name) return value.name
         if (value.email) return value.email
         return JSON.stringify(value)
+      }
+      if (moduleKey === 'payments') {
+        if (field === 'accountType') {
+          return this.formatPaymentModule(value)
+        }
+        if (field === 'paymentMethod') {
+          return this.formatPaymentMethod(value)
+        }
+        if (field === 'treasury') {
+          return item?.treasuryRef?.name || item?.treasury?.name || value || '-'
+        }
       }
       if (field.includes('date') || field.includes('Date') || field.includes('At')) {
         return this.formatDate(value)
@@ -280,7 +317,8 @@ export default {
         crushers: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>`,
         transports: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2m0 0V5a2 2 0 012-2h8a2 2 0 012 2v2m-12 0h4"/></svg>`,
         rentals: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>`,
-        expenses: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        payments: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v9A2.25 2.25 0 005.25 18.75h7.5M15 19.5l3-3 3 3M18 16.5V21"/></svg>`,
+        extracts: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
         vehicles: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1a4 4 0 01-4-4V6a4 4 0 014-4h6a4 4 0 014 4v6a4 4 0 01-4 4h-1"/></svg>`,
         companyWallet: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`
       }

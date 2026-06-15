@@ -228,14 +228,22 @@ export default {
     async function loadOptions(paramName, q = "") {
       paramLoading.value[paramName] = true;
       try {
-        const res = await getReportParamOptions(props.reportId, paramName, q);
+        const params = {};
+        (report.value?.params || []).forEach((p) => {
+          params[p.name] = serializeParamValue(p);
+        });
+        if (q !== "") params.q = q;
+        const res = await getReportParamOptions(props.reportId, paramName, params);
         // normalize items to have { id, label }
         const items = Array.isArray(res.data)
           ? res.data.map((it, idx) => {
               if (it && typeof it === "object") {
+                const rawId = it.id ?? it.value ?? it.key ?? idx;
+                const normalizedId = String(rawId ?? "").trim();
+                const localizedLabel = localizeOptionLabel(paramName, rawId, it.label ?? it.name ?? String(it));
                 return {
-                  id: it.id ?? it.value ?? it.key ?? idx,
-                  label: it.label ?? it.name ?? String(it),
+                  id: rawId,
+                  label: localizedLabel,
                 };
               }
               return { id: it, label: String(it) };
@@ -266,6 +274,36 @@ export default {
           : null;
       if (p.type === "BOOLEAN") return Boolean(val);
       return val === "" || val === null || val === undefined ? null : val;
+    }
+
+    function localizeOptionLabel(paramName, rawId, fallbackLabel) {
+      const key = String(rawId ?? "").trim().toLowerCase();
+      if (paramName === "module") {
+        const moduleLabels = {
+          supply: t("payments.modules.supply") || "Supply",
+          transport: t("payments.modules.transport") || "Transport",
+          rentals: t("payments.modules.rentals") || "Equipment Rental",
+          extract: t("payments.modules.extract") || "Extract",
+        };
+        return moduleLabels[key] || fallbackLabel;
+      }
+      if (paramName === "accountType") {
+        const accountTypeLabels = {
+          supply: t("payments.accountTypes.supply") || "Supply",
+          transport: t("payments.accountTypes.transport") || "Transport",
+          rental: t("payments.accountTypes.rental") || "Rental",
+          extract: t("payments.accountTypes.extract") || "Extract",
+        };
+        return accountTypeLabels[key] || fallbackLabel;
+      }
+      if (paramName === "paymentMethod") {
+        const paymentMethodLabels = {
+          cash: t("payments.methods.cash") || "Cash",
+          bank: t("payments.methods.bank") || "Bank",
+        };
+        return paymentMethodLabels[key] || fallbackLabel;
+      }
+      return fallbackLabel;
     }
 
     const buildExecutePayload = () => {
@@ -335,6 +373,11 @@ export default {
       // for dropdown: set single object
       values.value[paramName] = item;
       selectedLabels.value[paramName] = item?.label || "";
+      if (paramName === "module" || paramName === "accountType") {
+        values.value.contractorId = null;
+        selectedLabels.value.contractorId = "";
+        loadOptions("contractorId");
+      }
     }
 
     function onSelectMulti(paramName, item) {

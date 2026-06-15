@@ -46,7 +46,7 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentLog": "سجل المعدات",
-    "companyWallet": "الخزينة الرئيسيه",
+    "treasury": "الخزينة",
     "admin": "الإدارة"
   },
   "dashboard": {
@@ -55,6 +55,7 @@
     "pay": "سداد",
     "paymentsDescription": "صفحة عرض الفواتير مع فلاتر للبحث.",
     "treasury": "الخزينة",
+    "treasuryTransactions": "حركات الخزينة",
     "treasuryPlaceholder": "الخزينة التي اتُسحب منها",
     "suppliesList": "قائمة التوريدات",
     "crushersList": "قائمة الكسارات",
@@ -71,7 +72,7 @@
     "transport": "النقل",
     "expenses": "المصروفات",
     "equipmentLog": "سجل المعدات",
-    "companyWallet": "الخزينة الرئيسيه",
+    "companyWallet": "الخزينة",
     "expand": "توسيع",
     "collapse": "طي",
     "items": "الأصناف",
@@ -79,7 +80,8 @@
     "newItem": "صنف جديد",
     "extractsList": "قائمة المستخلصات",
     "newExtract": "مستخلص جديد" ,
-    "extractItems": "بنود المستخلصات"
+    "extractItems": "بنود المستخلصات",
+    "report": "التقرير"
   },
   "equipmentLog": {
     "deletedSuccessfully":"تم الحذف بنجاح",
@@ -192,6 +194,7 @@
     "addItem": "إضافة بند"
   },
   "labels": {
+    "system": "النظام",
     "enterDetails": "أدخل التفاصيل",
     "hours":"الساعات",
     "driver":"السائق",
@@ -358,6 +361,18 @@
     "step2": "الخطوة 2",
     "step2Description": "أدخل تفاصيل السداد.",
     "module": "الوحدة",
+    "modules": {
+      "supply": "توريدات",
+      "transport": "نقل",
+      "rentals": "سجلات المعدات",
+      "extract": "مستخلصات"
+    },
+    "accountTypes": {
+      "supply": "توريدات",
+      "transport": "نقل",
+      "rental": "سجل معدات",
+      "extract": "مستخلصات"
+    },
     "methods": {
       "cash": "نقداً",
       "bank": "بنك"
@@ -1046,7 +1061,7 @@
     "ownership": "الملكية",
     "all": "الكل",
     "companyEquipment": "معدات مملوكة للشركة",
-    "companyWallet": "الخزينة الرئيسيه",
+    "companyWallet": "الخزينة",
     "externalRental": "إيجار خارجي",
     "isCompanyOwned": "معدة مملوكة للشركة",
     "isCompanyOwnedDescription": "حدد إذا كانت هذه المعدة مملوكة للشركة",
@@ -1096,7 +1111,7 @@
   },
   "finance": {
     "wallets": "المحافظ",
-    "companyWallet": "الخزينة الرئيسيه",
+    "companyWallet": "الخزينة",
     "balance": "رصيد الشركة",
     "currentBalance": "الرصيد الحالي",
     "subWallets": "الخزائن الفرعية",
@@ -1276,9 +1291,60 @@
       "transports": "النقل",
       "rentals": "سجلات المعدات",
       "equipmentLogs": "سجلات المعدات",
+      "payments": "المدفوعات",
+      "extracts": "المستخلصات",
       "expenses": "المصروفات",
       "vehicles": "المركبات",
-      "companyWallet": "خزينة الشركة"
+    "companyWallet": "الخزينة"
+    }
+  },
+  "treasury": {
+    "ledgerTitle": "دفتر الخزينة",
+    "searchPlaceholder": "ابحث في الوصف أو المرجع...",
+    "searchTreasuriesPlaceholder": "ابحث في الخزائن...",
+    "items": "خزائن",
+    "add": "إضافة خزينة",
+    "edit": "تعديل الخزينة",
+    "delete": "حذف الخزينة",
+    "archive": "أرشفة الخزينة",
+    "unarchive": "إرجاع الخزينة",
+    "create": "إنشاء خزينة",
+    "addMoney": "إضافة مبلغ",
+    "refresh": "تحديث",
+    "balance": "الرصيد",
+    "last30dIn": "الوارد آخر 30 يوم",
+    "last30dOut": "الصادر آخر 30 يوم",
+    "recentLedger": "سجل الخزينة",
+    "filtersHint": "فلترة حسب التاريخ والنوع والبحث.",
+    "filtersTitle": "الفلاتر",
+    "view": "العرض",
+    "viewActive": "النشطة",
+    "viewArchived": "المؤرشفة",
+    "viewAll": "الكل",
+    "detailsHint": "اختر خزينة لمراجعة الحركات والإجراءات الخاصة بها.",
+    "active": "نشطة",
+    "archived": "مؤرشفة",
+    "date": "التاريخ",
+    "dateFrom": "من تاريخ",
+    "dateTo": "إلى تاريخ",
+    "type": "النوع",
+    "description": "الوصف",
+    "amount": "المبلغ",
+    "amountFrom": "من مبلغ",
+    "amountTo": "إلى مبلغ",
+    "name": "الاسم",
+    "pinned": "مثبتة",
+    "noTransactions": "لا توجد حركات",
+    "search": "بحث",
+    "reset": "إعادة تعيين",
+    "deleteConfirm": "حذف هذه الخزينة؟",
+    "archiveConfirm": "أرشفة هذه الخزينة؟ لن يمكن استخدامها حتى يتم إرجاعها.",
+    "restoreConfirm": "إرجاع هذه الخزينة؟",
+    "types": {
+      "deposit": "إيداع",
+      "payment": "دفع",
+      "withdraw": "سحب",
+      "adjustment": "تسوية"
     }
   },
   "users": {

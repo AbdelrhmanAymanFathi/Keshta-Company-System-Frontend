@@ -1,296 +1,273 @@
 <template>
-  <teleport to="body">
-    <transition name="kc-modal">
-      <div
-        v-if="isVisible"
-        :dir="isRTL ? 'rtl' : 'ltr'"
-        class="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden bg-black/60 p-4"
-        @click.self="closeModal"
-      >
-        <div class="kc-modal-panel flex max-h-[95vh] w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-          <div class="flex items-center justify-between border-b bg-gray-50 px-6 py-4">
-            <h2 class="text-2xl font-bold text-indigo-800">
-              {{ currentStep === 1 ? ($t('dashboard.pay') || 'Pay') : ($t('payments.enterPayment') || 'Enter payment') }}
-            </h2>
-            <button
-              type="button"
-              @click="closeModal"
-              class="text-3xl leading-none text-gray-500 transition hover:text-gray-800 focus:outline-none"
-              aria-label="Close"
-            >
-              &times;
-            </button>
-          </div>
+  <div :dir="isRTL ? 'rtl' : 'ltr'">
+    <teleport to="body">
+      <transition name="kc-modal">
+        <div
+          v-if="isVisible"
+          class="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden bg-black/60 p-4"
+          :dir="isRTL ? 'rtl' : 'ltr'"
+          @click.self="closeModal"
+        >
+          <div class="kc-modal-panel flex max-h-[95vh] w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div class="flex items-center justify-between border-b bg-gray-50 px-6 py-4">
+              <h2 class="text-2xl font-bold text-indigo-800">
+                {{ currentStep === 1 ? modalTitleComputed : enterPaymentTitle }}
+              </h2>
+              <button
+                type="button"
+                class="text-3xl leading-none text-gray-500 transition hover:text-gray-800 focus:outline-none"
+                aria-label="Close"
+                @click="closeModal"
+              >
+                &times;
+              </button>
+            </div>
 
-          <div class="modal-body-container relative flex-1 overflow-y-auto p-6">
-            <div v-if="currentStep === 1" class="w-full">
-              <h3 class="mb-8 text-center text-lg font-bold text-gray-800">
-                {{ $t('labels.step1BasicData') || 'Step 1: Basic data' }}
-              </h3>
+            <div class="modal-body-container relative flex-1 overflow-y-auto p-6">
+              <div v-if="currentStep === 1" class="w-full">
+                <h3 class="mb-8 text-center text-lg font-bold text-gray-800">
+                  {{ step1Title }}
+                </h3>
 
-              <div class="mx-auto max-w-6xl">
-                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                      <MapPinIcon class="w-4 h-4 inline-block mr-1 text-gray-500" />
-                      {{ $t('labels.site') || 'Site' }}
-                    </label>
-                    <div class="flex items-center gap-2">
+                <div class="mx-auto max-w-6xl">
+                  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        {{ siteLabel }}
+                      </label>
                       <SearchDropdown
                         v-model="filters.siteSearch"
                         :items="sites"
-                        :all-items="sites"
                         itemLabel="name"
-                        :placeholder="$t('labels.site') || 'Site'"
+                        :placeholder="searchLocationPlaceholder"
                         :inputClass="fieldClass"
+                        :dir="isRTL ? 'rtl' : 'ltr'"
                         @select="handleSiteSelect"
                       />
-                      <button type="button" @click="addSitePrompt" class="text-indigo-600 text-sm">
-                        {{ isRTL ? (($t('labels.add') || 'Add') + ' +') : ('+ ' + ($t('labels.add') || 'Add')) }}
-                      </button>
                     </div>
-                  </div>
 
-                  <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                      <BuildingLibraryIcon class="w-4 h-4 inline-block mr-1 text-gray-500" />
-                      {{ $t('labels.area') || 'Area' }} <span class="text-red-600">*</span>
-                    </label>
-                    <div class="flex items-center gap-2">
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        {{ areaLabel }}
+                      </label>
                       <SearchDropdown
                         v-model="filters.areaSearch"
                         :items="availableAreas"
-                        :all-items="areas"
-                        :itemLabel="areaLabel"
-                        :placeholder="$t('placeholders.searchArea') || 'Search area...'"
+                        itemLabel="name"
+                        :placeholder="searchAreaPlaceholder"
                         :inputClass="fieldClass"
+                        :dir="isRTL ? 'rtl' : 'ltr'"
+                        :disabled="!selectedSite"
                         @select="handleAreaSelect"
                       />
-                      <button type="button" @click="addAreaPrompt" class="text-indigo-600 text-sm">
-                        {{ isRTL ? (($t('labels.add') || 'Add') + ' +') : ('+ ' + ($t('labels.add') || 'Add')) }}
-                      </button>
                     </div>
                   </div>
+                </div>
 
+                <div class="mt-10 flex justify-end">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 font-medium text-white shadow-md transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    :disabled="!isStep1Valid"
+                    @click="goToStep2"
+                  >
+                    <span>{{ nextLabel }}</span>
+                    <component :is="isRTL ? ArrowLeftIcon : ArrowRightIcon" class="h-5 w-5" />
+                  </button>
                 </div>
               </div>
 
-              <div class="mt-10 flex justify-end gap-6">
-                <button
-                  type="button"
-                  @click="closeModal"
-                  class="rounded-lg border border-gray-300 px-10 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
-                >
-                  {{ $t('labels.cancel') || 'Cancel' }}
-                </button>
-                <button
-                  type="button"
-                  @click="goToStep2"
-                  :disabled="!isStep1Valid"
-                  class="flex items-center gap-3 rounded-lg bg-green-600 px-10 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-                >
-                  {{ $t('labels.next') || 'Next' }}
-                  <ArrowRightIcon :class="['w-5 h-5 transition-transform', isRTL ? 'rotate-180' : '']" />
-                </button>
-              </div>
-            </div>
-
-            <div v-else class="w-full">
-              <div class="mb-8 flex items-center justify-between">
-                <button
-                  type="button"
-                  @click="prevStep"
-                  class="flex items-center gap-3 font-medium text-indigo-600 transition hover:text-indigo-800"
-                >
-                  <ArrowLeftIcon :class="['w-5 h-5 transition-transform', isRTL ? 'rotate-180' : '']" />
-                  {{ $t('labels.back') || 'Back' }}
-                </button>
-                <h3 class="text-lg font-bold text-gray-800">
-                  {{ $t('labels.step2Data') || 'Step 2: Payment data' }}
+              <div v-else class="w-full">
+                <h3 class="mb-8 text-center text-lg font-bold text-gray-800">
+                  {{ step2Title }}
                 </h3>
-                <div></div>
-              </div>
 
-              <div class="mb-8 rounded-lg border border-indigo-200 bg-indigo-50 p-5">
-                <h4 class="mb-4 text-sm font-bold text-indigo-900">{{ $t('labels.summary') || 'Summary' }}</h4>
-                <dl class="grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.site') || 'Site' }}:</dt>
-                    <dd class="mt-1 text-gray-900">{{ selectedSite?.name || '-' }}</dd>
-                  </div>
-                  <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.area') || 'Area' }}:</dt>
-                    <dd class="mt-1 text-gray-900">{{ selectedArea?.name || '-' }}</dd>
-                  </div>
-                  <!-- <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.rows') || 'Rows' }}:</dt>
-                    <dd class="mt-1 text-gray-900">{{ rows.length }}</dd>
-                  </div> -->
-                  <div class="flex flex-col">
-                    <dt class="font-semibold text-gray-700">{{ $t('labels.total') || 'Total' }}:</dt>
-                    <dd class="mt-1 text-gray-900">{{ totalAmountDisplay }}</dd>
-                  </div>
-                </dl>
-              </div>
-
-              <div class="relative overflow-visible rounded-lg border border-gray-200 p-2">
-                <div class="w-full overflow-x-auto">
-                  <table class="w-full min-w-[1080px] divide-y divide-gray-200 rounded-lg border">
-                    <thead class="sticky top-0 z-10 bg-indigo-50">
+                <div class="overflow-x-auto rounded-xl border border-gray-200">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="sticky top-0 z-10 bg-gray-50">
                       <tr>
-                        <th class="w-12 px-4 py-3 text-center text-xs font-medium text-gray-700">#</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('labels.date') || 'Date' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('payments.module') || 'Module' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('labels.contractor') || 'Contractor' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('labels.amount') || 'Amount' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('labels.paymentMethod') || 'Payment Method' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('labels.treasury') || 'Treasury' }}</th>
-                        <th class="px-4 py-3 text-start text-xs font-medium text-gray-700">{{ $t('labels.notes') || 'Notes' }}</th>
-                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-700">{{ $t('labels.actions') || 'Actions' }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">#</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ dateLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ moduleLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ contractorLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ amountLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ paymentMethodLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ treasuryLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ notesLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ actionsLabel }}</th>
                       </tr>
                     </thead>
+
                     <tbody class="divide-y divide-gray-200 bg-white">
                       <tr v-for="(row, index) in rows" :key="row.id">
                         <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
+
                         <td class="px-3 py-2">
-                          <DateField v-model="row.date" class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+                          <DateField
+                            v-model="row.date"
+                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                          />
                         </td>
+
                         <td class="px-3 py-2">
-                          <select v-model="row.module" @change="handleRowModuleChange(row)" class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                            <option value="" disabled>{{ $t('placeholders.select') || 'Select' }}</option>
+                          <select
+                            v-model="row.module"
+                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            @change="handleRowModuleChange(row)"
+                          >
+                            <option value="">{{ modulePlaceholder }}</option>
                             <option v-for="option in moduleOptions" :key="option.value" :value="option.value">
                               {{ option.label }}
                             </option>
                           </select>
                         </td>
+
                         <td class="px-3 py-2">
                           <div class="flex items-center gap-2">
                             <SearchDropdown
                               v-model="row._contractorSearch"
                               :items="row.contractors"
                               itemLabel="name"
-                              :placeholder="row.module ? ($t('placeholders.searchContractor') || 'Search contractor') : ($t('payments.selectModuleFirst') || 'Select module first')"
+                              :placeholder="row.module ? searchContractorPlaceholder : selectModuleFirstPlaceholder"
                               :inputClass="fieldClass"
+                              :dir="isRTL ? 'rtl' : 'ltr'"
                               :disabled="!row.module || !row.contractors.length"
-                              @select="(c) => { row.contractor = c; row._contractorSearch = c?.name || '' }"
+                              teleportTarget=".modal-body-container"
+                              @select="(contractor) => selectContractor(row, contractor)"
                             />
-                            <button type="button" @click="addContractorPrompt(row)" class="text-indigo-600 text-sm">
-                              {{ isRTL ? (($t('labels.add') || 'Add') + ' +') : ('+ ' + ($t('labels.add') || 'Add')) }}
-                            </button>
                           </div>
                         </td>
+
                         <td class="px-3 py-2">
                           <input
                             v-model.number="row.amount"
                             type="number"
                             min="0"
                             step="0.01"
-                            :placeholder="$t('labels.amount') || 'Amount'"
-                            class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                            @keydown="(e) => handleAmountKeydown(e, index)"
+                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm no-spinner focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            @keydown.enter.prevent="handleEnterKey(index)"
                           />
                         </td>
+
                         <td class="px-3 py-2">
-                          <select v-model="row.paymentMethod" class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                            <option value="cash">{{ $t('payments.methods.cash') || 'Cash' }}</option>
-                            <option value="bank">{{ $t('payments.methods.bank') || 'Bank' }}</option>
+                          <select
+                            v-model="row.paymentMethod"
+                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                          >
+                            <option v-for="option in paymentMethodOptions" :key="option.value" :value="option.value">
+                              {{ option.label }}
+                            </option>
                           </select>
                         </td>
+
                         <td class="px-3 py-2">
-                          <input
-                            v-model="row.treasury"
-                            type="text"
-                            :placeholder="$t('dashboard.treasuryPlaceholder') || 'Source treasury'"
-                            class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          <SearchDropdown
+                            v-model="row._treasurySearch"
+                            :items="treasuryOptions"
+                            itemLabel="name"
+                            :placeholder="treasuryPlaceholder"
+                            :inputClass="fieldClass"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            :disabled="!treasuryOptions.length"
+                            teleportTarget=".modal-body-container"
+                            @select="(treasury) => selectTreasury(row, treasury)"
                           />
                         </td>
+
                         <td class="px-3 py-2">
                           <input
                             v-model="row.notes"
                             type="text"
-                            :placeholder="$t('labels.notes') || 'Notes'"
-                            class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.tab="onLastFieldTab(index, $event)"
                           />
                         </td>
-                        <td class="px-3 py-2 flex items-center justify-center gap-2">
-                          <button
-                            type="button"
-                            @click="duplicateRow(index)"
-                            class="rounded-full border border-gray-300 bg-white p-2 text-gray-600 transition hover:bg-gray-100"
-                            :aria-label="$t('labels.duplicate') || 'Duplicate row'"
-                          >
-                            ⎘
-                          </button>
-                          <button
-                            type="button"
-                            @click="removeRow(index)"
-                            class="rounded-full border border-gray-300 bg-white p-2 text-gray-600 transition hover:bg-gray-100"
-                            :aria-label="$t('labels.remove') || 'Remove row'"
-                          >
-                            ✕
-                          </button>
+
+                        <td class="px-4 py-3 text-center">
+                          <div class="flex justify-center gap-3">
+                            <button
+                              type="button"
+                              class="text-blue-600 transition hover:text-blue-800"
+                              title="Duplicate"
+                              tabindex="-1"
+                              @click="duplicateRow(index)"
+                            >
+                              <DocumentDuplicateIcon class="h-5 w-5" />
+                            </button>
+                            <button
+                              type="button"
+                              class="text-red-600 transition hover:text-red-800"
+                              title="Delete"
+                              tabindex="-1"
+                              @click="removeRow(index)"
+                            >
+                              <TrashIcon class="h-5 w-5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-              </div>
 
-              <div class="mt-6 rounded-lg bg-gray-50 p-6">
-                <div class="flex flex-wrap items-center gap-6 text-sm">
-                  <!-- <div class="flex items-center gap-3">
-                    <span class="font-semibold text-indigo-800">{{ $t('labels.site') || 'Site' }}:</span>
-                    <span class="text-gray-900">{{ selectedSite?.name || '-' }}</span>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="font-semibold text-indigo-800">{{ $t('labels.area') || 'Area' }}:</span>
-                    <span class="text-gray-900">{{ selectedArea?.name || '-' }}</span>
-                  </div> -->
-                  <!-- <div class="flex items-center gap-3">
-                    <span class="font-semibold text-indigo-800">{{ $t('labels.rows') || 'Rows' }}:</span>
-                    <span class="text-gray-900">{{ rows.length }}</span>
-                  </div> -->
-                  <div class="ml-auto flex items-center gap-3 text-base font-semibold text-indigo-900">
-                    <span>{{ $t('labels.total') || 'Total' }}:</span>
-                    <span>{{ totalAmountDisplay }}</span>
+                <p v-if="submitError" class="mt-4 text-center text-sm font-medium text-red-600">
+                  {{ submitError }}
+                </p>
+
+                <div class="mt-8 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
+                    @click="prevStep"
+                  >
+                    <component :is="isRTL ? ArrowRightIcon : ArrowLeftIcon" class="h-5 w-5" />
+                    <span>{{ backLabel }}</span>
+                  </button>
+
+                  <div class="flex flex-col gap-3 sm:items-end">
+                    <div class="text-sm font-medium text-gray-600">
+                      {{ totalLabel }}: <span class="font-semibold text-gray-900">{{ totalAmountDisplay }}</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-10 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                      :disabled="isSubmitDisabled || isSaving"
+                      @click="savePayment"
+                    >
+                      <span>{{ isSaving ? savingLabel : saveLabel }}</span>
+                      <CheckIcon class="h-5 w-5" />
+                    </button>
                   </div>
                 </div>
               </div>
-
-              <div class="mt-8 flex justify-end gap-4">
-                <button
-                  type="button"
-                  @click="prevStep"
-                  class="flex items-center gap-3 rounded-lg border border-gray-300 px-10 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
-                >
-                  <ArrowLeftIcon class="w-5 h-5" />
-                  {{ $t('labels.back') || 'Back' }}
-                </button>
-                <button
-                  type="button"
-                  @click="savePayment"
-                  :disabled="isSubmitDisabled"
-                  class="flex items-center gap-3 rounded-lg bg-green-600 px-10 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
-                >
-                  <span>✓</span>
-                  {{ $t('labels.save') || 'Save' }}
-                </button>
-              </div>
-              <p v-if="submitError" class="mt-4 text-sm text-red-600">{{ submitError }}</p>
             </div>
           </div>
         </div>
-      </div>
-    </transition>
-  </teleport>
+      </transition>
+    </teleport>
+  </div>
 </template>
 
 <script>
-import { ref, reactive, watch, computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import { getLocations, getContractors, createPayment } from '@/api'
-import { ArrowRightIcon, ArrowLeftIcon, MapPinIcon, BuildingLibraryIcon } from '@heroicons/vue/24/outline'
+import { createPayment, getContractors, getLocations, getTreasuries } from '@/api'
+import {
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  CheckIcon,
+  DocumentDuplicateIcon,
+  TrashIcon
+} from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
 
 const normalizeList = (payload) => {
@@ -304,7 +281,15 @@ const idsEqual = (left, right) => String(left ?? '') === String(right ?? '')
 
 export default {
   name: 'PaymentCreationModal',
-  components: { DateField, SearchDropdown, ArrowRightIcon, ArrowLeftIcon, MapPinIcon, BuildingLibraryIcon },
+  components: {
+    DateField,
+    SearchDropdown,
+    ArrowRightIcon,
+    ArrowLeftIcon,
+    CheckIcon,
+    DocumentDuplicateIcon,
+    TrashIcon
+  },
   props: {
     visible: {
       type: Boolean,
@@ -314,12 +299,18 @@ export default {
   emits: ['update:visible', 'saved'],
   setup(props, { emit }) {
     const { t } = useI18n()
+
     const internalVisible = ref(props.visible)
     const currentStep = ref(1)
     const locations = ref([])
+    const treasuries = ref([])
     const selectedSite = ref(null)
     const selectedArea = ref(null)
     const submitError = ref('')
+    const isSaving = ref(false)
+    const skipPersistOnClose = ref(false)
+
+    const fieldClass = 'w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200'
 
     const createRow = (overrides = {}) => ({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
@@ -329,7 +320,9 @@ export default {
       _contractorSearch: '',
       amount: '',
       paymentMethod: 'cash',
-      treasury: '',
+      treasury: null,
+      treasuryId: null,
+      _treasurySearch: '',
       notes: '',
       contractors: [],
       ...overrides
@@ -337,19 +330,15 @@ export default {
 
     const rows = ref([createRow()])
 
-    const filters = reactive({
+    const filters = ref({
       siteSearch: '',
       areaSearch: ''
     })
 
-    const moduleOptions = computed(() => ([
-      { value: 'supply', label: t('supply.title') || 'Supply' },
-      { value: 'transport', label: t('transport.transport') || 'Transport' },
-      { value: 'rentals', label: t('rentals.rentalList') || 'Equipment Logs' },
-      { value: 'extract', label: t('extracts.title') || 'Extracts' }
-    ]))
-
-    const fieldClass = 'w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200'
+    const labelFor = (key, fallback) => {
+      const value = t(key)
+      return value === key ? fallback : value
+    }
 
     const isRTL = computed(() => {
       if (typeof document === 'undefined') return false
@@ -360,6 +349,7 @@ export default {
 
     const areas = computed(() => {
       const flattened = []
+
       for (const site of locations.value) {
         const children = Array.isArray(site.children) ? site.children : []
         children.forEach(area => {
@@ -371,6 +361,7 @@ export default {
           })
         })
       }
+
       locations.value
         .filter(location => location.parentId || location.parent)
         .forEach(area => {
@@ -383,6 +374,7 @@ export default {
             })
           }
         })
+
       return flattened
     })
 
@@ -391,21 +383,59 @@ export default {
       return areas.value.filter(area => idsEqual(area.parentId, selectedSite.value.id) || idsEqual(area.site?.id, selectedSite.value.id))
     })
 
+    const moduleOptions = computed(() => ([
+      { value: 'supply', label: labelFor('supply.title', 'Supply') },
+      { value: 'transport', label: labelFor('transport.transport', 'Transport') },
+      { value: 'rentals', label: labelFor('rentals.rentalList', 'Equipment Logs') },
+      { value: 'extract', label: labelFor('extracts.title', 'Extracts') }
+    ]))
+
+    const paymentMethodOptions = computed(() => ([
+      { value: 'cash', label: labelFor('payments.cash', 'Cash') },
+      { value: 'bank', label: labelFor('payments.bank', 'Bank') }
+    ]))
+
+    const treasuryOptions = computed(() => treasuries.value)
+
     const isStep1Valid = computed(() => Boolean(selectedArea.value))
 
+    const rowsToSave = computed(() => rows.value.filter(row => !isRowEmpty(row)))
+
     const isSubmitDisabled = computed(() => {
-      return rows.value.some(row => {
-        return !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod || !row.treasury
-      })
+      if (!rowsToSave.value.length) return true
+      return rowsToSave.value.some(row => !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod || !row.treasuryId)
     })
 
-    const totalAmount = computed(() => {
-      return rows.value.reduce((sum, row) => sum + (Number(row.amount) || 0), 0)
-    })
+    const totalAmount = computed(() => rowsToSave.value.reduce((sum, row) => sum + (Number(row.amount) || 0), 0))
 
-    const totalAmountDisplay = computed(() => {
-      return totalAmount.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    })
+    const totalAmountDisplay = computed(() => totalAmount.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+
+    const enterPaymentTitle = computed(() => labelFor('payments.enterPayment', 'Enter payment'))
+    const step1Title = computed(() => labelFor('labels.step1BasicData', 'Step 1: Basic data'))
+    const step2Title = computed(() => labelFor('payments.enterPayment', 'Enter payment'))
+    const nextLabel = computed(() => labelFor('labels.next', 'Next'))
+    const backLabel = computed(() => labelFor('labels.back', 'Back'))
+    const saveLabel = computed(() => labelFor('labels.save', 'Save'))
+    const savingLabel = computed(() => labelFor('labels.saving', 'Saving'))
+    const totalLabel = computed(() => labelFor('labels.total', 'Total'))
+
+    const siteLabel = computed(() => labelFor('labels.site', 'Site'))
+    const areaLabel = computed(() => labelFor('labels.area', 'Area'))
+    const dateLabel = computed(() => labelFor('labels.date', 'Date'))
+    const moduleLabel = computed(() => labelFor('labels.module', 'Module'))
+    const contractorLabel = computed(() => labelFor('labels.contractor', 'Contractor'))
+    const amountLabel = computed(() => labelFor('labels.amount', 'Amount'))
+    const paymentMethodLabel = computed(() => labelFor('labels.paymentMethod', 'Payment Method'))
+    const treasuryLabel = computed(() => labelFor('dashboard.treasury', 'Treasury'))
+    const notesLabel = computed(() => labelFor('labels.notes', 'Notes'))
+    const actionsLabel = computed(() => labelFor('labels.actions', 'Actions'))
+
+    const searchLocationPlaceholder = computed(() => labelFor('placeholders.searchLocation', 'Search location'))
+    const searchAreaPlaceholder = computed(() => labelFor('placeholders.searchArea', 'Search area'))
+    const searchContractorPlaceholder = computed(() => labelFor('placeholders.searchContractor', 'Search contractor'))
+    const selectModuleFirstPlaceholder = computed(() => labelFor('payments.selectModuleFirst', 'Select module first'))
+    const treasuryPlaceholder = computed(() => labelFor('placeholders.searchTreasury', 'Search treasury'))
+    const modulePlaceholder = computed(() => labelFor('labels.module', 'Module'))
 
     function findSiteForArea(area) {
       if (!area) return null
@@ -414,12 +444,12 @@ export default {
       return locations.value.find(location => idsEqual(location.id, area.parentId) || idsEqual(location.id, area.locationId))
     }
 
-    const areaLabel = (area) => {
+    const areaLabelWithSite = (area) => {
       if (!area) return ''
       return area.parentName ? `${area.name} (${area.parentName})` : area.name
     }
 
-    const loadLocations = async () => {
+    async function loadLocations() {
       try {
         const res = await getLocations()
         locations.value = normalizeList(res?.data)
@@ -429,9 +459,21 @@ export default {
       }
     }
 
-    const loadContractorsForRow = async (row) => {
+    async function loadTreasuries() {
+      try {
+        const res = await getTreasuries()
+        treasuries.value = normalizeList(res?.data)
+      } catch (error) {
+        console.error('Failed to load treasuries', error)
+        treasuries.value = []
+      }
+    }
+
+    async function loadContractorsForRow(row) {
       if (!row.module) {
         row.contractors = []
+        row.contractor = null
+        row._contractorSearch = ''
         return
       }
 
@@ -441,7 +483,12 @@ export default {
           mode: row.module
         })
         row.contractors = normalizeList(res?.data)
-        if (row.contractor) row._contractorSearch = row.contractor.name
+
+        if (row.contractor?.id) {
+          const match = row.contractors.find(contractor => idsEqual(contractor.id, row.contractor.id))
+          row.contractor = match || row.contractor
+          row._contractorSearch = row.contractor?.name || row._contractorSearch || ''
+        }
       } catch (error) {
         console.error('Failed to load contractors', error)
         row.contractors = []
@@ -450,38 +497,54 @@ export default {
 
     const handleSiteSelect = (site) => {
       selectedSite.value = site
-      filters.siteSearch = site?.name || ''
+      filters.value.siteSearch = site?.name || ''
       selectedArea.value = null
-      filters.areaSearch = ''
+      filters.value.areaSearch = ''
     }
 
     const handleAreaSelect = (area) => {
       selectedArea.value = area
-      filters.areaSearch = area?.name || ''
+      filters.value.areaSearch = areaLabelWithSite(area)
       const site = findSiteForArea(area)
       if (site) {
         selectedSite.value = site
-        filters.siteSearch = site.name || ''
+        filters.value.siteSearch = site.name || ''
       }
     }
 
     const handleRowModuleChange = async (row) => {
       row.contractor = null
+      row._contractorSearch = ''
       row.contractors = []
       await loadContractorsForRow(row)
     }
 
+    const selectContractor = (row, contractor) => {
+      row.contractor = contractor
+      row._contractorSearch = contractor?.name || ''
+    }
+
+    const selectTreasury = (row, treasury) => {
+      row.treasury = treasury
+      row.treasuryId = treasury?.id ?? null
+      row._treasurySearch = treasury?.name || ''
+    }
+
     const duplicateRow = (index) => {
       const source = rows.value[index]
+      if (!source) return
       rows.value.splice(index + 1, 0, createRow({
         date: source.date,
         module: source.module,
         contractor: source.contractor,
+        _contractorSearch: source._contractorSearch,
         amount: source.amount,
         paymentMethod: source.paymentMethod,
         treasury: source.treasury,
+        treasuryId: source.treasuryId,
+        _treasurySearch: source._treasurySearch,
         notes: source.notes,
-        contractors: [...source.contractors]
+        contractors: [...(source.contractors || [])]
       }))
     }
 
@@ -498,127 +561,208 @@ export default {
       selectedSite.value = null
       selectedArea.value = null
       submitError.value = ''
-      filters.siteSearch = ''
-      filters.areaSearch = ''
       rows.value = [createRow()]
-    }
-
-    const STORAGE_KEY = 'paymentCreationModalCommonData'
-
-    const closeModal = () => {
-      internalVisible.value = false
+      filters.value.siteSearch = ''
+      filters.value.areaSearch = ''
     }
 
     function saveToStorage() {
       try {
-        const payload = { selectedSite: selectedSite.value, selectedArea: selectedArea.value, rows: rows.value.map(r => ({ id: r.id, date: r.date, module: r.module, contractor: r.contractor, amount: r.amount, paymentMethod: r.paymentMethod, treasury: r.treasury, notes: r.notes })) }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
-      } catch (e) { console.warn('save storage failed', e) }
+        if (typeof window === 'undefined') return
+        const payload = {
+          selectedSite: selectedSite.value,
+          selectedArea: selectedArea.value,
+          rows: rows.value.map(row => ({
+            id: row.id,
+            date: row.date,
+            module: row.module,
+            contractor: row.contractor,
+            amount: row.amount,
+            paymentMethod: row.paymentMethod,
+            treasury: row.treasury,
+            treasuryId: row.treasuryId,
+            notes: row.notes
+          }))
+        }
+        window.localStorage.setItem('paymentCreationModalCommonData', JSON.stringify(payload))
+      } catch (error) {
+        console.warn('save storage failed', error)
+      }
     }
 
     function loadFromStorage() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY)
+        if (typeof window === 'undefined') return
+        const raw = window.localStorage.getItem('paymentCreationModalCommonData')
         if (!raw) return
-        const p = JSON.parse(raw)
-        if (p.selectedSite) selectedSite.value = p.selectedSite
-        if (p.selectedArea) selectedArea.value = p.selectedArea
-        if (Array.isArray(p.rows) && p.rows.length) rows.value = p.rows.map(r => createRow({ id: r.id, date: r.date, module: r.module, contractor: r.contractor, amount: r.amount, paymentMethod: r.paymentMethod, treasury: r.treasury, notes: r.notes }))
-      } catch (e) { console.warn('load storage failed', e) }
-    }
+        const payload = JSON.parse(raw)
 
-    function addSitePrompt() {
-      const name = window.prompt('New site name')
-      if (!name) return
-      const s = { id: Date.now(), name }
-      locations.value.push(s)
-      selectedSite.value = s
-      filters.siteSearch = s.name
-      saveToStorage()
-    }
+        if (payload.selectedSite?.id) {
+          selectedSite.value = locations.value.find(location => idsEqual(location.id, payload.selectedSite.id)) || payload.selectedSite
+          filters.value.siteSearch = selectedSite.value?.name || ''
+        }
 
-    function addAreaPrompt() {
-      if (!selectedSite.value) { window.alert('Select a site first'); return }
-      const name = window.prompt('New area name')
-      if (!name) return
-      const a = { id: Date.now(), name, parentId: selectedSite.value.id }
-      locations.value.push(a)
-      selectedArea.value = a
-      filters.areaSearch = a.name
-      saveToStorage()
-    }
+        if (payload.selectedArea?.id) {
+          selectedArea.value = areas.value.find(area => idsEqual(area.id, payload.selectedArea.id)) || payload.selectedArea
+          filters.value.areaSearch = selectedArea.value ? areaLabelWithSite(selectedArea.value) : ''
+        }
 
-    function addContractorPrompt(row) {
-      const name = window.prompt('New contractor name')
-      if (!name) return
-      const c = { id: Date.now(), name }
-      row.contractors = row.contractors || []
-      row.contractors.push(c)
-      row.contractor = c
-      row._contractorSearch = c.name
-      saveToStorage()
+        if (Array.isArray(payload.rows) && payload.rows.length) {
+          rows.value = payload.rows.map(row => {
+            const treasury = row.treasuryId
+              ? treasuryOptions.value.find(item => idsEqual(item.id, row.treasuryId))
+              : null
+
+            return createRow({
+              id: row.id,
+              date: row.date,
+              module: row.module,
+              contractor: row.contractor,
+              _contractorSearch: row.contractor?.name || '',
+              amount: row.amount,
+              paymentMethod: row.paymentMethod || 'cash',
+              treasury: treasury || null,
+              treasuryId: treasury?.id ?? row.treasuryId ?? null,
+              _treasurySearch: treasury?.name || '',
+              notes: row.notes
+            })
+          })
+        }
+      } catch (error) {
+        console.warn('load storage failed', error)
+      }
     }
 
     function isRowEmpty(row) {
-      return !row.date && !row.module && !row.contractor && !row.amount && !row.treasury && !row.notes
+      return !row.date &&
+        !row.module &&
+        !row.contractor &&
+        !row.amount &&
+        !row.paymentMethod &&
+        !row.treasury &&
+        !row.treasuryId &&
+        !row.notes
     }
 
-    function handleAmountKeydown(e, index) {
-      if (e.key === 'Enter') { e.preventDefault(); if (index === rows.value.length - 1) { rows.value.push(createRow()); saveToStorage() } }
-      if (e.key === 'Tab' && !e.shiftKey && index === rows.value.length - 1) { rows.value.push(createRow()); saveToStorage() }
+    function handleEnterKey(index) {
+      if (index === rows.value.length - 1) {
+        rows.value.push(createRow())
+      }
+    }
+
+    function onLastFieldTab(index, event) {
+      if (event.shiftKey) return
+      if (event.key === 'Tab' && index === rows.value.length - 1) {
+        event.preventDefault()
+        rows.value.push(createRow())
+      }
+    }
+
+    const goToStep2 = () => {
+      if (!isStep1Valid.value) return
+      currentStep.value = 2
+      if (!rows.value.length) rows.value.push(createRow())
+      saveToStorage()
     }
 
     const prevStep = () => {
       currentStep.value = 1
     }
 
-    const goToStep2 = () => {
-      if (!isStep1Valid.value) return
-      currentStep.value = 2
+    const closeModal = () => {
+      internalVisible.value = false
+    }
+
+    const initializeModal = async () => {
+      await Promise.all([loadLocations(), loadTreasuries()])
+      loadFromStorage()
+      await Promise.all(rows.value.map(row => loadContractorsForRow(row)))
     }
 
     const savePayment = async () => {
       submitError.value = ''
-      // filter out completely empty rows
-      const filtered = rows.value.filter(r => !isRowEmpty(r))
-      if (!filtered.length) return
-      // basic validation on remaining rows
-      if (filtered.some(r => !r.date || !r.module || !r.amount || !r.contractor || !r.paymentMethod || !r.treasury)) return
-      const payload = {
-        site: selectedSite.value,
-        location: selectedSite.value,
-        area: selectedArea.value?.name || '',
-        areaObject: selectedArea.value,
-        areaId: selectedArea.value?.id,
-        siteId: selectedSite.value?.id,
-        rows: filtered.map(row => ({
-          date: row.date,
-          module: row.module,
-          amount: Number(row.amount) || 0,
-          contractor: row.contractor,
-          contractorId: row.contractor?.id,
-          paymentMethod: row.paymentMethod,
-          treasury: row.treasury,
-          notes: row.notes
-        }))
+      const filtered = rows.value.filter(row => !isRowEmpty(row))
+
+      if (!filtered.length) {
+        submitError.value = labelFor('common.selectAtLeastOneRow', 'Add at least one payment row')
+        return
       }
 
+      if (filtered.some(row => !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod || !row.treasuryId)) {
+        submitError.value = labelFor('common.fillRequiredFields', 'Fill all required fields')
+        return
+      }
+
+      isSaving.value = true
       try {
+        const payload = {
+          site: selectedSite.value,
+          location: selectedSite.value,
+          area: selectedArea.value?.name || '',
+          areaObject: selectedArea.value,
+          areaId: selectedArea.value?.id,
+          siteId: selectedSite.value?.id,
+          rows: filtered.map(row => ({
+            date: row.date,
+            module: row.module,
+            amount: Number(row.amount) || 0,
+            contractor: row.contractor,
+            contractorId: row.contractor?.id,
+            paymentMethod: row.paymentMethod,
+            treasury: row.treasury?.name || row.treasury || '',
+            treasuryId: row.treasuryId || row.treasury?.id || null,
+            notes: row.notes
+          }))
+        }
+
         const res = await createPayment(payload)
-        try { localStorage.removeItem(STORAGE_KEY) } catch (e) { console.warn('remove storage failed', e) }
+        skipPersistOnClose.value = true
+        try {
+          if (typeof window !== 'undefined') {
+            window.localStorage.removeItem('paymentCreationModalCommonData')
+          }
+        } catch (error) {
+          console.warn('remove storage failed', error)
+        }
         emit('saved', res?.data || payload)
         closeModal()
       } catch (error) {
         console.error('Failed to create payments', error)
-        submitError.value = error?.response?.data?.message || 'Failed to save payments'
+        submitError.value = error?.response?.data?.message || labelFor('common.saveError', 'Failed to save payments')
+      } finally {
+        isSaving.value = false
       }
     }
 
-    watch(() => props.visible, (value) => { internalVisible.value = value; if (value) currentStep.value = 1 })
-    watch(internalVisible, (value) => { emit('update:visible', value); if (!value) resetForm() })
+    watch(() => props.visible, async (value) => {
+      internalVisible.value = value
+      if (value) {
+        currentStep.value = 1
+        await initializeModal()
+      }
+    }, { immediate: true })
+
+    watch(internalVisible, (value) => {
+      emit('update:visible', value)
+      if (!value) {
+        if (skipPersistOnClose.value) {
+          skipPersistOnClose.value = false
+        } else {
+          saveToStorage()
+        }
+        resetForm()
+      }
+    })
+
     watch([selectedSite, selectedArea, rows], () => saveToStorage(), { deep: true })
 
-    onMounted(async () => { await loadLocations(); loadFromStorage() })
+    onMounted(async () => {
+      if (internalVisible.value) {
+        await initializeModal()
+      } else {
+        await Promise.all([loadLocations(), loadTreasuries()])
+      }
+    })
 
     return {
       isVisible: internalVisible,
@@ -632,14 +776,16 @@ export default {
       selectedSite,
       selectedArea,
       moduleOptions,
+      paymentMethodOptions,
+      treasuryOptions,
       fieldClass,
-      areaLabel,
-      isStep1Valid,
       isSubmitDisabled,
       totalAmountDisplay,
       handleSiteSelect,
       handleAreaSelect,
       handleRowModuleChange,
+      selectContractor,
+      selectTreasury,
       duplicateRow,
       removeRow,
       goToStep2,
@@ -647,14 +793,40 @@ export default {
       savePayment,
       closeModal,
       submitError,
-      addSitePrompt,
-      addAreaPrompt,
-      addContractorPrompt,
-      handleAmountKeydown
+      handleEnterKey,
+      onLastFieldTab,
+      ArrowRightIcon,
+      ArrowLeftIcon,
+      CheckIcon,
+      DocumentDuplicateIcon,
+      TrashIcon,
+      modalTitleComputed: computed(() => labelFor('dashboard.pay', 'Pay')),
+      enterPaymentTitle,
+      step1Title,
+      step2Title,
+      nextLabel,
+      backLabel,
+      saveLabel,
+      savingLabel,
+      totalLabel,
+      siteLabel,
+      areaLabel,
+      dateLabel,
+      moduleLabel,
+      contractorLabel,
+      amountLabel,
+      paymentMethodLabel,
+      treasuryLabel,
+      notesLabel,
+      actionsLabel,
+      searchLocationPlaceholder,
+      searchAreaPlaceholder,
+      searchContractorPlaceholder,
+      selectModuleFirstPlaceholder,
+      treasuryPlaceholder,
+      modulePlaceholder,
+      isStep1Valid
     }
   }
 }
 </script>
-
-<style scoped>
-</style>

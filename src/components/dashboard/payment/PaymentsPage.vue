@@ -10,8 +10,8 @@
       </button>
     </div>
 
-    <div class="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
-      <h4 class="text-sm font-semibold text-gray-700">{{ $t('labels.filters') || 'Filters' }}</h4>
+    <div class="bg-white rounded-lg shadow p-4">
+      <h4 class="text-sm font-semibold text-gray-900">{{ $t('labels.filters') || 'Filters' }}</h4>
 
       <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div>
@@ -110,17 +110,69 @@
         </div>
       </div>
 
-      <div class="mt-4 flex flex-wrap items-center gap-3">
+      <div class="mt-4 flex flex-wrap gap-2">
         <button @click="applyFilters"
-          class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-indigo-700">
+          class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
           {{ $t('labels.search') || 'Search' }}
         </button>
         <button @click="resetFilters"
-          class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-colors duration-200 hover:bg-gray-50">
+          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
           {{ $t('labels.clear') || 'Clear' }}
         </button>
       </div>
     </div>
+
+    <!-- <div class="bg-white rounded-lg shadow p-4">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900">{{ $t('reports.moduleReports') || 'Payment Reports' }}</h4>
+          <p class="text-xs text-gray-500">{{ $t('reports.moduleReportsHint') || 'Open reports built for payment records.' }}</p>
+        </div>
+      </div>
+
+      <div v-if="reportsLoading" class="mt-4 text-sm text-gray-500">
+        {{ $t('labels.loading') || 'Loading...' }}
+      </div>
+
+      <div v-else-if="paymentReports.length" class="mt-4 overflow-hidden rounded-lg border border-gray-200">
+        <div
+          v-for="report in paymentReports"
+          :key="report.id"
+          class="border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50"
+        >
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-900">
+                {{ isRTL && report.arTitle ? report.arTitle : report.title }}
+              </p>
+              <p class="mt-1 text-xs text-gray-500">{{ report.key }}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span v-if="report.active" class="rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+                {{ $t('labels.active') || 'Active' }}
+              </span>
+              <button
+                type="button"
+                @click="openReport(report.id)"
+                class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
+              >
+                {{ $t('admin.run') || 'Run' }}
+              </button>
+              <router-link
+                :to="{ name: 'admin-reports-edit', params: { id: report.id } }"
+                class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+              >
+                {{ $t('labels.edit') || 'Edit' }}
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="mt-4 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-500">
+        {{ $t('reports.noModuleReports') || 'No payment reports have been configured yet.' }}
+      </div>
+    </div> -->
 
     <div class="overflow-x-auto bg-white rounded-3xl border border-gray-200 shadow-sm">
       <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -165,7 +217,8 @@
 <script>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getPayments, getLocations, getContractors } from '@/api'
+import { useRouter } from 'vue-router'
+import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs } from '@/api'
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
@@ -188,11 +241,15 @@ export default {
   },
   setup() {
     const { locale, t } = useI18n()
+    const router = useRouter()
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const paymentModalVisible = ref(false)
     const payments = ref([])
+    const reports = ref([])
     const locations = ref([])
+    const treasuries = ref([])
     const contractorFilterOptions = ref([])
+    const reportsLoading = ref(false)
     const loading = ref(false)
     const createFilters = () => ({
       dateFrom: '',
@@ -250,7 +307,7 @@ export default {
     }
     const paymentContractor = (payment) => textValue(payment.contractorName || payment.contractor?.name || payment.contractor || '-')
     const paymentMethodLabel = (payment) => textValue(payment.method || payment.paymentMethod || payment.type || payment.payment_type || '-')
-    const paymentTreasury = (payment) => textValue(payment.treasury || payment.sourceAccount || payment.wallet || payment.branch?.name || payment.branch || '-')
+    const paymentTreasury = (payment) => textValue(payment.treasury || payment.treasuryRef?.name || payment.sourceAccount || payment.wallet || payment.branch?.name || payment.branch || '-')
     const paymentNotes = (payment) => textValue(payment.notes || payment.reference || '-')
     const findSiteForArea = (area) => {
       if (!area) return null
@@ -327,11 +384,7 @@ export default {
       'label'
     ))
 
-    const treasuryOptions = computed(() => uniqueByName(
-      payments.value
-        .map(payment => ({ id: paymentTreasury(payment), name: paymentTreasury(payment) }))
-        .filter(item => item.name && item.name !== '-')
-    ))
+    const treasuryOptions = computed(() => normalizeList(treasuries.value))
 
     const filteredPayments = computed(() => {
       const {
@@ -405,6 +458,16 @@ export default {
       } catch (error) {
         console.error('Failed to load locations', error)
         locations.value = []
+      }
+    }
+
+    const loadTreasuries = async () => {
+      try {
+        const res = await getTreasuries()
+        treasuries.value = normalizeList(res?.data)
+      } catch (error) {
+        console.error('Failed to load treasuries for payments', error)
+        treasuries.value = []
       }
     }
 
@@ -497,12 +560,43 @@ export default {
       return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     }
 
+    const paymentReports = computed(() => reports.value.filter(report => normalize(report?.module) === 'payments'))
+
+    const loadReports = async () => {
+      reportsLoading.value = true
+      try {
+        const res = await getReportDefs({ pageSize: 500 })
+        const data = res?.data
+        if (Array.isArray(data)) {
+          reports.value = data
+        } else if (Array.isArray(data?.items)) {
+          reports.value = data.items
+        } else if (Array.isArray(data?.data)) {
+          reports.value = data.data
+        } else {
+          reports.value = []
+        }
+      } catch (error) {
+        console.error('Failed to load payment reports', error)
+        reports.value = []
+      } finally {
+        reportsLoading.value = false
+      }
+    }
+
+    const openReport = (reportId) => {
+      if (!reportId) return
+      router.push({ name: 'admin-reports-run', params: { id: reportId } })
+    }
+
     return {
       isRTL,
       paymentModalVisible,
+      reportsLoading,
       filters,
       fieldClass,
       filteredPayments,
+      paymentReports,
       siteOptions,
       areaOptions,
       availableAreaOptions,
@@ -512,6 +606,7 @@ export default {
       treasuryOptions,
       applyFilters,
       loadLocations,
+      loadTreasuries,
       handleSiteSelect,
       handleAreaSelect,
       handleModuleSelect,
@@ -531,12 +626,16 @@ export default {
       paymentNotes,
       formatDate
       ,
-      formatAmount
+      formatAmount,
+      loadReports,
+      openReport
     }
   },
   mounted() {
     this.applyFilters()
     this.loadLocations()
+    this.loadTreasuries()
+    this.loadReports()
   }
 }
 </script>

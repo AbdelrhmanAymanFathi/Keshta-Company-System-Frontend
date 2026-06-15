@@ -90,13 +90,17 @@ export const useCompanyFinanceStore = defineStore('companyFinance', {
       }
     },
 
-    async fetchTransactions() {
+    async fetchTransactions(params = {}) {
       this.loading = true
       this.error = null
       try {
         const response = await getCompanyTransactions({
           page: this.transactions.page,
-          pageSize: this.transactions.pageSize
+          pageSize: this.transactions.pageSize,
+          startDate: params.startDate,
+          endDate: params.endDate,
+          type: params.type,
+          search: params.search
         })
         this.transactions.items = response.data.items || []
         this.transactions.total = response.data.total || 0

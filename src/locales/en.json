@@ -46,7 +46,7 @@
     "transport": "Transport",
     "expenses": "Expenses",
     "equipmentLog": "Equipment Log",
-    "companyWallet": "Main Treasury",
+    "treasury": "Treasury",
     "admin": "Admin"
   },
   "dashboard": {
@@ -55,6 +55,7 @@
     "pay": "Pay",
     "paymentsDescription": "Filter and review payment records.",
     "treasury": "Treasury",
+    "treasuryTransactions": "Treasury transactions",
     "treasuryPlaceholder": "Source treasury",
     "itemsList": "Items List",
     "items": "Items",
@@ -74,12 +75,13 @@
     "transport": "Transport",
     "expenses": "Expenses",
     "equipmentLog": "Equipment Log",
-    "companyWallet": "Main Treasury",
+    "companyWallet": "Treasury",
     "expand": "Expand",
     "collapse": "Collapse",
     "extractsList": "Extracts List",
     "newExtract": "New Extract",
-    "extractItems": "Extract Items"
+    "extractItems": "Extract Items",
+    "report": "Report"
   },
   "equipmentLog": {
     "deletedSuccessfully": "Deleted successfully",
@@ -191,6 +193,7 @@
     "addItem": "Add Item"
   },
   "labels": {
+    "system": "System",
     "enterDetails": "Enter details",
     "hours": "Hours", 
     "driver": "Driver",
@@ -356,6 +359,18 @@
     "step2": "Step 2",
     "step2Description": "Enter payment details.",
     "module": "Module",
+    "modules": {
+      "supply": "Supplies",
+      "transport": "Transports",
+      "rentals": "Equipment Logs",
+      "extract": "Extracts"
+    },
+    "accountTypes": {
+      "supply": "Supplies",
+      "transport": "Transports",
+      "rental": "Equipment Log",
+      "extract": "Extracts"
+    },
     "methods": {
       "cash": "Cash",
       "bank": "Bank"
@@ -1047,7 +1062,7 @@
     "ownership": "Ownership",
     "all": "All",
     "companyEquipment": "Company Equipment",
-    "companyWallet": "Main Treasury",
+    "companyWallet": "Treasury",
     "externalRental": "External Rental",
     "isCompanyOwned": "Company Owned",
     "isCompanyOwnedDescription": "Check if this equipment belongs to the company",
@@ -1097,7 +1112,7 @@
   },
   "finance": {
     "wallets": "Wallets",
-    "companyWallet": "Main Treasury",
+    "companyWallet": "Treasury",
     "balance": "Company Balance",
     "currentBalance": "Current Balance",
     "subWallets": "Sub-wallets",
@@ -1119,7 +1134,7 @@
     "branchName": "Branch Name",
     "transfer": "Transfer",
     "transferToBranch": "Transfer to Branch",
-    "transferToCompany": "Transfer to Main Treasury",
+    "transferToCompany": "Transfer to Treasury",
     "transferType": "Transfer Type",
     "fromBranch": "From Branch",
     "to": "To",
@@ -1277,9 +1292,60 @@
       "transports": "Transports",
       "rentals": "Equipment Logs",
       "equipmentLogs": "Equipment Logs",
+      "payments": "Payments",
+      "extracts": "Extracts",
       "expenses": "Expenses",
       "vehicles": "Vehicles",
-      "companyWallet": "Company Wallet"
+      "companyWallet": "Treasury"
+    }
+  },
+  "treasury": {
+    "ledgerTitle": "Treasury ledger",
+    "searchPlaceholder": "Search description or reference...",
+    "searchTreasuriesPlaceholder": "Search treasuries...",
+    "items": "treasuries",
+    "add": "Add Treasury",
+    "edit": "Edit Treasury",
+    "delete": "Delete Treasury",
+    "archive": "Archive Treasury",
+    "unarchive": "Restore Treasury",
+    "create": "Create Treasury",
+    "addMoney": "Add Money",
+    "refresh": "Refresh",
+    "balance": "Balance",
+    "last30dIn": "Last 30d In",
+    "last30dOut": "Last 30d Out",
+    "recentLedger": "Recent Ledger",
+    "filtersHint": "Filter by date, type, and search.",
+    "filtersTitle": "Filters",
+    "view": "View",
+    "viewActive": "Active",
+    "viewArchived": "Archived",
+    "viewAll": "All",
+    "detailsHint": "Select a treasury to inspect its ledger and actions.",
+    "active": "Active",
+    "archived": "Archived",
+    "date": "Date",
+    "dateFrom": "Date From",
+    "dateTo": "Date To",
+    "type": "Type",
+    "description": "Description",
+    "amount": "Amount",
+    "amountFrom": "Amount From",
+    "amountTo": "Amount To",
+    "name": "Name",
+    "pinned": "Pinned",
+    "noTransactions": "No transactions found",
+    "search": "Search",
+    "reset": "Reset",
+    "deleteConfirm": "Delete this treasury?",
+    "archiveConfirm": "Archive this treasury? Archived treasuries cannot be used until restored.",
+    "restoreConfirm": "Restore this treasury?",
+    "types": {
+      "deposit": "Deposit",
+      "payment": "Payment",
+      "withdraw": "Withdraw",
+      "adjustment": "Adjustment"
     }
   },
   "users": {

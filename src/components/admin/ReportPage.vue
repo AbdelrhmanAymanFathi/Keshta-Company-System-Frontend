@@ -1,63 +1,36 @@
 <!-- eslint-disable no-useless-escape -->
 <template>
   <div
-    class="report-page min-h-full p-4 sm:p-6 lg:p-8 overflow-visible"
+    class="report-page min-h-full overflow-visible bg-slate-50"
     :dir="isRTL ? 'rtl' : 'ltr'"
     :class="{ 'direction-rtl': isRTL }"
   >
-    <header class="relative mb-6 overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-slate-900 via-indigo-950 to-violet-950 px-5 py-6 sm:px-8 sm:py-7 shadow-xl shadow-indigo-950/20">
-      <div
-        class="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl"
-        aria-hidden="true"
-      />
-      <div
-        class="pointer-events-none absolute -bottom-20 -start-10 h-56 w-56 rounded-full bg-violet-500/15 blur-3xl"
-        aria-hidden="true"
-      />
-      <div class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div class="min-w-0 flex-1 space-y-2">
-          <div class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-indigo-100 backdrop-blur-sm">
-            <ChartBarSquareIcon class="h-3.5 w-3.5 shrink-0" />
+    <header class="mb-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div class="min-w-0 flex-1 space-y-1">
+          <!-- <div class="inline-flex items-center gap-2 rounded border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500">
+            <ChartBarSquareIcon class="h-3.5 w-3.5 shrink-0 text-slate-400" />
             <span>{{ $t('admin.runReport') }}</span>
-          </div>
-          <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          </div> -->
+          <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">
             {{ reportTitle }}
           </h1>
           <p
             v-if="report?.description"
-            class="max-w-2xl text-sm leading-relaxed text-slate-300"
+            class="max-w-2xl text-sm leading-relaxed text-slate-600"
           >
             {{ report.description }}
           </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <button
-            type="button"
-            @click="execute"
-            :disabled="executing"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-900/30 transition hover:from-emerald-400 hover:to-teal-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ArrowPathIcon v-if="executing" class="h-4 w-4 animate-spin" />
-            <MagnifyingGlassIcon v-else class="h-4 w-4" />
-            {{ $t('labels.search') }}
-          </button>
-          <button
-            type="button"
-            @click="clear"
-            class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
-          >
-            <ArrowUturnLeftIcon class="h-4 w-4" />
-            {{ $t('labels.clear') }}
-          </button>
-        </div>
+        
       </div>
     </header>
 
     <Transition name="report-fade">
       <div
         v-if="exportError"
-        class="mb-5 flex items-start gap-3 rounded-2xl border border-red-200/80 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm"
+        class="mb-4 flex items-start gap-3 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
         role="alert"
       >
         <ExclamationCircleIcon class="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
@@ -67,10 +40,10 @@
 
     <section
       v-if="reportFilterFields.length"
-      class="relative z-30 mb-6 overflow-visible rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-lg shadow-slate-200/40 backdrop-blur-sm sm:p-6"
+      class="relative z-30 mb-4 overflow-visible rounded border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
     >
-      <div class="mb-5 flex items-center gap-3 border-b border-slate-100 pb-4">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+      <div class="mb-4 flex items-center gap-3 border-b border-slate-100 pb-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded bg-slate-100 text-slate-500">
           <FunnelIcon class="h-5 w-5" />
         </div>
         <div>
@@ -82,7 +55,7 @@
           </p>
         </div>
       </div>
-      <div class="grid grid-cols-1 gap-5 overflow-visible md:grid-cols-2 xl:grid-cols-3">
+      <div class="grid grid-cols-1 gap-4 overflow-visible md:grid-cols-2 xl:grid-cols-3">
         <div
           v-for="p in reportFilterFields"
           :key="p.name"
@@ -173,17 +146,37 @@
           </div>
         </div>
       </div>
+      <div class="flex flex-wrap items-center gap-2 mt-3">
+          <button
+            type="button"
+            @click="execute"
+            :disabled="executing"
+            class="inline-flex items-center justify-center gap-2 rounded border border-emerald-200 bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-400/30 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <ArrowPathIcon v-if="executing" class="h-4 w-4 animate-spin" />
+            <MagnifyingGlassIcon v-else class="h-4 w-4" />
+            {{ $t('labels.search') }}
+          </button>
+          <button
+            type="button"
+            @click="clear"
+            class="inline-flex items-center justify-center gap-2 rounded border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300/40"
+          >
+            <ArrowUturnLeftIcon class="h-4 w-4" />
+            {{ $t('labels.clear') }}
+          </button>
+        </div>
     </section>
 
-    <section class="relative z-10 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
+    <section class="relative z-10 overflow-hidden rounded border border-slate-200 bg-white shadow-sm">
+      <div class="flex flex-col gap-3 border-b border-slate-100 bg-slate-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4">
         <div class="flex flex-wrap items-center gap-2">
-          <TableCellsIcon class="h-5 w-5 text-indigo-600" />
+          <TableCellsIcon class="h-5 w-5 text-slate-500" />
           <span class="text-sm font-semibold text-slate-800">{{ locale === 'ar' ? 'النتائج' : 'Results' }}</span>
-          <span v-if="hasResults && !executing" class="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800">
+          <span v-if="hasResults && !executing" class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
             {{ dataRowCount }} {{ locale === 'ar' ? 'صف' : 'rows' }}
           </span>
-          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium text-slate-600">
+          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
             {{ columns.length }} {{ locale === 'ar' ? 'عمود' : 'cols' }}
           </span>
         </div>
@@ -249,7 +242,7 @@
         <p class="text-sm font-medium text-slate-500">{{ $t('labels.loading') }}</p>
       </div>
 
-      <div v-else class="overflow-hidden rounded-xl border border-slate-200/80">
+      <div v-else class="overflow-hidden rounded border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
           <table class="report-table min-w-full">
             <thead>
@@ -268,7 +261,7 @@
               <tr v-if="!(tableData && tableData.length)">
                 <td :colspan="(columns && columns.length) || 1" class="px-6 py-16 text-center">
                   <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                    <div class="flex h-14 w-14 items-center justify-center rounded bg-slate-100 text-slate-400">
                       <TableCellsIcon class="h-7 w-7" />
                     </div>
                     <p class="text-sm font-medium text-slate-600">
@@ -366,6 +359,14 @@ export default {
   setup(props) {
     const { locale, t } = useI18n()
 
+    const normalizeFilterField = (field) => {
+      if (!field || typeof field !== 'object') return field
+      return {
+        ...field,
+        type: String(field.type ?? field.paramType ?? 'TEXT').toUpperCase(),
+      }
+    }
+
     const report = ref(null)
     const values = ref({})
     const result = ref(null)
@@ -389,10 +390,43 @@ export default {
     })
 
     const reportSelectFields = computed(() => normalizeReportSelectFields(report.value || {}))
-    const reportFilterFields = computed(() => normalizeReportFilterFields(report.value || {}))
+    const reportFilterFields = computed(() => normalizeReportFilterFields(report.value || {}).map(normalizeFilterField))
 
     const getParamByName = (paramName) => {
       return reportFilterFields.value.find((p) => p.name === paramName)
+    }
+
+    const getOptionId = (item) => {
+      if (!item || typeof item !== 'object') return item ?? null
+      return item.id ?? item.value ?? item.key ?? null
+    }
+
+    const getOptionLabel = (item) => {
+      if (!item || typeof item !== 'object') return String(item ?? '')
+      return String(item.label ?? item.name ?? item.value ?? item.id ?? '')
+    }
+
+    const resolveDropdownValue = (paramName) => {
+      const current = values.value[paramName]
+
+      if (current && typeof current === 'object') {
+        return current.id ?? current.value ?? current.key ?? null
+      }
+
+      if (current !== null && current !== undefined && current !== '') {
+        return current
+      }
+
+      const typed = String(selectedLabels.value[paramName] ?? '').trim().toLowerCase()
+      if (!typed) return null
+
+      const match = (paramOptions.value[paramName] || []).find((item) => {
+        const label = getOptionLabel(item).trim().toLowerCase()
+        const id = String(getOptionId(item) ?? '').trim().toLowerCase()
+        return label === typed || id === typed
+      })
+
+      return getOptionId(match)
     }
 
     function clearParamValue(paramName) {
@@ -641,7 +675,7 @@ export default {
             report.value.params = []
           }
 
-          report.value.filterFields = normalizeReportFilterFields(report.value)
+          report.value.filterFields = normalizeReportFilterFields(report.value).map(normalizeFilterField)
           report.value.selectFields = normalizeReportSelectFields(report.value)
           report.value.totals = normalizeReportTotals(report.value)
 
@@ -669,10 +703,10 @@ export default {
         const val = values.value[p.name]
 
         if (p.type === 'DROPDOWN') {
-          params[p.name] = val && typeof val === 'object' ? (val.id ?? val.value ?? val) : null
+          params[p.name] = resolveDropdownValue(p.name)
         } else if (p.type === 'MULTISELECT') {
           params[p.name] = Array.isArray(val)
-            ? val.map((it) => it && (it.id ?? it.value ?? it))
+            ? val.map((it) => getOptionId(it)).filter((it) => it !== null && it !== undefined && it !== '')
             : []
         } else if (p.type === 'NUMBER') {
           params[p.name] = val !== null && val !== undefined && val !== '' ? Number(val) : null
@@ -764,7 +798,14 @@ export default {
       selectedLabels.value[paramName] = q
 
       if (getParamByName(paramName)?.type === 'DROPDOWN') {
-        values.value[paramName] = null
+        const normalizedQuery = String(q ?? '').trim().toLowerCase()
+        const exactMatch = (paramOptions.value[paramName] || []).find((item) => {
+          const label = getOptionLabel(item).trim().toLowerCase()
+          const id = String(getOptionId(item) ?? '').trim().toLowerCase()
+          return label === normalizedQuery || id === normalizedQuery
+        })
+
+        values.value[paramName] = exactMatch ? getOptionId(exactMatch) : null
       }
 
       loadOptions(paramName, q)
@@ -780,14 +821,17 @@ export default {
           values.value[p.name] = []
         }
 
-        const exists = values.value[p.name].some((x) => x.id === item.id)
+        const nextId = getOptionId(item)
+        const exists = values.value[p.name].some((x) => String(getOptionId(x)) === String(nextId))
 
         if (!exists) {
-          values.value[p.name].push(item)
+          values.value[p.name].push(nextId)
         }
       } else {
-        values.value[p.name] = item
+        values.value[p.name] = getOptionId(item)
       }
+
+      selectedLabels.value[p.name] = getOptionLabel(item)
 
       Object.keys(paramDependencies.value).forEach((depParamName) => {
         const deps = paramDependencies.value[depParamName]
@@ -885,7 +929,7 @@ export default {
 
 <style scoped>
 .report-page {
-  background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 45%, #f5f3ff 100%);
+  background: #f8fafc;
   min-height: 100%;
 }
 
@@ -901,7 +945,7 @@ export default {
 }
 
 .report-export-btn {
-  @apply inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40;
+  @apply inline-flex items-center justify-center gap-1.5 rounded border px-3 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-40;
 }
 
 .report-export-btn--csv {
@@ -917,7 +961,7 @@ export default {
 }
 
 .report-table thead {
-  @apply bg-gradient-to-r from-slate-50 to-indigo-50/80;
+  @apply bg-slate-50;
 }
 
 .report-table tbody tr + tr td {

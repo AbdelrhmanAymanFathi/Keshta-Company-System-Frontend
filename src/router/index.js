@@ -29,8 +29,8 @@ const ExtractContractorsList = () => import('@/components/dashboard/Extracts/Ext
 const EquipmentLogList = () => import('@/components/dashboard/Equipment/EquipmentLogList.vue')
 const EquipmentReport = () => import('@/components/dashboard/Equipment/EquipmentLogReport.vue')
 const EquipmentList = () => import('@/components/dashboard/Equipment/EquipmentList.vue')
-const CompanyFinance = () => import('@/components/dashboard/CompanyFinance.vue')
-const CompanyTransactions = () => import('@/components/dashboard/CompanyTransactions.vue')
+const TreasuryDashboard = () => import('@/components/dashboard/Treasury/TreasuryDashboard.vue')
+const TreasuryTransactions = () => import('@/components/dashboard/Treasury/TreasuryTransactions.vue')
 const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
 const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vue')
 const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
@@ -207,18 +207,18 @@ const routes = [
         props: { mode: 'rentals' }
       },
 
-      // ==================== Company Wallet Module ====================
+      // ==================== Treasury Module ====================
       {
-        path: 'company-wallet',
-        name: 'company-wallet',
-        component: CompanyFinance,
-        meta: { title: 'dashboard.companyWallet' }
+        path: 'treasury',
+        name: 'treasury',
+        component: TreasuryDashboard,
+        meta: { title: 'dashboard.treasury', roles: ['admin'] }
       },
       {
         path: 'company-transactions',
         name: 'company-transactions',
-        component: CompanyTransactions,
-        meta: { title: 'transactions' }
+        component: TreasuryTransactions,
+        meta: { title: 'transactions', roles: ['admin'] }
       },
       {
         path: 'expenses',
