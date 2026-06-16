@@ -1,37 +1,33 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="space-y-6">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="app-page-header flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <div>
-        <h2 class="text-2xl font-semibold text-gray-900">{{ $t('dashboard.payments') || 'Payments' }}</h2>
+        <h2 class="text-2xl font-semibold theme-heading theme-text-primary">{{ $t('dashboard.payments') || 'Payments' }}</h2>
       </div>
-      <button @click="onPay"
-        class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-indigo-700">
-        {{ $t('dashboard.pay') || 'Pay' }}
-      </button>
+
+      <div class="mt-3 sm:mt-0 flex items-center gap-2">
+        <button @click="onPay" class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2">
+          {{ $t('dashboard.pay') || 'Pay' }}
+        </button>
+      </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-4">
-      <h4 class="text-sm font-semibold text-gray-900">{{ $t('labels.filters') || 'Filters' }}</h4>
+    <div class="theme-surface rounded-lg shadow-sm p-4">
+      <h4 class="text-sm font-semibold theme-text-primary">{{ $t('labels.filters') || 'Filters' }}</h4>
 
       <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.dateFrom') || 'Date from' }}</label>
-          <DateField
-            v-model="filters.dateFrom"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-          />
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.dateFrom') || 'Date from' }}</label>
+          <DateField v-model="filters.dateFrom" :class="fieldClass" />
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.dateTo') || 'Date to' }}</label>
-          <DateField
-            v-model="filters.dateTo"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
-          />
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.dateTo') || 'Date to' }}</label>
+          <DateField v-model="filters.dateTo" :class="fieldClass" />
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.site') || 'Site' }}</label>
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.site') || 'Site' }}</label>
           <SearchDropdown
             v-model="filters.siteSearch"
             :items="siteOptions"
@@ -44,7 +40,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.area') || 'Area' }}</label>
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.area') || 'Area' }}</label>
           <SearchDropdown
             v-model="filters.areaSearch"
             :items="availableAreaOptions"
@@ -57,7 +53,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('payments.module') || 'Module' }}</label>
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('payments.module') || 'Module' }}</label>
           <SearchDropdown
             v-model="filters.moduleSearch"
             :items="moduleOptions"
@@ -70,7 +66,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.contractor') || 'Contractor' }}</label>
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.contractor') || 'Contractor' }}</label>
           <SearchDropdown
             v-model="filters.contractorSearch"
             :items="contractorOptions"
@@ -84,7 +80,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.paymentMethod') || 'Payment Method' }}</label>
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.paymentMethod') || 'Payment Method' }}</label>
           <SearchDropdown
             v-model="filters.paymentMethodSearch"
             :items="paymentMethodOptions"
@@ -97,7 +93,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold text-gray-700">{{ $t('labels.treasury') || 'Treasury' }}</label>
+          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.treasury') || 'Treasury' }}</label>
           <SearchDropdown
             v-model="filters.treasurySearch"
             :items="treasuryOptions"
@@ -111,12 +107,10 @@
       </div>
 
       <div class="mt-4 flex flex-wrap gap-2">
-        <button @click="applyFilters"
-          class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+        <button @click="applyFilters" class="theme-button px-4 py-2">
           {{ $t('labels.search') || 'Search' }}
         </button>
-        <button @click="resetFilters"
-          class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <button @click="resetFilters" class="rounded-md border border-gray-200 px-4 py-2 theme-text-secondary hover:theme-hover-soft">
           {{ $t('labels.clear') || 'Clear' }}
         </button>
       </div>
@@ -125,12 +119,12 @@
     <!-- <div class="bg-white rounded-lg shadow p-4">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h4 class="text-sm font-semibold text-gray-900">{{ $t('reports.moduleReports') || 'Payment Reports' }}</h4>
-          <p class="text-xs text-gray-500">{{ $t('reports.moduleReportsHint') || 'Open reports built for payment records.' }}</p>
+          <h4 class="text-sm font-semibold theme-text-primary">{{ $t('reports.moduleReports') || 'Payment Reports' }}</h4>
+          <p class="text-xs theme-text-secondary">{{ $t('reports.moduleReportsHint') || 'Open reports built for payment records.' }}</p>
         </div>
       </div>
 
-      <div v-if="reportsLoading" class="mt-4 text-sm text-gray-500">
+      <div v-if="reportsLoading" class="mt-4 text-sm theme-text-secondary">
         {{ $t('labels.loading') || 'Loading...' }}
       </div>
 
@@ -138,14 +132,14 @@
         <div
           v-for="report in paymentReports"
           :key="report.id"
-          class="border-b border-gray-200 p-4 last:border-b-0 hover:bg-gray-50"
+          class="border-b border-gray-200 p-4 last:border-b-0 hover:theme-hover-soft"
         >
           <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-900">
+              <p class="text-sm font-medium theme-text-primary">
                 {{ isRTL && report.arTitle ? report.arTitle : report.title }}
               </p>
-              <p class="mt-1 text-xs text-gray-500">{{ report.key }}</p>
+              <p class="mt-1 text-xs theme-text-secondary">{{ report.key }}</p>
             </div>
             <div class="flex items-center gap-2">
               <span v-if="report.active" class="rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-700">
@@ -160,7 +154,7 @@
               </button>
               <router-link
                 :to="{ name: 'admin-reports-edit', params: { id: report.id } }"
-                class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                class="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium theme-text-secondary hover:theme-hover-soft"
               >
                 {{ $t('labels.edit') || 'Edit' }}
               </router-link>
@@ -169,14 +163,14 @@
         </div>
       </div>
 
-      <div v-else class="mt-4 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-sm text-gray-500">
+      <div v-else class="mt-4 rounded-lg border border-dashed border-gray-200 theme-dashboard-bg-soft p-4 text-sm theme-text-secondary">
         {{ $t('reports.noModuleReports') || 'No payment reports have been configured yet.' }}
       </div>
     </div> -->
 
-    <div class="overflow-x-auto bg-white rounded-3xl border border-gray-200 shadow-sm">
+    <div class="overflow-x-auto theme-surface rounded-3xl border border-gray-200 shadow-sm">
       <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-indigo-50 text-left text-xs uppercase tracking-wide text-gray-600">
+        <thead class="theme-table-thead-gradient text-left text-xs uppercase tracking-wide theme-text-muted">
           <tr>
             <th class="px-4 py-3">#</th>
             <th class="px-4 py-3">{{ $t('labels.date') || 'Date' }}</th>
@@ -192,19 +186,19 @@
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
           <tr v-for="(payment, index) in filteredPayments" :key="payment.id || index">
-            <td class="px-4 py-3 text-gray-700">{{ index + 1 }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ formatDate(paymentDate(payment)) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentSite(payment) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentArea(payment) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentModule(payment) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentContractor(payment) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ formatAmount(payment.amount) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentMethodLabel(payment) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentTreasury(payment) }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ paymentNotes(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ index + 1 }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ formatDate(paymentDate(payment)) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentSite(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentArea(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentModule(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentContractor(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ formatAmount(payment.amount) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentMethodLabel(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentTreasury(payment) }}</td>
+            <td class="px-4 py-3 theme-text-primary">{{ paymentNotes(payment) }}</td>
           </tr>
           <tr v-if="!filteredPayments.length">
-            <td class="px-4 py-6 text-center text-gray-500" :colspan="10">{{ $t('payments.noPayments') || 'No payments found' }}</td>
+            <td class="px-4 py-6 text-center theme-text-secondary" :colspan="10">{{ $t('payments.noPayments') || 'No payments found' }}</td>
           </tr>
         </tbody>
       </table>
@@ -269,7 +263,7 @@ export default {
     })
     const filters = ref(createFilters())
     const appliedFilters = ref(createFilters())
-    const fieldClass = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100'
+    const fieldClass = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm theme-input-focus'
 
     const normalize = (value = '') => String(value || '').toLowerCase().trim()
 

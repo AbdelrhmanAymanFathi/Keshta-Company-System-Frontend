@@ -1,102 +1,61 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex gap-6">
-    <aside class="w-80 shrink-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sticky top-4 h-fit">
+    <aside class="w-80 shrink-0 rounded-lg theme-surface p-4 shadow-sm sticky top-4 h-fit">
       <div class="flex items-center justify-between gap-2">
-        <h2 class="text-lg font-semibold text-gray-900">{{ t('dashboard.treasury') }}</h2>
-        <span class="text-xs text-gray-500">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
+        <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
+        <span class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
       </div>
       <div class="mt-4">
-        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.view') }}</label>
-        <select v-model="treasuryView" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.view') }}</label>
+        <select v-model="treasuryView" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm theme-input-focus">
           <option value="active">{{ t('treasury.viewActive') }}</option>
           <option value="archived">{{ t('treasury.viewArchived') }}</option>
           <option value="all">{{ t('treasury.viewAll') }}</option>
         </select>
       </div>
       <div class="mt-4">
-        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.search') }}</label>
-        <input
-          v-model="treasurySearch"
-          type="text"
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-          :placeholder="t('treasury.searchTreasuriesPlaceholder')"
-        />
+        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.search') }}</label>
+        <input v-model="treasurySearch" type="text" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm theme-input-focus" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
       </div>
       <div v-if="!visibleTreasuries.length" class="mt-4 rounded-lg border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500">
         {{ t('labels.noData') }}
       </div>
       <div v-else class="mt-4 space-y-2">
-        <button
-          v-for="treasury in visibleTreasuries"
-          :key="treasury.id"
-          :class="['w-full rounded-lg border px-3 py-2 transition', isRTL ? 'text-right' : 'text-left', store.selectedTreasuryId === treasury.id ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50']"
-          @click="selectTreasury(treasury.id)"
-        >
-          <div class="flex items-center justify-between gap-2">
-            <span class="truncate text-sm font-medium text-gray-900">{{ treasury.name }}</span>
-            <span
-              class="text-xs font-semibold"
-              :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'"
-            >
-              {{ formatCurrency(treasury.balance) }}
-            </span>
+        <button v-for="treasury in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
+          :class="['w-full rounded-lg px-3 py-2 transition flex items-center justify-between', store.selectedTreasuryId === treasury.id ? 'ring-1 ring-offset-0 ring-indigo-300 bg-indigo-50' : 'border border-gray-200 hover:bg-gray-50']">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="truncate text-sm font-medium theme-text-primary">{{ treasury.name }}</span>
+              <span class="text-xs font-semibold" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
+            </div>
+            <div class="mt-1 flex items-center gap-2 text-[11px] theme-text-secondary">
+              <span>#{{ index + 1 }}</span>
+              <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
+              <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
+            </div>
           </div>
-          <div class="mt-1 flex items-center gap-2">
-            <span
-              class="rounded-full px-2 py-0.5 text-[11px] font-semibold"
-              :class="treasury.deletedAt ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'"
-            >
-              {{ treasury.deletedAt ? t('treasury.archived') : t('treasury.active') }}
-            </span>
+          <div class="shrink-0">
+            <button v-if="isAdmin && !treasury.deletedAt" class="rounded-md px-2 py-1 text-xs theme-text-secondary hover:bg-gray-100" @click.stop="openEditModal(treasury)">{{ t('treasury.edit') }}</button>
           </div>
         </button>
       </div>
     </aside>
 
     <div class="min-w-0 flex-1 space-y-6">
-      <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div class="rounded-lg theme-surface p-4 shadow-sm">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 class="text-2xl font-semibold text-gray-900">{{ selectedTreasury?.name || t('dashboard.treasury') }}</h1>
+            <h1 class="text-2xl font-semibold theme-heading theme-text-primary">{{ selectedTreasury?.name || t('dashboard.treasury') }}</h1>
             <div class="mt-1 flex flex-wrap items-center gap-2">
-              <p class="text-sm text-gray-500">{{ t('treasury.ledgerTitle') }}</p>
-              <span
-                v-if="selectedTreasury"
-                class="rounded-full px-2.5 py-1 text-xs font-semibold"
-                :class="selectedTreasuryIsArchived ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'"
-              >
-                {{ selectedTreasuryIsArchived ? t('treasury.archived') : t('treasury.active') }}
-              </span>
+              <p class="text-sm theme-text-secondary">{{ t('treasury.ledgerTitle') }}</p>
+              <span v-if="selectedTreasury" class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="selectedTreasuryIsArchived ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'">{{ selectedTreasuryIsArchived ? t('treasury.archived') : t('treasury.active') }}</span>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <div class="text-sm text-gray-600">
-              {{ t('treasury.balance') }}: <span class="font-semibold">{{ formatCurrency(store.summary.balance) }}</span>
-            </div>
-            <button
-              type="button"
-              class="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="!selectedTreasury || !!exportingFormat || loading"
-              @click="downloadReport('csv')"
-            >
-              {{ exportingFormat === 'csv' ? t('labels.loading') : t('reports.downloadCsv') }}
-            </button>
-            <button
-              type="button"
-              class="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="!selectedTreasury || !!exportingFormat || loading"
-              @click="downloadReport('xlsx')"
-            >
-              {{ exportingFormat === 'xlsx' ? t('labels.loading') : t('reports.downloadExcel') }}
-            </button>
-            <button
-              type="button"
-              class="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="!selectedTreasury || !!exportingFormat || loading"
-              @click="downloadReport('pdf')"
-            >
-              {{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}
-            </button>
+            <div class="text-sm theme-text-secondary">{{ t('treasury.balance') }}: <span class="font-semibold">{{ formatCurrency(store.summary.balance) }}</span></div>
+            <button type="button" class="theme-button px-3 py-2" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('csv')">{{ exportingFormat === 'csv' ? t('labels.loading') : t('reports.downloadCsv') }}</button>
+            <button type="button" class="theme-button px-3 py-2" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('xlsx')">{{ exportingFormat === 'xlsx' ? t('labels.loading') : t('reports.downloadExcel') }}</button>
+            <button type="button" class="theme-button px-3 py-2" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('pdf')">{{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}</button>
           </div>
           <p v-if="exportError" class="text-xs text-red-600">{{ exportError }}</p>
         </div>

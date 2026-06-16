@@ -9,13 +9,13 @@
           @click.self="closeModal"
         >
           <div class="kc-modal-panel flex max-h-[95vh] w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div class="flex items-center justify-between border-b bg-gray-50 px-6 py-4">
-              <h2 class="text-2xl font-bold text-indigo-800">
+            <div class="flex items-center justify-between border-b theme-dashboard-bg-soft px-6 py-4">
+              <h2 class="text-2xl font-bold theme-heading theme-text-primary">
                 {{ currentStep === 1 ? modalTitleComputed : enterPaymentTitle }}
               </h2>
               <button
                 type="button"
-                class="text-3xl leading-none text-gray-500 transition hover:text-gray-800 focus:outline-none"
+                class="theme-caption hover:theme-text-secondary focus:outline-none"
                 aria-label="Close"
                 @click="closeModal"
               >
@@ -67,7 +67,7 @@
                 <div class="mt-10 flex justify-end">
                   <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 font-medium text-white shadow-md transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    class="theme-button inline-flex items-center gap-2 px-6 py-3"
                     :disabled="!isStep1Valid"
                     @click="goToStep2"
                   >
@@ -78,7 +78,7 @@
               </div>
 
               <div v-else class="w-full">
-                <h3 class="mb-8 text-center text-lg font-bold text-gray-800">
+                <h3 class="mb-8 text-center text-lg font-bold theme-text-primary">
                   {{ step2Title }}
                 </h3>
 
@@ -105,7 +105,7 @@
                         <td class="px-3 py-2">
                           <DateField
                             v-model="row.date"
-                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             @keydown.enter.prevent="handleEnterKey(index)"
                           />
@@ -114,7 +114,7 @@
                         <td class="px-3 py-2">
                           <select
                             v-model="row.module"
-                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             @change="handleRowModuleChange(row)"
                           >
@@ -147,7 +147,7 @@
                             type="number"
                             min="0"
                             step="0.01"
-                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm no-spinner focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             @keydown.enter.prevent="handleEnterKey(index)"
                           />
@@ -156,7 +156,7 @@
                         <td class="px-3 py-2">
                           <select
                             v-model="row.paymentMethod"
-                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             @keydown.enter.prevent="handleEnterKey(index)"
                           >
@@ -184,7 +184,7 @@
                           <input
                             v-model="row.notes"
                             type="text"
-                            :class="['w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500', isRTL ? 'text-right' : 'text-left']"
+                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             @keydown.enter.prevent="handleEnterKey(index)"
                             @keydown.tab="onLastFieldTab(index, $event)"
@@ -195,7 +195,7 @@
                           <div class="flex justify-center gap-3">
                             <button
                               type="button"
-                              class="text-blue-600 transition hover:text-blue-800"
+                              class="theme-caption hover:theme-text-primary"
                               title="Duplicate"
                               tabindex="-1"
                               @click="duplicateRow(index)"
@@ -204,7 +204,7 @@
                             </button>
                             <button
                               type="button"
-                              class="text-red-600 transition hover:text-red-800"
+                              class="theme-caption text-red-600 transition hover:text-red-800"
                               title="Delete"
                               tabindex="-1"
                               @click="removeRow(index)"
@@ -225,7 +225,7 @@
                 <div class="mt-8 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-6 py-3 font-medium theme-text-secondary hover:theme-hover-soft"
                     @click="prevStep"
                   >
                     <component :is="isRTL ? ArrowRightIcon : ArrowLeftIcon" class="h-5 w-5" />
@@ -233,12 +233,12 @@
                   </button>
 
                   <div class="flex flex-col gap-3 sm:items-end">
-                    <div class="text-sm font-medium text-gray-600">
-                      {{ totalLabel }}: <span class="font-semibold text-gray-900">{{ totalAmountDisplay }}</span>
+                    <div class="text-sm font-medium theme-text-secondary">
+                      {{ totalLabel }}: <span class="font-semibold theme-text-primary">{{ totalAmountDisplay }}</span>
                     </div>
                     <button
                       type="button"
-                      class="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-10 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+                      class="theme-button inline-flex items-center justify-center gap-2 px-10 py-3"
                       :disabled="isSubmitDisabled || isSaving"
                       @click="savePayment"
                     >
