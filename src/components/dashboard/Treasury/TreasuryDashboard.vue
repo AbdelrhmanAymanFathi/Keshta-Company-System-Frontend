@@ -1,6 +1,6 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex gap-6">
-    <aside class="sticky top-4 h-fit w-80 shrink-0 rounded-lg theme-surface p-4 shadow-sm">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex flex-col gap-6 lg:flex-row">
+    <aside class="w-full lg:w-80 lg:sticky lg:top-4 h-fit rounded-lg theme-surface p-4 shadow-sm">
       <div class="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
           <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
@@ -60,7 +60,7 @@
             </h1>
             <p class="text-sm text-gray-500">{{ t('treasury.detailsHint') }}</p>
           </div>
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             <span
               v-if="selectedTreasury"
               class="rounded-full px-4 py-3 text-xs font-semibold"
@@ -104,7 +104,7 @@
         </div>
       </div>
 
-      <div class="grid gap-4 md:grid-cols-3">
+      <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.balance') }}</p>
           <p
@@ -132,7 +132,7 @@
               <p class="text-xs text-gray-500">{{ t('treasury.filtersHint') }}</p>
             </div>
 
-            <div class="grid gap-4 xl:grid-cols-5">
+            <div class="grid gap-4 grid-cols-1 lg:grid-cols-5">
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateFrom') }}</label>
                 <DateField v-model="filters.startDate" class="w-full" />
@@ -161,7 +161,7 @@
               </div>
             </div>
 
-            <div class="grid gap-4 xl:grid-cols-[1fr_auto_auto]">
+            <div class="grid gap-4 grid-cols-1 lg:grid-cols-[1fr_auto_auto]">
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.search') }}</label>
                 <input

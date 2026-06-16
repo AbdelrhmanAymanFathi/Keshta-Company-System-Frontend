@@ -1,6 +1,6 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex gap-6">
-    <aside class="w-80 shrink-0 rounded-lg theme-surface p-4 shadow-sm sticky top-4 h-fit">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex flex-col gap-6 lg:flex-row">
+    <aside class="w-full lg:w-80 rounded-lg theme-surface p-4 shadow-sm lg:sticky lg:top-4 h-fit">
       <div class="flex items-center justify-between gap-2">
         <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
         <span class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
@@ -69,7 +69,7 @@
               <p class="text-xs text-gray-500">{{ t('treasury.filtersHint') }}</p>
             </div>
           </div>
-          <div class="grid gap-4 xl:grid-cols-5">
+          <div class="grid gap-4 grid-cols-1 lg:grid-cols-5">
             <div>
               <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateFrom') }}</label>
               <DateField v-model="filters.startDate" class="w-full" />
@@ -97,7 +97,7 @@
               <input v-model="filters.amountMax" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
             </div>
           </div>
-          <div class="mt-4 grid gap-4 xl:grid-cols-[1fr_auto_auto]">
+          <div class="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-[1fr_auto_auto]">
             <div>
               <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.search') }}</label>
               <input v-model="filters.search" type="text" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" :placeholder="t('treasury.searchPlaceholder')" />
