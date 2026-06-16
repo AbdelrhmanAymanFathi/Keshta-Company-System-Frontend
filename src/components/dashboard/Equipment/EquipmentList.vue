@@ -95,7 +95,8 @@
               :item-key="'id'"
               :item-label="'name'"
               :placeholder="$t('labels.contractor') || 'Search contractors'"
-              :dir="isRTL ? 'rtl' : 'ltr'"
+                :dir="isRTL ? 'rtl' : 'ltr'"
+                inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               @select="onSelectContractor"
             />
           </div>

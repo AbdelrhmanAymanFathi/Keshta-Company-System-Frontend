@@ -43,22 +43,22 @@
 
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('equipmentLog.equipment') }}</label>
-            <SearchDropdown v-model="filters.equipmentSearch" :items="equipments" :allItems="equipments" :placeholder="$t('placeholders.searchEquipment')" @select="(sel) => { filters.equipmentId = sel.id; filters.equipmentSearch = sel.name }" />
+            <SearchDropdown v-model="filters.equipmentSearch" :items="equipments" :allItems="equipments" :placeholder="$t('placeholders.searchEquipment')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.equipmentId = sel.id; filters.equipmentSearch = sel.name }" />
           </div>
 
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.driver') }}</label>
-            <SearchDropdown v-model="filters.driverSearch" :items="drivers" :allItems="drivers" :placeholder="$t('placeholders.searchDriver')" @select="(sel) => { filters.driverId = sel.id; filters.driverSearch = sel.name }" />
+            <SearchDropdown v-model="filters.driverSearch" :items="drivers" :allItems="drivers" :placeholder="$t('placeholders.searchDriver')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.driverId = sel.id; filters.driverSearch = sel.name }" />
           </div>
 
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.location') }}</label>
-            <SearchDropdown v-model="filters.locationSearch" :items="topLocations" :allItems="topLocations" :placeholder="$t('placeholders.searchLocation')" @select="(sel) => { filters.locationId = sel.id; filters.locationSearch = sel.name; filters.areaId = ''; filters.areaSearch = '' }" />
+            <SearchDropdown v-model="filters.locationSearch" :items="topLocations" :allItems="topLocations" :placeholder="$t('placeholders.searchLocation')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.locationId = sel.id; filters.locationSearch = sel.name; filters.areaId = ''; filters.areaSearch = '' }" />
           </div>
 
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1">{{ $t('labels.area') }}</label>
-            <SearchDropdown v-model="filters.areaSearch" :items="availableAreas" :allItems="availableAreas" :placeholder="$t('placeholders.searchArea')" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" />
+            <SearchDropdown v-model="filters.areaSearch" :items="availableAreas" :allItems="availableAreas" :placeholder="$t('placeholders.searchArea')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" />
           </div>
 
           <div class="flex gap-2 items-center">

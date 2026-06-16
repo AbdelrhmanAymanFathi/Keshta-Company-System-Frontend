@@ -34,6 +34,7 @@
             :items="contractors"
             :allItems="contractors"
             :placeholder="$t('placeholders.searchContractor')"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => { filters.contractorId = sel.id; filters.contractorSearch = sel.name }"
           />
         </div>
@@ -46,6 +47,7 @@
             :items="locations"
             :allItems="locations"
             :placeholder="$t('placeholders.searchLocation')"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => selectLocation(sel)"
           />
         </div>
@@ -58,6 +60,7 @@
             :items="availableAreas"
             :allItems="availableAreas"
             :placeholder="$t('placeholders.searchArea')"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => selectArea(sel)"
           />
         </div>
@@ -70,6 +73,7 @@
             :items="crushers"
             :allItems="crushers"
             :placeholder="$t('placeholders.searchCrusher')"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => { filters.crusherId = sel.id; filters.crusherSearch = sel.name }"
           />
         </div>
@@ -82,6 +86,7 @@
             :items="items"
             :allItems="items"
             :placeholder="$t('placeholders.searchItem')"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => { filters.itemId = sel.id; filters.itemSearch = sel.name }"
           />
         </div>
@@ -95,6 +100,7 @@
             :allItems="vehicles"
             :placeholder="$t('placeholders.searchVehicle')"
             :itemLabel="(v) => v.plateNumber || v.name"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => { filters.vehicleId = sel.id; filters.vehicleSearch = sel.plateNumber || sel.name }"
           />
         </div>
