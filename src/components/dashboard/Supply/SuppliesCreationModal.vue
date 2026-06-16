@@ -1,7 +1,7 @@
 <template>
   <!-- Button to open the Modal (you can remove or change it depending on the page) -->
   <button v-if="showTriggerButton" @click="openModal"
-    class="theme-button px-6 py-3 rounded-lg  font-medium shadow-md transition">
+    :class="triggerButtonClass">
     {{ triggerText }}
   </button>
 
@@ -626,6 +626,10 @@ export default {
     triggerButtonText: {
       type: String,
       default: ''
+    },
+    triggerButtonClass: {
+      type: String,
+      default: 'theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm'
     },
     modalTitle: {
       type: String,

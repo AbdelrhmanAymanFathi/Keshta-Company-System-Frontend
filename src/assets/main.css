@@ -1715,6 +1715,13 @@ body,
   padding: var(--theme-safe-padding);
 }
 
+/* Ensure main content is offset below the fixed top navbar on small screens */
+@media (max-width: 767px) {
+  .layout-main {
+    padding-top: calc(var(--mobile-toolbar-height) + var(--theme-safe-padding));
+  }
+}
+
 .layout-sidebar {
   position: relative;
   z-index: var(--layout-z-sidebar);

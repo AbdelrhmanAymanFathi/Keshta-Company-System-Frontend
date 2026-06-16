@@ -3,7 +3,12 @@
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.suppliesList') }}</h2>
 
-      <TableModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newSupply') + ' +'" @saved="onSupplySaved"/>
+      <TableModal
+        :showTriggerButton="true"
+        :triggerButtonText="$t('dashboard.newSupply') + ' +'"
+        triggerButtonClass="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
+        @saved="onSupplySaved"
+      />
     </div>
 
     <!-- Filters Section -->
