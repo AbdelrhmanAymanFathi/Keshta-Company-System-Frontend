@@ -158,7 +158,6 @@ export default {
     const loadingHistory = ref(false)
     const deposit = ref({ amount: '', description: '', date: '' })
     const selectedAccount = ref(null)
-    const selectedAccountType = computed(() => normalizeContractorAccountType(selectedAccount.value?.accountType))
     const depositModalOpen = ref(false)
     const withdrawal = ref({ amount: '', description: '', date: '' })
     const withdrawModalOpen = ref(false)
