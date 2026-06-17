@@ -331,7 +331,7 @@ export default {
       return document.documentElement?.dir === 'rtl' || document.body?.dir === 'rtl'
     })
 
-    const sites = computed(() => locations.value.filter(location => !location.parentId && !location.parent))
+    const sites = computed(() => locations.value.filter(location => !location.parentId))
 
     const moduleOptions = computed(() => ([
       { value: 'supply', label: labelFor('supply.title', 'Supply') },
