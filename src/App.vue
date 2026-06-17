@@ -1,15 +1,10 @@
 <template>
   <div :class="{'dir-rtl': isRTL}" class="min-h-screen bg-gray-50">
     <!-- Loading Screen -->
-    <div v-if="isLoading" class="min-h-screen flex items-center justify-center">
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent mx-auto mb-4"></div>
-        <p class="theme-text-secondary">{{ $t('auth.login.loading') }}</p>
-      </div>
-    </div>
+    <AppLoader v-if="isAppLoading" :label="loaderLabel" />
 
     <!-- Main Content -->
-    <router-view v-else />
+    <router-view />
     
     <!-- Toast Notifications -->
     <Toast />
@@ -21,20 +16,28 @@
 <script>
 import Toast from './components/shared/Toast.vue'
 import ErrorOverlay from './components/shared/ErrorOverlay.vue'
+import AppLoader from './components/shared/AppLoader.vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from './composables/useAuth'
+import { useRouteLoader } from './composables/useRouteLoader'
 
 export default {
   name: 'AppRoot',
-  components: { Toast, ErrorOverlay },
+  components: { Toast, ErrorOverlay, AppLoader },
   setup() {
-    const { locale } = useI18n()
+    const { locale, t } = useI18n()
     const { isLoggedIn, isLoading } = useAuth()
+    const { isRouteLoading } = useRouteLoader()
+    const isAppLoading = computed(() => isLoading.value || isRouteLoading.value)
+    const loaderLabel = computed(() => isLoading.value ? t('auth.login.loading') : t('labels.loading'))
     
     return { 
       locale,
       isLoggedIn,
-      isLoading
+      isLoading,
+      isAppLoading,
+      loaderLabel
     }
   },
   computed: {

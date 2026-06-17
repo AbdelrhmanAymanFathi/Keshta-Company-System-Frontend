@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { isAuthenticated, user, loading } from '@/composables/authStore'
 import { watch } from 'vue'
+import { startRouteLoading, stopRouteLoading } from '@/composables/useRouteLoader'
 
 // Auth Pages
 const Login = () => import('@/views/Login.vue')
@@ -214,13 +215,13 @@ const routes = [
         path: 'treasury',
         name: 'treasury',
         component: TreasuryDashboard,
-        meta: { title: 'dashboard.treasury', roles: ['admin'] }
+        meta: { title: 'dashboard.treasury' }
       },
       {
         path: 'company-transactions',
         name: 'company-transactions',
         component: TreasuryTransactions,
-        meta: { title: 'transactions', roles: ['admin'] }
+        meta: { title: 'transactions' }
       },
       {
         path: 'expenses',
@@ -381,6 +382,10 @@ const router = createRouter({
 
 // Before each navigation
 router.beforeEach(async (to, from, next) => {
+  if (to.fullPath !== from.fullPath) {
+    startRouteLoading()
+  }
+
   // Wait for auth to initialize (avoid race conditions)
   if (loading.value) {
     await new Promise(resolve => {
@@ -436,6 +441,8 @@ router.beforeEach(async (to, from, next) => {
 
 // After each navigation
 router.afterEach((to) => {
+  stopRouteLoading()
+
   // Update page title if available (can use i18n here)
   if (to.meta.title) {
     const appName = 'Keshta Company'
@@ -443,6 +450,10 @@ router.afterEach((to) => {
   } else {
     document.title = 'Keshta Company'
   }
+})
+
+router.onError(() => {
+  stopRouteLoading()
 })
 
 export default router

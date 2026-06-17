@@ -410,7 +410,6 @@ export default {
     filteredTopMenus() {
       const menus = { ...this.topMenus }
       if (!this.isAdmin) {
-        delete menus.treasury
         delete menus.admin
       }
       return menus

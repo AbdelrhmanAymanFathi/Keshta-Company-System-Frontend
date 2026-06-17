@@ -1,7 +1,9 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
+
     <!-- Header -->
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
+      
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('supply.suppliers') }}</h2>
       <div class="flex items-center gap-3">
         <!-- Import Excel -->
