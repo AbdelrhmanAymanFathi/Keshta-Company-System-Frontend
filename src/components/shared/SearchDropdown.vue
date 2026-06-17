@@ -14,7 +14,7 @@
       @keydown="handleKeydown"
     />
     <div
-      v-if="isOpen"
+      v-if="isOpen && !teleportTarget"
       ref="options"
       class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
       @mousedown.prevent
@@ -36,7 +36,7 @@
       </div>
     </div>
 
-    <teleport v-else-if="isOpen" :to="teleportTarget">
+    <teleport v-else-if="isOpen && teleportTarget" :to="teleportTarget">
       <div
         ref="optionsRef"
         class="absolute z-[9999] max-h-48 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-xl"
@@ -153,15 +153,27 @@ export default {
       if (!props.teleportTarget) return
       await nextTick()
       const inputEl = inputRef.value
-      const container = document.querySelector(props.teleportTarget)
-      if (!inputEl || !container) return
+      const targetElement = document.querySelector(props.teleportTarget)
+      if (!inputEl || !targetElement) return
 
       const inputRect = inputEl.getBoundingClientRect()
-      const containerRect = container.getBoundingClientRect()
+      const useFixed = props.teleportTarget === 'body'
 
+      if (useFixed) {
+        dropdownStyle.value = {
+          position: 'fixed',
+          top: `${inputRect.bottom}px`,
+          left: `${inputRect.left}px`,
+          width: `${inputRect.width}px`
+        }
+        return
+      }
+
+      const containerRect = targetElement.getBoundingClientRect()
       dropdownStyle.value = {
-        top: `${inputRect.bottom - containerRect.top + container.scrollTop}px`,
-        left: `${inputRect.left - containerRect.left + container.scrollLeft}px`,
+        position: 'absolute',
+        top: `${inputRect.bottom - containerRect.top + targetElement.scrollTop}px`,
+        left: `${inputRect.left - containerRect.left + targetElement.scrollLeft}px`,
         width: `${inputRect.width}px`
       }
     }

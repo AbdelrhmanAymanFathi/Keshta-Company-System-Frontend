@@ -135,7 +135,7 @@
                               :inputClass="fieldClass"
                               :dir="isRTL ? 'rtl' : 'ltr'"
                               :disabled="!row.module || !row.contractors.length"
-                              teleportTarget=".modal-body-container"
+                            teleportTarget="body"
                               @select="(contractor) => selectContractor(row, contractor)"
                             />
                           </div>
@@ -175,7 +175,7 @@
                             :inputClass="fieldClass"
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             :disabled="!treasuryOptions.length"
-                            teleportTarget=".modal-body-container"
+                            teleportTarget="body"
                             @select="(treasury) => selectTreasury(row, treasury)"
                           />
                         </td>
