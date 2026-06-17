@@ -32,7 +32,8 @@ function normalizeFieldEntry(item) {
     label: item.label ?? name,
     arName: item.arName ?? '',
     paramType: item.paramType ?? item.type ?? 'TEXT',
-    dataType: item.dataType ?? ''
+    dataType: item.dataType ?? '',
+    position: typeof item.position === 'number' ? item.position : null
   }
 }
 
@@ -44,7 +45,12 @@ function normalizeFieldList(items = []) {
         .filter(Boolean)
         .map((item) => [String(item.name), item])
     ).values()
-  )
+  ).sort((a, b) => {
+    const aPos = typeof a.position === 'number' ? a.position : Number.MAX_SAFE_INTEGER
+    const bPos = typeof b.position === 'number' ? b.position : Number.MAX_SAFE_INTEGER
+    if (aPos !== bPos) return aPos - bPos
+    return String(a.name).localeCompare(String(b.name))
+  })
 }
 
 function firstArrayFrom(definition, keys = []) {

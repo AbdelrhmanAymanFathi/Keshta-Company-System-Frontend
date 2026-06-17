@@ -168,11 +168,21 @@
               :class="[inputClass, 'flex items-center gap-2 bg-slate-100/80 theme-text-muted']"
             >
               <InformationCircleIcon class="h-4 w-4 shrink-0 theme-text" />
+
               <span class="text-xs leading-snug">
-              {{ locale === 'ar' ? 'يرجى اختيار ' : 'Please select ' }}{{ (paramDependencies[p.name] || []).map(dep => {
-                const depParam = reportFilterFields.find(pr => pr.name === dep)
-                return (locale === 'ar' && depParam?.arName) ? depParam.arName : (depParam?.label || dep)
-              }).join(', ') }}{{ locale === 'ar' ? ' أولاً' : ' first' }}
+                {{ locale === 'ar' ? 'يرجى اختيار ' : 'Please select ' }}
+                {{
+                  [...new Set(paramDependencies[p.name] || [])]
+                    .map(dep => {
+                      const depParam = reportFilterFields.find(pr => pr.name === dep)
+
+                      return locale === 'ar' && depParam?.arName
+                        ? depParam.arName
+                        : depParam?.label || dep
+                    })
+                    .join(', ')
+                }}
+                {{ locale === 'ar' ? ' أولاً' : ' first' }}
               </span>
             </div>
           </div>
@@ -469,7 +479,18 @@ export default {
 
       if (!first || typeof first !== 'object') return []
 
-      return Object.keys(first).filter((key) => !String(key).startsWith('__'))
+      const rowColumns = Object.keys(first).filter((key) => !String(key).startsWith('__'))
+      const configuredColumns = reportSelectFields.value
+        .map((field) => field?.name)
+        .filter((name) => name && rowColumns.includes(name))
+
+      if (!configuredColumns.length) {
+        return rowColumns
+      }
+
+      const remainingColumns = rowColumns.filter((col) => !configuredColumns.includes(col))
+
+      return [...configuredColumns, ...remainingColumns]
     })
 
     const tableData = computed(() => {
@@ -691,6 +712,15 @@ export default {
       return { params }
     }
 
+    function getSelectedDropdownLabel(paramName) {
+      const current = values.value[paramName]
+
+      if (!current || typeof current !== 'object') return ''
+
+      const rawLabel = current.label ?? current.name ?? current.text ?? current.value ?? current.id ?? ''
+      return String(rawLabel)
+    }
+
     async function downloadReport(format) {
       exportError.value = ''
       exportingFormat.value = format
@@ -769,7 +799,10 @@ export default {
       selectedLabels.value[paramName] = q
 
       if (getParamByName(paramName)?.type === 'DROPDOWN') {
-        values.value[paramName] = null
+        const currentLabel = getSelectedDropdownLabel(paramName)
+        if (String(q ?? '') !== currentLabel) {
+          values.value[paramName] = null
+        }
       }
 
       loadOptions(paramName, q)
