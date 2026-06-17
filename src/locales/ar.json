@@ -38,6 +38,7 @@
     "search": "بحث...",
     "searchEquipment": "ابحث عن المعدات...",
     "searchDriver": "ابحث عن سائق...",
+    "searchTreasury": "ابحث عن خزينة...",
     "select": "اختر"
   },
   "navbar": {
@@ -196,6 +197,7 @@
   },
   "labels": {
     "system": "النظام",
+    "module": "الوحدة",
     "signOut": "تسجيل الخروج",
     "enterDetails": "أدخل التفاصيل",
     "hours":"الساعات",
@@ -379,6 +381,8 @@
       "cash": "نقداً",
       "bank": "بنك"
     },
+    "cash": "نقداً",
+    "bank": "بنك",
     "amount": "المبلغ",
     "date": "التاريخ",
     "method": "الطريقة",
@@ -579,6 +583,11 @@
       "distanceKm": "المسافة (كم)",
       "numTrips": "عدد الرحلات",
       "total": "المجموع",
+      "amount": "المبلغ",
+      "paymentMethod": "طريقة الدفع",
+      "treasury": "الخزينة",
+      "paidAt": "تاريخ الدفع",
+      "module": "الوحدة",
       "earnings": "الأرباح",
       "payments": "المدفوعات",
       "balanceOwed": "الرصيد المستحق",

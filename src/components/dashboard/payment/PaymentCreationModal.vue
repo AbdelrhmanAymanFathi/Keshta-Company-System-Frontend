@@ -30,7 +30,7 @@
                 </h3>
 
                 <div class="mx-auto max-w-6xl">
-                  <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         {{ siteLabel }}
@@ -48,18 +48,29 @@
 
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                        {{ areaLabel }}
+                        {{ dateLabel }}
                       </label>
-                      <SearchDropdown
-                        v-model="filters.areaSearch"
-                        :items="availableAreas"
-                        itemLabel="name"
-                        :placeholder="searchAreaPlaceholder"
-                        :inputClass="fieldClass"
+                      <DateField
+                        v-model="selectedDate"
+                        :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
                         :dir="isRTL ? 'rtl' : 'ltr'"
-                        :disabled="!selectedSite"
-                        @select="handleAreaSelect"
                       />
+                    </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        {{ moduleLabel }}
+                      </label>
+                      <select
+                        v-model="selectedModule"
+                        :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
+                        :dir="isRTL ? 'rtl' : 'ltr'"
+                      >
+                        <option value="">{{ modulePlaceholder }}</option>
+                        <option v-for="option in moduleOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -87,8 +98,6 @@
                     <thead class="sticky top-0 z-10 bg-gray-50">
                       <tr>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">#</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ dateLabel }}</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ moduleLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ contractorLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ amountLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ paymentMethodLabel }}</th>
@@ -101,29 +110,6 @@
                     <tbody class="divide-y divide-gray-200 bg-white">
                       <tr v-for="(row, index) in rows" :key="row.id">
                         <td class="px-4 py-3 text-center text-sm text-gray-600">{{ index + 1 }}</td>
-
-                        <td class="px-3 py-2">
-                          <DateField
-                            v-model="row.date"
-                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
-                            :dir="isRTL ? 'rtl' : 'ltr'"
-                            @keydown.enter.prevent="handleEnterKey(index)"
-                          />
-                        </td>
-
-                        <td class="px-3 py-2">
-                          <select
-                            v-model="row.module"
-                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
-                            :dir="isRTL ? 'rtl' : 'ltr'"
-                            @change="handleRowModuleChange(row)"
-                          >
-                            <option value="">{{ modulePlaceholder }}</option>
-                            <option v-for="option in moduleOptions" :key="option.value" :value="option.value">
-                              {{ option.label }}
-                            </option>
-                          </select>
-                        </td>
 
                         <td class="px-3 py-2">
                           <div class="flex items-center gap-2">
@@ -305,7 +291,8 @@ export default {
     const locations = ref([])
     const treasuries = ref([])
     const selectedSite = ref(null)
-    const selectedArea = ref(null)
+    const selectedDate = ref('')
+    const selectedModule = ref('')
     const submitError = ref('')
     const isSaving = ref(false)
     const skipPersistOnClose = ref(false)
@@ -331,8 +318,7 @@ export default {
     const rows = ref([createRow()])
 
     const filters = ref({
-      siteSearch: '',
-      areaSearch: ''
+      siteSearch: ''
     })
 
     const labelFor = (key, fallback) => {
@@ -346,42 +332,6 @@ export default {
     })
 
     const sites = computed(() => locations.value.filter(location => !location.parentId && !location.parent))
-
-    const areas = computed(() => {
-      const flattened = []
-
-      for (const site of locations.value) {
-        const children = Array.isArray(site.children) ? site.children : []
-        children.forEach(area => {
-          flattened.push({
-            ...area,
-            parentId: area.parentId ?? site.id,
-            parentName: area.parentName || site.name,
-            site
-          })
-        })
-      }
-
-      locations.value
-        .filter(location => location.parentId || location.parent)
-        .forEach(area => {
-          if (!flattened.some(existing => idsEqual(existing.id, area.id))) {
-            const site = findSiteForArea(area)
-            flattened.push({
-              ...area,
-              parentName: area.parentName || site?.name || area.parent?.name || '',
-              site
-            })
-          }
-        })
-
-      return flattened
-    })
-
-    const availableAreas = computed(() => {
-      if (!selectedSite.value) return areas.value
-      return areas.value.filter(area => idsEqual(area.parentId, selectedSite.value.id) || idsEqual(area.site?.id, selectedSite.value.id))
-    })
 
     const moduleOptions = computed(() => ([
       { value: 'supply', label: labelFor('supply.title', 'Supply') },
@@ -397,7 +347,7 @@ export default {
 
     const treasuryOptions = computed(() => treasuries.value)
 
-    const isStep1Valid = computed(() => Boolean(selectedArea.value))
+    const isStep1Valid = computed(() => Boolean(selectedSite.value && selectedDate.value && selectedModule.value))
 
     const rowsToSave = computed(() => rows.value.filter(row => !isRowEmpty(row)))
 
@@ -420,7 +370,6 @@ export default {
     const totalLabel = computed(() => labelFor('labels.total', 'Total'))
 
     const siteLabel = computed(() => labelFor('labels.site', 'Site'))
-    const areaLabel = computed(() => labelFor('labels.area', 'Area'))
     const dateLabel = computed(() => labelFor('labels.date', 'Date'))
     const moduleLabel = computed(() => labelFor('labels.module', 'Module'))
     const contractorLabel = computed(() => labelFor('labels.contractor', 'Contractor'))
@@ -431,7 +380,6 @@ export default {
     const actionsLabel = computed(() => labelFor('labels.actions', 'Actions'))
 
     const searchLocationPlaceholder = computed(() => labelFor('placeholders.searchLocation', 'Search location'))
-    const searchAreaPlaceholder = computed(() => labelFor('placeholders.searchArea', 'Search area'))
     const searchContractorPlaceholder = computed(() => labelFor('placeholders.searchContractor', 'Search contractor'))
     const selectModuleFirstPlaceholder = computed(() => labelFor('payments.selectModuleFirst', 'Select module first'))
     const treasuryPlaceholder = computed(() => labelFor('placeholders.searchTreasury', 'Search treasury'))
@@ -442,11 +390,6 @@ export default {
       if (area.site) return area.site
       if (area.parent && typeof area.parent === 'object') return area.parent
       return locations.value.find(location => idsEqual(location.id, area.parentId) || idsEqual(location.id, area.locationId))
-    }
-
-    const areaLabelWithSite = (area) => {
-      if (!area) return ''
-      return area.parentName ? `${area.name} (${area.parentName})` : area.name
     }
 
     async function loadLocations() {
@@ -498,18 +441,6 @@ export default {
     const handleSiteSelect = (site) => {
       selectedSite.value = site
       filters.value.siteSearch = site?.name || ''
-      selectedArea.value = null
-      filters.value.areaSearch = ''
-    }
-
-    const handleAreaSelect = (area) => {
-      selectedArea.value = area
-      filters.value.areaSearch = areaLabelWithSite(area)
-      const site = findSiteForArea(area)
-      if (site) {
-        selectedSite.value = site
-        filters.value.siteSearch = site.name || ''
-      }
     }
 
     const handleRowModuleChange = async (row) => {
@@ -559,11 +490,11 @@ export default {
     const resetForm = () => {
       currentStep.value = 1
       selectedSite.value = null
-      selectedArea.value = null
+      selectedDate.value = ''
+      selectedModule.value = ''
       submitError.value = ''
       rows.value = [createRow()]
       filters.value.siteSearch = ''
-      filters.value.areaSearch = ''
     }
 
     function saveToStorage() {
@@ -571,7 +502,8 @@ export default {
         if (typeof window === 'undefined') return
         const payload = {
           selectedSite: selectedSite.value,
-          selectedArea: selectedArea.value,
+          selectedDate: selectedDate.value,
+          selectedModule: selectedModule.value,
           rows: rows.value.map(row => ({
             id: row.id,
             date: row.date,
@@ -602,9 +534,12 @@ export default {
           filters.value.siteSearch = selectedSite.value?.name || ''
         }
 
-        if (payload.selectedArea?.id) {
-          selectedArea.value = areas.value.find(area => idsEqual(area.id, payload.selectedArea.id)) || payload.selectedArea
-          filters.value.areaSearch = selectedArea.value ? areaLabelWithSite(selectedArea.value) : ''
+        if (payload.selectedDate) {
+          selectedDate.value = payload.selectedDate
+        }
+
+        if (payload.selectedModule) {
+          selectedModule.value = payload.selectedModule
         }
 
         if (Array.isArray(payload.rows) && payload.rows.length) {
@@ -634,9 +569,7 @@ export default {
     }
 
     function isRowEmpty(row) {
-      return !row.date &&
-        !row.module &&
-        !row.contractor &&
+      return !row.contractor &&
         !row.amount &&
         !row.paymentMethod &&
         !row.treasury &&
@@ -658,10 +591,18 @@ export default {
       }
     }
 
-    const goToStep2 = () => {
+    const goToStep2 = async () => {
       if (!isStep1Valid.value) return
       currentStep.value = 2
       if (!rows.value.length) rows.value.push(createRow())
+      rows.value.forEach(row => {
+        row.module = selectedModule.value
+        row.date = selectedDate.value
+        row.contractor = null
+        row._contractorSearch = ''
+        row.contractors = []
+      })
+      await Promise.all(rows.value.map(row => loadContractorsForRow(row)))
       saveToStorage()
     }
 
@@ -698,9 +639,9 @@ export default {
         const payload = {
           site: selectedSite.value,
           location: selectedSite.value,
-          area: selectedArea.value?.name || '',
-          areaObject: selectedArea.value,
-          areaId: selectedArea.value?.id,
+          area: '',
+          areaObject: null,
+          areaId: null,
           siteId: selectedSite.value?.id,
           rows: filtered.map(row => ({
             date: row.date,
@@ -754,7 +695,7 @@ export default {
       }
     })
 
-    watch([selectedSite, selectedArea, rows], () => saveToStorage(), { deep: true })
+    watch([selectedSite, selectedDate, selectedModule, rows], () => saveToStorage(), { deep: true })
 
     onMounted(async () => {
       if (internalVisible.value) {
@@ -770,11 +711,8 @@ export default {
       currentStep,
       filters,
       sites,
-      areas,
-      availableAreas,
       rows,
       selectedSite,
-      selectedArea,
       moduleOptions,
       paymentMethodOptions,
       treasuryOptions,
@@ -782,7 +720,6 @@ export default {
       isSubmitDisabled,
       totalAmountDisplay,
       handleSiteSelect,
-      handleAreaSelect,
       handleRowModuleChange,
       selectContractor,
       selectTreasury,
@@ -793,6 +730,8 @@ export default {
       savePayment,
       closeModal,
       submitError,
+      selectedDate,
+      selectedModule,
       handleEnterKey,
       onLastFieldTab,
       ArrowRightIcon,
@@ -810,7 +749,6 @@ export default {
       savingLabel,
       totalLabel,
       siteLabel,
-      areaLabel,
       dateLabel,
       moduleLabel,
       contractorLabel,
@@ -820,7 +758,6 @@ export default {
       notesLabel,
       actionsLabel,
       searchLocationPlaceholder,
-      searchAreaPlaceholder,
       searchContractorPlaceholder,
       selectModuleFirstPlaceholder,
       treasuryPlaceholder,

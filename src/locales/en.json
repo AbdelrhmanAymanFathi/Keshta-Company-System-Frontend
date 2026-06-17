@@ -38,6 +38,7 @@
     "search": "Search...",
     "searchEquipment": "Search equipment...",
     "searchDriver": "Search driver...",
+    "searchTreasury": "Search treasury...",
     "select": "Select"
   },
   "navbar": {
@@ -195,6 +196,7 @@
   },
   "labels": {
     "system": "System",
+    "module": "Module",
     "signOut": "Sign Out",
     "enterDetails": "Enter details",
     "hours": "Hours",
@@ -377,6 +379,8 @@
       "cash": "Cash",
       "bank": "Bank"
     },
+    "cash": "Cash",
+    "bank": "Bank",
     "amount": "Amount",
     "date": "Date",
     "method": "Method",
@@ -573,6 +577,11 @@
       "distanceKm": "Distance Km",
       "numTrips": "Num Trips",
       "total": "Total",
+      "amount": "Amount",
+      "paymentMethod": "Payment Method",
+      "treasury": "Treasury",
+      "paidAt": "Paid At",
+      "module": "Module",
       "earnings": "Earnings",
       "payments": "Payments",
       "balanceOwed": "Balance Owed",
