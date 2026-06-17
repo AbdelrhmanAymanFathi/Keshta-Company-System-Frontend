@@ -40,19 +40,6 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.area') || 'Area' }}</label>
-          <SearchDropdown
-            v-model="filters.areaSearch"
-            :items="availableAreaOptions"
-            :all-items="areaOptions"
-            itemLabel="name"
-            :placeholder="$t('placeholders.searchArea') || 'Search area...'"
-            :inputClass="fieldClass"
-            @select="handleAreaSelect"
-          />
-        </div>
-
-        <div>
           <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('payments.module') || 'Module' }}</label>
           <SearchDropdown
             v-model="filters.moduleSearch"
@@ -175,7 +162,6 @@
             <th class="px-4 py-3">#</th>
             <th class="px-4 py-3">{{ $t('labels.date') || 'Date' }}</th>
             <th class="px-4 py-3">{{ $t('labels.site') || 'Site' }}</th>
-            <th class="px-4 py-3">{{ $t('labels.area') || 'Area' }}</th>
             <th class="px-4 py-3">{{ $t('payments.module') || 'Module' }}</th>
             <th class="px-4 py-3">{{ $t('labels.contractor') || 'Contractor' }}</th>
             <th class="px-4 py-3">{{ $t('labels.amount') || 'Amount' }}</th>
@@ -189,7 +175,6 @@
             <td class="px-4 py-3 theme-text-primary">{{ index + 1 }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ formatDate(paymentDate(payment)) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentSite(payment) }}</td>
-            <td class="px-4 py-3 theme-text-primary">{{ paymentArea(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentModule(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentContractor(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ formatAmount(payment.amount) }}</td>
@@ -198,7 +183,7 @@
             <td class="px-4 py-3 theme-text-primary">{{ paymentNotes(payment) }}</td>
           </tr>
           <tr v-if="!filteredPayments.length">
-            <td class="px-4 py-6 text-center theme-text-secondary" :colspan="10">{{ $t('payments.noPayments') || 'No payments found' }}</td>
+            <td class="px-4 py-6 text-center theme-text-secondary" :colspan="9">{{ $t('payments.noPayments') || 'No payments found' }}</td>
           </tr>
         </tbody>
       </table>
@@ -224,8 +209,6 @@ const normalizeList = (payload) => {
   return []
 }
 
-const idsEqual = (left, right) => String(left ?? '') === String(right ?? '')
-
 export default {
   name: 'PaymentsPage',
   components: {
@@ -250,8 +233,6 @@ export default {
       dateTo: '',
       siteSearch: '',
       siteSelected: null,
-      areaSearch: '',
-      areaSelected: null,
       moduleSearch: '',
       moduleSelected: null,
       contractorSearch: '',
@@ -276,7 +257,6 @@ export default {
 
     const paymentDate = (payment) => payment.date || payment.paidAt || payment.paymentDate || payment.createdAt || payment.transactionDate || payment.dateTime || ''
     const paymentSite = (payment) => textValue(payment.location || payment.site?.name || payment.site || '-')
-    const paymentArea = (payment) => textValue(payment.area || payment.areaObject?.name || payment.region || payment.zone || '-')
     const paymentModule = (payment) => {
       const rawValue = String(payment.module || payment.accountType || payment.type || '').trim().toLowerCase()
 
@@ -301,14 +281,8 @@ export default {
     }
     const paymentContractor = (payment) => textValue(payment.contractorName || payment.contractor?.name || payment.contractor || '-')
     const paymentMethodLabel = (payment) => textValue(payment.method || payment.paymentMethod || payment.type || payment.payment_type || '-')
-    const paymentTreasury = (payment) => textValue(payment.treasury || payment.treasuryRef?.name || payment.sourceAccount || payment.wallet || payment.branch?.name || payment.branch || '-')
-    const paymentNotes = (payment) => textValue(payment.notes || payment.reference || '-')
-    const findSiteForArea = (area) => {
-      if (!area) return null
-      if (area.site) return area.site
-      if (area.parent && typeof area.parent === 'object') return area.parent
-      return locations.value.find(location => idsEqual(location.id, area.parentId) || idsEqual(location.id, area.locationId))
-    }
+    const paymentTreasury = (payment) => textValue(payment.treasury || payment.treasuryRef?.name || payment.sourceAccount || payment.wallet || '-')
+    const paymentNotes = (payment) => textValue(payment.notes || '-')
     const uniqueByName = (items = [], labelKey = 'name') => {
       const seen = new Set()
       return items.filter(item => {
@@ -320,44 +294,6 @@ export default {
     }
 
     const siteOptions = computed(() => locations.value.filter(location => !location.parentId && !location.parent))
-
-    const areaOptions = computed(() => {
-      const flattened = []
-
-      for (const site of locations.value) {
-        const children = Array.isArray(site.children) ? site.children : []
-        children.forEach(area => {
-          flattened.push({
-            ...area,
-            parentId: area.parentId ?? site.id,
-            parentName: area.parentName || site.name,
-            site
-          })
-        })
-      }
-
-      locations.value
-        .filter(location => location.parentId || location.parent)
-        .forEach(area => {
-          if (!flattened.some(existing => idsEqual(existing.id, area.id))) {
-            const site = findSiteForArea(area)
-            flattened.push({
-              ...area,
-              parentName: area.parentName || site?.name || area.parent?.name || '',
-              site
-            })
-          }
-        })
-
-      return flattened
-    })
-
-    const availableAreaOptions = computed(() => {
-      if (!filters.value.siteSelected?.name) return areaOptions.value
-      return areaOptions.value.filter(area =>
-        idsEqual(area.parentId, filters.value.siteSelected.id) || idsEqual(area.site?.id, filters.value.siteSelected.id)
-      )
-    })
 
     const moduleOptions = computed(() => ([
       { value: 'supply', label: t('supply.title') || 'Supply' },
@@ -385,14 +321,12 @@ export default {
         dateFrom,
         dateTo,
         siteSearch,
-        areaSearch,
         moduleSearch,
         contractorSearch,
         paymentMethodSearch,
         treasurySearch
       } = appliedFilters.value
       const lowerSite = normalize(siteSearch)
-      const lowerArea = normalize(areaSearch)
       const lowerModule = normalize(moduleSearch)
       const lowerContractor = normalize(contractorSearch)
       const lowerMethod = normalize(paymentMethodSearch)
@@ -405,7 +339,6 @@ export default {
         if (dateFrom && validDate && parsedDate < new Date(dateFrom + 'T00:00:00')) return false
         if (dateTo && validDate && parsedDate > new Date(dateTo + 'T23:59:59')) return false
         if (lowerSite && !normalize(paymentSite(payment)).includes(lowerSite)) return false
-        if (lowerArea && !normalize(paymentArea(payment)).includes(lowerArea)) return false
         if (lowerModule && !normalize(paymentModule(payment)).includes(lowerModule)) return false
         if (lowerContractor && !normalize(paymentContractor(payment)).includes(lowerContractor)) return false
         if (lowerMethod && !normalize(paymentMethodLabel(payment)).includes(lowerMethod)) return false
@@ -486,18 +419,6 @@ export default {
     const handleSiteSelect = (site) => {
       filters.value.siteSelected = site
       filters.value.siteSearch = site?.name || ''
-      filters.value.areaSelected = null
-      filters.value.areaSearch = ''
-    }
-
-    const handleAreaSelect = (area) => {
-      filters.value.areaSelected = area
-      filters.value.areaSearch = area?.name || ''
-      const site = findSiteForArea(area)
-      if (site) {
-        filters.value.siteSelected = site
-        filters.value.siteSearch = site.name || ''
-      }
     }
 
     const handleModuleSelect = async (module) => {
@@ -592,8 +513,6 @@ export default {
       filteredPayments,
       paymentReports,
       siteOptions,
-      areaOptions,
-      availableAreaOptions,
       moduleOptions,
       contractorOptions,
       paymentMethodOptions,
@@ -602,7 +521,6 @@ export default {
       loadLocations,
       loadTreasuries,
       handleSiteSelect,
-      handleAreaSelect,
       handleModuleSelect,
       handleContractorSelect,
       handlePaymentMethodSelect,
@@ -612,7 +530,6 @@ export default {
       onPaymentCreated,
       paymentDate,
       paymentSite,
-      paymentArea,
       paymentModule,
       paymentContractor,
       paymentMethodLabel,

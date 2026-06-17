@@ -385,13 +385,6 @@ export default {
     const treasuryPlaceholder = computed(() => labelFor('placeholders.searchTreasury', 'Search treasury'))
     const modulePlaceholder = computed(() => labelFor('labels.module', 'Module'))
 
-    function findSiteForArea(area) {
-      if (!area) return null
-      if (area.site) return area.site
-      if (area.parent && typeof area.parent === 'object') return area.parent
-      return locations.value.find(location => idsEqual(location.id, area.parentId) || idsEqual(location.id, area.locationId))
-    }
-
     async function loadLocations() {
       try {
         const res = await getLocations()
@@ -637,17 +630,11 @@ export default {
       isSaving.value = true
       try {
         const payload = {
-          site: selectedSite.value,
-          location: selectedSite.value,
-          area: '',
-          areaObject: null,
-          areaId: null,
           siteId: selectedSite.value?.id,
           rows: filtered.map(row => ({
             date: row.date,
             module: row.module,
             amount: Number(row.amount) || 0,
-            contractor: row.contractor,
             contractorId: row.contractor?.id,
             paymentMethod: row.paymentMethod,
             treasury: row.treasury?.name || row.treasury || '',
