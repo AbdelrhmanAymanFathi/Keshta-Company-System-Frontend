@@ -301,8 +301,8 @@ export default {
 
     const createRow = (overrides = {}) => ({
       id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-      date: '',
-      module: '',
+      date: selectedDate.value || '',
+      module: selectedModule.value || '',
       contractor: null,
       _contractorSearch: '',
       amount: '',
@@ -570,17 +570,21 @@ export default {
         !row.notes
     }
 
-    function handleEnterKey(index) {
+    async function handleEnterKey(index) {
       if (index === rows.value.length - 1) {
         rows.value.push(createRow())
+        const newRow = rows.value[rows.value.length - 1]
+        await loadContractorsForRow(newRow)
       }
     }
 
-    function onLastFieldTab(index, event) {
+    async function onLastFieldTab(index, event) {
       if (event.shiftKey) return
       if (event.key === 'Tab' && index === rows.value.length - 1) {
         event.preventDefault()
         rows.value.push(createRow())
+        const newRow = rows.value[rows.value.length - 1]
+        await loadContractorsForRow(newRow)
       }
     }
 
@@ -717,6 +721,7 @@ export default {
       savePayment,
       closeModal,
       submitError,
+      isSaving,
       selectedDate,
       selectedModule,
       handleEnterKey,
