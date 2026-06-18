@@ -184,7 +184,7 @@
     </div>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
+    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0;">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6">
         <div class="text-center">
           <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">

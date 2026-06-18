@@ -175,7 +175,7 @@
     </div>
 
     <!-- Deposit Modal -->
-    <div v-if="showDepositModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeDepositModal">
+    <div v-if="showDepositModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="margin-top: 0;" @click.self="closeDepositModal">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium theme-text-primary mb-4">{{ $t('company.wallet.deposit') }}</h3>
@@ -229,7 +229,7 @@
     </div>
 
     <!-- Withdraw Modal -->
-    <div v-if="showWithdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="closeWithdrawModal">
+    <div v-if="showWithdrawModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="margin-top: 0;" @click.self="closeWithdrawModal">
       <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
           <h3 class="text-lg font-medium theme-text-primary mb-4">{{ $t('company.wallet.withdraw') }}</h3>

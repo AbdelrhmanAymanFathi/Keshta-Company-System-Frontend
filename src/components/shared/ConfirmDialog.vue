@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" @click.self="handleBackdrop">
+  <div v-if="show" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="margin-top: 0;" @click.self="handleBackdrop">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white confirm-dialog-inner" :class="{ 'animate-shake': shaking }" tabindex="-1">
       <div class="mt-3">
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full" :class="iconBgClass">

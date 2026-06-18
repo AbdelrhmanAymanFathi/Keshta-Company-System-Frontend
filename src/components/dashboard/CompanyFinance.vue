@@ -860,7 +860,7 @@
       </div>
 
     <!-- Edit Branch Modal -->
-    <div v-if="showEditBranchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+    <div v-if="showEditBranchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="margin-top: 0;"
       @click.self="closeEditBranchModal">
       <div
         :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
