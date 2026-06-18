@@ -1070,6 +1070,9 @@ export const createExtract = (data) =>
 export const getExtract = (id) =>
   axios.get(withLangQuery(`${BASE_URL}/api/extracts/${id}`));
 
+export const deleteExtract = (id) =>
+  axios.delete(withLangQuery(`${BASE_URL}/api/extracts/${id}`));
+
 export const getExtractsForContractor = (contractorId, start, end) => {
   const params = {};
   if (start) params.startDate = start;

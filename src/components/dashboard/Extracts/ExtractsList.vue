@@ -155,7 +155,7 @@
 </template>
 
 <script>
-import { getExtracts } from '@/services/extracts'
+import { deleteExtract, getExtracts } from '@/services/extracts'
 import { getContractors, getLocations, getExportItems } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import ExtractsCreationModal from './ExtractsCreationModal.vue'
@@ -338,8 +338,7 @@ export default {
     async handleDelete(id) {
       this.deleting = true
       try {
-        // backend delete endpoint not implemented in services; attempt to call generic API
-        await fetch(`/api/extracts/${id}`, { method: 'DELETE', credentials: 'include' })
+        await deleteExtract(id)
         await this.loadExtracts()
         this.closeDeleteConfirm()
       } catch (e) {
