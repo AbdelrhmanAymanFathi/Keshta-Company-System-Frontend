@@ -141,7 +141,7 @@
       :pageSizeOptions="[10,20,50,100]" @update:page="(p) => { page = p; loadExtracts() }" @update:pageSize="(size) => { pageSize = size; page = 1; loadExtracts() }" />
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50">
+    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50" style="margin-top:0;">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 sm:p-6 w-full max-w-sm">
         <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
         <p class="theme-text-secondary mb-6">{{ $t('extracts.confirmDelete') || 'Are you sure you want to delete this extract?' }}</p>
