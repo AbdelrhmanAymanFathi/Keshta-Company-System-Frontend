@@ -101,7 +101,13 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(extract, idx) in extracts" :key="extract.rowKey || `extract-${extract.id}`" class="theme-table-row-hover">
+          <tr
+            v-for="(extract, idx) in extracts"
+            :key="extract.rowKey || `extract-${extract.id}`"
+            class="theme-table-row-hover cursor-pointer"
+            @click.stop="openRowMenu($event, extract)"
+            @contextmenu.prevent.stop="openRowMenu($event, extract)"
+          >
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateFrom || extract.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateTo || extract.date) }}</td>
@@ -139,6 +145,23 @@
 
     <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages"
       :pageSizeOptions="[10,20,50,100]" @update:page="(p) => { page = p; loadExtracts() }" @update:pageSize="(size) => { pageSize = size; page = 1; loadExtracts() }" />
+
+    <!-- Row Action Menu -->
+    <div
+      v-if="contextMenu.visible"
+      :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }"
+      class="fixed z-50 min-w-[9rem] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10"
+      @click.stop
+    >
+      <button
+        type="button"
+        class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+        @click="openDeleteConfirm(contextMenu.item)"
+      >
+        <TrashIcon class="h-4 w-4" />
+        {{ $t('labels.delete') || 'Delete' }}
+      </button>
+    </div>
 
     <!-- Delete Confirm Modal -->
     <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50" style="margin-top:0;">
@@ -179,6 +202,12 @@ export default {
       locations: [],
       items: [],
       deleting: false,
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        item: null
+      },
       deleteConfirmModal: { show: false, id: null },
       filters: {
         startDate: '',
@@ -332,6 +361,7 @@ export default {
     },
 
     openDeleteConfirm(item) {
+      this.closeContextMenu()
       this.deleteConfirmModal = { show: true, id: item.id }
     },
     closeDeleteConfirm() { this.deleteConfirmModal = { show: false, id: null } },
@@ -372,11 +402,23 @@ export default {
       return `${name} (${unitName})`
     },
 
-    onRowContextMenu() {
-      // placeholder for context menu
+    openRowMenu(event, item) {
+      this.contextMenu = {
+        visible: true,
+        x: event.clientX,
+        y: event.clientY,
+        item
+      }
     },
 
-    closeContextMenu() { /* no-op for now */ }
+    closeContextMenu() {
+      this.contextMenu = {
+        visible: false,
+        x: 0,
+        y: 0,
+        item: null
+      }
+    }
   }
 }
 </script>
