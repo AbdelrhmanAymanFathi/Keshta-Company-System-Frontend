@@ -290,6 +290,7 @@ import Pagination from '@/components/shared/Pagination.vue'
 
 export default {
   name: 'TreasuryDashboard',
+  emits: ['navigateReport', 'navigateStatement'],
   components: { DateField, Pagination },
   setup() {
     const { t, locale } = useI18n()
@@ -352,29 +353,41 @@ export default {
     const selectedTreasuryIsArchived = computed(() => !!selectedTreasury.value?.deletedAt)
 
     const loadTreasuries = async () => {
-      const includeArchived = treasuryView.value !== 'active'
-      await store.fetchTreasuries({ includeArchived })
-      if (store.selectedTreasuryId) {
-        await reloadSelected()
+      try {
+        const includeArchived = treasuryView.value !== 'active'
+        await store.fetchTreasuries({ includeArchived })
+        if (store.selectedTreasuryId) {
+          await reloadSelected()
+        }
+      } catch (err) {
+        console.error('[TreasuryDashboard] loadTreasuries error:', err)
       }
     }
 
     const selectTreasury = async (id) => {
-      store.selectTreasury(id)
-      await reloadSelected()
+      try {
+        store.selectTreasury(id)
+        await reloadSelected()
+      } catch (err) {
+        console.error('[TreasuryDashboard] selectTreasury error:', err)
+      }
     }
 
     const reloadSelected = async () => {
       if (!store.selectedTreasuryId) return
-      await store.fetchSummary(store.selectedTreasuryId)
-      await store.fetchTransactions({
-        startDate: filters.startDate || undefined,
-        endDate: filters.endDate || undefined,
-        type: filters.type || undefined,
-        amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
-        amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
-        search: filters.search || undefined,
-      }, store.selectedTreasuryId)
+      try {
+        await store.fetchSummary(store.selectedTreasuryId)
+        await store.fetchTransactions({
+          startDate: filters.startDate || undefined,
+          endDate: filters.endDate || undefined,
+          type: filters.type || undefined,
+          amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
+          amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
+          search: filters.search || undefined,
+        }, store.selectedTreasuryId)
+      } catch (err) {
+        console.error('[TreasuryDashboard] reloadSelected error:', err)
+      }
     }
 
     const reloadTreasuries = async () => {
@@ -428,11 +441,15 @@ export default {
     const closeModal = () => { showModal.value = false }
 
     const saveTreasury = async () => {
-      const payload = { name: form.name } //, pinned: form.pinned }
-      if (modalMode.value === 'create') await store.createTreasuryItem(payload)
-      else await store.updateTreasuryItem(form.id, payload)
-      showModal.value = false
-      await loadTreasuries()
+      try {
+        const payload = { name: form.name } //, pinned: form.pinned }
+        if (modalMode.value === 'create') await store.createTreasuryItem(payload)
+        else await store.updateTreasuryItem(form.id, payload)
+        showModal.value = false
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryDashboard] saveTreasury error:', err)
+      }
     }
 
     const openDepositModal = () => {
@@ -447,24 +464,36 @@ export default {
 
     const saveDeposit = async () => {
       if (!store.selectedTreasuryId || selectedTreasuryIsArchived.value) return
-      await store.deposit(depositForm.amount, depositForm.description, depositForm.date, store.selectedTreasuryId)
-      showDeposit.value = false
-      await reloadSelected()
-      await loadTreasuries()
+      try {
+        await store.deposit(depositForm.amount, depositForm.description, depositForm.date, store.selectedTreasuryId)
+        showDeposit.value = false
+        await reloadSelected()
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryDashboard] saveDeposit error:', err)
+      }
     }
 
     const archiveSelectedTreasury = async () => {
       if (!isAdmin.value || !store.selectedTreasuryId) return
       if (!window.confirm(t('treasury.archiveConfirm'))) return
-      await store.archiveTreasuryItem(store.selectedTreasuryId)
-      await loadTreasuries()
+      try {
+        await store.archiveTreasuryItem(store.selectedTreasuryId)
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryDashboard] archiveSelectedTreasury error:', err)
+      }
     }
 
     const restoreSelectedTreasury = async () => {
       if (!isAdmin.value || !store.selectedTreasuryId) return
       if (!window.confirm(t('treasury.restoreConfirm'))) return
-      await store.restoreTreasuryItem(store.selectedTreasuryId)
-      await loadTreasuries()
+      try {
+        await store.restoreTreasuryItem(store.selectedTreasuryId)
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryDashboard] restoreSelectedTreasury error:', err)
+      }
     }
 
     const onDragStart = (index, event) => {
@@ -491,16 +520,26 @@ export default {
     })
 
     watch(() => store.selectedTreasuryId, async (id) => {
-      if (id) await reloadSelected()
+      if (id) {
+        try {
+          await reloadSelected()
+        } catch (err) {
+          console.error('[TreasuryDashboard] watch selectedTreasuryId error:', err)
+        }
+      }
     })
 
     onMounted(async () => {
-      store.restoreSelection()
-      await loadTreasuries()
-      if (!store.selectedTreasuryId && store.treasuries[0]) {
-        store.selectTreasury(store.treasuries[0].id)
+      try {
+        store.restoreSelection()
+        await loadTreasuries()
+        if (!store.selectedTreasuryId && store.treasuries[0]) {
+          store.selectTreasury(store.treasuries[0].id)
+        }
+        await reloadSelected()
+      } catch (err) {
+        console.error('[TreasuryDashboard] onMounted error:', err)
       }
-      await reloadSelected()
     })
 
     return {

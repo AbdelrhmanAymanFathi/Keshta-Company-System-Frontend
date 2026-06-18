@@ -21,7 +21,7 @@
         {{ t('labels.noData') }}
       </div>
       <div v-else class="mt-4 space-y-2">
-        <button v-for="treasury in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
+        <button v-for="(treasury, index) in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
           :class="['w-full rounded-lg px-3 py-2 transition flex items-center justify-between', store.selectedTreasuryId === treasury.id ? 'ring-1 ring-offset-0 ring-indigo-300 bg-indigo-50' : 'border border-gray-200 hover:bg-gray-50']">
           <div class="min-w-0 flex-1">
             <div class="flex items-center justify-between gap-2">
@@ -33,9 +33,6 @@
               <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
               <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
             </div>
-          </div>
-          <div class="shrink-0">
-            <button v-if="isAdmin && !treasury.deletedAt" class="rounded-md px-2 py-1 text-xs theme-text-secondary hover:bg-gray-100" @click.stop="openEditModal(treasury)">{{ t('treasury.edit') }}</button>
           </div>
         </button>
       </div>
@@ -158,6 +155,7 @@
 <script>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import { downloadTreasuryTransactions } from '@/api'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
@@ -169,8 +167,13 @@ export default {
   components: { DateField, Pagination },
   setup() {
     const { t, locale } = useI18n()
+    const { user } = useAuth()
     const store = useTreasuryStore()
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
+    const isAdmin = computed(() => {
+      const roles = user.value?.roles || []
+      return roles.some(role => role.roleId === 1)
+    })
     const loading = computed(() => store.loading)
     const error = computed(() => store.error)
     const selectedTreasury = computed(() => store.activeTreasury)
@@ -216,37 +219,53 @@ export default {
 
     const load = async () => {
       if (!store.selectedTreasuryId) return
-      await store.fetchTransactions({
-        startDate: filters.startDate || undefined,
-        endDate: filters.endDate || undefined,
-        type: filters.type || undefined,
-        amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
-        amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
-        search: filters.search || undefined,
-      }, store.selectedTreasuryId)
+      try {
+        await store.fetchTransactions({
+          startDate: filters.startDate || undefined,
+          endDate: filters.endDate || undefined,
+          type: filters.type || undefined,
+          amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
+          amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
+          search: filters.search || undefined,
+        }, store.selectedTreasuryId)
+      } catch (err) {
+        console.error('[TreasuryTransactions] load error:', err)
+      }
     }
 
     const selectTreasury = async (id) => {
-      store.selectTreasury(id)
-      await store.fetchSummary(id)
-      await load()
+      try {
+        store.selectTreasury(id)
+        await store.fetchSummary(id)
+        await load()
+      } catch (err) {
+        console.error('[TreasuryTransactions] selectTreasury error:', err)
+      }
     }
 
     const loadTreasuries = async () => {
-      await store.fetchTreasuries({ includeArchived: treasuryView.value !== 'active' })
-      if (!store.selectedTreasuryId && visibleTreasuries.value[0]) {
-        store.selectTreasury(visibleTreasuries.value[0].id)
-        await store.fetchSummary(visibleTreasuries.value[0].id)
-      } else if (store.selectedTreasuryId && !visibleTreasuries.value.some((treasury) => treasury.id === store.selectedTreasuryId) && visibleTreasuries.value[0]) {
-        store.selectTreasury(visibleTreasuries.value[0].id)
-        await store.fetchSummary(visibleTreasuries.value[0].id)
+      try {
+        await store.fetchTreasuries({ includeArchived: treasuryView.value !== 'active' })
+        if (!store.selectedTreasuryId && visibleTreasuries.value[0]) {
+          store.selectTreasury(visibleTreasuries.value[0].id)
+          await store.fetchSummary(visibleTreasuries.value[0].id)
+        } else if (store.selectedTreasuryId && !visibleTreasuries.value.some((treasury) => treasury.id === store.selectedTreasuryId) && visibleTreasuries.value[0]) {
+          store.selectTreasury(visibleTreasuries.value[0].id)
+          await store.fetchSummary(visibleTreasuries.value[0].id)
+        }
+        await load()
+      } catch (err) {
+        console.error('[TreasuryTransactions] loadTreasuries error:', err)
       }
-      await load()
     }
 
     const applyFilters = async () => {
-      store.setTransactionPage(1)
-      await load()
+      try {
+        store.setTransactionPage(1)
+        await load()
+      } catch (err) {
+        console.error('[TreasuryTransactions] applyFilters error:', err)
+      }
     }
 
     const downloadReport = async (format = 'xlsx') => {
@@ -282,33 +301,53 @@ export default {
     }
 
     const resetFilters = async () => {
-      filters.startDate = ''
-      filters.endDate = ''
-      filters.type = ''
-      filters.amountMin = ''
-      filters.amountMax = ''
-      filters.search = ''
-      store.setTransactionPage(1)
-      await load()
+      try {
+        filters.startDate = ''
+        filters.endDate = ''
+        filters.type = ''
+        filters.amountMin = ''
+        filters.amountMax = ''
+        filters.search = ''
+        store.setTransactionPage(1)
+        await load()
+      } catch (err) {
+        console.error('[TreasuryTransactions] resetFilters error:', err)
+      }
     }
 
     const onUpdatePage = async (page) => {
-      store.setTransactionPage(page)
-      await load()
+      try {
+        store.setTransactionPage(page)
+        await load()
+      } catch (err) {
+        console.error('[TreasuryTransactions] onUpdatePage error:', err)
+      }
     }
 
     const onUpdatePageSize = async (pageSize) => {
-      store.setTransactionPageSize(pageSize)
-      await load()
+      try {
+        store.setTransactionPageSize(pageSize)
+        await load()
+      } catch (err) {
+        console.error('[TreasuryTransactions] onUpdatePageSize error:', err)
+      }
     }
 
     onMounted(async () => {
-      store.restoreSelection()
-      await loadTreasuries()
+      try {
+        store.restoreSelection()
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryTransactions] onMounted error:', err)
+      }
     })
 
     watch(treasuryView, async () => {
-      await loadTreasuries()
+      try {
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryTransactions] watch treasuryView error:', err)
+      }
     })
 
     return {
@@ -338,6 +377,7 @@ export default {
       isRTL,
       txTypeLabel,
       loadTreasuries,
+      isAdmin,
     }
   }
 }

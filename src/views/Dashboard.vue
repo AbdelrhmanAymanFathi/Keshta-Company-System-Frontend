@@ -223,13 +223,14 @@
       <main :class="mainClasses">
         <!-- <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t(currentLabel) }}</h2> -->
         <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component
-              :is="Component"
-              :key="$route.fullPath"
-              @navigate-report="navigateToReport"
-              @navigate-statement="navigateToStatement"
-            />
+          <transition name="fade" mode="out-in" appear>
+            <div :key="$route.fullPath" class="w-full">
+              <component
+                :is="Component"
+                @navigate-report="navigateToReport"
+                @navigate-statement="navigateToStatement"
+              />
+            </div>
           </transition>
         </router-view>
       </main>

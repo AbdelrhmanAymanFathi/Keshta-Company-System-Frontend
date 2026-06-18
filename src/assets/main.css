@@ -1706,6 +1706,35 @@ body,
   pointer-events: none;
 }
 
+/* =========================
+   Vue Transitions
+   ========================= */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+}
+
+.sidebar-label-enter-active,
+.sidebar-label-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-label-enter-from,
+.sidebar-label-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
 .layout-main {
   flex: 1 1 auto;
   min-width: 0;
