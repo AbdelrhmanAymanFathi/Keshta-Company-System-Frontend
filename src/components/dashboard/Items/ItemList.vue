@@ -5,7 +5,7 @@
       <button @click="openCreateModal"
         class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl  transition inline-flex items-center gap-2 shadow-sm  text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
-        {{ $t('dashboard.newItem') || 'Add Item' }} +
+        {{ $t('dashboard.newItem') || 'Add Item' }} 
       </button>
     </div>
 
