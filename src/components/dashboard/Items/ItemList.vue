@@ -299,6 +299,9 @@ export default {
     }
   },
   computed: {
+    effectiveMode() {
+      return this.mode === 'extract' ? 'extracts' : this.mode
+    },
     isRTL() {
       return this.$i18n?.locale === 'ar'
     }
@@ -332,7 +335,7 @@ export default {
         const params = {
           page: this.page,
           pageSize: this.pageSize,
-          mode: this.mode
+          mode: this.effectiveMode
         }
         const response = await getItems(params)
 
@@ -356,15 +359,15 @@ export default {
       this.editingItem = null
       this.resetForm()
       // Set availability flags based on incoming mode
-      if (this.mode === 'supply') {
+      if (this.effectiveMode === 'supply') {
         this.form.availableForSupplies = true
         this.form.availableForTransports = false
         this.form.availableForExtracts = false
-      } else if (this.mode === 'transport') {
+      } else if (this.effectiveMode === 'transport') {
         this.form.availableForSupplies = false
         this.form.availableForTransports = true
         this.form.availableForExtracts = false
-      } else if (this.mode === 'extracts') {
+      } else if (this.effectiveMode === 'extracts') {
         this.form.availableForSupplies = false
         this.form.availableForTransports = false
         this.form.availableForExtracts = true
@@ -430,7 +433,7 @@ export default {
       }
 
       // Validate prices depending on mode and availability checkboxes
-      if (this.mode === 'supply') {
+      if (this.effectiveMode === 'supply') {
         if (this.form.defaultSupplyPrice === null || this.form.defaultSupplyPrice === '' || this.form.defaultSupplyPrice < 0) {
           this.errors.currentPrice = this.$t('validation.priceRequired') || 'Price is required and must be positive'
         }
