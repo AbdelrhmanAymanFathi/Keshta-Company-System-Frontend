@@ -902,6 +902,7 @@
     "typeExtract": "مستخلص",
     "typeSupply": "توريد",
     "typeTransport": "نقل",
+    "typeExpense": "مصروف",
     "invalidDateRange": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية",
     "reportLoadError": "خطأ في تحميل الكشف",
     "reportDownloadError": "خطأ في تحميل التقرير",
