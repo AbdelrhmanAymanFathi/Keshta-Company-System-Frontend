@@ -6,7 +6,7 @@
           <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
           <p class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</p>
         </div>
-        <button v-if="isAdmin" class="theme-button px-3 py-2" @click="openCreateModal">+ {{ t('treasury.add') }}</button>
+        <button class="theme-button px-3 py-2" @click="openCreateModal">+ {{ t('treasury.add') }}</button>
       </div>
 
       <div class="mt-4 space-y-3 border-b border-slate-200 pb-4">
@@ -421,7 +421,6 @@ export default {
     }
 
     const openCreateModal = () => {
-      if (!isAdmin.value) return
       modalMode.value = 'create'
       form.id = null
       form.name = ''
