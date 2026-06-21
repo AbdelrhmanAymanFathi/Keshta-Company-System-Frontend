@@ -155,8 +155,10 @@ export default {
 <style scoped>
 :where(.date-field) {
   width: 100%;
-  padding: 0.375rem 0.5rem;
+  padding: 0.5rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 </style>

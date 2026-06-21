@@ -135,15 +135,15 @@
             <div class="grid gap-4 grid-cols-1 lg:grid-cols-5">
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateFrom') }}</label>
-                <DateField v-model="filters.startDate" class="w-full" />
+                <DateField v-model="filters.startDate" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateTo') }}</label>
-                <DateField v-model="filters.endDate" class="w-full" />
+                <DateField v-model="filters.endDate" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.type') }}</label>
-                <select v-model="filters.type" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                <select v-model="filters.type" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus">
                   <option value="">{{ t('labels.all') }}</option>
                   <option value="DEPOSIT">{{ t('treasury.types.deposit') }}</option>
                   <option value="PAYMENT">{{ t('treasury.types.payment') }}</option>
@@ -153,11 +153,11 @@
               </div>
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amountFrom') }}</label>
-                <input v-model="filters.amountMin" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+                <input v-model="filters.amountMin" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div>
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amountTo') }}</label>
-                <input v-model="filters.amountMax" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
+                <input v-model="filters.amountMax" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
             </div>
 
@@ -167,7 +167,7 @@
                 <input
                   v-model="filters.search"
                   type="text"
-                  class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus"
                   :placeholder="t('treasury.searchPlaceholder')"
                 />
               </div>
