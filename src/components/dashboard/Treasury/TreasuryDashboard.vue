@@ -70,7 +70,7 @@
             </span>
             <button
               v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
-              class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              class="rounded-md border border-gray-300 bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="!selectedTreasury"
               @click="openDepositModal"
             >

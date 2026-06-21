@@ -402,7 +402,7 @@ export const getContractorAccounts = (contractorId) =>
 
 export const getAccountTransactions = (accountId, params = {}) => {
   const { page = 1, pageSize = 20, start = '', end = '', type = '' } = params;
-  const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+  const q = new URLSearchParams(appendLangParam({ page: page.toString(), pageSize: pageSize.toString() }));
   if (start) q.append('start', start);
   if (end) q.append('end', end);
   if (type) q.append('type', type);
@@ -507,7 +507,7 @@ export const getContractorWalletHistory = async (contractorId, opts = {}) => {
   // If accountType provided, find the account and fetch its transactions
   if (accountType) {
     try {
-      const accRes = await axios.get(`${BASE_URL}/api/contractors/${contractorId}/accounts?type=${encodeURIComponent(accountType)}`)
+      const accRes = await axios.get(withLangQuery(`${BASE_URL}/api/contractors/${contractorId}/accounts`, { type: accountType }))
       const accounts = Array.isArray(accRes.data) ? accRes.data : (accRes.data && accRes.data.accounts ? accRes.data.accounts : (accRes.data ? [accRes.data] : []))
       const acct = accounts && accounts.length > 0 ? accounts[0] : null
       if (acct && acct.id) {
@@ -518,14 +518,7 @@ export const getContractorWalletHistory = async (contractorId, opts = {}) => {
     }
   }
 
-  // Attempt contractor-level accounts history if provided
-  try {
-    const res = await axios.get(`${BASE_URL}/api/contractors/${contractorId}/accounts/history`)
-    return res
-  } catch (e) {
-    // fallback
-  }
-  return axios.get(`${BASE_URL}/api/contractors/${contractorId}/wallet/history`)
+  return axios.get(withLangQuery(`${BASE_URL}/api/contractors/${contractorId}/wallet/history`))
 }
 
 // Fetch transactions across all accounts for a contractor (merge results)
@@ -550,7 +543,7 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
   } catch (e) {
     // fallback to legacy contractor wallet transactions endpoint
     const { page = 1, pageSize = 20, start = '', end = '', type = '' } = params;
-    const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() });
+    const q = new URLSearchParams(appendLangParam({ page: page.toString(), pageSize: pageSize.toString() }));
     if (start) q.append('start', start);
     if (end) q.append('end', end);
     if (type) q.append('type', type);
@@ -793,10 +786,10 @@ export const getTreasurySummary = (treasuryId) =>
   axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/summary`);
 export const getTreasuryTransactions = (treasuryId, params = {}) => {
   const { page = 1, pageSize = 20, startDate = '', endDate = '', type = '', search = '', amountMin = '', amountMax = '' } = params;
-  const queryParams = new URLSearchParams({
+  const queryParams = new URLSearchParams(appendLangParam({
     page: page.toString(),
     pageSize: pageSize.toString()
-  });
+  }));
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
   if (type) queryParams.append('type', type);
@@ -825,10 +818,10 @@ export const getBranchWalletSummary = (branchId) =>
   axios.get(`${BASE_URL}/api/branches/${branchId}/wallet/summary`);
 export const getBranchWalletTransactions = (branchId, params = {}) => {
   const { page = 1, pageSize = 20 } = params;
-  const queryParams = new URLSearchParams({
+  const queryParams = new URLSearchParams(appendLangParam({
     page: page.toString(),
     pageSize: pageSize.toString()
-  });
+  }));
   return axios.get(`${BASE_URL}/api/branches/${branchId}/wallet/transactions?${queryParams.toString()}`);
 };
 export const depositToBranchWallet = (branchId, data) =>
@@ -1245,6 +1238,7 @@ export const getCompanyTransactions = (params = {}) => {
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+  queryParams.append('lang', getCurrentApiLang());
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
   if (type) queryParams.append('type', type);
