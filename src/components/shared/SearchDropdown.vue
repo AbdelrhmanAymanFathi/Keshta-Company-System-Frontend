@@ -6,13 +6,24 @@
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
-      :class="[inputClass, isRTL ? 'text-right' : 'text-left']"
+      :class="[inputClass, isRTL ? 'text-right' : 'text-left', clearable && hasValue ? 'pe-9' : '']"
       :dir="dir"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
       @keydown="handleKeydown"
     />
+    <button
+      v-if="clearable && hasValue && !disabled"
+      type="button"
+      tabindex="-1"
+      class="absolute end-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-lg leading-none text-gray-400 hover:text-gray-600 focus:outline-none"
+      :aria-label="clearAriaLabel"
+      @mousedown.prevent
+      @click="clearValue"
+    >
+      ×
+    </button>
     <div
       v-if="isOpen && !teleportTarget"
       ref="options"
@@ -109,9 +120,17 @@ export default {
     teleportTarget: {
       type: String,
       default: ''
+    },
+    clearable: {
+      type: Boolean,
+      default: false
+    },
+    clearAriaLabel: {
+      type: String,
+      default: 'Clear'
     }
   },
-  emits: ['update:modelValue', 'select', 'focus', 'blur'],
+  emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear'],
   setup(props, { emit }) {
     const isRTL = computed(() => (props.dir || '').toLowerCase() === 'rtl')
     const rootRef = ref(null)
@@ -148,6 +167,15 @@ export default {
       if (!query) return sourceItems.value
       return sourceItems.value.filter((item) => normalize(getLabel(item)).includes(query))
     })
+
+    const hasValue = computed(() => normalize(props.modelValue).length > 0)
+
+    const clearValue = () => {
+      emit('update:modelValue', '')
+      emit('clear')
+      closeDropdown()
+      inputRef.value?.focus()
+    }
 
     const updateDropdownPosition = async () => {
       if (!props.teleportTarget) return
@@ -215,6 +243,12 @@ export default {
     }
 
     const handleKeydown = (event) => {
+      if (props.clearable && event.key === 'Delete' && hasValue.value) {
+        event.preventDefault()
+        clearValue()
+        return
+      }
+
       if (!isOpen.value && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
         event.preventDefault()
         openDropdown()
@@ -297,6 +331,7 @@ export default {
       highlightedIndex,
       dropdownStyle,
       filteredItems,
+      hasValue,
       getKey,
       getLabel,
       handleInput,
@@ -304,6 +339,7 @@ export default {
       handleBlur,
       handleKeydown,
       selectItem,
+      clearValue,
       isRTL
     }
   }

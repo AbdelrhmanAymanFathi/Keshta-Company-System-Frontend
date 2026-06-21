@@ -44,7 +44,10 @@
                       <SearchDropdown v-model:modelValue="filters.commonItemSearch" :items="items" :all-items="items"
                         :placeholder="$t('labels.item')" :itemKey="'id'" :itemLabel="'name'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="selectCommonItem">
+                        @select="selectCommonItem"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.item = null; filters.commonItemSearch = '' }">
                         <template #prefix>
                           <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
@@ -69,7 +72,10 @@
                       <SearchDropdown v-model:modelValue="filters.commonFromLocSearch" :items="locations"
                         :placeholder="$t('transport.location')" :itemKey="'id'" :itemLabel="locLabel"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { commonData.location = sel; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = sel.name + (sel.parentName ? ' (' + sel.parentName + ')' : ''); }">
+                        @select="(sel) => { commonData.location = sel; commonData.area = null; filters.commonToLocSearch = ''; filters.commonFromLocSearch = sel.name + (sel.parentName ? ' (' + sel.parentName + ')' : ''); }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.location = null; commonData.area = null; filters.commonFromLocSearch = ''; filters.commonToLocSearch = '' }">
                         <template #prefix>
                           <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
@@ -94,7 +100,10 @@
                       <SearchDropdown v-model:modelValue="filters.commonToLocSearch" :items="(commonData.location?.children && Array.isArray(commonData.location.children)) ? commonData.location.children : []"
                         :placeholder="$t('transport.area')" :itemKey="'id'" :itemLabel="'name'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { commonData.area = sel; filters.commonToLocSearch = sel.name; try{ saveCommonDataToStorage() }catch(e){} }">
+                        @select="(sel) => { commonData.area = sel; filters.commonToLocSearch = sel.name; try{ saveCommonDataToStorage() }catch(e){} }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.area = null; filters.commonToLocSearch = '' }">
                         <template #prefix>
                           <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
@@ -119,7 +128,10 @@
                       <SearchDropdown v-model:modelValue="filters.commonContractorSearch" :items="contractors"
                         :placeholder="$t('transport.contractor')" :itemKey="'id'" :itemLabel="'name'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="selectCommonContractor">
+                        @select="selectCommonContractor"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.contractor = null; filters.commonContractorSearch = ''; commonData.vehicle = null; filters.commonVehicleSearch = ''; vehicleCompanyCapacity = 0; }">
                         <template #prefix>
                           <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
@@ -144,7 +156,10 @@
                       <SearchDropdown v-model:modelValue="filters.commonVehicleSearch" :items="filteredCommonVehicles"
                         :all-items="filteredCommonVehicles" :placeholder="$t('labels.vehicle')" :itemKey="'id'" :itemLabel="'name'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="selectCommonVehicle">
+                        @select="selectCommonVehicle"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.vehicle = null; filters.commonVehicleSearch = ''; vehicleCompanyCapacity = 0; rows.forEach(r => { r.vehicle = null }) }">
                         <template #prefix>
                           <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>

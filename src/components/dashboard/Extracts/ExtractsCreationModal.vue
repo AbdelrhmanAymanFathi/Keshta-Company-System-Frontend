@@ -74,6 +74,9 @@
                           :placeholder="$t('labels.site')"
                           :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                           @select="selectSite"
+                          clearable
+                          :clearAriaLabel="$t('labels.clear')"
+                          @clear="() => { commonData.site = null; filters.commonSiteSearch = '' }"
                         >
                           <template #prefix>
                             <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -104,6 +107,9 @@
                           :disabled="!commonData.site"
                           :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
                           @select="selectArea"
+                          clearable
+                          :clearAriaLabel="$t('labels.clear')"
+                          @clear="() => { commonData.area = null; filters.commonAreaSearch = '' }"
                         >
                           <template #prefix>
                             <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -136,6 +142,9 @@
                           :placeholder="$t('labels.contractor')"
                           :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                           @select="selectContractor"
+                          clearable
+                          :clearAriaLabel="$t('labels.clear')"
+                          @clear="() => { commonData.contractor = null; filters.commonContractorSearch = '' }"
                         >
                           <template #prefix>
                             <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -297,7 +306,7 @@
                                 v-model="row.itemSearch"
                                 type="text"
                                 :placeholder="row.item?.name || $t('labels.item')"
-                                class="outline-none flex-1 text-sm bg-transparent"
+                                :class="['outline-none flex-1 text-sm bg-transparent', (row.itemSearch || row.item) ? 'pe-8' : '']"
                                 @keydown.enter.prevent
                                 @keydown.escape="row.itemOpen = false"
                                 @keydown="onItemDropdownKeydown($event, row)"
@@ -306,6 +315,17 @@
                                 @blur="row.itemOpen = false"
                               />
                               <span class="theme-caption">▾</span>
+                              <button
+                                v-if="row.itemSearch || row.item"
+                                type="button"
+                                tabindex="-1"
+                                class="absolute end-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-lg leading-none text-gray-400 hover:text-gray-600 focus:outline-none"
+                                :aria-label="$t('labels.clear')"
+                                @mousedown.prevent
+                                @click="() => { row.item = null; row.itemId = ''; row.itemSearch = '' }"
+                              >
+                                ×
+                              </button>
                             </div>
 
                             <teleport to=".modal-body-container" v-if="row.itemOpen">
@@ -698,6 +718,16 @@ export default {
     },
 
     onItemDropdownKeydown(event, row) {
+      // Allow Delete to clear the item when focused
+      if (event.key === 'Delete' && (row.itemSearch || row.item)) {
+        event.preventDefault()
+        row.item = null
+        row.itemId = ''
+        row.itemSearch = ''
+        row.itemOpen = false
+        return
+      }
+
       const items = this.filteredExtractItems(row)
 
       if (!items.length) return

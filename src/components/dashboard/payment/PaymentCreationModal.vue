@@ -42,7 +42,10 @@
                         :placeholder="searchLocationPlaceholder"
                         :inputClass="fieldClass"
                         :dir="isRTL ? 'rtl' : 'ltr'"
+                        clearable
+                        :clearAriaLabel="clearLabel"
                         @select="handleSiteSelect"
+                        @clear="clearSite"
                       />
                     </div>
 
@@ -50,27 +53,55 @@
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         {{ dateLabel }}
                       </label>
-                      <DateField
-                        v-model="selectedDate"
-                        :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
-                        :dir="isRTL ? 'rtl' : 'ltr'"
-                      />
+                      <div class="relative">
+                        <DateField
+                          v-model="selectedDate"
+                          :class="[fieldClass, isRTL ? 'text-right' : 'text-left', selectedDate ? 'pe-10' : '']"
+                          :dir="isRTL ? 'rtl' : 'ltr'"
+                          @keydown="handleStep1FieldKeydown($event, 'date')"
+                        />
+                        <button
+                          v-if="selectedDate"
+                          type="button"
+                          tabindex="-1"
+                          class="absolute end-2.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-lg leading-none text-gray-400 hover:text-gray-600 focus:outline-none"
+                          :aria-label="clearLabel"
+                          @mousedown.prevent
+                          @click="clearDate"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
 
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         {{ moduleLabel }}
                       </label>
-                      <select
-                        v-model="selectedModule"
-                        :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
-                        :dir="isRTL ? 'rtl' : 'ltr'"
-                      >
-                        <option value="">{{ modulePlaceholder }}</option>
-                        <option v-for="option in moduleOptions" :key="option.value" :value="option.value">
-                          {{ option.label }}
-                        </option>
-                      </select>
+                      <div class="relative">
+                        <select
+                          v-model="selectedModule"
+                          :class="[fieldClass, isRTL ? 'text-right' : 'text-left', selectedModule ? 'pe-10' : '']"
+                          :dir="isRTL ? 'rtl' : 'ltr'"
+                          @keydown="handleStep1FieldKeydown($event, 'module')"
+                        >
+                          <option value="">{{ modulePlaceholder }}</option>
+                          <option v-for="option in moduleOptions" :key="option.value" :value="option.value">
+                            {{ option.label }}
+                          </option>
+                        </select>
+                        <button
+                          v-if="selectedModule"
+                          type="button"
+                          tabindex="-1"
+                          class="absolute end-2.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-lg leading-none text-gray-400 hover:text-gray-600 focus:outline-none"
+                          :aria-label="clearLabel"
+                          @mousedown.prevent
+                          @click="clearModule"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -121,8 +152,11 @@
                               :inputClass="fieldClass"
                               :dir="isRTL ? 'rtl' : 'ltr'"
                               :disabled="!row.module || !row.contractors.length"
-                            teleportTarget="body"
+                              teleportTarget="body"
+                              clearable
+                              :clearAriaLabel="clearLabel"
                               @select="(contractor) => selectContractor(row, contractor)"
+                              @clear="() => { row.contractor = null; row._contractorSearch = ''; }"
                             />
                           </div>
                         </td>
@@ -162,7 +196,10 @@
                             :dir="isRTL ? 'rtl' : 'ltr'"
                             :disabled="!treasuryOptions.length"
                             teleportTarget="body"
+                            clearable
+                            :clearAriaLabel="clearLabel"
                             @select="(treasury) => selectTreasury(row, treasury)"
+                            @clear="() => { row.treasury = null; row._treasurySearch = ''; row.treasuryId = null }"
                           />
                         </td>
 
@@ -384,6 +421,7 @@ export default {
     const selectModuleFirstPlaceholder = computed(() => labelFor('payments.selectModuleFirst', 'Select module first'))
     const treasuryPlaceholder = computed(() => labelFor('placeholders.searchTreasury', 'Search treasury'))
     const modulePlaceholder = computed(() => labelFor('labels.module', 'Module'))
+    const clearLabel = computed(() => labelFor('labels.clear', 'Clear'))
 
     async function loadLocations() {
       try {
@@ -434,6 +472,34 @@ export default {
     const handleSiteSelect = (site) => {
       selectedSite.value = site
       filters.value.siteSearch = site?.name || ''
+    }
+
+    const clearSite = () => {
+      selectedSite.value = null
+      filters.value.siteSearch = ''
+    }
+
+    const clearDate = () => {
+      selectedDate.value = ''
+    }
+
+    const clearModule = () => {
+      selectedModule.value = ''
+    }
+
+    const handleStep1FieldKeydown = (event, field) => {
+      if (event.key !== 'Delete') return
+
+      if (field === 'date' && selectedDate.value) {
+        event.preventDefault()
+        clearDate()
+        return
+      }
+
+      if (field === 'module' && selectedModule.value) {
+        event.preventDefault()
+        clearModule()
+      }
     }
 
     const handleRowModuleChange = async (row) => {
@@ -711,6 +777,10 @@ export default {
       isSubmitDisabled,
       totalAmountDisplay,
       handleSiteSelect,
+      clearSite,
+      clearDate,
+      clearModule,
+      handleStep1FieldKeydown,
       handleRowModuleChange,
       selectContractor,
       selectTreasury,
@@ -754,6 +824,7 @@ export default {
       selectModuleFirstPlaceholder,
       treasuryPlaceholder,
       modulePlaceholder,
+      clearLabel,
       isStep1Valid
     }
   }

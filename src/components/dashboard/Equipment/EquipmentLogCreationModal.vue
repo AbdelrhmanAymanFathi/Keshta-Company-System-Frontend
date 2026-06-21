@@ -54,7 +54,7 @@
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" />
+                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" clearable :clearAriaLabel="$t('labels.clear')" @clear="() => selectEquipment(null)" />
                     </div>
                   </div>
                 </div>
@@ -70,13 +70,16 @@
                 <!-- Driver -->
                 <div v-if="isCompanyOwnedEquipment">
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.driver') }}</label>
-                  <SearchDropdown
+                      <SearchDropdown
                     v-model="form.driverLabel"
                     :items="drivers"
                     :allItems="drivers"
                     :placeholder="$t('labels.driver')"
                     :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                     @select="selectDriver"
+                    clearable
+                    :clearAriaLabel="$t('labels.clear')"
+                    @clear="clearDriver"
                   />
                 </div>
 
@@ -99,7 +102,10 @@
                       <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
                         :placeholder="$t('labels.site')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { form.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
+                        @select="(sel) => { form.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { form.site = null; filters.commonSiteSearch = '' }">
                         <template #prefix>
                           <MapPinIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -125,7 +131,10 @@
                       <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
                         :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!form.site"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
-                        @select="(sel) => { form.area = sel; filters.commonAreaSearch = sel.name }">
+                        @select="(sel) => { form.area = sel; filters.commonAreaSearch = sel.name }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { form.area = null; filters.commonAreaSearch = '' }">
                         <template #prefix>
                           <MapIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />

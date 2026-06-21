@@ -55,7 +55,10 @@
                       <SearchDropdown v-model="filters.commonItemSearch" :items="exportItems" :allItems="exportItems"
                         :placeholder="$t('labels.item')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }">
+                        @select="(sel) => { commonData.item = sel; filters.commonItemSearch = sel.name; onCommonItemSelect() }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.item = null; filters.commonItemSearch = '' }">
                         <template #prefix>
                           <ArchiveBoxIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -94,7 +97,10 @@
                       <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
                         :placeholder="$t('labels.site')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }">
+                        @select="(sel) => { commonData.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.site = null; filters.commonSiteSearch = ''; commonData.area = null; filters.commonAreaSearch = '' }">
                         <template #prefix>
                           <MapPinIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -120,7 +126,10 @@
                       <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
                         :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!commonData.site"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
-                        @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
+                        @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.area = null; filters.commonAreaSearch = '' }">
                         <template #prefix>
                           <MapIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -147,7 +156,10 @@
                       <SearchDropdown v-model="filters.commonContractorSearch" :items="contractors"
                         :allItems="contractors" :placeholder="$t('labels.contractor')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }">
+                        @select="(sel) => { commonData.contractor = sel; filters.commonContractorSearch = sel.name; onCommonContractorChange() }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.contractor = null; filters.commonContractorSearch = ''; onCommonContractorChange() }">
                         <template #prefix>
                           <UserGroupIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
@@ -173,7 +185,10 @@
                       <SearchDropdown v-model="filters.commonCrusherSearch" :items="crushers" :allItems="crushers"
                         :placeholder="$t('labels.crusher')"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
-                        @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
+                        @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }"
+                        clearable
+                        :clearAriaLabel="$t('labels.clear')"
+                        @clear="() => { commonData.crusher = null; filters.commonCrusherSearch = '' }">
                         <template #prefix>
                           <WrenchScrewdriverIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
