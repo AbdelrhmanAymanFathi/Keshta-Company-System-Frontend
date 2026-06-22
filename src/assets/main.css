@@ -62,7 +62,7 @@ body,
    Color Theme System
    ========================= */
 :root {
-  --theme-primary: #4f46e5;
+  --theme-primary: #4f7dcc;
   --theme-primary-rgb: 79, 70, 229;
   --theme-primary-50: 238, 242, 255;
   --theme-primary-100: 224, 231, 255;
@@ -105,7 +105,7 @@ body,
   --theme-text-light-muted: #d1d5db;
 
   --theme-heading-color: #0f172a;
-  --theme-link-color: #4f46e5;
+  --theme-link-color: #4f7dcc;
 
   --theme-sidebar-text: #334155;
   --theme-card-text: #111827;
@@ -176,7 +176,7 @@ body,
 
 /* Color picker — square, border matches selected color (--picker-color) */
 .theme-color-input {
-  --picker-color: #4f46e5;
+  --picker-color: #4f7dcc;
   box-sizing: border-box;
   width: 2.5rem;
   height: 2.5rem;

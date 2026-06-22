@@ -113,7 +113,7 @@ export const TYPOGRAPHY_DEFAULTS = {
 export const DEFAULT_THEME = {
   id: 'default',
   name: 'Default',
-  primary: '#4f46e5',
+  primary: '#4f7dcc',
   animation: DEFAULT_ANIMATION,
   iconPack: DEFAULT_ICON_PACK,
   sidebarType: DEFAULT_SIDEBAR_TYPE,

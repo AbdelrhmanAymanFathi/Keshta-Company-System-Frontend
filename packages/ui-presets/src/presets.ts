@@ -89,7 +89,7 @@ export const PRESET_THEMES: Record<string, ThemeDefinition> = {
     name: 'Minimal',
     personality: 'minimal',
     description: 'Clean Lucide UI with minimal motion and Plus Jakarta Sans.',
-    primary: '#4f46e5',
+    primary: '#4f7dcc',
     animation: 'minimal',
     iconPack: 'lucide',
     sidebarType: 'static',
