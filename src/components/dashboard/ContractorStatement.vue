@@ -254,7 +254,7 @@ import DateField from '@/components/shared/DateField.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import normalizeItem from '@/utils/normalizeItem'
 import { formatToISODate } from '@/utils/dateUtils'
-import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
+import { downloadBlobData, getFilenameFromResponse, getMimeTypeFromHeaders } from '@/utils/downloadFile'
 import { isContractorStatementTotalsRow, splitFooterRow } from '@/utils/reportDefinitions'
 // import { useRoute } from 'vue-router'
 
@@ -555,18 +555,18 @@ export default {
           ? `${filters.value.startDate}_${filters.value.endDate}`
           : 'all'
 
-        // Prefer filename from headers (Content-Disposition) when provided
-        let filename = getFilenameFromHeaders(headers, null)
-        if (!filename) {
-          const extension = format === 'csv' ? 'csv' : (format === 'pdf' ? 'pdf' : 'xlsx')
-          filename = `contractor-${contractorName}-statement-${dateRange}.${extension}`
-        }
+        const requestedExtension = format === 'csv' ? 'csv' : (format === 'pdf' ? 'pdf' : 'xlsx')
+        const fallbackName = `contractor-${contractorName}-statement-${dateRange}.${requestedExtension}`
+        const filename = getFilenameFromResponse(headers, fallbackName) || fallbackName
 
-        const mimeType = format === 'csv'
-          ? (headers && (headers['content-type'] || headers['Content-Type']) || 'text/csv;charset=utf-8;')
-          : format === 'pdf'
-            ? (headers && (headers['content-type'] || headers['Content-Type']) || 'application/pdf')
-            : (headers && (headers['content-type'] || headers['Content-Type']) || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        const mimeType = getMimeTypeFromHeaders(
+          headers,
+          format === 'csv'
+            ? 'text/csv;charset=utf-8;'
+            : format === 'pdf'
+              ? 'application/pdf'
+              : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
 
         downloadBlobData(data, filename, mimeType)
       } catch (err) {
