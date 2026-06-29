@@ -104,23 +104,23 @@
         </div>
       </div>
 
-      <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-        <div class="rounded-2xl border border-gray-100 p-4 shadow-sm theme-surface">
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="rounded-2xl border border-gray-100 p-3 shadow-sm theme-surface sm:p-4">
           <p class="text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.balance') }}</p>
           <p
-            class="mt-2 text-3xl font-semibold"
+            class="mt-2 text-2xl font-semibold sm:text-3xl"
             :class="Number(store.summary.balance) < 0 ? 'text-red-600' : 'text-indigo-700'"
           >
             {{ formatCurrency(store.summary.balance) }}
           </p>
         </div>
-        <div class="rounded-2xl border border-gray-100 p-4 shadow-sm theme-surface">
+        <div class="rounded-2xl border border-gray-100 p-3 shadow-sm theme-surface sm:p-4">
           <p class="text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.last30dIn') }}</p>
-          <p class="mt-2 text-3xl font-semibold text-emerald-700">{{ formatCurrency(store.summary.last30dIn) }}</p>
+          <p class="mt-2 text-2xl font-semibold text-emerald-700 sm:text-3xl">{{ formatCurrency(store.summary.last30dIn) }}</p>
         </div>
-        <div class="rounded-2xl border border-gray-100 p-4 shadow-sm theme-surface">
+        <div class="rounded-2xl border border-gray-100 p-3 shadow-sm theme-surface sm:p-4">
           <p class="text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.last30dOut') }}</p>
-          <p class="mt-2 text-3xl font-semibold text-red-700">{{ formatCurrency(store.summary.last30dOut) }}</p>
+          <p class="mt-2 text-2xl font-semibold text-red-700 sm:text-3xl">{{ formatCurrency(store.summary.last30dOut) }}</p>
         </div>
       </div>
 
