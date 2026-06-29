@@ -283,12 +283,12 @@
             </div>
 
             <!-- Add New Vehicle Button -->
-            <div class="mb-6" >
-              <button @click="showAddVehicleDialog = true"
+            <!-- <div class="mb-6" >
+              <button @click="showAddVehicleDialog = true"style="z-index: 900;"
                 class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">
                 + {{ $t('vehicles.addVehicle') || 'Add New Vehicle' }}
               </button>
-            </div>
+            </div> -->
 
             <!-- Table for Variable Data -->
             <div class="    mb-8
