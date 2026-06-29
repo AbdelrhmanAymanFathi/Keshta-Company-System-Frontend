@@ -339,6 +339,19 @@ export default {
       }
     }
 
+    const showTreasuryError = (err, fallbackMessage = t('treasury.saveError') || 'Failed to save treasury') => {
+      const serverMessage = err?.response?.data?.message || err?.response?.data?.error || err?.message
+      const message = typeof serverMessage === 'string' && serverMessage.trim() ? serverMessage : fallbackMessage
+      const conflictMessage = t('treasury.nameExists') || 'A treasury with this name already exists'
+
+      if (err?.response?.status === 409 || err?.status === 409) {
+        if (window.$toast) window.$toast(conflictMessage, 'error', 5000)
+        return
+      }
+
+      if (window.$toast) window.$toast(message, 'error', 5000)
+    }
+
     const normalizedSearch = computed(() => String(treasurySearch.value || '').trim().toLowerCase())
     const visibleTreasuries = computed(() => {
       const all = Array.isArray(store.treasuries) ? store.treasuries : []
@@ -448,6 +461,7 @@ export default {
         await loadTreasuries()
       } catch (err) {
         console.error('[TreasuryDashboard] saveTreasury error:', err)
+        showTreasuryError(err)
       }
     }
 

@@ -1436,6 +1436,8 @@
     "amountTo": "Amount To",
     "name": "Name",
     "pinned": "Pinned",
+    "nameExists": "A treasury with this name already exists",
+    "saveError": "Failed to save treasury",
     "noTransactions": "No transactions found",
     "search": "Search",
     "reset": "Reset",
