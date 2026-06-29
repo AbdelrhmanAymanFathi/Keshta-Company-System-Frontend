@@ -1092,6 +1092,7 @@
     "editVehicle": "Edit Vehicle",
     "deleteConfirm": "Are you sure you want to delete vehicle",
     "validationName": "Name is required",
+    "nameExists": "A vehicle with this name already exists",
     "validationContractor": "Contractor is required",
     "validationPositiveNumber": "Must be greater than 0",
     "companyCapacityRequired": "Company Cubic Capacity is required and must be greater than 0",

@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { createVehicle, getContractors, getCrushers } from '../../../api'
+import { createVehicle, getContractors, getCrushers, getVehicles } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import CreateContractorModal from './CreateContractorModal.vue'
 import CreateCrusherModal from './CreateCrusherModal.vue'
@@ -158,6 +158,7 @@ export default {
     return {
       contractors: [],
       crushers: [],
+      existingVehicles: [],
       // Searchable dropdown state
       contractorSearch: '',
       showContractorDropdown: false,
@@ -211,6 +212,23 @@ export default {
         this.showCrusherDropdown = false
       }
     },
+    async loadExistingVehicles() {
+      try {
+        const vehiclesRes = await getVehicles({ page: 1, pageSize: 1000, mode: this.mode })
+        const vehiclesPayload = vehiclesRes.data || {}
+        const vehicles = Array.isArray(vehiclesPayload.items)
+          ? vehiclesPayload.items
+          : Array.isArray(vehiclesPayload.data)
+            ? vehiclesPayload.data
+            : Array.isArray(vehiclesPayload)
+              ? vehiclesPayload
+              : []
+        this.existingVehicles = vehicles.map(normalizeItem)
+      } catch (error) {
+        console.error('Error loading vehicles:', error)
+        this.existingVehicles = []
+      }
+    },
     async loadLookups() {
       try {
         const contractorsRes = await getContractors({ mode: this.mode })
@@ -241,6 +259,7 @@ export default {
         console.error('Error loading crushers:', error)
         this.crushers = []
       }
+      await this.loadExistingVehicles()
       // drivers removed
     },
     openContractorDropdown() {
@@ -399,13 +418,35 @@ export default {
         return
       }
       
+      const trimmedName = String(this.form.name || '').trim()
+      if (!trimmedName) {
+        this.error = this.$t('vehicles.validationName') || 'Name is required'
+        if (window.$toast) {
+          window.$toast(this.error, 'error', 5000)
+        }
+        return
+      }
+
+      const duplicateVehicle = this.existingVehicles.find((vehicle) => {
+        const existingName = String(vehicle?.name || '').trim().toLowerCase()
+        return existingName && existingName === trimmedName.toLowerCase()
+      })
+
+      if (duplicateVehicle) {
+        this.error = this.$t('vehicles.nameExists') || 'A vehicle with this name already exists'
+        if (window.$toast) {
+          window.$toast(this.error, 'error', 5000)
+        }
+        return
+      }
+
       this.creating = true
       try {
         let contractorId = this.form.contractorId
         let crusherNumber = this.form.crusherNumber || null
 
         const payload = {
-          name: this.form.name,
+          name: trimmedName,
           contractorId: contractorId,
           crusherNumber: crusherNumber,
           mode: this.mode
@@ -422,6 +463,7 @@ export default {
         }
         
         await createVehicle(payload)
+        this.existingVehicles.push({ name: trimmedName })
         this.success = true
         if (window.$toast) {
           window.$toast(this.$t('vehicles.createdSuccessfully') || 'Vehicle created successfully', 'success')

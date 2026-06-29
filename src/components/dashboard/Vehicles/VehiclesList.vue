@@ -97,11 +97,11 @@
           </button>
         </li>
         <li>
-          <!-- <button
+          <button
             @click="onContextMenuSelectDelete"
             class="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 theme-text-secondary">
             {{ $t('labels.delete') || 'Delete' }}
-          </button> -->
+          </button>
         </li>
       </ul>
     </div>
