@@ -338,7 +338,7 @@ import {
   normalizeReportSelectFields,
   splitFooterRow
 } from '@/utils/reportDefinitions'
-import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
+import { downloadBlobData, getFilenameFromResponse, getMimeTypeFromHeaders } from '@/utils/downloadFile'
 import {
   ArrowPathIcon,
   ArrowUturnLeftIcon,
@@ -740,11 +740,8 @@ export default {
         })
 
         const fallbackName = `${getReportExportBaseName()}.${format}`
-        const filename = getFilenameFromHeaders(res.headers, fallbackName) || fallbackName
-        const mimeType =
-          res.headers?.['content-type'] ||
-          res.headers?.['Content-Type'] ||
-          'application/octet-stream'
+        const filename = getFilenameFromResponse(res.headers, fallbackName) || fallbackName
+        const mimeType = getMimeTypeFromHeaders(res.headers, 'application/octet-stream')
 
         downloadBlobData(res.data, filename, mimeType)
       } catch (err) {

@@ -177,7 +177,7 @@ import { useI18n } from "vue-i18n";
 import { getReportDef, executeReport, getReportParamOptions } from "@/api";
 import SearchDropdown from "@/components/shared/SearchDropdown.vue";
 import DateField from "@/components/shared/DateField.vue";
-import { downloadBlobData, getFilenameFromHeaders } from "@/utils/downloadFile";
+import { downloadBlobData, getFilenameFromResponse, getMimeTypeFromHeaders } from "@/utils/downloadFile";
 
 export default {
   components: { SearchDropdown, DateField },
@@ -354,8 +354,8 @@ export default {
           responseType: "blob"
         })
         const fallbackName = `dynamic-report-${props.reportId}.${format}`
-        const filename = getFilenameFromHeaders(res.headers, fallbackName) || fallbackName
-        const mimeType = res.headers?.["content-type"] || res.headers?.["Content-Type"] || "application/octet-stream"
+        const filename = getFilenameFromResponse(res.headers, fallbackName) || fallbackName
+        const mimeType = getMimeTypeFromHeaders(res.headers, "application/octet-stream")
         downloadBlobData(res.data, filename, mimeType)
       } catch (err) {
         console.error(`Dynamic report ${format} export failed`, err)
