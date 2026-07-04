@@ -26,6 +26,13 @@ module.exports = {
     client: {
       webSocketURL: `ws://${BaseIP}:8080/ws`
     },
+    allowedHosts: [
+      'keshta.collaga.app',
+      '89.116.29.238',
+      '38.242.152.149',
+      '127.0.0.1',
+      'localhost',
+    ],
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8080',
