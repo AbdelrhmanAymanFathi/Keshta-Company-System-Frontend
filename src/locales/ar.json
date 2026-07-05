@@ -49,7 +49,8 @@
     "expenses": "المصروفات",
     "equipmentLog": "سجل المعدات",
     "treasury": "الخزينة",
-    "admin": "الإدارة"
+    "admin": "الإدارة",
+    "reports": "التقارير"
   },
   "dashboard": {
     "newSupply": "توريدة جديدة",

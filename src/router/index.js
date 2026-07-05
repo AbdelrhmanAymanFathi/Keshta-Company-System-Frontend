@@ -283,6 +283,19 @@ const routes = [
         props: route => ({ reportId: route.params.id })
       },
       {
+        path: 'reports',
+        name: 'reports-landing',
+        component: () => import('@/components/dashboard/ReportsLanding.vue'),
+        meta: { title: 'Reports' }
+      },
+      {
+        path: 'reports/run/:id',
+        name: 'reports-run',
+        component: () => import('@/components/admin/ReportPage.vue'),
+        meta: { title: 'Run Report' },
+        props: route => ({ reportId: route.params.id })
+      },
+      {
         path: 'profile',
         name: 'profile',
         component: Profile,

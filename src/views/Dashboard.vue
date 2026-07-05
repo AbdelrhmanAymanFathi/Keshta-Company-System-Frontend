@@ -272,7 +272,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', payments: 'payments', treasury: 'treasury', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', payments: 'payments', treasury: 'treasury', reports: 'reports', admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
@@ -316,6 +316,9 @@ export default {
           { name: 'companyTransactions', label: 'dashboard.report', routeName: 'company-transactions' },
           // { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
           // { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
+        ],
+        reports: [
+          { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' }
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -435,6 +438,9 @@ export default {
     },
     reportsForModule() {
       if (!this.reports || !this.selectedTop) return []
+      if (this.selectedTop === 'reports') {
+        return this.reports
+      }
       const selectedModule = this.normalizeDashboardModule(this.selectedTop)
       return this.reports.filter((r) => this.normalizeDashboardModule(r?.module) === selectedModule)
     },
@@ -456,6 +462,8 @@ export default {
       // If the route explicitly opts out of dashboard top selection, keep no top highlight.
       const routeModule = this.$route?.meta?.module
       if (routeModule === 'profile' || routeModule === 'settings' || routeName === 'settings') return ''
+
+      if (routeName === 'reports-landing' || routeName === 'reports-run') return 'reports'
 
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
       const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''
@@ -548,7 +556,7 @@ export default {
     },
     isDynamicReportActive(report) {
       if (!report) return false
-      if (this.currentRouteName !== 'admin-reports-run') return false
+      if (this.currentRouteName !== 'admin-reports-run' && this.currentRouteName !== 'reports-run') return false
       return String(this.$route?.params?.id) === String(report.id)
     },
     selectTop(key) {
@@ -647,7 +655,8 @@ export default {
     },
     openReport(reportId) {
       // Navigate to report run page with the report id
-      this.router.push({ name: 'admin-reports-run', params: { id: reportId } })
+      const name = this.selectedTop === 'reports' ? 'reports-run' : 'admin-reports-run'
+      this.router.push({ name, params: { id: reportId } })
       if (this.isMobile) this.sidebarOpen = false
     }
   },
