@@ -1887,3 +1887,12 @@ export const getUnits = (params = {}) => {
   const search = new URLSearchParams(appendLangParam(params)).toString();
   return axios.get(`${BASE_URL}/api/units${search ? `?${search}` : ''}`);
 }
+
+export const createUnit = (data) =>
+  axios.post(withLangQuery(`${BASE_URL}/api/units`), data);
+
+export const updateUnit = (id, data) =>
+  axios.put(withLangQuery(`${BASE_URL}/api/units/${id}`), data);
+
+export const deleteUnit = (id) =>
+  axios.delete(withLangQuery(`${BASE_URL}/api/units/${id}`));

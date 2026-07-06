@@ -256,6 +256,12 @@ const routes = [
         meta: { title: 'locations.title', roles: ['admin'] }
       },
       {
+        path: 'admin/units',
+        name: 'admin-units-list',
+        component: () => import('@/components/dashboard/UnitsList.vue'),
+        meta: { title: 'units.title', roles: ['admin'] }
+      },
+      {
         path: 'admin/reports',
         name: 'admin-reports-list',
         component: () => import('@/components/admin/ReportsList.vue'),

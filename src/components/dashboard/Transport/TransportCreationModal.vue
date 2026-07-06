@@ -1291,7 +1291,7 @@ export default {
           const capacityForPayload = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
 
           const payload = {
-            date: this.commonData.date,
+            date: toSave[0]?.date || this.commonData.date,
             contractorId: this.commonData.contractor?.id || null,
             numTrips: totalTrips,
             distanceKm: Number(distanceKm.toFixed(3)),

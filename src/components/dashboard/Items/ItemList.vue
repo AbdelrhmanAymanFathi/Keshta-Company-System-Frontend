@@ -318,8 +318,8 @@ export default {
         { id: 'daily', name: 'daily' },
         { id: 'sectional', name: 'sectional' }
       ]
-      const seen = new Set((this.units || []).map(u => String(u.id)))
-      return [...(this.units || []), ...fallbackUnits.filter(u => !seen.has(String(u.id)))]
+      const seen = new Set((this.units || []).map(u => String(u.symbol || u.id).toLowerCase()))
+      return [...(this.units || []), ...fallbackUnits.filter(u => !seen.has(String(u.id).toLowerCase()))]
     }
   },
   watch: {
@@ -346,8 +346,9 @@ export default {
         else if (response.data && response.data.data) raw = response.data.data
 
         this.items = raw.map(normalizeItem)
-        this.total = response.data?.meta?.total || this.items.length
-        this.totalPages = response.data?.meta?.totalPages || Math.ceil(this.total / this.pageSize)
+        const meta = response.data?.meta || response.data || {}
+        this.total = (meta.total !== undefined && meta.total !== null) ? meta.total : this.items.length
+        this.totalPages = (meta.totalPages !== undefined && meta.totalPages !== null) ? meta.totalPages : (meta.pages !== undefined ? meta.pages : Math.ceil(this.total / this.pageSize))
       } catch (error) {
         this.showToast(error.response?.data?.message || this.$t('labels.failedLoadItems') || 'Failed to load items', 'error')
       } finally {
