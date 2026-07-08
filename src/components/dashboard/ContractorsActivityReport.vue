@@ -314,7 +314,7 @@ export default {
           actionType: 'نوع الحركة',
           modules: {
             SUPPLY: 'توريدات',
-            TRANSPORT: 'نقليات',
+            TRANSPORT: 'نقل',
             RENTAL: 'إيجار معدات',
             EXTRACT: 'مستخلصات',
             EXPENSE: 'مصاريف'
