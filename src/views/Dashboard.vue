@@ -318,7 +318,8 @@ export default {
           // { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
         ],
         reports: [
-          { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' }
+          { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' },
+          { name: 'contractorsActivityReport', label: 'dashboard.contractorsActivityReport', routeName: 'contractors-activity-report' }
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -464,7 +465,7 @@ export default {
       const routeModule = this.$route?.meta?.module
       if (routeModule === 'profile' || routeModule === 'settings' || routeName === 'settings') return ''
 
-      if (routeName === 'reports-landing' || routeName === 'reports-run') return 'reports'
+      if (routeName === 'reports-landing' || routeName === 'reports-run' || routeName === 'contractors-activity-report') return 'reports'
 
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
       const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''

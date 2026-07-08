@@ -34,6 +34,7 @@ const TreasuryDashboard = () => import('@/components/dashboard/Treasury/Treasury
 const TreasuryTransactions = () => import('@/components/dashboard/Treasury/TreasuryTransactions.vue')
 const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
 const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vue')
+const ContractorsActivityReport = () => import('@/components/dashboard/ContractorsActivityReport.vue')
 const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
 const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
@@ -293,6 +294,12 @@ const routes = [
         name: 'reports-landing',
         component: () => import('@/components/dashboard/ReportsLanding.vue'),
         meta: { title: 'Reports' }
+      },
+      {
+        path: 'reports/contractors-activity',
+        name: 'contractors-activity-report',
+        component: ContractorsActivityReport,
+        meta: { title: 'dashboard.contractorsActivityReport' }
       },
       {
         path: 'reports/run/:id',
