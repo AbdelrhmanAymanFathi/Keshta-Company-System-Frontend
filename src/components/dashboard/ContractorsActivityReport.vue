@@ -41,7 +41,7 @@
     <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') || 'Filters' }}</h4>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Contractor Selection -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('contractor') }}</label>
@@ -53,6 +53,20 @@
             <option value="">{{ t('allContractors') }}</option>
             <option v-for="c in contractors" :key="c.id" :value="c.id">
               {{ (isRTL && c.arName) ? c.arName : c.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Location Selection -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('location') }}</label>
+          <select 
+            v-model="filters.locationId"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus"
+          >
+            <option value="">{{ t('allLocations') }}</option>
+            <option v-for="l in locations" :key="l.id" :value="l.id">
+              {{ (isRTL && l.arName) ? l.arName : l.name }}
             </option>
           </select>
         </div>
@@ -135,6 +149,7 @@
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') || 'Date' }}</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('actionType') }}</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
@@ -153,6 +168,9 @@
                   {{ t(`modules.${row.module}`) }}
                 </span>
               </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                {{ isRTL && row.arAction ? row.arAction : row.action }}
+              </td>
               <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork > 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
@@ -163,7 +181,7 @@
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="10" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
+              <td colspan="11" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
                 {{ t('noData') }}
               </td>
             </tr>
@@ -194,7 +212,7 @@
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getContractors, getContractorsActivityReportData } from '@/api'
+import { getContractors, getContractorsActivityReportData, getLocations } from '@/api'
 import DateField from '../shared/DateField.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
@@ -210,6 +228,7 @@ export default {
     const downloading = ref(false)
     const error = ref(null)
     const contractors = ref([])
+    const locations = ref([])
     const items = ref([])
     
     const totals = ref({
@@ -220,6 +239,7 @@ export default {
     const filters = ref({
       contractorId: '',
       module: '',
+      locationId: '',
       startDate: '',
       endDate: ''
     })
@@ -257,6 +277,9 @@ export default {
           noData: 'No transactions found. Choose a different range or filter.',
           loading: 'Loading activities...',
           totals: 'Totals',
+          location: 'Location',
+          allLocations: 'All Locations',
+          actionType: 'Action Type',
           modules: {
             SUPPLY: 'Supply',
             TRANSPORT: 'Transport',
@@ -286,6 +309,9 @@ export default {
           noData: 'لا توجد حركات للفترة أو الفلاتر المحددة.',
           loading: 'جاري تحميل الحركات...',
           totals: 'الإجماليات',
+          location: 'الموقع',
+          allLocations: 'كل المواقع',
+          actionType: 'نوع الحركة',
           modules: {
             SUPPLY: 'توريدات',
             TRANSPORT: 'نقليات',
@@ -422,6 +448,15 @@ export default {
       }).format(amount || 0)
     }
 
+    const loadLocations = async () => {
+      try {
+        const res = await getLocations()
+        locations.value = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.data || [])
+      } catch (err) {
+        console.error('Failed to load locations:', err)
+      }
+    }
+
     const setDefaultDates = () => {
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -431,6 +466,7 @@ export default {
 
     onMounted(async () => {
       setDefaultDates()
+      await loadLocations()
       // No initial contractors loaded until a module is selected.
     })
 
@@ -440,6 +476,7 @@ export default {
       downloading,
       error,
       contractors,
+      locations,
       items,
       totals,
       filters,
