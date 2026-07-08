@@ -42,21 +42,6 @@
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') || 'Filters' }}</h4>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <!-- Contractor Selection -->
-        <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('contractor') }}</label>
-          <select 
-            v-model="filters.contractorId"
-            :disabled="!filters.module"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
-          >
-            <option value="">{{ t('allContractors') }}</option>
-            <option v-for="c in contractors" :key="c.id" :value="c.id">
-              {{ (isRTL && c.arName) ? c.arName : c.name }}
-            </option>
-          </select>
-        </div>
-
         <!-- Location Selection -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('location') }}</label>
@@ -70,7 +55,7 @@
             </option>
           </select>
         </div>
-
+        
         <!-- Module Selection -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('module') }}</label>
@@ -84,6 +69,21 @@
             <option value="RENTAL">{{ t('modules.RENTAL') }}</option>
             <option value="EXTRACT">{{ t('modules.EXTRACT') }}</option>
             <option value="EXPENSE">{{ t('modules.EXPENSE') }}</option>
+          </select>
+        </div>
+
+        <!-- Contractor Selection -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('contractor') }}</label>
+          <select 
+            v-model="filters.contractorId"
+            :disabled="!filters.module"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+          >
+            <option value="">{{ t('allContractors') }}</option>
+            <option v-for="c in contractors" :key="c.id" :value="c.id">
+              {{ (isRTL && c.arName) ? c.arName : c.name }}
+            </option>
           </select>
         </div>
 
