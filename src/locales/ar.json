@@ -755,6 +755,11 @@
     "add": "إضافة",
     "save": "حفظ",
     "under": "تحت",
+    "crusherTicket": "تذكرة الكسارة",
+    "companyTicket": "تذكرة الشركة",
+    "companyCapacity": "سعة الشركة",
+    "crusherCapacity": "سعة الكسارة",
+    "unitPrice": "سعر الوحدة",
     "exportTable": {
       "date": "التاريخ",
       "contractor": "المقاول",

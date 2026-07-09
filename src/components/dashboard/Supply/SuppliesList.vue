@@ -211,24 +211,31 @@
             </td>
 
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <button
-                @click.stop="openEdit(supply)"
-                :disabled="supply.hasPendingApproval"
-                :title="$t('labels.edit') || 'Edit'"
-                class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mr-1"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </button>
-              <button
-                @click.stop="openDeleteConfirm(supply)"
-                :disabled="supply.hasPendingApproval"
-                :title="$t('labels.delete')"
-                class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-              >
-                <TrashIcon class="w-4 h-4" />
-              </button>
+              <div class="flex items-center gap-2">
+                <!-- Edit Button -->
+                <button
+                  @click.stop="openEdit(supply)"
+                  :disabled="supply.hasPendingApproval"
+                  :title="$t('labels.edit') || 'Edit'"
+                  class="inline-flex items-center justify-center rounded-lg border theme-border-accent theme-dashboard-bg-soft p-2 theme-text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  <svg class="w-4 h-4 theme-text-secondary transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+
+                <!-- Delete Button -->
+                <button
+                  @click.stop="openDeleteConfirm(supply)"
+                  :disabled="supply.hasPendingApproval"
+                  :title="$t('labels.delete')"
+                  class="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-2 text-rose-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  <svg class="w-4 h-4 text-rose-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
@@ -257,15 +264,33 @@
       @update:pageSize="(size) => { pageSize = size; page = 1; loadSupplies() }" />
 
     <!-- Context menu for row actions -->
-    <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
-      class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
-      <ul class="p-2">
-        <li>
-          <button @click="openDeleteConfirm(contextMenu.item)"
-            :disabled="contextMenu.item?.hasPendingApproval"
-            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">{{ $t('labels.delete') }}</button>
-        </li>
-      </ul>
+    <div v-if="contextMenu.visible" 
+      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      class="fixed z-50 rounded-2xl theme-card border theme-border-accent shadow-lg shadow-slate-200/60 min-w-56 overflow-hidden"
+      @click.stop>
+      <div class="divide-y divide-slate-100">
+        <!-- Edit Option -->
+        <button @click.stop="openEdit(contextMenu.item); closeContextMenu()"
+          :disabled="contextMenu.item?.hasPendingApproval"
+          class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium theme-text-primary hover:theme-dashboard-bg-soft transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left">
+          <svg class="w-5 h-5 flex-shrink-0 theme-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span>{{ $t('labels.edit') || 'Edit' }}</span>
+          <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
+        </button>
+        
+        <!-- Delete Option -->
+        <button @click.stop="openDeleteConfirm(contextMenu.item); closeContextMenu()"
+          :disabled="contextMenu.item?.hasPendingApproval"
+          class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left">
+          <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span>{{ $t('labels.delete') || 'Delete' }}</span>
+          <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Delete Confirm Modal -->
@@ -437,7 +462,6 @@ import DateField from '@/components/shared/DateField.vue'
 // import PaymentModal from '../../shared/PaymentModal.vue'
 // import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
-import { TrashIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'SuppliesList',
@@ -446,7 +470,6 @@ export default {
     TableModal,
     Pagination,
     SearchDropdown,
-    TrashIcon,
     DateField
     // PaymentModal,
     // SupplyDetailModal
@@ -557,6 +580,13 @@ export default {
     this.$watch(() => this.paymentTarget, (nv) => {}, { deep: true })
     */
     document.addEventListener('click', this.closeContextMenu)
+    document.addEventListener('contextmenu', (e) => {
+      // Only close if clicking outside the context menu
+      const menu = document.querySelector('[v-if="contextMenu.visible"]')
+      if (menu && !menu.contains(e.target)) {
+        this.closeContextMenu()
+      }
+    })
   },
 
   beforeUnmount() {
@@ -807,12 +837,18 @@ formatDate(dateString) {
     },
 
     onRowContextMenu(e, item) {
+      e.preventDefault()
       this.contextMenu.visible = true
       // position relative to viewport
       this.contextMenu.x = e.clientX
       this.contextMenu.y = e.clientY
       // normalize: if an entry with { supply, line } was passed, store the supply object for actions
       this.contextMenu.item = (item && item.supply) ? item.supply : item
+    },
+
+    closeContextMenu() {
+      this.contextMenu.visible = false
+      this.contextMenu.item = null
     },
 
     openDetail(id) {

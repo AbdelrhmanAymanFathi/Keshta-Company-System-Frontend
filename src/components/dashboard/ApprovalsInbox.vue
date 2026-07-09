@@ -10,17 +10,24 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div v-for="tab in tabs" :key="tab.value"
         @click="activeStatus = tab.value"
-        class="cursor-pointer rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-200/30 transition-all hover:-translate-y-0.5"
-        :class="{ 'theme-ring-active theme-border ring-2 ring-indigo-500/20': activeStatus === tab.value }">
+        class="cursor-pointer rounded-2xl border border-slate-200/80 theme-card p-5 shadow-lg shadow-slate-200/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        :class="{ 'theme-ring-active theme-border-accent ring-2 ring-offset-1': activeStatus === tab.value }">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm theme-text-secondary font-medium">{{ tab.label }}</p>
-            <p class="text-3xl font-bold mt-2" :class="tab.colorClass">
+            <p class="text-3xl font-bold mt-2 theme-accent-strong transition-colors duration-300">
               {{ getCount(tab.value) }}
             </p>
           </div>
-          <div class="flex h-12 w-12 items-center justify-center rounded-2xl" :class="tab.bgClass">
-            <span class="text-2xl" :class="tab.iconColorClass">{{ tab.icon }}</span>
+          <div class="flex h-14 w-14 items-center justify-center rounded-2xl theme-dashboard-bg-soft transition-all duration-300">
+            <svg :class="['w-7 h-7 theme-text-primary transition-colors duration-300', tab.iconClass]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- PENDING: Clock icon -->
+              <path v-if="tab.value === 'PENDING'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <!-- APPROVED: Checkmark circle -->
+              <path v-else-if="tab.value === 'APPROVED'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <!-- REJECTED: X circle -->
+              <path v-else-if="tab.value === 'REJECTED'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9l6 6M15 9l-6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </div>
         </div>
       </div>
@@ -61,7 +68,12 @@
 
       <!-- Empty State -->
       <div v-else-if="filteredApprovals.length === 0" class="p-12 text-center">
-        <span class="text-5xl block mb-4">📭</span>
+        <div class="flex justify-center mb-4">
+          <svg class="w-16 h-16 theme-text-muted transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Inbox icon (empty) -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+        </div>
         <p class="text-lg theme-text-secondary font-medium">{{ t('noItems') }}</p>
         <p class="text-sm theme-text-muted mt-1">{{ t('noItemsDesc') }}</p>
       </div>
@@ -418,9 +430,9 @@ export default {
     },
     tabs() {
       return [
-        { value: 'PENDING', label: this.t('pendingTab'), icon: '⏳', colorClass: 'text-amber-500', bgClass: 'bg-amber-50', iconColorClass: 'text-amber-500' },
-        { value: 'APPROVED', label: this.t('approvedTab'), icon: '✅', colorClass: 'text-emerald-500', bgClass: 'bg-emerald-50', iconColorClass: 'text-emerald-500' },
-        { value: 'REJECTED', label: this.t('rejectedTab'), icon: '❌', colorClass: 'text-rose-500', bgClass: 'bg-rose-50', iconColorClass: 'text-rose-500' }
+        { value: 'PENDING', label: this.t('pendingTab'), iconClass: 'text-amber-500' },
+        { value: 'APPROVED', label: this.t('approvedTab'), iconClass: 'text-emerald-500' },
+        { value: 'REJECTED', label: this.t('rejectedTab'), iconClass: 'text-rose-500' }
       ];
     }
   },

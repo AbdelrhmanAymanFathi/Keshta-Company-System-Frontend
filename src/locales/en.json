@@ -755,6 +755,11 @@
     "add": "Add",
     "save": "Save",
     "under": "under",
+    "crusherTicket": "Crusher Ticket",
+    "companyTicket": "Company Ticket",
+    "companyCapacity": "Company Capacity",
+    "crusherCapacity": "Crusher Capacity",
+    "unitPrice": "Unit Price",
     "exportTable": {
       "date": "Date",
       "contractor": "Contractor",

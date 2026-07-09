@@ -66,13 +66,34 @@
         </div>
 
         <!-- Only Added & Reversals Switch -->
-        <div class="flex items-center gap-2 select-none min-h-[42px] pt-4 lg:pt-5 justify-start">
-          <label class="relative inline-flex items-center cursor-pointer">
+        <div class="flex items-center gap-3 select-none min-h-[42px] pt-4 lg:pt-5">
+          <label class="relative inline-flex items-center cursor-pointer group">
             <input type="checkbox" v-model="filters.onlyAddedAndReversals" class="sr-only peer" @change="loadReport">
-            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-            <span class="ms-3 text-xs font-medium theme-text-secondary">
-              {{ isRTL ? 'العمليات المضافة وعكسها فقط' : 'Only manual transactions & reversals' }}
-            </span>
+            
+            <!-- Toggle background track -->
+            <div class="theme-toggle-track w-12 h-7 rounded-full peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-offset-white transition-all duration-300 flex items-center px-1">
+              <!-- Toggle indicator with icon -->
+              <div class="relative w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 transform peer-checked:translate-x-5 flex items-center justify-center">
+                <!-- X icon (unchecked) -->
+                <svg v-if="!filters.onlyAddedAndReversals" class="w-3 h-3 theme-text-muted transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <!-- Check icon (checked) -->
+                <svg v-else class="w-3 h-3 theme-accent-strong transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="flex flex-col ms-3">
+              <span class="text-xs font-semibold theme-text-primary transition-all duration-200">
+                {{ filters.onlyAddedAndReversals ? '✓' : '✗' }}
+                {{ isRTL ? 'العمليات المضافة وعكسها فقط' : 'Only manual & reversals' }}
+              </span>
+              <span class="text-xs theme-text-muted">
+                {{ filters.onlyAddedAndReversals ? (isRTL ? 'مفعّل' : 'Enabled') : (isRTL ? 'معطّل' : 'Disabled') }}
+              </span>
+            </div>
           </label>
         </div>
 
