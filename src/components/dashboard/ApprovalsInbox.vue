@@ -34,15 +34,15 @@
     </div>
 
     <!-- Error Alert -->
-    <div v-if="error" class="rounded-2xl border border-rose-200 bg-rose-50 p-4 flex items-start gap-3">
-      <span class="text-rose-500 text-xl">⚠️</span>
-      <span class="text-rose-800 font-medium">{{ error }}</span>
+    <div v-if="error" class="rounded-2xl border border-rose-200 bg-rose-50 p-4 flex items-start gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
+      <span class="text-rose-500 text-xl shrink-0">⚠️</span>
+      <span class="text-rose-800 font-medium" :class="isRTL ? 'text-right' : 'text-left'">{{ error }}</span>
     </div>
 
     <!-- Success Alert -->
-    <div v-if="successMsg" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 flex items-start gap-3">
-      <span class="text-emerald-500 text-xl">✅</span>
-      <span class="text-emerald-800 font-medium">{{ successMsg }}</span>
+    <div v-if="successMsg" class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 flex items-start gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
+      <span class="text-emerald-500 text-xl shrink-0">✅</span>
+      <span class="text-emerald-800 font-medium" :class="isRTL ? 'text-right' : 'text-left'">{{ successMsg }}</span>
     </div>
 
     <!-- Main List/Table -->
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="filteredApprovals.length === 0" class="p-12 text-center">
+      <div v-else-if="filteredApprovals.length === 0" class="p-12 text-start">
         <div class="flex justify-center mb-4">
           <svg class="w-16 h-16 theme-text-muted transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <!-- Inbox icon (empty) -->
@@ -80,53 +80,53 @@
 
       <!-- Approvals Table -->
       <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-slate-50">
-            <tr>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colId') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colModule') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colAction') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colRequestedBy') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colDetails') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colDate') }}</th>
-              <th v-if="activeStatus !== 'PENDING'" class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colResolvedBy') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-center">{{ t('colActions') }}</th>
+        <table :dir="isRTL ? 'rtl' : 'ltr'" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-slate-50" :class="isRTL ? 'text-right' : 'text-left'">
+            <tr :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colId') }}</th>
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colModule') }}</th>
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colAction') }}</th>
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colRequestedBy') }}</th>
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colDetails') }}</th>
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colDate') }}</th>
+              <th v-if="activeStatus !== 'PENDING'" class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colResolvedBy') }}</th>
+              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colActions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 bg-white">
             <tr v-for="app in filteredApprovals" :key="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)" @contextmenu.prevent="openRowContextMenu($event, app)">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary text-center">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary text-start">
                 <button @click.stop="openDetailModal(app)" class="text-indigo-600 hover:text-indigo-900 underline font-semibold transition-colors">
                   #{{ app.id }}
                 </button>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
+              <td class="px-6 py-4 whitespace-nowrap text-start">
                 <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="getModuleClass(app.module)">
                   {{ getModuleLabel(app.module) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
+              <td class="px-6 py-4 whitespace-nowrap text-start">
                 <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="getActionClass(app.action)">
                   {{ getActionLabel(app.action) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center text-sm theme-text-secondary">
+              <td class="px-6 py-4 whitespace-nowrap text-start text-sm theme-text-secondary">
                 <div class="font-medium text-slate-800">{{ app.requestedBy?.name || 'User' }}</div>
                 <div class="text-xs text-slate-400">{{ app.requestedBy?.email }}</div>
               </td>
-              <td class="px-6 py-4 text-sm max-w-md">
+              <td class="px-6 py-4 text-sm max-w-md" :dir="isRTL ? 'rtl' : 'ltr'">
                 <!-- Change summary display -->
                 <div class="space-y-1.5">
-                  <div v-if="app.contractor" class="text-xs font-bold text-slate-600 mb-1">
+                  <div v-if="app.contractor" class="text-xs font-bold text-slate-600 mb-1" :class="isRTL ? 'text-right' : 'text-left'">
                     🏢 {{ t('contractor') }}: {{ app.contractor?.name }}
                   </div>
                   
-                  <div class="text-xs text-slate-700 bg-slate-50 rounded-lg p-2.5 space-y-1 font-mono border border-slate-100 max-h-40 overflow-y-auto">
+                  <div class="text-xs text-slate-700 bg-slate-50 rounded-lg p-2.5 space-y-1 font-mono border border-slate-100 max-h-40 overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
                     <!-- Update state diff -->
                     <template v-if="app.action === 'UPDATE'">
-                      <div v-for="(newVal, key) in getChangedFields(app)" :key="key" class="flex justify-between items-center gap-4 py-0.5">
+                      <div v-for="(newVal, key) in getChangedFields(app)" :key="key" class="flex gap-4 py-0.5" :class="isRTL ? 'flex-row-reverse' : ''">
                         <span class="text-slate-500 font-sans">{{ getFieldLabel(key) }}:</span>
-                        <span class="text-right">
+                        <span :class="isRTL ? 'text-left' : 'text-right'">
                           <span class="line-through text-red-500 text-xxs block sm:inline">{{ formatValue(app.beforeState[key], key) }}</span>
                           <span class="mx-1 text-slate-400 hidden sm:inline">➔</span>
                           <span class="text-emerald-600 font-bold block sm:inline">{{ formatValue(newVal, key) }}</span>
@@ -135,7 +135,7 @@
                     </template>
                     <!-- Delete state -->
                     <template v-else-if="app.action === 'DELETE'">
-                      <div class="text-red-500 font-bold text-center font-sans py-1">
+                      <div class="text-red-500 font-bold text-start font-sans py-1">
                         🗑️ {{ t('deletionNotice') }}
                       </div>
                       <div class="text-slate-500 text-xxs font-sans mt-1">
@@ -144,7 +144,7 @@
                     </template>
                     <!-- Restore state -->
                     <template v-else-if="app.action === 'RESTORE'">
-                      <div class="text-indigo-500 font-bold text-center font-sans py-1">
+                      <div class="text-indigo-500 font-bold text-start font-sans py-1">
                         🔄 {{ t('restoreNotice') }}
                       </div>
                       <div class="text-slate-500 text-xxs font-sans mt-1">
@@ -154,20 +154,20 @@
                   </div>
 
                   <!-- Rejection Notes or general notes -->
-                  <div v-if="app.notes" class="text-xs bg-amber-50 text-amber-800 rounded-lg p-2 font-sans border border-amber-100 mt-1">
+                  <div v-if="app.notes" class="text-xs bg-amber-50 text-amber-800 rounded-lg p-2 font-sans border border-amber-100 mt-1" :class="isRTL ? 'text-right' : 'text-left'">
                     <strong>💬 {{ t('notes') }}:</strong> {{ app.notes }}
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center text-sm theme-text-secondary">
+              <td class="px-6 py-4 whitespace-nowrap text-start text-sm theme-text-secondary">
                 {{ formatDateTime(app.createdAt) }}
               </td>
-              <td v-if="activeStatus !== 'PENDING'" class="px-6 py-4 whitespace-nowrap text-center text-sm theme-text-secondary">
+              <td v-if="activeStatus !== 'PENDING'" class="px-6 py-4 whitespace-nowrap text-start text-sm theme-text-secondary">
                 <div class="font-medium text-slate-800">{{ app.approvedBy?.name || '-' }}</div>
                 <div v-if="app.updatedAt" class="text-xxs text-slate-400">{{ formatDateTime(app.updatedAt) }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                <div v-if="app.status === 'PENDING'" class="flex justify-center items-center gap-2">
+              <td class="px-6 py-4 whitespace-nowrap text-start text-sm font-medium">
+                <div v-if="app.status === 'PENDING'" class="flex justify-center items-center gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
                   <button @click="handleApprove(app)" :disabled="submitting"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-3.5 py-1.5 text-xs font-semibold shadow-sm transition-all disabled:opacity-50">
                     {{ t('btnApprove') }}
@@ -189,7 +189,7 @@
 
     <!-- Rejection Dialog Modal -->
     <div v-if="showRejectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all border border-slate-100">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all border border-slate-100" :dir="isRTL ? 'rtl' : 'ltr'">
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-150 flex justify-between items-center">
           <h3 class="text-lg font-bold text-slate-800">
             {{ t('rejectModalTitle') }}
@@ -199,13 +199,13 @@
           </button>
         </div>
         <div class="p-6 space-y-4">
-          <p class="text-sm text-slate-600">
+          <p class="text-sm text-slate-600" :class="isRTL ? 'text-right' : 'text-left'">
             {{ t('rejectModalPrompt') }}
           </p>
           <div>
             <textarea v-model="rejectNotes" rows="3"
               class="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-              :placeholder="t('rejectModalPlaceholder')"></textarea>
+              :placeholder="t('rejectModalPlaceholder')" :dir="isRTL ? 'rtl' : 'ltr'"></textarea>
           </div>
         </div>
         <div class="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end gap-3">
@@ -224,7 +224,7 @@
 
     <!-- Full Details Modal -->
     <div v-if="selectedApprovalForDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto" style="margin-top:0;">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all border border-slate-100 max-h-[90vh] flex flex-col">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all border border-slate-100 max-h-[90vh] flex flex-col" :dir="isRTL ? 'rtl' : 'ltr'">
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-150 flex justify-between items-center">
           <h3 class="text-lg font-bold text-slate-800">
             🔍 {{ locale === 'ar' ? 'تفاصيل طلب الموافقة الكاملة' : 'Full Approval Request Details' }} (#{{ selectedApprovalForDetail.id }})
@@ -232,29 +232,29 @@
           <button @click="closeDetailModal" class="text-slate-400 hover:text-slate-600 text-2xl font-semibold leading-none">&times;</button>
         </div>
         
-        <div class="px-6 py-4 overflow-y-auto space-y-6 flex-grow">
+        <div class="px-6 py-4 overflow-y-auto space-y-6 flex-grow" :dir="isRTL ? 'rtl' : 'ltr'">
           <!-- Metadata Cards -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <div>
+            <div :class="isRTL ? 'text-right' : 'text-left'">
               <span class="text-xxs uppercase tracking-wider text-slate-400 block font-semibold">{{ t('colModule') }}</span>
               <span class="text-sm font-bold text-slate-700">{{ getModuleLabel(selectedApprovalForDetail.module) }}</span>
             </div>
-            <div>
+            <div :class="isRTL ? 'text-right' : 'text-left'">
               <span class="text-xxs uppercase tracking-wider text-slate-400 block font-semibold">{{ t('colAction') }}</span>
               <span class="text-sm font-bold text-slate-700">{{ getActionLabel(selectedApprovalForDetail.action) }}</span>
             </div>
-            <div>
+            <div :class="isRTL ? 'text-right' : 'text-left'">
               <span class="text-xxs uppercase tracking-wider text-slate-400 block font-semibold">{{ t('colRequestedBy') }}</span>
               <span class="text-sm font-bold text-slate-700">{{ selectedApprovalForDetail.requestedBy?.name || 'User' }}</span>
             </div>
-            <div>
+            <div :class="isRTL ? 'text-right' : 'text-left'">
               <span class="text-xxs uppercase tracking-wider text-slate-400 block font-semibold">{{ t('colDate') }}</span>
               <span class="text-sm font-bold text-slate-700">{{ formatDateTime(selectedApprovalForDetail.createdAt) }}</span>
             </div>
           </div>
 
           <!-- Comparison Table -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm" :dir="isRTL ? 'rtl' : 'ltr'">
             <table class="min-w-full divide-y divide-slate-200">
               <thead class="bg-slate-50">
                 <tr>
@@ -265,13 +265,13 @@
               </thead>
               <tbody class="bg-white divide-y divide-slate-100">
                 <tr v-for="key in getDetailKeys(selectedApprovalForDetail)" :key="key" class="hover:bg-slate-50/50 transition-colors">
-                  <td class="px-4 py-2.5 text-sm font-semibold text-slate-600">
+                  <td class="px-4 py-2.5 text-sm font-semibold text-slate-600" :class="isRTL ? 'text-right' : 'text-left'">
                     {{ getDetailKeyLabel(key) }}
                   </td>
-                  <td class="px-4 py-2.5 text-sm text-slate-700 font-mono">
+                  <td class="px-4 py-2.5 text-sm text-slate-700 font-mono" :class="isRTL ? 'text-right' : 'text-left'">
                     {{ getDisplayValue(selectedApprovalForDetail.beforeState[key], key) }}
                   </td>
-                  <td class="px-4 py-2.5 text-sm font-mono">
+                  <td class="px-4 py-2.5 text-sm font-mono" :class="isRTL ? 'text-right' : 'text-left'">
                     <template v-if="selectedApprovalForDetail.action === 'UPDATE'">
                       <span v-if="hasFieldChanged(selectedApprovalForDetail, key)" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 block w-max">
                         {{ getDisplayValue(selectedApprovalForDetail.afterState[key], key) }}
@@ -304,6 +304,7 @@
       v-if="contextMenu.visible"
       :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       class="fixed bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1 min-w-[180px]"
+      :dir="isRTL ? 'rtl' : 'ltr'"
       @click.stop
       @contextmenu.prevent
     >
