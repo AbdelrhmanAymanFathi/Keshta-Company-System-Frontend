@@ -94,7 +94,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 bg-white">
-            <tr v-for="app in filteredApprovals" :key="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)">
+            <tr v-for="app in filteredApprovals" :key="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)" @contextmenu.prevent="openRowContextMenu($event, app)">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary text-center">
                 <button @click.stop="openDetailModal(app)" class="text-indigo-600 hover:text-indigo-900 underline font-semibold transition-colors">
                   #{{ app.id }}
@@ -297,6 +297,52 @@
         </div>
       </div>
     </div>
+
+    <!-- Row Context Menu -->
+    <div v-if="contextMenu.visible" class="fixed inset-0 z-40" @click="contextMenu.visible = false"></div>
+    <div
+      v-if="contextMenu.visible"
+      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      class="fixed bg-white border border-slate-200 rounded-lg shadow-lg z-50 py-1 min-w-[180px]"
+      @click.stop
+      @contextmenu.prevent
+    >
+      <button
+        v-if="contextMenu.approval?.status === 'PENDING'"
+        type="button"
+        class="w-full px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors duration-200"
+        :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
+        @click="handleApprove(contextMenu.approval); contextMenu.visible = false"
+      >
+        <svg class="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ t('btnApprove') }}
+      </button>
+      <button
+        v-if="contextMenu.approval?.status === 'PENDING'"
+        type="button"
+        class="w-full px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors duration-200"
+        :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
+        @click="openRejectModal(contextMenu.approval); contextMenu.visible = false"
+      >
+        <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l6 6M15 9l-6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ t('btnReject') }}
+      </button>
+      <button
+        type="button"
+        class="w-full px-4 py-2 text-sm theme-text-primary hover:theme-dashboard-bg-soft flex items-center gap-2 transition-colors duration-200 border-t border-slate-100"
+        :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
+        @click="openDetailModal(contextMenu.approval); contextMenu.visible = false"
+      >
+        <svg class="w-4 h-4 shrink-0 theme-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {{ locale === 'ar' ? 'عرض التفاصيل' : 'View Details' }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -322,6 +368,12 @@ export default {
       selectedApproval: null,
       selectedApprovalForDetail: null,
       rejectNotes: '',
+      contextMenu: {
+        visible: false,
+        x: 0,
+        y: 0,
+        approval: null
+      },
       
       // Inline translations mapping
       translations: {
@@ -437,6 +489,15 @@ export default {
   },
   mounted() {
     this.loadApprovals();
+    this.closeContextMenuHandler = () => {
+      this.contextMenu.visible = false;
+    }
+    document.addEventListener('click', this.closeContextMenuHandler);
+  },
+  beforeUnmount() {
+    if (this.closeContextMenuHandler) {
+      document.removeEventListener('click', this.closeContextMenuHandler);
+    }
   },
   methods: {
     t(key) {
@@ -589,6 +650,16 @@ export default {
     },
     closeDetailModal() {
       this.selectedApprovalForDetail = null;
+    },
+    openRowContextMenu(event, app) {
+      this.contextMenu.x = event.clientX;
+      this.contextMenu.y = event.clientY;
+      this.contextMenu.approval = app;
+      this.contextMenu.visible = true;
+    },
+    closeRowContextMenu() {
+      this.contextMenu.visible = false;
+      this.contextMenu.approval = null;
     },
     getDetailKeys(app) {
       if (!app.beforeState) return [];
