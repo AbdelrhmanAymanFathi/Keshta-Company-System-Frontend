@@ -94,11 +94,10 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 bg-white">
-            <tr v-for="app in filteredApprovals" :key="app.id" class="hover:bg-slate-50/50 transition-colors">
+            <tr v-for="app in filteredApprovals" :key="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary text-center">
-                #{{ app.id }}
-                <button @click.stop="openDetailModal(app)" class="text-xxs text-indigo-600 hover:text-indigo-900 block mt-1 underline w-full text-center">
-                  {{ locale === 'ar' ? 'عرض التفاصيل الكاملة' : 'View Full Details' }}
+                <button @click.stop="openDetailModal(app)" class="text-indigo-600 hover:text-indigo-900 underline font-semibold transition-colors">
+                  #{{ app.id }}
                 </button>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-center">

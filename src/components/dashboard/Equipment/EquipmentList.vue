@@ -16,7 +16,7 @@
           :placeholder="$t('equipment.searchPlaceholder')"
           class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm  theme-input-focus"
         />
-        <button @click="clearSearch" class="rounded-xl border border-slate-200 px-3 py-2 text-sm theme-text-secondary hover:bg-slate-50">
+        <button @click="clearSearch" class="rounded-xl border theme-border-accent px-3 py-2 text-sm theme-text-secondary hover:theme-dashboard-bg-soft transition-colors duration-300 inline-flex items-center justify-center whitespace-nowrap">
           {{ $t('labels.clear') || 'Clear' }}
         </button>
       </div>
@@ -51,21 +51,21 @@
               <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 theme-text-secondary shadow-sm transition-all hover:-translate-y-0.5 hover:theme-border theme-hover-soft hover:theme-accent-strong hover:shadow-md"
+                  class="inline-flex items-center justify-center rounded-lg border theme-border-accent theme-dashboard-bg-soft p-2 theme-text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   :title="$t('labels.edit') || 'Edit'"
                   :aria-label="$t('labels.edit') || 'Edit'"
                   @click.stop="openEditModal(e)"
                 >
-                  <PencilIcon class="w-5 h-5" />
+                  <PencilIcon class="w-5 h-5 theme-text-secondary transition-colors duration-300" />
                 </button>
                 <button
                   type="button"
-                  class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md"
+                  class="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-2 text-rose-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-md"
                   :title="$t('labels.delete') || 'Delete'"
                   :aria-label="$t('labels.delete') || 'Delete'"
                   @click.stop="openDeleteConfirm(e)"
                 >
-                  <TrashIcon class="w-5 h-5" />
+                  <TrashIcon class="w-5 h-5 text-rose-500 transition-colors duration-300" />
                 </button>
               </div>
             </td>
@@ -140,20 +140,20 @@
     >
       <button
         type="button"
-        class="w-full px-4 py-2 text-sm theme-text-secondary theme-hover-soft flex items-center gap-2 transition"
+        class="w-full px-4 py-2 text-sm theme-text-primary hover:theme-dashboard-bg-soft flex items-center gap-2 transition-colors duration-200"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
         @click="onContextEdit"
       >
-        <PencilIcon class="w-4 h-4 shrink-0" />
+        <PencilIcon class="w-4 h-4 shrink-0 theme-text-secondary" />
         {{ $t('labels.edit') }}
       </button>
       <button
         type="button"
-        class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition"
+        class="w-full px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors duration-200"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
         @click="onContextDelete"
       >
-        <TrashIcon class="w-4 h-4 shrink-0" />
+        <TrashIcon class="w-4 h-4 shrink-0 text-rose-500" />
         {{ $t('labels.delete') }}
       </button>
     </div>
