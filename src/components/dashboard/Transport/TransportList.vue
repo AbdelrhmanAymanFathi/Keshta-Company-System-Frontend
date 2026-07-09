@@ -181,6 +181,9 @@
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               <div class="">{{ transport.contractor?.name || '-' }}</div>
+              <span v-if="transport.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
+                {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
+              </span>
               <!-- <div class="text-sm theme-text-muted">{{ transport.contractor?.phone || '-' }}</div> -->
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
@@ -222,23 +225,17 @@
               <div class="max-w-xs truncate">{{ transport.notes || transport.note || '-' }}</div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <!-- <button @click.stop="editTransport(transport)" class="theme-text hover:theme-accent-muted"
-                  :title="$t('common.edit')">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex gap-2" :class="isRTL ? 'justify-start' : 'justify-end'">
+                <button @click.stop="editTransport(transport)" :disabled="transport.hasPendingApproval" class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                  :title="$t('common.edit') || 'Edit'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
-                <button @click.stop="openPaymentModal('transport', transport.id)" class="text-green-600 hover:text-green-900"
-                  :title="$t('labels.addPayment')">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8" />
-                  </svg>
-                </button> -->
-                <button @click.stop="openDeleteConfirm(transport)" class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md"
+                <button @click.stop="openDeleteConfirm(transport)" :disabled="transport.hasPendingApproval" class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                   :title="$t('common.delete')">
-                  <TrashIcon class="h-5 w-5" />
+                  <TrashIcon class="h-4 h-4" />
                 </button>
               </div>
             </td>
@@ -268,7 +265,8 @@
         </li> -->
         <li>
           <button @click="openDeleteConfirm(contextMenu.item)"
-            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
+            :disabled="contextMenu.item?.hasPendingApproval"
+            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">{{ $t('labels.delete') }}</button>
         </li>
       </ul>
     </div>

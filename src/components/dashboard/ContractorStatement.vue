@@ -40,7 +40,7 @@
     <!-- Filters Section -->
     <div class="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Contractor Selector -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.name') }}</label>
@@ -63,6 +63,17 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+        </div>
+
+        <!-- Only Added & Reversals Switch -->
+        <div class="flex items-center gap-2 select-none min-h-[42px] pt-4 lg:pt-5 justify-start">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" v-model="filters.onlyAddedAndReversals" class="sr-only peer" @change="loadReport">
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+            <span class="ms-3 text-xs font-medium theme-text-secondary">
+              {{ isRTL ? 'العمليات المضافة وعكسها فقط' : 'Only manual transactions & reversals' }}
+            </span>
+          </label>
         </div>
 
         <!-- Load Button -->
@@ -279,7 +290,8 @@ export default {
     const mode = ref(undefined)
     const filters = ref({
       startDate: '',
-      endDate: ''
+      endDate: '',
+      onlyAddedAndReversals: false
     })
     const currentPage = ref(1)
     const pageSize = ref(50)
@@ -500,6 +512,7 @@ export default {
         const p = {}
         if (filters.value.startDate) p.startDate = filters.value.startDate
         if (filters.value.endDate) p.endDate = filters.value.endDate
+        if (filters.value.onlyAddedAndReversals) p.onlyAddedAndReversals = true
         p.format = 'json'
         if (currentLang.value) p.lang = currentLang.value
         if (statementMode.value) {
@@ -535,6 +548,7 @@ export default {
         const p = {}
         if (filters.value.startDate) p.startDate = filters.value.startDate
         if (filters.value.endDate) p.endDate = filters.value.endDate
+        if (filters.value.onlyAddedAndReversals) p.onlyAddedAndReversals = true
         p.format = format
         if (currentLang.value) p.lang = currentLang.value
         if (statementMode.value) {
@@ -584,7 +598,8 @@ export default {
     const clearFilters = () => {
       filters.value = {
         startDate: '',
-        endDate: ''
+        endDate: '',
+        onlyAddedAndReversals: false
       }
       report.value = null
       currentPage.value = 1

@@ -1923,3 +1923,14 @@ export const getContractorsActivityReportData = async (params = {}, format = 'js
 export const downloadContractorsActivityReport = async (params = {}, format = 'xlsx') => {
   return getContractorsActivityReportData(params, format);
 };
+
+// --- Approvals API ---
+export const getApprovals = (status = 'PENDING') =>
+  axios.get(withLangQuery(`${BASE_URL}/api/approvals`), { params: { status } });
+
+export const approveRequest = (id) =>
+  axios.post(withLangQuery(`${BASE_URL}/api/approvals/${id}/approve`));
+
+export const rejectRequest = (id, notes) =>
+  axios.post(withLangQuery(`${BASE_URL}/api/approvals/${id}/reject`), { notes });
+

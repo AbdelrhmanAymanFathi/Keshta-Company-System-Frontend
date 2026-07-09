@@ -323,6 +323,7 @@ export default {
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
+          { name: 'approvalsInbox', label: 'approvals.title', routeName: 'approvals-inbox' },
           { name: 'usersList', label: 'users.title', routeName: 'users-list' },
           { name: 'locations', label: 'locations.title', routeName: 'locations' },
           { name: 'units', label: 'units.title', routeName: 'admin-units-list' },
@@ -500,7 +501,7 @@ export default {
       // const walletRoutes = ['treasury', 'company-transactions', 'expenses-list', 'expenses-report']
 
       const paymentRoutes = ['payments']
-      const adminRoutes = ['changes-by-date', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
+      const adminRoutes = ['changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
       if (equipmentRoutes.includes(routeName)) return 'equipmentLog'

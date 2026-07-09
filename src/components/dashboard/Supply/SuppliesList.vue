@@ -189,7 +189,12 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.contractor?.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
+              {{ supply.contractor?.name || '-' }}
+              <span v-if="supply.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
+                {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
+              </span>
+            </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ getAreaName(supply) }}</td>
@@ -207,9 +212,20 @@
 
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               <button
+                @click.stop="openEdit(supply)"
+                :disabled="supply.hasPendingApproval"
+                :title="$t('labels.edit') || 'Edit'"
+                class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mr-1"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </button>
+              <button
                 @click.stop="openDeleteConfirm(supply)"
+                :disabled="supply.hasPendingApproval"
                 :title="$t('labels.delete')"
-                class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md"
+                class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 <TrashIcon class="w-4 h-4" />
               </button>
@@ -246,7 +262,8 @@
       <ul class="p-2">
         <li>
           <button @click="openDeleteConfirm(contextMenu.item)"
-            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600">{{ $t('labels.delete') }}</button>
+            :disabled="contextMenu.item?.hasPendingApproval"
+            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">{{ $t('labels.delete') }}</button>
         </li>
       </ul>
     </div>
@@ -269,39 +286,141 @@
 
     <!-- Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-2xl p-6 z-10">
-        <h3 class="text-lg font-semibold mb-4">{{ $t('dashboard.suppliesList') }} — {{ $t('labels.edit') }}</h3>
+      <div class="fixed inset-0 bg-slate-950/45 backdrop-blur-sm" @click="closeModal"></div>
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl p-6 z-10 max-h-[90vh] overflow-y-auto" style="margin-top:0;">
+        <h3 class="text-lg font-bold mb-4 theme-text-primary">{{ $t('dashboard.suppliesList') }} — {{ $t('labels.edit') }}</h3>
+        
         <div class="grid grid-cols-2 gap-4">
-          <label>
-            <div class="text-sm mb-1">{{ $t('labels.site') }}</div>
-            <input v-model="form.site" class="w-full px-3 py-2 border rounded" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('labels.area') }}</div>
-            <input v-model="form.area" class="w-full px-3 py-2 border rounded" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('labels.date') }}</div>
-            <DateField v-model="form.date" class="w-full px-3 py-2 border rounded" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('labels.contractor') }}</div>
-            <input v-model="form.contractor" class="w-full px-3 py-2 border rounded" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('labels.total') }}</div>
-            <input v-model.number="form.grandTotal" type="number" class="w-full px-3 py-2 border rounded" />
-          </label>
-          <label class="col-span-2">
-            <div class="text-sm mb-1">{{ $t('labels.notes') }}</div>
-            <textarea v-model="form.notes" rows="3" class="w-full px-3 py-2 border rounded"></textarea>
-          </label>
+          <!-- Date -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.date') }}</label>
+            <DateField v-model="form.date" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          </div>
+
+          <!-- Contractor -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.contractor') }}</label>
+            <SearchDropdown
+              v-model="form.contractorSearch"
+              :items="contractors"
+              :allItems="contractors"
+              placeholder=""
+              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              @select="(sel) => { form.contractorId = sel.id; form.contractorSearch = sel.name }"
+            />
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.location') }}</label>
+            <SearchDropdown
+              v-model="form.locationSearch"
+              :items="locations"
+              :allItems="locations"
+              placeholder=""
+              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              @select="(sel) => { form.locationId = sel.id; form.locationSearch = sel.name; form.areaId = ''; form.areaSearch = '' }"
+            />
+          </div>
+
+          <!-- Area -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.area') }}</label>
+            <SearchDropdown
+              v-model="form.areaSearch"
+              :items="availableAreasForEdit"
+              :allItems="availableAreasForEdit"
+              placeholder=""
+              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              @select="(sel) => { form.areaId = sel.id; form.areaSearch = sel.name }"
+            />
+          </div>
+
+          <!-- Crusher -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.crusher') }}</label>
+            <SearchDropdown
+              v-model="form.crusherSearch"
+              :items="crushers"
+              :allItems="crushers"
+              placeholder=""
+              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              @select="(sel) => { form.crusherId = sel.id; form.crusherSearch = sel.name }"
+            />
+          </div>
+
+          <!-- Item -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.item') }}</label>
+            <SearchDropdown
+              v-model="form.itemSearch"
+              :items="items"
+              :allItems="items"
+              placeholder=""
+              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              @select="(sel) => { form.itemId = sel.id; form.itemSearch = sel.name }"
+            />
+          </div>
+
+          <!-- Vehicle -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.vehicle') || 'Vehicle' }}</label>
+            <SearchDropdown
+              v-model="form.vehicleSearch"
+              :items="vehicles"
+              :allItems="vehicles"
+              placeholder=""
+              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              @select="(sel) => { form.vehicleId = sel.id; form.vehicleSearch = sel.name }"
+            />
+          </div>
+
+          <!-- Crusher Ticket -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.crusherTicket') || 'Crusher Ticket' }}</label>
+            <input v-model="form.crusherTicket" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Company Ticket -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.companyTicket') || 'Company Ticket' }}</label>
+            <input v-model="form.companyTicket" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Company Capacity -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.companyCapacity') || 'Company Capacity' }}</label>
+            <input v-model.number="form.companyCapacity" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Crusher Capacity -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.crusherCapacity') || 'Crusher Capacity' }}</label>
+            <input v-model.number="form.crusherCapacity" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Unit Price -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.unitPrice') || 'Unit Price' }}</label>
+            <input v-model.number="form.unitPrice" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Discount -->
+          <div>
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.discount') || 'Discount' }}</label>
+            <input v-model.number="form.discount" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Notes -->
+          <div class="col-span-2">
+            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.notes') }}</label>
+            <textarea v-model="form.notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          </div>
         </div>
-        <div class="mt-4 flex gap-2 justify-end">
-          <button @click="closeModal" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-          <button @click="saveEdit" class="px-4 py-2 rounded-xl theme-text-light theme-button">{{
-            $t('labels.save') }}</button>
+        
+        <div class="mt-6 flex gap-2 justify-end">
+          <button @click="closeModal" class="px-4 py-2 rounded-xl border border-gray-300 text-sm hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
+          <button @click="saveEdit" class="px-4 py-2 rounded-xl theme-text-light theme-button text-sm">{{ $t('labels.save') }}</button>
         </div>
       </div>
     </div>
@@ -309,7 +428,7 @@
 </template>
 
 <script>
-import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles } from '../../../api'
+import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles, updateExport } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import TableModal from './SuppliesCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
@@ -418,6 +537,14 @@ export default {
         return selected.children
       }
       return this.locations.filter(l => l.parentId === this.filters.locationId)
+    },
+    availableAreasForEdit() {
+      if (!this.form.locationId) return []
+      const selected = this.locations.find(l => l.id === this.form.locationId)
+      if (selected && Array.isArray(selected.children) && selected.children.length) {
+        return selected.children
+      }
+      return this.locations.filter(l => l.parentId === this.form.locationId)
     },
     
   },
@@ -649,7 +776,29 @@ formatDate(dateString) {
     },
 
     openEdit(supply) {
-      this.form = { ...supply }
+      this.form = {
+        id: supply.id,
+        date: supply.date ? supply.date.substring(0, 10) : '',
+        itemId: supply.itemId || supply.item?.id || '',
+        itemSearch: supply.item?.name || '',
+        contractorId: supply.contractorId || supply.contractor?.id || '',
+        contractorSearch: supply.contractor?.name || '',
+        locationId: supply.locationId || supply.location?.id || '',
+        locationSearch: supply.location?.name || '',
+        areaId: supply.areaId || supply.area?.id || '',
+        areaSearch: this.getAreaName(supply) !== '-' ? this.getAreaName(supply) : '',
+        crusherId: supply.crusherId || supply.crusher?.id || '',
+        crusherSearch: supply.crusher?.name || '',
+        vehicleId: supply.vehicleId || supply.vehicle?.id || '',
+        vehicleSearch: supply.vehicle?.name || '',
+        crusherTicket: supply.crusherTicket || '',
+        companyTicket: supply.companyTicket || '',
+        companyCapacity: supply.companyCapacity !== null && supply.companyCapacity !== undefined ? supply.companyCapacity : '',
+        crusherCapacity: supply.crusherCapacity !== null && supply.crusherCapacity !== undefined ? supply.crusherCapacity : '',
+        unitPrice: supply.unitPrice !== null && supply.unitPrice !== undefined ? supply.unitPrice : '',
+        discount: supply.discount !== null && supply.discount !== undefined ? supply.discount : 0,
+        notes: supply.notes || ''
+      }
       this.modalOpen = true
     },
 
@@ -732,11 +881,31 @@ formatDate(dateString) {
      * TODO: Call the API to save the changes in the backend.
      */
     async saveEdit() {
-      const idx = this.supplies.findIndex(s => s.id === this.form.id)
-      if (idx !== -1) {
-        this.supplies[idx] = { ...this.form }
+      try {
+        const payload = {
+          date: this.form.date,
+          itemId: this.form.itemId ? Number(this.form.itemId) : undefined,
+          contractorId: this.form.contractorId ? Number(this.form.contractorId) : undefined,
+          locationId: this.form.locationId ? Number(this.form.locationId) : undefined,
+          areaId: this.form.areaId ? Number(this.form.areaId) : null,
+          crusherId: this.form.crusherId ? Number(this.form.crusherId) : undefined,
+          vehicleId: this.form.vehicleId ? Number(this.form.vehicleId) : null,
+          crusherTicket: this.form.crusherTicket || undefined,
+          companyTicket: this.form.companyTicket || undefined,
+          companyCapacity: this.form.companyCapacity !== '' ? Number(this.form.companyCapacity) : undefined,
+          crusherCapacity: this.form.crusherCapacity !== '' ? Number(this.form.crusherCapacity) : undefined,
+          unitPrice: this.form.unitPrice !== '' ? Number(this.form.unitPrice) : undefined,
+          discount: this.form.discount !== '' ? Number(this.form.discount) : 0,
+          notes: this.form.notes || ''
+        }
+        await updateExport(this.form.id, payload)
+        this.$toast?.success(this.isRTL ? 'تم حفظ التعديل وإرساله للمراجعة بنجاح' : 'Edit request submitted for approval successfully')
+        this.closeModal()
+        await this.loadSupplies()
+      } catch (e) {
+        console.error(e)
+        this.$toast?.error(e.response?.data?.message || e.message || 'Error updating supply')
       }
-      this.modalOpen = false
     }
   }
 }

@@ -173,10 +173,10 @@
               </td>
               <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork > 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid > 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
-              <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ row.notes || '-' }}</td>
+              <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -262,8 +262,8 @@ export default {
           contractor: 'Contractor',
           module: 'Module',
           outstandingBefore: 'Outstanding Before',
-          totalOfWork: 'Total of Work',
-          totalPaid: 'Total Paid',
+          totalOfWork: 'Debit (Owed)',
+          totalPaid: 'Credit (Paid)',
           outstandingAfter: 'Outstanding After',
           notes: 'Notes',
           allModules: 'All Modules',
@@ -279,7 +279,7 @@ export default {
           totals: 'Totals',
           location: 'Location',
           allLocations: 'All Locations',
-          actionType: 'Action Type',
+          actionType: 'Type',
           modules: {
             SUPPLY: 'Supply',
             TRANSPORT: 'Transport',
@@ -294,8 +294,8 @@ export default {
           contractor: 'المقاول',
           module: 'القسم',
           outstandingBefore: 'الرصيد السابق',
-          totalOfWork: 'إجمالي العمل',
-          totalPaid: 'المدفوع',
+          totalOfWork: 'مدين (مستحق)',
+          totalPaid: 'دائن (مدفوع)',
           outstandingAfter: 'الرصيد الحالي',
           notes: 'ملاحظات',
           allModules: 'كل الأقسام',
@@ -311,7 +311,7 @@ export default {
           totals: 'الإجماليات',
           location: 'الموقع',
           allLocations: 'كل المواقع',
-          actionType: 'نوع الحركة',
+          actionType: 'النوع',
           modules: {
             SUPPLY: 'توريدات',
             TRANSPORT: 'نقل',

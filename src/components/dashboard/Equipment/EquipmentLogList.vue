@@ -222,6 +222,9 @@
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ rental.equipment.name }}
+                  <span v-if="rental.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
+                    {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
+                  </span>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.location?.name || '-' }}</div>
@@ -257,9 +260,18 @@
                   {{ rental.notes || rental.note || '-' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div class="flex gap-3 items-center">
+                  <div class="flex gap-2 items-center">
+                    <button @click="openEditModal(rental)"
+                      :disabled="rental.hasPendingApproval"
+                      class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      :title="$t('labels.edit') || 'Edit'">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
                     <button @click="confirmDelete(rental)"
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      :disabled="rental.hasPendingApproval"
+                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       :title="$t('labels.delete')">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -407,7 +419,8 @@
         :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }" @click.stop
         @contextmenu.prevent>
         <button @click="handleContextMenuAction('delete')"
-          class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+          :disabled="contextMenu.rental?.hasPendingApproval"
+          class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

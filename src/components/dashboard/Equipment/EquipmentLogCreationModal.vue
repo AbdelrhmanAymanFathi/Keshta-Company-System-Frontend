@@ -455,8 +455,28 @@ export default {
       this.rows = []
       await this.refreshLocations()
       await this.$nextTick()
-      this.syncFormLocationsFromModel()
-      this.loadCommonDataFromStorage()
+      if (this.isEditing) {
+        const mv = this.modelValue || {}
+        this.form.date = mv.date ? formatToISODate(mv.date) : getTodayISO()
+        this.form.equipmentId = mv.equipmentId || ''
+        this.form.equipmentLabel = mv.equipmentLabel || mv.equipment?.name || mv.equipmentLog?.name || ''
+        this.form.contractorId = mv.contractorId || mv.equipment?.contractorId || mv.equipment?.contractor?.id || ''
+        this.form.contractorLabel = mv.contractorLabel || mv.contractor?.name || mv.equipment?.contractor?.name || ''
+        this.form.hourlyRate = mv.hourlyRate || 0
+        this.form.discount = mv.discount || 0
+        this.form.hours = mv.hours || 1
+        this.form.driverId = mv.driverId || ''
+        this.form.driverLabel = mv.driverLabel || mv.driver?.name || ''
+        this.form.notes = mv.notes || mv.note || ''
+        this.form.isRental = mv.isRental !== undefined 
+          ? Boolean(mv.isRental) 
+          : (mv.isCompanyOwned !== undefined ? !mv.isCompanyOwned : false)
+        
+        this.syncFormLocationsFromModel()
+      } else {
+        this.syncFormLocationsFromModel()
+        this.loadCommonDataFromStorage()
+      }
     },
     chooseOwnership(isRental) {
       const targetIsRental = Boolean(isRental)
@@ -942,6 +962,7 @@ export default {
       }
     },
     saveCommonDataToStorage() {
+      if (this.isEditing) return
       try {
         const key = this.form.isRental ? 'equipmentLogCreationModalCommonData_rental' : 'equipmentLogCreationModalCommonData_company'
         const data = {
@@ -966,6 +987,7 @@ export default {
       }
     },
     loadCommonDataFromStorage() {
+      if (this.isEditing) return
       try {
         const key = this.form.isRental ? 'equipmentLogCreationModalCommonData_rental' : 'equipmentLogCreationModalCommonData_company'
         const saved = localStorage.getItem(key)

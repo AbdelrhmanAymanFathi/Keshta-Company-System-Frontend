@@ -36,6 +36,7 @@ const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
 const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vue')
 const ContractorsActivityReport = () => import('@/components/dashboard/ContractorsActivityReport.vue')
 const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
+const ApprovalsInbox = () => import('@/components/dashboard/ApprovalsInbox.vue')
 const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
 const Profile = () => import('@/views/Profile.vue')
@@ -243,6 +244,12 @@ const routes = [
         name: 'changes-by-date',
         component: ChangesByDate,
         meta: { title: 'changes.title', roles: ['admin'] }
+      },
+      {
+        path: 'admin/approvals',
+        name: 'approvals-inbox',
+        component: ApprovalsInbox,
+        meta: { title: 'approvals.title', roles: ['admin'] }
       },
       {
         path: 'admin/users',
