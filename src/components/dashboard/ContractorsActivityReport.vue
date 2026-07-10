@@ -68,7 +68,6 @@
             <option value="TRANSPORT">{{ t('modules.TRANSPORT') }}</option>
             <option value="RENTAL">{{ t('modules.RENTAL') }}</option>
             <option value="EXTRACT">{{ t('modules.EXTRACT') }}</option>
-            <option value="EXPENSE">{{ t('modules.EXPENSE') }}</option>
           </select>
         </div>
 
@@ -106,20 +105,66 @@
         </div>
       </div>
 
-      <div class="flex gap-2 pt-2">
-        <button 
-          @click="loadReport"
-          :disabled="loading"
-          class="px-4 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-sm font-semibold theme-text-light shadow-sm"
-        >
-          {{ t('generate') }}
-        </button>
-        <button 
-          @click="clearFilters"
-          class="px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 theme-text-secondary rounded-xl transition-colors text-sm font-semibold"
-        >
-          {{ t('clear') }}
-        </button>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-slate-100">
+        <!-- Hide Deleted Transactions Switch -->
+        <div class="flex items-center gap-3 select-none">
+          <label class="relative inline-flex items-center cursor-pointer group">
+            <input type="checkbox" v-model="filters.onlyAddedAndReversals" class="sr-only peer" @change="loadReport">
+            
+            <!-- Toggle background track -->
+            <div :class="[
+              'relative w-11 h-6 rounded-full border transition-all duration-300 shadow-inner',
+              filters.onlyAddedAndReversals 
+                ? 'bg-emerald-500 border-emerald-600' 
+                : 'bg-slate-100 border-slate-200'
+            ]">
+              <!-- Toggle indicator with icon -->
+              <div :class="[
+                'absolute top-[1px] w-5 h-5 bg-white rounded-full shadow transition-all duration-300 flex items-center justify-center',
+                isRTL 
+                  ? (filters.onlyAddedAndReversals ? 'right-[18px]' : 'right-[2px]')
+                  : (filters.onlyAddedAndReversals ? 'left-[18px]' : 'left-[2px]')
+              ]">
+                <!-- X icon (unchecked) -->
+                <svg v-if="!filters.onlyAddedAndReversals" class="w-3 h-3 text-slate-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <!-- Check icon (checked) -->
+                <svg v-else class="w-3 h-3 text-emerald-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="flex flex-col ms-3">
+              <span class="text-xs font-semibold theme-text-primary transition-all duration-200">
+                {{ isRTL ? 'إخفاء العمليات المحذوفة' : 'Hide Deleted Transactions' }}
+              </span>
+              <span class="text-[10px] theme-text-muted leading-tight">
+                {{ filters.onlyAddedAndReversals 
+                  ? (isRTL ? 'تم استبعاد حركات الحذف وعكسها' : 'Excluding deleted records & reversals')
+                  : (isRTL ? 'يعرض جميع حركات الحساب' : 'Showing all ledger records') 
+                }}
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <div class="flex gap-2">
+          <button 
+            @click="loadReport"
+            :disabled="loading"
+            class="px-4 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-sm font-semibold theme-text-light shadow-sm"
+          >
+            {{ t('generate') }}
+          </button>
+          <button 
+            @click="clearFilters"
+            class="px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 theme-text-secondary rounded-xl transition-colors text-sm font-semibold"
+          >
+            {{ t('clear') }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -241,7 +286,8 @@ export default {
       module: '',
       locationId: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
+      onlyAddedAndReversals: false
     })
 
     watch(() => filters.value.module, async (newVal) => {
@@ -294,8 +340,8 @@ export default {
           contractor: 'المقاول',
           module: 'القسم',
           outstandingBefore: 'الرصيد السابق',
-          totalOfWork: 'مدين (مستحق)',
-          totalPaid: 'دائن (مدفوع)',
+          totalOfWork: 'مدين',
+          totalPaid: 'دائن',
           outstandingAfter: 'الرصيد الحالي',
           notes: 'ملاحظات',
           allModules: 'كل الأقسام',
@@ -383,8 +429,10 @@ export default {
       filters.value = {
         contractorId: '',
         module: '',
+        locationId: '',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        onlyAddedAndReversals: false
       }
       // Re-initialize default date range
       setDefaultDates()

@@ -65,21 +65,31 @@
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
         </div>
 
-        <!-- Only Added & Reversals Switch -->
+        <!-- Hide Deleted Transactions Switch -->
         <div class="flex items-center gap-3 select-none min-h-[42px] pt-4 lg:pt-5">
           <label class="relative inline-flex items-center cursor-pointer group">
             <input type="checkbox" v-model="filters.onlyAddedAndReversals" class="sr-only peer" @change="loadReport">
             
             <!-- Toggle background track -->
-            <div class="theme-toggle-track w-12 h-7 rounded-full peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-offset-white transition-all duration-300 flex items-center px-1">
+            <div :class="[
+              'relative w-11 h-6 rounded-full border transition-all duration-300 shadow-inner',
+              filters.onlyAddedAndReversals 
+                ? 'bg-emerald-500 border-emerald-600' 
+                : 'bg-slate-100 border-slate-200'
+            ]">
               <!-- Toggle indicator with icon -->
-              <div class="relative w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 transform peer-checked:translate-x-5 flex items-center justify-center">
+              <div :class="[
+                'absolute top-[1px] w-5 h-5 bg-white rounded-full shadow transition-all duration-300 flex items-center justify-center',
+                isRTL 
+                  ? (filters.onlyAddedAndReversals ? 'right-[18px]' : 'right-[2px]')
+                  : (filters.onlyAddedAndReversals ? 'left-[18px]' : 'left-[2px]')
+              ]">
                 <!-- X icon (unchecked) -->
-                <svg v-if="!filters.onlyAddedAndReversals" class="w-3 h-3 theme-text-muted transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="!filters.onlyAddedAndReversals" class="w-3 h-3 text-slate-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 <!-- Check icon (checked) -->
-                <svg v-else class="w-3 h-3 theme-accent-strong transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
+                <svg v-else class="w-3 h-3 text-emerald-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
               </div>
@@ -87,11 +97,13 @@
 
             <div class="flex flex-col ms-3">
               <span class="text-xs font-semibold theme-text-primary transition-all duration-200">
-                {{ filters.onlyAddedAndReversals ? '✓' : '✗' }}
-                {{ isRTL ? 'العمليات المضافة وعكسها فقط' : 'Only manual & reversals' }}
+                {{ isRTL ? 'إخفاء العمليات المحذوفة' : 'Hide Deleted Transactions' }}
               </span>
-              <span class="text-xs theme-text-muted">
-                {{ filters.onlyAddedAndReversals ? (isRTL ? 'مفعّل' : 'Enabled') : (isRTL ? 'معطّل' : 'Disabled') }}
+              <span class="text-[10px] theme-text-muted leading-tight">
+                {{ filters.onlyAddedAndReversals 
+                  ? (isRTL ? 'تم استبعاد حركات الحذف وعكسها' : 'Excluding deleted records & reversals')
+                  : (isRTL ? 'يعرض جميع حركات الحساب' : 'Showing all ledger records') 
+                }}
               </span>
             </div>
           </label>
