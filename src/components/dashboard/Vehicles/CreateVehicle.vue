@@ -443,7 +443,7 @@ export default {
       this.creating = true
       try {
         let contractorId = this.form.contractorId
-        let crusherNumber = this.form.crusherNumber || null
+        let crusherNumber = this.form.crusherNumber?.trim() || undefined
 
         const payload = {
           name: trimmedName,
@@ -479,7 +479,20 @@ export default {
         this.form.companyCapacity = ''
         this.form.crusherCapacity = ''
       } catch (e) {
-        this.error = e?.response?.data?.message || this.$t('vehicles.saveError')
+        let errorMsg = this.$t('vehicles.saveError') || 'Save failed'
+        if (e?.response?.data) {
+          const data = e.response.data
+          if (typeof data.message === 'string') {
+            errorMsg = data.message
+          } else if (Array.isArray(data.message)) {
+            errorMsg = data.message.join(', ')
+          } else if (typeof data.error === 'string') {
+            errorMsg = data.error
+          }
+        } else if (e?.message) {
+          errorMsg = e.message
+        }
+        this.error = errorMsg
         if (window.$toast) {
           window.$toast(this.error, 'error', 5000)
         }

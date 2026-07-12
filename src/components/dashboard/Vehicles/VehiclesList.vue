@@ -133,6 +133,34 @@
             <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.truckName') || 'Truck Name' }}</label>
             <input v-model="editForm.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
           </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.crusherNumber') }}</label>
+            <div class="relative">
+              <input
+                type="text"
+                class="w-full border rounded px-3 py-2 text-sm"
+                :placeholder="$t('vehicles.selectCrusher')"
+                v-model="crusherSearch"
+                @focus="openCrusherDropdown"
+                @input="openCrusherDropdown"
+                @blur="closeCrusherDropdown"
+                aria-autocomplete="list"
+                aria-haspopup="true"
+                role="combobox"
+              />
+
+              <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
+                <button
+                  v-for="c in filteredCrushers"
+                  :key="c.id"
+                  @mousedown.prevent="selectCrusher(c)"
+                  class="w-full text-left px-3 py-2 hover:bg-gray-100"
+                >
+                  {{ c.name }}
+                </button>
+              </div>
+            </div>
+          </div>
           <div>
             <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.companyCapacity') }}</label>
             <input v-model="editForm.companyCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
@@ -310,6 +338,7 @@
 import {
   getVehicles,
   getContractors,
+  getCrushers,
   changeVehicleOwner,
   getVehicleOwnershipHistory,
   updateVehicle,
@@ -356,8 +385,12 @@ export default {
       editForm: {
         name: '',
         crusherCapacity: '',
-        companyCapacity: ''
+        companyCapacity: '',
+        crusherNumber: ''
       },
+      crushers: [],
+      showCrusherDropdown: false,
+      crusherSearch: '',
       editLoading: false,
       // Delete confirmation modal
       deleteConfirmVehicle: null,
@@ -386,7 +419,10 @@ export default {
       }
       return pages
     },
-    
+    filteredCrushers() {
+      if (!this.crusherSearch) return this.crushers
+      return this.crushers.filter(c => (c.name || '').toLowerCase().includes(this.crusherSearch.toLowerCase()))
+    }
   },
   methods: {
     /**
@@ -459,6 +495,35 @@ export default {
     onPageSizeChange() {
       this.page = 1
       this.loadVehicles()
+    },
+    async loadCrushers() {
+      try {
+        const res = await getCrushers({ pageSize: 1000 })
+        const payload = res.data || {}
+        this.crushers = Array.isArray(payload.items)
+          ? payload.items
+          : Array.isArray(payload.data)
+            ? payload.data
+            : Array.isArray(payload)
+              ? payload
+              : []
+      } catch (e) {
+        console.error('Error loading crushers', e)
+        this.crushers = []
+      }
+    },
+    openCrusherDropdown() {
+      this.showCrusherDropdown = true
+    },
+    closeCrusherDropdown() {
+      setTimeout(() => {
+        this.showCrusherDropdown = false
+      }, 150)
+    },
+    selectCrusher(c) {
+      this.editForm.crusherNumber = c.name
+      this.crusherSearch = c.name
+      this.showCrusherDropdown = false
     },
     async loadContractors() {
       try {
@@ -552,12 +617,15 @@ export default {
       this.editForm = {
         name: vehicle.name,
         crusherCapacity: vehicle.crusherCapacity || '',
-        companyCapacity: vehicle.companyCapacity || ''
+        companyCapacity: vehicle.companyCapacity || '',
+        crusherNumber: vehicle.crusherNumber || ''
       }
+      this.crusherSearch = vehicle.crusherNumber || ''
     },
     closeEditModal() {
       this.editingVehicle = null
-      this.editForm = { name: '', crusherCapacity: '', companyCapacity: '' }
+      this.editForm = { name: '', crusherCapacity: '', companyCapacity: '', crusherNumber: '' }
+      this.crusherSearch = ''
     },
     openCreateModal() {
       this.showCreateModal = true
@@ -593,7 +661,8 @@ export default {
       this.editLoading = true
       try {
         const payload = {
-          name: this.editForm.name
+          name: this.editForm.name,
+          crusherNumber: this.crusherSearch?.trim() || null
         }
         
         // Only include crusherCapacity if it's a valid number > 0
@@ -756,6 +825,7 @@ export default {
     try {
       await this.loadVehicles()
       await this.loadContractors()
+      await this.loadCrushers()
       // register global listeners for hiding context menu
       document.addEventListener('click', this.onGlobalClick)
       document.addEventListener('keydown', this.onGlobalKeydown)
