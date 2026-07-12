@@ -115,14 +115,18 @@
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('transport.date') }}
             </th>
-            <th
-              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('transport.contractor') }}
-            </th>
-            <th
-              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('transport.location') }}
-            </th>
+             <th
+               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+               {{ $t('transport.contractor') }}
+             </th>
+             <th
+               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+               {{ $t('labels.status') || 'Status' }}
+             </th>
+             <th
+               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+               {{ $t('transport.location') }}
+             </th>
             <th
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('transport.area') }}
@@ -179,16 +183,20 @@
             <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              <div class="">{{ transport.contractor?.name || '-' }}</div>
-              <span v-if="transport.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
-                {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
-              </span>
-              <!-- <div class="text-sm theme-text-muted">{{ transport.contractor?.phone || '-' }}</div> -->
-            </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              <div class=""><span class="">{{ transport.location.name || '-' }}</span></div>
-            </td>
+             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+               <div class="">{{ transport.contractor?.name || '-' }}</div>
+             </td>
+             <td class="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
+               <span v-if="transport.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
+                 {{ $t('labels.pendingReview') || 'Pending Review' }}
+               </span>
+               <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
+                 {{ $t('labels.approved') || 'Approved' }}
+               </span>
+             </td>
+             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+               <div class=""><span class="">{{ transport.location.name || '-' }}</span></div>
+             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               <div class=""><span class="">{{ transport.area.name || '-' }}</span></div>
             </td>
@@ -243,7 +251,7 @@
           <tr v-if="transports.length === 0">
             <td
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
-              :colspan="15">
+              :colspan="16">
               {{ $t('transport.noTransports') || 'No transports found' }}
             </td>
           </tr>

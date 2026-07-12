@@ -376,6 +376,13 @@ const routes = [
         props: true
       },
       {
+        path: 'extracts/:id/edit',
+        name: 'edit-extract',
+        component: CreateExtract,
+        meta: { title: 'extracts.edit.title' },
+        props: true
+      },
+      {
         path: 'payments',
         name: 'payments',
         component: () => import('@/components/dashboard/payment/PaymentsPage.vue'),

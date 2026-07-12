@@ -173,7 +173,7 @@ export default {
     const clearValue = () => {
       emit('update:modelValue', '')
       emit('clear')
-      closeDropdown()
+      openDropdown()
       inputRef.value?.focus()
     }
 

@@ -546,7 +546,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import { parseCreateExtract } from '@/validators/extracts'
-import { createExtract } from '@/services/extracts'
+import { createExtract, getExtract, updateExtract } from '@/services/extracts'
 import {
   getContractors,
   getLocations,
@@ -577,7 +577,9 @@ export default {
   props: {
     showTriggerButton: { type: Boolean, default: true },
     triggerButtonText: { type: String, default: '' },
-    modalTitle: { type: String, default: '' }
+    modalTitle: { type: String, default: '' },
+    isEditing: { type: Boolean, default: false },
+    extractId: { type: [Number, String], default: null }
   },
   data() {
     return {
@@ -629,6 +631,9 @@ export default {
       return this.triggerButtonText || (this.$t ? this.$t('dashboard.newExtract') + ' +' : 'New Extract +')
     },
     modalTitleComputed() {
+      if (this.isEditing) {
+        return this.$t ? this.$t('labels.edit') || 'Edit Extract' : 'Edit Extract'
+      }
       return this.modalTitle || (this.$t ? this.$t('dashboard.newExtract') : 'New Extract')
     },
     isRTL() {
@@ -809,12 +814,67 @@ export default {
       this.resetState()
       this.isOpen = true
       await this.loadInitialData()
-      this.loadCommonDataFromStorage()
+      if (this.isEditing && this.extractId) {
+        try {
+          const ext = await getExtract(this.extractId)
+          if (ext) {
+            this.commonData.dateFrom = ext.dateFrom ? ext.dateFrom.split('T')[0] : ''
+            this.commonData.dateTo = ext.dateTo ? ext.dateTo.split('T')[0] : ''
+            this.commonData.notes = ext.notes || ''
+             const findLoc = (id) => {
+               if (!id) return null
+               const findInTree = (list, targetId) => {
+                 for (const item of list) {
+                   if (item.id === targetId) return item
+                   if (item.children && item.children.length) {
+                     const found = findInTree(item.children, targetId)
+                     if (found) return found
+                   }
+                 }
+                 return null
+               }
+               return findInTree(this.allLocations, id)
+             }
+
+             this.commonData.site = findLoc(ext.locationId)
+             this.filters.commonSiteSearch = this.commonData.site?.name || ''
+
+             this.commonData.area = findLoc(ext.areaId)
+             this.filters.commonAreaSearch = this.commonData.area?.name || ''
+
+             this.commonData.contractor = this.contractors.find(c => c.id === ext.contractorId) || null
+             this.filters.commonContractorSearch = this.commonData.contractor?.name || ''
+
+            if (ext.lines && ext.lines.length) {
+              this.rows = ext.lines.map(l => ({
+                id: l.id || (Date.now() + Math.random()),
+                itemId: l.itemId || '',
+                itemSearch: l.item?.name || '',
+                price: l.price != null ? Number(l.price) : '',
+                quantity: l.quantity != null ? Number(l.quantity) : 1,
+                discount: l.discount != null ? Number(l.discount) : 0,
+                total: l.total != null ? Number(l.total) : 0
+              }))
+            } else {
+              this.rows = [this.createEmptyRow()]
+            }
+            this.currentStep = 2
+          }
+        } catch (error) {
+          console.error('Failed to load extract detail for editing:', error)
+          this.saveError = error?.message || 'Failed to load extract'
+        }
+      } else {
+        this.loadCommonDataFromStorage()
+      }
     },
     closeModal() {
-      this.saveCommonDataToStorage()
+      if (!this.isEditing) {
+        this.saveCommonDataToStorage()
+      }
       this.isOpen = false
       this.resetState()
+      this.$emit('close')
     },
     async loadInitialData() {
       try {
@@ -1067,7 +1127,15 @@ export default {
 
         parseCreateExtract(payload)
 
-        const res = await createExtract(payload)
+        let res
+        if (this.isEditing && this.extractId) {
+          res = await updateExtract(this.extractId, payload)
+          const isRTL = this.$i18n?.locale === 'ar'
+          this.$toast?.success(isRTL ? 'تم حفظ التعديل وإرساله للمراجعة بنجاح' : 'Edit request submitted for approval successfully')
+        } else {
+          res = await createExtract(payload)
+        }
+
         this.$emit('saved', res)
         this.closeModal()
       } catch (error) {

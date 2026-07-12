@@ -5,6 +5,11 @@ export async function createExtract(payload) {
   return data
 }
 
+export async function updateExtract(id, payload) {
+  const { data } = await api.updateExtract(id, payload)
+  return data
+}
+
 export async function getExtract(id) {
   const { data } = await api.getExtract(id)
   return data
@@ -31,6 +36,7 @@ export function getExtracts(params = {}) {
 
 export default {
   createExtract,
+  updateExtract,
   getExtract,
   deleteExtract,
   getExtractsForContractor,

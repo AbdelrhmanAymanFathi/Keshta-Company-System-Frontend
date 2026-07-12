@@ -334,7 +334,6 @@ export default {
       if (!item) {
         localForm.value.equipmentId = ''
         localForm.value.equipmentLabel = ''
-        localForm.value.isRental = false
         return
       }
       localForm.value.equipmentId = item.id != null ? Number(item.id) : ''

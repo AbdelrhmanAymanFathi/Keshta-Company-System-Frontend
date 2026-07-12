@@ -178,6 +178,11 @@
                 <th
                   class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
+                  {{ $t('labels.status') || 'Status' }}
+                </th>
+                <th
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
+                  :class="{ 'text-right': isRTL }">
                   {{ $t('labels.driver') || 'Driver' }}
                 </th>
                 <th
@@ -222,9 +227,6 @@
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ rental.equipment.name }}
-                  <span v-if="rental.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
-                    {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
-                  </span>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.location?.name || '-' }}</div>
@@ -235,6 +237,14 @@
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
+                </td>
+                <td class="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
+                  <span v-if="rental.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
+                    {{ $t('labels.pendingReview') || 'Pending Review' }}
+                  </span>
+                  <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
+                    {{ $t('labels.approved') || 'Approved' }}
+                  </span>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div class="truncate max-w-xs">{{ rental.driver?.name || rental.driverName || rental.driverLabel || '-' }}</div>

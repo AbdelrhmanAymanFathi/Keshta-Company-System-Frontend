@@ -1062,6 +1062,9 @@ export const deleteTransport = (id) =>
 export const createExtract = (data) =>
   axios.post(withLangQuery(`${BASE_URL}/api/extracts`), data);
 
+export const updateExtract = (id, data) =>
+  axios.put(withLangQuery(`${BASE_URL}/api/extracts/${id}`), data);
+
 export const getExtract = (id) =>
   axios.get(withLangQuery(`${BASE_URL}/api/extracts/${id}`));
 

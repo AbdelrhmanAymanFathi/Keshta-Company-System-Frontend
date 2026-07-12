@@ -2,7 +2,15 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex flex-col gap-3 rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50 sm:flex-row sm:items-center sm:justify-between">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.extractsList') || 'Extracts' }}</h2>
-      <ExtractsCreationModal :showTriggerButton="true" :triggerButtonText="$t('dashboard.newExtract') + ' +'" @saved="onExtractSaved"/>
+      <ExtractsCreationModal
+        ref="creationModal"
+        :showTriggerButton="true"
+        :triggerButtonText="$t('dashboard.newExtract') + ' +'"
+        :isEditing="modalState.isEditing"
+        :extractId="modalState.extractId"
+        @saved="onExtractSaved"
+        @close="onModalClosed"
+      />
     </div>
 
     <!-- Filters Section -->
@@ -93,6 +101,7 @@
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.price') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.discount') || 'Discount' }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.contractor') }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.status') || 'Status' }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.area') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') }}</th>
@@ -119,8 +128,13 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ extract.itemDiscount !== null && extract.itemDiscount !== undefined ? formatCurrency(extract.itemDiscount) : '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ extract.contractorName || '-' }}
-              <span v-if="extract.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
-                {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
+            </td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
+              <span v-if="extract.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
+                {{ $t('labels.pendingReview') || 'Pending Review' }}
+              </span>
+              <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
+                {{ $t('labels.approved') || 'Approved' }}
               </span>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.locationName || '-' }}</td>
@@ -131,14 +145,12 @@
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               <button
-                @click.stop="openDetail(extract.id)"
-                class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md mr-1"
-                :title="$t('labels.edit') || 'Edit / Detail'"
+                @click.stop="openEdit(extract.id)"
+                :disabled="extract.hasPendingApproval"
+                class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mr-1"
+                :title="$t('labels.edit') || 'Edit'"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
+                <PencilIcon class="w-4 h-4" />
               </button>
               <button
                 @click.stop="openDeleteConfirm(extract)"
@@ -151,7 +163,7 @@
             </td>
           </tr>
           <tr v-if="extracts.length === 0">
-              <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="13">
+              <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="14">
               {{ $t('extracts.noExtractsFound') || 'No extracts found' }}
             </td>
           </tr>
@@ -172,8 +184,17 @@
       <button
         type="button"
         :disabled="contextMenu.item?.hasPendingApproval"
+        class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border-b border-slate-100"
+        @click="openEdit(contextMenu.item.id); closeContextMenu()"
+      >
+        <PencilIcon class="h-4 w-4 text-slate-500" />
+        {{ $t('labels.edit') || 'Edit' }}
+      </button>
+      <button
+        type="button"
+        :disabled="contextMenu.item?.hasPendingApproval"
         class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        @click="openDeleteConfirm(contextMenu.item)"
+        @click="openDeleteConfirm(contextMenu.item); closeContextMenu()"
       >
         <TrashIcon class="h-4 w-4" />
         {{ $t('labels.delete') || 'Delete' }}
@@ -202,12 +223,12 @@ import ExtractsCreationModal from './ExtractsCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
-import { TrashIcon } from '@acme/icon-packs/legacy'
+import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
 import DateField from '../../shared/DateField.vue'
 
 export default {
   name: 'ExtractsList',
-  components: { ExtractsCreationModal, Pagination, SearchDropdown, TrashIcon, DateField },
+  components: { ExtractsCreationModal, Pagination, SearchDropdown, TrashIcon, PencilIcon, DateField },
   data() {
     return {
       extracts: [],
@@ -226,6 +247,11 @@ export default {
         item: null
       },
       deleteConfirmModal: { show: false, id: null },
+      modalState: {
+        show: false,
+        isEditing: false,
+        extractId: null
+      },
       filters: {
         startDate: '',
         endDate: '',
@@ -421,6 +447,24 @@ export default {
 
     openDetail(id) {
       this.$router.push({ name: 'extracts-detail', params: { id } })
+    },
+
+    openEdit(id) {
+      this.modalState.isEditing = true
+      this.modalState.extractId = id
+      this.modalState.show = true
+      this.$refs.creationModal?.openModal()
+    },
+
+    onModalClosed() {
+      this.modalState.isEditing = false
+      this.modalState.extractId = null
+      this.modalState.show = false
+    },
+
+    onExtractSaved() {
+      this.loadExtracts()
+      this.onModalClosed()
     },
 
     openRowMenu(event, item) {

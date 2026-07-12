@@ -672,7 +672,6 @@ export default {
         this.form.equipmentLabel = ''
         this.form.contractorId = ''
         this.form.contractorLabel = ''
-        this.form.isRental = false
         this.clearDriver()
         return 
       }

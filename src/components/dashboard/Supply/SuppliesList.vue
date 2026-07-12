@@ -137,12 +137,15 @@
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.item') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.contractor') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.crusher') }}</th>
+             <th
+               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+               {{ $t('labels.contractor') }}</th>
+             <th
+               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+               {{ $t('labels.status') || 'Status' }}</th>
+             <th
+               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+               {{ $t('labels.crusher') }}</th>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.location') }}</th>
@@ -191,8 +194,13 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ supply.contractor?.name || '-' }}
-              <span v-if="supply.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block mt-1 w-max">
-                {{ isRTL ? 'قيد المراجعة' : 'Pending Review' }}
+            </td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
+              <span v-if="supply.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
+                {{ $t('labels.pendingReview') || 'Pending Review' }}
+              </span>
+              <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
+                {{ $t('labels.approved') || 'Approved' }}
               </span>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
@@ -239,7 +247,7 @@
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="17">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="18">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>

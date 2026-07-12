@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import ExtractLineEditor from '@/components/dashboard/Extracts/ExtractLineEditor.vue'
@@ -176,6 +176,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { parseCreateExtract } from '@/validators/extracts'
 import { useCreateExtract } from '@/composables/useCreateExtract'
+import { getExtract, updateExtract } from '@/services/extracts'
 import { getContractors, getLocations, getCrushers, getExportItems, getVehicles, createLocation, createContractor, createCrusher, createExportItem, getContractorsWithVehicles } from '@/api'
 import normalizeItem from '@/utils/normalizeItem'
 import {
@@ -192,11 +193,17 @@ import {
 export default {
   name: 'CreateExtractView',
   components: { ExtractLineEditor, SearchDropdown, DateField, CalendarDaysIcon, MapPinIcon, MapIcon, UserGroupIcon, WrenchScrewdriverIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon },
-  props: { modalMode: { type: Boolean, default: false } },
+  props: {
+    modalMode: { type: Boolean, default: false },
+    id: { type: [String, Number], default: null }
+  },
   emits: ['submitted', 'cancelled', 'step-change'],
   setup(props, { emit }) {
     const router = useRouter()
     const { locale } = useI18n()
+    const { proxy } = getCurrentInstance()
+
+    const isEditing = computed(() => props.id != null)
 
     const currentStep = ref(1)
 
@@ -372,6 +379,61 @@ export default {
           loadLookups(),
           loadExportItems()
         ])
+
+        if (isEditing.value && props.id) {
+          try {
+            const ext = await getExtract(props.id)
+            if (ext) {
+              commonData.dateFrom = ext.dateFrom ? ext.dateFrom.split('T')[0] : ''
+              commonData.dateTo = ext.dateTo ? ext.dateTo.split('T')[0] : ''
+              commonData.notes = ext.notes || ''
+
+              // Resolve Site, Area, Contractor
+              const findLoc = (id) => {
+                if (!id) return null
+                const findInTree = (list, targetId) => {
+                  for (const item of list) {
+                    if (item.id === targetId) return item
+                    if (item.children && item.children.length) {
+                      const found = findInTree(item.children, targetId)
+                      if (found) return found
+                    }
+                  }
+                  return null
+                }
+                return findInTree(allLocations.value, id)
+              }
+
+              commonData.site = findLoc(ext.locationId)
+              filters.commonSiteSearch = commonData.site?.name || ''
+
+              commonData.area = findLoc(ext.areaId)
+              filters.commonAreaSearch = commonData.area?.name || ''
+
+              commonData.contractor = contractors.value.find(c => c.id === ext.contractorId) || null
+              filters.commonContractorSearch = commonData.contractor?.name || ''
+
+              if (ext.lines && ext.lines.length) {
+                rows.value = ext.lines.map(l => ({
+                  id: l.id || (Date.now() + Math.random()),
+                  itemId: l.itemId || '',
+                  itemSearch: l.item?.name || '',
+                  price: l.price != null ? Number(l.price) : '',
+                  quantity: l.quantity != null ? Number(l.quantity) : 1,
+                  discount: l.discount != null ? Number(l.discount) : 0,
+                  total: l.total != null ? Number(l.total) : 0
+                }))
+              } else {
+                rows.value = [createEmptyRow()]
+              }
+            }
+          } catch (e) {
+            console.error('Failed to load extract for editing:', e)
+            saveError.value = e?.message || 'Failed to load extract'
+          }
+        } else {
+          if (!rows.value.length) addRow()
+        }
       } catch (err) {
         console.error('Failed to load initial data:', err)
       }
@@ -419,15 +481,26 @@ export default {
         // validate
         try{ parseCreateExtract(payload) } catch(err){ console.error('Validation error', err); saveError.value = err?.message || 'Validation failed'; isSaving.value = false; return }
 
-        const res = await mutateAsync(payload)
-        if (props.modalMode) {
-          emit('submitted', res)
-        } else {
-          const id = res?.id
-          if (id) {
-            router.push({ name: 'extracts-detail', params: { id } })
+        if (isEditing.value) {
+          await updateExtract(props.id, payload)
+          const isRTL = locale.value === 'ar'
+          proxy.$toast?.success(isRTL ? 'تم حفظ التعديل وإرساله للمراجعة بنجاح' : 'Edit request submitted for approval successfully')
+          if (props.modalMode) {
+            emit('submitted', { id: props.id })
           } else {
             router.push({ name: 'extracts-list' })
+          }
+        } else {
+          const res = await mutateAsync(payload)
+          if (props.modalMode) {
+            emit('submitted', res)
+          } else {
+            const id = res?.id
+            if (id) {
+              router.push({ name: 'extracts-detail', params: { id } })
+            } else {
+              router.push({ name: 'extracts-list' })
+            }
           }
         }
       }catch(e){
@@ -603,6 +676,7 @@ export default {
     onMounted(() => { loadInitialData() })
 
     return {
+      isEditing,
       currentStep,
       commonData,
       rows,
