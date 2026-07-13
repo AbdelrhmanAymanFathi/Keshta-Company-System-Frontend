@@ -105,49 +105,98 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-slate-100">
-        <!-- Hide Deleted Transactions Switch -->
-        <div class="flex items-center gap-3 select-none">
-          <label class="relative inline-flex items-center cursor-pointer group">
-            <input type="checkbox" v-model="filters.onlyAddedAndReversals" class="sr-only peer" @change="loadReport">
-            
-            <!-- Toggle background track -->
-            <div :class="[
-              'relative w-11 h-6 rounded-full border transition-all duration-300 shadow-inner',
-              filters.onlyAddedAndReversals 
-                ? 'bg-emerald-500 border-emerald-600' 
-                : 'bg-slate-100 border-slate-200'
-            ]">
-              <!-- Toggle indicator with icon -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-slate-100 flex-wrap">
+        <!-- Switches Control Group Wrapper -->
+        <div class="flex flex-wrap items-center gap-6 rounded-2xl p-4 select-none">
+          
+          <!-- Detailed Mode Switch -->
+          <div class="flex items-center gap-3">
+            <label class="relative inline-flex items-center cursor-pointer group">
+              <input type="checkbox" v-model="isDetailedMode" class="sr-only peer" @change="loadReport">
+              
+              <!-- Toggle background track -->
               <div :class="[
-                'absolute top-[1px] w-5 h-5 bg-white rounded-full shadow transition-all duration-300 flex items-center justify-center',
-                isRTL 
-                  ? (filters.onlyAddedAndReversals ? 'right-[18px]' : 'right-[2px]')
-                  : (filters.onlyAddedAndReversals ? 'left-[18px]' : 'left-[2px]')
+                'relative w-12 h-6 rounded-full border transition-all duration-300 shadow-inner',
+                isDetailedMode 
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-600 shadow-emerald-200/50' 
+                  : 'bg-slate-200 border-slate-300'
               ]">
-                <!-- X icon (unchecked) -->
-                <svg v-if="!filters.onlyAddedAndReversals" class="w-3 h-3 text-slate-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                <!-- Check icon (checked) -->
-                <svg v-else class="w-3 h-3 text-emerald-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
+                <!-- Toggle indicator with icon -->
+                <div :class="[
+                  'absolute top-[2px] w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 flex items-center justify-center group-hover:scale-105',
+                  isRTL 
+                    ? (isDetailedMode ? 'right-[26px]' : 'right-[2px]')
+                    : (isDetailedMode ? 'left-[26px]' : 'left-[2px]')
+                ]">
+                  <!-- X icon (unchecked) -->
+                  <svg v-if="!isDetailedMode" class="w-3 h-3 text-slate-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <!-- Check icon (checked) -->
+                  <svg v-else class="w-3 h-3 text-indigo-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
               </div>
-            </div>
 
-            <div class="flex flex-col ms-3">
-              <span class="text-xs font-semibold theme-text-primary transition-all duration-200">
-                {{ isRTL ? 'إخفاء العمليات المحذوفة' : 'Hide Deleted Transactions' }}
-              </span>
-              <span class="text-[10px] theme-text-muted leading-tight">
-                {{ filters.onlyAddedAndReversals 
-                  ? (isRTL ? 'تم استبعاد حركات الحذف وعكسها' : 'Excluding deleted records & reversals')
-                  : (isRTL ? 'يعرض جميع حركات الحساب' : 'Showing all ledger records') 
-                }}
-              </span>
-            </div>
-          </label>
+              <div class="flex flex-col ms-3">
+                <span class="text-xs font-semibold theme-text-primary transition-colors duration-200 group-hover:text-indigo-900">
+                  {{ isRTL ? 'عرض تفصيلي (الحركات)' : 'Detailed Mode (Transactions)' }}
+                </span>
+                <span class="text-[10px] theme-text-muted leading-tight">
+                  {{ isDetailedMode 
+                    ? (isRTL ? 'يعرض تفاصيل الحركات والعمليات' : 'Showing detailed transaction ledger') 
+                    : (isRTL ? 'يعرض ملخص نشاط المقاولين فقط' : 'Showing contractor activity summary only')
+                  }}
+                </span>
+              </div>
+            </label>
+          </div>
+        
+          <!-- Hide Deleted Transactions Switch -->
+          <div class="flex items-center gap-3" v-if="isDetailedMode">
+            <label class="relative inline-flex items-center cursor-pointer group">
+              <input type="checkbox" v-model="filters.onlyAddedAndReversals" class="sr-only peer" @change="loadReport">
+              
+              <!-- Toggle background track -->
+              <div :class="[
+                'relative w-12 h-6 rounded-full border transition-all duration-300 shadow-inner',
+                filters.onlyAddedAndReversals 
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-600 shadow-emerald-200/50' 
+                  : 'bg-slate-200 border-slate-300'
+              ]">
+                <!-- Toggle indicator with icon -->
+                <div :class="[
+                  'absolute top-[2px] w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 flex items-center justify-center group-hover:scale-105',
+                  isRTL 
+                    ? (filters.onlyAddedAndReversals ? 'right-[26px]' : 'right-[2px]')
+                    : (filters.onlyAddedAndReversals ? 'left-[26px]' : 'left-[2px]')
+                ]">
+                  <!-- X icon (unchecked) -->
+                  <svg v-if="!filters.onlyAddedAndReversals" class="w-3 h-3 text-slate-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <!-- Check icon (checked) -->
+                  <svg v-else class="w-3 h-3 text-emerald-600 transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="flex flex-col ms-3">
+                <span class="text-xs font-semibold theme-text-primary transition-colors duration-200 group-hover:text-indigo-900">
+                  {{ isRTL ? 'إخفاء العمليات المحذوفة' : 'Hide Deleted Transactions' }}
+                </span>
+                <span class="text-[10px] theme-text-muted leading-tight">
+                  {{ filters.onlyAddedAndReversals 
+                    ? (isRTL ? 'تم استبعاد حركات الحذف وعكسها' : 'Excluding deleted records & reversals')
+                    : (isRTL ? 'يعرض جميع حركات الحساب' : 'Showing all ledger records') 
+                  }}
+                </span>
+              </div>
+            </label>
+          </div>
+
         </div>
 
         <div class="flex gap-2">
@@ -189,7 +238,17 @@
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-100 table-auto">
           <thead class="bg-slate-50">
-            <tr>
+            <tr v-if="!isDetailedMode">
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
+            </tr>
+            <tr v-else>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">ID</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') || 'Date' }}</th>
               <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
@@ -204,29 +263,47 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-100" v-if="items.length">
-            <tr v-for="(row, index) in items" :key="row.id || index" class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.id }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
-                  {{ t(`modules.${row.module}`) }}
-                </span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                {{ isRTL && row.arAction ? row.arAction : row.action }}
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
-              <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
-            </tr>
+            <template v-if="!isDetailedMode">
+              <tr v-for="(row, index) in items" :key="index" class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                  <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
+                    {{ t(`modules.${row.module}`) }}
+                  </span>
+                </td>
+                <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
+                <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
+              </tr>
+            </template>
+            <template v-else>
+              <tr v-for="(row, index) in items" :key="row.id || index" class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.id }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                  <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
+                    {{ t(`modules.${row.module}`) }}
+                  </span>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                  {{ isRTL && row.arAction ? row.arAction : row.action }}
+                </td>
+                <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
+                <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
+              </tr>
+            </template>
           </tbody>
           <tbody v-else>
             <tr>
-              <td colspan="11" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
+              <td :colspan="isDetailedMode ? 11 : 8" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
                 {{ t('noData') }}
               </td>
             </tr>
@@ -287,7 +364,17 @@ export default {
       locationId: '',
       startDate: '',
       endDate: '',
-      onlyAddedAndReversals: false
+      onlyAddedAndReversals: false,
+      reportVariant: 'simple'
+    })
+
+    const isDetailedMode = computed({
+      get() {
+        return filters.value.reportVariant === 'detailed'
+      },
+      set(val) {
+        filters.value.reportVariant = val ? 'detailed' : 'simple'
+      }
     })
 
     watch(() => filters.value.module, async (newVal) => {
@@ -432,7 +519,8 @@ export default {
         locationId: '',
         startDate: '',
         endDate: '',
-        onlyAddedAndReversals: false
+        onlyAddedAndReversals: false,
+        reportVariant: 'simple'
       }
       // Re-initialize default date range
       setDefaultDates()
@@ -528,6 +616,7 @@ export default {
       items,
       totals,
       filters,
+      isDetailedMode,
       t,
       loadReport,
       clearFilters,
