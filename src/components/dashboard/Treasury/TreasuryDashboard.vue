@@ -33,8 +33,10 @@
                 <p class="truncate text-sm font-medium theme-text-primary">{{ treasury.name }}</p>
                 <span class="text-xs font-semibold" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
               </div>
-              <div class="mt-1 flex items-center gap-2 text-[11px] theme-text-secondary">
+              <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] theme-text-secondary">
                 <span>#{{ index + 1 }}</span>
+                <span v-if="treasury.type === 'CUSTODY'" class="rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">عهدة</span>
+                <span v-else class="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">خزينة</span>
                 <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
                 <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
               </div>
@@ -64,6 +66,13 @@
             <span
               v-if="selectedTreasury"
               class="inline-flex items-center justify-center rounded-full px-3 py-2 text-xs font-semibold sm:px-4"
+              :class="selectedTreasury.type === 'CUSTODY' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'"
+            >
+              {{ selectedTreasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة رئيسية' }}
+            </span>
+            <span
+              v-if="selectedTreasury"
+              class="inline-flex items-center justify-center rounded-full px-3 py-2 text-xs font-semibold sm:px-4"
               :class="selectedTreasury.deletedAt ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'"
             >
               {{ selectedTreasury.deletedAt ? t('treasury.archived') : t('treasury.active') }}
@@ -75,6 +84,13 @@
               @click="openDepositModal"
             >
               {{ t('treasury.addMoney') }}
+            </button>
+            <button
+              v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
+              class="w-full rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 sm:w-auto"
+              @click="openTransferModal"
+            >
+              💸 تحويل أموال
             </button>
             <button
               v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
@@ -239,6 +255,13 @@
           <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.name') }}</label>
           <input v-model="form.name" type="text" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" />
         </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">نوع الخزينة / العهدة</label>
+          <select v-model="form.type" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+            <option value="MAIN">خزينة رئيسية (Main Treasury)</option>
+            <option value="CUSTODY">عهدة (Custody)</option>
+          </select>
+        </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeModal">{{ t('labels.cancel') }}</button>
           <button type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('labels.save') }}</button>
@@ -272,6 +295,52 @@
       </form>
     </div>
   </div>
+
+  <div v-if="showTransfer" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeTransferModal">
+    <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="text-lg font-semibold theme-text-primary">تحويل أموال بين الخزائن / العهد</h3>
+        <button class="theme-caption transition hover:theme-text-secondary" @click="closeTransferModal">×</button>
+      </div>
+      <form class="mt-4 space-y-4" @submit.prevent="executeTransfer">
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">من (الخزينة / العهدة المصدر)</label>
+          <select v-model="transferForm.fromTreasuryId" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+            <option v-for="tItem in store.treasuries.filter(x => !x.deletedAt)" :key="tItem.id" :value="tItem.id">
+              {{ tItem.name }} ({{ tItem.type === 'CUSTODY' ? 'عهدة' : 'رئيسية' }} - {{ formatCurrency(tItem.balance) }})
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">إلى (الخزينة / العهدة الوجهة)</label>
+          <select v-model="transferForm.toTreasuryId" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+            <option v-for="tItem in store.treasuries.filter(x => !x.deletedAt && x.id !== transferForm.fromTreasuryId)" :key="tItem.id" :value="tItem.id">
+              {{ tItem.name }} ({{ tItem.type === 'CUSTODY' ? 'عهدة' : 'رئيسية' }})
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">المبلغ</label>
+          <input v-model.number="transferForm.amount" type="number" step="0.01" min="0.01" required class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">البيان / الوصف</label>
+          <input v-model="transferForm.description" type="text" placeholder="مثال: تغذية عهدة موقع..." class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">التاريخ</label>
+          <DateField v-model="transferForm.date" />
+        </div>
+        <div v-if="transferError" class="rounded-lg bg-red-50 p-3 text-xs font-medium text-red-600">
+          {{ transferError }}
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeTransferModal">{{ t('labels.cancel') }}</button>
+          <button type="submit" :disabled="transferSubmitting" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">تحويل</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -281,6 +350,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
+import { transferBetweenTreasuries } from '@/api'
 
 export default {
   name: 'TreasuryDashboard',
@@ -305,9 +375,13 @@ export default {
     const visibleTransactions = computed(() => store.transactions.items || [])
     const showModal = ref(false)
     const showDeposit = ref(false)
+    const showTransfer = ref(false)
     const modalMode = ref('create')
-    const form = reactive({ id: null, name: ''}) //, pinned: false })
+    const form = reactive({ id: null, name: '', type: 'MAIN' })
     const depositForm = reactive({ amount: 0, description: '', date: '' })
+    const transferForm = reactive({ fromTreasuryId: null, toTreasuryId: null, amount: 0, description: '', date: '' })
+    const transferError = ref('')
+    const transferSubmitting = ref(false)
     const dragIndex = ref(null)
     const treasurySearch = ref('')
     const treasuryView = ref('active')
@@ -431,7 +505,7 @@ export default {
       modalMode.value = 'create'
       form.id = null
       form.name = ''
-      // form.pinned = false
+      form.type = 'MAIN'
       showModal.value = true
     }
 
@@ -440,7 +514,7 @@ export default {
       modalMode.value = 'edit'
       form.id = treasury.id
       form.name = treasury.name || ''
-      // form.pinned = !!treasury.pinned
+      form.type = treasury.type || 'MAIN'
       showModal.value = true
     }
 
@@ -448,7 +522,7 @@ export default {
 
     const saveTreasury = async () => {
       try {
-        const payload = { name: form.name } //, pinned: form.pinned }
+        const payload = { name: form.name, type: form.type }
         if (modalMode.value === 'create') await store.createTreasuryItem(payload)
         else await store.updateTreasuryItem(form.id, payload)
         showModal.value = false
@@ -478,6 +552,45 @@ export default {
         await loadTreasuries()
       } catch (err) {
         console.error('[TreasuryDashboard] saveDeposit error:', err)
+      }
+    }
+
+    const openTransferModal = () => {
+      transferForm.fromTreasuryId = selectedTreasury.value ? selectedTreasury.value.id : null
+      const dest = store.treasuries.find(t => !t.deletedAt && t.id !== transferForm.fromTreasuryId)
+      transferForm.toTreasuryId = dest ? dest.id : null
+      transferForm.amount = 0
+      transferForm.description = ''
+      transferForm.date = new Date().toISOString().slice(0, 10)
+      transferError.value = ''
+      showTransfer.value = true
+    }
+
+    const closeTransferModal = () => { showTransfer.value = false }
+
+    const executeTransfer = async () => {
+      if (!transferForm.fromTreasuryId || !transferForm.toTreasuryId || transferForm.amount <= 0) {
+        transferError.value = 'يرجى ملء كافة البيانات بشكل صحيح'
+        return
+      }
+      try {
+        transferSubmitting.value = true
+        transferError.value = ''
+        await transferBetweenTreasuries({
+          fromTreasuryId: transferForm.fromTreasuryId,
+          toTreasuryId: transferForm.toTreasuryId,
+          amount: transferForm.amount,
+          description: transferForm.description || undefined,
+          date: transferForm.date || undefined,
+        })
+        showTransfer.value = false
+        await reloadSelected()
+        await loadTreasuries()
+      } catch (err) {
+        console.error('[TreasuryDashboard] executeTransfer error:', err)
+        transferError.value = err?.response?.data?.message || err?.message || 'فشلت عملية التحويل'
+      } finally {
+        transferSubmitting.value = false
       }
     }
 
@@ -562,9 +675,13 @@ export default {
       visibleTransactions,
       showModal,
       showDeposit,
+      showTransfer,
       modalMode,
       form,
       depositForm,
+      transferForm,
+      transferError,
+      transferSubmitting,
       treasurySearch,
       treasuryView,
       isAdmin,
@@ -584,6 +701,9 @@ export default {
       openDepositModal,
       closeDepositModal,
       saveDeposit,
+      openTransferModal,
+      closeTransferModal,
+      executeTransfer,
       archiveSelectedTreasury,
       restoreSelectedTreasury,
       onDragStart,

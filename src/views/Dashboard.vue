@@ -272,7 +272,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', payments: 'payments', treasury: 'treasury', reports: 'reports', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', reports: 'reports', admin: 'admin' },
       menuMap: {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
@@ -311,11 +311,14 @@ export default {
         payments: [
           { name: 'payments', label: 'dashboard.payments', routeName: 'payments' }
         ],
+        expenses: [
+          { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
+          { name: 'expensesTerms', label: 'expenses.termsManagement', routeName: 'expenses-terms' },
+          { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
+        ],
         treasury: [
           { name: 'treasury', label: 'dashboard.treasury', routeName: 'treasury' },
           { name: 'companyTransactions', label: 'dashboard.report', routeName: 'company-transactions' },
-          // { name: 'expensesList', label: 'dashboard.expenses', routeName: 'expenses-list' },
-          // { name: 'expensesReport', label: 'expenses.report', routeName: 'expenses-report' }
         ],
         reports: [
           { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' },
@@ -497,15 +500,15 @@ export default {
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
-      const walletRoutes = ['treasury', 'company-transactions', 'expenses-report']
-      // const walletRoutes = ['treasury', 'company-transactions', 'expenses-list', 'expenses-report']
-
+      const walletRoutes = ['treasury', 'company-transactions']
+      const expensesRoutes = ['expenses-list', 'expenses-terms', 'expenses-report']
       const paymentRoutes = ['payments']
       const adminRoutes = ['changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
       if (equipmentRoutes.includes(routeName)) return 'equipmentLog'
       if (paymentRoutes.includes(routeName)) return 'payments'
+      if (expensesRoutes.includes(routeName)) return 'expenses'
       if (walletRoutes.includes(routeName)) return 'treasury'
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'

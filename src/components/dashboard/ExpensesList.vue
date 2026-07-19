@@ -29,75 +29,118 @@
       <!-- Export button removed as per UI request -->
     </div>
 
-    <!-- Search and Filters -->
-    <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
-      <div class="flex flex-col sm:flex-row gap-4">
-        <div class="flex-1">
-          <div class="relative">
-            <input 
-              v-model="searchQuery" 
-              type="search" 
-              :placeholder="$t('expenses.searchPlaceholder')"
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg theme-input-focus"
-              :class="isRTL ? 'text-right' : 'text-left'"
-            />
-            <svg class="absolute left-3 top-2.5 w-5 h-5 theme-caption" :class="isRTL ? 'left-auto right-3' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </div>
+    <!-- Filters Section -->
+    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
+      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') || 'الفلاتر' }}</h4>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Start Date -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') || 'تاريخ البدء' }}</label>
+          <DateField v-model="filters.startDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
-        
-        <div class="flex gap-2">
-          <select 
-            v-model.number="selectedCategoryId" 
-            class="px-4 py-2 border border-gray-300 rounded-lg theme-input-focus"
+
+        <!-- End Date -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') || 'تاريخ الانتهاء' }}</label>
+          <DateField v-model="filters.endDate"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
+        </div>
+
+        <!-- Main Term / البند الرئيسي -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">البند الرئيسي</label>
+          <SearchDropdown
+            v-model="filterCategorySearch"
+            :items="expenseCategories"
+            :allItems="expenseCategories"
+            placeholder="ابحث عن البند الرئيسي..."
+            clearable
+            @select="(sel) => { selectedCategoryId = sel.id; filterCategorySearch = sel.name; selectedSubcategoryId = null; filterSubcategorySearch = '' }"
+            @clear="() => { selectedCategoryId = null; filterCategorySearch = ''; selectedSubcategoryId = null; filterSubcategorySearch = '' }"
+          />
+        </div>
+
+        <!-- Secondary Term / البند الفرعي -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">البند الفرعي</label>
+          <SearchDropdown
+            v-model="filterSubcategorySearch"
+            :items="filterSubcategories"
+            :allItems="filterSubcategories"
+            :disabled="!selectedCategoryId"
+            placeholder="ابحث عن البند الفرعي..."
+            clearable
+            @select="(sel) => { selectedSubcategoryId = sel.id; filterSubcategorySearch = sel.name }"
+            @clear="() => { selectedSubcategoryId = null; filterSubcategorySearch = '' }"
+          />
+        </div>
+
+        <!-- Location / الموقع -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.location') || 'الموقع' }}</label>
+          <SearchDropdown
+            v-model="filterLocationSearch"
+            :items="locations"
+            :allItems="locations"
+            placeholder="ابحث عن الموقع..."
+            clearable
+            @select="(sel) => { selectedLocationId = sel.id; filterLocationSearch = sel.name }"
+            @clear="() => { selectedLocationId = null; filterLocationSearch = '' }"
+          />
+        </div>
+
+        <!-- Treasury/Custody / الخزينة أو العهدة -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">الخزينة / العهدة</label>
+          <SearchDropdown
+            v-model="filterTreasurySearch"
+            :items="treasuryItems"
+            :allItems="treasuryItems"
+            placeholder="ابحث عن الخزينة / العهدة..."
+            clearable
+            @select="(sel) => { selectedTreasuryId = sel.id; filterTreasurySearch = sel.name }"
+            @clear="() => { selectedTreasuryId = null; filterTreasurySearch = '' }"
+          />
+        </div>
+
+        <!-- Payment Method / طريقة الدفع -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">طريقة الدفع</label>
+          <SearchDropdown
+            v-model="filterPaymentMethodSearch"
+            :items="paymentMethodItems"
+            :allItems="paymentMethodItems"
+            placeholder="ابحث عن طريقة الدفع..."
+            clearable
+            @select="(sel) => { selectedPaymentMethod = sel.id; filterPaymentMethodSearch = sel.name }"
+            @clear="() => { selectedPaymentMethod = ''; filterPaymentMethodSearch = '' }"
+          />
+        </div>
+
+        <!-- Search / البحث في البيان -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">البحث في البيان</label>
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="ابحث في البيان أو الوصف..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
             :class="isRTL ? 'text-right' : 'text-left'"
-          >
-            <option :value="null">{{ $t('expenses.category') }}</option>
-            <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-          </select>
-          <div v-if="selectedCategoryId" :class="['flex items-center gap-2']">
-            <div class="relative flex-1">
-              <input
-                v-model="subcategoryInput"
-                @input="handleSubcategoryInput"
-                @focus="handleSubcategoryInput"
-                @blur="handleSubcategoryBlur"
-                @keydown="handleSubcategoryKeydown"
-                :disabled="loading"
-                :placeholder="$t('expenses.subcategory')"
-                :class="['w-full px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none theme-input-focus', isRTL ? 'text-right' : 'text-left']"
-              />
-              <div v-if="showSubcategoryDropdown && (filteredSubcategoryOptions.length > 0)" class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto" :class="isRTL ? 'text-right' : 'text-left'">
-                <div v-for="(option, index) in filteredSubcategoryOptions" :key="option.value" @mousedown.prevent="selectSubcategory(option.value)" :class="['px-3 py-2 cursor-pointer theme-hover-soft transition-colors', selectedSubcategoryIndex === index ? 'theme-icon-bg' : '']">
-                  {{ option.label }}
-                </div>
-              </div>
-            </div>
-            <button
-              type="button"
-              @click="addSubcategoryPrompt(selectedCategoryId)"
-              :disabled="!selectedCategoryId"
-              class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              :title="$t('expenses.addSubcategory') || 'Add subcategory'"
-            >
-              +
-            </button>
-          </div>
-          <select v-model="selectedKind" class="px-4 py-2 border border-gray-300 rounded-lg theme-input-focus" :class="isRTL ? 'text-right' : 'text-left'">
-            <option value="">{{ $t('expenses.typeAll') || 'All Types' }}</option>
-            <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
-            <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
-          </select>
-          
-          <button 
-            v-if="searchQuery || selectedCategoryId"
-            @click="clearFilters"
-            class="px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            {{ $t('expenses.clearSearch') }}
-          </button>
+          />
         </div>
+      </div>
+
+      <!-- Filter Action Buttons -->
+      <div class="flex gap-2 pt-2">
+        <button @click="currentPage = 1; loadExpenses()" :disabled="loading"
+          class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm">
+          {{ $t('labels.search') || 'بحث' }}
+        </button>
+        <button @click="clearFilters"
+          class="px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">
+          {{ $t('expenses.clearSearch') || 'إعادة ضبط' }}
+        </button>
       </div>
     </div>
 
@@ -122,101 +165,84 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('labels.#') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.date') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.type') || 'Type' }}
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                البند الرئيسي
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider"
-                  :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.category') }}
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                البند الفرعي
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider"
-                  :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.description') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.branch') }}
-              </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.location') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                طريقة الدفع
+              </th>
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                الخزينة / العهدة
+              </th>
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.amount') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.signedAmount') }}
-              </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.flow') }}
-              </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.notes') }}
               </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.actions') }}
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ (currentPage - 1) * pageSize + index + 1 }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatDate(expense.date) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.kind === 'ADVANCE' ? 'bg-yellow-100 text-yellow-800' : 'theme-icon-bg theme-accent-muted'">
-                  {{ expense.kind === 'ADVANCE' ? ( $t('expenses.kind.advance') || 'عهدة' ) : ( $t('expenses.kind.expense') || 'مصروف' ) }}
+              <td class="px-4 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="getCategoryColor(expense.category)">
+                  {{ getCategoryLabel(expense.category) }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
-                <div class="flex flex-col gap-1" :class="isRTL ? 'items-end' : 'items-start'">
-                  <!-- Category pill -->
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                        :class="getCategoryColor(expense.category)">
-                    {{ getCategoryLabel(expense.category) }}
-                  </span>
-
-                  <!-- Subcategory line -->
-                  <span class="text-xs theme-text-secondary">
-                    {{ getSubcategoryLabel(expense) }}
-                  </span>
-                </div>
+              <td class="px-4 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
+                <span v-if="getSubcategoryLabel(expense) !== '-'" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                  {{ getSubcategoryLabel(expense) }}
+                </span>
+                <span v-else class="text-xs theme-caption">-</span>
               </td>
-
-              <td class="px-6 py-4 text-sm theme-text-primary max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.description }}
               </td>
-              <td class="px-6 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                <span v-if="expense.branch" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
-                  {{ expense.branch.name }}
-                </span>
-                <span v-else class="theme-caption">-</span>
-              </td>
-              <td class="px-6 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-4 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 <span v-if="expense.location" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                   {{ expense.location.name }}
                 </span>
                 <span v-else class="theme-caption">-</span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ formatCurrency(expense.amount) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="[isRTL ? 'text-right' : 'text-left', expense.signedAmount < 0 ? 'text-red-600' : 'text-green-600']">
-                {{ formatCurrency(expense.signedAmount) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="expense.flow === 'IN' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
-                  {{ expense.flow === 'IN' ? $t('expenses.flowIn') : $t('expenses.flowOut') }}
+              <td class="px-4 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {{ getPaymentMethodLabel(expense.paymentMethod) }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm theme-text-muted max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
+              <td class="px-4 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+                <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.treasury.type === 'CUSTODY' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'">
+                  {{ expense.treasury.name }} ({{ expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }})
+                </span>
+                <span v-else class="text-xs theme-caption">المصروفات الرئيسية</span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ formatCurrency(expense.amount) }}
+              </td>
+              <td class="px-4 py-4 text-sm theme-text-muted max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ expense.notes || '-' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -367,271 +393,217 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeModal"></div>
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold theme-text-primary">
-              {{ editing ? $t('expenses.editExpense') : $t('expenses.addExpense') }}
-            </h3>
-            <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
-          <form @submit.prevent="saveExpense" class="grid gap-4 grid-cols-1 md:grid-cols-2">
-            <!-- Date - Column 1 -->
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.date') }} <span class="text-red-500">*</span>
-              </label>
-              <DateField
-                v-model="form.date"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
+    <teleport to="body">
+      <transition name="kc-modal">
+        <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+              <h2 class="text-xl sm:text-2xl font-bold theme-heading">
+                {{ editing ? ($t('expenses.editExpense') || 'تعديل مصروف') : ($t('expenses.addExpense') || 'إضافة مصروف جديد') }}
+              </h2>
+              <button @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</button>
             </div>
 
-            <!-- Category - Column 2 -->
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.category') }} <span class="text-red-500">*</span>
-              </label>
-              <div class="flex gap-2">
-                <select 
-                  v-model.number="form.categoryId" 
-                  required
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                  :class="isRTL ? 'text-right' : 'text-left'"
-                >
-                  <option :value="null">{{ $t('expenses.category') }}</option>
-                  <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-                </select>
-                <button type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
-              </div>
+            <!-- Body -->
+            <div class="flex-1 overflow-y-auto p-6 modal-body-container relative">
+              <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6">
+                
+                <!-- Step 1: Date & Location -->
+                <div v-if="modalStep===1" class="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-sm">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-100 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 11h.01M7 15h.01M13 7h7M13 11h7M13 15h7M3 7h.01M3 11h.01M3 15h.01"></path></svg>
+                    تصنيف البنود والموقع
+                  </h4>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Date -->
+                    <div>
+                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
+                        {{ $t('expenses.date') }} <span class="text-red-500">*</span>
+                      </label>
+                      <DateField
+                        v-model="form.date"
+                        required
+                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                        :class="isRTL ? 'text-right' : 'text-left'"
+                      />
+                    </div>
+
+                    <!-- Location -->
+                    <div>
+                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
+                        {{ $t('expenses.location') || 'الموقع' }} <span class="text-red-500">*</span>
+                      </label>
+                      <SearchDropdown
+                          v-model="formLocationSearch"
+                          :items="locations"
+                          :allItems="locations"
+                          placeholder="ابحث عن الموقع..."
+                          inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                          teleportTarget=".modal-body-container"
+                          @select="(sel) => { form.locationId = sel.id; formLocationSearch = sel.name }"
+                        />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 2: Remaining fields in table form -->
+                <div v-if="modalStep===2" class="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-sm">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-100 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    باقي الحقول
+                  </h4>
+                  <table class="w-full text-sm border-collapse">
+                    <tbody>
+                      <tr class="border-b">
+                        <td class="py-2 font-medium">البند الرئيسي</td>
+                        <td class="py-2">
+                          <SearchDropdown
+                            v-model="formCategorySearch"
+                            :items="expenseCategories"
+                            :allItems="expenseCategories"
+                            placeholder="ابحث عن البند الرئيسي..."
+                            inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                            teleportTarget=".modal-body-container"
+                            @select="(sel) => { form.categoryId = sel.id; formCategorySearch = sel.name; form.subCategoryId = null; formSubcategorySearch = '' }"
+                          />
+                        </td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="py-2 font-medium">البند الفرعي</td>
+                        <td class="py-2">
+                          <SearchDropdown
+                            v-model="formSubcategorySearch"
+                            :items="formSubcategories"
+                            :allItems="formSubcategories"
+                            :disabled="!form.categoryId"
+                            placeholder="ابحث عن البند الفرعي..."
+                            inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                            teleportTarget=".modal-body-container"
+                            @select="(sel) => { form.subCategoryId = sel.id; formSubcategorySearch = sel.name }"
+                          />
+                        </td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="py-2 font-medium">البيان / الوصف</td>
+                        <td class="py-2">
+                          <input v-model="form.description" type="text" required placeholder="أدخل البيان أو وصف المصروف..." class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus" :class="isRTL ? 'text-right' : 'text-left'" />
+                        </td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="py-2 font-medium">المبلغ</td>
+                        <td class="py-2">
+                          <input v-model="form.amount" type="number" step="0.01" min="0" required placeholder="المبلغ" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus font-semibold text-emerald-700" :class="isRTL ? 'text-right' : 'text-left'" />
+                        </td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="py-2 font-medium">طريقة الدفع</td>
+                        <td class="py-2">
+                          <SearchDropdown
+                            v-model="formPaymentMethodSearch"
+                            :items="paymentMethodItems"
+                            :allItems="paymentMethodItems"
+                            placeholder="ابحث عن طريقة الدفع..."
+                            inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                            teleportTarget=".modal-body-container"
+                            @select="(sel) => { form.paymentMethod = sel.id; formPaymentMethodSearch = sel.name }"
+                          />
+                        </td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="py-2 font-medium">الخزينة / العهدة</td>
+                        <td class="py-2">
+                          <SearchDropdown
+                            v-model="formTreasurySearch"
+                            :items="treasuryItems"
+                            :allItems="treasuryItems"
+                            placeholder="ابحث عن الخزينة / العهدة..."
+                            inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                            teleportTarget=".modal-body-container"
+                            clearable
+                            @select="(sel) => { form.treasuryId = sel.id; formTreasurySearch = sel.name }"
+                            @clear="() => { form.treasuryId = null; formTreasurySearch = '' }"
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 font-medium">ملاحظات</td>
+                        <td class="py-2">
+                          <textarea v-model="form.notes" rows="2" placeholder="ملاحظات" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus" :class="isRTL ? 'text-right' : 'text-left'"></textarea>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </form>
             </div>
 
-            <!-- Subcategory (optional) - Column 2 -->
-            <div v-if="form.categoryId">
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.subcategory') }}
-              </label>
-
-              <div class="flex gap-2">
-                <select v-model.number="form.subCategoryId" class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
-                  <option :value="null">{{ $t('expenses.subcategory') }}</option>
-                  <option v-for="sc in (expenseCategories.find(c=>c.id===form.categoryId)?.subCategories || [])" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
-                </select>
-
-                <button type="button" @click="addSubcategoryPrompt()" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
-              </div>
-            </div>
-
-            <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.kindLabel') }}</label>
-              <select v-model="form.kind" class="w-full px-3 py-2 border border-gray-300 rounded-lg" :class="isRTL ? 'text-right' : 'text-left'">
-                <option value="EXPENSE">{{ $t('expenses.kind.expense') || 'مصروف' }}</option>
-                <option value="ADVANCE">{{ $t('expenses.kind.advance') || 'عهدة' }}</option>
-              </select>
-            </div>
-
-            <!-- Description - Full Width -->
-            <div class="col-span-1 md:col-span-2">
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.description') }} <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.description" 
-                type="text" 
-                required
-                :placeholder="$t('expenses.description')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
-            </div>
-
-            <!-- Flow Type - Column 1 -->
-            <!-- <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.flow') }} <span class="text-red-500">*</span>
-              </label>
-              <div class="flex gap-2">
-                <button 
-                  type="button"
-                  @click="form.flow = 'OUT'"
-                  :class="[
-                    'flex-1 px-3 py-2 rounded-lg font-medium transition',
-                    form.flow === 'OUT' 
-                      ? 'bg-red-600 theme-text-light' 
-                      : 'bg-gray-100 theme-text-secondary hover:bg-gray-200'
-                  ]"
-                >
-                  {{ $t('expenses.flowOut') }}
-                </button>
-                <button 
-                  type="button"
-                  @click="form.flow = 'IN'"
-                  :class="[
-                    'flex-1 px-3 py-2 rounded-lg font-medium transition',
-                    form.flow === 'IN' 
-                      ? 'bg-green-600 theme-text-light' 
-                      : 'bg-gray-100 theme-text-secondary hover:bg-gray-200'
-                  ]"
-                >
-                  {{ $t('expenses.flowIn') }}
-                </button>
-              </div>
-            </div> -->
-
-            <!-- Settlement Date - Column 2 (for all flows as status/closing date) -->
-            <div class="animate-in fade-in">
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.settlementDate') }}
-              </label>
-              <DateField
-                v-model="form.settlementDate"
-                :placeholder="$t('expenses.settlementDatePlaceholder')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
-              <p class="text-xs theme-text-muted mt-1">{{ $t('expenses.settlementDateHint') }}</p>
-            </div>
-
-            <!-- Branch - Column 1 -->
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.branch') }}
-              </label>
-              <div class="flex gap-2">
-                <select 
-                  v-model="form.branchId" 
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                  :class="isRTL ? 'text-right' : 'text-left'"
-                >
-                  <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
-                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
-                </select>
-                <button type="button" @click="addBranchPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
-              </div>
-            </div>
-
-            <!-- Location - Column 2 -->
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.location') || 'Location' }} <span class="text-red-500">*</span>
-              </label>
-              <div class="flex gap-2">
-                <select 
-                  v-model="form.locationId" 
-                  required
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                  :class="isRTL ? 'text-right' : 'text-left'"
-                >
-                  <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
-                  <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
-                </select>
-                <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
-              </div>
-            </div>
-
-            <!-- Amount - Column 2 -->
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.amount') }} <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.amount" 
-                type="number" 
-                step="0.01"
-                min="0"
-                required
-                :placeholder="$t('expenses.amount')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              />
-            </div>
-
-            <!-- Notes - Full Width -->
-            <div class="col-span-1 md:col-span-2">
-              <label class="block text-sm font-medium theme-text-secondary mb-1" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.notes') }}
-              </label>
-              <textarea 
-                v-model="form.notes" 
-                rows="2"
-                :placeholder="$t('expenses.notes')"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
-                :class="isRTL ? 'text-right' : 'text-left'"
-              ></textarea>
-            </div>
-
-            <!-- Buttons - Full Width -->
-            <div class="col-span-1 md:col-span-2 flex gap-3 pt-4" :class="isRTL ? 'flex-row-reverse' : ''">
+            <!-- Footer -->
+            <div class="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-3" :dir="isRTL ? 'rtl' : 'ltr'">
               <button 
                 type="button" 
                 @click="closeModal"
-                class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm"
               >
-                {{ $t('labels.cancel') }}
+                {{ $t('labels.cancel') || 'إلغاء' }}
               </button>
-              <button 
-                type="submit" 
-                :disabled="saving"
-                class="flex-1 px-4 py-2 theme-button rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-              >
+              <button v-if="modalStep===2" type="button" @click="modalStep=1" class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm">
+                {{ $t('labels.back') || 'رجوع' }}
+              </button>
+              <button v-if="modalStep===1" type="button" @click="validateStep1() && (modalStep=2)" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md transition text-sm">
+                {{ $t('labels.next') || 'متابعة' }}
+              </button>
+              <button v-else type="submit" form="expenseForm" :disabled="saving" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2">
                 <div v-if="saving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                {{ saving ? $t('labels.saving') : $t('labels.save') }}
+                {{ saving ? ($t('labels.saving') || 'جاري الحفظ...') : (editing ? ($t('labels.saveChanges') || 'حفظ التعديلات') : ($t('labels.save') || 'حفظ المصروف')) }}
               </button>
             </div>
-          </form>
+          </div>
         </div>
-      </div>
-    </div>
+      </transition>
+    </teleport>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="fixed inset-0 bg-black bg-opacity-50" @click="cancelDelete"></div>
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-10">
-        <div class="p-6">
-          <div class="flex items-center mb-4">
-            <div class="flex-shrink-0">
-              <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
+    <teleport to="body">
+      <transition name="kc-modal">
+        <div v-if="deleteConfirm.open" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="cancelDelete">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="p-6">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold theme-text-primary">{{ $t('expenses.deleteExpense') || 'حذف المصروف' }}</h3>
+                  <p class="text-xs theme-text-muted mt-0.5">{{ $t('expenses.deleteConfirmation') || 'هل أنت تأكد من تقديم طلب حذف هذا المصروف؟' }}</p>
+                </div>
+              </div>
+              
+              <div class="flex gap-3 pt-2 justify-end">
+                <button 
+                  @click="cancelDelete"
+                  class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm"
+                >
+                  {{ $t('labels.cancel') || 'إلغاء' }}
+                </button>
+                <button 
+                  @click="doDelete"
+                  :disabled="deleting"
+                  class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2"
+                >
+                  <div v-if="deleting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  {{ deleting ? ($t('labels.deleting') || 'جاري الحذف...') : ($t('labels.delete') || 'حذف') }}
+                </button>
+              </div>
             </div>
-            <div class="ml-3" :class="isRTL ? 'ml-0 mr-3' : ''">
-              <h3 class="text-lg font-medium theme-text-primary">{{ $t('expenses.deleteExpense') }}</h3>
-            </div>
-          </div>
-          
-          <p class="text-sm theme-text-muted mb-6" :class="isRTL ? 'text-right' : 'text-left'">
-            {{ $t('expenses.deleteConfirmation') }}
-          </p>
-          
-          <div class="flex gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
-            <button 
-              @click="cancelDelete"
-              class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              {{ $t('labels.cancel') }}
-            </button>
-            <button 
-              @click="doDelete"
-              :disabled="deleting"
-              class="flex-1 px-4 py-2 bg-red-600 theme-text-light rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-            >
-              <div v-if="deleting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              {{ deleting ? $t('labels.deleting') : $t('labels.delete') }}
-            </button>
           </div>
         </div>
-      </div>
-    </div>
+      </transition>
+    </teleport>
 
     <!-- Location Dialog Modal -->
     <div v-if="showLocationDialog" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -758,21 +730,24 @@ import {
   getBranches,
   getLocations,
   createBranch,
-  createLocation
+  createLocation,
+  getTreasuries
 } from '../../api'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 import DateField from '@/components/shared/DateField.vue'
+import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
-  components: { AddFieldModal, DateField },
+  components: { AddFieldModal, DateField, SearchDropdown },
   data() {
     return {
       expenses: [],
       branches: [],
       locations: [],
+      treasuries: [],
       // Hierarchical expense categories tree
       expenseCategories: [],
       loading: false,
@@ -780,12 +755,32 @@ export default {
       searchQuery: '',
       selectedCategoryId: null,
       selectedSubcategoryId: null,
+      selectedLocationId: null,
+      selectedTreasuryId: null,
+      selectedPaymentMethod: '',
+      // Search text for SearchDropdown filters
+      filterCategorySearch: '',
+      filterSubcategorySearch: '',
+      filterLocationSearch: '',
+      filterTreasurySearch: '',
+      filterPaymentMethodSearch: '',
+      // Search text for modal form SearchDropdowns
+      formCategorySearch: '',
+      formSubcategorySearch: '',
+      formLocationSearch: '',
+      formPaymentMethodSearch: '',
+      formTreasurySearch: '',
+      filters: {
+        startDate: '',
+        endDate: ''
+      },
       // Subcategory combobox state
       subcategoryInput: '',
       showSubcategoryDropdown: false,
       selectedSubcategoryIndex: -1,
       selectedKind: '',
       modalOpen: false,
+        modalStep: 1,
       editing: false,
       saving: false,
       deleting: false,
@@ -805,6 +800,8 @@ export default {
         flow: 'OUT',
         branchId: null,
         locationId: null,
+        treasuryId: null,
+        paymentMethod: 'CASH',
         settlementDate: null
       },
       deleteConfirm: { open: false, item: null },
@@ -817,6 +814,36 @@ export default {
   computed: {
     isRTL() { 
       return this.$i18n && this.$i18n.locale === 'ar' 
+    },
+
+    // Treasury items with computed display name for SearchDropdown
+    treasuryItems() {
+      return (this.treasuries || []).map(tr => ({
+        id: tr.id,
+        name: `${tr.name} (${tr.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})`
+      }))
+    },
+
+    // Payment method items for SearchDropdown
+    paymentMethodItems() {
+      return [
+        { id: 'CASH', name: 'نقداً' },
+        { id: 'BANK_TRANSFER', name: 'تحويل بنكي' },
+        { id: 'CHEQUE', name: 'شيك' },
+        { id: 'CUSTODY_CASH', name: 'عهدة نقداً' }
+      ]
+    },
+
+    // Subcategories for filter (based on selected filter category)
+    filterSubcategories() {
+      if (!this.selectedCategoryId) return []
+      return this.expenseCategories.find(c => c.id === this.selectedCategoryId)?.subCategories || []
+    },
+
+    // Subcategories for modal form (based on selected form category)
+    formSubcategories() {
+      if (!this.form.categoryId) return []
+      return this.expenseCategories.find(c => c.id === this.form.categoryId)?.subCategories || []
     },
 
     // Subcategory options computed from selected category
@@ -918,9 +945,20 @@ export default {
     await this.loadExpenses()
     await this.fetchBranches()
     await this.fetchLocations()
+    await this.fetchTreasuries()
   },
   
   methods: {
+    async fetchTreasuries() {
+      try {
+        const response = await getTreasuries({ includeArchived: false })
+        this.treasuries = response.data || []
+      } catch (e) {
+        console.error('Failed to fetch treasuries in ExpensesList:', e)
+        this.treasuries = []
+      }
+    },
+
     async loadExpenses() {
       this.loading = true
       this.error = null
@@ -932,8 +970,13 @@ export default {
           pageSize: this.pageSize
         }
         if (this.searchQuery) params.q = this.searchQuery
+        if (this.filters?.startDate) params.startDate = this.filters.startDate
+        if (this.filters?.endDate) params.endDate = this.filters.endDate
         if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
+        if (this.selectedLocationId !== null && this.selectedLocationId !== undefined) params.locationId = this.selectedLocationId
+        if (this.selectedTreasuryId !== null && this.selectedTreasuryId !== undefined) params.treasuryId = this.selectedTreasuryId
+        if (this.selectedPaymentMethod) params.paymentMethod = this.selectedPaymentMethod
         if (this.selectedKind) params.kind = this.selectedKind
         
         const response = await getExpenses(params)
@@ -1078,9 +1121,18 @@ export default {
         flow: 'OUT',
         branchId: null,
         locationId: this.locations?.[0]?.id ?? null,
+        treasuryId: null,
+        paymentMethod: 'CASH',
         notes: '',
         settlementDate: null
       }
+      this.modalStep = 1
+      // Reset form search texts
+      this.formLocationSearch = this.locations?.[0]?.name ?? ''
+      this.formCategorySearch = ''
+      this.formSubcategorySearch = ''
+      this.formPaymentMethodSearch = 'نقداً'
+      this.formTreasurySearch = ''
       this.modalOpen = true
     },
     
@@ -1097,14 +1149,25 @@ export default {
         flow: expense.flow || 'OUT',
         branchId: expense.branchId || null,
         locationId: expense.locationId || null,
+        treasuryId: expense.treasuryId || expense.treasury?.id || null,
+        paymentMethod: expense.paymentMethod || 'CASH',
         notes: expense.notes || '',
-        settlementDate: expense.settlementDate || null
+        settlementDate: expense.settlementDate ? expense.settlementDate.split('T')[0] : null
       }
+      this.modalStep = 1
+      // Populate form search texts from expense data
+      this.formLocationSearch = expense.location?.name || this.locations?.find(l => l.id === expense.locationId)?.name || ''
+      this.formCategorySearch = this.expenseCategories?.find(c => c.id === expense.categoryId)?.name || ''
+      const parentCat = this.expenseCategories?.find(c => c.id === expense.categoryId)
+      this.formSubcategorySearch = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)?.name || ''
+      this.formPaymentMethodSearch = this.paymentMethodItems?.find(p => p.id === expense.paymentMethod)?.name || 'نقداً'
+      this.formTreasurySearch = expense.treasury?.name ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : ''
       this.modalOpen = true
     },
     
     closeModal() {
       this.modalOpen = false
+      this.modalStep = 1
       this.form = {
         id: null,
         date: '',
@@ -1116,9 +1179,17 @@ export default {
         flow: 'OUT',
         branchId: null,
         locationId: null,
+        treasuryId: null,
+        paymentMethod: 'CASH',
         notes: '',
         settlementDate: null
       }
+      // Reset form search texts
+      this.formLocationSearch = ''
+      this.formCategorySearch = ''
+      this.formSubcategorySearch = ''
+      this.formPaymentMethodSearch = ''
+      this.formTreasurySearch = ''
     },
     
     async saveExpense() {
@@ -1136,8 +1207,9 @@ export default {
           amount: parseFloat(this.form.amount),
           flow: this.form.flow || 'OUT',
           branchId: this.form.branchId || null,
-          // send the selected locationId (required and validated)
           locationId: this.form.locationId,
+          treasuryId: this.form.treasuryId ?? null,
+          paymentMethod: this.form.paymentMethod || 'CASH',
           notes: this.form.notes || ''
         }
         // Normalize settlementDate: send either null or an ISO datetime string
@@ -1156,14 +1228,26 @@ export default {
         
         if (this.editing) {
           try {
-            await updateExpense(this.form.id, expenseData)
+            const res = await updateExpense(this.form.id, expenseData)
+            if (res.status === 202 || res.data?.status === 'PENDING') {
+              this.closeModal()
+              this.showSuccess('تم تقديم طلب التعديل للموافقة الإدارية بنجاح')
+              await this.loadExpenses()
+              return
+            }
             const index = this.expenses.findIndex(e => e.id === this.form.id)
             if (index !== -1) {
               this.expenses.splice(index, 1, { ...this.expenses[index], ...expenseData })
             }
-            // Refresh list to pick up any backend-side changes (including saved category)
+            // Refresh list to pick up any backend-side changes
             await this.loadExpenses()
           } catch (updateError) {
+            if (updateError.response?.status === 202 || updateError.response?.data?.status === 'PENDING') {
+              this.closeModal()
+              this.showSuccess('تم تقديم طلب التعديل للموافقة الإدارية بنجاح')
+              await this.loadExpenses()
+              return
+            }
             // If backend is not available, simulate update
             if (updateError.response?.status === 500 || updateError.code === 'ERR_NETWORK') {
               console.log('Backend not available, simulating expense update')
@@ -1236,6 +1320,18 @@ export default {
       }
     },
     
+    validateStep1() {
+      if (!this.form.date) {
+        this.showError(this.$t('expenses.validation.dateRequired'))
+        return false
+      }
+      if (this.form.locationId === null) {
+        this.showError((this.$t('expenses.location') || 'Location') + ' ' + (this.$t('common.required') || 'is required'))
+        return false
+      }
+      return true
+    },
+
     validateForm() {
       if (!this.form.date) {
         this.showError(this.$t('expenses.validation.dateRequired'))
@@ -1273,12 +1369,24 @@ export default {
       this.deleting = true
       
       try {
-        await deleteExpense(this.deleteConfirm.item.id)
+        const res = await deleteExpense(this.deleteConfirm.item.id)
+        if (res?.status === 202 || res?.data?.status === 'PENDING') {
+          this.cancelDelete()
+          this.showSuccess('تم تقديم طلب الحذف للموافقة الإدارية بنجاح')
+          await this.loadExpenses()
+          return
+        }
         this.expenses = this.expenses.filter(e => e.id !== this.deleteConfirm.item.id)
         this.totalItems--
         this.cancelDelete()
         this.showSuccess(this.$t('expenses.success.deleted'))
       } catch (error) {
+        if (error.response?.status === 202 || error.response?.data?.status === 'PENDING') {
+          this.cancelDelete()
+          this.showSuccess('تم تقديم طلب الحذف للموافقة الإدارية بنجاح')
+          await this.loadExpenses()
+          return
+        }
         console.error('Error deleting expense:', error)
         
         // If backend is not available, simulate deletion
@@ -1300,9 +1408,33 @@ export default {
       this.searchQuery = ''
       this.selectedCategoryId = null
       this.selectedSubcategoryId = null
+      this.selectedLocationId = null
+      this.selectedTreasuryId = null
+      this.selectedPaymentMethod = ''
       this.selectedKind = ''
+      // Reset filter search texts
+      this.filterCategorySearch = ''
+      this.filterSubcategorySearch = ''
+      this.filterLocationSearch = ''
+      this.filterTreasurySearch = ''
+      this.filterPaymentMethodSearch = ''
+      this.filters = {
+        startDate: '',
+        endDate: ''
+      }
       this.currentPage = 1
       this.loadExpenses()
+    },
+
+    getPaymentMethodLabel(method) {
+      if (!method) return 'نقداً'
+      const map = {
+        'CASH': 'نقداً',
+        'BANK_TRANSFER': 'تحويل بنكي',
+        'CHEQUE': 'شيك',
+        'CUSTODY_CASH': 'عهدة نقداً'
+      }
+      return map[method] || method
     },
     
     getCategoryLabel(category) {

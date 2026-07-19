@@ -813,6 +813,8 @@ export const downloadTreasuryTransactions = (treasuryId, params = {}, format = '
 };
 export const depositToTreasury = (treasuryId, data) =>
   axios.post(`${BASE_URL}/api/treasuries/${treasuryId}/deposit`, data);
+export const transferBetweenTreasuries = (data) =>
+  axios.post(`${BASE_URL}/api/treasuries/transfer`, data);
 
 // Branch Wallet APIs
 export const getBranchWalletSummary = (branchId) =>

@@ -530,7 +530,8 @@ export default {
         SUPPLY: this.locale === 'ar' ? 'توريدات' : 'Supply',
         TRANSPORT: this.locale === 'ar' ? 'نقليات' : 'Transport',
         RENTAL: this.locale === 'ar' ? 'سجلات معدات' : 'Equipment Rental',
-        EXTRACT: this.locale === 'ar' ? 'مستخلصات' : 'Extract'
+        EXTRACT: this.locale === 'ar' ? 'مستخلصات' : 'Extract',
+        EXPENSE: this.locale === 'ar' ? 'مصروفات' : 'Expense'
       };
       return labels[mod] || mod;
     },
@@ -539,7 +540,8 @@ export default {
         SUPPLY: 'bg-sky-50 text-sky-700 border border-sky-100',
         TRANSPORT: 'bg-purple-50 text-purple-700 border border-purple-100',
         RENTAL: 'bg-teal-50 text-teal-700 border border-teal-100',
-        EXTRACT: 'bg-indigo-50 text-indigo-700 border border-indigo-100'
+        EXTRACT: 'bg-indigo-50 text-indigo-700 border border-indigo-100',
+        EXPENSE: 'bg-emerald-50 text-emerald-700 border border-emerald-100'
       };
       return classes[mod] || 'bg-slate-50 text-slate-700';
     },

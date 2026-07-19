@@ -237,6 +237,12 @@ const routes = [
         component: ExpensesReport,
         meta: { title: 'expenses.report' }
       },
+      {
+        path: 'expenses/terms',
+        name: 'expenses-terms',
+        component: () => import('@/components/dashboard/TermsManagement.vue'),
+        meta: { title: 'expenses.termsManagement' }
+      },
 
       // ==================== Admin Module (Role Protected) ====================
       {
