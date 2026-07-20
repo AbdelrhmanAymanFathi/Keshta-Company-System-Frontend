@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6" :class="{ 'direction-rtl': isRTL }">
-    <PageHeader title="إدارة البنود (البنود الرئيسية والفرعية)" subtitle="إضافة وتعديل البنود الرئيسية والفرعية المستخدمة في المصروفات والعهد">
+    <PageHeader :title="$t('expenses.termsManagement')" :subtitle="$t('expenses.termsManagementSubtitle')">
       <button 
         @click="openAddCategoryModal"
         class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
@@ -8,7 +8,7 @@
         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
-        إضافة بند رئيسي جديد
+        {{ $t('expenses.addMainTerm') }}
       </button>
     </PageHeader>
 
@@ -18,7 +18,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="البحث في البنود الرئيسية أو الفرعية..."
+          :placeholder="$t('expenses.searchTermsPlaceholder')"
           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl theme-input-focus pl-10 pr-4 text-sm"
           :class="isRTL ? 'text-right pr-4 pl-10' : 'text-left pl-4 pr-10'"
         />
@@ -27,7 +27,7 @@
         </svg>
       </div>
       <div class="text-sm theme-text-muted font-medium whitespace-nowrap">
-        إجمالي البنود الرئيسية: {{ categories.length }}
+        {{ $t('expenses.totalMainTerms', { count: categories.length }) }}
       </div>
     </div>
 
@@ -41,8 +41,8 @@
       <svg class="w-16 h-16 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
       </svg>
-      <h3 class="text-lg font-semibold text-slate-700 mb-1">لا توجد بنود مطابقة</h3>
-      <p class="text-sm text-slate-500">قم بإضافة بند رئيسي جديد لبدء التصنيف</p>
+      <h3 class="text-lg font-semibold text-slate-700 mb-1">{{ $t('expenses.noMatchingTerms') }}</h3>
+      <p class="text-sm text-slate-500">{{ $t('expenses.addMainTermHint') }}</p>
     </div>
 
     <!-- Main Terms List (Tree / Accordion View) -->
@@ -62,7 +62,7 @@
               <h3 class="text-base font-bold theme-text-primary flex items-center gap-2">
                 {{ cat.name }}
                 <span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-                  {{ cat.subCategories ? cat.subCategories.length : 0 }} بند فرعي
+                  {{ cat.subCategories ? cat.subCategories.length : 0 }} {{ $t('expenses.subcategoryCount') }}
                 </span>
               </h3>
             </div>
@@ -77,14 +77,14 @@
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
               </svg>
-              إضافة بند فرعي
+              {{ $t('expenses.addSubcategory') }}
             </button>
 
             <!-- Edit Main Term Button -->
             <button 
               @click="openEditCategoryModal(cat)"
               class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="تعديل البند الرئيسي"
+              :title="$t('expenses.editMainTerm')"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -95,7 +95,7 @@
             <button 
               @click="confirmDeleteCategory(cat)"
               class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="حذف البند الرئيسي"
+              :title="$t('expenses.deleteMainTerm')"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -107,7 +107,7 @@
         <!-- Subcategories Grid -->
         <div class="p-4 bg-slate-50/50">
           <div v-if="!cat.subCategories || cat.subCategories.length === 0" class="text-xs text-slate-400 italic py-2 px-3">
-            لا توجد بنود فرعية مسجلة في هذا البند الرئيسي.
+            {{ $t('expenses.noSubcategories') }}
           </div>
           <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             <div 
@@ -144,12 +144,12 @@
     <div v-if="categoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
-          <h3 class="font-bold text-lg">{{ categoryModal.isEdit ? 'تعديل البند الرئيسي' : 'إضافة بند رئيسي جديد' }}</h3>
+          <h3 class="font-bold text-lg">{{ categoryModal.isEdit ? $t('expenses.editMainTerm') : $t('expenses.addMainTerm') }}</h3>
           <button @click="categoryModal.open = false" class="text-white/80 hover:text-white">&times;</button>
         </div>
         <form @submit.prevent="saveCategory" class="p-6 space-y-4">
           <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">اسم البند الرئيسي <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.mainTermName') }} <span class="text-red-500">*</span></label>
             <input 
               v-model="categoryModal.name" 
               type="text" 
@@ -164,14 +164,14 @@
               @click="categoryModal.open = false" 
               class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
             >
-              إلغاء
+              {{ $t('labels.cancel') }}
             </button>
             <button 
               type="submit" 
               :disabled="saving"
               class="px-4 py-2 text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
             >
-              {{ saving ? 'جاري الحفظ...' : 'حفظ' }}
+              {{ saving ? $t('labels.saving') : $t('labels.save') }}
             </button>
           </div>
         </form>
@@ -182,12 +182,12 @@
     <div v-if="subCategoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
-          <h3 class="font-bold text-lg">{{ subCategoryModal.isEdit ? 'تعديل البند الفرعي' : 'إضافة بند فرعي جديد' }}</h3>
+          <h3 class="font-bold text-lg">{{ subCategoryModal.isEdit ? $t('expenses.editSubcategory') : $t('expenses.addSubcategory') }}</h3>
           <button @click="subCategoryModal.open = false" class="text-white/80 hover:text-white">&times;</button>
         </div>
         <form @submit.prevent="saveSubCategory" class="p-6 space-y-4">
           <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">البند الرئيسي التابع له</label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.parentCategoryLabel') }}</label>
             <input 
               :value="subCategoryModal.parentCategoryName" 
               disabled 
@@ -196,7 +196,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">اسم البند الفرعي <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.subcategoryName') }} <span class="text-red-500">*</span></label>
             <input 
               v-model="subCategoryModal.name" 
               type="text" 
@@ -211,14 +211,14 @@
               @click="subCategoryModal.open = false" 
               class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
             >
-              إلغاء
+              {{ $t('labels.cancel') }}
             </button>
             <button 
               type="submit" 
               :disabled="saving"
               class="px-4 py-2 text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
             >
-              {{ saving ? 'جاري الحفظ...' : 'حفظ' }}
+              {{ saving ? $t('labels.saving') : $t('labels.save') }}
             </button>
           </div>
         </form>
@@ -236,7 +236,7 @@ import {
   createExpenseSubCategory,
   updateExpenseSubCategory,
   deleteExpenseSubCategory
-} from '../../api'
+} from '../../../api'
 import PageHeader from '@/components/shared/PageHeader.vue'
 
 export default {

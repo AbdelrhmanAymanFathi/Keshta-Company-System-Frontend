@@ -175,7 +175,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { getExpensesReportData, downloadExpensesReport } from '@/api'
-import DateField from '../shared/DateField.vue'
+import DateField from '../../shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
@@ -246,7 +246,7 @@ export default {
       error.value = null
       if (!filters.value.startDate || !filters.value.endDate) {
         items.value = []
-        error.value = 'من فضلك حدد تاريخ البداية وتاريخ النهاية ثم اضغط بحث'
+        error.value = 'Please select the start and end dates before searching'
         return
       }
 
@@ -256,7 +256,7 @@ export default {
         const e = new Date(filters.value.endDate)
         if (e < s) {
           items.value = []
-          error.value = 'تأكد أن تاريخ النهاية بعد أو يساوي تاريخ البداية'
+          error.value = 'Please make sure the end date is on or after the start date'
           return
         }
       } catch (e) {

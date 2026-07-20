@@ -32,8 +32,8 @@ const EquipmentReport = () => import('@/components/dashboard/Equipment/Equipment
 const EquipmentList = () => import('@/components/dashboard/Equipment/EquipmentList.vue')
 const TreasuryDashboard = () => import('@/components/dashboard/Treasury/TreasuryDashboard.vue')
 const TreasuryTransactions = () => import('@/components/dashboard/Treasury/TreasuryTransactions.vue')
-const ExpensesList = () => import('@/components/dashboard/ExpensesList.vue')
-const ExpensesReport = () => import('@/components/dashboard/ExpensesReportNew.vue')
+const ExpensesList = () => import('@/components/dashboard/Expenses/ExpensesList.vue')
+const ExpensesReport = () => import('@/components/dashboard/Expenses/ExpensesReportNew.vue')
 const ContractorsActivityReport = () => import('@/components/dashboard/ContractorsActivityReport.vue')
 const ChangesByDate = () => import('@/components/dashboard/ChangesByDate.vue')
 const ApprovalsInbox = () => import('@/components/dashboard/ApprovalsInbox.vue')
@@ -240,7 +240,7 @@ const routes = [
       {
         path: 'expenses/terms',
         name: 'expenses-terms',
-        component: () => import('@/components/dashboard/TermsManagement.vue'),
+        component: () => import('@/components/dashboard/Expenses/TermsManagement.vue'),
         meta: { title: 'expenses.termsManagement' }
       },
 

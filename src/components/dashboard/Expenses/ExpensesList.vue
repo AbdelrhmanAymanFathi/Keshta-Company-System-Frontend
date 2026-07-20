@@ -8,7 +8,7 @@
     @close="closeFieldModal"
     @save="handleFieldSave"
   />
-  <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl p-6' : 'p-6'">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <PageHeader :title="$t('expenses.title')" :subtitle="$t('expenses.searchBy')">
       <button 
         @click="openAddModal" 
@@ -23,30 +23,30 @@
 
     <!-- Filters Section -->
     <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
-      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') || 'الفلاتر' }}</h4>
+      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') || 'تاريخ البدء' }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- End Date -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') || 'تاريخ الانتهاء' }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField v-model="filters.endDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
         <!-- Main Term / البند الرئيسي -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">البند الرئيسي</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.mainTerm') }}</label>
           <SearchDropdown
             v-model="filterCategorySearch"
             :items="expenseCategories"
             :allItems="expenseCategories"
-            placeholder="ابحث عن البند الرئيسي..."
+            :placeholder="$t('expenses.searchMainTerm')"
             clearable
             @select="(sel) => { selectedCategoryId = sel.id; filterCategorySearch = sel.name; selectedSubcategoryId = null; filterSubcategorySearch = '' }"
             @clear="() => { selectedCategoryId = null; filterCategorySearch = ''; selectedSubcategoryId = null; filterSubcategorySearch = '' }"
@@ -55,13 +55,13 @@
 
         <!-- Secondary Term / البند الفرعي -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">البند الفرعي</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.subTerm') }}</label>
           <SearchDropdown
             v-model="filterSubcategorySearch"
             :items="filterSubcategories"
             :allItems="filterSubcategories"
             :disabled="!selectedCategoryId"
-            placeholder="ابحث عن البند الفرعي..."
+            :placeholder="$t('expenses.searchSubTerm')"
             clearable
             @select="(sel) => { selectedSubcategoryId = sel.id; filterSubcategorySearch = sel.name }"
             @clear="() => { selectedSubcategoryId = null; filterSubcategorySearch = '' }"
@@ -70,12 +70,12 @@
 
         <!-- Location / الموقع -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.location') || 'الموقع' }}</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.location') }}</label>
           <SearchDropdown
             v-model="filterLocationSearch"
             :items="locations"
             :allItems="locations"
-            placeholder="ابحث عن الموقع..."
+            :placeholder="$t('expenses.searchLocation')"
             clearable
             @select="(sel) => { selectedLocationId = sel.id; filterLocationSearch = sel.name }"
             @clear="() => { selectedLocationId = null; filterLocationSearch = '' }"
@@ -84,12 +84,12 @@
 
         <!-- Treasury/Custody / الخزينة أو العهدة -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">الخزينة / العهدة</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.treasuryOrCustody') }}</label>
           <SearchDropdown
             v-model="filterTreasurySearch"
             :items="treasuryItems"
             :allItems="treasuryItems"
-            placeholder="ابحث عن الخزينة / العهدة..."
+            :placeholder="$t('expenses.searchTreasury')"
             clearable
             @select="(sel) => { selectedTreasuryId = sel.id; filterTreasurySearch = sel.name }"
             @clear="() => { selectedTreasuryId = null; filterTreasurySearch = '' }"
@@ -98,12 +98,12 @@
 
         <!-- Payment Method / طريقة الدفع -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">طريقة الدفع</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.paymentMethod') }}</label>
           <SearchDropdown
             v-model="filterPaymentMethodSearch"
             :items="paymentMethodItems"
             :allItems="paymentMethodItems"
-            placeholder="ابحث عن طريقة الدفع..."
+            :placeholder="$t('expenses.searchPaymentMethod')"
             clearable
             @select="(sel) => { selectedPaymentMethod = sel.id; filterPaymentMethodSearch = sel.name }"
             @clear="() => { selectedPaymentMethod = ''; filterPaymentMethodSearch = '' }"
@@ -112,11 +112,11 @@
 
         <!-- Search / البحث في البيان -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">البحث في البيان</label>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.searchStatement') }}</label>
           <input 
             v-model="searchQuery" 
             type="text" 
-            placeholder="ابحث في البيان أو الوصف..."
+            :placeholder="$t('expenses.searchStatementPlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
             :class="isRTL ? 'text-right' : 'text-left'"
           />
@@ -124,14 +124,14 @@
       </div>
 
       <!-- Filter Action Buttons -->
-      <div class="flex gap-2 pt-2">
+      <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
         <button @click="currentPage = 1; loadExpenses()" :disabled="loading"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm">
-          {{ $t('labels.search') || 'بحث' }}
+          class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm">
+          {{ $t('labels.search') }}
         </button>
         <button @click="clearFilters"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">
-          {{ $t('expenses.clearSearch') || 'إعادة ضبط' }}
+          class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">
+          {{ $t('expenses.clearSearch') }}
         </button>
       </div>
     </div>
@@ -152,7 +152,7 @@
     </div>
 
     <!-- Desktop Table -->
-    <div v-if="!loading && !error" class="hidden sm:block bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div v-if="!loading && !error" class="hidden sm:block overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -164,10 +164,10 @@
                 {{ $t('expenses.date') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                البند الرئيسي
+                {{ $t('expenses.mainTerm') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                البند الفرعي
+                {{ $t('expenses.subTerm') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.description') }}
@@ -176,10 +176,10 @@
                 {{ $t('expenses.location') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                طريقة الدفع
+                {{ $t('expenses.paymentMethod') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                الخزينة / العهدة
+                {{ $t('expenses.treasuryOrCustody') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.amount') }}
@@ -229,7 +229,7 @@
                 <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.treasury.type === 'CUSTODY' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'">
                   {{ expense.treasury.name }} ({{ expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }})
                 </span>
-                <span v-else class="text-xs theme-caption">المصروفات الرئيسية</span>
+                <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatCurrency(expense.amount) }}
@@ -281,7 +281,7 @@
       <div 
         v-for="expense in filteredExpenses" 
         :key="expense.id" 
-        class="bg-white rounded-lg shadow-sm border p-4"
+        class="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40 p-4"
       >
         <div class="flex justify-between items-start mb-3">
           <div :class="isRTL ? 'text-right' : 'text-left'">
@@ -388,7 +388,7 @@
     <teleport to="body">
       <transition name="kc-modal">
         <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden">
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
@@ -398,14 +398,14 @@
             </div>
 
             <!-- Body -->
-            <div class="flex-1 overflow-y-auto p-6 modal-body-container relative">
+            <div class="flex-1 overflow-y-auto p-6 sm:p-8 modal-body-container relative">
               <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6">
                 
                 <!-- Step 1: Date & Location -->
-                <div v-if="modalStep===1" class="bg-white rounded-xl border border-slate-200 p-5 space-y-4 shadow-sm">
+                <div v-if="modalStep===1" class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-sm">
                   <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-100 flex items-center gap-2">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 11h.01M7 15h.01M13 7h7M13 11h7M13 15h7M3 7h.01M3 11h.01M3 15h.01"></path></svg>
-                    تصنيف البنود والموقع
+                    {{ $t('expenses.modalStepOneTitle') }}
                   </h4>
 
                   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -425,13 +425,13 @@
                     <!-- Location -->
                     <div>
                       <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.location') || 'الموقع' }} <span class="text-red-500">*</span>
+                        {{ $t('expenses.location') }} <span class="text-red-500">*</span>
                       </label>
                       <SearchDropdown
                           v-model="formLocationSearch"
                           :items="locations"
                           :allItems="locations"
-                          placeholder="ابحث عن الموقع..."
+                          :placeholder="$t('expenses.searchLocation')"
                           inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                           teleportTarget=".modal-body-container"
                           @select="(sel) => { form.locationId = sel.id; formLocationSearch = sel.name }"
@@ -444,28 +444,28 @@
                 <div v-if="modalStep===2" class="bg-white rounded-xl border border-slate-200 shadow-sm">
                   <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">تفاصيل المصروفات</h4>
-                      <p class="mt-1 text-xs theme-text-muted">اكتب سطرًا جديدًا ثم اضغط Enter أو Tab لإنشاء سطر آخر بسرعة.</p>
+                      <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $t('expenses.modalStepTwoTitle') }}</h4>
+                      <p class="mt-1 text-xs theme-text-muted">{{ $t('expenses.modalStepTwoHint') }}</p>
                     </div>
                     <button type="button" @click="addRow" class="theme-button px-3 py-2 rounded-lg text-sm font-medium shadow-sm">
-                      + إضافة سطر
+                      + {{ $t('expenses.addRow') }}
                     </button>
                   </div>
 
-                  <div class="p-2 sm:p-4">
+                  <div class="p-4 sm:p-5">
                     <div class="relative overflow-x-auto overflow-y-visible rounded-xl border border-slate-200">
                       <table ref="tableRef" class="min-w-[980px] w-full border-collapse bg-white">
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
                             <th class="w-12 px-3 py-3 text-center text-xs font-medium theme-text-secondary">#</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">البند الرئيسي</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">البند الفرعي</th>
-                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">البيان / الوصف</th>
-                            <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">المبلغ</th>
-                            <th class="min-w-[160px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">طريقة الدفع</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">الخزينة / العهدة</th>
-                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">ملاحظات</th>
-                            <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">إجراءات</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
+                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
+                            <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
+                            <th class="min-w-[160px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.paymentMethod') }}</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.treasuryOrCustody') }}</th>
+                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
+                            <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
@@ -476,12 +476,14 @@
                                 v-model="row.categorySearch"
                                 :items="expenseCategories"
                                 :allItems="expenseCategories"
-                                placeholder="ابحث عن البند الرئيسي..."
+                                :placeholder="$t('expenses.searchMainTerm')"
                                 inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                                 teleportTarget=".modal-body-container"
                                 clearable
                                 @select="(sel) => { row.categoryId = sel.id; row.categorySearch = sel.name; row.subCategoryId = null; row.subCategorySearch = '' }"
                                 @clear="() => { row.categoryId = null; row.categorySearch = ''; row.subCategoryId = null; row.subCategorySearch = '' }"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'category', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'category', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -490,21 +492,24 @@
                                 :items="getRowSubcategories(row)"
                                 :allItems="getRowSubcategories(row)"
                                 :disabled="!row.categoryId"
-                                placeholder="ابحث عن البند الفرعي..."
+                                :placeholder="$t('expenses.searchSubTerm')"
                                 inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                                 teleportTarget=".modal-body-container"
                                 clearable
                                 @select="(sel) => { row.subCategoryId = sel.id; row.subCategorySearch = sel.name }"
                                 @clear="() => { row.subCategoryId = null; row.subCategorySearch = '' }"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'subcategory', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
                               <input
                                 v-model="row.description"
                                 type="text"
-                                placeholder="أدخل البيان أو الوصف..."
+                                :placeholder="$t('expenses.statementPlaceholder')"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                @keydown.enter.prevent="handleEnterKey(index)"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -515,8 +520,8 @@
                                 min="0"
                                 placeholder="0.00"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-semibold theme-input-focus"
-                                @keydown.enter.prevent="handleEnterKey(index)"
-                                @keydown.tab="onLastFieldTab(index, $event)"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'amount', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'amount', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -524,11 +529,13 @@
                                 v-model="row.paymentMethodSearch"
                                 :items="paymentMethodItems"
                                 :allItems="paymentMethodItems"
-                                placeholder="ابحث عن طريقة الدفع..."
+                                :placeholder="$t('expenses.searchPaymentMethod')"
                                 inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                                 teleportTarget=".modal-body-container"
                                 @select="(sel) => { row.paymentMethod = sel.id; row.paymentMethodSearch = sel.name }"
                                 @clear="() => { row.paymentMethod = 'CASH'; row.paymentMethodSearch = 'نقداً' }"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'paymentMethod', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'paymentMethod', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -536,22 +543,24 @@
                                 v-model="row.treasurySearch"
                                 :items="treasuryItems"
                                 :allItems="treasuryItems"
-                                placeholder="ابحث عن الخزينة / العهدة..."
+                                :placeholder="$t('expenses.searchTreasury')"
                                 inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                                 teleportTarget=".modal-body-container"
                                 clearable
                                 @select="(sel) => { row.treasuryId = sel.id; row.treasurySearch = sel.name }"
                                 @clear="() => { row.treasuryId = null; row.treasurySearch = '' }"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'treasury', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'treasury', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
                               <textarea
                                 v-model="row.notes"
                                 rows="2"
-                                placeholder="ملاحظات"
+                                :placeholder="$t('expenses.notesPlaceholder')"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                @keydown.enter.prevent="handleEnterKey(index)"
-                                @keydown.tab="onLastFieldTab(index, $event)"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'notes', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'notes', $event)"
                               ></textarea>
                             </td>
                             <td class="px-3 py-2 text-center">
@@ -586,17 +595,17 @@
                 @click="closeModal"
                 class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm"
               >
-                {{ $t('labels.cancel') || 'إلغاء' }}
+                {{ $t('labels.cancel') }}
               </button>
               <button v-if="modalStep===2" type="button" @click="modalStep=1" class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm">
-                {{ $t('labels.back') || 'رجوع' }}
+                {{ $t('labels.back') }}
               </button>
               <button v-if="modalStep===1" type="button" @click="validateStep1() && (modalStep=2)" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md transition text-sm">
-                {{ $t('labels.next') || 'متابعة' }}
+                {{ $t('labels.next') }}
               </button>
               <button v-else type="submit" form="expenseForm" :disabled="saving" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2">
                 <div v-if="saving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                {{ saving ? ($t('labels.saving') || 'جاري الحفظ...') : (editing ? ($t('labels.saveChanges') || 'حفظ التعديلات') : ($t('labels.save') || 'حفظ المصروف')) }}
+                {{ saving ? $t('labels.saving') : (editing ? $t('labels.saveChanges') : $t('labels.save')) }}
               </button>
             </div>
           </div>
@@ -627,7 +636,7 @@
                   @click="cancelDelete"
                   class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm"
                 >
-                  {{ $t('labels.cancel') || 'إلغاء' }}
+                  {{ $t('labels.cancel') }}
                 </button>
                 <button 
                   @click="doDelete"
@@ -635,7 +644,7 @@
                   class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2"
                 >
                   <div v-if="deleting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  {{ deleting ? ($t('labels.deleting') || 'جاري الحذف...') : ($t('labels.delete') || 'حذف') }}
+                  {{ deleting ? $t('labels.deleting') : $t('labels.delete') }}
                 </button>
               </div>
             </div>
@@ -771,7 +780,7 @@ import {
   createBranch,
   createLocation,
   getTreasuries
-} from '../../api'
+} from '../../../api'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
@@ -1300,17 +1309,47 @@ export default {
       return this.expenseCategories.find(c => c.id === row.categoryId)?.subCategories || []
     },
 
-    onLastFieldTab(index, event) {
+    handleFieldNavigation(index, field, event) {
+      if (!event) return
       if (event.shiftKey) return
-      if (event.key === 'Tab' && index === this.rows.length - 1) {
+      if (event.key !== 'Tab' && event.key !== 'Enter') return
+
+      const isTab = event.key === 'Tab'
+      const isLastField = field === 'notes'
+
+      if (isLastField && (isTab || event.key === 'Enter')) {
         event.preventDefault()
         this.addRow()
+        return
       }
-    },
 
-    handleEnterKey(index) {
-      if (index < this.rows.length - 1) return
-      this.addRow()
+      event.preventDefault()
+
+      const nextFields = ['category', 'subcategory', 'description', 'amount', 'paymentMethod', 'treasury', 'notes']
+      const currentIndex = nextFields.indexOf(field)
+      const nextField = nextFields[currentIndex + 1]
+      if (!nextField) {
+        this.addRow()
+        return
+      }
+
+      const rows = this.$refs.tableRef?.querySelectorAll('tbody tr') || []
+      const row = rows[index]
+      if (!row) return
+
+      const selectorMap = {
+        category: 'td:nth-child(2) input',
+        subcategory: 'td:nth-child(3) input',
+        description: 'td:nth-child(4) input',
+        amount: 'td:nth-child(5) input',
+        paymentMethod: 'td:nth-child(6) input',
+        treasury: 'td:nth-child(7) input',
+        notes: 'td:nth-child(8) textarea'
+      }
+
+      const target = row.querySelector(selectorMap[nextField])
+      target?.focus()
+      if (target?.select) target.select()
     },
     
     async saveExpense() {

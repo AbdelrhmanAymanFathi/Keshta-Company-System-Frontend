@@ -776,6 +776,7 @@ body,
     linear-gradient(90deg, rgba(var(--theme-primary-rgb), 0.09) 1px, transparent 1px),
     linear-gradient(135deg, rgba(var(--theme-primary-rgb), 0.05) 0%, transparent 55%);
   background-size: 28px 28px, 28px 28px, 100% 100%;
+  -webkit-mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.92) 0%, rgb(0 0 0 / 0.35) 100%);
   mask-image: linear-gradient(180deg, rgb(0 0 0 / 0.92) 0%, rgb(0 0 0 / 0.35) 100%);
 }
 
@@ -869,6 +870,7 @@ body,
     radial-gradient(circle, rgba(var(--theme-primary-rgb), 0.22) 0%, rgba(var(--theme-primary-rgb), 0) 70%);
   filter: blur(20px);
   animation: theme-particles-glow 14s ease-in-out infinite;
+
 }
 
 /* --- Vue motion layer presets (truck, smart-city, construction, blueprint) --- */
