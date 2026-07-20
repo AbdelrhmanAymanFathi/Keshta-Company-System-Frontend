@@ -388,7 +388,7 @@
     <teleport to="body">
       <transition name="kc-modal">
         <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
