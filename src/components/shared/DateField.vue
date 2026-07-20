@@ -7,6 +7,7 @@
     @input="onInput"
     @blur="onBlur"
     @focus="onFocus"
+    @keydown="onKeyDown"
     :value="internalValue"
   />
 </template>
@@ -124,6 +125,43 @@ export default {
       isFocused.value = true
     }
 
+    function addDays(date, n) {
+      const d = new Date(date)
+      d.setDate(d.getDate() + n)
+      return d
+    }
+
+    function onKeyDown(e) {
+      if (!fp) return
+      const key = e.key
+      const map = {
+        ArrowLeft: -1,
+        ArrowRight: 1,
+        ArrowUp: -7,
+        ArrowDown: 7,
+        PageUp: -30,
+        PageDown: 30
+      }
+      if (!(key in map)) return
+      e.preventDefault()
+      try {
+        // open calendar so user sees changes
+        fp.open()
+        let base = null
+        if (fp.selectedDates && fp.selectedDates.length) base = fp.selectedDates[0]
+        else base = parseISODateToDate(props.modelValue) || new Date()
+
+        const next = addDays(base, map[key])
+        // setDate with trigger to update picker's selected date and call onChange
+        fp.setDate(next, true)
+        const iso = formatToISODate(next)
+        internalValue.value = formatDateDMY(iso)
+        emit('update:modelValue', iso)
+      } catch (err) {
+        // ignore
+      }
+    }
+
     function onBlur() {
       isFocused.value = false
       const v = internalValue.value || ''
@@ -146,7 +184,8 @@ export default {
       internalValue,
       onInput,
       onBlur,
-      onFocus
+      onFocus,
+      onKeyDown
     }
   }
 }
