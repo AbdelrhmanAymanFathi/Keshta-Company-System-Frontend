@@ -2,6 +2,7 @@
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" :dir="isRTL ? 'rtl' : 'ltr'">
       <div
+        :data-modal-id="modalId || null"
         :class="[
           'relative z-10 bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col',
           sizeClass
@@ -53,6 +54,10 @@ export default {
     title: {
       type: String,
       required: true
+    },
+    modalId: {
+      type: String,
+      default: ''
     },
     size: {
       type: String,

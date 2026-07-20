@@ -21,6 +21,21 @@
       <div class="responsive-stack">
 
         <div class="settings-card">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.formMemoryTitle') || 'Form Memory' }}</h2>
+          </div>
+          <div class="settings-card__body space-y-4">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.formMemoryDescription') || 'Remember last entered modal/form data for 1 hour.' }}</p>
+            <div class="settings-control-row">
+              <label class="flex items-center gap-3">
+                <input type="checkbox" v-model="modalMemoryStore.enabled" @input="onToggleEnabled" />
+                <span class="text-sm theme-text-primary">{{ $t('profile.formMemoryEnabled') || 'Remember the last entered data in forms' }}</span>
+              </label>
+            </div>
+            <p class="text-xs theme-caption">{{ $t('profile.formMemoryHint') || 'When enabled, modal data is restored when reopening the same modal. Data auto-expires after 1 hour.' }}</p>
+          </div>
+        </div>
+
 
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
 
@@ -388,7 +403,7 @@
 
     </div>
 
-  </div>
+
 
 </template>
 
@@ -399,6 +414,7 @@
 import { ref, computed, watch, reactive } from 'vue'
 
 import { useI18n } from 'vue-i18n'
+import { useModalMemoryStore } from '@/stores/useModalMemoryStore'
 
 import {
 
@@ -464,6 +480,8 @@ export default {
     const shadowPresets = SHADOW_PRESETS
 
     const isRTL = computed(() => locale.value === 'ar')
+
+    const modalMemoryStore = useModalMemoryStore()
 
 
 
@@ -697,6 +715,10 @@ export default {
       return t(`profile.preset_${personalityId}`) || t(`profile.personality_${personalityId}`) || personalityId
     }
 
+    function onToggleEnabled() {
+      modalMemoryStore.setEnabled(modalMemoryStore.enabled)
+    }
+
     return {
 
       themeColor,
@@ -752,6 +774,10 @@ export default {
       getIconPackDescription,
 
       getPersonalityLabel
+      ,
+      // modal memory
+      modalMemoryStore,
+      onToggleEnabled
 
     }
 

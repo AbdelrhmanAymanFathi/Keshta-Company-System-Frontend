@@ -786,6 +786,7 @@ import DateField from '@/components/shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO } from '@/utils/dateUtils'
+import useModalMemory from '@/composables/useModalMemory'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
@@ -1004,6 +1005,29 @@ export default {
     await this.fetchBranches()
     await this.fetchLocations()
     await this.fetchTreasuries()
+    // Setup modal memories for create/edit
+    try {
+      this.modalMemoryCreate = useModalMemory('expenses.create')
+      this.modalMemoryEdit = useModalMemory('expenses.edit')
+      this._modalWatcher = this.$watch(
+        () => ({ form: this.form, rows: this.rows, modalStep: this.modalStep, editing: this.editing, modalOpen: this.modalOpen }),
+        (val) => {
+          if (!this.modalOpen) return
+          try {
+            if (val.editing) {
+              this.modalMemoryEdit.save({ form: val.form, rows: val.rows, modalStep: val.modalStep })
+            } else {
+              this.modalMemoryCreate.save({ form: val.form, rows: val.rows, modalStep: val.modalStep })
+            }
+          } catch (e) {
+            // ignore
+          }
+        },
+        { deep: true }
+      )
+    } catch (e) {
+      console.warn('Expenses modal memory init failed', e)
+    }
   },
   
   methods: {
@@ -1191,6 +1215,17 @@ export default {
       this.formSubcategorySearch = ''
       this.formPaymentMethodSearch = 'نقداً'
       this.formTreasurySearch = ''
+      // restore last entered create payload if available
+      try {
+        const payload = this.modalMemoryCreate && this.modalMemoryCreate.restore()
+        if (payload) {
+          if (payload.form) Object.assign(this.form, payload.form)
+          if (payload.rows) this.rows = payload.rows
+          if (payload.modalStep) this.modalStep = payload.modalStep
+        }
+      } catch (e) {
+        // ignore
+      }
       this.modalOpen = true
     },
     
@@ -1232,6 +1267,17 @@ export default {
       this.formSubcategorySearch = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)?.name || ''
       this.formPaymentMethodSearch = this.paymentMethodItems?.find(p => p.id === expense.paymentMethod)?.name || 'نقداً'
       this.formTreasurySearch = expense.treasury?.name ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : ''
+      // restore last entered edit payload if available
+      try {
+        const payload = this.modalMemoryEdit && this.modalMemoryEdit.restore()
+        if (payload) {
+          if (payload.form) Object.assign(this.form, payload.form)
+          if (payload.rows) this.rows = payload.rows
+          if (payload.modalStep) this.modalStep = payload.modalStep
+        }
+      } catch (e) {
+        // ignore
+      }
       this.modalOpen = true
     },
     
@@ -1450,6 +1496,13 @@ export default {
         }
         
         this.closeModal()
+        // clear modal memory on successful save
+        try {
+          if (this.editing && this.modalMemoryEdit) this.modalMemoryEdit.clear()
+          if (!this.editing && this.modalMemoryCreate) this.modalMemoryCreate.clear()
+        } catch (e) {
+          // ignore
+        }
         this.showSuccess(this.editing ? 'expenses.success.updated' : 'expenses.success.created')
       } catch (error) {
         console.error('Error saving expense:', error)

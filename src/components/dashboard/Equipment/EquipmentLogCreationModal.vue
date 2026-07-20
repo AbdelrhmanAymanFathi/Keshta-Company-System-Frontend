@@ -330,6 +330,7 @@ import DateField from '@/components/shared/DateField.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@acme/icon-packs/legacy'
 import { getLocations, createLocation } from '@/api'
+import useModalMemory from '@/composables/useModalMemory'
 
 export default {
   name: 'EquipmentLogCreationModal',
@@ -478,6 +479,21 @@ export default {
         this.loadCommonDataFromStorage()
       }
     },
+  created() {
+    try {
+      this.modalMemory = useModalMemory('equipmentLog.create')
+      this._modalWatcher = this.$watch(
+        () => ({ form: this.form, rows: this.rows, currentStep: this.currentStep, isOpen: this.isOpen }),
+        (val) => {
+          if (!this.isOpen || this.isEditing) return
+          try { this.modalMemory.save({ commonData: val.form, rows: val.rows, currentStep: val.currentStep }) } catch (e) {}
+        },
+        { deep: true }
+      )
+    } catch (e) {
+      // ignore
+    }
+  },
     chooseOwnership(isRental) {
       const targetIsRental = Boolean(isRental)
       const isSameMode = this.form.isRental === targetIsRental
@@ -953,6 +969,7 @@ export default {
         }
 
         this.$emit('saved', payload)
+        try { if (this.modalMemory) this.modalMemory.clear() } catch (e) {}
         this.closeModal()
       } catch (e) {
         this.saveError = e?.message || (this.$t('common.saveError') || 'Error saving')
@@ -980,6 +997,9 @@ export default {
           notes: this.form.notes,
           isRental: this.form.isRental
         }
+        if (this.modalMemory) {
+          try { this.modalMemory.save({ commonData: data, rows: this.rows }) ; return } catch (e) {}
+        }
         localStorage.setItem(key, JSON.stringify(data))
       } catch (err) {
         console.warn('Failed to save equipment log data:', err)
@@ -989,9 +1009,14 @@ export default {
       if (this.isEditing) return
       try {
         const key = this.form.isRental ? 'equipmentLogCreationModalCommonData_rental' : 'equipmentLogCreationModalCommonData_company'
-        const saved = localStorage.getItem(key)
-        if (saved) {
-          const data = JSON.parse(saved)
+        let data = null
+        try { if (this.modalMemory) data = this.modalMemory.restore()?.commonData || null } catch (e) { data = null }
+        if (!data) {
+          const saved = localStorage.getItem(key)
+          if (!saved) return
+          data = JSON.parse(saved)
+        }
+        if (data) {
           console.log('📦 Loaded equipment log data from storage:', data)
           this.form.date = data.date || this.form.date
           this.form.equipmentId = data.equipmentId || ''

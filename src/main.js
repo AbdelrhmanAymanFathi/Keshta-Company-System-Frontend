@@ -31,11 +31,13 @@ const queryClient = new QueryClient()
 app.use(VueQueryPlugin, { queryClient })
 
 // use pinia
+// DOM-based modal memory plugin removed in favor of Pinia + composable approach
 app.use(pinia)
 // use i18n
 app.use(i18n)
 // use router
 app.use(router)
+// modal memory plugin (persists modal form state when enabled)
 
 // Provide auth manager globally
 app.provide('authManager', authManager)

@@ -391,6 +391,7 @@ import {
 } from '@/api'
 import normalizeItem from '@/utils/normalizeItem'
 import DateField from './DateField.vue'
+import useModalMemory from '@/composables/useModalMemory'
 
 export default {
   emits: ['saved'],
@@ -406,6 +407,7 @@ export default {
   },
   data() {
     return {
+      modalMemory: null,
       isOpen: false,
       isSaving: false,
       sites: [],
@@ -488,12 +490,23 @@ export default {
   async mounted() {
     // Create first row on load
     this.rows = [this.createEmptyRow()]
-    // Load last entered data from localStorage
+    // Init modal memory and load last entered data
+    try {
+      this.modalMemory = useModalMemory('tableModal.last')
+    } catch (e) {
+      this.modalMemory = null
+    }
     this.loadLastEnteredData()
   },
   methods: {
     loadLastEnteredData() {
       try {
+        let payload = null
+        try { if (this.modalMemory) payload = this.modalMemory.restore() } catch (e) { payload = null }
+        if (payload) {
+          this.lastEnteredData = payload
+          return
+        }
         const saved = localStorage.getItem('tableModalLastData')
         if (saved) {
           this.lastEnteredData = JSON.parse(saved)
@@ -512,7 +525,11 @@ export default {
           price: row.price || 0,
           crusher: row.crusher ? { id: row.crusher.id, name: row.crusher.name } : null
         }
-        localStorage.setItem('tableModalLastData', JSON.stringify(data))
+        if (this.modalMemory) {
+          try { this.modalMemory.save(data) } catch (e) { localStorage.setItem('tableModalLastData', JSON.stringify(data)) }
+        } else {
+          localStorage.setItem('tableModalLastData', JSON.stringify(data))
+        }
         this.lastEnteredData = data
         console.log('Saved lastEnteredData:', data)
       } catch (err) {
@@ -1001,6 +1018,7 @@ handleEnterKey(rowIndex) {
         alert(this.$t('labels.saved') || 'Saved successfully ✅')
         this.resetRows()
         this.closeModal()
+        try { if (this.modalMemory) this.modalMemory.clear() } catch (e) {}
         this.$emit('saved') // Notify parent of save
       } catch (err) {
         console.error('saveData error:', err)

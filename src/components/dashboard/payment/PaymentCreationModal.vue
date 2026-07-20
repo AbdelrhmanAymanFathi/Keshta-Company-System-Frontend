@@ -292,6 +292,7 @@ import {
   TrashIcon
 } from '@heroicons/vue/24/outline'
 import { useI18n } from 'vue-i18n'
+import useModalMemory from '@/composables/useModalMemory'
 
 const normalizeList = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -353,6 +354,9 @@ export default {
     })
 
     const rows = ref([createRow()])
+
+    let modalMemory = null
+    try { modalMemory = useModalMemory('payment.create') } catch (e) { modalMemory = null }
 
     const filters = ref({
       siteSearch: ''
@@ -575,6 +579,9 @@ export default {
             notes: row.notes
           }))
         }
+        if (modalMemory) {
+          try { modalMemory.save(payload); return } catch (e) { /* fallback */ }
+        }
         window.localStorage.setItem('paymentCreationModalCommonData', JSON.stringify(payload))
       } catch (error) {
         console.warn('save storage failed', error)
@@ -584,24 +591,23 @@ export default {
     function loadFromStorage() {
       try {
         if (typeof window === 'undefined') return
-        const raw = window.localStorage.getItem('paymentCreationModalCommonData')
-        if (!raw) return
-        const payload = JSON.parse(raw)
+        let payload = null
+        try { if (modalMemory) payload = modalMemory.restore() } catch (e) { payload = null }
+        if (!payload) {
+          const raw = window.localStorage.getItem('paymentCreationModalCommonData')
+          if (!raw) return
+          payload = JSON.parse(raw)
+        }
 
-        if (payload.selectedSite?.id) {
+        if (payload?.selectedSite?.id) {
           selectedSite.value = locations.value.find(location => idsEqual(location.id, payload.selectedSite.id)) || payload.selectedSite
           filters.value.siteSearch = selectedSite.value?.name || ''
         }
 
-        if (payload.selectedDate) {
-          selectedDate.value = payload.selectedDate
-        }
+        if (payload?.selectedDate) selectedDate.value = payload.selectedDate
+        if (payload?.selectedModule) selectedModule.value = payload.selectedModule
 
-        if (payload.selectedModule) {
-          selectedModule.value = payload.selectedModule
-        }
-
-        if (Array.isArray(payload.rows) && payload.rows.length) {
+        if (Array.isArray(payload?.rows) && payload.rows.length) {
           rows.value = payload.rows.map(row => {
             const treasury = row.treasuryId
               ? treasuryOptions.value.find(item => idsEqual(item.id, row.treasuryId))
@@ -715,13 +721,7 @@ export default {
 
         const res = await createPayment(payload)
         skipPersistOnClose.value = true
-        try {
-          if (typeof window !== 'undefined') {
-            window.localStorage.removeItem('paymentCreationModalCommonData')
-          }
-        } catch (error) {
-          console.warn('remove storage failed', error)
-        }
+        try { if (modalMemory) modalMemory.clear(); else if (typeof window !== 'undefined') window.localStorage.removeItem('paymentCreationModalCommonData') } catch (error) { console.warn('remove storage failed', error) }
         emit('saved', res?.data || payload)
         closeModal()
       } catch (error) {

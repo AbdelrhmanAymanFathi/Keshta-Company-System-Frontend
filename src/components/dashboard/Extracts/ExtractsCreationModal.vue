@@ -557,6 +557,7 @@ import {
   createCrusher,
   createExportItem
 } from '@/api'
+import useModalMemory from '@/composables/useModalMemory'
 
 export default {
   name: 'ExtractsCreationModal',
@@ -660,10 +661,25 @@ export default {
   },
   mounted() {
     document.addEventListener('click', this.handleGlobalClick)
+    // modal memory composable
+    try {
+      this.modalMemory = useModalMemory('extracts.create')
+      this._modalWatcher = this.$watch(
+        () => ({ commonData: this.commonData, rows: this.rows, currentStep: this.currentStep, isOpen: this.isOpen }),
+        (val) => {
+          if (!this.isOpen) return
+          try { this.modalMemory.save({ commonData: val.commonData, rows: val.rows, currentStep: val.currentStep }) } catch (e) {}
+        },
+        { deep: true }
+      )
+    } catch (e) {
+      console.warn('extracts modal memory init failed', e)
+    }
   },
 
   beforeUnmount() {
     document.removeEventListener('click', this.handleGlobalClick)
+    if (this._modalWatcher) this._modalWatcher()
   },
   methods: {
     handleGlobalClick(e) {
@@ -865,7 +881,17 @@ export default {
           this.saveError = error?.message || 'Failed to load extract'
         }
       } else {
-        this.loadCommonDataFromStorage()
+        // try restore from modal memory
+        try {
+          const payload = this.modalMemory && this.modalMemory.restore()
+          if (payload) {
+            if (payload.commonData) Object.assign(this.commonData, payload.commonData)
+            if (payload.rows) this.rows = payload.rows
+            if (payload.currentStep) this.currentStep = payload.currentStep
+          }
+        } catch (e) {
+          // ignore
+        }
       }
     },
     closeModal() {
@@ -1136,6 +1162,8 @@ export default {
           res = await createExtract(payload)
         }
 
+        // clear modal memory after successful save
+        try { if (this.modalMemory) this.modalMemory.clear() } catch (e) {}
         this.$emit('saved', res)
         this.closeModal()
       } catch (error) {

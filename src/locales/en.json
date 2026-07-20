@@ -421,6 +421,10 @@
     "importError": "Could not parse theme file."
   },
   "profile": {
+    "formMemoryEnabled": "Enable form state memory",
+    "formMemoryHint": "When enabled, form state is saved in local storage and restored when you return to the form.",
+    "formMemoryDescription": "Enable or disable form state memory for all forms in the app. When enabled, form state is saved in local storage and restored when you return to the form.",
+    "formMemoryTitle": "Form State Memory",
     "preset_minimal": "Minimal",
     "settingsDescription": "Customize your profile and preferences here.",
     "settings": "Settings",

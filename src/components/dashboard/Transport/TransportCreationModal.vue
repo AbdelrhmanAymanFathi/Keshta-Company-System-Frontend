@@ -541,6 +541,7 @@ import {
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { getTodayISO, formatToISODate } from '@/utils/dateUtils'
+import useModalMemory from '@/composables/useModalMemory'
 
 export default {
   name: 'TransportModal',
@@ -722,7 +723,7 @@ export default {
           this.currentStep = 1
           this.rows = []
           this.saveError = ''
-          this.saveCommonDataToStorage()
+          // persisted via modalMemory watcher
         }
       }
     },
@@ -884,20 +885,27 @@ export default {
     },
     saveCommonDataToStorage() {
       try {
-        const data = {
-          date: this.commonData.date,
-          item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
-          location: this.commonData.location ? { id: this.commonData.location.id, name: this.commonData.location.name } : null,
-          area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
-          contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
-          vehicle: this.commonData.vehicle ? { id: this.commonData.vehicle.id, name: this.commonData.vehicle.name } : null,
-          distanceKm: this.commonData.distanceKm,
-          firstKmPrice: this.commonData.firstKmPrice,
-          perKmPrice: this.commonData.perKmPrice,
-          notes: this.commonData.notes,
-          vehicleCompanyCapacity: this.vehicleCompanyCapacity
+        const payload = {
+          commonData: {
+            date: this.commonData.date,
+            item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
+            location: this.commonData.location ? { id: this.commonData.location.id, name: this.commonData.location.name } : null,
+            area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
+            contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
+            vehicle: this.commonData.vehicle ? { id: this.commonData.vehicle.id, name: this.commonData.vehicle.name } : null,
+            distanceKm: this.commonData.distanceKm,
+            firstKmPrice: this.commonData.firstKmPrice,
+            perKmPrice: this.commonData.perKmPrice,
+            notes: this.commonData.notes,
+            vehicleCompanyCapacity: this.vehicleCompanyCapacity
+          },
+          rows: this.rows
         }
-        localStorage.setItem('transportCreationModalCommonData', JSON.stringify(data))
+        if (this.modalMemory) {
+          this.modalMemory.save(payload)
+          return
+        }
+        localStorage.setItem('transportCreationModalCommonData', JSON.stringify(payload.commonData))
       } catch (err) {
         console.warn('Failed to save common data:', err)
       }
@@ -1318,7 +1326,9 @@ export default {
             await createTransport(payload)
           }
 
-        this.saveCommonDataToStorage()
+        // persist saved state
+        try { if (this.modalMemory) this.modalMemory.clear() } catch (e) {}
+        try { this.saveCommonDataToStorage() } catch (e) {}
         this.$emit('saved')
         this.closeModal()
       } catch (err) {
@@ -1404,9 +1414,24 @@ export default {
   },
   mounted() {
     document.addEventListener('click', this.handleGlobalClick)
+    // modal memory
+    try {
+      this.modalMemory = useModalMemory('transport.create')
+      this._modalWatcher = this.$watch(
+        () => ({ commonData: this.commonData, rows: this.rows, currentStep: this.currentStep, isOpen: this.isOpen }),
+        (val) => {
+          if (!this.isOpen) return
+          try { this.modalMemory.save({ commonData: val.commonData, rows: val.rows, currentStep: val.currentStep }) } catch (e) {}
+        },
+        { deep: true }
+      )
+    } catch (e) {
+      console.warn('transport modal memory init failed', e)
+    }
   },
   beforeUnmount() {
     document.removeEventListener('click', this.handleGlobalClick)
+    if (this._modalWatcher) this._modalWatcher()
   }
 }
 </script>

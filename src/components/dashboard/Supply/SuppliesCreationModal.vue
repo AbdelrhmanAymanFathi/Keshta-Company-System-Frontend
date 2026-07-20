@@ -611,6 +611,7 @@ import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
 import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import DateField from '@/components/shared/DateField.vue'
+import useModalMemory from '@/composables/useModalMemory'
 
 export default {
   emits: ['saved'],
@@ -734,15 +735,8 @@ export default {
       tableRef: null,
 
       // Last entered data for localStorage
-      lastEnteredData: {
-        date: '',
-        contractor: null,
-        area: null,
-        item: null,
-        price: 0,
-        crusher: null,
-        site: null
-      }
+      // modal memory will persist state via Pinia/composable; no localStorage here
+      // lastEnteredData kept for backward compatibility removed
     }
   },
 
@@ -794,12 +788,34 @@ export default {
   },
 
   async mounted() {
-    this.loadLastEnteredDataFromStorage()
+    // Initialize modal memory for this modal instance
+    try {
+      this.modalMemory = useModalMemory('supplies.create')
+      const payload = this.modalMemory.restore()
+      if (payload) {
+        if (payload.commonData) Object.assign(this.commonData, payload.commonData)
+        if (payload.rows) this.rows = payload.rows
+        if (payload.currentStep) this.currentStep = payload.currentStep
+        if (payload.filters) Object.assign(this.filters, payload.filters)
+      }
+      // Watch relevant modal state and persist on changes (deep)
+      this._modalWatcher = this.$watch(
+        () => ({ commonData: this.commonData, rows: this.rows, currentStep: this.currentStep, filters: this.filters }),
+        (val) => {
+          if (this.modalMemory) this.modalMemory.save(val)
+        },
+        { deep: true }
+      )
+    } catch (e) {
+      console.warn('Modal memory init failed', e)
+    }
+
     document.addEventListener('click', this.handleGlobalClick)
   },
 
   beforeUnmount() {
     document.removeEventListener('click', this.handleGlobalClick)
+    if (this._modalWatcher) this._modalWatcher()
   },
 
   methods: {
@@ -888,7 +904,6 @@ export default {
       if (!this.isStep1Valid()) return
       this.currentStep = 2
       this.rows = [this.createEmptyRow()]
-      this.saveCommonDataToStorage()
     },
 
     goBackToStep1() {
@@ -904,15 +919,14 @@ export default {
       console.log('🔄 Opening modal...')
       await this.loadInitialData()
       console.log('✅ Initial data loaded')
-      this.loadCommonDataFromStorage()
-      console.log('✅ Common data restored from storage:', this.commonData)
+      // commonData restored via modalMemory in mounted
     },
 
     closeModal() {
       this.isOpen = false
       this.saveError = ''
       this.currentStep = 1
-      this.saveCommonDataToStorage()
+      // state is persisted by watcher; do not clear on close
     },
 
     async loadInitialData() {
@@ -928,92 +942,7 @@ export default {
     },
 
     // ============ Data Loading & Storage ============
-    loadLastEnteredDataFromStorage() {
-      try {
-        const saved = localStorage.getItem('suppliesCreationModalLastData')
-        if (saved) {
-          this.lastEnteredData = JSON.parse(saved)
-        }
-      } catch (err) {
-        console.warn('Failed to load last entered data:', err)
-      }
-    },
-
-    loadCommonDataFromStorage() {
-      try {
-        const saved = localStorage.getItem('suppliesCreationModalCommonData')
-        if (saved) {
-          const data = JSON.parse(saved)
-          console.log('📦 Loaded from storage:', data)
-          this.commonData.date = data.date || ''
-
-          // Restore site
-          if (data.site?.id) {
-            this.commonData.site = this.allLocations.find(l => l.id === data.site.id) || null
-            if (this.commonData.site) this.filters.commonSiteSearch = this.commonData.site.name
-            console.log('✅ Restored site:', this.commonData.site)
-          }
-
-          // Restore area — prefer searching the site's `children` if present
-          if (data.area?.id && this.commonData.site) {
-            let found = null
-            if (Array.isArray(this.commonData.site.children) && this.commonData.site.children.length) {
-              found = this.commonData.site.children.find(c => c.id === data.area.id) || null
-            }
-            // fallback to global lookup
-            if (!found) found = this.allLocations.find(l => l.id === data.area.id) || null
-            this.commonData.area = found
-            if (this.commonData.area) this.filters.commonAreaSearch = this.commonData.area.name
-            console.log('✅ Restored area:', this.commonData.area)
-          }
-
-          // Restore contractor
-          if (data.contractor?.id) {
-            this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
-            if (this.commonData.contractor) this.filters.commonContractorSearch = this.commonData.contractor.name
-            console.log('✅ Restored contractor:', this.commonData.contractor)
-          }
-
-          // Restore crusher
-          if (data.crusher?.id) {
-            this.commonData.crusher = this.crushers.find(c => c.id === data.crusher.id) || null
-            if (this.commonData.crusher) this.filters.commonCrusherSearch = this.commonData.crusher.name
-            console.log('✅ Restored crusher:', this.commonData.crusher)
-          }
-
-          // Restore item
-          if (data.item?.id) {
-            this.commonData.item = this.exportItems.find(i => i.id === data.item.id) || null
-            if (this.commonData.item) this.filters.commonItemSearch = this.commonData.item.name
-            console.log('✅ Restored item:', this.commonData.item)
-          }
-
-          this.commonData.price = data.price || 0
-          this.commonData.notes = data.notes || ''
-          console.log('📦 Final commonData:', this.commonData)
-        }
-      } catch (err) {
-        console.warn('Failed to load common data:', err)
-      }
-    },
-
-    saveCommonDataToStorage() {
-      try {
-        const data = {
-          date: this.commonData.date,
-          site: this.commonData.site ? { id: this.commonData.site.id, name: this.commonData.site.name } : null,
-          area: this.commonData.area ? { id: this.commonData.area.id, name: this.commonData.area.name } : null,
-          contractor: this.commonData.contractor ? { id: this.commonData.contractor.id, name: this.commonData.contractor.name } : null,
-          crusher: this.commonData.crusher ? { id: this.commonData.crusher.id, name: this.commonData.crusher.name } : null,
-          item: this.commonData.item ? { id: this.commonData.item.id, name: this.commonData.item.name } : null,
-          price: this.commonData.price,
-          notes: this.commonData.notes
-        }
-        localStorage.setItem('suppliesCreationModalCommonData', JSON.stringify(data))
-      } catch (err) {
-        console.warn('Failed to save common data:', err)
-      }
-    },
+    // persistence now handled by Pinia + composable
 
     // ============ Row Management ============
     createEmptyRow() {
@@ -1665,7 +1594,12 @@ export default {
           }
         }
 
-        this.saveCommonDataToStorage()
+        // Clear modal memory on successful save
+        try {
+          if (this.modalMemory) this.modalMemory.clear()
+        } catch (e) {
+          console.warn('Failed to clear modal memory after save', e)
+        }
 
         // capture the step-1 data so we can pass it to transport modal if needed
         const step1 = JSON.parse(JSON.stringify(this.commonData || {}))
