@@ -382,10 +382,7 @@ export default {
       ]
     },
     mainClasses() {
-      return [
-        'layout-main dashboard-module-content app-scrollbar theme-main-gradient overflow-y-auto p-3 sm:p-4 lg:p-6',
-        this.isMobile ? 'pt-16' : ''
-      ]
+      return 'layout-main dashboard-module-content app-scrollbar theme-main-gradient overflow-y-auto'
     },
     showSidebarLabels() {
       return shouldShowSidebarLabels(this.sidebarControllerState)
