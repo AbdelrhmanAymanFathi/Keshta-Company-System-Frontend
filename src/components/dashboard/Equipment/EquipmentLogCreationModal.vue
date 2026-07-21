@@ -489,7 +489,7 @@ export default {
 
       this.currentStep = 1
       if (!this.rows || !this.rows.length) {
-        this.rows = [this.createEmptyRow()]
+        this.rows = [this.createEmptyRow('')]
       }
       this.loadCommonDataFromStorage()
     },
@@ -713,16 +713,15 @@ export default {
     goToStep2() {
       if (!this.isStep1Valid()) return
       this.currentStep = 2
-      // initialize rows for step 2 if empty
-      if (!this.rows || !this.rows.length) this.rows = [this.createEmptyRow()]
+      if (!this.rows || !this.rows.length) this.rows = [this.createEmptyRow('')]
     },
     goBackToStep0() { this.currentStep = 0 },
     goBackToStep1() { this.currentStep = 1 },
     formatNumber(v) { return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 }) },
-    createEmptyRow() {
+    createEmptyRow(date = '') {
       return {
         id: Date.now() + Math.random(),
-        date: this.form.date || '',
+        date,
         hours: this.form.hours || 1,
         discount: 0,
         driver: null,
@@ -735,7 +734,9 @@ export default {
       }
     },
     addRow() {
-      this.rows.push(this.createEmptyRow())
+      const lastRow = this.rows[this.rows.length - 1]
+      const prevDate = lastRow?.date || ''
+      this.rows.push(this.createEmptyRow(this.addOneDayISO(prevDate)))
     },
     duplicateRow(index) {
       const src = this.rows[index]
@@ -866,19 +867,40 @@ export default {
       const discount = this.isCompanyOwnedEquipment ? 0 : Number(row.discount || 0)
       return Math.max(0, h * r - discount)
     },
+    addOneDayISO(isoDate) {
+      if (!isoDate || typeof isoDate !== 'string') return ''
+      const m = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+      if (!m) return ''
+      const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+      if (Number.isNaN(d.getTime())) return ''
+      d.setDate(d.getDate() + 1)
+      const dd = String(d.getDate()).padStart(2, '0')
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      return `${d.getFullYear()}-${mm}-${dd}`
+    },
+
     handleEnterKey(index) {
-      const newRow = this.createEmptyRow()
-      this.rows.splice(index + 1, 0, newRow)
+      if (index !== this.rows.length - 1) return
+      const prevDate = this.rows[index]?.date || ''
+      const newRow = this.createEmptyRow(this.addOneDayISO(prevDate))
+      this.rows.push(newRow)
+      this.$nextTick(() => {
+        const input = newRow.hoursInput
+        if (input && typeof input.focus === 'function') {
+          input.focus()
+          if (typeof input.select === 'function') input.select()
+        }
+      })
     },
     onLastFieldTab(index, event) {
       if (event.shiftKey) return
-      // If tabbing on the last row, create a new row and focus its hours input
       if (index === (this.rows.length - 1)) {
         event.preventDefault()
-        this.addRow()
+        const prevDate = this.rows[index]?.date || ''
+        const newRow = this.createEmptyRow(this.addOneDayISO(prevDate))
+        this.rows.push(newRow)
         this.$nextTick(() => {
-          const newRow = this.rows[index + 1]
-          if (newRow && newRow.hoursInput && typeof newRow.hoursInput.focus === 'function') {
+          if (newRow.hoursInput && typeof newRow.hoursInput.focus === 'function') {
             newRow.hoursInput.focus()
             if (typeof newRow.hoursInput.select === 'function') newRow.hoursInput.select()
           }
@@ -910,9 +932,9 @@ export default {
 
         const hourlyRateNum = Number(this.form.hourlyRate || 0)
 
-        const commonDate = (this.form.date && formatToISODate(this.form.date)) || getTodayISO()
+        const commonDate = getTodayISO()
 
-        // Build rows payload. Step-one date/driver apply to every row.
+        // Build rows payload. Each row uses its own date.
         const rowsPayload = (this.rows || []).map(r => {
           const hoursVal = Number(r.hours || 0)
           const rowHourly = Number(r.hourlyRate != null ? r.hourlyRate : this.form.hourlyRate || 0)
