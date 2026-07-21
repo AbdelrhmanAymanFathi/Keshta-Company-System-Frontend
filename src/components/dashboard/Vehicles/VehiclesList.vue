@@ -347,6 +347,7 @@ import {
 import CreateVehicle from './CreateVehicle.vue'
 import Pagination from '../../shared/Pagination.vue'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
+import { normalizeVehicleName } from '@/utils/normalizeVehicleName'
 import { ArrowsRightLeftIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
@@ -659,6 +660,33 @@ export default {
       }
       
       this.editLoading = true
+
+      // Check for canonical duplicates (reversed slash-separated names)
+      const trimmedName = String(this.editForm.name || '').trim()
+      if (trimmedName) {
+        const canonicalNew = normalizeVehicleName(trimmedName)
+        const duplicateVehicle = this.vehicles.find(v => {
+          if (v.id === this.editingVehicle.id) return false
+          const existingName = String(v.name || '').trim()
+          if (!existingName) return false
+          if (existingName.toLowerCase() === trimmedName.toLowerCase()) return true
+          return normalizeVehicleName(existingName) === canonicalNew
+        })
+        if (duplicateVehicle) {
+          const existingName = String(duplicateVehicle.name || '').trim()
+          const isReversedDuplicate = existingName.toLowerCase() !== trimmedName.toLowerCase()
+            && existingName.includes('/')
+          const errorMsg = isReversedDuplicate
+            ? (this.$t('vehicles.nameExistsReversed', { existingName })
+              || `This vehicle already exists as "${existingName}". The parts are the same in different order.`)
+            : (this.$t('vehicles.nameExists') || 'A vehicle with this name already exists')
+          if (window.$toast) {
+            window.$toast(errorMsg, 'error', 5000)
+          }
+          this.editLoading = false
+          return
+        }
+      }
       try {
         const payload = {
           name: this.editForm.name,

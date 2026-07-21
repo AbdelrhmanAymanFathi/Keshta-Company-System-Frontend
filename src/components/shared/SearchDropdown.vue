@@ -128,6 +128,10 @@ export default {
     clearAriaLabel: {
       type: String,
       default: 'Clear'
+    },
+    filterFn: {
+      type: Function,
+      default: null
     }
   },
   emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear'],
@@ -165,6 +169,9 @@ export default {
     const filteredItems = computed(() => {
       const query = normalize(props.modelValue)
       if (!query) return sourceItems.value
+      if (typeof props.filterFn === 'function') {
+        return sourceItems.value.filter((item) => props.filterFn(item, query))
+      }
       return sourceItems.value.filter((item) => normalize(getLabel(item)).includes(query))
     })
 

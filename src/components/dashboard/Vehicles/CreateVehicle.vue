@@ -140,6 +140,7 @@
 <script>
 import { createVehicle, getContractors, getCrushers, getVehicles } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
+import { normalizeVehicleName } from '@/utils/normalizeVehicleName'
 import CreateContractorModal from './CreateContractorModal.vue'
 import CreateCrusherModal from './CreateCrusherModal.vue'
 
@@ -428,12 +429,24 @@ export default {
       }
 
       const duplicateVehicle = this.existingVehicles.find((vehicle) => {
-        const existingName = String(vehicle?.name || '').trim().toLowerCase()
-        return existingName && existingName === trimmedName.toLowerCase()
+        const existingName = String(vehicle?.name || '').trim()
+        if (!existingName) return false
+        // Exact match check
+        if (existingName.toLowerCase() === trimmedName.toLowerCase()) return true
+        // Canonical match check (reversed slash-separated names)
+        return normalizeVehicleName(existingName) === normalizeVehicleName(trimmedName)
       })
 
       if (duplicateVehicle) {
-        this.error = this.$t('vehicles.nameExists') || 'A vehicle with this name already exists'
+        const existingName = String(duplicateVehicle.name || '').trim()
+        const isReversedDuplicate = existingName.toLowerCase() !== trimmedName.toLowerCase()
+          && existingName.includes('/')
+        if (isReversedDuplicate) {
+          this.error = this.$t('vehicles.nameExistsReversed', { existingName }) 
+            || `This vehicle already exists as "${existingName}". The parts are the same in different order.`
+        } else {
+          this.error = this.$t('vehicles.nameExists') || 'A vehicle with this name already exists'
+        }
         if (window.$toast) {
           window.$toast(this.error, 'error', 5000)
         }

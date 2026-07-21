@@ -527,6 +527,7 @@ import {
   createLocation,
   getItems
 } from '@/api'
+import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import {
   ArchiveBoxIcon,
   MapPinIcon,
@@ -973,7 +974,7 @@ export default {
     filteredVehicles(row) {
       const q = row.search?.toLowerCase() || ''
       return (row.availableVehicles || []).filter(v =>
-        (v.name || '').toLowerCase().includes(q)
+        matchesVehicleName(v.name, q)
       )
     },
 

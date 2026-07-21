@@ -1100,6 +1100,7 @@
     "deleteConfirm": "هل أنت متأكد من حذف المركبة",
     "validationName": "الاسم مطلوب",
     "nameExists": "يوجد مركبة بنفس هذا الاسم بالفعل",
+    "nameExistsReversed": "هذه المركبة موجودة بالفعل باسم \"{existingName}\". الأجزاء نفسها ولكن بترتيب مختلف.",
     "validationContractor": "المقاول مطلوب",
     "validationPositiveNumber": "يجب أن تكون القيمة أكبر من 0",
     "companyCapacityRequired": "تكعيب الشركة مطلوبة ويجب أن تكون أكبر من 0",

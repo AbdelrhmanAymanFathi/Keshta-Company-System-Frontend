@@ -105,6 +105,7 @@
             :allItems="vehicles"
             :placeholder="$t('placeholders.searchVehicle')"
             :itemLabel="(v) => v.plateNumber || v.name"
+            :filterFn="vehicleFilterFn"
             inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             @select="(sel) => { filters.vehicleId = sel.id; filters.vehicleSearch = sel.plateNumber || sel.name }"
           />
@@ -402,6 +403,7 @@
               v-model="form.vehicleSearch"
               :items="vehicles"
               :allItems="vehicles"
+              :filterFn="vehicleFilterFn"
               placeholder=""
               inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               @select="(sel) => { form.vehicleId = sel.id; form.vehicleSearch = sel.name }"
@@ -470,6 +472,7 @@ import DateField from '@/components/shared/DateField.vue'
 // import PaymentModal from '../../shared/PaymentModal.vue'
 // import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
+import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 
 export default {
   name: 'SuppliesList',
@@ -602,6 +605,9 @@ export default {
   },
 
   methods: {
+    vehicleFilterFn(item, query) {
+      return matchesVehicleName(item.plateNumber || item.name, query)
+    },
     /**
      * Load filter data from API
      */

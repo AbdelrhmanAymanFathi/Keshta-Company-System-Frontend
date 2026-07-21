@@ -87,6 +87,7 @@
             :items="vehicles"
             :allItems="vehicles"
             :itemLabel="(vehicle) => vehicle?.plateNumber || vehicle?.name || ''"
+            :filterFn="vehicleFilterFn"
             :placeholder="$t('placeholders.searchVehicle')"
             :inputClass="'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'"
             @select="(vehicle) => { filters.vehicleId = vehicle.id; filters.vehicleSearch = vehicle.plateNumber || vehicle.name; filters.vehicleSelected = vehicle }"
@@ -317,6 +318,7 @@ import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { TrashIcon } from '@acme/icon-packs/legacy'
+import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 
 export default {
   name: 'TransportList',
@@ -399,6 +401,9 @@ export default {
   },
 
   methods: {
+    vehicleFilterFn(item, query) {
+      return matchesVehicleName(item.plateNumber || item.name, query)
+    },
     /**
      * Load filter data from API
      */
