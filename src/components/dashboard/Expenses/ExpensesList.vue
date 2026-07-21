@@ -193,7 +193,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" class="hover:bg-gray-50 transition-colors">
+            <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" class="hover:bg-gray-50 transition-colors" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ (currentPage - 1) * pageSize + index + 1 }}
               </td>
@@ -384,11 +384,30 @@
       </div>
     </div>
 
+    <!-- Context Menu for Rows -->
+    <div v-if="expenseContextMenu.visible" 
+         class="context-menu" 
+         :style="{ top: expenseContextMenu.top + 'px', left: expenseContextMenu.left + 'px' }"
+         @click="hideExpenseContextMenu">
+      <div class="context-menu-item" @click="openEditModal(expenseContextMenu.expense)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+        </svg>
+        <span>{{ $t('labels.edit') || 'تعديل' }}</span>
+      </div>
+      <div class="context-menu-item delete-item" @click="confirmDelete(expenseContextMenu.expense)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        <span>{{ $t('labels.delete') || 'حذف' }}</span>
+      </div>
+    </div>
+    
     <!-- Add/Edit Modal -->
     <teleport to="body">
       <transition name="kc-modal">
         <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden" :class="isRTL ? 'rtl-modal' : ''">
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
@@ -398,8 +417,8 @@
             </div>
 
             <!-- Body -->
-            <div class="flex-1 overflow-y-auto p-6 sm:p-8 modal-body-container relative">
-              <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6">
+            <div class="flex-1 overflow-y-auto p-6 sm:p-8 modal-body-container relative" :class="isRTL ? 'rtl-modal' : ''">
+              <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6" :class="isRTL ? 'rtl-modal' : ''">
                 
                 <!-- Step 1: Date & Location -->
                 <div v-if="modalStep===1" class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-sm">
@@ -432,7 +451,7 @@
                           :items="locations"
                           :allItems="locations"
                           :placeholder="$t('expenses.searchLocation')"
-                          inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                          :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                           teleportTarget=".modal-body-container"
                           @select="(sel) => { form.locationId = sel.id; formLocationSearch = sel.name }"
                         />
@@ -477,7 +496,7 @@
                                 :items="expenseCategories"
                                 :allItems="expenseCategories"
                                 :placeholder="$t('expenses.searchMainTerm')"
-                                inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget=".modal-body-container"
                                 clearable
                                 @select="(sel) => { row.categoryId = sel.id; row.categorySearch = sel.name; row.subCategoryId = null; row.subCategorySearch = '' }"
@@ -493,7 +512,7 @@
                                 :allItems="getRowSubcategories(row)"
                                 :disabled="!row.categoryId"
                                 :placeholder="$t('expenses.searchSubTerm')"
-                                inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget=".modal-body-container"
                                 clearable
                                 @select="(sel) => { row.subCategoryId = sel.id; row.subCategorySearch = sel.name }"
@@ -508,6 +527,7 @@
                                 type="text"
                                 :placeholder="$t('expenses.statementPlaceholder')"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
@@ -520,6 +540,7 @@
                                 min="0"
                                 placeholder="0.00"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-semibold theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'amount', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'amount', $event)"
                               />
@@ -530,7 +551,7 @@
                                 :items="paymentMethodItems"
                                 :allItems="paymentMethodItems"
                                 :placeholder="$t('expenses.searchPaymentMethod')"
-                                inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget=".modal-body-container"
                                 @select="(sel) => { row.paymentMethod = sel.id; row.paymentMethodSearch = sel.name }"
                                 @clear="() => { row.paymentMethod = 'CASH'; row.paymentMethodSearch = 'نقداً' }"
@@ -544,7 +565,7 @@
                                 :items="treasuryItems"
                                 :allItems="treasuryItems"
                                 :placeholder="$t('expenses.searchTreasury')"
-                                inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget=".modal-body-container"
                                 clearable
                                 @select="(sel) => { row.treasuryId = sel.id; row.treasurySearch = sel.name }"
@@ -556,9 +577,10 @@
                             <td class="px-3 py-2">
                               <textarea
                                 v-model="row.notes"
-                                rows="2"
+                                rows="1"
                                 :placeholder="$t('expenses.notesPlaceholder')"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'notes', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'notes', $event)"
                               ></textarea>
@@ -838,6 +860,13 @@ export default {
       selectedLocation: 'downloads',
       tableRef: null,
       rows: [],
+      draftModalState: null,
+      expenseContextMenu: {
+        visible: false,
+        top: 0,
+        left: 0,
+        expense: null
+      },
       fieldModal: { open: false, type: '', name: '', category: '', parentId: null },
       form: {
         id: null,
@@ -1166,9 +1195,8 @@ export default {
       await this.loadExpenses()
     },
     
-    openAddModal() {
-      this.editing = false
-      this.form = {
+    getEmptyExpenseForm() {
+      return {
         id: null,
         date: getTodayISO(),
         categoryId: null,
@@ -1184,13 +1212,42 @@ export default {
         notes: '',
         settlementDate: null
       }
+    },
+
+    applyModalDraft(draft = null) {
+      const baseForm = this.getEmptyExpenseForm()
+      const currentDraft = draft || this.draftModalState
+
+      this.form = {
+        ...baseForm,
+        ...(currentDraft?.form || {})
+      }
+      this.rows = (currentDraft?.rows || []).length
+        ? (currentDraft.rows || []).map(row => ({ ...row }))
+        : [this.createEmptyRow()]
+      this.formLocationSearch = currentDraft?.formLocationSearch ?? ''
+      this.formCategorySearch = currentDraft?.formCategorySearch ?? ''
+      this.formSubcategorySearch = currentDraft?.formSubcategorySearch ?? ''
+      this.formPaymentMethodSearch = currentDraft?.formPaymentMethodSearch ?? 'نقداً'
+      this.formTreasurySearch = currentDraft?.formTreasurySearch ?? ''
+    },
+
+    saveModalDraft() {
+      this.draftModalState = {
+        form: { ...this.form },
+        rows: this.rows.map(row => ({ ...row })),
+        formLocationSearch: this.formLocationSearch,
+        formCategorySearch: this.formCategorySearch,
+        formSubcategorySearch: this.formSubcategorySearch,
+        formPaymentMethodSearch: this.formPaymentMethodSearch,
+        formTreasurySearch: this.formTreasurySearch
+      }
+    },
+
+    openAddModal() {
+      this.editing = false
       this.modalStep = 1
-      this.rows = [this.createEmptyRow()]
-      this.formLocationSearch = this.locations?.[0]?.name ?? ''
-      this.formCategorySearch = ''
-      this.formSubcategorySearch = ''
-      this.formPaymentMethodSearch = 'نقداً'
-      this.formTreasurySearch = ''
+      this.applyModalDraft(this.draftModalState)
       this.modalOpen = true
     },
     
@@ -1236,30 +1293,9 @@ export default {
     },
     
     closeModal() {
+      this.saveModalDraft()
       this.modalOpen = false
       this.modalStep = 1
-      this.form = {
-        id: null,
-        date: '',
-        categoryId: null,
-        subCategoryId: null,
-        kind: 'EXPENSE',
-        description: '',
-        amount: '',
-        flow: 'OUT',
-        branchId: null,
-        locationId: null,
-        treasuryId: null,
-        paymentMethod: 'CASH',
-        notes: '',
-        settlementDate: null
-      }
-      this.rows = []
-      this.formLocationSearch = ''
-      this.formCategorySearch = ''
-      this.formSubcategorySearch = ''
-      this.formPaymentMethodSearch = ''
-      this.formTreasurySearch = ''
     },
 
     createEmptyRow() {
@@ -1449,7 +1485,9 @@ export default {
           await this.loadExpenses()
         }
         
-        this.closeModal()
+        this.draftModalState = null
+        this.modalOpen = false
+        this.modalStep = 1
         this.showSuccess(this.editing ? 'expenses.success.updated' : 'expenses.success.created')
       } catch (error) {
         console.error('Error saving expense:', error)
@@ -1817,6 +1855,70 @@ export default {
     closeFieldModal() {
       this.fieldModal = { open: false, type: '', name: '', category: '' }
     },
+
+    showExpenseContextMenu(event, expense) {
+      this.expenseContextMenu.top = event.clientY
+      this.expenseContextMenu.left = event.clientX
+      this.expenseContextMenu.expense = expense
+      this.expenseContextMenu.visible = true
+      
+      // Hide context menu when clicking outside
+      this.$nextTick(() => {
+        document.addEventListener('click', this.hideExpenseContextMenu)
+      })
+    },
+
+    hideExpenseContextMenu() {
+      this.expenseContextMenu.visible = false
+      document.removeEventListener('click', this.hideExpenseContextMenu)
+    },
+
+    openEditModal(expense) {
+      // Load expense data into form for editing
+      this.form = {
+        id: expense.id,
+        date: expense.date,
+        categoryId: expense.categoryId,
+        subCategoryId: expense.subCategoryId,
+        kind: expense.kind || 'EXPENSE',
+        description: expense.description,
+        amount: expense.amount,
+        notes: expense.notes,
+        flow: expense.flow || 'OUT',
+        branchId: expense.branchId,
+        locationId: expense.locationId,
+        treasuryId: expense.treasuryId,
+        paymentMethod: expense.paymentMethod || 'CASH',
+        settlementDate: expense.settlementDate
+      }
+      
+      // Set search fields for dropdowns
+      const category = this.expenseCategories.find(c => c.id === expense.categoryId)
+      this.formCategorySearch = category?.name || ''
+      
+      const subcategory = category?.children?.find(s => s.id === expense.subCategoryId)
+      this.formSubcategorySearch = subcategory?.name || ''
+      
+      const location = this.locations.find(l => l.id === expense.locationId)
+      this.formLocationSearch = location?.name || ''
+      
+      const paymentMethod = this.paymentMethodItems.find(p => p.id === expense.paymentMethod)
+      this.formPaymentMethodSearch = paymentMethod?.name || ''
+      
+      const treasury = this.treasuries.find(t => t.id === expense.treasuryId)
+      this.formTreasurySearch = treasury?.name || ''
+      
+      this.editing = true
+      this.modalOpen = true
+      this.modalStep = 1
+      this.hideExpenseContextMenu()
+    },
+
+    confirmDelete(expense) {
+      this.deleteConfirm.item = expense
+      this.deleteConfirm.open = true
+      this.hideExpenseContextMenu()
+    },
     
     showSuccess(message) {
       // You can implement a toast notification here
@@ -1844,9 +1946,56 @@ export default {
   text-align: right;
 }
 
+.rtl-modal,
+.rtl-modal form,
+.rtl-modal .modal-body-container {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl-modal input,
+.rtl-modal select,
+.rtl-modal textarea {
+  text-align: right;
+}
+
 /* Custom scrollbar for better UX */
 .overflow-x-auto::-webkit-scrollbar {
   height: 6px;
+}
+
+/* Context Menu Styles */
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 140px;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  color: #1f2937;
+  font-size: 0.875rem;
+}
+
+.context-menu-item:hover {
+  background-color: #f3f4f6;
+}
+
+.context-menu-item.delete-item {
+  color: #dc2626;
+}
+
+.context-menu-item.delete-item:hover {
+  background-color: #fee2e2;
 }
 
 .overflow-x-auto::-webkit-scrollbar-track {
