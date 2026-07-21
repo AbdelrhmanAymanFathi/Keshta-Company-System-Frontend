@@ -220,7 +220,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="rental in filteredItems" :key="rental.id" class="theme-table-row-hover"
+              <tr v-for="rental in filteredItems" :key="rental.id" :class="['theme-table-row-hover', { 'row-pending-review': rental.hasPendingApproval }]"
                 @contextmenu.prevent="openContextMenu($event, rental)">
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ formatDate(rental.date) }}

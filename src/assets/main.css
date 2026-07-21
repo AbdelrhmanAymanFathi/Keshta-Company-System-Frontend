@@ -388,6 +388,13 @@ body,
   background-color: rgba(var(--theme-primary-rgb), 0.06);
 }
 
+.row-pending-review {
+  opacity: 0.6;
+}
+.row-pending-review:hover {
+  opacity: 0.8;
+}
+
 .theme-accent-strong {
   color: rgb(var(--theme-primary-700));
 }

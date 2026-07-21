@@ -179,7 +179,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" class="theme-table-row-hover"
+          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" :class="['theme-table-row-hover', { 'row-pending-review': transport.hasPendingApproval }]"
               @contextmenu.prevent="onRowContextMenu($event, transport)">
             <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}

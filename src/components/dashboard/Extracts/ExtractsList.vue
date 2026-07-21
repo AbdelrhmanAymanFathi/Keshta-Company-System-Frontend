@@ -113,7 +113,7 @@
           <tr
             v-for="(extract, idx) in extracts"
             :key="extract.rowKey || `extract-${extract.id}`"
-            class="theme-table-row-hover cursor-pointer"
+            :class="['theme-table-row-hover', 'cursor-pointer', { 'row-pending-review': extract.hasPendingApproval }]"
             @click.stop="openRowMenu($event, extract)"
             @contextmenu.prevent.stop="openRowMenu($event, extract)"
           >

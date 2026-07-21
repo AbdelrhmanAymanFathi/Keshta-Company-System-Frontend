@@ -189,7 +189,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
-          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" class="theme-table-row-hover" @contextmenu.prevent="onRowContextMenu($event, supply)">
+          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" :class="['theme-table-row-hover', { 'row-pending-review': supply.hasPendingApproval }]" @contextmenu.prevent="onRowContextMenu($event, supply)">
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
