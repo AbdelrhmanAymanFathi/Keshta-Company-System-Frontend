@@ -775,7 +775,10 @@ export default {
       if (event.key === 'Tab' && index === this.rows.length - 1) {
         event.preventDefault()
         const newRowIndex = this.rows.length
-        this.addRow()
+        const prevDate = this.rows[index]?.date || ''
+        const newRow = this.createEmptyRow()
+        newRow.date = this.addOneDayISO(prevDate)
+        this.rows.push(newRow)
         setTimeout(() => {
           this.$nextTick(() => {
             if (!this.tableRef) return
@@ -815,8 +818,6 @@ export default {
       this.loadCommonDataFromStorage()
       if (this.transport) {
         this.populateForm()
-      } else {
-        this.commonData.date = getTodayISO()
       }
     },
     closeModal() {
@@ -837,7 +838,6 @@ export default {
         const saved = localStorage.getItem('transportCreationModalCommonData')
         if (saved) {
           const data = JSON.parse(saved)
-          this.commonData.date = data.date || ''
           if (data.item?.id) {
             this.commonData.item = this.items.find(i => i.id === data.item.id) || null
             if (this.commonData.item) this.filters.commonItemSearch = this.commonData.item.name
@@ -919,7 +919,7 @@ export default {
         // per-row variable fields
         count: 1,
         distanceKm: 0,
-        date: this.commonData.date ? formatToISODate(this.commonData.date) : getTodayISO(),
+        date: '',
         highlightedVehicleIndex: -1
       }
       // rows inherit the header-selected vehicle by default
@@ -942,8 +942,23 @@ export default {
       this.rows.splice(index, 1)
       if (this.rows.length === 0) this.addRow()
     },
+    addOneDayISO(isoDate) {
+      if (!isoDate || typeof isoDate !== 'string') return ''
+      const m = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+      if (!m) return ''
+      const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+      if (Number.isNaN(d.getTime())) return ''
+      d.setDate(d.getDate() + 1)
+      const dd = String(d.getDate()).padStart(2, '0')
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      return `${d.getFullYear()}-${mm}-${dd}`
+    },
+
     handleEnterKey(index) {
+      if (index !== this.rows.length - 1) return
+      const prevDate = this.rows[index]?.date || ''
       const newRow = this.createEmptyRow()
+      newRow.date = this.addOneDayISO(prevDate)
       this.rows.push(newRow)
       this.$nextTick(() => {
         if (!this.tableRef) return
@@ -1261,12 +1276,37 @@ export default {
         this.creatingItem = false
       }
     },
+    buildRowPayload(row) {
+      const locId = this.commonData.location?.id ?? null
+      const areaId = this.commonData.area?.id ?? null
+      const capacityForPayload = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
+
+      return {
+        date: row.date || '',
+        contractorId: this.commonData.contractor?.id || null,
+        numTrips: Number(row.count) || 1,
+        distanceKm: Number(Number(row.distanceKm || 0).toFixed(3)),
+        discount: Number(row.discount || 0),
+        pricing: {
+          firstKm: 1,
+          firstKmPrice: Number(this.commonData.firstKmPrice || 0),
+          perKmPrice: Number(this.commonData.perKmPrice || 0)
+        },
+        vehicleId: this.commonData.vehicle?.id || null,
+        locationId: locId,
+        areaId: areaId,
+        itemId: this.commonData.item?.id || null,
+        notes: this.commonData.notes || '',
+        vehicleCompanyCapacity: Number(capacityForPayload || 0)
+      }
+    },
+
     async saveData() {
       this.saveError = ''
       this.isSaving = true
       const toSave = this.rows.filter(r => (Number(r.count) > 0 || Number(r.distanceKm) > 0))
-      const totalTrips = toSave.reduce((s, r) => s + (Number(r.count) || 0), 0)
-      if (!toSave.length || totalTrips <= 0) {
+
+      if (!toSave.length) {
         this.saveError = this.$t('common.noData') || 'No data to save'
         this.isSaving = false
         return
@@ -1282,40 +1322,16 @@ export default {
       }
 
       try {
-          // Aggregate rows into single payload matching current API format
-          const totalDiscount = toSave.reduce((s, r) => s + (Number(r.discount) || 0), 0)
-          // weighted average distance per trip
-          const weightedDistSum = toSave.reduce((s, r) => s + (Number(r.distanceKm || 0) * (Number(r.count) || 1)), 0)
-          const distanceKm = totalTrips > 0 ? (weightedDistSum / totalTrips) : 0
-          // const computedRate = Number((Number(this.commonData.firstKmPrice || 0) + Math.max(0, Number(distanceKm || 0) - 1) * Number(this.commonData.perKmPrice || 0)).toFixed(3))
-          const capacityForPayload = Number(this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
-
-          const payload = {
-            date: toSave[0]?.date || this.commonData.date,
-            contractorId: this.commonData.contractor?.id || null,
-            numTrips: totalTrips,
-            distanceKm: Number(distanceKm.toFixed(3)),
-            discount: Number(totalDiscount || 0),
-            // Backward compatibility for backend schemas that still require `rate`.
-            // UI/business logic uses firstKmPrice + perKmPrice as the source of truth.
-            // rate: computedRate,
-            pricing: {
-              firstKm: 1,
-              firstKmPrice: Number(this.commonData.firstKmPrice || 0),
-              perKmPrice: Number(this.commonData.perKmPrice || 0)
-            },
-            vehicleId: this.commonData.vehicle?.id || null,
-            locationId: locId,
-            areaId: areaId,
-            itemId: this.commonData.item?.id || null,
-            notes: this.commonData.notes || '',
-            vehicleCompanyCapacity: Number(capacityForPayload || 0)
-          }
-
+          // Edit mode: single existing transport record
           if (this.transport && this.transport.id) {
-            await updateTransport(this.transport.id, payload)
+            const row = toSave[0]
+            if (row) {
+              await updateTransport(this.transport.id, this.buildRowPayload(row))
+            }
           } else {
-            await createTransport(payload)
+            // Create mode: one transport record per row
+            const createPromises = toSave.map(row => createTransport(this.buildRowPayload(row)))
+            await Promise.all(createPromises)
           }
 
         this.saveCommonDataToStorage()
