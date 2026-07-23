@@ -56,6 +56,9 @@
                 <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('suppliers.statement')">
                   <DocumentTextIcon class="h-5 w-5" />
                 </button>
+                <button @click.stop="openWallet(c)" class="rounded-lg border theme-border theme-dashboard-bg-soft p-2 theme-accent-strong hover:theme-icon-bg" :title="$t('transporters.wallet')">
+                  <WalletIcon class="h-5 w-5" />
+                </button>
                 <button @click.stop="openEdit(c)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" :title="$t('labels.edit')">
                   <PencilSquareIcon class="h-5 w-5" />
                 </button>
@@ -192,6 +195,88 @@
       </div>
     </div>
 
+    <!-- Contractor Wallet Modal -->
+    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 z-10">
+        <div class="flex items-start justify-between mb-4">
+          <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">
+            {{ selectedContractor ? selectedContractor.name : $t('suppliers.wallet') }}
+          </h3>
+          <button @click="walletModalOpen = false" class="theme-text-muted hover:theme-text-secondary">✕</button>
+        </div>
+        <div v-if="walletLoading" class="text-center py-8">{{ $t('labels.loading') || 'Loading...' }}</div>
+        <div v-else>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="p-4 bg-gray-50 rounded">
+              <div class="text-sm theme-text-muted">{{ $t('suppliers.balance') || 'Balance' }}</div>
+              <div class="text-2xl font-semibold text-red-600">{{ wallet ? wallet.balance : '-' }}</div>
+            </div>
+            <div class="p-4 bg-gray-50 rounded">
+              <div class="text-sm theme-text-muted">{{ $t('suppliers.totalDeposits') || 'Total Deposits' }}</div>
+              <div class="text-lg font-semibold text-green-600">{{ wallet ? wallet.totalDeposits : '-' }}</div>
+            </div>
+            <div class="p-4 bg-gray-50 rounded">
+              <div class="text-sm theme-text-muted">{{ $t('suppliers.sources') || 'Sources' }}</div>
+              <div class="text-sm">
+                <div>{{ $t('suppliers.supply') || 'Supply' }}: {{ wallet && wallet.sources ? (wallet.sources.supply ?? wallet.sources.exports ?? 0) : 0 }}</div>
+                <div>{{ $t('suppliers.transport') || 'Transport' }}: {{ wallet && wallet.sources ? wallet.sources.transport : 0 }}</div>
+                <div>{{ $t('suppliers.expenses') || 'Expenses' }}: {{ wallet && wallet.sources ? wallet.sources.expenses : 0 }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <h4 class="font-semibold mb-2">{{ $t('suppliers.transactions') || 'Transactions' }}</h4>
+              <div class="overflow-auto max-h-64 bg-white rounded border">
+                <table class="min-w-full">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="p-2 text-left">{{ $t('labels.type') || 'Type' }}</th>
+                      <th class="p-2 text-left">{{ $t('labels.date') || 'Date' }}</th>
+                      <th class="p-2 text-right">{{ $t('labels.amount') || 'Amount' }}</th>
+                      <th class="p-2 text-right">{{ $t('suppliers.balanceAfter') || 'Balance After' }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="!wallet || !wallet.entries || wallet.entries.length === 0">
+                      <td class="p-3 text-center" colspan="4">{{ $t('suppliers.noTransactions') || 'No transactions' }}</td>
+                    </tr>
+                    <tr v-for="(e, idx) in (wallet && wallet.entries) || []" :key="idx" class="border-t">
+                      <td class="p-2">{{ e.type }}</td>
+                      <td class="p-2">{{ new Date(e.date).toLocaleString() }}</td>
+                      <td class="p-2 text-right">{{ e.signedAmount || e.amount }}</td>
+                      <td class="p-2 text-right">{{ e.balanceAfter != null ? e.balanceAfter : '-' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-2">{{ $t('suppliers.deposit') || 'Deposit' }}</h4>
+              <div class="grid gap-2">
+                <label>
+                  <div class="text-sm mb-1">{{ $t('suppliers.amount') || 'Amount' }}</div>
+                  <input v-model="depositForm.amount" type="number" class="w-full px-3 py-2 border rounded" />
+                </label>
+                <label>
+                  <div class="text-sm mb-1">{{ $t('labels.date') || 'Date' }}</div>
+                  <DateField v-model="depositForm.date" class="w-full px-3 py-2 border rounded" />
+                </label>
+                <label>
+                  <div class="text-sm mb-1">{{ $t('labels.description') || 'Description' }}</div>
+                  <input v-model="depositForm.description" class="w-full px-3 py-2 border rounded" />
+                </label>
+                <div class="flex justify-end gap-2 mt-2">
+                  <button @click="walletModalOpen = false" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
+                  <button @click="doDeposit" class="px-4 py-2 rounded theme-button">{{ $t('labels.deposit') || 'Deposit' }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Confirm delete modal -->
     <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0 !important;">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6 z-10">
@@ -215,15 +300,16 @@
 import * as XLSX from 'xlsx'
 import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
+import DateField from '@/components/shared/DateField.vue'
 import normalizeItem from '@/utils/normalizeItem'
-import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
+import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'EquipmentContractorsList',
   props: {
     mode: { type: String, default: 'rentals' }
   },
-  components: { Pagination, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: { Pagination, DateField, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
   data() {
     return {
       q: '',

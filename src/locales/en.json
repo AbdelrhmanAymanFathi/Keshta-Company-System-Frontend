@@ -1386,6 +1386,7 @@
       "descriptionRequired": "Description is required",
       "amountRequired": "Amount is required",
       "amountInvalid": "Amount must be a valid number",
+      "settlementDateRequired": "Settlement Date is required",
       "settlementDateInvalid": "Settlement Date Invalid"
     },
     "success": {

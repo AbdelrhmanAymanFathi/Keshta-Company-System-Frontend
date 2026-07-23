@@ -182,6 +182,9 @@
                 {{ $t('expenses.treasuryOrCustody') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ $t('expenses.settlementDate') }}
+              </th>
+              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ $t('expenses.amount') }}
               </th>
               <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
@@ -230,6 +233,9 @@
                   {{ expense.treasury.name }} ({{ expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }})
                 </span>
                 <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
+                {{ formatDate(expense.settlementDate) }}
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800" :class="isRTL ? 'text-right' : 'text-left'">
                 {{ formatCurrency(expense.amount) }}
@@ -438,6 +444,20 @@
                         required
                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                         :class="isRTL ? 'text-right' : 'text-left'"
+                        @update:modelValue="onFormDateChange"
+                      />
+                    </div>
+
+                    <!-- Settlement Date -->
+                    <div>
+                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
+                        {{ $t('expenses.settlementDate') }} <span class="text-red-500">*</span>
+                      </label>
+                      <DateField
+                        v-model="form.settlementDate"
+                        required
+                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                        :class="isRTL ? 'text-right' : 'text-left'"
                       />
                     </div>
 
@@ -480,6 +500,7 @@
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
+                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') }}</th>
                             <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
                             <th class="min-w-[160px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.paymentMethod') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.treasuryOrCustody') }}</th>
@@ -530,6 +551,13 @@
                                 :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
+                              />
+                            </td>
+                            <td class="px-3 py-2">
+                              <DateField
+                                v-model="row.settlementDate"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -859,7 +887,7 @@ export default {
       showLocationDialog: false,
       selectedLocation: 'downloads',
       tableRef: null,
-      rows: [],
+rows: [],
       draftModalState: null,
       expenseContextMenu: {
         visible: false,
@@ -1210,7 +1238,7 @@ export default {
         treasuryId: null,
         paymentMethod: 'CASH',
         notes: '',
-        settlementDate: null
+        settlementDate: getTodayISO()
       }
     },
 
@@ -1253,49 +1281,110 @@ export default {
     
     openEditModal(expense) {
       this.editing = true
+      const formattedDate = expense.date ? (typeof expense.date === 'string' && expense.date.includes('T') ? expense.date.split('T')[0] : expense.date) : new Date().toISOString().split('T')[0]
+      const formattedSettlementDate = expense.settlementDate ? (typeof expense.settlementDate === 'string' && expense.settlementDate.includes('T') ? expense.settlementDate.split('T')[0] : expense.settlementDate) : formattedDate
+
+      // 1. Resolve Category
+      const catId = expense.categoryId || expense.categoryRef?.id || expense.category?.id || (typeof expense.category === 'object' ? expense.category.id : null)
+      let parentCat = this.expenseCategories?.find(c => (catId && Number(c.id) === Number(catId)) || (expense.categoryRef?.name && c.name === expense.categoryRef.name) || (expense.category && c.name === (typeof expense.category === 'string' ? expense.category : expense.category?.name)))
+
+      // 2. Resolve SubCategory
+      const subCatId = expense.subCategoryId || expense.subCategoryRef?.id || expense.subCategory?.id || (typeof expense.subCategory === 'object' ? expense.subCategory.id : null)
+      let subCat = null
+
+      if (parentCat) {
+        const subCats = parentCat.subCategories || parentCat.subcategories || parentCat.children || []
+        subCat = subCats.find(sc => (subCatId && Number(sc.id) === Number(subCatId)) || (expense.subCategoryRef?.name && sc.name === expense.subCategoryRef.name) || (expense.classification && sc.name === expense.classification))
+      }
+
+      // If parentCat or subCat was not matched yet, search across all categories for the subcategory
+      if (!subCat && (subCatId || expense.subCategoryRef?.name || expense.classification)) {
+        for (const cat of (this.expenseCategories || [])) {
+          const subCats = cat.subCategories || cat.subcategories || cat.children || []
+          const found = subCats.find(sc => (subCatId && Number(sc.id) === Number(subCatId)) || (expense.subCategoryRef?.name && sc.name === expense.subCategoryRef.name) || (expense.classification && sc.name === expense.classification))
+          if (found) {
+            subCat = found
+            if (!parentCat) parentCat = cat
+            break
+          }
+        }
+      }
+
+      const finalCategoryId = parentCat ? parentCat.id : (catId ? Number(catId) : null)
+      const finalSubCategoryId = subCat ? subCat.id : (subCatId ? Number(subCatId) : null)
+
+      const categoryName = parentCat?.name || expense.categoryRef?.name || (typeof expense.category === 'string' ? expense.category : expense.category?.name) || ''
+      const subCategoryName = subCat?.name || expense.subCategoryRef?.name || expense.classification || (typeof expense.subCategory === 'string' ? expense.subCategory : expense.subCategory?.name) || ''
+
+      // 3. Resolve Treasury
+      const targetTreasuryId = expense.treasuryId || expense.treasury?.id || null
+      let treasurySearchName = ''
+      if (targetTreasuryId) {
+        const foundTr = this.treasuryItems?.find(t => Number(t.id) === Number(targetTreasuryId))
+        if (foundTr) {
+          treasurySearchName = foundTr.name
+        }
+      }
+      if (!treasurySearchName && expense.treasury?.name) {
+        const typeLabel = expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'
+        treasurySearchName = `${expense.treasury.name} (${typeLabel})`
+      }
+
       this.form = {
         id: expense.id,
-        date: expense.date.split('T')[0],
-        categoryId: expense.categoryId || null,
-        subCategoryId: expense.subCategoryId || null,
+        date: formattedDate,
+        categoryId: finalCategoryId,
+        subCategoryId: finalSubCategoryId,
         kind: expense.kind || 'EXPENSE',
-        description: expense.description,
-        amount: expense.amount,
+        description: expense.description || '',
+        amount: expense.amount || '',
         flow: expense.flow || 'OUT',
         branchId: expense.branchId || null,
-        locationId: expense.locationId || null,
-        treasuryId: expense.treasuryId || expense.treasury?.id || null,
+        locationId: expense.locationId || expense.location?.id || null,
+        treasuryId: targetTreasuryId,
         paymentMethod: expense.paymentMethod || 'CASH',
         notes: expense.notes || '',
-        settlementDate: expense.settlementDate ? expense.settlementDate.split('T')[0] : null
+        settlementDate: formattedSettlementDate
       }
       this.modalStep = 1
-      const parentCat = this.expenseCategories?.find(c => c.id === expense.categoryId)
+
       const row = this.createEmptyRow()
-      row.categoryId = expense.categoryId || null
-      row.categorySearch = parentCat?.name || ''
-      row.subCategoryId = expense.subCategoryId || null
-      row.subCategorySearch = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)?.name || ''
+      row.categoryId = finalCategoryId
+      row.categorySearch = categoryName
+      row.subCategoryId = finalSubCategoryId
+      row.subCategorySearch = subCategoryName
       row.description = expense.description || ''
       row.amount = expense.amount || ''
       row.paymentMethod = expense.paymentMethod || 'CASH'
       row.paymentMethodSearch = this.paymentMethodItems?.find(p => p.id === row.paymentMethod)?.name || 'نقداً'
-      row.treasuryId = expense.treasuryId || expense.treasury?.id || null
-      row.treasurySearch = expense.treasury?.name ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : ''
+      row.treasuryId = targetTreasuryId
+      row.treasurySearch = treasurySearchName
+      row.settlementDate = formattedSettlementDate
       row.notes = expense.notes || ''
       this.rows = [row]
-      this.formLocationSearch = expense.location?.name || this.locations?.find(l => l.id === expense.locationId)?.name || ''
-      this.formCategorySearch = parentCat?.name || ''
-      this.formSubcategorySearch = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)?.name || ''
+
+      this.formLocationSearch = expense.location?.name || this.locations?.find(l => Number(l.id) === Number(expense.locationId))?.name || ''
+      this.formCategorySearch = categoryName
+      this.formSubcategorySearch = subCategoryName
       this.formPaymentMethodSearch = this.paymentMethodItems?.find(p => p.id === expense.paymentMethod)?.name || 'نقداً'
-      this.formTreasurySearch = expense.treasury?.name ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : ''
+      this.formTreasurySearch = treasurySearchName
       this.modalOpen = true
+      this.hideExpenseContextMenu()
     },
     
     closeModal() {
       this.saveModalDraft()
       this.modalOpen = false
       this.modalStep = 1
+    },
+
+    onFormDateChange(newDate) {
+      if (newDate) {
+        this.form.settlementDate = newDate
+        this.rows.forEach(r => {
+          if (!r.settlementDate) r.settlementDate = newDate
+        })
+      }
     },
 
     createEmptyRow() {
@@ -1311,6 +1400,7 @@ export default {
         paymentMethodSearch: 'نقداً',
         treasuryId: null,
         treasurySearch: '',
+        settlementDate: this.form?.settlementDate || this.form?.date || new Date().toISOString().split('T')[0],
         notes: ''
       }
     },
@@ -1320,15 +1410,17 @@ export default {
       this.$nextTick(() => {
         const rows = this.$refs.tableRef?.querySelectorAll('tbody tr') || []
         const lastRow = rows[this.rows.length - 1]
-        const descriptionInput = lastRow?.querySelector('input[type="text"]')
-        descriptionInput?.focus()
+        const firstInput = lastRow?.querySelector('td:nth-child(2) input')
+        firstInput?.focus()
       })
     },
 
     duplicateRow(index) {
       const source = this.rows[index]
-      if (!source) return
-      const clone = { ...source, id: Date.now() + Math.random() }
+      const clone = {
+        ...source,
+        id: Date.now() + Math.random()
+      }
       this.rows.splice(index + 1, 0, clone)
     },
 
@@ -1342,7 +1434,8 @@ export default {
 
     getRowSubcategories(row) {
       if (!row?.categoryId) return []
-      return this.expenseCategories.find(c => c.id === row.categoryId)?.subCategories || []
+      const cat = this.expenseCategories.find(c => Number(c.id) === Number(row.categoryId))
+      return cat?.subCategories || cat?.subcategories || cat?.children || []
     },
 
     handleFieldNavigation(index, field, event) {
@@ -1361,7 +1454,7 @@ export default {
 
       event.preventDefault()
 
-      const nextFields = ['category', 'subcategory', 'description', 'amount', 'paymentMethod', 'treasury', 'notes']
+      const nextFields = ['category', 'subcategory', 'description', 'settlementDate', 'amount', 'paymentMethod', 'treasury', 'notes']
       const currentIndex = nextFields.indexOf(field)
       const nextField = nextFields[currentIndex + 1]
       if (!nextField) {
@@ -1377,10 +1470,11 @@ export default {
         category: 'td:nth-child(2) input',
         subcategory: 'td:nth-child(3) input',
         description: 'td:nth-child(4) input',
-        amount: 'td:nth-child(5) input',
-        paymentMethod: 'td:nth-child(6) input',
-        treasury: 'td:nth-child(7) input',
-        notes: 'td:nth-child(8) textarea'
+        settlementDate: 'td:nth-child(5) input',
+        amount: 'td:nth-child(6) input',
+        paymentMethod: 'td:nth-child(7) input',
+        treasury: 'td:nth-child(8) input',
+        notes: 'td:nth-child(9) textarea'
       }
 
       const target = row.querySelector(selectorMap[nextField])
@@ -1398,6 +1492,7 @@ export default {
           .filter(row => String(row.description || '').trim() || row.amount || row.categoryId)
           .map(row => {
             const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
+            const rowSettlementDate = row.settlementDate || this.form.settlementDate || this.form.date
             return {
               date: this.form.date,
               kind: this.form.kind || 'EXPENSE',
@@ -1410,7 +1505,8 @@ export default {
               locationId: this.form.locationId,
               treasuryId: row.treasuryId ?? null,
               paymentMethod: row.paymentMethod || 'CASH',
-              notes: row.notes || ''
+              notes: row.notes || '',
+              settlementDate: rowSettlementDate ? new Date(rowSettlementDate + 'T00:00:00Z').toISOString() : null
             }
           })
 
@@ -1442,6 +1538,13 @@ export default {
             if (updateError.response?.status === 202 || updateError.response?.data?.status === 'PENDING') {
               this.closeModal()
               this.showSuccess('تم تقديم طلب التعديل للموافقة الإدارية بنجاح')
+              await this.loadExpenses()
+              return
+            }
+            if (updateError.response?.status === 409) {
+              const pendingMsg = updateError.response?.data?.message || 'This record already has a pending approval request. Please wait for it to be resolved before submitting another change.'
+              this.modalOpen = false
+              this.showError(pendingMsg)
               await this.loadExpenses()
               return
             }
@@ -1494,7 +1597,9 @@ export default {
         console.error('Error details:', error.response?.data)
         
         let errorMessage = this.$t('expenses.saveError')
-        if (error.response?.data?.message) {
+        if (error.response?.status === 409) {
+          errorMessage = error.response?.data?.message || 'This record already has a pending approval request. Please wait for it to be resolved before submitting another change.'
+        } else if (error.response?.data?.message) {
           errorMessage = error.response.data.message
         } else if (error.response?.status === 500) {
           errorMessage = 'Server error. Please check if the backend is running.'
@@ -1511,6 +1616,10 @@ export default {
     validateStep1() {
       if (!this.form.date) {
         this.showError(this.$t('expenses.validation.dateRequired'))
+        return false
+      }
+      if (!this.form.settlementDate) {
+        this.showError(this.$t('expenses.validation.settlementDateRequired') || 'Settlement Date is required')
         return false
       }
       if (this.form.locationId === null) {
@@ -1576,6 +1685,13 @@ export default {
           await this.loadExpenses()
           return
         }
+        if (error.response?.status === 409) {
+          const pendingMsg = error.response?.data?.message || 'This record already has a pending approval request. Please wait for it to be resolved before submitting another change.'
+          this.cancelDelete()
+          this.showError(pendingMsg)
+          await this.loadExpenses()
+          return
+        }
         console.error('Error deleting expense:', error)
         
         // If backend is not available, simulate deletion
@@ -1586,7 +1702,8 @@ export default {
           this.cancelDelete()
           this.showSuccess(this.$t('expenses.success.deleted'))
         } else {
-          this.showError(this.$t('expenses.deleteError'))
+          const msg = error.response?.data?.message || this.$t('expenses.deleteError')
+          this.showError(msg)
         }
       } finally {
         this.deleting = false
@@ -1873,47 +1990,6 @@ export default {
       document.removeEventListener('click', this.hideExpenseContextMenu)
     },
 
-    openEditModal(expense) {
-      // Load expense data into form for editing
-      this.form = {
-        id: expense.id,
-        date: expense.date,
-        categoryId: expense.categoryId,
-        subCategoryId: expense.subCategoryId,
-        kind: expense.kind || 'EXPENSE',
-        description: expense.description,
-        amount: expense.amount,
-        notes: expense.notes,
-        flow: expense.flow || 'OUT',
-        branchId: expense.branchId,
-        locationId: expense.locationId,
-        treasuryId: expense.treasuryId,
-        paymentMethod: expense.paymentMethod || 'CASH',
-        settlementDate: expense.settlementDate
-      }
-      
-      // Set search fields for dropdowns
-      const category = this.expenseCategories.find(c => c.id === expense.categoryId)
-      this.formCategorySearch = category?.name || ''
-      
-      const subcategory = category?.children?.find(s => s.id === expense.subCategoryId)
-      this.formSubcategorySearch = subcategory?.name || ''
-      
-      const location = this.locations.find(l => l.id === expense.locationId)
-      this.formLocationSearch = location?.name || ''
-      
-      const paymentMethod = this.paymentMethodItems.find(p => p.id === expense.paymentMethod)
-      this.formPaymentMethodSearch = paymentMethod?.name || ''
-      
-      const treasury = this.treasuries.find(t => t.id === expense.treasuryId)
-      this.formTreasurySearch = treasury?.name || ''
-      
-      this.editing = true
-      this.modalOpen = true
-      this.modalStep = 1
-      this.hideExpenseContextMenu()
-    },
-
     confirmDelete(expense) {
       this.deleteConfirm.item = expense
       this.deleteConfirm.open = true
@@ -1921,13 +1997,19 @@ export default {
     },
     
     showSuccess(message) {
-      // You can implement a toast notification here
-      console.log('Success:', message)
+      if (window.$toast) {
+        window.$toast(message, 'success')
+      } else {
+        console.log('Success:', message)
+      }
     },
     
     showError(message) {
-      // You can implement a toast notification here
-      alert(message)
+      if (window.$toast) {
+        window.$toast(message, 'error')
+      } else {
+        alert(message)
+      }
     }
   }
 }

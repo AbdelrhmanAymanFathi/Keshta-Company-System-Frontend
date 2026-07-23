@@ -5,7 +5,7 @@
               class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium theme-text-primary transition-colors hover:bg-slate-50 disabled:opacity-50 sm:px-4 sm:py-2">
         {{ $t('labels.refresh') }}
       </button>
-      <button @click="downloadReport" :disabled="downloading"
+      <button @click="downloadReport('xlsx')" :disabled="downloading"
               class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 text-xs sm:text-sm">
         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
@@ -48,20 +48,75 @@
           />
         </div>
 
-        <!-- Category Filter -->
+        <!-- Category (Main Term) Filter -->
         <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.category') }}</label>
-          <select 
-            v-model="filters.category"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
-          >
-            <option value="">{{ $t('labels.all') }}</option>
-            <option value="operational">Operational</option>
-            <option value="maintenance">Maintenance</option>
-            <option value="fuel">Fuel</option>
-            <option value="salary">Salary</option>
-            <option value="other">Other</option>
-          </select>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.mainTerm') }}</label>
+          <SearchDropdown
+            v-model="categorySearchText"
+            :items="categories"
+            :allItems="categories"
+            :placeholder="$t('expenses.searchMainTerm') || $t('placeholders.search')"
+            clearable
+            @select="(sel) => { filters.categoryId = sel.id; categorySearchText = sel.name; filters.subCategoryId = ''; subCategorySearchText = '' }"
+            @clear="() => { filters.categoryId = ''; categorySearchText = ''; filters.subCategoryId = ''; subCategorySearchText = '' }"
+          />
+        </div>
+
+        <!-- SubCategory (Sub Term) Filter -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.subTerm') }}</label>
+          <SearchDropdown
+            v-model="subCategorySearchText"
+            :items="availableSubcategories"
+            :allItems="availableSubcategories"
+            :disabled="!filters.categoryId"
+            :placeholder="$t('expenses.searchSubTerm') || $t('placeholders.search')"
+            clearable
+            @select="(sel) => { filters.subCategoryId = sel.id; subCategorySearchText = sel.name }"
+            @clear="() => { filters.subCategoryId = ''; subCategorySearchText = '' }"
+          />
+        </div>
+
+        <!-- Location Filter -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.location') }}</label>
+          <SearchDropdown
+            v-model="locationSearchText"
+            :items="locations"
+            :allItems="locations"
+            :placeholder="$t('expenses.searchLocation') || $t('placeholders.search')"
+            clearable
+            @select="(sel) => { filters.locationId = sel.id; locationSearchText = sel.name }"
+            @clear="() => { filters.locationId = ''; locationSearchText = '' }"
+          />
+        </div>
+
+        <!-- Treasury / Custody Filter -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.treasuryOrCustody') }}</label>
+          <SearchDropdown
+            v-model="treasurySearchText"
+            :items="treasuryItems"
+            :allItems="treasuryItems"
+            :placeholder="$t('expenses.searchTreasury') || $t('placeholders.search')"
+            clearable
+            @select="(sel) => { filters.treasuryId = sel.id; treasurySearchText = sel.name }"
+            @clear="() => { filters.treasuryId = ''; treasurySearchText = '' }"
+          />
+        </div>
+
+        <!-- Payment Method Filter -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.paymentMethod') }}</label>
+          <SearchDropdown
+            v-model="paymentMethodSearchText"
+            :items="paymentMethodItems"
+            :allItems="paymentMethodItems"
+            :placeholder="$t('expenses.searchPaymentMethod') || $t('placeholders.search')"
+            clearable
+            @select="(sel) => { filters.paymentMethod = sel.id; paymentMethodSearchText = sel.name }"
+            @clear="() => { filters.paymentMethod = ''; paymentMethodSearchText = '' }"
+          />
         </div>
       </div>
 
@@ -104,39 +159,55 @@
         <table class="min-w-full divide-y divide-gray-200 table-auto">
           <thead class="bg-gray-50">
             <tr>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.type') || 'Type' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') || 'Location' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.category') || 'Category' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') || 'Description' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') || 'Amount' }}</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') || 'Notes' }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.date') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.mainTerm') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.subTerm') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.paymentMethod') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.treasuryOrCustody') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(expense, index) in items" :key="expense.ID || expense.id || index" class="hover:bg-gray-50">
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.id || expense.ID || index + 1 }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.type || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.settlementDate || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary" style="display: table-cell !important;">{{ expense.branch || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.locationName || expense.location?.name || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <div class="flex flex-col gap-1 items-start">
-                  <span class="font-medium theme-text-primary">
-                    {{ expense.category || '-' }}
-                  </span>
-                  <span class="text-xs theme-text-secondary">
-                    {{ expense.classification || '-' }}
-                  </span>
-                </div>
+            <tr v-for="(expense, index) in items" :key="expense.id || expense.ID || index" class="hover:bg-gray-50">
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ index + 1 }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
+                  {{ expense.category || '-' }}
+                </span>
               </td>
-              <td class="table-cell px-6 py-4 text-sm theme-text-primary">{{ expense.description || '-' }}</td>
-              <td class="table-cell px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">{{ formatCurrency(expense.amount || 0) }}</td>
-              <td class="table-cell px-6 py-4 text-sm theme-text-primary">{{ expense.notes || '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span v-if="expense.classification && expense.classification !== '-'" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                  {{ expense.classification }}
+                </span>
+                <span v-else class="text-xs theme-caption">-</span>
+              </td>
+              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.description || '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span v-if="expense.locationName || expense.location?.name" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
+                  {{ expense.locationName || expense.location?.name }}
+                </span>
+                <span v-else class="theme-caption">-</span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {{ getPaymentMethodLabel(expense.paymentMethod) }}
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  {{ expense.treasury }}
+                </span>
+                <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.settlementDate) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800">{{ formatCurrency(expense.amount || expense.expense || 0) }}</td>
+              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.notes || '-' }}</td>
             </tr>
           </tbody>
           <tbody v-else>
@@ -174,30 +245,69 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { getExpensesReportData, downloadExpensesReport } from '@/api'
+import { getExpensesReportData, downloadExpensesReport, getExpenseCategories, getLocations, getTreasuries } from '@/api'
 import DateField from '../../shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
+import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'ExpensesReport',
-  components: { DateField, PageHeader },
+  components: { DateField, PageHeader, SearchDropdown },
   setup() {
     const downloading = ref(false)
     const error = ref(null)
     const loading = ref(false)
     const items = ref([])
+
+    const categories = ref([])
+    const locations = ref([])
+    const treasuries = ref([])
+
+    const categorySearchText = ref('')
+    const subCategorySearchText = ref('')
+    const locationSearchText = ref('')
+    const treasurySearchText = ref('')
+    const paymentMethodSearchText = ref('')
+
     const filters = ref({
       q: '',
       startDate: '',
       endDate: '',
-      category: ''
+      categoryId: '',
+      subCategoryId: '',
+      locationId: '',
+      treasuryId: '',
+      paymentMethod: '',
+      kind: ''
+    })
+
+    const availableSubcategories = computed(() => {
+      if (!filters.value.categoryId) return []
+      const cat = categories.value.find(c => c.id === Number(filters.value.categoryId))
+      return cat?.subCategories || cat?.subcategories || []
+    })
+
+    const treasuryItems = computed(() => {
+      return (treasuries.value || []).map(tr => ({
+        id: tr.id,
+        name: `${tr.name} (${tr.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})`
+      }))
+    })
+
+    const paymentMethodItems = computed(() => {
+      return [
+        { id: 'CASH', name: 'نقداً' },
+        { id: 'BANK_TRANSFER', name: 'تحويل بنكي' },
+        { id: 'CHEQUE', name: 'شيك' },
+        { id: 'CUSTODY', name: 'عهدة' }
+      ]
     })
 
     const totalAmount = computed(() => {
       return items.value.reduce((sum, item) => {
-        const amount = parseFloat(String(item['المبلغ'] || item.amount || item.total || 0).replace(/,/g, '')) || 0
+        const amount = parseFloat(String(item['المبلغ'] || item.amount || item.expense || item.total || 0).replace(/,/g, '')) || 0
         return sum + amount
       }, 0)
     })
@@ -209,12 +319,11 @@ export default {
 
     const highestExpense = computed(() => {
       if (items.value.length === 0) return 0
-      return Math.max(...items.value.map(item => parseFloat(String(item['المبلغ'] || item.amount || item.total || 0).replace(/,/g, '')) || 0))
+      return Math.max(...items.value.map(item => parseFloat(String(item['المبلغ'] || item.amount || item.expense || item.total || 0).replace(/,/g, '')) || 0))
     })
 
     const formatDate = (dateString) => {
       if (!dateString) return '-'
-      // Use Gregorian calendar (en-US) to avoid Hijri dates
       return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: '2-digit',
@@ -229,20 +338,32 @@ export default {
       }).format(amount || 0)
     }
 
-    const getCategoryVariant = (category) => {
-      // Badge.vue supports: default, success, warning, danger, info, company, external
-      const variants = {
-        operational: 'info',    // blue-ish
-        maintenance: 'warning', // yellow
-        fuel: 'danger',         // red
-        salary: 'success',      // green
-        other: 'default'
+    const getPaymentMethodLabel = (method) => {
+      if (!method) return '-'
+      if (method === 'CASH' || method === 'نقداً') return 'نقداً'
+      if (method === 'BANK_TRANSFER' || method === 'تحويل بنكي') return 'تحويل بنكي'
+      if (method === 'CHEQUE' || method === 'شيك') return 'شيك'
+      if (method === 'CUSTODY' || method === 'عهدة') return 'عهدة'
+      return method
+    }
+
+    const loadMasterData = async () => {
+      try {
+        const [catRes, locRes, trRes] = await Promise.all([
+          getExpenseCategories().catch(() => null),
+          getLocations().catch(() => null),
+          getTreasuries().catch(() => null)
+        ])
+
+        if (catRes?.data) categories.value = Array.isArray(catRes.data) ? catRes.data : (catRes.data.data || [])
+        if (locRes?.data) locations.value = Array.isArray(locRes.data) ? locRes.data : (locRes.data.data || [])
+        if (trRes?.data) treasuries.value = Array.isArray(trRes.data) ? trRes.data : (trRes.data.data || [])
+      } catch (err) {
+        console.error('Error loading report master data:', err)
       }
-      return variants[category] || 'default'
     }
 
     const loadReport = async () => {
-      // Require start and end dates before loading
       error.value = null
       if (!filters.value.startDate || !filters.value.endDate) {
         items.value = []
@@ -250,7 +371,6 @@ export default {
         return
       }
 
-      // Ensure endDate is not before startDate
       try {
         const s = new Date(filters.value.startDate)
         const e = new Date(filters.value.endDate)
@@ -260,7 +380,7 @@ export default {
           return
         }
       } catch (e) {
-        // ignore parse error and let API handle it
+        // ignore parse error
       }
 
       loading.value = true
@@ -270,20 +390,10 @@ export default {
           buildQueryParams(filters.value),
           'json'
         )
-        
-        // Destructure data and headers from response
-        const { data, headers } = response
-        console.log('Raw response:', { data, headers })
 
-        // Handle various response formats:
-        // 1. Direct array: [...]
-        // 2. { rows: [...] }   <-- backend returns this
-        // 3. { items: [...] }
-        // 4. { data: [...] }
-        // 5. Nested { data: { items: [...] } }
+        const { data } = response
         let parsedItems = []
 
-        // Prefer backend `rows` when present (server returns { rows: [...] })
         if (Array.isArray(data?.rows)) {
           parsedItems = data.rows
         } else if (Array.isArray(data)) {
@@ -292,29 +402,9 @@ export default {
           parsedItems = data.items
         } else if (Array.isArray(data?.data)) {
           parsedItems = data.data
-        } else if (typeof data === 'string') {
-          // Might be stringified JSON
-          try {
-            const parsed = JSON.parse(data)
-            if (Array.isArray(parsed?.rows)) {
-              parsedItems = parsed.rows
-            } else if (Array.isArray(parsed)) {
-              parsedItems = parsed
-            } else if (Array.isArray(parsed?.items)) {
-              parsedItems = parsed.items
-            } else if (Array.isArray(parsed?.data)) {
-              parsedItems = parsed.data
-            } else {
-              parsedItems = []
-            }
-          } catch (_) {
-            parsedItems = []
-          }
         }
 
         items.value = parsedItems
-        console.log('Parsed items count:', parsedItems.length)
-        console.log('First item:', parsedItems[0])
       } catch (err) {
         console.error('Error loading expenses report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'
@@ -330,11 +420,20 @@ export default {
     const clearFilters = () => {
       filters.value = {
         q: '',
-        startDate: '',
-        endDate: '',
-        category: ''
+        startDate: filters.value.startDate,
+        endDate: filters.value.endDate,
+        categoryId: '',
+        subCategoryId: '',
+        locationId: '',
+        treasuryId: '',
+        paymentMethod: '',
+        kind: ''
       }
-      // Do not auto-load after clearing filters: user must click Search
+      categorySearchText.value = ''
+      subCategorySearchText.value = ''
+      locationSearchText.value = ''
+      treasurySearchText.value = ''
+      paymentMethodSearchText.value = ''
       items.value = []
     }
 
@@ -347,7 +446,6 @@ export default {
           format
         )
 
-        // Prefer filename from headers
         let filename = getFilenameFromHeaders(headers, null)
         if (!filename) {
           const ext = format === 'csv' ? 'csv' : (format === 'pdf' ? 'pdf' : 'xlsx')
@@ -369,13 +467,13 @@ export default {
       }
     }
 
-    onMounted(() => {
+    onMounted(async () => {
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
       
       filters.value.endDate = endDate.toISOString().split('T')[0]
       filters.value.startDate = startDate.toISOString().split('T')[0]
-      // Do not auto-load: user must click Search
+      await loadMasterData()
     })
 
     return {
@@ -383,13 +481,24 @@ export default {
       error,
       loading,
       items,
+      categories,
+      locations,
+      treasuries,
+      categorySearchText,
+      subCategorySearchText,
+      locationSearchText,
+      treasurySearchText,
+      paymentMethodSearchText,
       filters,
+      availableSubcategories,
+      treasuryItems,
+      paymentMethodItems,
       totalAmount,
       averageExpense,
       highestExpense,
       formatDate,
       formatCurrency,
-      getCategoryVariant,
+      getPaymentMethodLabel,
       loadReport,
       refresh,
       clearFilters,

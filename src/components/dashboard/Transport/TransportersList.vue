@@ -311,6 +311,7 @@ import * as XLSX from 'xlsx'
 import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
+import WalletPanel from '@/components/shared/WalletPanel.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
@@ -319,7 +320,7 @@ export default {
   props: {
     mode: { type: String, default: 'transport' }
   },
-  components: { Pagination, DateField, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
+  components: { Pagination, DateField, WalletPanel, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
   data() {
     return {
       q: '',
