@@ -18,18 +18,6 @@
     <div class="bg-white rounded-lg shadow p-4 space-y-4">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Search -->
-        <div>
-          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.search') }}</label>
-          <input 
-            v-model="filters.q"
-            @keyup.enter="loadReport"
-            type="text"
-            :placeholder="$t('placeholders.search')"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
-          >
-        </div>
-
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
@@ -116,6 +104,18 @@
             clearable
             @select="(sel) => { filters.paymentMethod = sel.id; paymentMethodSearchText = sel.name }"
             @clear="() => { filters.paymentMethod = ''; paymentMethodSearchText = '' }"
+          />
+        </div>
+
+        <!-- Search in Statement / Description / البحث في البيان -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.searchStatement') }}</label>
+          <input 
+            v-model="filters.q"
+            @keyup.enter="loadReport"
+            type="text"
+            :placeholder="$t('expenses.searchStatementPlaceholder')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
       </div>
@@ -474,6 +474,7 @@ export default {
       filters.value.endDate = endDate.toISOString().split('T')[0]
       filters.value.startDate = startDate.toISOString().split('T')[0]
       await loadMasterData()
+      await loadReport()
     })
 
     return {

@@ -1025,25 +1025,39 @@ rows: [],
   watch: {
     searchQuery() {
       this.currentPage = 1
+      this.loadExpenses()
     },
     selectedCategoryId() {
       this.selectedSubcategoryId = null
-      this.subcategoryInput = ''
+      this.filterSubcategorySearch = ''
       this.currentPage = 1
       this.loadExpenses()
     },
     selectedSubcategoryId() {
-      // Keep input label in sync and trigger filtering
-      if (this.selectedSubcategoryId) {
-        const sc = this.subcategoryOptions.find(s => s.value === this.selectedSubcategoryId)
-        this.subcategoryInput = sc ? sc.label : ''
-      } else {
-        this.subcategoryInput = ''
-      }
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedLocationId() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedTreasuryId() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedPaymentMethod() {
       this.currentPage = 1
       this.loadExpenses()
     },
     selectedKind() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    'filters.startDate'() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    'filters.endDate'() {
       this.currentPage = 1
       this.loadExpenses()
     }

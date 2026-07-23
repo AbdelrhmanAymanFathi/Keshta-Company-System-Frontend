@@ -12,22 +12,43 @@
       </button>
     </PageHeader>
 
-    <!-- Search & Filter bar -->
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <!-- Search & Tree Controls bar -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col sm:flex-row gap-4 items-center justify-between">
       <div class="relative flex-1 w-full">
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="$t('expenses.searchTermsPlaceholder')"
-          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl theme-input-focus pl-10 pr-4 text-sm"
-          :class="isRTL ? 'text-right pr-4 pl-10' : 'text-left pl-4 pr-10'"
+          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl theme-input-focus text-sm transition-all"
+          :class="isRTL ? 'text-right pr-10 pl-4' : 'text-left pl-10 pr-4'"
         />
-        <svg class="w-5 h-5 text-slate-400 absolute top-3" :class="isRTL ? 'left-3' : 'right-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-slate-400 absolute top-3" :class="isRTL ? 'right-3' : 'left-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </div>
-      <div class="text-sm theme-text-muted font-medium whitespace-nowrap">
-        {{ $t('expenses.totalMainTerms', { count: categories.length }) }}
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button 
+          @click="expandAll" 
+          class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+          توسيع الكل
+        </button>
+        <button 
+          @click="collapseAll" 
+          class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+          </svg>
+          طي الكل
+        </button>
+        <div class="text-xs theme-text-muted font-medium px-2 py-1 bg-slate-50 rounded-lg border border-slate-100">
+          {{ $t('expenses.totalMainTerms', { count: categories.length }) }}
+        </div>
       </div>
     </div>
 
@@ -45,34 +66,51 @@
       <p class="text-sm text-slate-500">{{ $t('expenses.addMainTermHint') }}</p>
     </div>
 
-    <!-- Main Terms List (Tree / Accordion View) -->
-    <div v-else class="space-y-4">
+    <!-- Main Terms Tree View Hierarchy -->
+    <div v-else class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6 space-y-3">
       <div 
         v-for="cat in filteredCategories" 
         :key="cat.id" 
-        class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-200 hover:border-slate-300"
+        class="border border-slate-200/80 rounded-xl overflow-hidden transition-all duration-200"
       >
-        <!-- Category Row Header -->
-        <div class="p-5 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white border-b border-slate-100">
+        <!-- Main Term Node Header -->
+        <div 
+          class="p-4 flex items-center justify-between bg-slate-50/80 hover:bg-slate-100/80 cursor-pointer transition-colors select-none"
+          @click="toggleExpand(cat.id)"
+        >
           <div class="flex items-center gap-3">
-            <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 font-bold flex items-center justify-center text-sm shadow-sm border border-emerald-100">
-              {{ cat.name ? cat.name.charAt(0).toUpperCase() : '#' }}
+            <!-- Expand / Collapse Chevron Icon -->
+            <button 
+              type="button"
+              class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-transform duration-200 shadow-2xs"
+              :class="{ 'rotate-90': isExpanded(cat.id) }"
+            >
+              <svg class="w-4 h-4" :class="isRTL ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+
+            <!-- Folder Icon & Category Title -->
+            <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-sm shadow-2xs border border-emerald-200/60">
+              <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+              </svg>
             </span>
             <div>
               <h3 class="text-base font-bold theme-text-primary flex items-center gap-2">
                 {{ cat.name }}
-                <span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   {{ cat.subCategories ? cat.subCategories.length : 0 }} {{ $t('expenses.subcategoryCount') }}
                 </span>
               </h3>
             </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <!-- Add Subcategory Button -->
+          <!-- Actions (Add Sub, Edit, Delete) -->
+          <div class="flex items-center gap-2" @click.stop>
             <button 
               @click="openAddSubCategoryModal(cat)"
-              class="px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1"
+              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -80,7 +118,6 @@
               {{ $t('expenses.addSubcategory') }}
             </button>
 
-            <!-- Edit Main Term Button -->
             <button 
               @click="openEditCategoryModal(cat)"
               class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -91,7 +128,6 @@
               </svg>
             </button>
 
-            <!-- Delete Main Term Button -->
             <button 
               @click="confirmDeleteCategory(cat)"
               class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -104,32 +140,47 @@
           </div>
         </div>
 
-        <!-- Subcategories Grid -->
-        <div class="p-4 bg-slate-50/50">
-          <div v-if="!cat.subCategories || cat.subCategories.length === 0" class="text-xs text-slate-400 italic py-2 px-3">
+        <!-- Subcategories Tree Branch View -->
+        <div v-show="isExpanded(cat.id)" class="bg-slate-50/40 p-4 border-t border-slate-200/60">
+          <div v-if="!cat.subCategories || cat.subCategories.length === 0" class="text-xs text-slate-400 italic py-3 px-6">
             {{ $t('expenses.noSubcategories') }}
           </div>
-          <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+
+          <div v-else class="relative space-y-2" :class="isRTL ? 'pr-6 border-r-2 border-emerald-300/60' : 'pl-6 border-l-2 border-emerald-300/60'">
             <div 
               v-for="subCat in cat.subCategories" 
               :key="subCat.id"
-              class="bg-white p-3 rounded-xl border border-slate-200/80 flex items-center justify-between hover:shadow-sm transition-all"
+              class="relative bg-white p-3 rounded-xl border border-slate-200/80 flex items-center justify-between hover:border-emerald-300 hover:shadow-xs transition-all"
             >
-              <span class="text-sm font-medium text-slate-700 truncate">{{ subCat.name }}</span>
+              <!-- Branch Line Bullet -->
+              <div 
+                class="absolute w-3 h-0.5 bg-emerald-300/80 top-1/2"
+                :class="isRTL ? '-right-3' : '-left-3'"
+              ></div>
+
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                </svg>
+                <span class="text-sm font-semibold text-slate-800">{{ subCat.name }}</span>
+              </div>
+
               <div class="flex items-center gap-1">
                 <button 
                   @click="openEditSubCategoryModal(cat, subCat)" 
-                  class="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                  class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                  :title="$t('expenses.editSubcategory')"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                   </svg>
                 </button>
                 <button 
                   @click="confirmDeleteSubCategory(subCat)" 
-                  class="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                  class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                  :title="$t('expenses.deleteSubcategory')"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
                 </button>
@@ -245,6 +296,7 @@ export default {
   data() {
     return {
       categories: [],
+      expandedCategoryIds: [],
       loading: false,
       saving: false,
       searchQuery: '',
@@ -272,10 +324,18 @@ export default {
       if (!this.searchQuery || !this.searchQuery.trim()) return this.categories
       const q = this.searchQuery.toLowerCase().trim()
       return this.categories.filter(cat => {
-        const catMatch = cat.name.toLowerCase().includes(q)
-        const subMatch = cat.subCategories && cat.subCategories.some(sc => sc.name.toLowerCase().includes(q))
+        const catMatch = cat.name && cat.name.toLowerCase().includes(q)
+        const subMatch = cat.subCategories && cat.subCategories.some(sc => sc.name && sc.name.toLowerCase().includes(q))
         return catMatch || subMatch
       })
+    }
+  },
+  watch: {
+    searchQuery(newVal) {
+      if (newVal && newVal.trim()) {
+        // Auto-expand all categories during active search
+        this.expandAll()
+      }
     }
   },
   async mounted() {
@@ -287,12 +347,37 @@ export default {
       try {
         const response = await getExpenseCategories()
         this.categories = response.data || []
+        // By default expand top 5 categories
+        if (this.categories.length > 0) {
+          this.expandedCategoryIds = this.categories.slice(0, 5).map(c => c.id)
+        }
       } catch (err) {
         console.error('Failed to load terms:', err)
       } finally {
         this.loading = false
       }
     },
+
+    isExpanded(catId) {
+      return this.expandedCategoryIds.includes(catId)
+    },
+
+    toggleExpand(catId) {
+      if (this.isExpanded(catId)) {
+        this.expandedCategoryIds = this.expandedCategoryIds.filter(id => id !== catId)
+      } else {
+        this.expandedCategoryIds.push(catId)
+      }
+    },
+
+    expandAll() {
+      this.expandedCategoryIds = this.categories.map(c => c.id)
+    },
+
+    collapseAll() {
+      this.expandedCategoryIds = []
+    },
+
     openAddCategoryModal() {
       this.categoryModal = { open: true, isEdit: false, id: null, name: '' }
     },

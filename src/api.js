@@ -1337,6 +1337,8 @@ export const getExpenses = (params = {}) => {
     kind,
     branchId, 
     locationId, 
+    treasuryId,
+    paymentMethod,
     startDate, 
     endDate,
     includeSummary 
@@ -1347,11 +1349,13 @@ export const getExpenses = (params = {}) => {
   });
   // Only append non-empty, non-null, non-undefined values
   if (q) queryParams.append('q', q);
-  if (categoryId !== undefined && categoryId !== null) queryParams.append('categoryId', categoryId.toString());
-  if (subCategoryId !== undefined && subCategoryId !== null) queryParams.append('subCategoryId', subCategoryId.toString());
+  if (categoryId !== undefined && categoryId !== null && categoryId !== '') queryParams.append('categoryId', categoryId.toString());
+  if (subCategoryId !== undefined && subCategoryId !== null && subCategoryId !== '') queryParams.append('subCategoryId', subCategoryId.toString());
   if (kind) queryParams.append('kind', kind);
-  if (branchId !== undefined && branchId !== null) queryParams.append('branchId', branchId.toString());
-  if (locationId !== undefined && locationId !== null) queryParams.append('locationId', locationId.toString());
+  if (branchId !== undefined && branchId !== null && branchId !== '') queryParams.append('branchId', branchId.toString());
+  if (locationId !== undefined && locationId !== null && locationId !== '') queryParams.append('locationId', locationId.toString());
+  if (treasuryId !== undefined && treasuryId !== null && treasuryId !== '') queryParams.append('treasuryId', treasuryId.toString());
+  if (paymentMethod) queryParams.append('paymentMethod', paymentMethod);
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
   if (includeSummary) queryParams.append('includeSummary', '1');
