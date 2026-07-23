@@ -1310,7 +1310,7 @@
     "paid": "المدفوع",
     "remaining": "المتبقي",
     "notSettled": "غير مسدد",
-    "report": "التقرير",
+    "report": "تقرير المصروفات",
     "reportTitle": "تقرير المصروفات",
     "reportDescription": "قم بتنزيل تقرير إكسل لكل المصروفات.",
     "exportReport": "تصدير التقرير",
@@ -1450,6 +1450,7 @@
     }
   },
   "treasury": {
+    "report": "تقرير الخزينة",
     "ledgerTitle": "دفتر الخزينة",
     "searchPlaceholder": "ابحث في الوصف أو المرجع...",
     "searchTreasuriesPlaceholder": "ابحث في الخزائن...",

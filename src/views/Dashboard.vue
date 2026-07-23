@@ -318,11 +318,16 @@ export default {
         ],
         treasury: [
           { name: 'treasury', label: 'dashboard.treasury', routeName: 'treasury' },
-          { name: 'companyTransactions', label: 'dashboard.report', routeName: 'company-transactions' },
+          { name: 'companyTransactions', label: 'treasury.report', routeName: 'report-company-transactions' },
         ],
         reports: [
           { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' },
-          { name: 'contractorsActivityReport', label: 'dashboard.contractorsActivityReport', routeName: 'contractors-activity-report' }
+          { name: 'contractorsActivityReport', label: 'dashboard.contractorsActivityReport', routeName: 'contractors-activity-report' },
+          // { name: 'suppliesReport', label: 'dashboard.suppliesReport', routeName: 'supplies-report' },
+          // { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' },
+          // { name: 'equipmentReport', label: 'equipment.reportMenu', routeName: 'equipment-report' },
+          { name: 'expensesReport', label: 'expenses.report', routeName: 'report-expenses-report' },
+          { name: 'companyTransactions', label: 'treasury.report', routeName: 'report-company-transactions' },
         ],
         admin: [
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -466,7 +471,7 @@ export default {
       const routeModule = this.$route?.meta?.module
       if (routeModule === 'profile' || routeModule === 'settings' || routeName === 'settings') return ''
 
-      if (routeName === 'reports-landing' || routeName === 'reports-run' || routeName === 'contractors-activity-report') return 'reports'
+      if (routeName === 'reports-landing' || routeName === 'reports-run' || routeName === 'contractors-activity-report' || routeName === 'report-expenses-report' || routeName === 'report-company-transactions') return 'reports'
 
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
       const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''
@@ -500,6 +505,7 @@ export default {
       const walletRoutes = ['treasury', 'company-transactions']
       const expensesRoutes = ['expenses-list', 'expenses-terms', 'expenses-report']
       const paymentRoutes = ['payments']
+      const reportsRoutes = ['reports-landing', 'contractors-activity-report', 'admin-reports-list', 'admin-reports-run']
       const adminRoutes = ['changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
@@ -507,6 +513,7 @@ export default {
       if (paymentRoutes.includes(routeName)) return 'payments'
       if (expensesRoutes.includes(routeName)) return 'expenses'
       if (walletRoutes.includes(routeName)) return 'treasury'
+      if (reportsRoutes.includes(routeName)) return 'reports'
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'
     },

@@ -1,17 +1,33 @@
 <template>
   <div class="space-y-6">
     <PageHeader :title="$t('expenses.reportTitle')" :subtitle="$t('expenses.reportDescription')">
-      <button @click="refresh" :disabled="loading"
-              class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium theme-text-primary transition-colors hover:bg-slate-50 disabled:opacity-50 sm:px-4 sm:py-2">
-        {{ $t('labels.refresh') }}
-      </button>
-      <button @click="downloadReport('xlsx')" :disabled="downloading"
-              class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 text-xs sm:text-sm">
-        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
-        </svg>
-        {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <button @click="refresh" :disabled="loading"
+                class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium theme-text-primary transition-colors hover:bg-slate-50 disabled:opacity-50 sm:px-4 sm:py-2 shadow-2xs">
+          {{ $t('labels.refresh') }}
+        </button>
+        <button @click="downloadReport('xlsx')" :disabled="downloading"
+                class="inline-flex items-center gap-1.5 rounded-xl theme-button px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-2xs transition-colors disabled:opacity-50">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
+          </svg>
+          Excel
+        </button>
+        <button @click="downloadReport('csv')" :disabled="downloading"
+                class="inline-flex items-center gap-1.5 rounded-xl theme-button px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-2xs transition-colors disabled:opacity-50">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
+          </svg>
+          CSV
+        </button>
+        <button @click="downloadReport('pdf')" :disabled="downloading"
+                class="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-2xs transition-colors disabled:opacity-50">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
+          </svg>
+          PDF
+        </button>
+      </div>
     </PageHeader>
 
     <!-- Filters Section -->

@@ -1311,7 +1311,7 @@
     "paid": "Paid",
     "remaining": "Remaining",
     "notSettled": "Not settled",
-    "report": "Report",
+    "report": "Expenses Report",
     "reportTitle": "Expenses Report",
     "reportDescription": "Download an Excel report of all expenses.",
     "exportReport": "Export Report",
@@ -1451,6 +1451,7 @@
     }
   },
   "treasury": {
+    "report": "Treasury Report",
     "ledgerTitle": "Treasury ledger",
     "searchPlaceholder": "Search description or reference...",
     "searchTreasuriesPlaceholder": "Search treasuries...",

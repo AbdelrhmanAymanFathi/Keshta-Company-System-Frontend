@@ -315,6 +315,18 @@ const routes = [
         meta: { title: 'dashboard.contractorsActivityReport' }
       },
       {
+        path: 'reports/company-transactions',
+        name: 'report-company-transactions',
+        component: TreasuryTransactions,
+        meta: { title: 'transactions' }
+      },
+      {
+        path: 'reports/expenses',
+        name: 'report-expenses-report',
+        component: ExpensesReport,
+        meta: { title: 'expenses.report' }
+      },
+      {
         path: 'reports/run/:id',
         name: 'reports-run',
         component: () => import('@/components/admin/ReportPage.vue'),
