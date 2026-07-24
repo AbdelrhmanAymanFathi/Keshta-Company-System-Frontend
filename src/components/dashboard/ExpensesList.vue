@@ -441,8 +441,8 @@
                 </div>
 
                 <!-- Step 2: Editable expense rows with the same interaction rhythm as the supply modal -->
-                <div v-if="modalStep===2" class="bg-white rounded-xl border border-slate-200 shadow-sm">
-                  <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div v-if="modalStep===2" class="bg-white rounded-xl shadow-sm">
+                  <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">تفاصيل المصروفات</h4>
                       <p class="mt-1 text-xs theme-text-muted">اكتب سطرًا جديدًا ثم اضغط Enter أو Tab لإنشاء سطر آخر بسرعة.</p>

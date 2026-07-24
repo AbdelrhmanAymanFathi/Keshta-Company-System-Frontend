@@ -426,14 +426,14 @@
             <div class="flex-1 overflow-y-auto p-6 sm:p-8 modal-body-container relative" :class="isRTL ? 'rtl-modal' : ''">
               <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6" :class="isRTL ? 'rtl-modal' : ''">
                 
-                <!-- Step 1: Date & Location -->
-                <div v-if="modalStep===1" class="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-sm">
-                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 border-b border-slate-100 flex items-center gap-2">
+                <!-- Step 1: Date & Treasury -->
+                <div v-if="modalStep===1" class="bg-white rounded-xl p-5 sm:p-6 space-y-4 shadow-sm">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 flex items-center gap-2">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 11h.01M7 15h.01M13 7h7M13 11h7M13 15h7M3 7h.01M3 11h.01M3 15h.01"></path></svg>
                     {{ $t('expenses.modalStepOneTitle') }}
                   </h4>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Date -->
                     <div>
                       <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
@@ -448,40 +448,29 @@
                       />
                     </div>
 
-                    <!-- Settlement Date -->
+                    <!-- Treasury -->
                     <div>
                       <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.settlementDate') }} <span class="text-red-500">*</span>
-                      </label>
-                      <DateField
-                        v-model="form.settlementDate"
-                        required
-                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
-                        :class="isRTL ? 'text-right' : 'text-left'"
-                      />
-                    </div>
-
-                    <!-- Location -->
-                    <div>
-                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.location') }} <span class="text-red-500">*</span>
+                        {{ $t('expenses.treasuryOrCustody') }}
                       </label>
                       <SearchDropdown
-                          v-model="formLocationSearch"
-                          :items="locations"
-                          :allItems="locations"
-                          :placeholder="$t('expenses.searchLocation')"
-                          :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                          teleportTarget=".modal-body-container"
-                          @select="(sel) => { form.locationId = sel.id; formLocationSearch = sel.name }"
-                        />
+                        v-model="formTreasurySearch"
+                        :items="treasuryItems"
+                        :allItems="treasuryItems"
+                        :placeholder="$t('expenses.searchTreasury')"
+                        :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                        teleportTarget=".modal-body-container"
+                        clearable
+                        @select="(sel) => { form.treasuryId = sel.id; formTreasurySearch = sel.name }"
+                        @clear="() => { form.treasuryId = null; formTreasurySearch = '' }"
+                      />
                     </div>
                   </div>
                 </div>
 
                 <!-- Step 2: Editable expense rows with the same interaction rhythm as the supply modal -->
-                <div v-if="modalStep===2" class="bg-white rounded-xl border border-slate-200 shadow-sm">
-                  <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div v-if="modalStep===2" class="bg-white rounded-xl shadow-sm">
+                  <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $t('expenses.modalStepTwoTitle') }}</h4>
                       <p class="mt-1 text-xs theme-text-muted">{{ $t('expenses.modalStepTwoHint') }}</p>
@@ -497,13 +486,13 @@
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
                             <th class="w-12 px-3 py-3 text-center text-xs font-medium theme-text-secondary">#</th>
+                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
-                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
-                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') }}</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
                             <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
+                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') }}</th>
                             <th class="min-w-[160px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.paymentMethod') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.treasuryOrCustody') }}</th>
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
                             <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
                           </tr>
@@ -511,6 +500,17 @@
                         <tbody class="divide-y divide-slate-100 bg-white">
                           <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
                             <td class="px-3 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
+                            <td class="px-3 py-2">
+                              <input
+                                v-model="row.description"
+                                type="text"
+                                :placeholder="$t('expenses.statementPlaceholder')"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'description', $event)"
+                              />
+                            </td>
                             <td class="px-3 py-2">
                               <SearchDropdown
                                 v-model="row.categorySearch"
@@ -543,21 +543,18 @@
                               />
                             </td>
                             <td class="px-3 py-2">
-                              <input
-                                v-model="row.description"
-                                type="text"
-                                :placeholder="$t('expenses.statementPlaceholder')"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                :class="isRTL ? 'text-right' : 'text-left'"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'description', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
-                              <DateField
-                                v-model="row.settlementDate"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                :class="isRTL ? 'text-right' : 'text-left'"
+                              <SearchDropdown
+                                v-model="row.locationSearch"
+                                :items="locations"
+                                :allItems="locations"
+                                :placeholder="$t('expenses.searchLocation')"
+                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                teleportTarget=".modal-body-container"
+                                clearable
+                                @select="(sel) => { row.locationId = sel.id; row.locationSearch = sel.name }"
+                                @clear="() => { row.locationId = null; row.locationSearch = '' }"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'location', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'location', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -574,6 +571,15 @@
                               />
                             </td>
                             <td class="px-3 py-2">
+                              <DateField
+                                v-model="row.settlementDate"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'settlementDate', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'settlementDate', $event)"
+                              />
+                            </td>
+                            <td class="px-3 py-2">
                               <SearchDropdown
                                 v-model="row.paymentMethodSearch"
                                 :items="paymentMethodItems"
@@ -585,21 +591,6 @@
                                 @clear="() => { row.paymentMethod = 'CASH'; row.paymentMethodSearch = 'نقداً' }"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'paymentMethod', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'paymentMethod', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
-                              <SearchDropdown
-                                v-model="row.treasurySearch"
-                                :items="treasuryItems"
-                                :allItems="treasuryItems"
-                                :placeholder="$t('expenses.searchTreasury')"
-                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                                teleportTarget=".modal-body-container"
-                                clearable
-                                @select="(sel) => { row.treasuryId = sel.id; row.treasurySearch = sel.name }"
-                                @clear="() => { row.treasuryId = null; row.treasurySearch = '' }"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'treasury', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'treasury', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -1116,51 +1107,51 @@ rows: [],
         console.error('Error loading expenses:', error)
         
         // If backend is not available, use demo data
-        if (error.response?.status === 500 || error.code === 'ERR_NETWORK') {
-          console.log('Using demo data for expenses')
-          console.warn('Backend server is not available. Using demo data for testing.')
-          this.expenses = [
-            {
-              id: 1,
-              date: '2025-01-15T00:00:00.000Z',
-              category: 'Travel',
-              description: 'Taxi from airport to hotel',
-              amount: '42.5',
-              notes: 'Paid in cash',
-              createdAt: '2025-01-15T10:00:00.000Z',
-              updatedAt: '2025-01-15T10:00:00.000Z'
-            },
-            {
-              id: 2,
-              date: '2025-01-14T00:00:00.000Z',
-              category: 'Meals',
-              description: 'Business lunch with client',
-              amount: '85.0',
-              notes: 'Company credit card',
-              createdAt: '2025-01-14T14:30:00.000Z',
-              updatedAt: '2025-01-14T14:30:00.000Z'
-            },
-            {
-              id: 3,
-              date: '2025-01-13T00:00:00.000Z',
-              category: 'Office',
-              description: 'Office supplies',
-              amount: '25.75',
-              notes: 'Stationery and paper',
-              createdAt: '2025-01-13T09:15:00.000Z',
-              updatedAt: '2025-01-13T09:15:00.000Z'
-            }
-          ]
-          this.totalItems = this.expenses.length
-          this.totalPages = 1
+        // if (error.response?.status === 500 || error.code === 'ERR_NETWORK') {
+        //   console.log('Using demo data for expenses')
+        //   console.warn('Backend server is not available. Using demo data for testing.')
+        //   this.expenses = [
+        //     {
+        //       id: 1,
+        //       date: '2025-01-15T00:00:00.000Z',
+        //       category: 'Travel',
+        //       description: 'Taxi from airport to hotel',
+        //       amount: '42.5',
+        //       notes: 'Paid in cash',
+        //       createdAt: '2025-01-15T10:00:00.000Z',
+        //       updatedAt: '2025-01-15T10:00:00.000Z'
+        //     },
+        //     {
+        //       id: 2,
+        //       date: '2025-01-14T00:00:00.000Z',
+        //       category: 'Meals',
+        //       description: 'Business lunch with client',
+        //       amount: '85.0',
+        //       notes: 'Company credit card',
+        //       createdAt: '2025-01-14T14:30:00.000Z',
+        //       updatedAt: '2025-01-14T14:30:00.000Z'
+        //     },
+        //     {
+        //       id: 3,
+        //       date: '2025-01-13T00:00:00.000Z',
+        //       category: 'Office',
+        //       description: 'Office supplies',
+        //       amount: '25.75',
+        //       notes: 'Stationery and paper',
+        //       createdAt: '2025-01-13T09:15:00.000Z',
+        //       updatedAt: '2025-01-13T09:15:00.000Z'
+        //     }
+        //   ]
+        //   this.totalItems = this.expenses.length
+        //   this.totalPages = 1
           
-          // Show demo mode notification
-          setTimeout(() => {
-            this.showSuccess('Demo Mode: Backend server is not available. Using sample data for testing.')
-          }, 1000)
-        } else {
-          this.error = error.message || this.$t('expenses.loadError')
-        }
+        //   // Show demo mode notification
+        //   setTimeout(() => {
+        //     this.showSuccess('Demo Mode: Backend server is not available. Using sample data for testing.')
+        //   }, 1000)
+        // } else {
+        this.error = error.message || this.$t('expenses.loadError')
+        // }
       } finally {
         this.loading = false
       }
@@ -1248,7 +1239,7 @@ rows: [],
         amount: '',
         flow: 'OUT',
         branchId: null,
-        locationId: this.locations?.[0]?.id ?? null,
+        locationId: null,
         treasuryId: null,
         paymentMethod: 'CASH',
         notes: '',
@@ -1367,12 +1358,12 @@ rows: [],
       row.categorySearch = categoryName
       row.subCategoryId = finalSubCategoryId
       row.subCategorySearch = subCategoryName
+      row.locationId = expense.locationId || expense.location?.id || null
+      row.locationSearch = expense.location?.name || this.locations?.find(l => Number(l.id) === Number(expense.locationId))?.name || ''
       row.description = expense.description || ''
       row.amount = expense.amount || ''
       row.paymentMethod = expense.paymentMethod || 'CASH'
       row.paymentMethodSearch = this.paymentMethodItems?.find(p => p.id === row.paymentMethod)?.name || 'نقداً'
-      row.treasuryId = targetTreasuryId
-      row.treasurySearch = treasurySearchName
       row.settlementDate = formattedSettlementDate
       row.notes = expense.notes || ''
       this.rows = [row]
@@ -1408,13 +1399,13 @@ rows: [],
         subCategoryId: null,
         categorySearch: '',
         subCategorySearch: '',
+        locationId: this.locations?.[0]?.id ?? null,
+        locationSearch: this.locations?.[0]?.name ?? '',
         description: '',
         amount: '',
         paymentMethod: 'CASH',
         paymentMethodSearch: 'نقداً',
-        treasuryId: null,
-        treasurySearch: '',
-        settlementDate: this.form?.settlementDate || this.form?.date || new Date().toISOString().split('T')[0],
+        settlementDate: this.form?.date || new Date().toISOString().split('T')[0],
         notes: ''
       }
     },
@@ -1468,7 +1459,7 @@ rows: [],
 
       event.preventDefault()
 
-      const nextFields = ['category', 'subcategory', 'description', 'settlementDate', 'amount', 'paymentMethod', 'treasury', 'notes']
+      const nextFields = ['description', 'category', 'subcategory', 'location', 'amount', 'settlementDate', 'paymentMethod', 'notes']
       const currentIndex = nextFields.indexOf(field)
       const nextField = nextFields[currentIndex + 1]
       if (!nextField) {
@@ -1481,13 +1472,13 @@ rows: [],
       if (!row) return
 
       const selectorMap = {
-        category: 'td:nth-child(2) input',
-        subcategory: 'td:nth-child(3) input',
-        description: 'td:nth-child(4) input',
-        settlementDate: 'td:nth-child(5) input',
+        description: 'td:nth-child(2) input',
+        category: 'td:nth-child(3) input',
+        subcategory: 'td:nth-child(4) input',
+        location: 'td:nth-child(5) input',
         amount: 'td:nth-child(6) input',
-        paymentMethod: 'td:nth-child(7) input',
-        treasury: 'td:nth-child(8) input',
+        settlementDate: 'td:nth-child(7) input',
+        paymentMethod: 'td:nth-child(8) input',
         notes: 'td:nth-child(9) textarea'
       }
 
@@ -1506,7 +1497,7 @@ rows: [],
           .filter(row => String(row.description || '').trim() || row.amount || row.categoryId)
           .map(row => {
             const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
-            const rowSettlementDate = row.settlementDate || this.form.settlementDate || this.form.date
+            const rowSettlementDate = row.settlementDate || this.form.date
             return {
               date: this.form.date,
               kind: this.form.kind || 'EXPENSE',
@@ -1516,8 +1507,8 @@ rows: [],
               amount: Number.isFinite(amount) ? amount : 0,
               flow: this.form.flow || 'OUT',
               branchId: this.form.branchId || null,
-              locationId: this.form.locationId,
-              treasuryId: row.treasuryId ?? null,
+              locationId: row.locationId,
+              treasuryId: this.form.treasuryId ?? null,
               paymentMethod: row.paymentMethod || 'CASH',
               notes: row.notes || '',
               settlementDate: rowSettlementDate ? new Date(rowSettlementDate + 'T00:00:00Z').toISOString() : null
@@ -1532,8 +1523,7 @@ rows: [],
 
         if (this.editing) {
           const expenseData = {
-            ...payloads[0],
-            settlementDate: this.form.settlementDate ? new Date(this.form.settlementDate + 'T00:00:00Z').toISOString() : null
+            ...payloads[0]
           }
           try {
             const res = await updateExpense(this.form.id, expenseData)
@@ -1632,14 +1622,6 @@ rows: [],
         this.showError(this.$t('expenses.validation.dateRequired'))
         return false
       }
-      if (!this.form.settlementDate) {
-        this.showError(this.$t('expenses.validation.settlementDateRequired') || 'Settlement Date is required')
-        return false
-      }
-      if (this.form.locationId === null) {
-        this.showError((this.$t('expenses.location') || 'Location') + ' ' + (this.$t('common.required') || 'is required'))
-        return false
-      }
       return true
     },
 
@@ -1659,9 +1641,17 @@ rows: [],
           this.showError(this.$t('expenses.validation.descriptionRequired'))
           return false
         }
+        if (row.locationId === null || row.locationId === undefined) {
+          this.showError((this.$t('expenses.location') || 'Location') + ' ' + (this.$t('common.required') || 'is required'))
+          return false
+        }
         const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
         if (!Number.isFinite(amount) || amount <= 0) {
           this.showError(this.$t('expenses.validation.amountInvalid'))
+          return false
+        }
+        if (!row.settlementDate) {
+          this.showError(this.$t('expenses.validation.settlementDateRequired') || 'Settlement Date is required')
           return false
         }
       }
