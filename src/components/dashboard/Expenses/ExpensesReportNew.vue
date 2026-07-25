@@ -177,14 +177,14 @@
             <tr>
               <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
               <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.date') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.mainTerm') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.subTerm') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.treasuryOrCustody') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
               <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.subTerm') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.mainTerm') }}</th>
+              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') }}</th>
               <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') }}</th>
               <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.paymentMethod') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.treasuryOrCustody') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
               <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') }}</th>
             </tr>
           </thead>
@@ -193,17 +193,25 @@
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ index + 1 }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
-                  {{ expense.category || '-' }}
+                <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  {{ expense.treasury }}
                 </span>
+                <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
               </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800">{{ formatCurrency(expense.amount || expense.expense || 0) }}</td>
+              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.description || '-' }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
                 <span v-if="expense.classification && expense.classification !== '-'" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
                   {{ expense.classification }}
                 </span>
                 <span v-else class="text-xs theme-caption">-</span>
               </td>
-              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.description || '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
+                  {{ expense.category || '-' }}
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.settlementDate) }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
                 <span v-if="expense.locationName || expense.location?.name" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
                   {{ expense.locationName || expense.location?.name }}
@@ -215,14 +223,6 @@
                   {{ getPaymentMethodLabel(expense.paymentMethod) }}
                 </span>
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  {{ expense.treasury }}
-                </span>
-                <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.settlementDate) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800">{{ formatCurrency(expense.amount || expense.expense || 0) }}</td>
               <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.notes || '-' }}</td>
             </tr>
           </tbody>

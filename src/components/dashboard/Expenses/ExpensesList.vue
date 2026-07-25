@@ -486,13 +486,12 @@
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
                             <th class="w-12 px-3 py-3 text-center text-xs font-medium theme-text-secondary">#</th>
-                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
                             <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
+                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
                             <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') }}</th>
-                            <th class="min-w-[160px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.paymentMethod') }}</th>
+                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
                             <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
                           </tr>
@@ -500,6 +499,19 @@
                         <tbody class="divide-y divide-slate-100 bg-white">
                           <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
                             <td class="px-3 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
+                            <td class="px-3 py-2">
+                              <input
+                                v-model="row.amount"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-semibold theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'amount', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'amount', $event)"
+                              />
+                            </td>
                             <td class="px-3 py-2">
                               <input
                                 v-model="row.description"
@@ -513,33 +525,41 @@
                             </td>
                             <td class="px-3 py-2">
                               <SearchDropdown
+                                v-model="row.subCategorySearch"
+                                :items="getRowSubcategories(row)"
+                                :allItems="getRowSubcategories(row)"
+                                :placeholder="$t('expenses.searchSubTerm')"
+                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                teleportTarget=".modal-body-container"
+                                clearable
+                                @select="(sel) => onSelectRowSubcategory(row, sel)"
+                                @clear="() => onClearRowSubcategory(row)"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'subcategory', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
+                              />
+                            </td>
+                            <td class="px-3 py-2">
+                              <SearchDropdown
                                 v-model="row.categorySearch"
-                                :items="expenseCategories"
-                                :allItems="expenseCategories"
+                                :items="getRowCategories(row)"
+                                :allItems="getRowCategories(row)"
                                 :placeholder="$t('expenses.searchMainTerm')"
                                 :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget=".modal-body-container"
                                 clearable
-                                @select="(sel) => { row.categoryId = sel.id; row.categorySearch = sel.name; row.subCategoryId = null; row.subCategorySearch = '' }"
-                                @clear="() => { row.categoryId = null; row.categorySearch = ''; row.subCategoryId = null; row.subCategorySearch = '' }"
+                                @select="(sel) => onSelectRowCategory(row, sel)"
+                                @clear="() => onClearRowCategory(row)"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'category', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'category', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
-                              <SearchDropdown
-                                v-model="row.subCategorySearch"
-                                :items="getRowSubcategories(row)"
-                                :allItems="getRowSubcategories(row)"
-                                :disabled="!row.categoryId"
-                                :placeholder="$t('expenses.searchSubTerm')"
-                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                                teleportTarget=".modal-body-container"
-                                clearable
-                                @select="(sel) => { row.subCategoryId = sel.id; row.subCategorySearch = sel.name }"
-                                @clear="() => { row.subCategoryId = null; row.subCategorySearch = '' }"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'subcategory', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
+                              <DateField
+                                v-model="row.settlementDate"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'settlementDate', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'settlementDate', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -555,42 +575,6 @@
                                 @clear="() => { row.locationId = null; row.locationSearch = '' }"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'location', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'location', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
-                              <input
-                                v-model="row.amount"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                placeholder="0.00"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-semibold theme-input-focus"
-                                :class="isRTL ? 'text-right' : 'text-left'"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'amount', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'amount', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
-                              <DateField
-                                v-model="row.settlementDate"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                :class="isRTL ? 'text-right' : 'text-left'"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'settlementDate', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'settlementDate', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
-                              <SearchDropdown
-                                v-model="row.paymentMethodSearch"
-                                :items="paymentMethodItems"
-                                :allItems="paymentMethodItems"
-                                :placeholder="$t('expenses.searchPaymentMethod')"
-                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                                teleportTarget=".modal-body-container"
-                                @select="(sel) => { row.paymentMethod = sel.id; row.paymentMethodSearch = sel.name }"
-                                @clear="() => { row.paymentMethod = 'CASH'; row.paymentMethodSearch = 'نقداً' }"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'paymentMethod', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'paymentMethod', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -1438,9 +1422,111 @@ rows: [],
     },
 
     getRowSubcategories(row) {
-      if (!row?.categoryId) return []
-      const cat = this.expenseCategories.find(c => Number(c.id) === Number(row.categoryId))
-      return cat?.subCategories || cat?.subcategories || cat?.children || []
+      if (row.categoryId) {
+        const cat = this.expenseCategories.find(c => Number(c.id) === Number(row.categoryId))
+        const subCats = cat?.subCategories || cat?.subcategories || cat?.children || []
+        return subCats.map(sc => ({ id: sc.id, name: sc.name }))
+      } else {
+        // Return unique subcategory names across all categories
+        const names = new Set()
+        const uniqueSubCats = []
+        this.expenseCategories.forEach(cat => {
+          const subCats = cat.subCategories || cat.subcategories || cat.children || []
+          subCats.forEach(sc => {
+            if (sc.name && !names.has(sc.name)) {
+              names.add(sc.name)
+              uniqueSubCats.push({ id: sc.name, name: sc.name })
+            }
+          })
+        })
+        return uniqueSubCats
+      }
+    },
+
+    getRowCategories(row) {
+      if (row.subCategorySearch) {
+        // Find all parent categories that contain a subcategory matching row.subCategorySearch
+        const matchingCategories = []
+        this.expenseCategories.forEach(cat => {
+          const subCats = cat.subCategories || cat.subcategories || cat.children || []
+          const hasSub = subCats.some(sc => sc.name && String(sc.name).trim().toLowerCase() === String(row.subCategorySearch).trim().toLowerCase())
+          if (hasSub) {
+            matchingCategories.push(cat)
+          }
+        })
+        return matchingCategories.map(cat => ({ id: cat.id, name: cat.name }))
+      } else {
+        return this.expenseCategories.map(cat => ({ id: cat.id, name: cat.name }))
+      }
+    },
+
+    onSelectRowSubcategory(row, sel) {
+      row.subCategorySearch = sel.name
+
+      // Find all categories containing a subcategory with this name
+      const matchingCats = []
+      const matchingSubcategories = []
+
+      this.expenseCategories.forEach(cat => {
+        const subCats = cat.subCategories || cat.subcategories || cat.children || []
+        const found = subCats.find(sc => sc.name && String(sc.name).trim().toLowerCase() === String(sel.name).trim().toLowerCase())
+        if (found) {
+          matchingCats.push(cat)
+          matchingSubcategories.push(found)
+        }
+      })
+
+      if (matchingCats.length === 1) {
+        // Unique subcategory: auto-populate category and resolve subCategoryId
+        row.categoryId = matchingCats[0].id
+        row.categorySearch = matchingCats[0].name
+        row.subCategoryId = matchingSubcategories[0].id
+      } else if (matchingCats.length > 1) {
+        // Duplicate subcategory names exist:
+        // If current selected category is one of the matching ones, resolve subCategoryId
+        if (row.categoryId && matchingCats.some(c => Number(c.id) === Number(row.categoryId))) {
+          const matchedSub = matchingSubcategories.find(sc => Number(sc.categoryId) === Number(row.categoryId))
+          row.subCategoryId = matchedSub ? matchedSub.id : null
+        } else {
+          // Reset category so user selects from the filtered categories
+          row.categoryId = null
+          row.categorySearch = ''
+          row.subCategoryId = null
+        }
+      }
+    },
+
+    onSelectRowCategory(row, sel) {
+      row.categoryId = sel.id
+      row.categorySearch = sel.name
+
+      // If a subcategory search text exists, try to resolve subCategoryId under this category
+      if (row.subCategorySearch) {
+        const cat = this.expenseCategories.find(c => Number(c.id) === Number(sel.id))
+        const subCats = cat?.subCategories || cat?.subcategories || cat?.children || []
+        const matchedSub = subCats.find(sc => sc.name && String(sc.name).trim().toLowerCase() === String(row.subCategorySearch).trim().toLowerCase())
+        if (matchedSub) {
+          row.subCategoryId = matchedSub.id
+        } else {
+          // If it doesn't exist in this category, clear subcategory
+          row.subCategoryId = null
+          row.subCategorySearch = ''
+        }
+      }
+    },
+
+    onClearRowCategory(row) {
+      row.categoryId = null
+      row.categorySearch = ''
+      row.subCategoryId = null
+      row.subCategorySearch = ''
+    },
+
+    onClearRowSubcategory(row) {
+      row.subCategoryId = null
+      row.subCategorySearch = ''
+      row.categoryId = null
+      row.categorySearch = ''
     },
 
     handleFieldNavigation(index, field, event) {
@@ -1459,7 +1545,7 @@ rows: [],
 
       event.preventDefault()
 
-      const nextFields = ['description', 'category', 'subcategory', 'location', 'amount', 'settlementDate', 'paymentMethod', 'notes']
+      const nextFields = ['amount', 'description', 'subcategory', 'category', 'settlementDate', 'location', 'notes']
       const currentIndex = nextFields.indexOf(field)
       const nextField = nextFields[currentIndex + 1]
       if (!nextField) {
@@ -1472,14 +1558,13 @@ rows: [],
       if (!row) return
 
       const selectorMap = {
-        description: 'td:nth-child(2) input',
-        category: 'td:nth-child(3) input',
+        amount: 'td:nth-child(2) input',
+        description: 'td:nth-child(3) input',
         subcategory: 'td:nth-child(4) input',
-        location: 'td:nth-child(5) input',
-        amount: 'td:nth-child(6) input',
-        settlementDate: 'td:nth-child(7) input',
-        paymentMethod: 'td:nth-child(8) input',
-        notes: 'td:nth-child(9) textarea'
+        category: 'td:nth-child(5) input',
+        settlementDate: 'td:nth-child(6) input',
+        location: 'td:nth-child(7) input',
+        notes: 'td:nth-child(8) textarea'
       }
 
       const target = row.querySelector(selectorMap[nextField])
