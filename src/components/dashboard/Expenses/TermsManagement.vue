@@ -300,8 +300,8 @@
     </div>
 
     <!-- SubCategory Modal (Add / Edit Secondary Term) -->
-    <div v-if="subCategoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.tab.capture="trapFocus" @keydown.esc="subCategoryModal.open = false">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200" ref="subCatModalEl">
+    <div v-if="subCategoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="subCategoryModal.open = false">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
           <div>
             <h3 class="font-bold text-lg">{{ subCategoryModal.isEdit ? $t('expenses.editSubcategory') : $t('expenses.addSubcategory') }}</h3>
@@ -310,36 +310,76 @@
           <button @click="subCategoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
         </div>
 
-        <form @submit.prevent="saveSubCategoryAndClose" class="p-6 space-y-4">
-          <!-- Name input -->
-          <div>
+        <form @submit.prevent="saveSubCategory" class="p-6 space-y-4">
+          
+          <!-- EDIT MODE: single input -->
+          <div v-if="subCategoryModal.isEdit">
             <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.subcategoryName') }} <span class="text-red-500">*</span></label>
             <input
               v-model="subCategoryModal.name"
-              ref="subCatNameInput"
               type="text"
               required
               autofocus
-              placeholder="مثال: ديميكس دبل أبيض، هراس GCB..."
+              placeholder="مثال: ديميكس دبل أبيض..."
               class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl theme-input-focus text-sm"
             />
           </div>
 
-          <!-- Already added in this session list -->
-          <div v-if="subCategoryModal.addedInSession && subCategoryModal.addedInSession.length > 0" class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
-            <p class="text-xs font-semibold text-emerald-700 mb-2 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              تمت إضافتهم في هذه الجلسة ({{ subCategoryModal.addedInSession.length }})
-            </p>
-            <div class="flex flex-wrap gap-1.5">
-              <span
-                v-for="(item, i) in subCategoryModal.addedInSession"
-                :key="i"
-                class="text-xs bg-white text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-full font-medium"
-              >
-                {{ item }}
+          <!-- ADD MODE: dynamic rows -->
+          <div v-else class="space-y-2">
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-sm font-medium theme-text-secondary">البنود الفرعية <span class="text-red-500">*</span></label>
+              <span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">
+                {{ subCategoryModal.rows.filter(r => r.trim()).length }} بند
               </span>
             </div>
+
+            <!-- Rows -->
+            <div
+              v-for="(row, idx) in subCategoryModal.rows"
+              :key="idx"
+              class="flex items-center gap-2 group"
+            >
+              <span class="text-xs text-slate-400 w-5 text-center shrink-0">{{ idx + 1 }}</span>
+              <input
+                :ref="el => { if (el) subCategoryRowRefs[idx] = el }"
+                v-model="subCategoryModal.rows[idx]"
+                type="text"
+                :placeholder="idx === 0 ? 'مثال: ديميكس دبل أبيض' : 'بند فرعي جديد...' "
+                class="flex-1 px-3 py-2 border border-slate-300 rounded-xl theme-input-focus text-sm transition-all"
+                @keydown.tab.prevent="onSubCategoryRowTab(idx)"
+              />
+              <!-- Duplicate btn -->
+              <button
+                v-if="row.trim()"
+                type="button"
+                @click="duplicateSubCategoryRow(idx)"
+                class="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                title="تكرار"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              </button>
+              <!-- Delete btn -->
+              <button
+                type="button"
+                @click="removeSubCategoryRow(idx)"
+                :disabled="subCategoryModal.rows.length === 1"
+                class="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-0"
+                title="حذف"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+
+            <!-- Add row manually -->
+            <button
+              type="button"
+              @click="addSubCategoryRow"
+              class="w-full mt-1 py-2 border-2 border-dashed border-slate-200 hover:border-emerald-400 text-slate-400 hover:text-emerald-600 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              إضافة سطر
+            </button>
           </div>
 
           <!-- Buttons -->
@@ -351,25 +391,17 @@
             >
               {{ $t('labels.cancel') }}
             </button>
-            <!-- Save & Add Another (only when adding, not editing) -->
-            <button
-              v-if="!subCategoryModal.isEdit"
-              type="button"
-              :disabled="saving || !subCategoryModal.name.trim()"
-              @click="saveSubCategoryAndContinue"
-              class="px-4 py-2 text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-xl hover:bg-emerald-100 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-1.5"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              حفظ وإضافة آخر
-            </button>
             <!-- Save & Close -->
             <button
               type="submit"
-              :disabled="saving || !subCategoryModal.name.trim()"
+              :disabled="saving || (!subCategoryModal.isEdit && subCategoryModal.rows.every(r => !r.trim()))"
               class="px-4 py-2 text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-1.5"
             >
               <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-              {{ saving ? $t('labels.saving') : $t('labels.save') }}
+              <span v-if="!subCategoryModal.isEdit && subCategoryModal.rows.filter(r=>r.trim()).length > 1">
+                حفظ {{ subCategoryModal.rows.filter(r=>r.trim()).length }} بنود فرعية
+              </span>
+              <span v-else>{{ saving ? $t('labels.saving') : $t('labels.save') }}</span>
             </button>
           </div>
         </form>
@@ -415,8 +447,9 @@ export default {
         categoryId: null,
         parentCategoryName: '',
         name: '',
-        addedInSession: []
-      }
+        rows: ['']
+      },
+      subCategoryRowRefs: []
     }
   },
   computed: {
@@ -598,6 +631,7 @@ export default {
       if (!this.expandedCategoryIds.includes(parentCat.id)) {
         this.expandedCategoryIds.push(parentCat.id)
       }
+      this.subCategoryRowRefs = []
       this.subCategoryModal = {
         open: true,
         isEdit: false,
@@ -605,10 +639,10 @@ export default {
         categoryId: parentCat.id,
         parentCategoryName: parentCat.name,
         name: '',
-        addedInSession: []
+        rows: ['']
       }
       this.$nextTick(() => {
-        this.$refs.subCatNameInput?.focus()
+        this.subCategoryRowRefs[0]?.focus()
       })
     },
     openEditSubCategoryModal(parentCat, subCat) {
@@ -619,52 +653,96 @@ export default {
         categoryId: parentCat.id,
         parentCategoryName: parentCat.name,
         name: subCat.name,
-        addedInSession: []
+        rows: [subCat.name]
       }
       this.$nextTick(() => {
-        this.$refs.subCatNameInput?.focus()
+        this.subCategoryRowRefs[0]?.focus()
       })
     },
 
-    // Save and keep modal open for adding another subcategory
-    async saveSubCategoryAndContinue() {
-      if (!this.subCategoryModal.name.trim()) return
-      this.saving = true
-      const savedName = this.subCategoryModal.name.trim()
-      try {
-        if (this.subCategoryModal.isEdit) {
-          await updateExpenseSubCategory(this.subCategoryModal.id, { name: savedName })
-          this.subCategoryModal.open = false
-          await this.loadCategories(true)
-        } else {
-          await createExpenseSubCategory(this.subCategoryModal.categoryId, { name: savedName })
-          this.subCategoryModal.addedInSession.push(savedName)
-          this.subCategoryModal.name = ''
-          await this.loadCategories(true)
-          this.$nextTick(() => {
-            this.$refs.subCatNameInput?.focus()
-          })
-        }
-      } catch (err) {
-        alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي')
-      } finally {
-        this.saving = false
+    // Tab on a row: move to next or create new
+    onSubCategoryRowTab(idx) {
+      if (idx === this.subCategoryModal.rows.length - 1) {
+        // Last row → add new row
+        this.subCategoryModal.rows.push('')
+        this.$nextTick(() => {
+          this.subCategoryRowRefs[idx + 1]?.focus()
+        })
+      } else {
+        // Move focus to next
+        this.subCategoryRowRefs[idx + 1]?.focus()
       }
     },
 
-    // Save and close modal
-    async saveSubCategoryAndClose() {
-      if (!this.subCategoryModal.name.trim()) return
+    addSubCategoryRow() {
+      this.subCategoryModal.rows.push('')
+      this.$nextTick(() => {
+        const last = this.subCategoryModal.rows.length - 1
+        this.subCategoryRowRefs[last]?.focus()
+      })
+    },
+
+    removeSubCategoryRow(idx) {
+      if (this.subCategoryModal.rows.length === 1) return
+      this.subCategoryModal.rows.splice(idx, 1)
+      this.$nextTick(() => {
+        const focusIdx = Math.min(idx, this.subCategoryModal.rows.length - 1)
+        this.subCategoryRowRefs[focusIdx]?.focus()
+      })
+    },
+
+    duplicateSubCategoryRow(idx) {
+      const val = this.subCategoryModal.rows[idx]
+      this.subCategoryModal.rows.splice(idx + 1, 0, val)
+      this.$nextTick(() => {
+        this.subCategoryRowRefs[idx + 1]?.focus()
+      })
+    },
+
+    async saveSubCategory() {
       this.saving = true
-      const savedName = this.subCategoryModal.name.trim()
       try {
         if (this.subCategoryModal.isEdit) {
-          await updateExpenseSubCategory(this.subCategoryModal.id, { name: savedName })
+          if (!this.subCategoryModal.name.trim()) return
+          await updateExpenseSubCategory(this.subCategoryModal.id, { name: this.subCategoryModal.name.trim() })
+          this.subCategoryModal.open = false
+          await this.loadCategories(true)
         } else {
-          await createExpenseSubCategory(this.subCategoryModal.categoryId, { name: savedName })
+          // Bulk save: filter non-empty rows and send each individually
+          const names = this.subCategoryModal.rows.map(r => r.trim()).filter(r => r)
+          if (!names.length) {
+            this.saving = false
+            return
+          }
+
+          const results = await Promise.allSettled(
+            names.map(name => createExpenseSubCategory(this.subCategoryModal.categoryId, { name }).then(() => name))
+          )
+
+          const succeeded = []
+          const failed = []
+
+          results.forEach((res, i) => {
+            const name = names[i]
+            if (res.status === 'fulfilled') {
+              succeeded.push(name)
+            } else {
+              failed.push(name)
+            }
+          })
+
+          // Reload categories to show the succeeded ones
+          await this.loadCategories(true)
+
+          if (failed.length > 0) {
+            // Keep only the failed ones in the rows so user can edit and try again
+            this.subCategoryModal.rows = failed
+            const duplicateNames = failed.map(n => `"${n}"`).join('، ')
+            alert(`تم حفظ البنود الفرعية بنجاح ما عدا البنود التالية (قد تكون مكررة أو حدث خطأ): ${duplicateNames}`)
+          } else {
+            this.subCategoryModal.open = false
+          }
         }
-        this.subCategoryModal.open = false
-        await this.loadCategories(true)
       } catch (err) {
         alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي')
       } finally {
