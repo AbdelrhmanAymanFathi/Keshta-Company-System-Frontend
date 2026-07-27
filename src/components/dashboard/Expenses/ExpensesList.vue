@@ -433,7 +433,7 @@
                     {{ $t('expenses.modalStepOneTitle') }}
                   </h4>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <!-- Date -->
                     <div>
                       <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
@@ -445,6 +445,18 @@
                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                         :class="isRTL ? 'text-right' : 'text-left'"
                         @update:modelValue="onFormDateChange"
+                      />
+                    </div>
+
+                    <!-- Settlement Date -->
+                    <div>
+                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
+                        {{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}
+                      </label>
+                      <DateField
+                        v-model="form.settlementDate"
+                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
+                        :class="isRTL ? 'text-right' : 'text-left'"
                       />
                     </div>
 
@@ -490,8 +502,8 @@
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
-                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
+                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.date') || 'تاريخ المصروف' }}</th>
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
                             <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
                           </tr>
@@ -554,15 +566,6 @@
                               />
                             </td>
                             <td class="px-3 py-2">
-                              <DateField
-                                v-model="row.settlementDate"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                :class="isRTL ? 'text-right' : 'text-left'"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'settlementDate', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'settlementDate', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
                               <SearchDropdown
                                 v-model="row.locationSearch"
                                 :items="locations"
@@ -575,6 +578,15 @@
                                 @clear="() => { row.locationId = null; row.locationSearch = '' }"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'location', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'location', $event)"
+                              />
+                            </td>
+                            <td class="px-3 py-2">
+                              <DateField
+                                v-model="row.date"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'date', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'date', $event)"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -1035,6 +1047,15 @@ rows: [],
     'filters.endDate'() {
       this.currentPage = 1
       this.loadExpenses()
+    },
+    modalStep(newStep) {
+      if (newStep === 2) {
+        this.$nextTick(() => {
+          const firstInput = this.$refs.tableRef?.querySelector('tbody tr td:nth-child(2) input')
+          firstInput?.focus()
+          if (firstInput?.select) firstInput.select()
+        })
+      }
     }
   },
   
@@ -1371,25 +1392,30 @@ rows: [],
       if (newDate) {
         this.form.settlementDate = newDate
         this.rows.forEach(r => {
-          if (!r.settlementDate) r.settlementDate = newDate
+          if (!r.date) r.date = newDate
         })
       }
     },
 
     createEmptyRow() {
+      const prevRow = (this.rows && this.rows.length > 0) ? this.rows[this.rows.length - 1] : null
+      const rowDate = prevRow?.date || this.form?.date || getTodayISO()
+      const rowLocationId = prevRow?.locationId ?? (this.locations?.[0]?.id ?? null)
+      const rowLocationSearch = prevRow?.locationSearch ?? (this.locations?.[0]?.name ?? '')
+
       return {
         id: Date.now() + Math.random(),
         categoryId: null,
         subCategoryId: null,
         categorySearch: '',
         subCategorySearch: '',
-        locationId: this.locations?.[0]?.id ?? null,
-        locationSearch: this.locations?.[0]?.name ?? '',
+        locationId: rowLocationId,
+        locationSearch: rowLocationSearch,
         description: '',
         amount: '',
         paymentMethod: 'CASH',
         paymentMethodSearch: 'نقداً',
-        settlementDate: this.form?.date || new Date().toISOString().split('T')[0],
+        date: rowDate,
         notes: ''
       }
     },
@@ -1545,7 +1571,7 @@ rows: [],
 
       event.preventDefault()
 
-      const nextFields = ['amount', 'description', 'subcategory', 'category', 'settlementDate', 'location', 'notes']
+      const nextFields = ['amount', 'description', 'subcategory', 'category', 'location', 'date', 'notes']
       const currentIndex = nextFields.indexOf(field)
       const nextField = nextFields[currentIndex + 1]
       if (!nextField) {
@@ -1562,8 +1588,8 @@ rows: [],
         description: 'td:nth-child(3) input',
         subcategory: 'td:nth-child(4) input',
         category: 'td:nth-child(5) input',
-        settlementDate: 'td:nth-child(6) input',
-        location: 'td:nth-child(7) input',
+        location: 'td:nth-child(6) input',
+        date: 'td:nth-child(7) input',
         notes: 'td:nth-child(8) textarea'
       }
 
@@ -1582,9 +1608,10 @@ rows: [],
           .filter(row => String(row.description || '').trim() || row.amount || row.categoryId)
           .map(row => {
             const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
-            const rowSettlementDate = row.settlementDate || this.form.date
+            const rowExpenseDate = row.date || this.form.date
+            const rowSettlementDate = this.form.settlementDate || this.form.date
             return {
-              date: this.form.date,
+              date: rowExpenseDate,
               kind: this.form.kind || 'EXPENSE',
               categoryId: row.categoryId,
               subCategoryId: row.subCategoryId || undefined,
@@ -1735,8 +1762,8 @@ rows: [],
           this.showError(this.$t('expenses.validation.amountInvalid'))
           return false
         }
-        if (!row.settlementDate) {
-          this.showError(this.$t('expenses.validation.settlementDateRequired') || 'Settlement Date is required')
+        if (!row.date && !this.form.date) {
+          this.showError('تاريخ المصروف مطلوب')
           return false
         }
       }

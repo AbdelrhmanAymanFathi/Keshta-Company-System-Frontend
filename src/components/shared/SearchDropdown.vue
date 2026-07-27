@@ -213,10 +213,21 @@ export default {
       }
     }
 
+    const scrollOptionIntoView = async () => {
+      await nextTick()
+      if (highlightedIndex.value < 0) return
+      const container = optionsRef.value || rootRef.value?.querySelector('.overflow-y-auto')
+      const items = container?.querySelectorAll('div > div > div') || optionItems.value
+      const target = items?.[highlightedIndex.value]
+      if (target && target.scrollIntoView) {
+        target.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
+    }
+
     const openDropdown = async () => {
       if (props.disabled) return
       isOpen.value = true
-      highlightedIndex.value = -1
+      highlightedIndex.value = filteredItems.value.length ? 0 : -1
       await updateDropdownPosition()
     }
 
@@ -233,8 +244,12 @@ export default {
 
     const handleInput = (event) => {
       emit('update:modelValue', event.target.value)
-      if (!isOpen.value) openDropdown()
-      else updateDropdownPosition()
+      if (!isOpen.value) {
+        openDropdown()
+      } else {
+        highlightedIndex.value = filteredItems.value.length ? 0 : -1
+        updateDropdownPosition()
+      }
     }
 
     const handleFocus = () => {
@@ -246,7 +261,7 @@ export default {
       emit('blur')
       window.setTimeout(() => {
         closeDropdown()
-      }, 120)
+      }, 150)
     }
 
     const handleKeydown = (event) => {
@@ -271,19 +286,40 @@ export default {
 
       if (event.key === 'ArrowDown') {
         event.preventDefault()
-        highlightedIndex.value = (highlightedIndex.value + 1) % filteredItems.value.length
+        if (!isOpen.value) {
+          openDropdown()
+          return
+        }
+        if (highlightedIndex.value === -1) {
+          highlightedIndex.value = 0
+        } else {
+          highlightedIndex.value = (highlightedIndex.value + 1) % filteredItems.value.length
+        }
+        scrollOptionIntoView()
       }
 
       if (event.key === 'ArrowUp') {
         event.preventDefault()
-        highlightedIndex.value = highlightedIndex.value <= 0
-          ? filteredItems.value.length - 1
-          : highlightedIndex.value - 1
+        if (!isOpen.value) {
+          openDropdown()
+          return
+        }
+        if (highlightedIndex.value <= 0) {
+          highlightedIndex.value = filteredItems.value.length - 1
+        } else {
+          highlightedIndex.value = highlightedIndex.value - 1
+        }
+        scrollOptionIntoView()
       }
 
-      if (event.key === 'Enter' && highlightedIndex.value >= 0) {
-        event.preventDefault()
-        selectItem(filteredItems.value[highlightedIndex.value])
+      if ((event.key === 'Enter' || event.key === 'Tab') && isOpen.value && highlightedIndex.value >= 0) {
+        const item = filteredItems.value[highlightedIndex.value]
+        if (item) {
+          selectItem(item)
+          if (event.key === 'Enter') {
+            event.preventDefault()
+          }
+        }
       }
     }
 
