@@ -1385,22 +1385,8 @@ rows: [],
 
     createEmptyRow() {
       const prevRow = (this.rows && this.rows.length > 0) ? this.rows[this.rows.length - 1] : null
-      // If previous row exists and has a date, increment by one day for the new row
-      let rowDate = this.form?.date || getTodayISO()
-      try {
-        if (prevRow && prevRow.date) {
-          const prevIso = formatToISODate(prevRow.date)
-          const prevDateObj = parseISODateToDate(prevIso) || null
-          if (prevDateObj) {
-            const next = new Date(prevDateObj.getTime())
-            next.setDate(next.getDate() + 1)
-            rowDate = formatToISODate(next)
-          }
-        }
-      } catch (e) {
-        // ignore and fallback to form date or today
-        rowDate = this.form?.date || getTodayISO()
-      }
+      // Keep the same date when adding a new row in step 2.
+      const rowDate = this.form?.date || getTodayISO()
       const rowLocationId = prevRow?.locationId ?? (this.locations?.[0]?.id ?? null)
       const rowLocationSearch = prevRow?.locationSearch ?? (this.locations?.[0]?.name ?? '')
 
