@@ -816,7 +816,7 @@ import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import { getTodayISO } from '@/utils/dateUtils'
+import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
@@ -1385,7 +1385,22 @@ rows: [],
 
     createEmptyRow() {
       const prevRow = (this.rows && this.rows.length > 0) ? this.rows[this.rows.length - 1] : null
-      const rowDate = this.form?.date || getTodayISO()
+      // If previous row exists and has a date, increment by one day for the new row
+      let rowDate = this.form?.date || getTodayISO()
+      try {
+        if (prevRow && prevRow.date) {
+          const prevIso = formatToISODate(prevRow.date)
+          const prevDateObj = parseISODateToDate(prevIso) || null
+          if (prevDateObj) {
+            const next = new Date(prevDateObj.getTime())
+            next.setDate(next.getDate() + 1)
+            rowDate = formatToISODate(next)
+          }
+        }
+      } catch (e) {
+        // ignore and fallback to form date or today
+        rowDate = this.form?.date || getTodayISO()
+      }
       const rowLocationId = prevRow?.locationId ?? (this.locations?.[0]?.id ?? null)
       const rowLocationSearch = prevRow?.locationSearch ?? (this.locations?.[0]?.name ?? '')
 
