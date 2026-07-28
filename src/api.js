@@ -554,10 +554,30 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
 
 export const depositToContractorWallet = async (contractorId, data) => {
   const payload = withContractorAccountContext(data);
+  console.debug('[API] depositToContractorWallet called', { contractorId, payload });
   // If caller provided accountId, use it
   if (payload && payload.accountId) {
     const accountPayload = { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date };
-    return postAccountTransaction(payload.accountId, accountPayload);
+    try {
+      return await postAccountTransaction(payload.accountId, accountPayload);
+    } catch (err) {
+      console.error('[API] depositToContractorWallet - postAccountTransaction error', {
+        accountId: payload.accountId,
+        accountPayload,
+        error: err?.response?.data || err?.message || err
+      });
+      // If server error on accounts endpoint, fallback to legacy wallet deposit
+      if (err?.response && err.response.status >= 500) {
+        console.warn('[API] Falling back to /api/contractors/:id/wallet/deposit due to accounts endpoint error');
+        try {
+          return await axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
+        } catch (innerErr) {
+          console.error('[API] depositToContractorWallet - fallback wallet deposit also failed', innerErr?.response?.data || innerErr?.message || innerErr);
+          throw innerErr;
+        }
+      }
+      throw err;
+    }
   }
   // If caller provided accountType, try to find account
   if (payload && payload.accountType) {
@@ -565,14 +585,35 @@ export const depositToContractorWallet = async (contractorId, data) => {
       const accRes = await getContractorAccounts(contractorId);
       const accounts = accRes.data || [];
       const acct = accounts.find(a => normalizeContractorAccountType(a.accountType) === payload.accountType) || accounts[0];
-      if (acct) return postAccountTransaction(acct.id, { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date });
+      if (acct) {
+        try {
+          return await postAccountTransaction(acct.id, { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date });
+        } catch (err) {
+          console.error('[API] depositToContractorWallet - postAccountTransaction (by accountType) error', { accountId: acct.id, error: err?.response?.data || err?.message || err });
+          if (err?.response && err.response.status >= 500) {
+            console.warn('[API] Falling back to /api/contractors/:id/wallet/deposit due to accounts endpoint error (accountType path)');
+            try {
+              return await axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
+            } catch (innerErr) {
+              console.error('[API] depositToContractorWallet - fallback wallet deposit also failed', innerErr?.response?.data || innerErr?.message || innerErr);
+              throw innerErr;
+            }
+          }
+          throw err;
+        }
+      }
     } catch (e) {
       // fallthrough
     }
   }
 
   // Fallback: wallet deposit endpoint
-  return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
+  try {
+    return await axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
+  } catch (err) {
+    console.error('[API] depositToContractorWallet - wallet/deposit error', { contractorId, payload, error: err?.response?.data || err?.message || err });
+    throw err;
+  }
 };
 
 export const withdrawFromContractorWallet = async (contractorId, data) => {

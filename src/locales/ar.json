@@ -1274,6 +1274,7 @@
     }
   },
   "expenses": {
+    "deleteSubcategory": "حذف التصنيف الفرعي",
       "treasuryRequired": "الخزينة / العهدة مطلوبة",
     "statementPlaceholder": "ابحث في البيان أو الوصف...",
     "expense": "مصروف",

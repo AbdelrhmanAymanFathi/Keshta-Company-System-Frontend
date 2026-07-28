@@ -214,77 +214,7 @@
           </h3>
           <button @click="walletModalOpen = false" class="theme-text-muted hover:theme-text-secondary">✕</button>
         </div>
-        <div v-if="walletLoading" class="text-center py-8">{{ $t('labels.loading') || 'Loading...' }}</div>
-        <div v-else>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div class="p-4 bg-gray-50 rounded">
-              <div class="text-sm theme-text-muted">{{ $t('extracts.balance') || 'Balance' }}</div>
-              <div class="text-2xl font-semibold text-red-600">{{ wallet ? wallet.balance : '-' }}</div>
-            </div>
-            <div class="p-4 bg-gray-50 rounded">
-              <div class="text-sm theme-text-muted">{{ $t('extracts.totalDeposits') || 'Total Deposits' }}</div>
-              <div class="text-lg font-semibold text-green-600">{{ wallet ? wallet.totalDeposits : '-' }}</div>
-            </div>
-            <div class="p-4 bg-gray-50 rounded">
-              <div class="text-sm theme-text-muted">{{ $t('extracts.sources') || 'Sources' }}</div>
-              <div class="text-sm">
-                <div>{{ $t('extracts.exports') || 'Exports' }}: {{ wallet && wallet.sources ? wallet.sources.exports : 0 }}</div>
-                <div>{{ $t('extracts.transport') || 'Transport' }}: {{ wallet && wallet.sources ? wallet.sources.transport : 0 }}</div>
-                <div>{{ $t('extracts.expenses') || 'Expenses' }}: {{ wallet && wallet.sources ? wallet.sources.expenses : 0 }}</div>
-                <div>{{ $t('extracts.extracts') || 'Extracts' }}: {{ wallet && wallet.sources ? wallet.sources.extracts : 0 }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="grid md:grid-cols-2 gap-4">
-            <div>
-              <h4 class="font-semibold mb-2">{{ $t('extracts.transactions') || 'Transactions' }}</h4>
-              <div class="overflow-auto max-h-64 bg-white rounded border">
-                <table class="min-w-full">
-                  <thead class="bg-gray-100">
-                    <tr>
-                      <th class="p-2 text-left">{{ $t('labels.type') || 'Type' }}</th>
-                      <th class="p-2 text-left">{{ $t('labels.date') || 'Date' }}</th>
-                      <th class="p-2 text-right">{{ $t('labels.amount') || 'Amount' }}</th>
-                      <th class="p-2 text-right">{{ $t('extracts.balanceAfter') || 'Balance After' }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-if="!wallet || !wallet.entries || wallet.entries.length === 0">
-                      <td class="p-3 text-center" colspan="4">{{ $t('extracts.noTransactions') || 'No transactions' }}</td>
-                    </tr>
-                    <tr v-for="(e, idx) in (wallet && wallet.entries) || []" :key="idx" class="border-t">
-                      <td class="p-2">{{ e.type }}</td>
-                      <td class="p-2">{{ new Date(e.date).toLocaleString() }}</td>
-                      <td class="p-2 text-right">{{ e.signedAmount || e.amount }}</td>
-                      <td class="p-2 text-right">{{ e.balanceAfter != null ? e.balanceAfter : '-' }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div>
-              <h4 class="font-semibold mb-2">{{ $t('extracts.deposit') || 'Deposit' }}</h4>
-              <div class="grid gap-2">
-                <label>
-                  <div class="text-sm mb-1">{{ $t('extracts.amount') || 'Amount' }}</div>
-                  <input v-model="depositForm.amount" type="number" class="w-full px-3 py-2 border rounded" />
-                </label>
-                <label>
-                  <div class="text-sm mb-1">{{ $t('labels.date') || 'Date' }}</div>
-                  <DateField v-model="depositForm.date" class="w-full px-3 py-2 border rounded" />
-                </label>
-                <label>
-                  <div class="text-sm mb-1">{{ $t('labels.description') || 'Description' }}</div>
-                  <input v-model="depositForm.description" class="w-full px-3 py-2 border rounded" />
-                </label>
-                <div class="flex justify-end gap-2 mt-2">
-                  <button @click="walletModalOpen = false" class="px-4 py-2 rounded border">{{ $t('labels.cancel') }}</button>
-                  <button @click="doDeposit" class="px-4 py-2 rounded theme-button">{{ $t('labels.deposit') || 'Deposit' }}</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <WalletPanel v-if="selectedContractor" :contractorId="selectedContractor.id" />
       </div>
     </div>
 
@@ -309,7 +239,7 @@
 
 <script>
 import * as XLSX from 'xlsx'
-import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
+import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
@@ -335,6 +265,7 @@ export default {
       walletLoading: false,
       wallet: null,
       selectedContractor: null,
+      selectedWalletAccount: null,
       depositForm: { amount: '', description: '', date: '' },
       page: 1,
       pageSize: 20,
@@ -490,21 +421,36 @@ export default {
       this.walletModalOpen = true
       this.wallet = null
       this.depositForm = { amount: '', description: '', date: '' }
-      await this.fetchWallet(c.id)
     },
     async fetchWallet(contractorId) {
       this.walletLoading = true
       try {
         const accountType = normalizeContractorAccountType(this.mode)
-        const [wRes, hRes] = await Promise.all([
-          getContractorWallet(contractorId, { accountType }),
-          getContractorWalletHistory(contractorId, { accountType })
-        ])
+        // Step 1: fetch wallet summary (no filter — same as WalletPanel.loadSummary)
+        const wRes = await getContractorWallet(contractorId)
         this.wallet = wRes.data || null
-        const historyData = hRes?.data || hRes
-        if (historyData?.items) this.wallet.entries = historyData.items
-        else if (historyData?.entries) this.wallet.entries = historyData.entries
-        else if (Array.isArray(historyData)) this.wallet.entries = historyData
+        // Step 2: always fetch all accounts explicitly so we have IDs for deposit
+        try {
+          const accRes = await getContractorAccounts(contractorId)
+          const raw = accRes?.data || []
+          const acctArr = Array.isArray(raw) ? raw : (raw.accounts || raw.data || [])
+          if (acctArr.length > 0) {
+            this.wallet = this.wallet || {}
+            this.wallet.accounts = acctArr
+            // pre-select matching account for this mode
+            this.selectedWalletAccount = acctArr.find(a => normalizeContractorAccountType(a.accountType) === accountType) || acctArr[0]
+          }
+        } catch (e) { /* ignore — fallback without accounts */ }
+        // Step 3: fetch history for the selected account (or fallback)
+        try {
+          const hRes = await getContractorWalletHistory(contractorId, { accountType })
+          const historyData = hRes?.data || hRes
+          if (this.wallet) {
+            if (historyData?.items) this.wallet.entries = historyData.items
+            else if (historyData?.entries) this.wallet.entries = historyData.entries
+            else if (Array.isArray(historyData)) this.wallet.entries = historyData
+          }
+        } catch (e) { /* ignore history errors */ }
       } catch (err) {
         console.error('Error fetching wallet', err)
         if (window.$toast) window.$toast(this.$t('extracts.walletFetchError') || 'Error fetching wallet', 'error')
@@ -520,11 +466,15 @@ export default {
         return
       }
       try {
+        const accountType = normalizeContractorAccountType(this.mode)
+        // Use the pre-selected account (loaded in fetchWallet) — mirrors WalletPanel doDeposit
+        const acct = this.selectedWalletAccount
         const payload = {
           amount,
           description: this.depositForm.description || '',
           date: this.depositForm.date || undefined,
-          accountType: normalizeContractorAccountType(this.mode)
+          accountId: acct?.id || undefined,
+          accountType
         }
         const res = await depositToContractorWallet(this.selectedContractor.id, payload)
         if (res?.data) this.wallet = res.data

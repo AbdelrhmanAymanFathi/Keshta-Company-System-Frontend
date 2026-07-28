@@ -1275,6 +1275,7 @@
     }
   },
   "expenses": {
+    "deleteSubcategory": "Delete Subcategory",
    "statementPlaceholder": "Search statement or description...",
     "expense": "Expense",
     "addCategory": "Add Main Term",
