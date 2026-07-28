@@ -415,19 +415,16 @@ export default {
 
     const loadReport = async () => {
       error.value = null
-      if (!filters.value.startDate || !filters.value.endDate) {
-        items.value = []
-        error.value = 'Please select the start and end dates before searching'
-        return
-      }
 
       try {
-        const s = new Date(filters.value.startDate)
-        const e = new Date(filters.value.endDate)
-        if (e < s) {
-          items.value = []
-          error.value = 'Please make sure the end date is on or after the start date'
-          return
+        if (filters.value.startDate && filters.value.endDate) {
+          const s = new Date(filters.value.startDate)
+          const e = new Date(filters.value.endDate)
+          if (e < s) {
+            items.value = []
+            error.value = 'Please make sure the end date is on or after the start date'
+            return
+          }
         }
       } catch (e) {
         // ignore parse error
@@ -520,13 +517,7 @@ export default {
     }
 
     onMounted(async () => {
-      const endDate = new Date()
-      const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-      
-      filters.value.endDate = endDate.toISOString().split('T')[0]
-      filters.value.startDate = startDate.toISOString().split('T')[0]
       await loadMasterData()
-      await loadReport()
     })
 
     return {
