@@ -1399,6 +1399,8 @@ export const getExpenses = (params = {}) => {
   if (paymentMethod) queryParams.append('paymentMethod', paymentMethod);
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
+  if (params.settlementDateStart) queryParams.append('settlementDateStart', params.settlementDateStart);
+  if (params.settlementDateEnd) queryParams.append('settlementDateEnd', params.settlementDateEnd);
   if (includeSummary) queryParams.append('includeSummary', '1');
   return axios.get(`${BASE_URL}/api/expenses?${queryParams.toString()}`);
 };

@@ -39,6 +39,24 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
 
+        <!-- Settlement Date From / تاريخ التسوية من -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.settlementDate') }} {{ $t('labels.startDate') }}</label>
+          <DateField v-model="filters.settlementDateStart"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+            :placeholder="$t('expenses.settlementDatePlaceholder')"
+          />
+        </div>
+
+        <!-- Settlement Date To / تاريخ التسوية إلى -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.settlementDate') }} {{ $t('labels.endDate') }}</label>
+          <DateField v-model="filters.settlementDateEnd"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+            :placeholder="$t('expenses.settlementDatePlaceholder')"
+          />
+        </div>
+
         <!-- Main Term / البند الرئيسي -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.mainTerm') }}</label>
@@ -852,7 +870,9 @@ export default {
       formTreasurySearch: '',
       filters: {
         startDate: '',
-        endDate: ''
+        endDate: '',
+        settlementDateStart: '',
+        settlementDateEnd: ''
       },
       // Subcategory combobox state
       subcategoryInput: '',
@@ -1042,6 +1062,14 @@ rows: [],
       this.currentPage = 1
       this.loadExpenses()
     },
+    'filters.settlementDateStart'() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    'filters.settlementDateEnd'() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
     modalStep(newStep) {
       if (newStep === 2) {
         this.$nextTick(() => {
@@ -1091,6 +1119,8 @@ rows: [],
         if (this.searchQuery) params.q = this.searchQuery
         if (this.filters?.startDate) params.startDate = this.filters.startDate
         if (this.filters?.endDate) params.endDate = this.filters.endDate
+        if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
+        if (this.filters?.settlementDateEnd) params.settlementDateEnd = this.filters.settlementDateEnd
         if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
         if (this.selectedLocationId !== null && this.selectedLocationId !== undefined) params.locationId = this.selectedLocationId
@@ -1831,7 +1861,9 @@ rows: [],
       this.filterPaymentMethodSearch = ''
       this.filters = {
         startDate: '',
-        endDate: ''
+        endDate: '',
+        settlementDateStart: '',
+        settlementDateEnd: ''
       }
       this.currentPage = 1
       this.loadExpenses()
@@ -1923,8 +1955,9 @@ rows: [],
         if (this.searchQuery) params.q = this.searchQuery
         if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
+        if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
+        if (this.filters?.settlementDateEnd) params.settlementDateEnd = this.filters.settlementDateEnd
         if (this.selectedKind) params.kind = this.selectedKind
-        // (Only pass filters available in this component: query, categoryId, subCategoryId, kind)
         const response = await getExpensesReport(params)
         // Handle both direct blob and response.data blob
         const blobData = response instanceof Blob ? response : response.data
