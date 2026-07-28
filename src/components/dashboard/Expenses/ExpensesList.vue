@@ -427,34 +427,22 @@
               <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6" :class="isRTL ? 'rtl-modal' : ''">
                 
                 <!-- Step 1: Date & Treasury -->
+                <!-- Step 1: Settlement Date & Treasury -->
                 <div v-if="modalStep===1" class="bg-white rounded-xl p-5 sm:p-6 space-y-4 shadow-sm">
                   <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 pb-2 flex items-center gap-2">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 11h.01M7 15h.01M13 7h7M13 11h7M13 15h7M3 7h.01M3 11h.01M3 15h.01"></path></svg>
                     {{ $t('expenses.modalStepOneTitle') }}
                   </h4>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <!-- Date -->
-                    <div>
-                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.date') }} <span class="text-red-500">*</span>
-                      </label>
-                      <DateField
-                        v-model="form.date"
-                        required
-                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
-                        :class="isRTL ? 'text-right' : 'text-left'"
-                        @update:modelValue="onFormDateChange"
-                      />
-                    </div>
-
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Settlement Date -->
                     <div>
                       <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}
+                        {{ $t('expenses.settlementDate') || 'تاريخ التسوية' }} <span class="text-red-500">*</span>
                       </label>
                       <DateField
                         v-model="form.settlementDate"
+                        required
                         class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                         :class="isRTL ? 'text-right' : 'text-left'"
                       />
@@ -463,7 +451,7 @@
                     <!-- Treasury -->
                     <div>
                       <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.treasuryOrCustody') }}
+                        {{ $t('expenses.treasuryOrCustody') }} <span class="text-red-500">*</span>
                       </label>
                       <SearchDropdown
                         v-model="formTreasurySearch"
@@ -480,7 +468,7 @@
                   </div>
                 </div>
 
-                <!-- Step 2: Editable expense rows with the same interaction rhythm as the supply modal -->
+                <!-- Step 2: Editable expense rows with exact requested column structure -->
                 <div v-if="modalStep===2" class="bg-white rounded-xl shadow-sm">
                   <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -494,23 +482,34 @@
 
                   <div class="p-4 sm:p-5">
                     <div class="relative overflow-x-auto overflow-y-visible rounded-xl border border-slate-200">
-                      <table ref="tableRef" class="min-w-[980px] w-full border-collapse bg-white">
+                      <table ref="tableRef" class="min-w-[1100px] w-full border-collapse bg-white">
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
                             <th class="w-12 px-3 py-3 text-center text-xs font-medium theme-text-secondary">#</th>
+                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.date') || 'التاريخ' }}</th>
                             <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
                             <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
-                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.date') || 'تاريخ المصروف' }}</th>
                             <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
+                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
                             <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
                           <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
                             <td class="px-3 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
+                            <!-- Row Date (Editable per row) -->
+                            <td class="px-3 py-2">
+                              <DateField
+                                v-model="row.date"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                                @keydown.enter.prevent="handleFieldNavigation(index, 'date', $event)"
+                                @keydown.tab="handleFieldNavigation(index, 'date', $event)"
+                              />
+                            </td>
                             <td class="px-3 py-2">
                               <input
                                 v-model="row.amount"
@@ -581,15 +580,6 @@
                               />
                             </td>
                             <td class="px-3 py-2">
-                              <DateField
-                                v-model="row.date"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
-                                :class="isRTL ? 'text-right' : 'text-left'"
-                                @keydown.enter.prevent="handleFieldNavigation(index, 'date', $event)"
-                                @keydown.tab="handleFieldNavigation(index, 'date', $event)"
-                              />
-                            </td>
-                            <td class="px-3 py-2">
                               <textarea
                                 v-model="row.notes"
                                 rows="1"
@@ -599,6 +589,10 @@
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'notes', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'notes', $event)"
                               ></textarea>
+                            </td>
+                            <!-- Settlement Date (Static from Step 1) -->
+                            <td class="px-3 py-3 text-sm theme-text-secondary whitespace-nowrap align-middle">
+                              {{ formatDate(form.settlementDate || form.date) }}
                             </td>
                             <td class="px-3 py-2 text-center">
                               <div class="flex justify-center gap-2">
@@ -1051,7 +1045,7 @@ rows: [],
     modalStep(newStep) {
       if (newStep === 2) {
         this.$nextTick(() => {
-          const firstInput = this.$refs.tableRef?.querySelector('tbody tr td:nth-child(2) input')
+          const firstInput = this.$refs.tableRef?.querySelector('tbody tr td:nth-child(3) input')
           firstInput?.focus()
           if (firstInput?.select) firstInput.select()
         })
@@ -1342,7 +1336,7 @@ rows: [],
 
       this.form = {
         id: expense.id,
-        date: formattedDate,
+        date: formattedSettlementDate,
         categoryId: finalCategoryId,
         subCategoryId: finalSubCategoryId,
         kind: expense.kind || 'EXPENSE',
@@ -1359,6 +1353,7 @@ rows: [],
       this.modalStep = 1
 
       const row = this.createEmptyRow()
+      row.date = formattedDate
       row.categoryId = finalCategoryId
       row.categorySearch = categoryName
       row.subCategoryId = finalSubCategoryId
@@ -1388,18 +1383,9 @@ rows: [],
       this.modalStep = 1
     },
 
-    onFormDateChange(newDate) {
-      if (newDate) {
-        this.form.settlementDate = newDate
-        this.rows.forEach(r => {
-          if (!r.date) r.date = newDate
-        })
-      }
-    },
-
     createEmptyRow() {
       const prevRow = (this.rows && this.rows.length > 0) ? this.rows[this.rows.length - 1] : null
-      const rowDate = prevRow?.date || this.form?.date || getTodayISO()
+      const rowDate = this.form?.date || getTodayISO()
       const rowLocationId = prevRow?.locationId ?? (this.locations?.[0]?.id ?? null)
       const rowLocationSearch = prevRow?.locationSearch ?? (this.locations?.[0]?.name ?? '')
 
@@ -1425,7 +1411,7 @@ rows: [],
       this.$nextTick(() => {
         const rows = this.$refs.tableRef?.querySelectorAll('tbody tr') || []
         const lastRow = rows[this.rows.length - 1]
-        const firstInput = lastRow?.querySelector('td:nth-child(2) input')
+        const firstInput = lastRow?.querySelector('td:nth-child(3) input')
         firstInput?.focus()
       })
     },
@@ -1571,7 +1557,7 @@ rows: [],
 
       event.preventDefault()
 
-      const nextFields = ['amount', 'description', 'subcategory', 'category', 'location', 'date', 'notes']
+      const nextFields = ['date', 'amount', 'description', 'subcategory', 'category', 'location', 'notes']
       const currentIndex = nextFields.indexOf(field)
       const nextField = nextFields[currentIndex + 1]
       if (!nextField) {
@@ -1584,12 +1570,12 @@ rows: [],
       if (!row) return
 
       const selectorMap = {
-        amount: 'td:nth-child(2) input',
-        description: 'td:nth-child(3) input',
-        subcategory: 'td:nth-child(4) input',
-        category: 'td:nth-child(5) input',
-        location: 'td:nth-child(6) input',
-        date: 'td:nth-child(7) input',
+        date: 'td:nth-child(2) input',
+        amount: 'td:nth-child(3) input',
+        description: 'td:nth-child(4) input',
+        subcategory: 'td:nth-child(5) input',
+        category: 'td:nth-child(6) input',
+        location: 'td:nth-child(7) input',
         notes: 'td:nth-child(8) textarea'
       }
 
@@ -1608,8 +1594,8 @@ rows: [],
           .filter(row => String(row.description || '').trim() || row.amount || row.categoryId)
           .map(row => {
             const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
-            const rowExpenseDate = row.date || this.form.date
-            const rowSettlementDate = this.form.settlementDate || this.form.date
+            const rowExpenseDate = row.date || getTodayISO()
+            const rowSettlementDate = this.form.settlementDate || this.form.date || getTodayISO()
             return {
               date: rowExpenseDate,
               kind: this.form.kind || 'EXPENSE',
@@ -1623,7 +1609,7 @@ rows: [],
               treasuryId: this.form.treasuryId ?? null,
               paymentMethod: row.paymentMethod || 'CASH',
               notes: row.notes || '',
-              settlementDate: rowSettlementDate ? new Date(rowSettlementDate + 'T00:00:00Z').toISOString() : null
+              settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString()
             }
           })
 
@@ -1730,8 +1716,12 @@ rows: [],
     },
     
     validateStep1() {
-      if (!this.form.date) {
-        this.showError(this.$t('expenses.validation.dateRequired'))
+      if (!this.form.settlementDate) {
+        this.showError(this.$t('expenses.validation.settlementDateRequired') || 'تاريخ التسوية مطلوب')
+        return false
+      }
+      if (!this.form.treasuryId) {
+        this.showError(this.$t('expenses.validation.treasuryRequired') || 'الخزينة أو العهدة مطلوبة')
         return false
       }
       return true
@@ -1771,9 +1761,7 @@ rows: [],
       return true
     },
     
-    confirmDelete(expense) {
-      this.deleteConfirm = { open: true, item: expense }
-    },
+
     
     cancelDelete() {
       this.deleteConfirm = { open: false, item: null }
@@ -1900,13 +1888,24 @@ rows: [],
     
     formatDate(dateString) {
       if (!dateString) return '-';
-      const date = new Date(dateString);
-      // Always use Gregorian calendar (en-US) to avoid Hijri in Chrome Arabic
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
+      let d;
+      if (typeof dateString === 'string') {
+        const m = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) {
+          d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+        } else {
+          d = new Date(dateString);
+        }
+      } else if (dateString instanceof Date) {
+        d = dateString;
+      } else {
+        d = new Date(dateString);
+      }
+      if (!d || Number.isNaN(d.getTime())) return '-';
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
     },
     
     formatCurrency(amount) {

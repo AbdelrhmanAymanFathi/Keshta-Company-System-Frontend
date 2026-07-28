@@ -1274,7 +1274,8 @@
     }
   },
   "expenses": {
-   "statementPlaceholder": "ابحث في البيان أو الوصف...",
+      "treasuryRequired": "الخزينة / العهدة مطلوبة",
+    "statementPlaceholder": "ابحث في البيان أو الوصف...",
     "expense": "مصروف",
     "addCategory": "إضافة بند رئيسي",
     "addBranch": "إضافة فرع",
@@ -1293,6 +1294,7 @@
     "editExpense": "تعديل المصروف",
     "deleteExpense": "حذف المصروف",
     "date": "التاريخ",
+    "transactionDate": "تاريخ المعاملة",
     "category": "الفئة",
     "description": "الوصف",
     "amount": "المبلغ",
@@ -1386,7 +1388,8 @@
       "amountRequired": "المبلغ مطلوب",
       "amountInvalid": "المبلغ يجب أن يكون رقماً صحيحاً",
       "settlementDateRequired": "تاريخ التسوية مطلوب",
-      "settlementDateInvalid": "تاريخ التسوية غير صالح"
+      "settlementDateInvalid": "تاريخ التسوية غير صالح",
+      "treasuryRequired": "الخزينة أو العهدة مطلوبة"
     },
     "success": {
       "created": "تم إنشاء المصروف بنجاح",

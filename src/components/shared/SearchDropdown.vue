@@ -39,7 +39,7 @@
           @mouseenter="highlightedIndex = i"
           :class="[
             'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
-            i === highlightedIndex ? 'theme-icon-bg' : 'theme-hover-soft'
+            i === highlightedIndex ? 'theme-icon-bg theme-text font-semibold' : 'theme-hover-soft theme-text-primary'
           ]"
         >
           {{ getLabel(item) }}
@@ -61,7 +61,7 @@
             ref="optionItems"
             :class="[
               'cursor-pointer border-b border-gray-100 px-3 py-2 text-sm last:border-b-0',
-              index === highlightedIndex ? 'bg-indigo-100' : 'hover:bg-indigo-50'
+              index === highlightedIndex ? 'theme-icon-bg theme-text font-semibold' : 'theme-hover-soft theme-text-primary'
             ]"
             @mousedown.prevent="selectItem(item)"
             @mouseenter="highlightedIndex = index"
@@ -271,55 +271,59 @@ export default {
         return
       }
 
-      if (!isOpen.value && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-        event.preventDefault()
-        openDropdown()
-        return
-      }
-
       if (event.key === 'Escape') {
-        closeDropdown()
+        if (isOpen.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          closeDropdown()
+        }
         return
       }
 
-      if (!filteredItems.value.length) return
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault()
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         if (!isOpen.value) {
+          event.preventDefault()
           openDropdown()
           return
         }
-        if (highlightedIndex.value === -1) {
-          highlightedIndex.value = 0
-        } else {
-          highlightedIndex.value = (highlightedIndex.value + 1) % filteredItems.value.length
-        }
-        scrollOptionIntoView()
-      }
-
-      if (event.key === 'ArrowUp') {
+        if (!filteredItems.value.length) return
         event.preventDefault()
-        if (!isOpen.value) {
-          openDropdown()
-          return
-        }
-        if (highlightedIndex.value <= 0) {
-          highlightedIndex.value = filteredItems.value.length - 1
+        event.stopPropagation()
+        if (event.key === 'ArrowDown') {
+          highlightedIndex.value = highlightedIndex.value === -1
+            ? 0
+            : (highlightedIndex.value + 1) % filteredItems.value.length
         } else {
-          highlightedIndex.value = highlightedIndex.value - 1
+          highlightedIndex.value = highlightedIndex.value <= 0
+            ? filteredItems.value.length - 1
+            : highlightedIndex.value - 1
         }
         scrollOptionIntoView()
+        return
       }
 
-      if ((event.key === 'Enter' || event.key === 'Tab') && isOpen.value && highlightedIndex.value >= 0) {
-        const item = filteredItems.value[highlightedIndex.value]
-        if (item) {
-          selectItem(item)
-          if (event.key === 'Enter') {
-            event.preventDefault()
+      if (event.key === 'Enter') {
+        if (isOpen.value) {
+          event.preventDefault()
+          event.stopPropagation()
+          if (highlightedIndex.value >= 0 && filteredItems.value.length) {
+            const item = filteredItems.value[highlightedIndex.value]
+            if (item) selectItem(item)
+          } else {
+            closeDropdown()
           }
         }
+        return
+      }
+
+      if (event.key === 'Tab' && isOpen.value) {
+        if (highlightedIndex.value >= 0 && filteredItems.value.length) {
+          const item = filteredItems.value[highlightedIndex.value]
+          if (item) selectItem(item)
+        } else {
+          closeDropdown()
+        }
+        return
       }
     }
 

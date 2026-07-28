@@ -1294,6 +1294,7 @@
     "editExpense": "Edit Expense",
     "deleteExpense": "Delete Expense",
     "date": "Date",
+    "transactionDate": "Transaction Date",
     "category": "Category",
     "description": "Description",
     "amount": "Amount",
@@ -1387,7 +1388,8 @@
       "amountRequired": "Amount is required",
       "amountInvalid": "Amount must be a valid number",
       "settlementDateRequired": "Settlement Date is required",
-      "settlementDateInvalid": "Settlement Date Invalid"
+      "settlementDateInvalid": "Settlement Date Invalid",
+      "treasuryRequired": "Treasury or Custody is required"
     },
     "success": {
       "created": "Expense created successfully",
