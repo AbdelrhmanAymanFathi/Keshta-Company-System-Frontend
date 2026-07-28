@@ -91,7 +91,6 @@
             v-model="subCategorySearchText"
             :items="availableSubcategories"
             :allItems="availableSubcategories"
-            :disabled="!filters.categoryId"
             :placeholder="$t('expenses.searchSubTerm') || $t('placeholders.search')"
             clearable
             @select="(sel) => { filters.subCategoryId = sel.id; subCategorySearchText = sel.name }"
@@ -320,7 +319,9 @@ export default {
     })
 
     const availableSubcategories = computed(() => {
-      if (!filters.value.categoryId) return []
+      if (!filters.value.categoryId) {
+        return categories.value.flatMap(c => c.subCategories || c.subcategories || [])
+      }
       const cat = categories.value.find(c => c.id === Number(filters.value.categoryId))
       return cat?.subCategories || cat?.subcategories || []
     })
