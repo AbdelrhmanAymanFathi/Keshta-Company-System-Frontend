@@ -52,6 +52,24 @@
           />
         </div>
 
+        <!-- Settlement Date From -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.settlementDate') }} {{ $t('labels.startDate') }}</label>
+          <DateField
+            v-model="filters.settlementDateStart"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+          />
+        </div>
+
+        <!-- Settlement Date To -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.settlementDate') }} {{ $t('labels.endDate') }}</label>
+          <DateField
+            v-model="filters.settlementDateEnd"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+          />
+        </div>
+
         <!-- Category (Main Term) Filter -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.mainTerm') }}</label>
@@ -291,6 +309,8 @@ export default {
       q: '',
       startDate: '',
       endDate: '',
+      settlementDateStart: '',
+      settlementDateEnd: '',
       categoryId: '',
       subCategoryId: '',
       locationId: '',
@@ -451,6 +471,8 @@ export default {
         q: '',
         startDate: filters.value.startDate,
         endDate: filters.value.endDate,
+        settlementDateStart: '',
+        settlementDateEnd: '',
         categoryId: '',
         subCategoryId: '',
         locationId: '',
