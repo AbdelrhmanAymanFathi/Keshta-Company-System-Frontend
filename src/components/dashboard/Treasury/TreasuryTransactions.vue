@@ -115,19 +115,28 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.date') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.dateTime') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.updatedBy') }}</th>
                 <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ t('treasury.amount') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
               <tr v-for="tx in transactions" :key="tx.id" class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ formatDate(tx.date) }}</td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
                 <td class="px-4 py-3 text-sm">
                   <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="badgeClass(tx.type)">{{ txTypeLabel(tx.type) }}</span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ tx.description || tx.refType || '-' }}</td>
+                <td class="px-4 py-3 text-sm">
+                  <span v-if="tx.refId" class="cursor-pointer font-medium text-blue-600 hover:text-blue-800 hover:underline" @click="navigateToSource(tx)">{{ formatSource(tx) }}</span>
+                  <span v-else class="text-gray-700">{{ formatSource(tx) }}</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">{{ displayDescription(tx) }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ tx.createdBy?.name || tx.createdByName || '-' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ tx.updatedBy?.name || tx.updatedByName || '-' }}</td>
                 <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
                   {{ formatCurrency(tx.amount) }}
                 </td>
@@ -154,6 +163,7 @@
 
 <script>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
@@ -169,6 +179,7 @@ export default {
     const { t, locale } = useI18n()
     const { user } = useAuth()
     const store = useTreasuryStore()
+    const router = useRouter()
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const isAdmin = computed(() => {
       const roles = user.value?.roles || []
@@ -199,6 +210,7 @@ export default {
 
     const formatCurrency = (value) => new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
     const formatDate = (value) => value ? new Date(value).toLocaleDateString(locale.value || 'en-US') : '-'
+    const formatDateTime = (value) => value ? new Date(value).toLocaleString(locale.value || 'en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'
     const txTypeLabel = (type) => {
       switch (String(type || '').toUpperCase()) {
         case 'DEPOSIT': return t('treasury.types.deposit')
@@ -215,6 +227,26 @@ export default {
         case 'WITHDRAW': return 'bg-amber-100 text-amber-700'
         default: return 'bg-gray-100 text-gray-700'
       }
+    }
+    const formatSource = (tx) => {
+      const label = tx.source || tx.refType || ''
+      const refId = tx.refId
+      if (!label) return '-'
+      return refId ? `${label} #${refId}` : label
+    }
+    const displayDescription = (tx) => {
+      if (locale.value?.startsWith('ar')) return tx.arDescription || tx.description || tx.refType || '-'
+      return tx.description || tx.refType || '-'
+    }
+    const navigateToSource = (tx) => {
+      if (!tx.refId) return
+      const routeMap = {
+        EXPENSE: '/dashboard/expenses',
+        PAYMENT: '/dashboard/payments',
+        TRANSFER: '/dashboard/treasury',
+      }
+      const path = routeMap[String(tx.refType || '').toUpperCase()]
+      if (path) router.push(path)
     }
 
     const load = async () => {
@@ -366,7 +398,10 @@ export default {
       visibleTreasuries,
       formatCurrency,
       formatDate,
+      formatDateTime,
       badgeClass,
+      formatSource,
+      navigateToSource,
       selectTreasury,
       applyFilters,
       downloadReport,
@@ -376,6 +411,7 @@ export default {
       t,
       isRTL,
       txTypeLabel,
+      displayDescription,
       loadTreasuries,
       isAdmin,
     }

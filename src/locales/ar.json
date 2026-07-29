@@ -1450,7 +1450,9 @@
       "extracts": "المستخلصات",
       "expenses": "المصروفات",
       "vehicles": "المركبات",
-    "companyWallet": "الخزينة"
+      "companyWallet": "الخزينة",
+      "branches": "الفروع",
+      "petroleumSupplies": "المواد البترولية"
     }
   },
   "treasury": {
@@ -1481,10 +1483,14 @@
     "active": "نشطة",
     "archived": "مؤرشفة",
     "date": "التاريخ",
+    "dateTime": "التاريخ / الوقت",
     "dateFrom": "من تاريخ",
     "dateTo": "إلى تاريخ",
     "type": "النوع",
+    "source": "المصدر",
     "description": "الوصف",
+    "createdBy": "تم الإنشاء بواسطة",
+    "updatedBy": "تم التحديث بواسطة",
     "amount": "المبلغ",
     "amountFrom": "من مبلغ",
     "amountTo": "إلى مبلغ",

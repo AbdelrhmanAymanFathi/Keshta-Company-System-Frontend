@@ -1450,7 +1450,9 @@
       "extracts": "Extracts",
       "expenses": "Expenses",
       "vehicles": "Vehicles",
-      "companyWallet": "Treasury"
+      "companyWallet": "Treasury",
+      "branches": "Branches",
+      "petroleumSupplies": "Petroleum Supplies"
     }
   },
   "treasury": {
@@ -1481,10 +1483,14 @@
     "active": "Active",
     "archived": "Archived",
     "date": "Date",
+    "dateTime": "Date / Time",
     "dateFrom": "Date From",
     "dateTo": "Date To",
     "type": "Type",
+    "source": "Source",
     "description": "Description",
+    "createdBy": "Created By",
+    "updatedBy": "Updated By",
     "amount": "Amount",
     "amountFrom": "Amount From",
     "amountTo": "Amount To",

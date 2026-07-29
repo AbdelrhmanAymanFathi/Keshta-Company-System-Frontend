@@ -318,8 +318,6 @@ export default {
 
     const filteredPayments = computed(() => {
       const {
-        dateFrom,
-        dateTo,
         siteSearch,
         moduleSearch,
         contractorSearch,
@@ -333,11 +331,6 @@ export default {
       const lowerTreasury = normalize(treasurySearch)
 
       return payments.value.filter(payment => {
-        const dateValue = paymentDate(payment)
-        const parsedDate = dateValue ? new Date(dateValue) : null
-        const validDate = parsedDate && !Number.isNaN(parsedDate.getTime())
-        if (dateFrom && validDate && parsedDate < new Date(dateFrom + 'T00:00:00')) return false
-        if (dateTo && validDate && parsedDate > new Date(dateTo + 'T23:59:59')) return false
         if (lowerSite && !normalize(paymentSite(payment)).includes(lowerSite)) return false
         if (lowerModule && !normalize(paymentModule(payment)).includes(lowerModule)) return false
         if (lowerContractor && !normalize(paymentContractor(payment)).includes(lowerContractor)) return false
@@ -349,8 +342,17 @@ export default {
 
     const loadPayments = async () => {
       loading.value = true
+      const apiParams = {}
+      const { dateFrom, dateTo } = appliedFilters.value
+      if (dateFrom) apiParams.startDate = dateFrom
+      if (dateTo) apiParams.endDate = dateTo
+      if (!Object.keys(apiParams).length) {
+        const { dateFrom: rawFrom, dateTo: rawTo } = filters.value
+        if (rawFrom) apiParams.startDate = rawFrom
+        if (rawTo) apiParams.endDate = rawTo
+      }
       try {
-        const res = await getPayments()
+        const res = await getPayments(apiParams)
         const data = res?.data
         if (Array.isArray(data)) {
           payments.value = data

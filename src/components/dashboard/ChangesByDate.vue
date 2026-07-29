@@ -11,14 +11,20 @@
       <div class="flex flex-col sm:flex-row gap-4 items-end">
         <div class="flex-1">
           <label class="mb-2 block text-sm font-medium theme-text-secondary">
-            {{ $t('changes.selectDate') }}
+            {{ $t('labels.fromDate') || 'From Date' }}
           </label>
-          <DateField v-model="selectedDate"
-            class="w-full rounded-xl border border-slate-200 px-4 py-2  theme-input-focus"
-            @update:modelValue="loadChanges" />
+          <DateField v-model="selectedDateFrom"
+            class="w-full rounded-xl border border-slate-200 px-4 py-2 theme-input-focus" />
         </div>
-        <button @click="loadChanges" :disabled="loading || !selectedDate"
-          class="rounded-xl theme-button px-6 py-2 theme-text-light shadow-sm  transition-colors  disabled:cursor-not-allowed disabled:opacity-50">
+        <div class="flex-1">
+          <label class="mb-2 block text-sm font-medium theme-text-secondary">
+            {{ $t('labels.toDate') || 'To Date' }}
+          </label>
+          <DateField v-model="selectedDateTo"
+            class="w-full rounded-xl border border-slate-200 px-4 py-2 theme-input-focus" />
+        </div>
+        <button @click="loadChanges" :disabled="loading || !selectedDateFrom"
+          class="rounded-xl theme-button px-6 py-2 theme-text-light shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50">
           {{ $t('changes.loadChanges') }}
         </button>
       </div>
@@ -68,7 +74,7 @@
         class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
         <div class="border-b border-slate-200 theme-table-thead-gradient px-6 py-4">
           <h2 class="text-lg font-semibold theme-text-primary">
-            {{ $t(`changes.modules.${activeModule}`) }} - {{ $t('changes.changesFor') }} {{ formatDate(selectedDate) }}
+            {{ $t(`changes.modules.${activeModule}`) }} - {{ $t('changes.changesFor') }} {{ formatDate(selectedDateFrom) }}{{ selectedDateTo && selectedDateTo !== selectedDateFrom ? ' - ' + formatDate(selectedDateTo) : '' }}
           </h2>
           <p class="mt-1 text-sm theme-text-secondary">
             {{ $t('changes.totalChanges') }}: {{ changes[activeModule].count }}
@@ -98,7 +104,7 @@
       </div>
 
       <!-- No Changes Message -->
-      <div v-else-if="selectedDate && !loading" class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
+      <div v-else-if="selectedDateFrom && !loading" class="rounded-2xl border border-slate-200/80 bg-white p-8 text-center shadow-lg shadow-slate-200/40">
         <svg class="w-16 h-16 theme-caption mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -133,7 +139,12 @@ import {
   getPaymentsChanges,
   getExtractsChanges,
   getVehiclesChanges,
-  getCompanyWalletTransactionsChanges
+  getCompanyWalletTransactionsChanges,
+  getExpensesChanges,
+  // Branches changes API
+  getBranchesChanges,
+  // Petroleum Materials changes API
+  getPetroleumSuppliesChanges
 } from '@/api'
 import DateField from '@/components/shared/DateField.vue'
 import { getTodayISO } from '@/utils/dateUtils'
@@ -147,10 +158,49 @@ export default {
   },
   data() {
     return {
-      selectedDate: getTodayISO(),
+      selectedDateFrom: getTodayISO(),
+      selectedDateTo: getTodayISO(),
       loading: false,
       error: null,
       activeModule: null,
+      headersAr: {
+        'ID': 'المعرف',
+        'Date': 'التاريخ',
+        'Date From': 'من تاريخ',
+        'Date To': 'إلى تاريخ',
+        'Name': 'الاسم',
+        'Contractor': 'المقاول',
+        'Crusher': 'الكسارة',
+        'Location': 'الموقع',
+        'Vehicle': 'المركبة',
+        'Created By': 'تم بواسطة',
+        'Parent': 'الأب',
+        'Phone': 'الهاتف',
+        'Bank': 'البنك',
+        'Account': 'الحساب',
+        'From': 'من',
+        'To': 'إلى',
+        'Trips': 'الرحلات',
+        'Total': 'الإجمالي',
+        'Equipment': 'المعدة',
+        'Hours': 'الساعات',
+        'Site': 'الموقع',
+        'Area': 'المنطقة',
+        'Module': 'الوحدة',
+        'Amount': 'المبلغ',
+        'Payment Method': 'طريقة الدفع',
+        'Treasury': 'الخزينة',
+        'Notes': 'ملاحظات',
+        'Actor': 'المستخدم',
+        'Updated At': 'آخر تحديث',
+        'Company Capacity': 'سعة الشركة',
+        'Crusher Capacity': 'سعة الكسارة',
+        'Type': 'النوع',
+        'Description': 'الوصف',
+        'Category': 'التصنيف',
+        'Item': 'الصنف',
+        'Quantity': 'الكمية'
+      },
       changes: {
         exports: { count: 0, items: [] },
         locations: { count: 0, items: [] },
@@ -161,7 +211,12 @@ export default {
         payments: { count: 0, items: [] },
         extracts: { count: 0, items: [] },
         vehicles: { count: 0, items: [] },
-        companyWallet: { count: 0, items: [] }
+        companyWallet: { count: 0, items: [] },
+        expenses: { count: 0, items: [] },
+        // [COMMENTED OUT] Branches changes data (company branches)
+        // branches: { count: 0, items: [] },
+        // [COMMENTED OUT] Petroleum Materials changes data (fuel/oil supplies from contractors)
+        // petroleumSupplies: { count: 0, items: [] }
       }
     }
   },
@@ -175,23 +230,31 @@ export default {
   },
   methods: {
     async loadChanges() {
-      if (!this.selectedDate) return
+      if (!this.selectedDateFrom) return
       this.loading = true
       this.error = null
       this.activeModule = null
       try {
-        const dateStr = this.selectedDate
+        const dateParams = {
+          fromDate: this.selectedDateFrom,
+          toDate: this.selectedDateTo || this.selectedDateFrom
+        }
         const promises = [
-          this.loadModuleChanges('exports', () => getExportsChanges(dateStr)),
-          this.loadModuleChanges('locations', () => getLocationsChanges(dateStr)),
-          this.loadModuleChanges('contractors', () => getContractorsChanges(dateStr)),
-          this.loadModuleChanges('crushers', () => getCrushersChanges(dateStr)),
-          this.loadModuleChanges('transports', () => getTransportsChanges(dateStr)),
-          this.loadModuleChanges('rentals', () => getEquipmentLogsChanges(dateStr)),
-          this.loadModuleChanges('payments', () => getPaymentsChanges(dateStr)),
-          this.loadModuleChanges('extracts', () => getExtractsChanges(dateStr)),
-          this.loadModuleChanges('vehicles', () => getVehiclesChanges(dateStr)),
-          this.loadModuleChanges('companyWallet', () => getCompanyWalletTransactionsChanges(dateStr))
+          this.loadModuleChanges('exports', () => getExportsChanges(dateParams)),
+          this.loadModuleChanges('locations', () => getLocationsChanges(dateParams)),
+          this.loadModuleChanges('contractors', () => getContractorsChanges(dateParams)),
+          this.loadModuleChanges('crushers', () => getCrushersChanges(dateParams)),
+          this.loadModuleChanges('transports', () => getTransportsChanges(dateParams)),
+          this.loadModuleChanges('rentals', () => getEquipmentLogsChanges(dateParams)),
+          this.loadModuleChanges('payments', () => getPaymentsChanges(dateParams)),
+          this.loadModuleChanges('extracts', () => getExtractsChanges(dateParams)),
+          this.loadModuleChanges('vehicles', () => getVehiclesChanges(dateParams)),
+          this.loadModuleChanges('companyWallet', () => getCompanyWalletTransactionsChanges(dateParams)),
+          this.loadModuleChanges('expenses', () => getExpensesChanges(dateParams)),
+          // [COMMENTED OUT] Load changes for company branches
+          // this.loadModuleChanges('branches', () => getBranchesChanges(dateParams)),
+          // [COMMENTED OUT] Load changes for petroleum materials (fuel/oil supplies from contractors)
+          // this.loadModuleChanges('petroleumSupplies', () => getPetroleumSuppliesChanges(dateParams))
         ]
         await Promise.allSettled(promises)
         const moduleWithChanges = Object.keys(this.changes).find(key => this.changes[key].count > 0)
@@ -219,6 +282,10 @@ export default {
         this.changes[moduleKey] = { count: 0, items: [] }
       }
     },
+    bilingualHeader(en) {
+      const ar = this.headersAr[en] || en
+      return this.isRTL ? `${ar} / ${en}` : `${en} / ${ar}`
+    },
     getHeadersForModule(moduleKey) {
       const configs = {
         exports: ['ID', 'Date', 'Contractor', 'Crusher', 'Location', 'Vehicle', 'Created By'],
@@ -230,9 +297,14 @@ export default {
         payments: ['ID', 'Date', 'Site', 'Area', 'Module', 'Contractor', 'Amount', 'Payment Method', 'Treasury', 'Notes', 'Actor', 'Updated At'],
         extracts: ['ID', 'Date From', 'Date To', 'Contractor', 'Location', 'Area', 'Total', 'Notes', 'Actor', 'Updated At'],
         vehicles: ['ID', 'Name', 'Contractor', 'Company Capacity', 'Crusher Capacity', 'Created By'],
-        companyWallet: ['ID', 'Date', 'Type', 'Amount', 'Description', 'Created By']
+        companyWallet: ['ID', 'Date', 'Type', 'Amount', 'Description', 'Created By'],
+        expenses: ['ID', 'Date', 'Category', 'Amount', 'Description', 'Created By'],
+        // [COMMENTED OUT] Branches: tracks branch name changes
+        // branches: ['ID', 'Name', 'Created By'],
+        // [COMMENTED OUT] Petroleum Materials: tracks fuel/oil supply records from contractors
+        // petroleumSupplies: ['ID', 'Date', 'Contractor', 'Item', 'Quantity', 'Total', 'Created By']
       }
-      return configs[moduleKey] || []
+      return (configs[moduleKey] || []).map(h => this.bilingualHeader(h))
     },
     getFieldsForModule(moduleKey) {
       const configs = {
@@ -245,7 +317,12 @@ export default {
         payments: ['id', 'paidAt', 'site.name', 'area.name', 'accountType', 'contractor.name', 'amount', 'paymentMethod', 'treasury', 'notes', 'actor', 'updatedAt'],
         extracts: ['id', 'dateFrom', 'dateTo', 'contractor.name', 'location.name', 'area.name', 'total', 'notes', 'actor', 'updatedAt'],
         vehicles: ['id', 'name', 'contractor.name', 'companyCapacity', 'crusherCapacity', 'createdBy.name'],
-        companyWallet: ['id', 'date', 'type', 'amount', 'description', 'createdBy.name']
+        companyWallet: ['id', 'date', 'type', 'amount', 'description', 'createdBy.name'],
+        expenses: ['id', 'date', 'category.name', 'amount', 'description', 'createdBy.name'],
+        // [COMMENTED OUT] Branches: id, branch name, who created it
+        // branches: ['id', 'name', 'createdBy.name'],
+        // [COMMENTED OUT] Petroleum Materials: id, date, contractor, item name, quantity, total cost, who created it
+        // petroleumSupplies: ['id', 'date', 'contractor.name', 'item.name', 'quantity', 'total', 'createdBy.name']
       }
       return configs[moduleKey] || []
     },
@@ -266,6 +343,16 @@ export default {
       const actor = item?.actor?.name || item?.updatedBy?.name || item?.createdBy?.name || item?.actorName
       if (actor) return actor
       return this.$t('labels.system') || 'System'
+    },
+    formatTreasuryType(type) {
+      const raw = String(type || '').toUpperCase()
+      switch (raw) {
+        case 'DEPOSIT': return this.$t('treasury.types.deposit')
+        case 'PAYMENT': return this.$t('treasury.types.payment')
+        case 'WITHDRAW': return this.$t('treasury.types.withdraw')
+        case 'ADJUSTMENT': return this.$t('treasury.types.adjustment')
+        default: return type || '-'
+      }
     },
     formatField(item, field, moduleKey) {
       const value = this.getNestedValue(item, field)
@@ -288,6 +375,9 @@ export default {
         if (field === 'treasury') {
           return item?.treasuryRef?.name || item?.treasury?.name || value || '-'
         }
+      }
+      if (moduleKey === 'companyWallet' && field === 'type') {
+        return this.formatTreasuryType(value)
       }
       if (field.includes('date') || field.includes('Date') || field.includes('At')) {
         return this.formatDate(value)
@@ -320,7 +410,12 @@ export default {
         payments: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v9A2.25 2.25 0 005.25 18.75h7.5M15 19.5l3-3 3 3M18 16.5V21"/></svg>`,
         extracts: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
         vehicles: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1a4 4 0 01-4-4V6a4 4 0 014-4h6a4 4 0 014 4v6a4 4 0 01-4 4h-1"/></svg>`,
-        companyWallet: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`
+        companyWallet: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>`,
+        expenses: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>`,
+        // [COMMENTED OUT] Branch offices icon (building)
+        // branches: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>`,
+        // [COMMENTED OUT] Petroleum Materials icon (lightning bolt — fuel/energy)
+        // petroleumSupplies: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`
       }
       return icons[moduleKey] || `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`
     }
