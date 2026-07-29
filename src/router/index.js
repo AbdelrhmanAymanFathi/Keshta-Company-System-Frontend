@@ -276,6 +276,12 @@ const routes = [
         meta: { title: 'units.title', roles: ['admin'] }
       },
       {
+        path: 'admin/statistics',
+        name: 'admin-statistics',
+        component: () => import('@/components/dashboard/Administration/AdminStatistics.vue'),
+        meta: { title: 'adminStats.title', roles: ['admin'] }
+      },
+      {
         path: 'admin/reports',
         name: 'admin-reports-list',
         component: () => import('@/components/admin/ReportsList.vue'),

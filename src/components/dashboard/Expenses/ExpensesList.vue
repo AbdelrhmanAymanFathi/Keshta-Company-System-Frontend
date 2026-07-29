@@ -78,7 +78,6 @@
             v-model="filterSubcategorySearch"
             :items="filterSubcategories"
             :allItems="filterSubcategories"
-            :disabled="!selectedCategoryId"
             :placeholder="$t('expenses.searchSubTerm')"
             clearable
             @select="(sel) => { selectedSubcategoryId = sel.id; filterSubcategorySearch = sel.name }"
@@ -943,9 +942,11 @@ rows: [],
       ]
     },
 
-    // Subcategories for filter (based on selected filter category)
+    // Subcategories for filter — all subcategories when no category selected, filtered otherwise
     filterSubcategories() {
-      if (!this.selectedCategoryId) return []
+      if (!this.selectedCategoryId) {
+        return this.expenseCategories.reduce((acc, cat) => acc.concat(cat.subCategories || []), [])
+      }
       return this.expenseCategories.find(c => c.id === this.selectedCategoryId)?.subCategories || []
     },
 

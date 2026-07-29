@@ -292,8 +292,8 @@
                 </div>
               </div>
 
-              <!-- Subcategory Filter - shows when a categoryId is selected -->
-              <div v-if="expensesFilters.categoryId" class="relative">
+              <!-- Subcategory Filter - always visible, shows all subcats when no main category selected -->
+              <div class="relative">
                 <label :class="['block text-xs font-medium theme-text-secondary mb-1', isRTL ? 'text-start' : 'text-start']">{{ $t('expenses.subcategory') || 'Subcategory' }}</label>
                 <div class="flex items-center gap-2">
                   <div class="relative flex-1">
@@ -1381,6 +1381,11 @@ export default {
 
     const subcategoryOptions = computed(() => {
       const catId = expensesFilters.value.categoryId
+      if (!catId) {
+        return expenseCategories.value.reduce((acc, cat) => {
+          return acc.concat((cat.subCategories || []).map(sc => ({ value: sc.id, label: sc.name })))
+        }, [])
+      }
       const subcats = expenseCategories.value.find(c => c.id === catId)?.subCategories || []
       return subcats.map(sc => ({ value: sc.id, label: sc.name }))
     })
