@@ -13,10 +13,10 @@ const routeMap = {
 }
 
 export function resolveNotificationRoute(item) {
+  const name = routeMap[item.type || item.entityType]
+  if (name) return { name }
   if (item.route && item.route !== '#' && item.route !== null) {
     return item.route.startsWith('/') ? item.route : { path: item.route }
   }
-  const name = routeMap[item.type || item.entityType]
-  if (name) return { name }
   return null
 }
