@@ -98,7 +98,8 @@ export default {
     loading: { type: Boolean, default: false },
     error: { type: String, default: '' },
     sparklineData: { type: Array, default: null },
-    sparklineColor: { type: String, default: '#6366f1' }
+    sparklineColor: { type: String, default: '#6366f1' },
+    locale: { type: String, default: 'en-US' }
   },
   emits: ['click'],
   computed: {
@@ -106,12 +107,12 @@ export default {
       return ICON_PATHS[this.icon] || ICON_PATHS.chart
     },
     formattedValue() {
-      if (this.value === null || this.value === undefined) return '—'
+      if (this.value === null || this.value === undefined) return '\u2014'
       if (typeof this.value === 'number' && !Number.isInteger(this.value)) {
-        return `${this.prefix}${this.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${this.suffix}`
+        return `${this.prefix}${this.formatLoc(this.value, 2)}${this.suffix}`
       }
       if (typeof this.value === 'number') {
-        return `${this.prefix}${this.value.toLocaleString()}${this.suffix}`
+        return `${this.prefix}${this.formatLoc(this.value, 0)}${this.suffix}`
       }
       return `${this.prefix}${this.value}${this.suffix}`
     },
@@ -133,6 +134,20 @@ export default {
     },
     iconColorClass() {
       return this.colorClasses.icon
+    }
+  },
+  methods: {
+    formatLoc(v, decimals) {
+      try {
+        const formatted = new Intl.NumberFormat(this.locale, {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals || 2
+        }).format(v)
+        const rtl = String(this.$i18n?.locale || '').startsWith('ar')
+        return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
+      } catch {
+        return String(v)
+      }
     }
   }
 }

@@ -874,7 +874,7 @@ row.price = this.lastEnteredData.price ?? 0
       return Math.max(0, subtotal - discountAmount)
     },
     formatNumber(v) {
-      return Number(v || 0).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
+      const formatted = Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 }); return this.isRTL ? '\u200E' + formatted : formatted
     },
 
     // Handle Enter key press in any field - add new row immediately

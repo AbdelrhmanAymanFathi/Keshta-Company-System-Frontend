@@ -339,7 +339,8 @@ export default {
 
     const formatCurrency = (amt) => {
       const num = Number(amt || 0)
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(num)
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num)
+      return isRTL.value && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     const formatTypeLabel = (type) => {

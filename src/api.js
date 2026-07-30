@@ -2085,3 +2085,19 @@ export const getRecentActivity = (params = {}) => {
   return axios.get(`${BASE_URL}/api/dashboard/recent-activity`, { params: q })
 }
 
+// --- Notifications ---
+export const getNotifications = (params = {}) => {
+  const { page = 1, pageSize = 20 } = params
+  const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
+  return axios.get(`${BASE_URL}/api/notifications?${q.toString()}`)
+}
+
+export const getUnreadNotificationCount = () =>
+  axios.get(`${BASE_URL}/api/notifications/unread-count`)
+
+export const markNotificationRead = (id) =>
+  axios.patch(`${BASE_URL}/api/notifications/${id}/read`)
+
+export const markAllNotificationsRead = () =>
+  axios.post(`${BASE_URL}/api/notifications/read-all`)
+

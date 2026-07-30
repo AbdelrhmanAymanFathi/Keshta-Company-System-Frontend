@@ -578,10 +578,12 @@ export default {
     }
 
     const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP'
+      const rtl = locale.value?.startsWith('ar')
+      const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(amount || 0)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     const loadLocations = async () => {

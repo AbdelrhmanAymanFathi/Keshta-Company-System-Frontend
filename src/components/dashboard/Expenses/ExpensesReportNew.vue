@@ -278,6 +278,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getExpensesReportData, downloadExpensesReport, getExpenseCategories, getLocations, getTreasuries } from '@/api'
 import DateField from '../../shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
@@ -289,6 +290,7 @@ export default {
   name: 'ExpensesReport',
   components: { DateField, PageHeader, SearchDropdown },
   setup() {
+    const { locale } = useI18n()
     const downloading = ref(false)
     const error = ref(null)
     const loading = ref(false)
@@ -382,10 +384,12 @@ export default {
     }
 
     const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP'
+      const rtl = locale.value?.startsWith('ar')
+      const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(amount || 0)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     const getPaymentMethodLabel = (method) => {

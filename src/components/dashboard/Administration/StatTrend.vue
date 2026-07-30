@@ -28,6 +28,7 @@ export default {
   props: {
     value: { type: Number, default: null },
     direction: { type: String, default: 'up' },
+    locale: { type: String, default: 'en-US' },
     prefix: { type: String, default: '' },
     suffix: { type: String, default: '%' },
     invert: { type: Boolean, default: false }
@@ -36,7 +37,13 @@ export default {
     formatted() {
       if (this.value == null) return ''
       const abs = Math.abs(this.value)
-      return `${this.prefix}${abs.toFixed(1)}${this.suffix}`
+      const loc = this.locale || 'en-US'
+      try {
+        const formatted = new Intl.NumberFormat(loc, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(abs)
+        return `${this.prefix}${formatted}${this.suffix}`
+      } catch {
+        return `${this.prefix}${abs.toFixed(1)}${this.suffix}`
+      }
     },
     trendClass() {
       if (this.value == null) return ''

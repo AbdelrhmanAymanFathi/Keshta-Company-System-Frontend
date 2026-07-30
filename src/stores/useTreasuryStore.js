@@ -27,7 +27,7 @@ export const useTreasuryStore = defineStore('treasury', {
     activeTreasury: (state) => state.treasuries.find(t => String(t.id) === String(state.selectedTreasuryId)) || null,
     formattedBalance: (state) => {
       const amount = Number(state.summary.balance || 0)
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(amount)
+      return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
     },
     totalPages: (state) => Math.max(1, Math.ceil((state.transactions.total || 0) / (state.transactions.pageSize || 20))),
   },

@@ -26,27 +26,24 @@ export const useCompanyFinanceStore = defineStore('companyFinance', {
     formattedBalance: (state) => {
       const balance = parseFloat(state.summary.balance || 0)
       return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(balance)
     },
 
     formattedLast30dIn: (state) => {
       const amount = parseFloat(state.summary.last30dIn || 0)
       return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(amount)
     },
 
     formattedLast30dOut: (state) => {
       const amount = parseFloat(state.summary.last30dOut || 0)
       return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(amount)
     },
 

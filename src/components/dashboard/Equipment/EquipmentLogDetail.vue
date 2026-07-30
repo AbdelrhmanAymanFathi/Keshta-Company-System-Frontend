@@ -109,6 +109,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DateField from '@/components/shared/DateField.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 import { getRental, getRentalJobs, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog } from '@/api'
@@ -124,6 +125,7 @@ export default {
   emits: ['close'],
   components: { DateField },
   setup(props) {
+    const { locale } = useI18n()
     const loading = ref(true)
     const error = ref(null)
     const rental = ref({})
@@ -243,7 +245,9 @@ export default {
     }
 
     const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount || 0)
+      const rtl = locale.value === 'ar'
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount || 0)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     onMounted(fetchRental)

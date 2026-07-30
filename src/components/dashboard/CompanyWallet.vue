@@ -286,6 +286,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useCompanyStore } from '@/stores/useCompanyStore'
 import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet } from '../../api'
 import Badge from '../shared/Badge.vue'
@@ -296,6 +297,7 @@ export default {
   name: 'CompanyWallet',
   components: { Badge, DateField },
   setup() {
+    const { locale } = useI18n()
     const companyStore = useCompanyStore()
     const showDepositModal = ref(false)
     const showWithdrawModal = ref(false)
@@ -512,11 +514,12 @@ export default {
     }
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(amount)
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
+      const rtl = locale.value?.startsWith('ar')
+      const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(numAmount)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     onMounted(async () => {

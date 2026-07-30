@@ -201,6 +201,7 @@ import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import { useRealtime } from '@/composables/useRealtime'
 
 const normalizeList = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -370,6 +371,12 @@ export default {
         loading.value = false
       }
     }
+
+    useRealtime({
+      channel: 'payments',
+      events: ['payment_created', 'payment_deleted'],
+      handler: () => { loadPayments() },
+    })
 
     const applyFilters = () => {
       if (!payments.value.length) {

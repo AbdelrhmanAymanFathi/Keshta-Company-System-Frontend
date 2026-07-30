@@ -22,42 +22,43 @@
     <DashboardGrid :cols="4">
       <StatisticsCard
         :title="$t('adminStats.totalExpenses')" :value="summary?.expenses?.total"
-        icon="chart" color="rose" :loading="loading" :error="summary === null && error ? error : ''"
+        icon="chart" color="rose" :loading="loading" :locale="gaugeLocale"
+        :error="summary === null && error ? error : ''"
         @click="goTo('report-expenses-report')"
       />
       <StatisticsCard
         :title="$t('adminStats.totalPayments')" :value="summary?.payments?.total"
-        icon="currency" color="amber" :loading="loading"
+        icon="currency" color="amber" :loading="loading" :locale="gaugeLocale"
         @click="goTo('payments')"
       />
       <StatisticsCard
         :title="$t('adminStats.treasuryBalance')" :value="summary?.treasury?.totalBalance"
-        icon="building" color="emerald" :loading="loading"
+        icon="building" color="emerald" :loading="loading" :locale="gaugeLocale"
         @click="goTo('treasury')"
       />
       <StatisticsCard
         :title="$t('adminStats.companyWallet')" :value="summary?.companyWallet?.balance"
-        icon="wallet" color="indigo" :loading="loading"
+        icon="wallet" color="indigo" :loading="loading" :locale="gaugeLocale"
         @click="goTo('report-company-transactions')"
       />
       <StatisticsCard
         :title="$t('adminStats.outstandingContractorBalance')" :value="summary?.contractorWallets?.totalOutstanding"
-        icon="users" color="sky" :loading="loading"
+        icon="users" color="sky" :loading="loading" :locale="gaugeLocale"
         @click="goTo('contractors-list')"
       />
       <StatisticsCard
         :title="$t('adminStats.activeBranches')" :value="summary?.system?.activeBranches"
-        icon="building" color="cyan" :loading="loading"
+        icon="building" color="cyan" :loading="loading" :locale="gaugeLocale"
         @click="goTo('locations')"
       />
       <StatisticsCard
         :title="$t('adminStats.activeUsers')" :value="summary?.system?.activeUsers"
-        icon="users" color="violet" :loading="loading"
+        icon="users" color="violet" :loading="loading" :locale="gaugeLocale"
         @click="goTo('users-list')"
       />
       <StatisticsCard
         :title="$t('adminStats.pendingApprovals')" :value="summary?.system?.pendingApprovals"
-        icon="clipboard" color="amber" :loading="loading"
+        icon="clipboard" color="amber" :loading="loading" :locale="gaugeLocale"
         @click="goTo('approvals-inbox')"
       />
     </DashboardGrid>
@@ -103,25 +104,25 @@
           :title="$t('adminStats.treasuryHealth')" :subtitle="$t('adminStats.treasuryHealthDesc')"
           :value="treasuryHealthValue" :color="treasuryHealthColor"
           :label="$t('adminStats.health')" :loading="loading" type="semi-circle"
-          :badge="treasuryHealthBadge" badge-color="emerald"
+          :badge="treasuryHealthBadge" badge-color="emerald" :locale="gaugeLocale"
         />
         <GaugeCard
           :title="$t('adminStats.budgetConsumption')" :subtitle="$t('adminStats.budgetConsumptionDesc')"
           :value="budgetConsumptionValue" color="#f59e0b"
           :label="$t('adminStats.consumed')" :loading="loading" type="semi-circle"
-          :badge="budgetConsumptionBadge" badge-color="amber"
+          :badge="budgetConsumptionBadge" badge-color="amber" :locale="gaugeLocale"
         />
         <GaugeCard
           :title="$t('adminStats.approvalCompletion')" :subtitle="$t('adminStats.approvalCompletionDesc')"
           :value="approvalCompletionValue" color="#8b5cf6"
           :label="$t('adminStats.completed')" :loading="loading" type="radial"
-          :badge="approvalCompletionBadge" badge-color="indigo"
+          :badge="approvalCompletionBadge" badge-color="indigo" :locale="gaugeLocale"
         />
         <GaugeCard
           :title="$t('adminStats.cashFlowHealth')" :subtitle="$t('adminStats.cashFlowHealthDesc')"
           :value="cashFlowHealthValue" :color="cashFlowHealthColor"
           :label="$t('adminStats.health')" :loading="loading" type="radial"
-          :badge="cashFlowHealthBadge" badge-color="emerald"
+          :badge="cashFlowHealthBadge" badge-color="emerald" :locale="gaugeLocale"
         />
       </DashboardGrid>
     </div>
@@ -207,6 +208,7 @@
 
 <script>
 import { useDashboardData } from '@/composables/useDashboardData'
+import { useRealtime } from '@/composables/useRealtime'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import DateRangeToolbar from './DateRangeToolbar.vue'
 import DashboardGrid from './DashboardGrid.vue'
@@ -227,6 +229,11 @@ export default {
   },
   setup() {
     const dd = useDashboardData()
+    useRealtime({
+      channel: 'dashboard',
+      events: ['statistics_updated'],
+      handler: () => { dd.fetchAll() },
+    })
     return {
       loading: dd.loading,
       error: dd.error,
@@ -247,16 +254,21 @@ export default {
       fetchAll: dd.fetchAll
     }
   },
+  props: {
+    budgetLimit: { type: Number, default: null },
+    treasuryMaxBalance: { type: Number, default: null }
+  },
   data() {
     return { fromDate: '', toDate: '' }
   },
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
+    gaugeLocale() { return 'en-US' },
 
     // Gauge values
     treasuryHealthValue() {
       const b = this.summary?.treasury?.totalBalance || 0
-      const max = 10000000
+      const max = Number(this.treasuryMaxBalance) || 10000000
       return Math.min(100, (b / max) * 100)
     },
     treasuryHealthColor() {
@@ -270,7 +282,7 @@ export default {
     budgetConsumptionValue() {
       if (!this.summary?.expenses) return 0
       const total = this.summary.expenses.total || 0
-      const max = total * 3
+      const max = Number(this.budgetLimit) || total * 5
       return max > 0 ? Math.min(100, (total / max) * 100) : 0
     },
     budgetConsumptionBadge() {
@@ -322,8 +334,8 @@ export default {
         stroke: { curve: 'smooth', width: 2 },
         fill: { type: 'gradient', gradient: { shadeIntensity: 0.1, opacityFrom: 0.3, opacityTo: 0 } },
         xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => v.toLocaleString() } },
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { position: 'top' }
       }
     },
@@ -344,8 +356,8 @@ export default {
         dataLabels: { enabled: false },
         labels: d.map(m => m.month),
         xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => v.toLocaleString() } },
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { position: 'top' }
       }
     },
@@ -367,8 +379,8 @@ export default {
         stroke: { curve: 'smooth', width: 2 },
         fill: { type: 'gradient', gradient: { shadeIntensity: 0.1, opacityFrom: 0.3, opacityTo: 0 } },
         xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => v.toLocaleString() } },
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { position: 'top' }
       }
     },
@@ -389,8 +401,8 @@ export default {
         stroke: { curve: 'smooth', width: 2.5 },
         markers: { size: 4 },
         xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => v.toLocaleString() } },
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
     },
@@ -404,7 +416,7 @@ export default {
         chart: { toolbar: { show: true } },
         labels: d.map(m => this.$t(`adminStats.module_${(m.name || '').toLowerCase()}`) || m.name),
         dataLabels: { enabled: true, formatter: v => v.toFixed(1) + '%' },
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { position: 'bottom' },
         responsive: [{ breakpoint: 480, options: { chart: { width: 300 }, legend: { position: 'bottom' } } }]
       }
@@ -420,10 +432,10 @@ export default {
         chart: { toolbar: { show: true }, animations: { speed: 500 } },
         colors: ['#6366f1', '#f59e0b', '#06b6d4', '#10b981'],
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
-        dataLabels: { enabled: true, formatter: v => v.toLocaleString() },
-        xaxis: { labels: { formatter: v => v.toLocaleString() } },
+        dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
+        xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
         labels: d.map(c => c.classification),
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
     },
@@ -438,11 +450,11 @@ export default {
         chart: { toolbar: { show: true }, animations: { speed: 500 } },
         colors: ['#6366f1'],
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
-        dataLabels: { enabled: true, formatter: v => v.toLocaleString() },
-        xaxis: { labels: { formatter: v => v.toLocaleString() } },
+        dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
+        xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
         yaxis: { labels: { formatter: v => v.length > 12 ? v.slice(0, 12) + '...' : v } },
         labels: d.map(c => c.name || '—'),
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
     },
@@ -458,10 +470,10 @@ export default {
         chart: { toolbar: { show: true }, animations: { speed: 500 } },
         colors: ['#10b981', '#6366f1', '#f59e0b', '#06b6d4', '#ef4444'],
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
-        dataLabels: { enabled: true, formatter: v => v.toLocaleString() },
-        xaxis: { labels: { formatter: v => v.toLocaleString() } },
+        dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
+        xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
         labels: t.map(t => t.name || '—'),
-        tooltip: { y: { formatter: v => v.toLocaleString() } },
+        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
     }
@@ -496,7 +508,13 @@ export default {
     },
     formatAmount(v) {
       const n = parseFloat(v)
-      return isNaN(n) ? '—' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      if (isNaN(n)) return '\u2014'
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
+      return this.isRTL && formatted.startsWith('-') ? '\u200E' + formatted : formatted
+    },
+    formatChartNumber(v) {
+      const formatted = new Intl.NumberFormat('en-US').format(v)
+      return this.isRTL && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     },
     moduleBadgeClass(mod) {
       const map = {

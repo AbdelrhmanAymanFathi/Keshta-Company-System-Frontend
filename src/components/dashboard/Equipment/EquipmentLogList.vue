@@ -522,6 +522,7 @@ import EquipmentLogCreationModal from './EquipmentLogCreationModal.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import DateField from '../../shared/DateField.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
+import { useRealtime } from '@/composables/useRealtime'
 
 export default {
   name: 'EquipmentLogList',
@@ -529,6 +530,11 @@ export default {
   setup() {
     const instance = getCurrentInstance()
     const equipmentLogsStore = useEquipmentLogsStore()
+    useRealtime({
+      channel: 'equipment-log',
+      events: ['equipment_created', 'equipment_updated', 'equipment_deleted'],
+      handler: () => { equipmentLogsStore.fetchRentals() },
+    })
     const showModal = ref(false)
     const showDeleteModal = ref(false)
     const isEditing = ref(false)
@@ -1025,11 +1031,11 @@ export default {
 
 
     const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
+      const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(amount)
+      return isRTL.value && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     const openDetailModal = (rental) => {

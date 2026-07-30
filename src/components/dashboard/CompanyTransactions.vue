@@ -126,6 +126,8 @@ export default {
   setup() {
     const store = useCompanyFinanceStore()
 
+    const { t, locale } = useI18n()
+
     const summary = computed(() => store.summary || { balance: 0, last30dIn: 0, last30dOut: 0 })
 
     const transactions = computed(() => store.transactions)
@@ -134,11 +136,14 @@ export default {
 
     const formatDate = (dateString) => {
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+      const loc = locale.value === 'ar' ? 'en-US' : 'en-US'
+      return date.toLocaleDateString(loc, { year: 'numeric', month: 'short', day: 'numeric' })
     }
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(amount)
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(numAmount)
+      const rtl = locale.value?.startsWith('ar')
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numAmount)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     const badgeVariant = (type) => {
@@ -149,8 +154,6 @@ export default {
         default: return 'muted'
       }
     }
-
-    const { t } = useI18n()
 
     const badgeLabel = (type) => {
       switch ((type || '').toUpperCase()) {

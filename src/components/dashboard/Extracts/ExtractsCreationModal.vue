@@ -1061,7 +1061,9 @@ export default {
       if (value === undefined || value === null || value === '') return '-'
       const number = Number(value)
       if (Number.isNaN(number)) return value
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(number)
+      const rtl = this.$i18n?.locale === 'ar'
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(number)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     },
     toNumericId(value) {
       if (value === '' || value === null || value === undefined) return undefined

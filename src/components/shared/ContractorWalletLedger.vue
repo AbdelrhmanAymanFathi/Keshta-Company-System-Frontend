@@ -147,7 +147,12 @@ export default {
     changePage(p) { if (p < 1) p = 1; if (p > this.totalPages) p = this.totalPages; this.page = p; this.load() },
     onPageSizeChange() { this.page = 1; this.load() },
     formatDate(d) { if (!d) return '-'; try { return new Intl.DateTimeFormat().format(new Date(d)) } catch { return d } },
-    formatCurrency(v) { if (v === undefined || v === null) return '-'; return Number(v).toLocaleString() },
+    formatCurrency(v) {
+      if (v === undefined || v === null) return '-'
+      const rtl = this.$i18n?.locale === 'ar'
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v))
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
+    },
     downloadCsv() {
       if (!this.items || !this.items.length) return
       const rows = this.items.map(tx => ({

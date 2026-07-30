@@ -319,6 +319,7 @@ import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { TrashIcon } from '@acme/icon-packs/legacy'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
+import { realtimeService } from '@/services/realtimeService'
 
 export default {
   name: 'TransportList',
@@ -394,9 +395,11 @@ export default {
     await this.loadFilterData()
     await this.loadTransports()
     document.addEventListener('click', this.closeContextMenu)
+    this.__realtimeUnsub = realtimeService.subscribe('transport', ['transport_created', 'transport_updated', 'transport_deleted'], () => { this.loadTransports() })
   },
 
   beforeUnmount() {
+    if (this.__realtimeUnsub) { this.__realtimeUnsub(); this.__realtimeUnsub = null }
     document.removeEventListener('click', this.closeContextMenu)
   },
 

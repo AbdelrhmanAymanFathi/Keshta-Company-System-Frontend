@@ -336,7 +336,8 @@ export default {
 
     const formatCurrency = (v) => {
       if (v === undefined || v === null) return '-'
-      return Number(v).toLocaleString()
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v))
+      return isRTL.value && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     return { wallet, history, loading, loadingHistory, deposit, loadSummary, loadHistory, doDeposit, clearDeposit, formatCurrency, formatDate, depositModalOpen, openDepositModal, closeDepositModal, confirmDeposit, isVisible, isRTL,

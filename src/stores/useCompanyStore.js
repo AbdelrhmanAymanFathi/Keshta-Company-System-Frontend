@@ -22,9 +22,8 @@ export const useCompanyStore = defineStore('company', {
     formattedBalance: (state) => {
       const balance = parseFloat(state.company.balance || 0)
       return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
-        minimumFractionDigits: 2
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(balance)
     },
     totalPages: (state) => Math.ceil(state.transactions.total / state.transactions.pageSize)

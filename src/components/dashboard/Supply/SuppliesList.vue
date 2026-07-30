@@ -473,6 +473,7 @@ import DateField from '@/components/shared/DateField.vue'
 // import SupplyDetailModal from '../../shared/SupplyDetailModal.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
+import { realtimeService } from '@/services/realtimeService'
 
 export default {
   name: 'SuppliesList',
@@ -598,9 +599,11 @@ export default {
         this.closeContextMenu()
       }
     })
+    this.__realtimeUnsub = realtimeService.subscribe('supplies', ['supply_created', 'supply_updated', 'supply_deleted'], () => { this.loadSupplies() })
   },
 
   beforeUnmount() {
+    if (this.__realtimeUnsub) { this.__realtimeUnsub(); this.__realtimeUnsub = null }
     document.removeEventListener('click', this.closeContextMenu)
   },
 
@@ -760,7 +763,8 @@ export default {
     },
 
     formatNumber(v) {
-      return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 })
+      const formatted = Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 })
+      return this.isRTL && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     },
 
     formatCurrency(v) {

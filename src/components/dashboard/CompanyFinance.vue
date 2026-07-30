@@ -1110,7 +1110,7 @@ export default {
       const cat = expenseCategories.value.find(c => c.id === catId)
       return Array.isArray(cat?.subCategories) ? cat.subCategories : []
     })
-    const { t, tm } = useI18n()
+    const { t, tm, locale } = useI18n()
 
     // ✅ Category combobox state
     const categoryInput = ref('')
@@ -1979,7 +1979,9 @@ export default {
 
     const formatCurrency = (amount) => {
       const numAmount = parseFloat(amount)
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(numAmount)
+      const rtl = locale.value?.startsWith('ar')
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numAmount)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     // Expense modal handlers

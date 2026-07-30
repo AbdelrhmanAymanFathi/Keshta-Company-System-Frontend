@@ -360,6 +360,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
+import { useRealtime } from '@/composables/useRealtime'
 import { transferBetweenTreasuries } from '@/api'
 
 export default {
@@ -371,6 +372,17 @@ export default {
     const { user } = useAuth()
     const store = useTreasuryStore()
     const router = useRouter()
+
+    useRealtime({
+      channel: 'treasury',
+      events: ['treasury_balance_changed', 'treasury_transaction_created'],
+      handler: (eventName) => {
+        store.fetchTreasuries()
+        if (eventName === 'treasury_transaction_created') {
+          store.fetchTransactions()
+        }
+      },
+    })
 
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const isAdmin = computed(() => {

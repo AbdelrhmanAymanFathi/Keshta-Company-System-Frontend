@@ -834,6 +834,7 @@ import DateField from '@/components/shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
+import { realtimeService } from '@/services/realtimeService'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
@@ -1094,6 +1095,11 @@ rows: [],
     await this.fetchBranches()
     await this.fetchLocations()
     await this.fetchTreasuries()
+    this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], () => { this.loadExpenses() })
+  },
+  
+  beforeUnmount() {
+    if (this.__realtimeUnsub) { this.__realtimeUnsub(); this.__realtimeUnsub = null }
   },
   
   methods: {

@@ -286,7 +286,12 @@ export default {
       return s + (Number.isFinite(total) ? total : 0)
     }, 0))
 
-    function formatCurrency(v){ if (v===undefined||v===null||v==='') return '-'; const n=Number(v); if (Number.isNaN(n)) return v; return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(n) }
+    function formatCurrency(v) {
+      if (v === undefined || v === null || v === '') return '-'
+      const n = Number(v)
+      if (Number.isNaN(n)) return v
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); return locale.value === 'ar' ? '\u200E' + formatted : formatted
+    }
 
     function isStep1Valid(){
       return commonData.dateFrom &&

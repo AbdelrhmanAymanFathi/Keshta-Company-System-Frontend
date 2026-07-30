@@ -225,6 +225,7 @@ import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
 import DateField from '../../shared/DateField.vue'
+import { realtimeService } from '@/services/realtimeService'
 
 export default {
   name: 'ExtractsList',
@@ -280,8 +281,12 @@ export default {
     await this.loadFilterData()
     await this.loadExtracts()
     document.addEventListener('click', this.closeContextMenu)
+    this.__realtimeUnsub = realtimeService.subscribe('extracts', ['extract_created', 'extract_updated', 'extract_deleted'], () => { this.loadExtracts() })
   },
-  beforeUnmount() { document.removeEventListener('click', this.closeContextMenu) },
+  beforeUnmount() {
+    if (this.__realtimeUnsub) { this.__realtimeUnsub(); this.__realtimeUnsub = null }
+    document.removeEventListener('click', this.closeContextMenu)
+  },
   methods: {
     normalizeExtractForList(extract) {
       const lines = Array.isArray(extract?.lines) ? extract.lines : []
@@ -432,7 +437,9 @@ export default {
       if (v === undefined || v === null || v === '') return '-'
       const n = Number(v)
       if (Number.isNaN(n)) return v
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(n)
+      const rtl = this.$i18n?.locale === 'ar'
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     },
 
     formatItemWithUnit(item) {

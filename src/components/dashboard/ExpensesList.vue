@@ -1600,10 +1600,11 @@ export default {
     },
     
     formatCurrency(amount) {
-      return new Intl.NumberFormat(this.isRTL ? 'ar-SA' : 'en-US', {
-        style: 'currency',
-        currency: 'EGP'
+      const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       }).format(amount)
+      return this.isRTL && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     },
     
     async downloadReport() {

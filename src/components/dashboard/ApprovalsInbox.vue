@@ -348,13 +348,21 @@
 </template>
 
 <script>
+import { getCurrentInstance } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getApprovals, approveRequest, rejectRequest } from '@/api';
+import { useRealtime } from '@/composables/useRealtime';
 
 export default {
   name: 'ApprovalsInbox',
   setup() {
     const { locale } = useI18n();
+    const instance = getCurrentInstance()
+    useRealtime({
+      channel: 'approvals',
+      events: ['approval_created', 'approval_completed', 'approval_rejected'],
+      handler: () => { instance.proxy?.loadApprovals() },
+    })
     return { locale };
   },
   data() {
@@ -586,14 +594,14 @@ export default {
         return val ? (this.locale === 'ar' ? 'نعم' : 'Yes') : (this.locale === 'ar' ? 'لا' : 'No');
       }
       if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate'].includes(key)) {
-        return Number(val).toLocaleString(this.locale === 'ar' ? 'ar-EG' : 'en-US', { style: 'currency', currency: 'SAR' });
+        const formatted = Number(val).toLocaleString('en-US', { style: 'currency', currency: 'SAR' }); return this.locale === 'ar' ? '\u200E' + formatted : formatted;
       }
       return val;
     },
     formatDateTime(dateStr) {
       if (!dateStr) return '';
       const date = new Date(dateStr);
-      return date.toLocaleString(this.locale === 'ar' ? 'ar-EG' : 'en-US', {
+      return date.toLocaleString('en-US', {
         year: 'numeric', month: 'short', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
       });
@@ -725,11 +733,11 @@ export default {
         return val ? (this.locale === 'ar' ? 'نعم' : 'Yes') : (this.locale === 'ar' ? 'لا' : 'No');
       }
       if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate', 'firstKmPrice', 'perKmPrice'].includes(key)) {
-        return Number(val).toLocaleString(this.locale === 'ar' ? 'ar-EG' : 'en-US', { style: 'currency', currency: 'EGP' });
+        const formatted = Number(val).toLocaleString('en-US', { style: 'currency', currency: 'EGP' }); return this.locale === 'ar' ? '\u200E' + formatted : formatted;
       }
       if (key === 'date' || key === 'createdAt' || key === 'updatedAt') {
         try {
-          return new Intl.DateTimeFormat(this.locale === 'ar' ? 'ar-EG' : 'en-GB').format(new Date(val));
+          return new Intl.DateTimeFormat('en-US').format(new Date(val));
         } catch {
           return val;
         }

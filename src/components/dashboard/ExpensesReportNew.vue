@@ -174,6 +174,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getExpensesReportData, downloadExpensesReport } from '@/api'
 import DateField from '../shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
@@ -184,6 +185,8 @@ export default {
   name: 'ExpensesReport',
   components: { DateField, PageHeader },
   setup() {
+    const { locale } = useI18n()
+    const isRTL = computed(() => locale.value?.startsWith('ar'))
     const downloading = ref(false)
     const error = ref(null)
     const loading = ref(false)
@@ -212,21 +215,19 @@ export default {
       return Math.max(...items.value.map(item => parseFloat(String(item['المبلغ'] || item.amount || item.total || 0).replace(/,/g, '')) || 0))
     })
 
+    const formatCurrency = (amount) => {
+      const rtl = locale.value?.startsWith('ar')
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount || 0)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
+    }
+
     const formatDate = (dateString) => {
       if (!dateString) return '-'
-      // Use Gregorian calendar (en-US) to avoid Hijri dates
-      return new Date(dateString).toLocaleDateString('en-US', {
+      return new Date(dateString).toLocaleDateString(locale.value || 'en-US', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
       })
-    }
-
-    const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP'
-      }).format(amount || 0)
     }
 
     const getCategoryVariant = (category) => {

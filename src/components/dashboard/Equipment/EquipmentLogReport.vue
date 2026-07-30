@@ -64,6 +64,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getEquipmentLogsReportData, getEquipments, getBranches } from '@/api'
 import DateField from '@/components/shared/DateField.vue'
 
@@ -71,6 +72,7 @@ export default {
   name: 'EquipmentLogReport',
   components: { DateField },
   setup() {
+    const { locale } = useI18n()
     const filters = ref({ from: '', to: '', equipmentId: '', companyId: '' })
     const loading = ref(false)
     const report = ref({ rows: [] })
@@ -134,7 +136,9 @@ export default {
     }
 
     const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP' }).format(amount || 0)
+      const rtl = locale?.value === 'ar'
+      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount || 0)
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
     onMounted(async () => {

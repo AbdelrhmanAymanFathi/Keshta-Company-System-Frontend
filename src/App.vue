@@ -21,6 +21,8 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from './composables/useAuth'
 import { useRouteLoader } from './composables/useRouteLoader'
+import { useRealtime } from './composables/useRealtime'
+import { useNotificationStore } from './stores/useNotificationStore'
 
 export default {
   name: 'AppRoot',
@@ -31,6 +33,17 @@ export default {
     const { isRouteLoading } = useRouteLoader()
     const isAppLoading = computed(() => isLoading.value || isRouteLoading.value)
     const loaderLabel = computed(() => isLoading.value ? t('auth.login.loading') : t('labels.loading'))
+
+    const notificationStore = useNotificationStore()
+    notificationStore.fetchUnreadCount()
+
+    useRealtime({
+      channel: 'notifications',
+      events: ['notification_created'],
+      handler: () => {
+        notificationStore.fetchUnreadCount()
+      },
+    })
     
     return { 
       locale,

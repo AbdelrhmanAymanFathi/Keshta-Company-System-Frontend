@@ -55,6 +55,7 @@ export default {
     badgeColor: { type: String, default: 'emerald' },
     footerLabel: { type: String, default: '' },
     label: { type: String, default: '' },
+    locale: { type: String, default: 'en-US' },
     formatter: { type: Function, default: null }
   },
   emits: ['retry'],
@@ -99,17 +100,14 @@ export default {
                 fontWeight: 600,
                 color: '#1e293b',
                 offsetY: isSemi ? 0 : 6,
-                formatter: this.formatter || (v => {
-                  const raw = (this.value / (this.max || 1)) * 100
-                  return raw.toFixed(1) + '%'
-                })
+                formatter: this.formatter || (v => v.toFixed(1) + '%')
               }
             }
           }
         },
         stroke: { lineCap: 'round' },
         labels: [this.label || ''],
-        tooltip: { enabled: true, y: { formatter: v => this.value.toLocaleString() } }
+        tooltip: { y: { formatter: v => this.formatValue(v) } }
       }
     },
     badgeClass() {
@@ -122,6 +120,13 @@ export default {
         indigo: 'bg-indigo-100 text-indigo-700'
       }
       return map[this.badgeColor] || map.emerald
+    }
+  },
+  methods: {
+    formatValue(v) {
+      const formatted = new Intl.NumberFormat(this.locale).format(v)
+      const rtl = String(this.$i18n?.locale || '').startsWith('ar')
+      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
   }
 }

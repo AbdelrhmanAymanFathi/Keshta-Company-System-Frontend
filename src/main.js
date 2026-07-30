@@ -11,8 +11,9 @@ import { iconRevision, ICON_REVISION_KEY } from '@acme/icon-packs'
 import { themeRevision, THEME_REVISION_KEY } from '@acme/theme-engine'
 import i18n from './i18n'
 import authManager from './auth'
-import { initializeAuthStore } from './composables/authStore'
-import './api' // Initialize API with token management
+import { isAuthenticated, initializeAuthStore } from './composables/authStore'
+import { realtimeService } from './services/realtimeService'
+import { tokenManager } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
 
 // Initialize auth store immediately on app load
@@ -44,6 +45,24 @@ app.provide('authManager', authManager)
 app.mount('#app')
 installHeaderMotion(router)
 
+// Initialize realtime SSE connection after mount
+if (isAuthenticated.value) {
+  realtimeService.init(() => {
+    try { return tokenManager.getToken() } catch { return null }
+  })
+}
+
+// Watch auth changes to init/destroy SSE
+watch(isAuthenticated, (val) => {
+  if (val) {
+    realtimeService.init(() => {
+      try { return tokenManager.getToken() } catch { return null }
+    })
+  } else {
+    realtimeService.destroy()
+  }
+})
+
 /**
  * Set document <html> lang and dir based on locale
  * (required so browser/UA widgets and CSS direction behave correctly)
@@ -70,7 +89,7 @@ authManager.addListener((event, data) => {
   console.log('Auth event:', event, data);
   
   if (event === 'auth:logout') {
-    // Handle logout - redirect to login if not already there
+    realtimeService.destroy()
     if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
       window.location.href = '/login';
     }
