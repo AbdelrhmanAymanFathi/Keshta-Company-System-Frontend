@@ -123,9 +123,12 @@
                   </div>
                 </div>
               </div>
-              <div class="border-t border-slate-100 px-4 py-2.5 text-center">
+              <div class="border-t border-slate-100 p-2">
                 <router-link :to="{ name: 'notifications' }" @click="notificationMenuOpen = false"
-                  class="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                  class="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 hover:shadow-md active:scale-[0.97]">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
                   {{ $t('notifications.viewAll') || 'View all notifications' }}
                 </router-link>
               </div>
@@ -734,7 +737,7 @@ export default {
     async fetchNotifPreview() {
       this.notifLoading = true
       try {
-        const res = await getNotifications({ page: 1, pageSize: 5 })
+        const res = await getNotifications({ page: 1, pageSize: 10 })
         const data = res?.data
         if (Array.isArray(data)) {
           this.notifItems = data
