@@ -122,6 +122,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNotificationStore } from '@/stores/useNotificationStore'
+import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
@@ -168,9 +169,8 @@ export default {
     }
 
     function onClick(item) {
-      if (item.route && item.route !== '#' && item.route !== null) {
-        router.push(item.route)
-      }
+      const route = resolveNotificationRoute(item)
+      if (route) router.push(route)
       if (!item.isRead) {
         store.markRead(item.id)
       }

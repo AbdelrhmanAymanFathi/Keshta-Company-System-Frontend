@@ -327,6 +327,7 @@ import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy
 import { iconRevision, getMenuIcon } from '@acme/icon-packs'
 import { themeRevision, loadTheme } from '@acme/theme-engine'
 import { useNotificationStore } from '@/stores/useNotificationStore'
+import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import {
   getSidebarAsideClasses,
   shouldShowBackdrop,
@@ -757,9 +758,8 @@ export default {
         this.notificationStore.unreadCount = Math.max(0, this.notificationStore.unreadCount - 1)
         item.isRead = true
       }
-      if (item.route && item.route !== '#') {
-        this.router.push(item.route.startsWith('/') ? item.route : { path: item.route })
-      }
+      const route = resolveNotificationRoute(item)
+      if (route) this.router.push(route)
     },
     async markAllRead() {
       try {
