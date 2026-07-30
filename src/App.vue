@@ -31,7 +31,7 @@ export default {
   components: { Toast, ErrorOverlay, AppLoader },
   setup() {
     const { locale, t } = useI18n()
-    const { isLoggedIn, isLoading } = useAuth()
+    const { isLoggedIn, isLoading, currentUser } = useAuth()
     const { isRouteLoading } = useRouteLoader()
     const isAppLoading = computed(() => isLoading.value || isRouteLoading.value)
     const loaderLabel = computed(() => isLoading.value ? t('auth.login.loading') : t('labels.loading'))
@@ -44,7 +44,11 @@ export default {
     useRealtime({
       channel: 'notifications',
       events: ['notification_created'],
-      handler: () => {
+      handler: (eventName, data) => {
+        // Only process notifications for the current user or broadcast (userId: null)
+        if (data?.userId && data.userId !== currentUser.value?.id) {
+          return
+        }
         if (window.$toast) {
           window.$toast('إشعار جديد', 'info', 5000)
         }
