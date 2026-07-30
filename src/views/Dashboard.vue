@@ -192,7 +192,7 @@
     <div class="layout-shell">
       <!-- Sidebar -->
       <aside
-        v-if="!isHorizontal"
+        v-if="!isHorizontal && $route?.meta?.module !== 'notifications'"
         role="navigation"
         :class="asideClasses"
         @mouseenter="sidebarHovered = true"
@@ -473,7 +473,7 @@ export default {
       ]
     },
     mainClasses() {
-      return 'layout-main dashboard-module-content app-scrollbar theme-main-gradient overflow-y-auto'
+      return 'layout-main dashboard-module-content app-scrollbar theme-main-gradient overflow-y-auto' + (this.$route?.meta?.module === 'notifications' ? ' layout-main--full' : '')
     },
     showSidebarLabels() {
       return shouldShowSidebarLabels(this.sidebarControllerState)
@@ -513,6 +513,9 @@ export default {
       return menus
     },
     filteredVerticalMenu() {
+      // Notifications page — no sidebar
+      if (this.$route?.meta?.module === 'notifications') return []
+
       // When viewing profile-related pages, show a small profile menu
       const profileRoutes = ['profile', 'settings', 'theme-studio']
       if (profileRoutes.includes(this.currentRouteName) || ['profile', 'settings'].includes(this.$route?.meta?.module)) {
@@ -555,7 +558,7 @@ export default {
       const routeName = this.currentRouteName
       // If the route explicitly opts out of dashboard top selection, keep no top highlight.
       const routeModule = this.$route?.meta?.module
-      if (routeModule === 'profile' || routeModule === 'settings' || routeName === 'settings') return ''
+      if (routeModule === 'profile' || routeModule === 'settings' || routeName === 'settings' || routeModule === 'notifications') return ''
 
       if (routeName === 'reports-landing' || routeName === 'reports-run' || routeName === 'contractors-activity-report' || routeName === 'report-expenses-report' || routeName === 'report-company-transactions') return 'reports'
 
@@ -896,6 +899,17 @@ export default {
 .sidebar-link-collapsed:not(.sidebar-link-active):hover .sidebar-link-icon {
   background: rgba(var(--theme-primary-rgb), 0.12) !important;
   color: rgb(var(--theme-primary-700)) !important;
+}
+
+.layout-main--full {
+  margin-inline: auto;
+  max-width: 100%;
+}
+@media (min-width: 768px) {
+  .layout-main--full {
+    padding-inline: 2rem;
+    max-width: 960px;
+  }
 }
 
 .theme-btn-primary {

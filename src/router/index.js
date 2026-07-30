@@ -417,7 +417,7 @@ const routes = [
         path: 'notifications',
         name: 'notifications',
         component: NotificationCenter,
-        meta: { title: 'الإشعارات' }
+        meta: { title: 'الإشعارات', module: 'notifications' }
       },
 
       // ==================== Default Redirect ====================
