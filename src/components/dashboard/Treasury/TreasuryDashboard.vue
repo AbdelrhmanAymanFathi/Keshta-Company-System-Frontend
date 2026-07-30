@@ -361,6 +361,7 @@ import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import { useRealtime } from '@/composables/useRealtime'
+import { debounce } from '@/utils/debounce'
 import { transferBetweenTreasuries } from '@/api'
 
 export default {
@@ -376,12 +377,12 @@ export default {
     useRealtime({
       channel: 'treasury',
       events: ['treasury_balance_changed', 'treasury_transaction_created'],
-      handler: (eventName) => {
+      handler: debounce((eventName) => {
         store.fetchTreasuries()
         if (eventName === 'treasury_transaction_created') {
           store.fetchTransactions()
         }
-      },
+      }, 300),
     })
 
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))

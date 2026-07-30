@@ -41,17 +41,18 @@
     "searchTreasury": "Search treasury...",
     "select": "Select"
   },
-  "navbar": {
-    "supplies": "Supplies",
-    "extracts": "Extracts",
-    "payments": "Payments",
-    "transport": "Transport",
-    "expenses": "Expenses",
-    "equipmentLog": "Equipment Log",
-    "treasury": "Treasury",
-    "admin": "Admin",
-    "reports": "Reports"
-  },
+    "navbar": {
+      "supplies": "Supplies",
+      "extracts": "Extracts",
+      "payments": "Payments",
+      "transport": "Transport",
+      "expenses": "Expenses",
+      "equipmentLog": "Equipment Log",
+      "treasury": "Treasury",
+      "admin": "Admin",
+      "reports": "Reports",
+      "notifications": "Notifications"
+    },
   "dashboard": {
     "newItem": "New Item",
     "payments": "Payments",
@@ -82,11 +83,12 @@
     "companyWallet": "Treasury",
     "expand": "Expand",
     "collapse": "Collapse",
-    "extractsList": "Extracts List",
-    "newExtract": "New Extract",
-    "extractItems": "Extract Items",
-    "report": "Report"
-  },
+      "extractsList": "Extracts List",
+      "newExtract": "New Extract",
+      "extractItems": "Extract Items",
+      "report": "Report",
+      "notifications": "Notifications"
+    },
   "equipmentLog": {
     "deletedSuccessfully": "Deleted successfully",
     "list": "Equipment Log",
@@ -1686,5 +1688,27 @@
   },
   "approvals": {
     "title": "Admin Approvals"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "unreadOnly": "Unread only",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark as read",
+    "delete": "Delete",
+    "reset": "Reset",
+    "allTypes": "All types",
+    "typeExpense": "Expense",
+    "typePayment": "Payment",
+    "typeTreasury": "Treasury",
+    "typeApproval": "Approval",
+    "typeSupply": "Supply",
+    "typeTransport": "Transport",
+    "typeEquipment": "Equipment",
+    "typeExtract": "Extract",
+    "typeRental": "Rental",
+    "typePetroleum": "Petroleum Supply",
+    "typeWallet": "Wallet",
+    "viewAll": "View all notifications"
   }
 }

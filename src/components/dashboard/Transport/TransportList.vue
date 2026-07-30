@@ -320,6 +320,7 @@ import { buildQueryParams } from '@/utils/buildQueryParams'
 import { TrashIcon } from '@acme/icon-packs/legacy'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
+import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'TransportList',
@@ -395,7 +396,7 @@ export default {
     await this.loadFilterData()
     await this.loadTransports()
     document.addEventListener('click', this.closeContextMenu)
-    this.__realtimeUnsub = realtimeService.subscribe('transport', ['transport_created', 'transport_updated', 'transport_deleted'], () => { this.loadTransports() })
+    this.__realtimeUnsub = realtimeService.subscribe('transport', ['transport_created', 'transport_updated', 'transport_deleted'], debounce(() => { this.loadTransports() }, 300))
   },
 
   beforeUnmount() {

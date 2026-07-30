@@ -474,6 +474,7 @@ import DateField from '@/components/shared/DateField.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
+import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'SuppliesList',
@@ -599,7 +600,7 @@ export default {
         this.closeContextMenu()
       }
     })
-    this.__realtimeUnsub = realtimeService.subscribe('supplies', ['supply_created', 'supply_updated', 'supply_deleted'], () => { this.loadSupplies() })
+    this.__realtimeUnsub = realtimeService.subscribe('supplies', ['supply_created', 'supply_updated', 'supply_deleted'], debounce(() => { this.loadSupplies() }, 300))
   },
 
   beforeUnmount() {

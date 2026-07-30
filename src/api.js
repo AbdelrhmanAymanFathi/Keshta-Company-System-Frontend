@@ -841,9 +841,8 @@ export const getTreasuryTransactions = (treasuryId, params = {}) => {
   return axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/transactions?${queryParams.toString()}`);
 };
 export const downloadTreasuryTransactions = (treasuryId, params = {}, format = 'xlsx') => {
-  const { page = 1, pageSize = 20, ...rest } = params || {};
   const sanitized = Object.fromEntries(
-    Object.entries({ ...rest, format }).filter(([, value]) => value !== '' && value !== null && value !== undefined)
+    Object.entries({ ...params, format }).filter(([, value]) => value !== '' && value !== null && value !== undefined)
   );
   const queryParams = appendLangParam(sanitized);
   const search = new URLSearchParams(queryParams).toString();
@@ -1650,15 +1649,20 @@ axios.interceptors.response.use(
   },
   async error => {
     const originalRequest = error.config;
-    
+
+    // 304 Not Modified — browser cached version is in error.response.data
+    if (error.response && error.response.status === 304) {
+      return error.response;
+    }
+
     // Log detailed error information for debugging — but ignore noisy 404s for DELETE
     if (error.response) {
       const status = error.response.status
       const method = (originalRequest && originalRequest.method) ? originalRequest.method.toLowerCase() : ''
 
       // Suppress console noise for expected errors like 404, 409
-      if (status === 404 && method === 'delete') {
-        // Resource already deleted - not an error
+      if (status === 404 && (method === 'delete' || originalRequest.url?.includes('unread-count'))) {
+        // Resource already deleted or unread-count endpoint not available
       } else if (status === 409) {
         // Conflict errors (e.g., item in use) - handled by component with toast
       } else {
@@ -2087,8 +2091,12 @@ export const getRecentActivity = (params = {}) => {
 
 // --- Notifications ---
 export const getNotifications = (params = {}) => {
-  const { page = 1, pageSize = 20 } = params
+  const { page = 1, pageSize = 20, unreadOnly, type, startDate, endDate } = params
   const q = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
+  if (unreadOnly) q.set('unreadOnly', unreadOnly)
+  if (type) q.set('type', type)
+  if (startDate) q.set('startDate', startDate)
+  if (endDate) q.set('endDate', endDate)
   return axios.get(`${BASE_URL}/api/notifications?${q.toString()}`)
 }
 
@@ -2099,5 +2107,8 @@ export const markNotificationRead = (id) =>
   axios.patch(`${BASE_URL}/api/notifications/${id}/read`)
 
 export const markAllNotificationsRead = () =>
-  axios.post(`${BASE_URL}/api/notifications/read-all`)
+  axios.patch(`${BASE_URL}/api/notifications/read-all`)
+
+export const deleteNotification = (id) =>
+  axios.delete(`${BASE_URL}/api/notifications/${id}`)
 

@@ -1,15 +1,9 @@
-const DEFAULT_CURRENCY = 'EGP'
 const DEFAULT_LOCALE = 'en-US'
 
 const LRM = '\u200E'
 
 function isRTL(locale) {
   return String(locale || '').startsWith('ar')
-}
-
-function resolveLocale(locale) {
-  if (!locale || locale === 'undefined') return DEFAULT_LOCALE
-  return DEFAULT_LOCALE
 }
 
 function formatRTL(formatted, rtl) {
@@ -19,7 +13,7 @@ function formatRTL(formatted, rtl) {
   return formatted
 }
 
-export function formatCurrency(value, locale, currency = DEFAULT_CURRENCY) {
+export function formatCurrency(value, locale) {
   if (value === null || value === undefined || value === '') return '\u2014'
   const n = Number(value)
   if (Number.isNaN(n)) return String(value)

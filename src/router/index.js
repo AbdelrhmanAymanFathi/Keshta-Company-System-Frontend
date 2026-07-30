@@ -43,6 +43,7 @@ const Profile = () => import('@/views/Profile.vue')
 const Settings = () => import('@/views/Settings.vue')
 const ThemeStudio = () => import('@/views/ThemeStudio.vue')
 const ExtractsPage = () => import('@/views/extracts/ExtractsPage.vue')
+const NotificationCenter = () => import('@/components/dashboard/NotificationCenter.vue')
 const CreateExtract = () => import('@/views/extracts/CreateExtract.vue')
 const ExtractDetail = () => import('@/views/extracts/ExtractDetail.vue')
 // const ExtractItemsManager = () => import('@/components/dashboard/Extracts/ExtractItemsManager.vue')
@@ -411,6 +412,12 @@ const routes = [
         name: 'payments',
         component: () => import('@/components/dashboard/payment/PaymentsPage.vue'),
         meta: { title: 'dashboard.payments' }
+      },
+      {
+        path: 'notifications',
+        name: 'notifications',
+        component: NotificationCenter,
+        meta: { title: 'الإشعارات' }
       },
 
       // ==================== Default Redirect ====================

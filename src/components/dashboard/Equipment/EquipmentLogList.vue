@@ -523,6 +523,7 @@ import SearchDropdown from '../../shared/SearchDropdown.vue'
 import DateField from '../../shared/DateField.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 import { useRealtime } from '@/composables/useRealtime'
+import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'EquipmentLogList',
@@ -533,7 +534,7 @@ export default {
     useRealtime({
       channel: 'equipment-log',
       events: ['equipment_created', 'equipment_updated', 'equipment_deleted'],
-      handler: () => { equipmentLogsStore.fetchRentals() },
+      handler: debounce(() => { equipmentLogsStore.fetchRentals() }, 300),
     })
     const showModal = ref(false)
     const showDeleteModal = ref(false)

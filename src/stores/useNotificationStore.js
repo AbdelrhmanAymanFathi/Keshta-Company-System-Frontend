@@ -4,6 +4,7 @@ import {
   getUnreadNotificationCount,
   markNotificationRead,
   markAllNotificationsRead,
+  deleteNotification,
 } from '@/api'
 
 export const useNotificationStore = defineStore('notifications', {
@@ -15,10 +16,24 @@ export const useNotificationStore = defineStore('notifications', {
     total: 0,
     loading: false,
     error: null,
+    filterUnreadOnly: false,
+    filterType: '',
+    filterStartDate: '',
+    filterEndDate: '',
   }),
 
   getters: {
     totalPages: (state) => Math.ceil(state.total / state.pageSize),
+    filters(state) {
+      return {
+        page: state.page,
+        pageSize: state.pageSize,
+        unreadOnly: state.filterUnreadOnly ? 'true' : undefined,
+        type: state.filterType || undefined,
+        startDate: state.filterStartDate || undefined,
+        endDate: state.filterEndDate || undefined,
+      }
+    },
   },
 
   actions: {
@@ -26,7 +41,7 @@ export const useNotificationStore = defineStore('notifications', {
       this.loading = true
       this.error = null
       try {
-        const resp = await getNotifications({ page: this.page, pageSize: this.pageSize })
+        const resp = await getNotifications(this.filters)
         this.items = resp.data?.items || resp.data?.data || []
         this.total = resp.data?.total || 0
       } catch (err) {
@@ -49,6 +64,8 @@ export const useNotificationStore = defineStore('notifications', {
       try {
         await markNotificationRead(id)
         this.unreadCount = Math.max(0, this.unreadCount - 1)
+        const item = this.items.find(i => i.id === id)
+        if (item) item.isRead = true
       } catch {
         // silently fail
       }
@@ -58,9 +75,40 @@ export const useNotificationStore = defineStore('notifications', {
       try {
         await markAllNotificationsRead()
         this.unreadCount = 0
+        this.items.forEach(i => { i.isRead = true })
       } catch {
         // silently fail
       }
+    },
+
+    async remove(id) {
+      try {
+        await deleteNotification(id)
+        this.items = this.items.filter(i => i.id !== id)
+        this.total = Math.max(0, this.total - 1)
+      } catch {
+        // silently fail
+      }
+    },
+
+    setPage(page) {
+      this.page = page
+      this.fetchList()
+    },
+
+    setFilter(filter, value) {
+      this[filter] = value
+      this.page = 1
+      this.fetchList()
+    },
+
+    resetFilters() {
+      this.filterUnreadOnly = false
+      this.filterType = ''
+      this.filterStartDate = ''
+      this.filterEndDate = ''
+      this.page = 1
+      this.fetchList()
     },
   },
 })

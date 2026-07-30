@@ -57,6 +57,82 @@
           </button>
         </div>
 
+        <!-- Notification Bell -->
+        <div class="relative shrink-0">
+          <button @click="toggleNotificationMenu"
+            class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm transition-all duration-200 hover:bg-white/16 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10">
+            <svg class="w-5 h-5 theme-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+            </svg>
+            <span v-if="notificationStore.unreadCount > 0"
+              class="absolute -top-1 -end-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none shadow-md shadow-red-500/40">
+              {{ notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount }}
+            </span>
+          </button>
+          <!-- Notification Dropdown -->
+          <div v-if="notificationMenuOpen"
+            class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100"
+            :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
+            <div class="w-80 animate-fade-in rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                <span class="text-sm font-semibold theme-text-primary">{{ $t('notifications.title') || 'Notifications' }}</span>
+                <div class="flex items-center gap-2">
+                  <button v-if="notificationStore.unreadCount > 0" @click="markAllRead"
+                    class="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                    {{ $t('notifications.markAllRead') || 'Mark all read' }}
+                  </button>
+                  <button @click="notificationMenuOpen = false" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div v-if="notifLoading" class="flex items-center justify-center py-8">
+                <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              </div>
+              <div v-else-if="notifItems.length === 0" class="flex flex-col items-center justify-center py-8 text-slate-400">
+                <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                </svg>
+                <span class="text-sm">{{ $t('notifications.empty') || 'No notifications yet' }}</span>
+              </div>
+              <div v-else class="max-h-96 overflow-y-auto divide-y divide-slate-50">
+                <div v-for="item in notifItems" :key="item.id"
+                  @click="onNotifClick(item)"
+                  class="flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors duration-150"
+                  :class="item.isRead ? 'hover:bg-slate-50' : 'bg-blue-50/40 hover:bg-blue-50/70'">
+                  <div class="shrink-0 mt-0.5">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold"
+                      :style="{ backgroundColor: typeColor(item.type) + '20', color: typeColor(item.type) }">
+                      {{ typeAbbr(item.type) }}
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm truncate" :class="item.isRead ? 'theme-text-primary' : 'font-semibold theme-text-primary'">
+                      {{ item.title }}
+                    </p>
+                    <p class="text-xs text-slate-500 truncate mt-0.5">{{ item.message }}</p>
+                    <p class="text-[10px] text-slate-400 mt-1">{{ formatNotifDate(item.createdAt) }}</p>
+                  </div>
+                  <div v-if="!item.isRead" class="shrink-0 mt-2">
+                    <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="border-t border-slate-100 px-4 py-2.5 text-center">
+                <router-link :to="{ name: 'notifications' }" @click="notificationMenuOpen = false"
+                  class="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+                  {{ $t('notifications.viewAll') || 'View all notifications' }}
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
           <button @click="toggleUserMenu"
@@ -246,10 +322,11 @@ import AuthLogout from '@/components/auth/Logout.vue'
 import { ThemeIcon } from '@acme/icon-packs'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
-import { getReportDefs } from '@/api'
+import { getReportDefs, getNotifications, markNotificationRead, markAllNotificationsRead } from '@/api'
 import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
 import { iconRevision, getMenuIcon } from '@acme/icon-packs'
 import { themeRevision, loadTheme } from '@acme/theme-engine'
+import { useNotificationStore } from '@/stores/useNotificationStore'
 import {
   getSidebarAsideClasses,
   shouldShowBackdrop,
@@ -268,7 +345,8 @@ export default {
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
-    return { authLogout, user, router }
+    const notificationStore = useNotificationStore()
+    return { authLogout, user, router, notificationStore }
   },
   data() {
     return {
@@ -344,6 +422,9 @@ export default {
       sidebarHovered: false,
       showLogoutDialog: false,
       userMenuOpen: false,
+      notificationMenuOpen: false,
+      notifLoading: false,
+      notifItems: [],
       isMobile: window.innerWidth < 768,
       reports: []
     }
@@ -643,6 +724,78 @@ export default {
       document.documentElement.lang = lang
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
     },
+    toggleNotificationMenu() {
+      this.notificationMenuOpen = !this.notificationMenuOpen
+      if (this.notificationMenuOpen && this.notifItems.length === 0) {
+        this.fetchNotifPreview()
+      }
+    },
+    async fetchNotifPreview() {
+      this.notifLoading = true
+      try {
+        const res = await getNotifications({ page: 1, pageSize: 5 })
+        const data = res?.data
+        if (Array.isArray(data)) {
+          this.notifItems = data
+        } else if (data?.items) {
+          this.notifItems = data.items
+        } else if (data?.data) {
+          this.notifItems = data.data
+        } else {
+          this.notifItems = []
+        }
+      } catch {
+        this.notifItems = []
+      } finally {
+        this.notifLoading = false
+      }
+    },
+    async onNotifClick(item) {
+      this.notificationMenuOpen = false
+      if (!item.isRead) {
+        try { await markNotificationRead(item.id) } catch { /* ignore */ }
+        this.notificationStore.unreadCount = Math.max(0, this.notificationStore.unreadCount - 1)
+        item.isRead = true
+      }
+      if (item.route && item.route !== '#') {
+        this.router.push(item.route.startsWith('/') ? item.route : { path: item.route })
+      }
+    },
+    async markAllRead() {
+      try {
+        await markAllNotificationsRead()
+        this.notificationStore.unreadCount = 0
+        this.notifItems.forEach(item => { item.isRead = true })
+      } catch { /* ignore */ }
+    },
+    typeColor(type) {
+      const map = {
+        expense: '#ef4444', payment: '#22c55e', treasury: '#f59e0b',
+        approval: '#8b5cf6', supply: '#3b82f6', transport: '#06b6d4',
+        equipment: '#f97316', extract: '#14b8a6', rental: '#ec4899',
+        'petroleum-supply': '#6366f1', wallet: '#10b981'
+      }
+      return map[type] || '#6b7280'
+    },
+    typeAbbr(type) {
+      const map = {
+        expense: 'م', payment: 'د', treasury: 'خ',
+        approval: 'و', supply: 'ت', transport: 'ن',
+        equipment: 'ع', extract: 'م', rental: 'إ',
+        'petroleum-supply': 'ب', wallet: 'م'
+      }
+      return map[type] || '?'
+    },
+    formatNotifDate(dateStr) {
+      if (!dateStr) return ''
+      const d = new Date(dateStr)
+      const now = new Date()
+      const diff = now - d
+      if (diff < 60000) return this.$i18n.locale === 'ar' ? 'الآن' : 'now'
+      if (diff < 3600000) return Math.floor(diff / 60000) + (this.$i18n.locale === 'ar' ? ' د' : 'm')
+      if (diff < 86400000) return Math.floor(diff / 3600000) + (this.$i18n.locale === 'ar' ? ' س' : 'h')
+      return d.toLocaleDateString(this.$i18n.locale === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })
+    },
     menuIconComponent(name) {
       void this.iconTick
       return getMenuIcon(name)
@@ -683,7 +836,12 @@ export default {
     document.addEventListener('keydown', this.onSidebarEscape)
     this.loadReports()
     document.addEventListener('click', (e) => {
-      if (!this.$el.querySelector('.relative')?.contains(e.target)) this.userMenuOpen = false
+      const relatives = this.$el.querySelectorAll('.relative')
+      const inside = Array.from(relatives).some(el => el.contains(e.target))
+      if (!inside) {
+        this.userMenuOpen = false
+        this.notificationMenuOpen = false
+      }
     })
   },
   beforeUnmount() {

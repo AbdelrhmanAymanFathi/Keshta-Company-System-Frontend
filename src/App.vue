@@ -23,6 +23,8 @@ import { useAuth } from './composables/useAuth'
 import { useRouteLoader } from './composables/useRouteLoader'
 import { useRealtime } from './composables/useRealtime'
 import { useNotificationStore } from './stores/useNotificationStore'
+import { playNotificationSound } from './utils/notificationSound'
+import { debounce } from './utils/debounce'
 
 export default {
   name: 'AppRoot',
@@ -37,11 +39,17 @@ export default {
     const notificationStore = useNotificationStore()
     notificationStore.fetchUnreadCount()
 
+    const debouncedFetchUnread = debounce(() => notificationStore.fetchUnreadCount(), 300)
+
     useRealtime({
       channel: 'notifications',
       events: ['notification_created'],
       handler: () => {
-        notificationStore.fetchUnreadCount()
+        if (window.$toast) {
+          window.$toast('إشعار جديد', 'info', 5000)
+        }
+        playNotificationSound()
+        debouncedFetchUnread()
       },
     })
     

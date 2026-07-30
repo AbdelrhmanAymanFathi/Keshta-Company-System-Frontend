@@ -37,13 +37,13 @@ export const useTreasuryStore = defineStore('treasury', {
       try {
         if (id === null || id === undefined || id === '') localStorage.removeItem(STORAGE_KEY)
         else localStorage.setItem(STORAGE_KEY, String(id))
-      } catch (_) {}
+      } catch (_) { /* ignore */ }
     },
     restoreSelection() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY)
         if (saved) this.selectedTreasuryId = Number(saved)
-      } catch (_) {}
+      } catch (_) { /* ignore */ }
     },
     async fetchTreasuries(options = {}) {
       this.loading = true

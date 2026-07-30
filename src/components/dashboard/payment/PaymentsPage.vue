@@ -202,6 +202,7 @@ import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreation
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { useRealtime } from '@/composables/useRealtime'
+import { debounce } from '@/utils/debounce'
 
 const normalizeList = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -375,7 +376,7 @@ export default {
     useRealtime({
       channel: 'payments',
       events: ['payment_created', 'payment_deleted'],
-      handler: () => { loadPayments() },
+      handler: debounce(() => { loadPayments() }, 300),
     })
 
     const applyFilters = () => {

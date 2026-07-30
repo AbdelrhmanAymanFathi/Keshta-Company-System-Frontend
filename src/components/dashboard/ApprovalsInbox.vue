@@ -352,6 +352,7 @@ import { getCurrentInstance } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getApprovals, approveRequest, rejectRequest } from '@/api';
 import { useRealtime } from '@/composables/useRealtime';
+import { debounce } from '@/utils/debounce';
 
 export default {
   name: 'ApprovalsInbox',
@@ -361,7 +362,7 @@ export default {
     useRealtime({
       channel: 'approvals',
       events: ['approval_created', 'approval_completed', 'approval_rejected'],
-      handler: () => { instance.proxy?.loadApprovals() },
+      handler: debounce(() => { instance.proxy?.loadApprovals() }, 300),
     })
     return { locale };
   },
@@ -619,8 +620,9 @@ export default {
           await this.loadApprovals();
         }
       } catch (err) {
-        console.error(err);
-        this.error = err.response?.data?.message || 'Error executing approval';
+        const msg = err.response?.data?.message || 'Error executing approval';
+        this.error = msg;
+        if (window.$toast) window.$toast(msg, 'error', 5000);
       } finally {
         this.submitting = false;
       }
@@ -650,8 +652,9 @@ export default {
           await this.loadApprovals();
         }
       } catch (err) {
-        console.error(err);
-        this.error = err.response?.data?.message || 'Error rejecting request';
+        const msg = err.response?.data?.message || 'Error rejecting request';
+        this.error = msg;
+        if (window.$toast) window.$toast(msg, 'error', 5000);
       } finally {
         this.submitting = false;
       }

@@ -1,5 +1,6 @@
 import { useRealtime } from './useRealtime'
 import { useDashboardData } from './useDashboardData'
+import { debounce } from '@/utils/debounce'
 
 export function useRealtimeDashboard() {
   const dd = useDashboardData()
@@ -7,9 +8,9 @@ export function useRealtimeDashboard() {
   useRealtime({
     channel: 'dashboard',
     events: ['statistics_updated'],
-    handler: () => {
+    handler: debounce(() => {
       dd.fetchAll()
-    },
+    }, 300),
   })
 
   return {}

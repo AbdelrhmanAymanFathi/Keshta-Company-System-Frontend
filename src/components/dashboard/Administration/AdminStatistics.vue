@@ -209,6 +209,7 @@
 <script>
 import { useDashboardData } from '@/composables/useDashboardData'
 import { useRealtime } from '@/composables/useRealtime'
+import { debounce } from '@/utils/debounce'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import DateRangeToolbar from './DateRangeToolbar.vue'
 import DashboardGrid from './DashboardGrid.vue'
@@ -232,7 +233,7 @@ export default {
     useRealtime({
       channel: 'dashboard',
       events: ['statistics_updated'],
-      handler: () => { dd.fetchAll() },
+      handler: debounce(() => { dd.fetchAll() }, 300),
     })
     return {
       loading: dd.loading,

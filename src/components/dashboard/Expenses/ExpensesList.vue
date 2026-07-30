@@ -835,6 +835,7 @@ import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
 import { realtimeService } from '@/services/realtimeService'
+import { debounce } from '@/utils/debounce'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
@@ -1095,7 +1096,7 @@ rows: [],
     await this.fetchBranches()
     await this.fetchLocations()
     await this.fetchTreasuries()
-    this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], () => { this.loadExpenses() })
+    this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], debounce(() => { this.loadExpenses() }, 300))
   },
   
   beforeUnmount() {

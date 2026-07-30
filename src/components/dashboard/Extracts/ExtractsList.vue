@@ -226,6 +226,7 @@ import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
 import DateField from '../../shared/DateField.vue'
 import { realtimeService } from '@/services/realtimeService'
+import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'ExtractsList',
@@ -281,7 +282,7 @@ export default {
     await this.loadFilterData()
     await this.loadExtracts()
     document.addEventListener('click', this.closeContextMenu)
-    this.__realtimeUnsub = realtimeService.subscribe('extracts', ['extract_created', 'extract_updated', 'extract_deleted'], () => { this.loadExtracts() })
+    this.__realtimeUnsub = realtimeService.subscribe('extracts', ['extract_created', 'extract_updated', 'extract_deleted'], debounce(() => { this.loadExtracts() }, 300))
   },
   beforeUnmount() {
     if (this.__realtimeUnsub) { this.__realtimeUnsub(); this.__realtimeUnsub = null }

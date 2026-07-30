@@ -41,17 +41,18 @@
     "searchTreasury": "ابحث عن خزينة...",
     "select": "اختر"
   },
-  "navbar": {
-    "supplies": "التوريدات",
-    "extracts": "المستخلصات",
-    "payments": "المدفوعات",
-    "transport": "النقل",
-    "expenses": "المصروفات",
-    "equipmentLog": "سجل المعدات",
-    "treasury": "الخزينة",
-    "admin": "الإدارة",
-    "reports": "التقارير"
-  },
+    "navbar": {
+      "supplies": "التوريدات",
+      "extracts": "المستخلصات",
+      "payments": "المدفوعات",
+      "transport": "النقل",
+      "expenses": "المصروفات",
+      "equipmentLog": "سجل المعدات",
+      "treasury": "الخزينة",
+      "admin": "الإدارة",
+      "reports": "التقارير",
+      "notifications": "الإشعارات"
+    },
   "dashboard": {
     "newSupply": "توريدة جديدة",
     "payments": "المدفوعات",
@@ -85,7 +86,8 @@
     "extractsList": "قائمة المستخلصات",
     "newExtract": "مستخلص جديد" ,
     "extractItems": "بنود المستخلصات",
-    "report": "التقرير"
+    "report": "التقرير",
+    "notifications": "الإشعارات"
   },
   "equipmentLog": {
     "deletedSuccessfully":"تم الحذف بنجاح",
@@ -1686,5 +1688,40 @@
   },
   "approvals": {
     "title": "الموافقات الإدارية"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "markAllRead": "تحديد الكل كمقروء",
+    "markAsRead": "تحديد كمقروء",
+    "delete": "حذف",
+    "confirmDelete": "هل أنت متأكد من حذف هذا الإشعار؟",
+    "noResults": "لا توجد إشعارات",
+    "empty": "لا توجد إشعارات بعد",
+    "loadError": "خطأ في تحميل الإشعارات",
+    "filters": {
+      "all": "الكل",
+      "unreadOnly": "غير مقروء فقط",
+      "type": {
+        "all": "جميع الأنواع",
+        "extract": "مستخلص",
+        "supply": "تموين",
+        "transport": "نقل",
+        "expense": "مصروف",
+        "approval": "موافقة",
+        "payment": "دفعة"
+      }
+    },
+    "badge": {
+      "new": "جديد"
+    },
+    "types": {
+      "extract": "مستخلص",
+      "supply": "تموين",
+      "transport": "نقل",
+      "expense": "مصروف",
+      "approval": "موافقة",
+      "payment": "دفعة"
+    },
+    "viewAll": "عرض كل الإشعارات"
   }
 }

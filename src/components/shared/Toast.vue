@@ -1,6 +1,6 @@
 <template>
   <teleport to="body">
-    <transition-group name="toast" tag="div" class="fixed top-4 right-4 z-50 space-y-2">
+    <transition-group name="toast" tag="div" class="fixed top-4 right-4 z-[9999] space-y-2">
       <div
         v-for="toast in toasts"
         :key="toast.id"
@@ -73,14 +73,14 @@ export default {
     const toastVariantClasses = {
       success: 'bg-green-50 border border-green-200',
       error: 'bg-red-50 border border-red-200',
-      info: 'theme-info-panel',
+      info: 'bg-white border border-gray-300',
       warning: 'bg-yellow-50 border border-yellow-200'
     }
 
     const toastTextClasses = {
       success: 'text-green-800',
       error: 'text-red-800',
-      info: 'theme-accent-strong',
+      info: 'text-gray-900',
       warning: 'text-yellow-800'
     }
 
