@@ -49,6 +49,10 @@
         <div class="text-xs theme-text-muted font-medium px-2 py-1 bg-slate-50 rounded-lg border border-slate-100">
           {{ $t('expenses.totalMainTerms', { count: categories.length }) }}
         </div>
+        <svg v-if="refreshing" class="w-4 h-4 animate-spin text-emerald-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
       </div>
     </div>
 
@@ -430,6 +434,7 @@ export default {
       categories: [],
       expandedCategoryIds: [],
       loading: false,
+      refreshing: false,
       saving: false,
       searchQuery: '',
       categoryModal: {
@@ -478,8 +483,17 @@ export default {
     await this.loadCategories()
   },
   methods: {
-    async loadCategories(preserveExpanded = false) {
-      this.loading = true
+    async loadCategories(options = {}) {
+      const { preserveExpanded = false, silent = false } = options
+      const scrollEl = silent ? this.findScrollContainer() : null
+      const savedScrollTop = scrollEl ? scrollEl.scrollTop : null
+
+      if (silent) {
+        this.refreshing = true
+      } else {
+        this.loading = true
+      }
+
       const prevExpanded = preserveExpanded ? [...this.expandedCategoryIds] : null
       try {
         const response = await getExpenseCategories()
@@ -493,8 +507,26 @@ export default {
       } catch (err) {
         console.error('Failed to load terms:', err)
       } finally {
-        this.loading = false
+        if (silent) {
+          this.refreshing = false
+          // Restore the scroll position so the user stays in the same spot
+          // while bulk-editing subcategories in a long list.
+          if (savedScrollTop !== null && scrollEl) {
+            scrollEl.scrollTop = savedScrollTop
+          }
+        } else {
+          this.loading = false
+        }
       }
+    },
+
+    findScrollContainer() {
+      let el = this.$el
+      while (el) {
+        if (el.scrollHeight > el.clientHeight) return el
+        el = el.parentElement
+      }
+      return null
     },
 
     isExpanded(catId) {
@@ -574,7 +606,7 @@ export default {
           if (!this.categoryModal.name.trim()) return
           await updateExpenseCategory(this.categoryModal.id, { name: this.categoryModal.name.trim() })
           this.categoryModal.open = false
-          await this.loadCategories(true)
+          await this.loadCategories({ preserveExpanded: true, silent: true })
         } else {
           // Bulk save: filter non-empty rows and send each individually
           const names = this.categoryModal.rows.map(r => r.trim()).filter(r => r)
@@ -600,7 +632,7 @@ export default {
           })
 
           // Reload categories to show the succeeded ones
-          await this.loadCategories(true)
+          await this.loadCategories({ preserveExpanded: true, silent: true })
 
           if (failed.length > 0) {
             // Keep only the failed ones in the rows so user can edit and try again
@@ -621,7 +653,7 @@ export default {
       if (!confirm(`هل أنت تأكد من حذف البند الرئيسي "${cat.name}"؟`)) return
       try {
         await deleteExpenseCategory(cat.id)
-        await this.loadCategories(true)
+        await this.loadCategories({ preserveExpanded: true, silent: true })
       } catch (err) {
         alert(err.response?.data?.message || 'تعذر حذف البند الرئيسي')
       }
@@ -706,7 +738,7 @@ export default {
           if (!this.subCategoryModal.name.trim()) return
           await updateExpenseSubCategory(this.subCategoryModal.id, { name: this.subCategoryModal.name.trim() })
           this.subCategoryModal.open = false
-          await this.loadCategories(true)
+          await this.loadCategories({ preserveExpanded: true, silent: true })
         } else {
           // Bulk save: filter non-empty rows and send each individually
           const names = this.subCategoryModal.rows.map(r => r.trim()).filter(r => r)
@@ -732,7 +764,7 @@ export default {
           })
 
           // Reload categories to show the succeeded ones
-          await this.loadCategories(true)
+          await this.loadCategories({ preserveExpanded: true, silent: true })
 
           if (failed.length > 0) {
             // Keep only the failed ones in the rows so user can edit and try again
@@ -754,7 +786,7 @@ export default {
       if (!confirm(`هل أنت تأكد من حذف البند الفرعي "${subCat.name}"؟`)) return
       try {
         await deleteExpenseSubCategory(subCat.id)
-        await this.loadCategories(true)
+        await this.loadCategories({ preserveExpanded: true, silent: true })
       } catch (err) {
         alert(err.response?.data?.message || 'تعذر حذف البند الفرعي')
       }

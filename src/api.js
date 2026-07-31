@@ -2109,6 +2109,3 @@ export const markNotificationRead = (id) =>
 export const markAllNotificationsRead = () =>
   axios.patch(`${BASE_URL}/api/notifications/read-all`)
 
-export const deleteNotification = (id) =>
-  axios.delete(`${BASE_URL}/api/notifications/${id}`)
-

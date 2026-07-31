@@ -4,7 +4,6 @@ import {
   getUnreadNotificationCount,
   markNotificationRead,
   markAllNotificationsRead,
-  deleteNotification,
 } from '@/api'
 
 export const useNotificationStore = defineStore('notifications', {
@@ -76,16 +75,6 @@ export const useNotificationStore = defineStore('notifications', {
         await markAllNotificationsRead()
         this.unreadCount = 0
         this.items.forEach(i => { i.isRead = true })
-      } catch {
-        // silently fail
-      }
-    },
-
-    async remove(id) {
-      try {
-        await deleteNotification(id)
-        this.items = this.items.filter(i => i.id !== id)
-        this.total = Math.max(0, this.total - 1)
       } catch {
         // silently fail
       }

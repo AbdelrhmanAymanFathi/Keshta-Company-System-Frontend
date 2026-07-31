@@ -88,13 +88,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
             </button>
-            <button @click.stop="confirmDelete(item)"
-              title="حذف"
-              class="rounded-lg p-2 hover:bg-red-100 text-red-500 transition-colors">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
           </div>
         </div>
       </div>
@@ -108,13 +101,6 @@
         @update:page="store.setPage($event)"
       />
     </div>
-
-    <ConfirmDialog
-      v-if="deleteTarget"
-      :message="`حذف الإشعار نهائياً؟`"
-      @confirm="onDeleteConfirmed"
-      @cancel="deleteTarget = null"
-    />
   </div>
 </template>
 
@@ -125,15 +111,13 @@ import { useNotificationStore } from '@/stores/useNotificationStore'
 import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import Pagination from '@/components/shared/Pagination.vue'
-import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 
 export default {
   name: 'NotificationCenter',
-  components: { PageHeader, Pagination, ConfirmDialog },
+  components: { PageHeader, Pagination },
   setup() {
     const store = useNotificationStore()
     const router = useRouter()
-    const deleteTarget = ref(null)
     const filterType = ref(store.filterType || '')
 
     const title = computed(() => {
@@ -178,17 +162,6 @@ export default {
 
     function onMarkRead(item) {
       store.markRead(item.id)
-    }
-
-    function confirmDelete(item) {
-      deleteTarget.value = item
-    }
-
-    function onDeleteConfirmed() {
-      if (deleteTarget.value) {
-        store.remove(deleteTarget.value.id)
-      }
-      deleteTarget.value = null
     }
 
     function formatDate(iso) {
@@ -246,8 +219,8 @@ export default {
     })
 
     return {
-      store, deleteTarget, filterType, typeOptions, title,
-      onFilterChange, onReset, onClick, onMarkRead, confirmDelete, onDeleteConfirmed,
+      store, filterType, typeOptions, title,
+      onFilterChange, onReset, onClick, onMarkRead,
       formatDate, typeColor, typeAbbr, typeBadge, typeLabel,
     }
   }
