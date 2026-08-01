@@ -67,12 +67,15 @@
     <div class="space-y-4">
       <h3 class="text-lg font-semibold theme-text-primary px-1">{{ $t('adminStats.financialAnalytics') }}</h3>
       <DashboardGrid :cols="2">
-        <ChartCard :title="$t('adminStats.cashFlow')" :subtitle="$t('adminStats.cashFlowDesc')"
-          :loading="loading" :empty="!cashFlow?.length" :empty-message="$t('adminStats.noData')">
-          <template #chart>
-            <apexchart v-if="cashFlow?.length" :key="'cf-' + cashFlow.length" type="area" height="320" :options="cashFlowOptions" :series="cashFlowSeries" />
-          </template>
-        </ChartCard>
+        <DirectionGauge
+          :title="$t('adminStats.cashFlow')" :subtitle="$t('adminStats.cashFlowDesc')"
+          :value="cashFlowNet" :loading="loading" :empty="!cashFlow?.length"
+          :empty-message="$t('adminStats.noData')"
+          :label="$t('adminStats.net')"
+          :positive-label="$t('adminStats.surplus')" :negative-label="$t('adminStats.deficit')"
+          :neutral-label="$t('adminStats.stable')"
+          :stats="[{ label: $t('adminStats.inflow'), value: cashFlowIn }, { label: $t('adminStats.outflow'), value: cashFlowOut }]"
+        />
         <ChartCard :title="$t('adminStats.monthlyComparison')" :subtitle="$t('adminStats.monthlyComparisonDesc')"
           :loading="loading" :empty="!monthlyComparison?.length" :empty-message="$t('adminStats.noData')">
           <template #chart>
@@ -81,18 +84,24 @@
         </ChartCard>
       </DashboardGrid>
       <DashboardGrid :cols="2">
-        <ChartCard :title="$t('adminStats.walletTrend')" :subtitle="$t('adminStats.walletTrendDesc')"
-          :loading="loading" :empty="!walletTrend?.length" :empty-message="$t('adminStats.noData')">
-          <template #chart>
-            <apexchart v-if="walletTrend?.length" :key="'wt-' + walletTrend.length" type="area" height="320" :options="walletOptions" :series="walletSeries" />
-          </template>
-        </ChartCard>
-        <ChartCard :title="$t('adminStats.expensesTrend')" :subtitle="$t('adminStats.expensesTrendDesc')"
-          :loading="loading" :empty="!expensesTrend?.length" :empty-message="$t('adminStats.noData')">
-          <template #chart>
-            <apexchart v-if="expensesTrend?.length" :key="'et-' + expensesTrend.length" type="line" height="320" :options="expTrendOptions" :series="expTrendSeries" />
-          </template>
-        </ChartCard>
+        <DirectionGauge
+          :title="$t('adminStats.walletTrend')" :subtitle="$t('adminStats.walletTrendDesc')"
+          :value="walletNet" :loading="loading" :empty="!walletTrend?.length"
+          :empty-message="$t('adminStats.noData')"
+          :label="$t('adminStats.net')"
+          :positive-label="$t('adminStats.surplus')" :negative-label="$t('adminStats.deficit')"
+          :neutral-label="$t('adminStats.stable')"
+          :stats="[{ label: $t('adminStats.deposits'), value: walletDeposits }, { label: $t('adminStats.withdrawals'), value: walletWithdrawals }]"
+        />
+        <DirectionGauge
+          :title="$t('adminStats.expensesTrend')" :subtitle="$t('adminStats.expensesTrendDesc')"
+          :value="expenseChange" :loading="loading" :empty="!expensesTrend?.length"
+          :empty-message="$t('adminStats.noData')"
+          :label="$t('adminStats.change')" :invert="true"
+          :positive-label="$t('adminStats.rising')" :negative-label="$t('adminStats.declining')"
+          :neutral-label="$t('adminStats.stable')"
+          :stats="[{ label: $t('adminStats.expenses'), value: expensesTotal }]"
+        />
       </DashboardGrid>
     </div>
 
@@ -108,7 +117,7 @@
         />
         <GaugeCard
           :title="$t('adminStats.budgetConsumption')" :subtitle="$t('adminStats.budgetConsumptionDesc')"
-          :value="budgetConsumptionValue" color="#f59e0b"
+          :value="budgetConsumptionValue" :color="budgetConsumptionColor"
           :label="$t('adminStats.consumed')" :loading="loading" type="semi-circle"
           :badge="budgetConsumptionBadge" badge-color="amber" :locale="gaugeLocale"
         />
@@ -132,9 +141,9 @@
       <h3 class="text-lg font-semibold theme-text-primary px-1">{{ $t('adminStats.operationalAnalytics') }}</h3>
       <DashboardGrid :cols="2">
         <ChartCard :title="$t('adminStats.moduleActivity')" :subtitle="$t('adminStats.moduleActivityDesc')"
-          :loading="loading" :empty="!moduleActivity?.length" :empty-message="$t('adminStats.noData')">
+          :loading="loading" :empty="!moduleActivityData.length" :empty-message="$t('adminStats.noData')">
           <template #chart>
-            <apexchart v-if="moduleActivity?.length" :key="'ma-' + moduleActivity.length" type="donut" height="360" :options="moduleOptions" :series="moduleSeries" />
+            <apexchart v-if="moduleActivityData.length" :key="'ma-' + moduleActivityData.length" type="donut" height="360" :options="moduleOptions" :series="moduleSeries" />
           </template>
         </ChartCard>
         <ChartCard :title="$t('adminStats.expenseClassification')" :subtitle="$t('adminStats.expenseClassificationDesc')"
@@ -216,6 +225,7 @@ import DashboardGrid from './DashboardGrid.vue'
 import StatisticsCard from './StatisticsCard.vue'
 import ChartCard from './ChartCard.vue'
 import GaugeCard from './GaugeCard.vue'
+import DirectionGauge from './DirectionGauge.vue'
 import DashboardSkeleton from './DashboardSkeleton.vue'
 import DashboardEmpty from './DashboardEmpty.vue'
 import VueApexCharts from 'vue3-apexcharts'
@@ -224,7 +234,7 @@ export default {
   name: 'AdminStatistics',
   components: {
     PageHeader, DateRangeToolbar, DashboardGrid,
-    StatisticsCard, ChartCard, GaugeCard,
+    StatisticsCard, ChartCard, GaugeCard, DirectionGauge,
     DashboardSkeleton, DashboardEmpty,
     apexchart: VueApexCharts
   },
@@ -282,9 +292,22 @@ export default {
     },
     budgetConsumptionValue() {
       if (!this.summary?.expenses) return 0
-      const total = this.summary.expenses.total || 0
-      const max = Number(this.budgetLimit) || total * 5
-      return max > 0 ? Math.min(100, (total / max) * 100) : 0
+      const total = this.safeNum(this.summary.expenses.total)
+      const limit = Number(this.budgetLimit)
+      let max = Number.isFinite(limit) && limit > 0 ? limit : this.monthlyBudgetEstimate
+      if (!Number.isFinite(max) || max <= 0) max = total
+      return max > 0 ? Math.min(100, Math.max(0, (total / max) * 100)) : 0
+    },
+    monthlyBudgetEstimate() {
+      const months = (this.monthlyComparison || [])
+        .filter(m => this.safeNum(m?.expenses) > 0)
+        .slice(0, -1)
+      if (!months.length) return 0
+      return months.reduce((s, m) => s + this.safeNum(m?.expenses), 0) / months.length
+    },
+    budgetConsumptionColor() {
+      const v = this.budgetConsumptionValue
+      return v > 80 ? '#ef4444' : v > 50 ? '#f59e0b' : '#10b981'
     },
     budgetConsumptionBadge() {
       const v = this.budgetConsumptionValue
@@ -317,30 +340,47 @@ export default {
       return v > 60 ? this.$t('adminStats.good') : v > 35 ? this.$t('adminStats.fair') : this.$t('adminStats.low')
     },
 
-    // Chart series / options
-    cashFlowSeries() {
-      if (!this.cashFlow?.length) return []
-      return [
-        { name: this.$t('adminStats.inflow'), data: this.cashFlow.map(m => m.in || 0) },
-        { name: this.$t('adminStats.outflow'), data: this.cashFlow.map(m => m.out || 0) }
-      ]
+    // Direction gauge values (net movement over the selected period)
+    cashFlowNet() {
+      const rows = this.cashFlow || []
+      return rows.reduce((sum, m) => {
+        const net = this.safeNum(m?.net)
+        return sum + (Number.isFinite(net) ? net : this.safeNum(m?.in) - this.safeNum(m?.out))
+      }, 0)
     },
-    cashFlowOptions() {
-      const d = this.cashFlow || []
-      return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 } },
-        colors: ['#10b981', '#ef4444'],
-        labels: d.map(m => m.date || '—'),
-        dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 2 },
-        fill: { type: 'gradient', gradient: { shadeIntensity: 0.1, opacityFrom: 0.3, opacityTo: 0 } },
-        xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
-        legend: { position: 'top' }
-      }
+    walletNet() {
+      const rows = this.walletTrend || []
+      return rows.reduce((sum, m) => {
+        const net = this.safeNum(m?.net)
+        return sum + (Number.isFinite(net) ? net : this.safeNum(m?.deposits) - this.safeNum(m?.withdrawals))
+      }, 0)
+    },
+    expenseChange() {
+      const rows = this.expensesTrend || []
+      if (!rows.length) return 0
+      const first = this.safeNum(rows[0]?.total)
+      const last = this.safeNum(rows[rows.length - 1]?.total)
+      return last - first
     },
 
+    // Direction gauge breakdown totals
+    cashFlowIn() {
+      return (this.cashFlow || []).reduce((s, m) => s + (this.safeNum(m?.in) || 0), 0)
+    },
+    cashFlowOut() {
+      return (this.cashFlow || []).reduce((s, m) => s + (this.safeNum(m?.out) || 0), 0)
+    },
+    walletDeposits() {
+      return (this.walletTrend || []).reduce((s, m) => s + (this.safeNum(m?.deposits) || 0), 0)
+    },
+    walletWithdrawals() {
+      return (this.walletTrend || []).reduce((s, m) => s + (this.safeNum(m?.withdrawals) || 0), 0)
+    },
+    expensesTotal() {
+      return (this.expensesTrend || []).reduce((s, m) => s + (this.safeNum(m?.total) || 0), 0)
+    },
+
+    // Chart series / options
     monthlySeries() {
       if (!this.monthlyComparison?.length) return []
       return [
@@ -355,7 +395,7 @@ export default {
         colors: ['#ef4444', '#10b981'],
         plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
         dataLabels: { enabled: false },
-        labels: d.map(m => m.month || '—'),
+        labels: d.map(m => this.safeLabel(m?.month)),
         xaxis: { type: 'category', labels: { rotate: -45 } },
         yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
@@ -363,60 +403,37 @@ export default {
       }
     },
 
-    walletSeries() {
-      if (!this.walletTrend?.length) return []
-      return [
-        { name: this.$t('adminStats.deposits'), data: this.walletTrend.map(m => m.deposits || 0) },
-        { name: this.$t('adminStats.withdrawals'), data: this.walletTrend.map(m => m.withdrawals || 0) }
-      ]
+    moduleActivityData() {
+      const base = (this.moduleActivity || [])
+        .filter(m => this.safeNum(m?.total) > 0)
+        .map(m => ({ name: this.safeLabel(m?.name), total: this.safeNum(m?.total) || 0 }))
+      const s = this.summary || {}
+      const extra = []
+      const expTotal = this.safeNum(s?.expenses?.total)
+      if (expTotal > 0) extra.push({ name: 'EXPENSES', total: expTotal })
+      const payTotal = this.safeNum(s?.payments?.total)
+      const payFallback = (this.paymentsByType || []).reduce((sum, g) => sum + (this.safeNum(g?.total) || 0), 0)
+      const pay = payTotal > 0 ? payTotal : payFallback
+      if (pay > 0) extra.push({ name: 'PAYMENTS', total: pay })
+      const txActivity = (this.safeNum(s?.treasury?.periodIn) || 0) + (this.safeNum(s?.treasury?.periodOut) || 0)
+      if (txActivity > 0) extra.push({ name: 'TREASURY', total: txActivity })
+      return [...base, ...extra]
     },
-    walletOptions() {
-      const d = this.walletTrend || []
-      return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 } },
-        colors: ['#10b981', '#ef4444'],
-        labels: d.map(m => m.date || '—'),
-        dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 2 },
-        fill: { type: 'gradient', gradient: { shadeIntensity: 0.1, opacityFrom: 0.3, opacityTo: 0 } },
-        xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
-        legend: { position: 'top' }
-      }
-    },
-
-    expTrendSeries() {
-      if (!this.expensesTrend?.length) return []
-      return [
-        { name: this.$t('adminStats.expenses'), data: this.expensesTrend.map(m => m.total || 0) }
-      ]
-    },
-    expTrendOptions() {
-      const d = this.expensesTrend || []
-      return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 } },
-        colors: ['#f59e0b'],
-        labels: d.map(m => m.date || '—'),
-        dataLabels: { enabled: false },
-        stroke: { curve: 'smooth', width: 2.5 },
-        markers: { size: 4 },
-        xaxis: { type: 'category', labels: { rotate: -45 } },
-        yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
-        legend: { show: false }
-      }
-    },
-
     moduleSeries() {
-      return this.moduleActivity?.map(m => m.total || m.percentage || 0) || []
+      return this.moduleActivityData.map(m => m.total)
     },
     moduleOptions() {
-      const d = this.moduleActivity || []
+      const d = this.moduleActivityData
       return {
         chart: { toolbar: { show: true } },
-        labels: d.map(m => this.$t(`adminStats.module_${(m.name || '').toLowerCase()}`) || m.name),
-        dataLabels: { enabled: true, formatter: v => v.toFixed(1) + '%' },
+        labels: d.map(m => this.moduleLabel(m.name)),
+        dataLabels: {
+          enabled: true,
+          formatter: (v, opts) => {
+            const per = opts?.w?.globals?.seriesPercent?.[opts.seriesIndex]
+            return Number.isFinite(Number(per)) ? Number(per).toFixed(1) + '%' : ''
+          }
+        },
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { position: 'bottom' },
         responsive: [{ breakpoint: 480, options: { chart: { width: 300 }, legend: { position: 'bottom' } } }]
@@ -425,7 +442,7 @@ export default {
 
     classificationSeries() {
       if (!this.expenseClassifications?.length) return []
-      return [{ name: this.$t('adminStats.total'), data: this.expenseClassifications.map(c => c.total || 0) }]
+      return [{ name: this.$t('adminStats.total'), data: this.expenseClassifications.map(c => this.safeNum(c?.total) || 0) }]
     },
     classificationOptions() {
       const d = this.expenseClassifications || []
@@ -435,7 +452,7 @@ export default {
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
         dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
         xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        labels: d.map(c => c.classification || '—'),
+        labels: d.map(c => this.safeLabel(c?.classification)),
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
@@ -443,7 +460,7 @@ export default {
 
     contractorSeries() {
       if (!this.topContractors?.length) return []
-      return [{ name: this.$t('adminStats.total'), data: this.topContractors.map(c => c.total || 0) }]
+      return [{ name: this.$t('adminStats.total'), data: this.topContractors.map(c => this.safeNum(c?.total) || 0) }]
     },
     contractorOptions() {
       const d = this.topContractors || []
@@ -453,8 +470,8 @@ export default {
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
         dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
         xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        yaxis: { labels: { formatter: v => v.length > 12 ? v.slice(0, 12) + '...' : v } },
-        labels: d.map(c => c.name || '—'),
+        yaxis: { labels: { formatter: v => { const s = String(v ?? ''); return s.length > 12 ? s.slice(0, 12) + '...' : s } } },
+        labels: d.map(c => this.safeLabel(c?.name)),
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
@@ -463,7 +480,7 @@ export default {
     treasuryDistSeries() {
       const t = this.treasuryOverview?.treasuries
       if (!t?.length) return []
-      return [{ name: this.$t('adminStats.balance'), data: t.map(t => t.balance || 0) }]
+      return [{ name: this.$t('adminStats.balance'), data: t.map(t => this.safeNum(t?.balance) || 0) }]
     },
     treasuryDistOptions() {
       const t = this.treasuryOverview?.treasuries || []
@@ -473,13 +490,27 @@ export default {
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
         dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
         xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        labels: t.map(t => t.name || '—'),
+        labels: t.map(t => this.safeLabel(t?.name)),
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }
     }
   },
   methods: {
+    safeNum(v) {
+      const n = Number(v)
+      return Number.isFinite(n) ? n : null
+    },
+    safeLabel(v) {
+      if (v === null || v === undefined) return '—'
+      const s = String(v)
+      return s.length ? s : '—'
+    },
+    moduleLabel(name) {
+      const key = `adminStats.module_${String(name || '').toLowerCase()}`
+      const translated = this.$t(key)
+      return translated && translated !== key ? translated : this.safeLabel(name)
+    },
     onDateChange(range) {
       if (range.startDate !== this.fromDate || range.endDate !== this.toDate) {
         this.fromDate = range.startDate
