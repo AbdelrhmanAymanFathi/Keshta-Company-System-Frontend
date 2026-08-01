@@ -126,6 +126,64 @@
       </div>
     </div>
 
+    <!-- Backups on disk -->
+    <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+        <h3 class="text-base font-semibold theme-text-primary">{{ $t('databaseBackup.backupsTitle') }}</h3>
+        <button @click="loadBackups" :disabled="filesLoading" class="flex items-center gap-1.5 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
+          <svg class="w-4 h-4" :class="{ 'animate-spin': filesLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
+
+      <div v-if="filesLoading" class="p-6">
+        <div v-for="n in 4" :key="n" class="animate-pulse h-4 rounded bg-slate-200 mb-3" :style="{ width: (100 - n * 15) + '%' }"></div>
+      </div>
+      <div v-else-if="!backupFiles.length" class="p-6 text-sm theme-text-muted text-center">{{ $t('databaseBackup.backupsEmpty') }}</div>
+      <div v-else class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="theme-table-thead-gradient">
+            <tr>
+              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colName') }}</th>
+              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colDate') }}</th>
+              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colSize') }}</th>
+              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colType') }}</th>
+              <th class="px-5 py-3" />
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr v-for="f in backupFiles" :key="f.name" class="theme-table-row-hover transition-colors">
+              <td class="px-5 py-3 text-sm theme-text-primary max-w-[260px] truncate" :title="f.name">{{ f.name }}</td>
+              <td class="px-5 py-3 whitespace-nowrap text-sm theme-text-secondary">{{ formatDate(f.createdAt) }}</td>
+              <td class="px-5 py-3 whitespace-nowrap text-sm theme-text-secondary">{{ formatBytes(f.sizeBytes) }}</td>
+              <td class="px-5 py-3 whitespace-nowrap">
+                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  :class="f.type === 'safety' ? 'bg-violet-100 text-violet-700' : 'bg-blue-100 text-blue-700'">
+                  {{ f.type === 'safety' ? $t('databaseBackup.typeSafety') : $t('databaseBackup.typeBackup') }}
+                </span>
+              </td>
+              <td class="px-5 py-3 whitespace-nowrap text-right">
+                <button
+                  @click="onDownloadFile(f)"
+                  :disabled="downloadingFile === f.name"
+                  class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm theme-text-secondary hover:theme-hover-soft transition-colors disabled:opacity-40"
+                >
+                  <svg v-if="downloadingFile !== f.name" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+                  </svg>
+                  <svg v-else class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {{ $t('databaseBackup.actionBackupDownload') }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Backup history -->
     <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
@@ -211,7 +269,7 @@
 import { useI18n } from 'vue-i18n'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
-import { downloadDatabaseBackup, restoreDatabaseBackup, getDatabaseBackupLogs } from '@/api'
+import { downloadDatabaseBackup, restoreDatabaseBackup, getDatabaseBackupLogs, listDatabaseBackupFiles, downloadDatabaseBackupFile } from '@/api'
 
 export default {
   name: 'DatabaseBackup',
@@ -227,6 +285,9 @@ export default {
       uploadPercent: 0,
       selectedFile: null,
       showConfirm: false,
+      backupFiles: [],
+      filesLoading: false,
+      downloadingFile: null,
       logs: [],
       logsLoading: false,
       page: 1,
@@ -239,6 +300,7 @@ export default {
     isRTL() { return this.locale === 'ar' }
   },
   mounted() {
+    this.loadBackups()
     this.loadLogs()
   },
   methods: {
@@ -280,6 +342,48 @@ export default {
       this.uploadPercent = 0
       e.target.value = null
     },
+    async loadBackups() {
+      this.filesLoading = true
+      try {
+        const response = await listDatabaseBackupFiles()
+        this.backupFiles = response.data?.items || []
+      } catch (error) {
+        console.error('Failed to load backup files:', error)
+        if (window.$toast) window.$toast(this.$t('databaseBackup.loadBackupsError'), 'error')
+      } finally {
+        this.filesLoading = false
+      }
+    },
+    async onDownloadFile(file) {
+      if (!file?.name || this.downloadingFile === file.name) return
+      this.downloadingFile = file.name
+      try {
+        const response = await downloadDatabaseBackupFile(file.name)
+        const blob = response.data
+        if (!blob || blob.size === 0) throw new Error('empty response')
+
+        let fileName = file.name
+        const contentDisposition = response.headers?.['content-disposition'] || ''
+        const match = contentDisposition.match(/filename="?([^";]+)"?/)
+        if (match && match[1]) fileName = decodeURIComponent(match[1])
+
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = fileName
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+
+        if (window.$toast) window.$toast(this.$t('databaseBackup.downloadSuccess'), 'success', 4000)
+      } catch (error) {
+        console.error('Backup file download failed:', error)
+        if (window.$toast) window.$toast(this.$t('databaseBackup.downloadError'), 'error', 5000)
+      } finally {
+        this.downloadingFile = null
+      }
+    },
     clearFile() {
       if (this.restoring) return
       this.selectedFile = null
@@ -299,6 +403,7 @@ export default {
         if (window.$toast) window.$toast(this.$t('databaseBackup.restoreSuccess'), 'success', 6000)
         this.selectedFile = null
         if (this.$refs.fileInput) this.$refs.fileInput.value = null
+        this.loadBackups()
         this.loadLogs()
       } catch (error) {
         const message = error?.response?.data?.message
