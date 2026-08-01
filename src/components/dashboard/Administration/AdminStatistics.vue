@@ -330,7 +330,7 @@ export default {
       return {
         chart: { toolbar: { show: true }, animations: { speed: 500 } },
         colors: ['#10b981', '#ef4444'],
-        labels: d.map(m => m.date),
+        labels: d.map(m => m.date || '—'),
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 2 },
         fill: { type: 'gradient', gradient: { shadeIntensity: 0.1, opacityFrom: 0.3, opacityTo: 0 } },
@@ -355,7 +355,7 @@ export default {
         colors: ['#ef4444', '#10b981'],
         plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
         dataLabels: { enabled: false },
-        labels: d.map(m => m.month),
+        labels: d.map(m => m.month || '—'),
         xaxis: { type: 'category', labels: { rotate: -45 } },
         yaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
@@ -375,7 +375,7 @@ export default {
       return {
         chart: { toolbar: { show: true }, animations: { speed: 500 } },
         colors: ['#10b981', '#ef4444'],
-        labels: d.map(m => m.date),
+        labels: d.map(m => m.date || '—'),
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 2 },
         fill: { type: 'gradient', gradient: { shadeIntensity: 0.1, opacityFrom: 0.3, opacityTo: 0 } },
@@ -397,7 +397,7 @@ export default {
       return {
         chart: { toolbar: { show: true }, animations: { speed: 500 } },
         colors: ['#f59e0b'],
-        labels: d.map(m => m.date),
+        labels: d.map(m => m.date || '—'),
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 2.5 },
         markers: { size: 4 },
@@ -435,7 +435,7 @@ export default {
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
         dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
         xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        labels: d.map(c => c.classification),
+        labels: d.map(c => c.classification || '—'),
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false }
       }

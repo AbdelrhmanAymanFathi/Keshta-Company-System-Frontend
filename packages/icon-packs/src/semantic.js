@@ -72,6 +72,7 @@ export const MENU_ICON_ALIASES = {
   expensesList: 'money',
   expensesReport: 'reports',
   changesByDate: 'clock',
+  databaseBackup: 'archive',
   reportsList: 'reports',
   locations: 'mapPin',
   users: 'userGroup',

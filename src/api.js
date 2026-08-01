@@ -2109,3 +2109,24 @@ export const markNotificationRead = (id) =>
 export const markAllNotificationsRead = () =>
   axios.patch(`${BASE_URL}/api/notifications/read-all`)
 
+// --- Admin: Database Backup & Restore ---
+export const downloadDatabaseBackup = () =>
+  axios.get(`${BASE_URL}/api/admin/backup/download`, { responseType: 'blob', timeout: 0 })
+
+export const restoreDatabaseBackup = (file, onProgress) =>
+  axios.post(`${BASE_URL}/api/admin/backup/restore`, file, {
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      'X-Backup-Filename': encodeURIComponent(file.name || 'backup.dump')
+    },
+    timeout: 0,
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+    onUploadProgress: onProgress
+  })
+
+export const getDatabaseBackupLogs = (params = {}) => {
+  const { page = 1, pageSize = 20 } = params
+  return axios.get(`${BASE_URL}/api/admin/backup/logs`, { params: { page, pageSize } })
+}
+
