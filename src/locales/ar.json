@@ -591,7 +591,7 @@
     "walletTrend": "اتجاه المحفظة",
     "walletTrendDesc": "إيداعات وسحوبات محفظة الشركة",
     "expensesTrend": "اتجاه المصروفات",
-    "expensesTrendDesc": "تتبع المصروفات اليومية والأسبوعية",
+    "expensesTrendDesc": "تتبع المصروفات اليومية",
     "gauges": "مقاييس الأداء",
     "treasuryHealth": "صحة الخزينة",
     "treasuryHealthDesc": "صحة الرصيد الإجمالي للخزينة",

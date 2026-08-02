@@ -108,7 +108,7 @@ export function useDashboardData() {
         getModuleActivity(p),
         getPetroleumTrend(p),
         getWalletTrend(p),
-        getExpensesTrend(p),
+        getExpensesTrend({ ...p, groupBy: 'day' }),
         getApprovalStats(),
         getRecentActivity({ page: 1, pageSize: 10 })
       ])

@@ -381,7 +381,7 @@ export default {
     },
 
     // Chart series / options
-    monthlySeries() {
+      monthlySeries() {
       if (!this.monthlyComparison?.length) return []
       return [
         { name: this.$t('adminStats.expenses'), data: this.monthlyComparison.map(m => m.expenses || 0) },

@@ -589,7 +589,7 @@
     "walletTrend": "Wallet Trend",
     "walletTrendDesc": "Company wallet deposits and withdrawals",
     "expensesTrend": "Expenses Trend",
-    "expensesTrendDesc": "Daily and weekly expense tracking",
+    "expensesTrendDesc": "Daily expense tracking",
     "gauges": "Performance Gauges",
     "treasuryHealth": "Treasury Health",
     "treasuryHealthDesc": "Overall treasury balance health",

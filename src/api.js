@@ -2078,7 +2078,7 @@ export const getWalletTrend = (params = {}) =>
   axios.get(`${BASE_URL}/api/dashboard/wallet-trend`, { params: { ...dashParams(params), groupBy: params.groupBy || 'month' } })
 
 export const getExpensesTrend = (params = {}) =>
-  axios.get(`${BASE_URL}/api/dashboard/expenses-trend`, { params: { ...dashParams(params), groupBy: params.groupBy || 'month' } })
+  axios.get(`${BASE_URL}/api/dashboard/expenses-trend`, { params: { ...dashParams(params), groupBy: params.groupBy || 'day' } })
 
 export const getApprovalStats = () =>
   axios.get(`${BASE_URL}/api/dashboard/approval-stats`)
