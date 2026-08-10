@@ -56,6 +56,15 @@
               <option :value="500">500</option>
               <option :value="1000">1000</option>
             </select>
+            <button v-if="selectedFile" @click="onDownloadFile" :disabled="downloading" class="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors">
+              <svg v-if="downloading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+              </svg>
+              {{ $t('systemLogs.download') }}
+            </button>
           </div>
         </div>
 
@@ -67,7 +76,7 @@
             {{ $t('systemLogs.noFileSelectedDescription') }}
           </div>
           <div v-else>
-            <pre class="max-h-[calc(100vh-250px)] overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-slate-200 bg-slate-950 p-4 text-xs text-slate-100"><code>{{ fileContent }}</code></pre>
+            <pre class="max-h-[calc(100vh-250px)] overflow-auto whitespace-pre-wrap break-words rounded-2xl border border-slate-200 bg-slate-950 p-4 text-xs text-slate-100" style="text-align: left;"><code>{{ fileContent }}</code></pre>
           </div>
         </div>
       </div>
@@ -78,7 +87,7 @@
 <script>
 import { useI18n } from 'vue-i18n'
 import PageHeader from '@/components/shared/PageHeader.vue'
-import { getServerLogFiles, getServerLogFile } from '@/api'
+import { getServerLogFiles, getServerLogFile, downloadServerLogFile } from '@/api'
 
 export default {
   name: 'SystemLogs',
@@ -94,6 +103,7 @@ export default {
       fileContent: '',
       filesLoading: false,
       fileLoading: false,
+      downloading: false,
       lines: 200,
     }
   },
@@ -138,6 +148,32 @@ export default {
         if (window.$toast) window.$toast(this.$t('systemLogs.loadContentError'), 'error')
       } finally {
         this.fileLoading = false
+      }
+    },
+    async onDownloadFile() {
+      const file = this.selectedFile
+      if (!file?.name || this.downloading) return
+      this.downloading = true
+      try {
+        const response = await downloadServerLogFile(file.name)
+        const blob = response.data
+        if (!blob || blob.size === 0) throw new Error('empty response')
+
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = file.name
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+
+        if (window.$toast) window.$toast(this.$t('systemLogs.downloadSuccess'), 'success', 4000)
+      } catch (error) {
+        console.error('Log file download failed:', error)
+        if (window.$toast) window.$toast(this.$t('systemLogs.downloadError'), 'error', 5000)
+      } finally {
+        this.downloading = false
       }
     },
     formatBytes(value) {

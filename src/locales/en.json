@@ -720,7 +720,10 @@
     "linesLabel": "Lines",
     "refresh": "Refresh",
     "loadFilesError": "Failed to load log files.",
-    "loadContentError": "Failed to load log content."
+    "loadContentError": "Failed to load log content.",
+    "download": "Download",
+    "downloadSuccess": "Log file downloaded.",
+    "downloadError": "Failed to download log file."
   },
   "reports": {
     "columns": {

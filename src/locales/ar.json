@@ -722,7 +722,10 @@
     "linesLabel": "الأسطر",
     "refresh": "تحديث",
     "loadFilesError": "فشل تحميل ملفات السجل.",
-    "loadContentError": "فشل تحميل محتوى السجل."
+    "loadContentError": "فشل تحميل محتوى السجل.",
+    "download": "تنزيل",
+    "downloadSuccess": "تم تنزيل ملف السجل.",
+    "downloadError": "فشل تنزيل ملف السجل."
   },
   "reports": {
     "columns": {

@@ -2144,3 +2144,6 @@ export const getServerLogFile = (name, lines = 200) =>
     params: { lines },
   })
 
+export const downloadServerLogFile = (name) =>
+  axios.get(`${BASE_URL}/api/admin/logs/files/${encodeURIComponent(name)}/download`, { responseType: 'blob', timeout: 0 })
+
