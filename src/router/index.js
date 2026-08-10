@@ -289,6 +289,12 @@ const routes = [
         meta: { title: 'admin.databaseBackup', roles: ['admin'] }
       },
       {
+        path: 'admin/system-logs',
+        name: 'admin-system-logs',
+        component: () => import('@/components/dashboard/Administration/SystemLogs.vue'),
+        meta: { title: 'systemLogs.title', roles: ['admin'] }
+      },
+      {
         path: 'admin/reports',
         name: 'admin-reports-list',
         component: () => import('@/components/admin/ReportsList.vue'),

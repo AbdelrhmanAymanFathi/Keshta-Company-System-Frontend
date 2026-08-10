@@ -707,6 +707,23 @@
     "loadLogsError": "فشل تحميل سجل العمليات",
     "restoreInProgress": "عملية استعادة قيد التنفيذ بالفعل. يرجى الانتظار."
   },
+  "systemLogs": {
+    "title": "سجلات النظام",
+    "description": "عرض سجلات التطبيق مباشرة من الخادم.",
+    "filesTitle": "ملفات السجل",
+    "filePreviewTitle": "معاينة الملف",
+    "filePreviewSubtitle": "يتم عرض نهاية ملف السجل المحدد هنا.",
+    "noFiles": "لا توجد ملفات سجل.",
+    "noFileSelected": "اختر ملف سجل لعرض محتواه.",
+    "noFileSelectedDescription": "اختر ملف سجل من القائمة على اليسار لعرض أحدث الأسطر.",
+    "colName": "الاسم",
+    "colModified": "آخر تحديث",
+    "colSize": "الحجم",
+    "linesLabel": "الأسطر",
+    "refresh": "تحديث",
+    "loadFilesError": "فشل تحميل ملفات السجل.",
+    "loadContentError": "فشل تحميل محتوى السجل."
+  },
   "reports": {
     "columns": {
       "date": "التاريخ",

@@ -705,6 +705,23 @@
     "loadLogsError": "Failed to load backup history",
     "restoreInProgress": "A restore operation is already in progress. Please wait."
   },
+  "systemLogs": {
+    "title": "System Logs",
+    "description": "View application log files directly from the server.",
+    "filesTitle": "Log Files",
+    "filePreviewTitle": "File Preview",
+    "filePreviewSubtitle": "Tail of the selected log file is shown here.",
+    "noFiles": "No log files found.",
+    "noFileSelected": "Select a log file to preview its contents.",
+    "noFileSelectedDescription": "Choose a log file from the list on the left to display the most recent log lines.",
+    "colName": "Name",
+    "colModified": "Updated",
+    "colSize": "Size",
+    "linesLabel": "Lines",
+    "refresh": "Refresh",
+    "loadFilesError": "Failed to load log files.",
+    "loadContentError": "Failed to load log content."
+  },
   "reports": {
     "columns": {
       "date": "Date",

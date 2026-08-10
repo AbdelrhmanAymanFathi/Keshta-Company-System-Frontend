@@ -2136,3 +2136,11 @@ export const listDatabaseBackupFiles = () =>
 export const downloadDatabaseBackupFile = (name) =>
   axios.get(`${BASE_URL}/api/admin/backup/files/${encodeURIComponent(name)}`, { responseType: 'blob', timeout: 0 })
 
+export const getServerLogFiles = () =>
+  axios.get(`${BASE_URL}/api/admin/logs`)
+
+export const getServerLogFile = (name, lines = 200) =>
+  axios.get(`${BASE_URL}/api/admin/logs/files/${encodeURIComponent(name)}`, {
+    params: { lines },
+  })
+
