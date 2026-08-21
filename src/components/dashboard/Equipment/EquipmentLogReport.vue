@@ -10,17 +10,64 @@
     </div>
 
     <div class="bg-white rounded-lg p-4 border">
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <DateField v-model="filters.from" class="border rounded px-3 py-2 text-sm" />
-        <DateField v-model="filters.to" class="border rounded px-3 py-2 text-sm" />
-        <select v-model="filters.equipmentId" class="border rounded px-3 py-2 text-sm">
-          <option value="">{{ $t('equipmentLog.allEquipments') }}</option>
-          <option v-for="e in equipments" :key="e.id" :value="e.id">{{ e.name }}</option>
-        </select>
-        <select v-model="filters.companyId" class="border rounded px-3 py-2 text-sm">
-          <option value="">{{ $t('equipmentLog.allCompanies') }}</option>
-          <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
-        </select>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.dateFrom') }}</label>
+          <DateField v-model="filters.from" class="w-full border rounded px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.dateTo') }}</label>
+          <DateField v-model="filters.to" class="w-full border rounded px-3 py-2 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.equipment') }}</label>
+          <select v-model="filters.equipmentId" class="w-full border rounded px-3 py-2 text-sm">
+            <option value="">{{ $t('equipmentLog.allEquipments') }}</option>
+            <option v-for="e in equipments" :key="e.id" :value="e.id">{{ e.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.equipmentType') }}</label>
+          <div class="flex flex-col sm:flex-row gap-2 w-full">
+            <button
+              type="button"
+              @click="filters.isRental = ''"
+              :class="[
+                'px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none',
+                filters.isRental === '' ? 'theme-button shadow-sm' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200'
+              ]"
+            >
+              {{ $t('equipmentLog.all') }}
+            </button>
+            <button
+              type="button"
+              @click="filters.isRental = 'false'"
+              :class="[
+                'px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none',
+                filters.isRental === 'false' ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200'
+              ]"
+            >
+              {{ $t('equipmentLog.companyOwned') }}
+            </button>
+            <button
+              type="button"
+              @click="filters.isRental = 'true'"
+              :class="[
+                'px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none',
+                filters.isRental === 'true' ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200'
+              ]"
+            >
+              {{ $t('equipmentLog.externalRented') }}
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.company') }}</label>
+          <select v-model="filters.companyId" class="w-full border rounded px-3 py-2 text-sm">
+            <option value="">{{ $t('equipmentLog.allCompanies') }}</option>
+            <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
+          </select>
+        </div>
       </div>
 
       <div class="mt-4 flex gap-2">
@@ -50,7 +97,7 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="row in report.rows" :key="row.id">
               <td class="px-6 py-4 text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
-              <td class="px-6 py-4 text-sm theme-text-primary">{{ row.equipment }}</td>
+              <td class="px-6 py-4 text-sm theme-text-primary">{{ equipmentName(row) || '-' }}</td>
               <td class="px-6 py-4 text-sm theme-text-primary">{{ row.hours }}</td>
               <td class="px-6 py-4 text-sm theme-text-primary">{{ formatCurrency(row.hourlyRate) }}</td>
               <td class="px-6 py-4 text-sm font-semibold theme-text-primary">{{ formatCurrency(row.total) }}</td>
@@ -65,7 +112,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getEquipmentLogsReportData, getEquipments, getBranches } from '@/api'
+import { getEquipmentLogs, getEquipments, getBranches } from '@/api'
 import DateField from '@/components/shared/DateField.vue'
 
 export default {
@@ -73,23 +120,44 @@ export default {
   components: { DateField },
   setup() {
     const { locale } = useI18n()
-    const filters = ref({ from: '', to: '', equipmentId: '', companyId: '' })
+    const filters = ref({ from: '', to: '', equipmentId: '', companyId: '', isRental: '' })
     const loading = ref(false)
     const report = ref({ rows: [] })
     const equipments = ref([])
     const companies = ref([])
 
+    const buildQueryParams = (page) => ({
+      page,
+      pageSize: 100,
+      ...(filters.value.from ? { startDate: filters.value.from } : {}),
+      ...(filters.value.to ? { endDate: filters.value.to } : {}),
+      ...(filters.value.equipmentId !== '' && filters.value.equipmentId !== null && filters.value.equipmentId !== undefined ? { equipmentId: filters.value.equipmentId } : {}),
+      ...(filters.value.isRental !== '' ? { isRental: filters.value.isRental === 'true' } : {})
+    })
+
+    const extractItems = (payload) => {
+      if (Array.isArray(payload?.items)) return payload.items
+      if (Array.isArray(payload?.data)) return payload.data
+      if (Array.isArray(payload)) return payload
+      return []
+    }
+
     const runReport = async () => {
       loading.value = true
       try {
-        const params = {
-          from: filters.value.from,
-          to: filters.value.to,
-          equipmentId: filters.value.equipmentId,
-          companyId: filters.value.companyId
+        const rows = []
+        let page = 1
+        let total = Number.MAX_SAFE_INTEGER
+        while (page <= 200) {
+          const res = await getEquipmentLogs(buildQueryParams(page))
+          const payload = res?.data || {}
+          const items = extractItems(payload)
+          total = Number(payload?.meta?.total ?? payload?.total ?? total)
+          rows.push(...items)
+          if (items.length === 0 || rows.length >= total) break
+          page += 1
         }
-        const res = await getEquipmentLogsReportData(params)
-        report.value = res.data || { rows: [] }
+        report.value = { rows }
       } catch (e) {
         console.error('Failed to run report', e)
         report.value = { rows: [] }
@@ -101,7 +169,12 @@ export default {
     const loadMeta = async () => {
       try {
         const eq = await getEquipments()
-        equipments.value = eq.data || []
+        const eqPayload = eq?.data || {}
+        equipments.value = Array.isArray(eqPayload.items)
+          ? eqPayload.items
+          : Array.isArray(eqPayload.data)
+            ? eqPayload.data
+            : Array.isArray(eqPayload) ? eqPayload : []
         const co = await getBranches()
         companies.value = co.data || []
       } catch (e) {
@@ -111,14 +184,22 @@ export default {
     }
 
     const clearFilters = () => {
-      filters.value = { from: '', to: '', equipmentId: '', companyId: '' }
+      filters.value = { from: '', to: '', equipmentId: '', companyId: '', isRental: '' }
+      runReport()
+    }
+
+    const equipmentName = (row) => {
+      const eq = row?.equipment
+      if (eq && typeof eq === 'object') return eq.name || ''
+      if (typeof eq === 'string') return eq
+      return row?.equipmentName || ''
     }
 
     const exportCsv = () => {
       const rows = report.value.rows || []
       if (!rows.length) return
       const header = ['date', 'equipment', 'hours', 'hourlyRate', 'total']
-      const csv = [header.join(',')].concat(rows.map(r => [r.date, '"' + (r.equipment || '') + '"', r.hours, r.hourlyRate, r.total].join(','))).join('\n')
+      const csv = [header.join(',')].concat(rows.map(r => [r.date, '"' + equipmentName(r) + '"', r.hours, r.hourlyRate, r.total].join(','))).join('\n')
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -143,9 +224,10 @@ export default {
 
     onMounted(async () => {
       await loadMeta()
+      await runReport()
     })
 
-    return { filters, loading, report, runReport, equipments, companies, clearFilters, exportCsv, formatDate, formatCurrency }
+    return { filters, loading, report, runReport, equipments, companies, clearFilters, exportCsv, formatDate, formatCurrency, equipmentName }
   }
 }
 </script>

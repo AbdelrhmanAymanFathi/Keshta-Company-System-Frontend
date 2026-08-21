@@ -61,7 +61,8 @@
             <SearchDropdown v-model="filters.areaSearch" :items="availableAreas" :allItems="availableAreas" :placeholder="$t('placeholders.searchArea')" @select="(sel) => { filters.areaId = sel.id; filters.areaSearch = sel.name }" />
           </div>
 
-          <div class="flex gap-2 items-center">
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.equipmentType') }}</label>
             <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'theme-button shadow-sm ' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.all') }}</button>
               <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.companyOwned') }}</button>

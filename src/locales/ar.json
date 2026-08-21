@@ -103,6 +103,7 @@
     "all": "الكل",
     "companyOwned": "مملوكة للشركة",
     "external": "خارجية",
+    "externalRented": "خارجية / مؤجرة",
     "totalCount": "إجمالي السجلات",
     "totalSum": "إجمالي المبلغ",
     "pageSize": "حجم الصفحة",
@@ -139,7 +140,13 @@
     "typeWithdrawal": "سحب",
     "typeSupply": "حساب التوريدات (جميع المعاملات)",
     "noJobs": "لم يتم العثور على إدخالات عمل",
-    "selectEquipment": "يرجى اختيار المعدات"
+    "selectEquipment": "يرجى اختيار المعدات",
+    "equipmentType": "نوع المعدة",
+    "exportCsv": "تصدير CSV",
+    "allEquipments": "كل المعدات",
+    "allCompanies": "كل الشركات",
+    "company": "الشركة",
+    "noReportData": "لا توجد بيانات للتقرير"
   },
   "drivers": {
     "singular": "سائق",
@@ -237,6 +244,8 @@
     "deleting": "جاري الحذف...",
     "reset": "إعادة تعيين",
     "resetting": "جاري إعادة التعيين...",
+    "run": "تشغيل",
+    "running": "جاري التشغيل...",
     "removing": "جاري الإزالة...",
     "confirmDelete": "تأكيد الحذف",
     "processing": "جاري المعالجة...",

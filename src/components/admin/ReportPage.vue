@@ -98,7 +98,7 @@
             {{ (locale === 'ar' && p.arName) ? p.arName : (p.label || p.name) }}
           </label>
 
-          <div v-if="!p.type || p.type === 'TEXT'">
+          <div v-if="!isEquipmentTypeParam(p) && (!p.type || p.type === 'TEXT')">
             <input
               v-model="values[p.name]"
               :class="inputClass"
@@ -119,6 +119,42 @@
               v-model="values[p.name]"
               :class="inputClass"
             />
+          </div>
+
+          <div
+            v-else-if="isEquipmentTypeParam(p)"
+            class="flex flex-col gap-2 sm:flex-row"
+          >
+            <button
+              type="button"
+              @click="values[p.name] = ''"
+              :class="[
+                'flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition sm:flex-none',
+                values[p.name] === '' ? 'theme-button shadow-sm' : 'border border-slate-200 bg-white theme-text-secondary hover:bg-slate-50'
+              ]"
+            >
+              {{ $t('equipmentLog.all') }}
+            </button>
+            <button
+              type="button"
+              @click="values[p.name] = 'false'"
+              :class="[
+                'flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition sm:flex-none',
+                values[p.name] === 'false' ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'border border-slate-200 bg-white theme-text-secondary hover:bg-slate-50'
+              ]"
+            >
+              {{ $t('equipmentLog.companyOwned') }}
+            </button>
+            <button
+              type="button"
+              @click="values[p.name] = 'true'"
+              :class="[
+                'flex-1 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition sm:flex-none',
+                values[p.name] === 'true' ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'border border-slate-200 bg-white theme-text-secondary hover:bg-slate-50'
+              ]"
+            >
+              {{ $t('equipmentLog.externalRented') }}
+            </button>
           </div>
 
           <div
@@ -403,8 +439,39 @@ export default {
         : (report.value.title || report.value.arTitle || t('admin.runReport'))
     })
 
+    const isEquipmentLogReport = computed(() => {
+      const title = [report.value?.title, report.value?.arTitle, report.value?.name, report.value?.slug]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+      return (title.includes('equipment') && title.includes('log')) || title.includes('سجل المعدات')
+    })
+
+    const isEquipmentTypeParam = (param) => {
+      const descriptor = [param?.name, param?.label, param?.arName]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+      return param?.name === 'isRental' || descriptor.includes('نوع المعدة') || descriptor.includes('equipment type')
+    }
+
     const reportSelectFields = computed(() => normalizeReportSelectFields(report.value || {}))
-    const reportFilterFields = computed(() => normalizeReportFilterFields(report.value || {}))
+    const reportFilterFields = computed(() => {
+      const fields = normalizeReportFilterFields(report.value || {})
+      if (isEquipmentLogReport.value && !fields.some((field) => field.name === 'isRental')) {
+        return [...fields, {
+          name: 'isRental',
+          label: 'Equipment Type',
+          arName: 'نوع المعدة',
+          type: 'EQUIPMENT_TYPE',
+          paramType: 'EQUIPMENT_TYPE'
+        }]
+      }
+
+      return fields
+    })
 
     const getParamByName = (paramName) => {
       return reportFilterFields.value.find((p) => p.name === paramName)
@@ -674,6 +741,8 @@ export default {
           ;(reportFilterFields.value || []).forEach((p) => {
             if (p.type === 'MULTISELECT') {
               values.value[p.name] = p.default || []
+            } else if (isEquipmentTypeParam(p)) {
+              values.value[p.name] = ''
             } else {
               values.value[p.name] = p.default ?? null
             }
@@ -694,7 +763,12 @@ export default {
       ;(reportFilterFields.value || []).forEach((p) => {
         const val = values.value[p.name]
 
-        if (p.type === 'DROPDOWN') {
+        if (isEquipmentTypeParam(p)) {
+          const paramName = 'isRental'
+          if (val !== '' && val !== null && val !== undefined) {
+            params[paramName] = val === 'true'
+          }
+        } else if (p.type === 'DROPDOWN') {
           params[p.name] = val && typeof val === 'object' ? (val.id ?? val.value ?? val) : null
         } else if (p.type === 'MULTISELECT') {
           params[p.name] = Array.isArray(val)
@@ -882,6 +956,7 @@ export default {
     return {
       report,
       reportTitle,
+      isEquipmentTypeParam,
       reportSelectFields,
       reportFilterFields,
       values,

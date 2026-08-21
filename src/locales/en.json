@@ -103,6 +103,7 @@
     "all": "All",
     "companyOwned": "Company Owned",
     "external": "External",
+    "externalRented": "External / Rented",
     "totalCount": "Total entries",
     "totalSum": "Total sum",
     "pageSize": "Page size",
@@ -138,7 +139,13 @@
     "detail": "Detail",
     "jobEntries": "Job Entries",
     "noJobs": "No job entries found",
-    "selectEquipment": "Please select equipment"
+    "selectEquipment": "Please select equipment",
+    "equipmentType": "Equipment Type",
+    "exportCsv": "Export CSV",
+    "allEquipments": "All Equipments",
+    "allCompanies": "All Companies",
+    "company": "Company",
+    "noReportData": "No report data"
   },
   "drivers": {
     "singular": "Driver",
@@ -236,6 +243,8 @@
     "deleting": "Deleting...",
     "reset": "Reset",
     "resetting": "Resetting...",
+    "run": "Run",
+    "running": "Running...",
     "removing": "Removing...",
     "confirmDelete": "Confirm Delete",
     "processing": "Processing...",
