@@ -195,11 +195,22 @@ export default {
       const useFixed = props.teleportTarget === 'body'
 
       if (useFixed) {
+        const viewportPadding = 8
+        const maxDropdownHeight = 192
+        const spaceBelow = window.innerHeight - inputRect.bottom - viewportPadding
+        const spaceAbove = inputRect.top - viewportPadding
+        const openAbove = spaceBelow < Math.min(maxDropdownHeight, spaceAbove) && spaceAbove > spaceBelow
+        const availableHeight = Math.max(
+          0,
+          Math.min(maxDropdownHeight, openAbove ? spaceAbove : spaceBelow)
+        )
+
         dropdownStyle.value = {
           position: 'fixed',
-          top: `${inputRect.bottom}px`,
+          top: `${openAbove ? Math.max(viewportPadding, inputRect.top - availableHeight) : inputRect.bottom}px`,
           left: `${inputRect.left}px`,
-          width: `${inputRect.width}px`
+          width: `${inputRect.width}px`,
+          maxHeight: `${availableHeight}px`
         }
         return
       }

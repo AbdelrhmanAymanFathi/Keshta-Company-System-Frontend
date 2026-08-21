@@ -430,7 +430,7 @@
     <teleport to="body">
       <transition name="kc-modal">
         <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col overflow-hidden" :class="isRTL ? 'rtl-modal' : ''">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-[calc(100vw-24px)] max-w-[calc(100vw-24px)] md:w-[80vw] md:max-w-[80vw] lg:w-[75vw] lg:max-w-[75vw] max-h-[95vh] flex flex-col" :class="isRTL ? 'rtl-modal' : ''">
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
@@ -440,7 +440,7 @@
             </div>
 
             <!-- Body -->
-            <div class="flex-1 overflow-y-auto p-6 sm:p-8 modal-body-container relative" :class="isRTL ? 'rtl-modal' : ''">
+            <div class="flex-1 min-h-0 overflow-y-auto p-6 sm:p-8 modal-body-container relative" :class="isRTL ? 'rtl-modal' : ''">
               <form id="expenseForm" @submit.prevent="saveExpense" class="space-y-6" :class="isRTL ? 'rtl-modal' : ''">
                 
                 <!-- Step 1: Date & Treasury -->
@@ -476,7 +476,7 @@
                         :allItems="treasuryItems"
                         :placeholder="$t('expenses.searchTreasury')"
                         :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                        teleportTarget=".modal-body-container"
+                        teleportTarget="body"
                         clearable
                         @select="(sel) => { form.treasuryId = sel.id; formTreasurySearch = sel.name }"
                         @clear="() => { form.treasuryId = null; formTreasurySearch = '' }"
@@ -498,19 +498,19 @@
                   </div>
 
                   <div class="p-4 sm:p-5">
-                    <div class="relative overflow-x-auto overflow-y-visible rounded-xl border border-slate-200">
-                      <table ref="tableRef" class="min-w-[1100px] w-full border-collapse bg-white">
+                    <div class="expense-rows-table-container relative overflow-x-auto overflow-y-visible rounded-xl border border-slate-200">
+                      <table ref="tableRef" class="expense-rows-table w-full border-collapse bg-white">
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
                             <th class="w-12 px-3 py-3 text-center text-xs font-medium theme-text-secondary">#</th>
-                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.date') || 'التاريخ' }}</th>
-                            <th class="min-w-[140px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
-                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
-                            <th class="min-w-[180px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
-                            <th class="min-w-[220px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
-                            <th class="min-w-[150px] px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
+                            <th class="expense-column-date px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.date') || 'التاريخ' }}</th>
+                            <th class="expense-column-amount px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
+                            <th class="expense-column-description px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
+                            <th class="expense-column-category px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
+                            <th class="expense-column-category px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
+                            <th class="expense-column-category px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
+                            <th class="expense-column-notes px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
+                            <th class="expense-column-settlement px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
                             <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
                           </tr>
                         </thead>
@@ -558,7 +558,7 @@
                                 :allItems="getRowSubcategories(row)"
                                 :placeholder="$t('expenses.searchSubTerm')"
                                 :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                                teleportTarget=".modal-body-container"
+                                teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowSubcategory(row, sel)"
                                 @clear="() => onClearRowSubcategory(row)"
@@ -573,7 +573,7 @@
                                 :allItems="getRowCategories(row)"
                                 :placeholder="$t('expenses.searchMainTerm')"
                                 :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                                teleportTarget=".modal-body-container"
+                                teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowCategory(row, sel)"
                                 @clear="() => onClearRowCategory(row)"
@@ -588,7 +588,7 @@
                                 :allItems="locations"
                                 :placeholder="$t('expenses.searchLocation')"
                                 :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                                teleportTarget=".modal-body-container"
+                                teleportTarget="body"
                                 clearable
                                 @select="(sel) => { row.locationId = sel.id; row.locationSearch = sel.name }"
                                 @clear="() => { row.locationId = null; row.locationSearch = '' }"
