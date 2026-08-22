@@ -300,7 +300,7 @@
     </div>
 
     <!-- Mobile Cards -->
-    <div v-else class="sm:hidden space-y-4">
+    <div v-if="!loading && !error" class="sm:hidden space-y-4">
       <div 
         v-for="expense in filteredExpenses" 
         :key="expense.id" 
