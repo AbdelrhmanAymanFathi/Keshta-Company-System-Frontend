@@ -1591,12 +1591,12 @@ export default {
     formatDate(dateString) {
       if (!dateString) return '-';
       const date = new Date(dateString);
-      // Always use Gregorian calendar (en-US) to avoid Hijri in Chrome Arabic
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
+      if (isNaN(date.getTime())) return dateString;
+      return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
         month: '2-digit',
-        day: '2-digit'
-      });
+        year: 'numeric'
+      }).format(date);
     },
     
     formatCurrency(amount) {

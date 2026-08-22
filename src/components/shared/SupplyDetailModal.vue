@@ -176,8 +176,7 @@ export default {
     },
     formatDate(d) {
       if (!d) return '-'
-      const locale = (this.$i18n && this.$i18n.locale) || (navigator && navigator.language) || 'en-GB'
-      try { return new Intl.DateTimeFormat(locale).format(new Date(d)) } catch { return d }
+      try { return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(d)) } catch { return d }
     },
     formatCurrency(v) {
       if (v === undefined || v === null || v === '') return '-'

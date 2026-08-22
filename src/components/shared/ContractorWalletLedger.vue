@@ -146,7 +146,7 @@ export default {
     resetFilters() { this.filters = { start: '', end: '', type: '' }; this.page = 1; this.load() },
     changePage(p) { if (p < 1) p = 1; if (p > this.totalPages) p = this.totalPages; this.page = p; this.load() },
     onPageSizeChange() { this.page = 1; this.load() },
-    formatDate(d) { if (!d) return '-'; try { return new Intl.DateTimeFormat().format(new Date(d)) } catch { return d } },
+    formatDate(d) { if (!d) return '-'; try { return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(d)) } catch { return d } },
     formatCurrency(v) {
       if (v === undefined || v === null) return '-'
       const rtl = this.$i18n?.locale === 'ar'

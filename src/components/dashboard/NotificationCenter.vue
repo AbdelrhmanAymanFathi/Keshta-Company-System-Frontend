@@ -167,10 +167,13 @@ export default {
     function formatDate(iso) {
       if (!iso) return ''
       const d = new Date(iso)
-      return d.toLocaleDateString('ar-EG', {
-        year: 'numeric', month: 'short', day: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      })
+      if (isNaN(d.getTime())) return iso
+      const day = String(d.getDate()).padStart(2, '0')
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const year = d.getFullYear()
+      const hours = String(d.getHours()).padStart(2, '0')
+      const minutes = String(d.getMinutes()).padStart(2, '0')
+      return `${day}/${month}/${year} ${hours}:${minutes}`
     }
 
     function typeColor(type) {

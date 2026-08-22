@@ -209,8 +209,23 @@ export default {
     const filters = reactive({ startDate: '', endDate: '', type: '', amountMin: '', amountMax: '', search: '' })
 
     const formatCurrency = (value) => new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
-    const formatDate = (value) => value ? new Date(value).toLocaleDateString(locale.value || 'en-US') : '-'
-    const formatDateTime = (value) => value ? new Date(value).toLocaleString(locale.value || 'en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'
+    const formatDate = (value) => {
+      if (!value) return '-'
+      const d = new Date(value)
+      if (isNaN(d.getTime())) return value
+      return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
+    }
+    const formatDateTime = (value) => {
+      if (!value) return '-'
+      const d = new Date(value)
+      if (isNaN(d.getTime())) return value
+      const day = String(d.getDate()).padStart(2, '0')
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const year = d.getFullYear()
+      const hours = String(d.getHours()).padStart(2, '0')
+      const minutes = String(d.getMinutes()).padStart(2, '0')
+      return `${day}/${month}/${year} ${hours}:${minutes}`
+    }
     const txTypeLabel = (type) => {
       switch (String(type || '').toUpperCase()) {
         case 'DEPOSIT': return t('treasury.types.deposit')

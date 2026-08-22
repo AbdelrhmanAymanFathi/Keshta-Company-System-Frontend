@@ -802,7 +802,7 @@ export default {
       if (diff < 60000) return this.$i18n.locale === 'ar' ? 'الآن' : 'now'
       if (diff < 3600000) return Math.floor(diff / 60000) + (this.$i18n.locale === 'ar' ? ' د' : 'm')
       if (diff < 86400000) return Math.floor(diff / 3600000) + (this.$i18n.locale === 'ar' ? ' س' : 'h')
-      return d.toLocaleDateString(this.$i18n.locale === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric' })
+      return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
     },
     menuIconComponent(name) {
       void this.iconTick

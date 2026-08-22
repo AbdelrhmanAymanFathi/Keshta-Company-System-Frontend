@@ -223,11 +223,13 @@ export default {
 
     const formatDate = (dateString) => {
       if (!dateString) return '-'
-      return new Date(dateString).toLocaleDateString(locale.value || 'en-US', {
-        year: 'numeric',
+      const d = new Date(dateString)
+      if (isNaN(d.getTime())) return dateString
+      return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
         month: '2-digit',
-        day: '2-digit'
-      })
+        year: 'numeric'
+      }).format(d)
     }
 
     const getCategoryVariant = (category) => {
