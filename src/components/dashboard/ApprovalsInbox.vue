@@ -595,7 +595,7 @@ export default {
         return val ? (this.locale === 'ar' ? 'نعم' : 'Yes') : (this.locale === 'ar' ? 'لا' : 'No');
       }
       if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate'].includes(key)) {
-        const formatted = Number(val).toLocaleString('en-US', { style: 'currency', currency: 'SAR' }); return this.locale === 'ar' ? '\u200E' + formatted : formatted;
+        const formatted = Number(val).toLocaleString('en-US', { style: 'currency', currency: 'EGP' }); return this.locale === 'ar' ? '\u200E' + formatted : formatted;
       }
       return val;
     },
