@@ -329,19 +329,19 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between bg-gray-50 p-4 rounded-lg">
-      <div class="flex items-center gap-4">
-        <div class="text-sm theme-text-secondary">
-          {{ $t('supply.showing') }} {{ (currentPage - 1) * pageSize + 1 }} {{ $t('supply.to') }} 
+    <div v-if="totalPages > 1" class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50 p-3 sm:p-4 rounded-lg">
+      <div class="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-2 w-full sm:w-auto">
+        <div class="text-xs sm:text-sm theme-text-secondary text-center sm:text-start">
+          {{ $t('supply.showing') }} {{ (currentPage - 1) * pageSize + 1 }} {{ $t('supply.to') }}
           {{ Math.min(currentPage * pageSize, totalItems) }} {{ $t('supply.of') }} {{ totalItems }} {{ $t('supply.results') }}
         </div>
-        
-        <div class="flex items-center gap-2">
-          <label class="text-sm theme-text-secondary">{{ $t('expenses.pageSize') }}:</label>
-          <select 
-            v-model="pageSize" 
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <label class="hidden sm:inline text-xs sm:text-sm theme-text-secondary">{{ $t('expenses.pageSize') }}:</label>
+          <select
+            v-model="pageSize"
             @change="onPageSizeChange"
-            class="px-2 py-1 text-sm border border-gray-300 rounded theme-input-focus"
+            class="px-1.5 py-1 text-xs sm:text-sm border border-gray-300 rounded theme-input-focus"
           >
             <option value="10">10</option>
             <option value="20">20</option>
@@ -350,34 +350,34 @@
           </select>
         </div>
       </div>
-      
-      <div class="flex gap-2">
-        <button 
+
+      <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+        <button
           @click="goToPage(currentPage - 1)"
           :disabled="currentPage === 1"
-          class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {{ $t('supply.previous') }}
         </button>
-        
-        <button 
-          v-for="page in visiblePages" 
+
+        <button
+          v-for="page in visiblePages"
           :key="page"
           @click="goToPage(page)"
           :class="[
-            'px-3 py-2 text-sm border rounded-lg transition-colors',
-            page === currentPage 
-              ? 'theme-button theme-border-accent' 
+            'px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border rounded-lg transition-colors',
+            page === currentPage
+              ? 'theme-button theme-border-accent'
               : 'border-gray-300 hover:bg-gray-50'
           ]"
         >
           {{ page }}
         </button>
-        
-        <button 
+
+        <button
           @click="goToPage(currentPage + 1)"
           :disabled="currentPage === totalPages"
-          class="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {{ $t('supply.next') }}
         </button>
