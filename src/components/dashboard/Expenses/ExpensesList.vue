@@ -1423,8 +1423,8 @@ rows: [],
 
     createEmptyRow() {
       const prevRow = (this.rows && this.rows.length > 0) ? this.rows[this.rows.length - 1] : null
-      // Keep the same date when adding a new row in step 2.
-      const rowDate = this.form?.date || getTodayISO()
+      // Keep the same expense date as the previous row (like location).
+      const rowDate = prevRow?.date || this.form?.date || getTodayISO()
       const rowLocationId = prevRow?.locationId ?? (this.locations?.[0]?.id ?? null)
       const rowLocationSearch = prevRow?.locationSearch ?? (this.locations?.[0]?.name ?? '')
 
