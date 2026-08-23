@@ -168,187 +168,129 @@
       </div>
     </div>
 
-    <!-- Desktop Table -->
-    <div v-if="!loading && !error" class="hidden sm:block overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('labels.#') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.date') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.mainTerm') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.subTerm') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.description') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.location') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.paymentMethod') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.treasuryOrCustody') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.settlementDate') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.amount') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.notes') }}
-              </th>
-              <th class="px-4 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('expenses.actions') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" class="hover:bg-gray-50 transition-colors" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ (currentPage - 1) * pageSize + index + 1 }}
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ formatDate(expense.date) }}
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="getCategoryColor(expense.category)">
-                  {{ getCategoryLabel(expense.category) }}
-                </span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap" :class="isRTL ? 'text-right' : 'text-left'">
-                <span v-if="getSubcategoryLabel(expense) !== '-'" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
-                  {{ getSubcategoryLabel(expense) }}
-                </span>
-                <span v-else class="text-xs theme-caption">-</span>
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ expense.description }}
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                <span v-if="expense.location" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
-                  {{ expense.location.name }}
-                </span>
-                <span v-else class="theme-caption">-</span>
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  {{ getPaymentMethodLabel(expense.paymentMethod) }}
-                </span>
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="expense.treasury.type === 'CUSTODY' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'">
-                  {{ expense.treasury.name }} ({{ expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }})
-                </span>
-                <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ formatDate(expense.settlementDate) }}
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ formatCurrency(expense.amount) }}
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-muted max-w-xs truncate" :class="isRTL ? 'text-right' : 'text-left'">
-                {{ expense.notes || '-' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
-                  <button 
-                    @click="openEditModal(expense)" 
-                    class="theme-text hover:theme-accent-muted transition-colors"
-                    :title="$t('labels.edit')"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                  </button>
-                  <button 
-                    @click="confirmDelete(expense)" 
-                    class="text-red-600 hover:text-red-900 transition-colors"
-                    :title="$t('labels.delete')"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="filteredExpenses.length === 0">
-              <td colspan="12" class="px-6 py-12 text-center theme-text-muted">
-                <div class="flex flex-col items-center">
-                  <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    <!-- Laptop/desktop: one card, all columns visible, text wraps instead of clipping -->
+    <div v-if="!loading && !error" class="expenses-list-card hidden lg:block rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <table class="expenses-list-table">
+        <colgroup>
+          <col style="width: 3.5%" />
+          <col style="width: 8%" />
+          <col style="width: 9%" />
+          <col style="width: 9%" />
+          <col style="width: 13%" />
+          <col style="width: 9%" />
+          <col style="width: 7%" />
+          <col style="width: 12%" />
+          <col style="width: 8%" />
+          <col style="width: 12%" />
+          <col style="width: 5.5%" />
+          <col style="width: 4%" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>{{ $t('labels.#') }}</th>
+            <th>{{ $t('expenses.date') }}</th>
+            <th>{{ $t('expenses.mainTerm') }}</th>
+            <th>{{ $t('expenses.subTerm') }}</th>
+            <th>{{ $t('expenses.description') }}</th>
+            <th>{{ $t('expenses.location') }}</th>
+            <th>{{ $t('expenses.paymentMethod') }}</th>
+            <th>{{ $t('expenses.treasuryOrCustody') }}</th>
+            <th>{{ $t('expenses.settlementDate') }}</th>
+            <th>{{ $t('expenses.amount') }}</th>
+            <th>{{ $t('expenses.notes') }}</th>
+            <th>{{ $t('expenses.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
+            <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
+            <td>{{ formatDate(expense.date) }}</td>
+            <td>
+              <span class="expense-chip" :class="getCategoryColor(expense.category)">{{ getCategoryLabel(expense.category) }}</span>
+            </td>
+            <td>
+              <span v-if="getSubcategoryLabel(expense) !== '-'" class="expense-chip bg-slate-100 text-slate-700">{{ getSubcategoryLabel(expense) }}</span>
+              <span v-else>-</span>
+            </td>
+            <td>{{ expense.description }}</td>
+            <td>
+              <span v-if="expense.location" class="expense-chip theme-badge">{{ expense.location.name }}</span>
+              <span v-else>-</span>
+            </td>
+            <td>
+              <span class="expense-chip bg-emerald-50 text-emerald-800 border border-emerald-200">{{ getPaymentMethodLabel(expense.paymentMethod) }}</span>
+            </td>
+            <td>
+              <span v-if="expense.treasury" class="expense-chip" :class="expense.treasury.type === 'CUSTODY' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'">
+                {{ expense.treasury.name }} ({{ expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }})
+              </span>
+              <span v-else>{{ $t('expenses.mainExpensesFallback') }}</span>
+            </td>
+            <td>{{ formatDate(expense.settlementDate) }}</td>
+            <td class="amount-cell">{{ formatCurrency(expense.amount) }}</td>
+            <td>{{ expense.notes || '-' }}</td>
+            <td>
+              <div class="flex gap-1.5">
+                <button type="button" @click="openEditModal(expense)" class="theme-text" :title="$t('labels.edit')">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
-                  <p class="text-lg font-medium">{{ $t('expenses.noResults') }}</p>
-                  <p class="text-sm theme-caption mt-1">{{ $t('expenses.searchBy') }}</p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                </button>
+                <button type="button" @click="confirmDelete(expense)" class="text-red-600" :title="$t('labels.delete')">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="filteredExpenses.length === 0">
+            <td colspan="12" class="empty-cell">
+              <p class="text-lg font-medium">{{ $t('expenses.noResults') }}</p>
+              <p class="text-sm theme-caption mt-1">{{ $t('expenses.searchBy') }}</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- Mobile Cards -->
-    <div v-if="!loading && !error" class="sm:hidden space-y-4">
-      <div 
-        v-for="expense in filteredExpenses" 
-        :key="expense.id" 
-        class="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40 p-4"
+    <!-- Phone / tablet: same fields stacked inside one card -->
+    <div v-if="!loading && !error" class="lg:hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <div
+        v-for="expense in filteredExpenses"
+        :key="expense.id"
+        class="border-b border-slate-100 last:border-b-0 p-4"
+        @contextmenu.prevent="showExpenseContextMenu($event, expense)"
       >
-        <div class="flex justify-between items-start mb-3">
-          <div :class="isRTL ? 'text-right' : 'text-left'">
-            <h3 class="font-semibold theme-text-primary">{{ expense.description }}</h3>
-            <p class="text-sm theme-text-muted">{{ formatDate(expense.date) }}</p>
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="min-w-0">
+            <h3 class="font-semibold theme-text-primary break-words">{{ expense.description }}</h3>
+            <p class="text-sm theme-text-muted mt-1">{{ formatDate(expense.date) }}</p>
           </div>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" :class="getCategoryColor(expense.category)">
-            {{ getCategoryLabel(expense.category) }}
-          </span>
+          <span class="text-base font-bold text-slate-800 shrink-0">{{ formatCurrency(expense.amount) }}</span>
         </div>
-        
-        <div class="flex justify-between items-center mb-3">
-          <span class="text-lg font-semibold theme-text-primary">{{ formatCurrency(expense.amount) }}</span>
-          <div class="flex gap-2">
-            <button 
-              @click="openEditModal(expense)" 
-              class="p-2 theme-text theme-hover-soft rounded-lg transition-colors"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-              </svg>
-            </button>
-            <button 
-              @click="confirmDelete(expense)" 
-              class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-            </button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+          <div><span class="theme-caption">{{ $t('expenses.mainTerm') }}:</span> {{ getCategoryLabel(expense.category) }}</div>
+          <div><span class="theme-caption">{{ $t('expenses.subTerm') }}:</span> {{ getSubcategoryLabel(expense) }}</div>
+          <div><span class="theme-caption">{{ $t('expenses.location') }}:</span> {{ expense.location?.name || '-' }}</div>
+          <div><span class="theme-caption">{{ $t('expenses.paymentMethod') }}:</span> {{ getPaymentMethodLabel(expense.paymentMethod) }}</div>
+          <div>
+            <span class="theme-caption">{{ $t('expenses.treasuryOrCustody') }}:</span>
+            {{ expense.treasury ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : $t('expenses.mainExpensesFallback') }}
           </div>
+          <div><span class="theme-caption">{{ $t('expenses.settlementDate') }}:</span> {{ formatDate(expense.settlementDate) }}</div>
         </div>
-        
-        <p v-if="expense.notes" class="text-sm theme-text-secondary" :class="isRTL ? 'text-right' : 'text-left'">
-          {{ expense.notes }}
-        </p>
+        <p v-if="expense.notes" class="text-sm theme-text-secondary mt-3 break-words">{{ expense.notes }}</p>
+        <div class="flex gap-2 mt-3">
+          <button type="button" @click="openEditModal(expense)" class="p-2 theme-text" :title="$t('labels.edit')">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          </button>
+          <button type="button" @click="confirmDelete(expense)" class="p-2 text-red-600" :title="$t('labels.delete')">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        </div>
       </div>
-      
-      <div v-if="filteredExpenses.length === 0" class="text-center py-12">
-        <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        <p class="text-lg font-medium theme-text-muted">{{ $t('expenses.noResults') }}</p>
-      </div>
+      <div v-if="filteredExpenses.length === 0" class="text-center py-12 theme-text-muted">{{ $t('expenses.noResults') }}</div>
     </div>
 
     <!-- Pagination -->
@@ -2183,6 +2125,59 @@ rows: [],
 .direction-rtl table th,
 .direction-rtl table td {
   text-align: right;
+}
+
+.expenses-list-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.expenses-list-table {
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 0 !important;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.expenses-list-card :deep(th),
+.expenses-list-card :deep(td) {
+  min-width: 0;
+  padding: 0.5rem 0.4rem !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.expenses-list-card :deep(th) {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 600;
+}
+
+.expense-chip {
+  display: inline;
+  max-width: 100%;
+  padding: 0.125rem 0.375rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.amount-cell {
+  font-weight: 700;
+  white-space: normal !important;
+}
+
+.empty-cell {
+  text-align: center !important;
+  padding: 3rem 1rem !important;
 }
 
 .rtl-modal,
