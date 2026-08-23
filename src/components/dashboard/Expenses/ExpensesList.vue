@@ -176,14 +176,14 @@
           <col style="width: 8%" />
           <col style="width: 9%" />
           <col style="width: 9%" />
-          <col style="width: 13%" />
+          <col style="width: 11%" />
           <col style="width: 9%" />
           <col style="width: 7%" />
           <col style="width: 12%" />
           <col style="width: 8%" />
-          <col style="width: 12%" />
-          <col style="width: 5.5%" />
-          <col style="width: 4%" />
+          <col style="width: 10%" />
+          <col style="width: 6%" />
+          <col style="width: 7.5%" />
         </colgroup>
         <thead>
           <tr>
@@ -198,7 +198,7 @@
             <th>{{ $t('expenses.settlementDate') }}</th>
             <th>{{ $t('expenses.amount') }}</th>
             <th>{{ $t('expenses.notes') }}</th>
-            <th>{{ $t('expenses.actions') }}</th>
+            <th class="actions-col">{{ $t('expenses.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -229,7 +229,7 @@
             <td>{{ formatDate(expense.settlementDate) }}</td>
             <td class="amount-cell">{{ formatCurrency(expense.amount) }}</td>
             <td>{{ expense.notes || '-' }}</td>
-            <td>
+            <td class="actions-col">
               <div class="flex gap-1.5">
                 <button type="button" @click="openEditModal(expense)" class="theme-text" :title="$t('labels.edit')">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2144,10 +2144,10 @@ rows: [],
 .expenses-list-card :deep(th),
 .expenses-list-card :deep(td) {
   min-width: 0;
-  padding: 0.5rem 0.4rem !important;
+  padding: 0.5rem 0.28rem !important;
   white-space: normal !important;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
   vertical-align: top;
   font-size: 0.75rem;
   line-height: 1.35;
@@ -2157,6 +2157,14 @@ rows: [],
   text-transform: none !important;
   letter-spacing: 0 !important;
   font-weight: 600;
+  overflow-wrap: normal;
+  word-break: keep-all;
+}
+
+.expenses-list-card :deep(.actions-col) {
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
 }
 
 .expense-chip {
