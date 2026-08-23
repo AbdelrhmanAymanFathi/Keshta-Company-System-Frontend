@@ -1008,39 +1008,33 @@ body,
 }
 @media (min-width: 768px) {
   .expense-rows-table {
-    table-layout: fixed;
-    min-width: 0;
+    table-layout: auto;
+    width: 100%;
   }
 
   .expense-rows-table th,
   .expense-rows-table td {
     min-width: 0;
-    overflow-wrap: anywhere;
-  }
-
-  .expense-rows-table input,
-  .expense-rows-table textarea,
-  .expense-rows-table .relative {
-    min-width: 0;
-    max-width: 100%;
   }
 
   .expense-column-date,
   .expense-column-settlement {
-    width: 10%;
+    width: 8.75rem;
+    min-width: 8.75rem;
   }
 
   .expense-column-amount {
-    width: 9%;
+    width: 7.5rem;
+    min-width: 7.5rem;
   }
 
   .expense-column-description,
   .expense-column-notes {
-    width: 14%;
+    min-width: 9rem;
   }
 
   .expense-column-category {
-    width: 11%;
+    min-width: 8.5rem;
   }
 }
 

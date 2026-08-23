@@ -372,7 +372,7 @@
     <teleport to="body">
       <transition name="kc-modal">
         <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-[calc(100vw-24px)] max-w-[calc(100vw-24px)] md:w-[80vw] md:max-w-[80vw] lg:w-[75vw] lg:max-w-[75vw] max-h-[95vh] flex flex-col" :class="isRTL ? 'rtl-modal' : ''">
+          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-[calc(100vw-16px)] max-w-[calc(100vw-16px)] md:w-[96vw] md:max-w-[96vw] max-h-[95vh] flex flex-col" :class="isRTL ? 'rtl-modal' : ''">
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
@@ -444,62 +444,62 @@
                       <table ref="tableRef" class="expense-rows-table w-full border-collapse bg-white">
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
-                            <th class="w-12 px-3 py-3 text-center text-xs font-medium theme-text-secondary">#</th>
-                            <th class="expense-column-date px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.date') || 'التاريخ' }}</th>
-                            <th class="expense-column-amount px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.amount') }}</th>
-                            <th class="expense-column-description px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
-                            <th class="expense-column-category px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
-                            <th class="expense-column-category px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
-                            <th class="expense-column-category px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
-                            <th class="expense-column-notes px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
-                            <th class="expense-column-settlement px-3 py-3 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
-                            <th class="w-24 px-3 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('expenses.actions') }}</th>
+                            <th class="w-10 px-2 py-2 text-center text-xs font-medium theme-text-secondary">#</th>
+                            <th class="expense-column-date px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.date') || 'التاريخ' }}</th>
+                            <th class="expense-column-amount px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.amount') }}</th>
+                            <th class="expense-column-description px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
+                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
+                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
+                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
+                            <th class="expense-column-notes px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
+                            <th class="expense-column-settlement px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
+                            <th class="actions-col px-2 py-2 text-center text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.actions') }}</th>
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
                           <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
-                            <td class="px-3 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
+                            <td class="px-2 py-2 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
                             <!-- Row Date (Editable per row) -->
-                            <td class="px-3 py-2">
+                            <td class="expense-column-date px-2 py-2">
                               <DateField
                                 v-model="row.date"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                class="w-full min-w-[8.5rem] border border-gray-300 rounded-lg px-2 py-2 text-sm theme-input-focus"
                                 :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'date', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'date', $event)"
                               />
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="expense-column-amount px-2 py-2">
                               <input
                                 v-model="row.amount"
                                 type="number"
                                 step="0.01"
                                 min="0"
                                 placeholder="0.00"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm font-semibold theme-input-focus"
+                                class="expense-amount-input w-full min-w-[7rem] border border-gray-300 rounded-lg px-2 py-2 text-sm font-semibold theme-input-focus"
                                 :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'amount', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'amount', $event)"
                               />
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                               <input
                                 v-model="row.description"
                                 type="text"
                                 :placeholder="$t('expenses.statementPlaceholder')"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                class="w-full min-w-[9rem] border border-gray-300 rounded-lg px-2 py-2 text-sm theme-input-focus"
                                 :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                               <SearchDropdown
                                 v-model="row.subCategorySearch"
                                 :items="getRowSubcategories(row)"
                                 :allItems="getRowSubcategories(row)"
                                 :placeholder="$t('expenses.searchSubTerm')"
-                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[8.5rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowSubcategory(row, sel)"
@@ -508,13 +508,13 @@
                                 @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
                               />
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                               <SearchDropdown
                                 v-model="row.categorySearch"
                                 :items="getRowCategories(row)"
                                 :allItems="getRowCategories(row)"
                                 :placeholder="$t('expenses.searchMainTerm')"
-                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[8.5rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowCategory(row, sel)"
@@ -523,13 +523,13 @@
                                 @keydown.tab="handleFieldNavigation(index, 'category', $event)"
                               />
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                               <SearchDropdown
                                 v-model="row.locationSearch"
                                 :items="locations"
                                 :allItems="locations"
                                 :placeholder="$t('expenses.searchLocation')"
-                                :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[8.5rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => { row.locationId = sel.id; row.locationSearch = sel.name }"
@@ -538,23 +538,23 @@
                                 @keydown.tab="handleFieldNavigation(index, 'location', $event)"
                               />
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                               <textarea
                                 v-model="row.notes"
                                 rows="1"
                                 :placeholder="$t('expenses.notesPlaceholder')"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm theme-input-focus"
+                                class="w-full min-w-[8rem] border border-gray-300 rounded-lg px-2 py-2 text-sm theme-input-focus"
                                 :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'notes', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'notes', $event)"
                               ></textarea>
                             </td>
                             <!-- Settlement Date (Static from Step 1) -->
-                            <td class="px-3 py-3 text-sm theme-text-secondary whitespace-nowrap align-middle">
+                            <td class="expense-column-settlement px-2 py-2 text-sm theme-text-secondary whitespace-nowrap align-middle">
                               {{ formatDate(form.settlementDate || form.date) }}
                             </td>
-                            <td class="px-3 py-2 text-center">
-                              <div class="flex justify-center gap-2">
+                            <td class="actions-col px-1 py-2 text-center">
+                              <div class="flex justify-center gap-1">
                                 <button type="button" @click="duplicateRow(index)" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-emerald-700" title="Duplicate">
                                   ⧉
                                 </button>
@@ -2165,6 +2165,27 @@ rows: [],
   white-space: nowrap !important;
   overflow-wrap: normal !important;
   word-break: keep-all !important;
+}
+
+.expense-rows-table {
+  width: 100%;
+}
+
+.expense-rows-table :deep(.date-field),
+.expense-rows-table .expense-amount-input {
+  min-width: 7.25rem;
+  box-sizing: border-box;
+}
+
+.expense-amount-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.expense-amount-input::-webkit-outer-spin-button,
+.expense-amount-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .expense-chip {
