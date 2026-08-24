@@ -147,7 +147,7 @@
             v-model="filters.q"
             @keyup.enter="loadReport"
             type="text"
-            :placeholder="$t('expenses.searchStatementPlaceholder')"
+            :placeholder="$t('expenses.searchNotesPlaceholder')"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
