@@ -142,7 +142,7 @@
 
       <!-- Filter Action Buttons -->
       <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
-        <button @click="currentPage = 1; loadExpenses()" :disabled="loading"
+        <button @click="currentPage = 1; resolveSubcategoryFilterFromSearch(); loadExpenses()" :disabled="loading"
           class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm">
           {{ $t('labels.search') }}
         </button>
@@ -889,10 +889,18 @@ rows: [],
 
     // Subcategories for filter — all subcategories when no category selected, filtered otherwise
     filterSubcategories() {
-      if (!this.selectedCategoryId) {
-        return this.expenseCategories.reduce((acc, cat) => acc.concat(cat.subCategories || []), [])
-      }
-      return this.expenseCategories.find(c => c.id === this.selectedCategoryId)?.subCategories || []
+      const list = this.flattenSubcategories(
+        this.selectedCategoryId
+          ? this.expenseCategories.filter(c => Number(c.id) === Number(this.selectedCategoryId))
+          : this.expenseCategories
+      )
+      const seen = new Set()
+      return list.filter(sub => {
+        const key = this.normalizeTermName(sub?.name)
+        if (!key || seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
     },
 
     // Subcategories for modal form (based on selected form category)
@@ -936,11 +944,12 @@ rows: [],
         )
       }
       
-      if (this.selectedCategoryId) {
-        filtered = filtered.filter(expense => expense.categoryId === this.selectedCategoryId)
+      if (this.selectedCategoryId && !this.selectedSubcategoryId) {
+        filtered = filtered.filter(expense => Number(expense.categoryId) === Number(this.selectedCategoryId))
       }
       if (this.selectedSubcategoryId) {
-        filtered = filtered.filter(expense => expense.subCategoryId === this.selectedSubcategoryId)
+        const ids = this.sameNameSubcategoryIds(this.selectedSubcategoryId).map(Number)
+        filtered = filtered.filter(expense => ids.includes(Number(expense.subCategoryId ?? expense.subCategoryId)))
       }
       if (this.selectedKind) {
         filtered = filtered.filter(expense => expense.kind === this.selectedKind)
@@ -1065,6 +1074,7 @@ rows: [],
       this.error = null
       
       try {
+        this.resolveSubcategoryFilterFromSearch()
         // Build params object with all filters (only non-empty values)
         const params = {
           page: this.currentPage,
@@ -1075,7 +1085,9 @@ rows: [],
         if (this.filters?.endDate) params.endDate = this.filters.endDate
         if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
         if (this.filters?.settlementDateEnd) params.settlementDateEnd = this.filters.settlementDateEnd
-        if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
+        if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined && !this.selectedSubcategoryId) {
+          params.categoryId = this.selectedCategoryId
+        }
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
         if (this.selectedLocationId !== null && this.selectedLocationId !== undefined) params.locationId = this.selectedLocationId
         if (this.selectedTreasuryId !== null && this.selectedTreasuryId !== undefined) params.treasuryId = this.selectedTreasuryId
@@ -1417,6 +1429,43 @@ rows: [],
         return
       }
       this.rows.splice(index, 1)
+    },
+
+    normalizeTermName(value) {
+      return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase()
+    },
+
+    flattenSubcategories(categories = this.expenseCategories) {
+      const list = []
+      ;(categories || []).forEach(cat => {
+        const subCats = cat?.subCategories || cat?.subcategories || cat?.children || []
+        subCats.forEach(sc => list.push(sc))
+      })
+      return list
+    },
+
+    resolveSubcategoryFilterFromSearch() {
+      if (this.selectedSubcategoryId != null) return
+      const query = this.normalizeTermName(this.filterSubcategorySearch)
+      if (!query) return
+      const match = this.flattenSubcategories().find(sc => this.normalizeTermName(sc?.name) === query)
+        || this.flattenSubcategories().find(sc => this.normalizeTermName(sc?.name).includes(query))
+      if (match?.id != null) {
+        this.selectedSubcategoryId = match.id
+        this.filterSubcategorySearch = match.name
+      }
+    },
+
+    sameNameSubcategoryIds(subCategoryId) {
+      if (subCategoryId == null) return []
+      const all = this.flattenSubcategories()
+      const selected = all.find(sc => Number(sc.id) === Number(subCategoryId))
+      const key = this.normalizeTermName(selected?.name)
+      if (!key) return [Number(subCategoryId)]
+      const ids = all
+        .filter(sc => this.normalizeTermName(sc.name) === key)
+        .map(sc => Number(sc.id))
+      return ids.length ? ids : [Number(subCategoryId)]
     },
 
     getRowSubcategories(row) {
@@ -1863,15 +1912,13 @@ rows: [],
     },
 
     getSubcategoryLabel(expense) {
-      // Prefer resolving by IDs from hierarchical tree
-      if (expense?.subCategoryId && this.expenseCategories?.length) {
-        const cat = this.expenseCategories.find(c => c.id === expense.categoryId)
-        const sub = cat?.subCategories?.find(sc => sc.id === expense.subCategoryId)
+      const subId = expense?.subCategoryId ?? expense?.subCategoryId
+      if (subId != null && this.expenseCategories?.length) {
+        const sub = this.flattenSubcategories().find(sc => Number(sc.id) === Number(subId))
         if (sub?.name) return sub.name
       }
 
-      // Fallback: legacy text field from backend
-      return expense?.classification || '-'
+      return expense?.subCategoryRef?.name || expense?.classification || '-'
     },
     
     formatDate(dateString) {

@@ -321,11 +321,18 @@ export default {
     })
 
     const availableSubcategories = computed(() => {
-      if (!filters.value.categoryId) {
-        return categories.value.flatMap(c => c.subCategories || c.subcategories || [])
-      }
-      const cat = categories.value.find(c => c.id === Number(filters.value.categoryId))
-      return cat?.subCategories || cat?.subcategories || []
+      const list = !filters.value.categoryId
+        ? categories.value.flatMap(c => c.subCategories || c.subcategories || [])
+        : ((categories.value.find(c => c.id === Number(filters.value.categoryId))?.subCategories)
+          || (categories.value.find(c => c.id === Number(filters.value.categoryId))?.subcategories)
+          || [])
+      const seen = new Set()
+      return list.filter(sub => {
+        const key = String(sub?.name || '').trim().replace(/\s+/g, ' ').toLowerCase()
+        if (!key || seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
     })
 
     const treasuryItems = computed(() => {

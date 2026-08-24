@@ -1373,7 +1373,6 @@ export const getExpenses = (params = {}) => {
     pageSize = 20, 
     q, 
     categoryId, 
-    subCategoryId,
     kind,
     branchId, 
     locationId, 
@@ -1383,6 +1382,7 @@ export const getExpenses = (params = {}) => {
     endDate,
     includeSummary 
   } = params;
+  const subCategoryId = params.subCategoryId ?? params.subCategoryId;
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
