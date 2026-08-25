@@ -1519,6 +1519,8 @@
     "searchStatement": "Search statement and notes",
     "searchStatementPlaceholder": "Search the statement, description, or notes...",
     "searchNotesPlaceholder": "Search by paper number in notes or statement...",
+    "searchAmount": "Search by amount",
+    "searchAmountPlaceholder": "Enter an amount, e.g. 1550",
     "treasuryOrCustody": "Treasury / Custody",
     "mainExpensesFallback": "Main expenses",
     "modalStepOneTitle": "Step 1: Basic details",

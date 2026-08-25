@@ -151,6 +151,18 @@
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
+
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.searchAmount') }}</label>
+          <input
+            v-model="filters.amountSearch"
+            @keyup.enter="loadReport"
+            type="text"
+            inputmode="decimal"
+            :placeholder="$t('expenses.searchAmountPlaceholder')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+          />
+        </div>
       </div>
 
       <div class="flex gap-2">
@@ -308,6 +320,7 @@ export default {
 
     const filters = ref({
       q: '',
+      amountSearch: '',
       startDate: '',
       endDate: '',
       settlementDateStart: '',
@@ -478,6 +491,7 @@ export default {
     const clearFilters = () => {
       filters.value = {
         q: '',
+        amountSearch: '',
         startDate: filters.value.startDate,
         endDate: filters.value.endDate,
         settlementDateStart: '',

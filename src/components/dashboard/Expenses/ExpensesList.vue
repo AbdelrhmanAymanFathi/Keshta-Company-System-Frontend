@@ -138,6 +138,19 @@
             :class="isRTL ? 'text-right' : 'text-left'"
           />
         </div>
+
+        <!-- Search by amount / البحث بالمبلغ -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.searchAmount') }}</label>
+          <input
+            v-model="amountSearch"
+            type="text"
+            inputmode="decimal"
+            :placeholder="$t('expenses.searchAmountPlaceholder')"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+            :class="isRTL ? 'text-right' : 'text-left'"
+          />
+        </div>
       </div>
 
       <!-- Filter Action Buttons -->
@@ -794,6 +807,7 @@ export default {
       loading: false,
       error: null,
       searchQuery: '',
+      amountSearch: '',
       searchDebounceTimer: null,
       selectedCategoryId: null,
       selectedSubcategoryId: null,
@@ -954,6 +968,13 @@ rows: [],
       if (this.selectedKind) {
         filtered = filtered.filter(expense => expense.kind === this.selectedKind)
       }
+      if (this.amountSearch) {
+        const cleanAmt = String(this.amountSearch).trim().replace(/,/g, '')
+        const numAmt = parseFloat(cleanAmt)
+        if (!isNaN(numAmt) && cleanAmt !== '') {
+          filtered = filtered.filter(expense => Math.abs(Number(expense.amount) - numAmt) < 0.001)
+        }
+      }
       
       return filtered
     },
@@ -980,6 +1001,13 @@ rows: [],
   
   watch: {
     searchQuery() {
+      this.currentPage = 1
+      clearTimeout(this.searchDebounceTimer)
+      this.searchDebounceTimer = setTimeout(() => {
+        this.loadExpenses()
+      }, 250)
+    },
+    amountSearch() {
       this.currentPage = 1
       clearTimeout(this.searchDebounceTimer)
       this.searchDebounceTimer = setTimeout(() => {
@@ -1081,6 +1109,7 @@ rows: [],
           pageSize: this.pageSize
         }
         if (this.searchQuery) params.q = this.searchQuery
+        if (this.amountSearch) params.amountSearch = String(this.amountSearch).trim()
         if (this.filters?.startDate) params.startDate = this.filters.startDate
         if (this.filters?.endDate) params.endDate = this.filters.endDate
         if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
@@ -1851,6 +1880,7 @@ rows: [],
     
     clearFilters() {
       this.searchQuery = ''
+      this.amountSearch = ''
       this.selectedCategoryId = null
       this.selectedSubcategoryId = null
       this.selectedLocationId = null
@@ -1955,6 +1985,7 @@ rows: [],
       try {
         const params = {}
         if (this.searchQuery) params.q = this.searchQuery
+        if (this.amountSearch) params.amountSearch = String(this.amountSearch).trim()
         if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
         if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
