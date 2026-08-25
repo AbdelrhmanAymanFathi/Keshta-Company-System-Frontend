@@ -1652,7 +1652,7 @@
     "archive": "Archive Treasury",
     "unarchive": "Restore Treasury",
     "create": "Create Treasury",
-    "addMoney": "Add Money",
+    "addMoney": "Deposit to treasury",
     "refresh": "Refresh",
     "balance": "Balance",
     "last30dIn": "Last 30d In",

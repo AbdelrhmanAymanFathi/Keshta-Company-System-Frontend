@@ -60,7 +60,9 @@
             <h1 class="text-xl font-semibold theme-heading theme-text-primary sm:text-2xl">
               {{ selectedTreasury?.name || t('dashboard.treasury') }}
             </h1>
-            <p class="mt-1 text-sm theme-text-secondary">{{ t('treasury.detailsHint') }}</p>
+            <p class="mt-1 text-sm theme-text-secondary">
+              {{ isCustodySelected ? (isRTL ? 'العهدة للصرف فقط. الإيداع في الخزينة، والتغذية تتم بالتحويل من الخزينة.' : 'Custody is for spending only. Deposit into a treasury, then transfer to fund custody.') : t('treasury.detailsHint') }}
+            </p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
             <span
@@ -78,7 +80,7 @@
               {{ selectedTreasury.deletedAt ? t('treasury.archived') : t('treasury.active') }}
             </span>
             <button
-              v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
+              v-if="isAdmin && canDeposit"
               class="w-full rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button sm:w-auto"
               :disabled="!selectedTreasury"
               @click="openDepositModal"
@@ -308,7 +310,7 @@
   <div v-if="showTransfer" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeTransferModal">
     <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h3 class="text-lg font-semibold theme-text-primary">تحويل أموال بين الخزائن / العهد</h3>
+        <h3 class="text-lg font-semibold theme-text-primary">تحويل / تغذية عهدة</h3>
         <button class="theme-caption transition hover:theme-text-secondary" @click="closeTransferModal">×</button>
       </div>
       <form class="mt-4 space-y-4" @submit.prevent="executeTransfer">
@@ -492,6 +494,10 @@ export default {
       })
     })
     const selectedTreasuryIsArchived = computed(() => !!selectedTreasury.value?.deletedAt)
+    const isCustodySelected = computed(() => selectedTreasury.value?.type === 'CUSTODY')
+    const canDeposit = computed(() =>
+      !!selectedTreasury.value && !selectedTreasuryIsArchived.value && !isCustodySelected.value
+    )
 
     const loadTreasuries = async () => {
       try {
@@ -594,7 +600,7 @@ export default {
     }
 
     const openDepositModal = () => {
-      if (!selectedTreasury.value || selectedTreasuryIsArchived.value) return
+      if (!canDeposit.value) return
       depositForm.amount = 0
       depositForm.description = ''
       depositForm.date = new Date().toISOString().slice(0, 10)
@@ -604,7 +610,7 @@ export default {
     const closeDepositModal = () => { showDeposit.value = false }
 
     const saveDeposit = async () => {
-      if (!store.selectedTreasuryId || selectedTreasuryIsArchived.value) return
+      if (!canDeposit.value || !store.selectedTreasuryId) return
       try {
         await store.deposit(depositForm.amount, depositForm.description, depositForm.date, store.selectedTreasuryId)
         showDeposit.value = false
@@ -616,11 +622,20 @@ export default {
     }
 
     const openTransferModal = () => {
-      transferForm.fromTreasuryId = selectedTreasury.value ? selectedTreasury.value.id : null
-      const dest = store.treasuries.find(t => !t.deletedAt && t.id !== transferForm.fromTreasuryId)
-      transferForm.toTreasuryId = dest ? dest.id : null
+      const selected = selectedTreasury.value
+      const active = store.treasuries.filter(t => !t.deletedAt)
+      const mains = active.filter(t => t.type !== 'CUSTODY')
+      if (selected?.type === 'CUSTODY') {
+        transferForm.fromTreasuryId = mains[0]?.id ?? null
+        transferForm.toTreasuryId = selected.id
+        transferForm.description = 'تغذية عهدة'
+      } else {
+        transferForm.fromTreasuryId = selected ? selected.id : null
+        const dest = active.find(t => t.id !== transferForm.fromTreasuryId)
+        transferForm.toTreasuryId = dest ? dest.id : null
+        transferForm.description = ''
+      }
       transferForm.amount = 0
-      transferForm.description = ''
       transferForm.date = new Date().toISOString().slice(0, 10)
       transferError.value = ''
       showTransfer.value = true
@@ -777,6 +792,8 @@ export default {
       isRTL,
       txTypeLabel,
       selectedTreasuryIsArchived,
+      isCustodySelected,
+      canDeposit,
     }
   }
 }
