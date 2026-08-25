@@ -80,7 +80,7 @@
               {{ selectedTreasury.deletedAt ? t('treasury.archived') : t('treasury.active') }}
             </span>
             <button
-              v-if="isAdmin && canDeposit"
+              v-if="canDeposit"
               class="w-full rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button sm:w-auto"
               :disabled="!selectedTreasury"
               @click="openDepositModal"
