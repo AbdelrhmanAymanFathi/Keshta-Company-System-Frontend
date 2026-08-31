@@ -145,12 +145,16 @@ export const useTreasuryStore = defineStore('treasury', {
       await this.fetchTreasuries()
       return response.data
     },
-    async deposit(amount, description, date, treasuryId = this.selectedTreasuryId) {
+    async deposit(amount, description, date, treasuryId = this.selectedTreasuryId, fromTreasuryId = null) {
       const treasury = this.treasuries.find(t => String(t.id) === String(treasuryId))
+      const payload = { amount, description, date }
       if (treasury?.type === 'CUSTODY') {
-        throw new Error('الإيداع متاح في الخزينة فقط. تغذية العهدة تتم بالتحويل من الخزينة.')
+        if (!fromTreasuryId) {
+          throw new Error('إيداع العهدة يتطلب اختيار الخزينة المصدر.')
+        }
+        payload.fromTreasuryId = fromTreasuryId
       }
-      const response = await depositToTreasury(treasuryId, { amount, description, date })
+      const response = await depositToTreasury(treasuryId, payload)
       await this.fetchSummary(treasuryId)
       await this.fetchTransactions({}, treasuryId)
       await this.fetchTreasuries()

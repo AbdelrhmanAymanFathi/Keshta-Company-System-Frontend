@@ -120,6 +120,38 @@
             <div class="text-sm mb-1">{{ $t('labels.date') }}</div>
             <DateTimeField v-model="deposit.date" class="w-full px-3 py-2 border rounded" />
           </label>
+
+          <!-- Case 2: Source Treasury (optional) -->
+          <label>
+            <div class="text-sm mb-1 font-medium">
+              {{ isRTL ? 'مصدر الإيداع (اختياري)' : 'Source Treasury (optional)' }}
+            </div>
+            <select v-model="deposit.sourceTreasuryId" class="w-full px-3 py-2 border rounded text-sm">
+              <option :value="null">{{ isRTL ? '— بدون خصم من خزينة —' : '— No treasury deduction —' }}</option>
+              <option v-for="t in mainTreasuries" :key="t.id" :value="t.id">
+                {{ t.name }} ({{ isRTL ? 'رصيد: ' : 'Balance: ' }}{{ t.balance ? Number(t.balance).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '0.00' }})
+              </option>
+            </select>
+            <p class="mt-1 text-xs text-slate-500">
+              {{ isRTL
+                ? 'إذا اخترت خزينة، سيُخصم المبلغ منها تلقائياً ويُضاف لحساب المقاول.'
+                : 'If selected, the amount will be atomically deducted from that treasury.' }}
+            </p>
+          </label>
+
+          <!-- Preview -->
+          <div v-if="deposit.sourceTreasuryId && Number(deposit.amount) > 0"
+               class="rounded-lg bg-slate-50 border border-slate-200 p-3 text-sm space-y-1">
+            <p class="font-semibold text-slate-700 mb-2">{{ isRTL ? 'معاينة العملية:' : 'Transaction Preview:' }}</p>
+            <div class="flex justify-between">
+              <span class="text-slate-500">{{ mainTreasuries.find(t => t.id == deposit.sourceTreasuryId)?.name }}</span>
+              <span class="font-bold text-red-600">−{{ Number(deposit.amount).toLocaleString('en-US', {minimumFractionDigits:2}) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">{{ isRTL ? 'حساب المقاول' : 'Contractor Account' }}</span>
+              <span class="font-bold text-emerald-600">+{{ Number(deposit.amount).toLocaleString('en-US', {minimumFractionDigits:2}) }}</span>
+            </div>
+          </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <button @click="closeDepositModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
@@ -134,7 +166,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
-import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions, getContractorAccounts, normalizeContractorAccountType } from '@/api'
+import { getContractorWallet, getContractorWalletHistory, depositToContractorWallet, withdrawFromContractorWallet, getAccountTransactions, getContractorAccounts, normalizeContractorAccountType, getTreasuries } from '@/api'
 
 export default {
   name: 'WalletPanel',
@@ -156,13 +188,14 @@ export default {
     const history = ref([])
     const loading = ref(false)
     const loadingHistory = ref(false)
-    const deposit = ref({ amount: '', description: '', date: '' })
+    const deposit = ref({ amount: '', description: '', date: '', sourceTreasuryId: null })
     const selectedAccount = ref(null)
     const depositModalOpen = ref(false)
     const withdrawal = ref({ amount: '', description: '', date: '' })
     const withdrawModalOpen = ref(false)
     const withdrawalSubmitting = ref(false)
     const withdrawalError = ref('')
+    const mainTreasuries = ref([])
     const selectedAccountType = computed(() => normalizeContractorAccountType(selectedAccount.value?.accountType))
 
     const loadSummary = async () => {
@@ -223,6 +256,15 @@ export default {
       return d.toISOString().slice(0, 16)
     }
 
+    const loadMainTreasuries = async () => {
+      try {
+        const res = await getTreasuries({ includeArchived: false })
+        mainTreasuries.value = (res?.data || []).filter(t => t.type !== 'CUSTODY')
+      } catch (e) {
+        mainTreasuries.value = []
+      }
+    }
+
     const doDeposit = async () => {
       const amount = Number(deposit.value.amount || 0)
       if (!amount || amount <= 0) {
@@ -235,27 +277,32 @@ export default {
           description: deposit.value.description || undefined,
           date: deposit.value.date || undefined,
           accountId: selectedAccount.value?.id || undefined,
-          accountType: selectedAccountType.value
+          accountType: selectedAccountType.value,
+          // Case 2: source treasury — deducted atomically on the backend
+          sourceTreasuryId: deposit.value.sourceTreasuryId || undefined
         }
         const res = await depositToContractorWallet(props.contractorId, payload)
         if (!res) throw new Error('No response from deposit request')
         if (res?.data) {
           wallet.value = res.data
         }
+        await loadSummary()
         await loadHistory()
-        if (window.$toast) window.$toast('Deposit successful', 'success')
+        if (window.$toast) window.$toast(isRTL.value ? 'تم الإيداع بنجاح' : 'Deposit successful', 'success')
         window.dispatchEvent(new CustomEvent('contractor:wallet-updated', { detail: { contractorId: props.contractorId } }))
-        deposit.value = { amount: '', description: '', date: '' }
+        window.dispatchEvent(new CustomEvent('treasury:balance-changed'))
+        deposit.value = { amount: '', description: '', date: '', sourceTreasuryId: null }
         return true
       } catch (e) {
         console.error('Deposit failed', e)
-        if (window.$toast) window.$toast('Deposit failed', 'error')
+        const msg = e?.response?.data?.message || e?.message || (isRTL.value ? 'فشل الإيداع' : 'Deposit failed')
+        if (window.$toast) window.$toast(msg, 'error')
         return false
       }
     }
 
-    const clearDeposit = () => { deposit.value = { amount: '', description: '', date: '' } }
-    const openDepositModal = () => { deposit.value.date = getLocalDate(); depositModalOpen.value = true }
+    const clearDeposit = () => { deposit.value = { amount: '', description: '', date: '', sourceTreasuryId: null } }
+    const openDepositModal = () => { deposit.value.date = getLocalDate(); loadMainTreasuries(); depositModalOpen.value = true }
     const closeDepositModal = () => { depositModalOpen.value = false }
     const confirmDeposit = async () => {
       const ok = await doDeposit()
@@ -342,7 +389,7 @@ export default {
 
     return { wallet, history, loading, loadingHistory, deposit, loadSummary, loadHistory, doDeposit, clearDeposit, formatCurrency, formatDate, depositModalOpen, openDepositModal, closeDepositModal, confirmDeposit, isVisible, isRTL,
       withdrawal, withdrawModalOpen, openWithdrawModal, closeWithdrawModal, submitWithdrawal, withdrawalSubmitting, withdrawalError,
-      selectedAccount, selectedAccountType, selectAccount, displayBalance }
+      selectedAccount, selectedAccountType, selectAccount, displayBalance, mainTreasuries }
   }
 }
 </script>

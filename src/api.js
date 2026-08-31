@@ -555,6 +555,13 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
 export const depositToContractorWallet = async (contractorId, data) => {
   const payload = withContractorAccountContext(data);
   console.debug('[API] depositToContractorWallet called', { contractorId, payload });
+
+  // Case 2: if sourceTreasuryId is provided, use the direct wallet/deposit endpoint
+  // which handles the atomic treasury deduction on the backend.
+  if (payload && payload.sourceTreasuryId) {
+    return await axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/deposit`, payload);
+  }
+
   // If caller provided accountId, use it
   if (payload && payload.accountId) {
     const accountPayload = { amount: payload.amount, type: 'CREDIT', description: payload.description, date: payload.date };

@@ -61,7 +61,7 @@
               {{ selectedTreasury?.name || t('dashboard.treasury') }}
             </h1>
             <p class="mt-1 text-sm theme-text-secondary">
-              {{ isCustodySelected ? (isRTL ? 'العهدة للصرف فقط. الإيداع في الخزينة، والتغذية تتم بالتحويل من الخزينة.' : 'Custody is for spending only. Deposit into a treasury, then transfer to fund custody.') : t('treasury.detailsHint') }}
+              {{ isCustodySelected ? t('treasury.custodyDepositHint') : t('treasury.mainDepositHint') }}
             </p>
           </div>
           <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
@@ -85,7 +85,7 @@
               :disabled="!selectedTreasury"
               @click="openDepositModal"
             >
-              {{ t('treasury.addMoney') }}
+              {{ isCustodySelected ? t('treasury.addMoneyCustody') : t('treasury.addMoney') }}
             </button>
             <button
               v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
@@ -284,9 +284,40 @@
   <div v-if="showDeposit" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeDepositModal">
     <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
       <div class="border-b border-gray-100 pb-3">
-        <h3 class="text-lg font-semibold theme-text-primary">{{ t('treasury.addMoney') }}</h3>
+        <h3 class="text-lg font-semibold theme-text-primary">{{ isCustodySelected ? t('treasury.addMoneyCustody') : t('treasury.addMoney') }}</h3>
+        <p class="mt-1 text-xs theme-text-secondary">{{ isCustodySelected ? t('treasury.custodyDepositHint') : t('treasury.mainDepositHint') }}</p>
       </div>
       <form class="mt-4 space-y-4" @submit.prevent="saveDeposit">
+        <div v-if="isCustodySelected">
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.fromTreasury') }}</label>
+          <select v-model="depositForm.fromTreasuryId" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+            <option :value="null" disabled>{{ t('treasury.selectFromTreasury') }}</option>
+            <option v-for="tItem in mainTreasuries" :key="tItem.id" :value="tItem.id">
+              {{ tItem.name }} ({{ formatCurrency(tItem.balance) }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Case 3: Source account for MAIN treasury deposit -->
+        <div v-if="!isCustodySelected">
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">
+            {{ t('treasury.sourceAccount') || 'مصدر الإيداع (اختياري)' }}
+          </label>
+          <select v-model="depositForm.sourceTreasuryId" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
+            <option :value="null">{{ t('treasury.externalSource') || '— مصدر خارجي (لا خصم) —' }}</option>
+            <option
+              v-for="tItem in store.treasuries.filter(x => !x.deletedAt && x.id !== store.selectedTreasuryId)"
+              :key="tItem.id"
+              :value="tItem.id"
+            >
+              {{ tItem.name }} ({{ tItem.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }} — {{ formatCurrency(tItem.balance) }})
+            </option>
+          </select>
+          <p class="mt-1 text-xs text-slate-500">
+            {{ t('treasury.sourceAccountHint') || 'إذا اخترت حساباً، سيُخصم منه المبلغ تلقائياً ويُضاف للخزينة الحالية في نفس العملية.' }}
+          </p>
+        </div>
+
         <div>
           <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.amount') }}</label>
           <input v-model.number="depositForm.amount" type="number" min="0.01" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" />
@@ -298,6 +329,28 @@
         <div>
           <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.date') }}</label>
           <DateField v-model="depositForm.date" />
+        </div>
+
+        <!-- Transaction Preview -->
+        <div
+          v-if="depositForm.amount > 0 && (depositForm.sourceTreasuryId || (isCustodySelected && depositForm.fromTreasuryId))"
+          class="rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm space-y-1.5"
+        >
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">{{ t('treasury.preview') || 'معاينة العملية' }}</p>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-600">
+              {{ store.treasuries.find(x => x.id === (depositForm.sourceTreasuryId || depositForm.fromTreasuryId))?.name || '...' }}
+            </span>
+            <span class="font-bold text-red-600">− {{ formatCurrency(depositForm.amount) }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-600">{{ selectedTreasury?.name }}</span>
+            <span class="font-bold text-emerald-600">+ {{ formatCurrency(depositForm.amount) }}</span>
+          </div>
+        </div>
+
+        <div v-if="depositError" class="rounded-lg bg-red-50 p-3 text-xs font-medium text-red-600">
+          {{ depositError }}
         </div>
         <div class="flex justify-end gap-2 pt-2">
           <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeDepositModal">{{ t('labels.cancel') }}</button>
@@ -404,7 +457,8 @@ export default {
     const showTransfer = ref(false)
     const modalMode = ref('create')
     const form = reactive({ id: null, name: '', type: 'MAIN' })
-    const depositForm = reactive({ amount: 0, description: '', date: '' })
+    const depositForm = reactive({ amount: 0, description: '', date: '', fromTreasuryId: null, sourceTreasuryId: null })
+    const depositError = ref('')
     const transferForm = reactive({ fromTreasuryId: null, toTreasuryId: null, amount: 0, description: '', date: '' })
     const transferError = ref('')
     const transferSubmitting = ref(false)
@@ -496,7 +550,10 @@ export default {
     const selectedTreasuryIsArchived = computed(() => !!selectedTreasury.value?.deletedAt)
     const isCustodySelected = computed(() => selectedTreasury.value?.type === 'CUSTODY')
     const canDeposit = computed(() =>
-      !!selectedTreasury.value && !selectedTreasuryIsArchived.value && !isCustodySelected.value
+      !!selectedTreasury.value && !selectedTreasuryIsArchived.value
+    )
+    const mainTreasuries = computed(() =>
+      (store.treasuries || []).filter((t) => !t.deletedAt && t.type !== 'CUSTODY')
     )
 
     const loadTreasuries = async () => {
@@ -604,6 +661,9 @@ export default {
       depositForm.amount = 0
       depositForm.description = ''
       depositForm.date = new Date().toISOString().slice(0, 10)
+      depositForm.fromTreasuryId = isCustodySelected.value ? (mainTreasuries.value[0]?.id ?? null) : null
+      depositForm.sourceTreasuryId = null
+      depositError.value = ''
       showDeposit.value = true
     }
 
@@ -611,13 +671,55 @@ export default {
 
     const saveDeposit = async () => {
       if (!canDeposit.value || !store.selectedTreasuryId) return
+
+      // Custody deposit: requires fromTreasuryId (existing behaviour)
+      if (isCustodySelected.value && !depositForm.fromTreasuryId) {
+        depositError.value = t('treasury.fromTreasuryRequired')
+        return
+      }
+
+      // Main treasury deposit with source: use transfer endpoint (Case 3)
+      if (!isCustodySelected.value && depositForm.sourceTreasuryId) {
+        if (depositForm.sourceTreasuryId === store.selectedTreasuryId) {
+          depositError.value = t('treasury.sameAccountError') || 'لا يمكن التحويل من نفس الخزينة'
+          return
+        }
+        try {
+          depositError.value = ''
+          const { transferBetweenTreasuries } = await import('@/api')
+          await transferBetweenTreasuries({
+            fromTreasuryId: depositForm.sourceTreasuryId,
+            toTreasuryId: store.selectedTreasuryId,
+            amount: depositForm.amount,
+            description: depositForm.description || undefined,
+            date: depositForm.date || undefined,
+          })
+          showDeposit.value = false
+          await reloadSelected()
+          await loadTreasuries()
+        } catch (err) {
+          console.error('[TreasuryDashboard] saveDeposit (transfer) error:', err)
+          depositError.value = err?.response?.data?.message || err?.message || t('treasury.saveError')
+        }
+        return
+      }
+
+      // Standard deposit (no source treasury)
       try {
-        await store.deposit(depositForm.amount, depositForm.description, depositForm.date, store.selectedTreasuryId)
+        depositError.value = ''
+        await store.deposit(
+          depositForm.amount,
+          depositForm.description,
+          depositForm.date,
+          store.selectedTreasuryId,
+          isCustodySelected.value ? depositForm.fromTreasuryId : null
+        )
         showDeposit.value = false
         await reloadSelected()
         await loadTreasuries()
       } catch (err) {
         console.error('[TreasuryDashboard] saveDeposit error:', err)
+        depositError.value = err?.response?.data?.message || err?.message || t('treasury.saveError')
       }
     }
 
@@ -754,6 +856,8 @@ export default {
       modalMode,
       form,
       depositForm,
+      depositError,
+      mainTreasuries,
       transferForm,
       transferError,
       transferSubmitting,

@@ -238,6 +238,9 @@
                 {{ expense.treasury.name }} ({{ expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة' }})
               </span>
               <span v-else>{{ $t('expenses.mainExpensesFallback') }}</span>
+              <span v-if="expense.destinationTreasury" class="expense-chip bg-violet-100 text-violet-800">
+                ← {{ expense.destinationTreasury.name }}
+              </span>
             </td>
             <td>{{ formatDate(expense.settlementDate) }}</td>
             <td class="amount-cell">{{ formatCurrency(expense.amount) }}</td>
@@ -290,6 +293,7 @@
           <div>
             <span class="theme-caption">{{ $t('expenses.treasuryOrCustody') }}:</span>
             {{ expense.treasury ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : $t('expenses.mainExpensesFallback') }}
+            <span v-if="expense.destinationTreasury"> ← {{ expense.destinationTreasury.name }}</span>
           </div>
           <div><span class="theme-caption">{{ $t('expenses.settlementDate') }}:</span> {{ formatDate(expense.settlementDate) }}</div>
         </div>
@@ -433,9 +437,51 @@
                         :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                         teleportTarget="body"
                         clearable
-                        @select="(sel) => { form.treasuryId = sel.id; formTreasurySearch = sel.name }"
-                        @clear="() => { form.treasuryId = null; formTreasurySearch = '' }"
+                        @select="onSelectSourceTreasury"
+                        @clear="onClearSourceTreasury"
                       />
+                    </div>
+
+                    <div v-if="isMainSourceTreasury">
+                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
+                        {{ $t('expenses.depositToCustody') }}
+                      </label>
+                      <SearchDropdown
+                        v-model="formDestinationTreasurySearch"
+                        :items="custodyTreasuryItems"
+                        :allItems="custodyTreasuryItems"
+                        :placeholder="$t('expenses.searchCustodyAccount')"
+                        :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                        teleportTarget="body"
+                        clearable
+                        @select="(sel) => { form.destinationTreasuryId = sel.id; formDestinationTreasurySearch = sel.name }"
+                        @clear="() => { form.destinationTreasuryId = null; formDestinationTreasurySearch = '' }"
+                      />
+                      <p class="mt-1 text-[11px] theme-text-muted">{{ $t('expenses.depositToCustodyHint') }}</p>
+                    </div>
+
+                    <!-- Case 1: Link expense to a contractor account (only when NO custody destination) -->
+                    <div v-if="form.treasuryId && !form.destinationTreasuryId">
+                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
+                        {{ isRTL ? 'إيداع في حساب مقاول (اختياري)' : 'Credit Contractor Account (optional)' }}
+                      </label>
+                      <SearchDropdown
+                        v-model="formContractorSearch"
+                        :items="contractorItems"
+                        :allItems="contractorItems"
+                        :placeholder="isRTL ? 'اختر المقاول...' : 'Select contractor...'"
+                        :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                        teleportTarget="body"
+                        clearable
+                        @select="(sel) => { form.contractorId = sel.id; formContractorSearch = sel.name }"
+                        @clear="() => { form.contractorId = null; formContractorSearch = '' }"
+                      />
+                      <p v-if="form.contractorId" class="mt-1 text-[11px] text-emerald-600 font-medium">
+                        {{ isRTL ? `✓ سيُسجَّل إيداع تلقائي في حساب ${formContractorSearch}` : `✓ A deposit will be auto-created in ${formContractorSearch}'s account` }}
+                      </p>
+                      <p v-else class="mt-1 text-[11px] theme-text-muted">
+                        {{ isRTL ? 'إذا كان المصروف موجَّه لمقاول، اختره هنا حتى يُسجَّل في حسابه تلقائياً.' : 'If this expense goes to a contractor, select them to auto-credit their account.' }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -802,6 +848,7 @@ export default {
       branches: [],
       locations: [],
       treasuries: [],
+      contractors: [],
       // Hierarchical expense categories tree
       expenseCategories: [],
       loading: false,
@@ -826,6 +873,8 @@ export default {
       formLocationSearch: '',
       formPaymentMethodSearch: '',
       formTreasurySearch: '',
+      formDestinationTreasurySearch: '',
+      formContractorSearch: '',
       filters: {
         startDate: '',
         endDate: '',
@@ -868,6 +917,7 @@ rows: [],
         branchId: null,
         locationId: null,
         treasuryId: null,
+        destinationTreasuryId: null,
         paymentMethod: 'CASH',
         settlementDate: null
       },
@@ -888,6 +938,31 @@ rows: [],
       return (this.treasuries || []).map(tr => ({
         id: tr.id,
         name: `${tr.name} (${tr.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})`
+      }))
+    },
+
+    selectedSourceTreasury() {
+      return (this.treasuries || []).find(tr => Number(tr.id) === Number(this.form.treasuryId)) || null
+    },
+
+    isMainSourceTreasury() {
+      return this.selectedSourceTreasury?.type === 'MAIN'
+    },
+
+    custodyTreasuryItems() {
+      return (this.treasuries || [])
+        .filter(tr => tr.type === 'CUSTODY' && Number(tr.id) !== Number(this.form.treasuryId))
+        .map(tr => ({
+          id: tr.id,
+          name: `${tr.name} (عهدة)`
+        }))
+    },
+
+    // Contractor items for the "credit contractor account" dropdown
+    contractorItems() {
+      return (this.contractors || []).map(c => ({
+        id: c.id,
+        name: c.name
       }))
     },
 
@@ -1079,6 +1154,7 @@ rows: [],
     await this.fetchBranches()
     await this.fetchLocations()
     await this.fetchTreasuries()
+    await this.fetchContractors()
     this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], debounce(() => { this.loadExpenses() }, 300))
   },
   
@@ -1094,6 +1170,25 @@ rows: [],
       } catch (e) {
         console.error('Failed to fetch treasuries in ExpensesList:', e)
         this.treasuries = []
+      }
+    },
+
+    async fetchContractors() {
+      try {
+        const { getContractors } = await import('@/api')
+        const response = await getContractors({ pageSize: 500 })
+        const data = response.data
+        // Handle both array and paginated responses
+        this.contractors = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.items)
+            ? data.items
+            : Array.isArray(data?.data)
+              ? data.data
+              : []
+      } catch (e) {
+        console.error('Failed to fetch contractors in ExpensesList:', e)
+        this.contractors = []
       }
     },
 
@@ -1265,9 +1360,12 @@ rows: [],
         branchId: null,
         locationId: null,
         treasuryId: null,
+        destinationTreasuryId: null,
         paymentMethod: 'CASH',
         notes: '',
-        settlementDate: getTodayISO()
+        settlementDate: getTodayISO(),
+        contractorId: null,
+        contractorAccountType: 'GENERAL'
       }
     },
 
@@ -1287,6 +1385,8 @@ rows: [],
       this.formSubcategorySearch = currentDraft?.formSubcategorySearch ?? ''
       this.formPaymentMethodSearch = currentDraft?.formPaymentMethodSearch ?? 'نقداً'
       this.formTreasurySearch = currentDraft?.formTreasurySearch ?? ''
+      this.formDestinationTreasurySearch = currentDraft?.formDestinationTreasurySearch ?? ''
+      this.formContractorSearch = currentDraft?.formContractorSearch ?? ''
     },
 
     saveModalDraft() {
@@ -1297,7 +1397,9 @@ rows: [],
         formCategorySearch: this.formCategorySearch,
         formSubcategorySearch: this.formSubcategorySearch,
         formPaymentMethodSearch: this.formPaymentMethodSearch,
-        formTreasurySearch: this.formTreasurySearch
+        formTreasurySearch: this.formTreasurySearch,
+        formDestinationTreasurySearch: this.formDestinationTreasurySearch,
+        formContractorSearch: this.formContractorSearch
       }
     },
 
@@ -1371,9 +1473,12 @@ rows: [],
         branchId: expense.branchId || null,
         locationId: expense.locationId || expense.location?.id || null,
         treasuryId: targetTreasuryId,
+        destinationTreasuryId: expense.destinationTreasuryId || expense.destinationTreasury?.id || null,
         paymentMethod: expense.paymentMethod || 'CASH',
         notes: expense.notes || '',
-        settlementDate: formattedSettlementDate
+        settlementDate: formattedSettlementDate,
+        contractorId: expense.contractorId || null,
+        contractorAccountType: expense.contractorAccountType || 'GENERAL'
       }
       this.modalStep = 1
 
@@ -1398,6 +1503,27 @@ rows: [],
       this.formSubcategorySearch = subCategoryName
       this.formPaymentMethodSearch = this.paymentMethodItems?.find(p => p.id === expense.paymentMethod)?.name || 'نقداً'
       this.formTreasurySearch = treasurySearchName
+      const destTreasury = expense.destinationTreasury
+      const destId = expense.destinationTreasuryId || destTreasury?.id || null
+      if (destId) {
+        const foundDest = this.custodyTreasuryItems?.find(t => Number(t.id) === Number(destId))
+        this.formDestinationTreasurySearch = foundDest?.name || (destTreasury ? `${destTreasury.name} (عهدة)` : '')
+      } else {
+        this.formDestinationTreasurySearch = ''
+      }
+
+      // Resolve contractor search text
+      const contractorId = expense.contractorId || null
+      if (contractorId) {
+        const foundContractor = this.contractors?.find(c => Number(c.id) === Number(contractorId))
+        this.formContractorSearch = foundContractor?.name
+          || expense.contractorRef?.name
+          || expense.contractor?.name
+          || expense.contractorName
+          || ''
+      } else {
+        this.formContractorSearch = ''
+      }
       this.modalOpen = true
       this.hideExpenseContextMenu()
     },
@@ -1671,9 +1797,13 @@ rows: [],
               branchId: this.form.branchId || null,
               locationId: row.locationId,
               treasuryId: this.form.treasuryId ?? null,
+              destinationTreasuryId: this.isMainSourceTreasury ? (this.form.destinationTreasuryId ?? null) : null,
               paymentMethod: row.paymentMethod || 'CASH',
               notes: row.notes || '',
-              settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString()
+              settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString(),
+              // Case 1: optional contractor link — auto-credits contractor account
+              contractorId: (this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null,
+              contractorAccountType: this.form.contractorAccountType || 'GENERAL'
             }
           })
 
@@ -1789,6 +1919,23 @@ rows: [],
         return false
       }
       return true
+    },
+
+    onSelectSourceTreasury(sel) {
+      this.form.treasuryId = sel.id
+      this.formTreasurySearch = sel.name
+      const selected = (this.treasuries || []).find(tr => Number(tr.id) === Number(sel.id))
+      if (selected?.type !== 'MAIN') {
+        this.form.destinationTreasuryId = null
+        this.formDestinationTreasurySearch = ''
+      }
+    },
+
+    onClearSourceTreasury() {
+      this.form.treasuryId = null
+      this.formTreasurySearch = ''
+      this.form.destinationTreasuryId = null
+      this.formDestinationTreasurySearch = ''
     },
 
     validateRows() {
