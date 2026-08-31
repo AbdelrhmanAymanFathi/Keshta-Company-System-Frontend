@@ -153,15 +153,15 @@
             <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateFrom') }}</label>
-                <DateField v-model="filters.startDate" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <DateField v-model="filters.startDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateTo') }}</label>
-                <DateField v-model="filters.endDate" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <DateField v-model="filters.endDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.type') }}</label>
-                <select v-model="filters.type" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus">
+                <select v-model="filters.type" @change="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus">
                   <option value="">{{ t('labels.all') }}</option>
                   <option value="DEPOSIT">{{ t('treasury.types.deposit') }}</option>
                   <option value="PAYMENT">{{ t('treasury.types.payment') }}</option>
@@ -171,11 +171,11 @@
               </div>
               <div class="sm:col-span-1 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amountFrom') }}</label>
-                <input v-model="filters.amountMin" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <input v-model="filters.amountMin" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div class="sm:col-span-1 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amountTo') }}</label>
-                <input v-model="filters.amountMax" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <input v-model="filters.amountMax" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
             </div>
 
@@ -185,6 +185,8 @@
                 <input
                   v-model="filters.search"
                   type="text"
+                  @input="debouncedApply"
+                  @keyup.enter="applyFilters"
                   class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus"
                   :placeholder="t('treasury.searchPlaceholder')"
                 />
@@ -603,6 +605,13 @@ export default {
       await reloadSelected()
     }
 
+    // Debounced version for text/number inputs (500ms delay)
+    let _applyTimer = null
+    const debouncedApply = () => {
+      if (_applyTimer) clearTimeout(_applyTimer)
+      _applyTimer = setTimeout(() => { applyFilters() }, 500)
+    }
+
     const resetFilters = async () => {
       filters.startDate = ''
       filters.endDate = ''
@@ -874,6 +883,7 @@ export default {
       selectTreasury,
       reloadTreasuries,
       applyFilters,
+      debouncedApply,
       resetFilters,
       onUpdatePage,
       onUpdatePageSize,

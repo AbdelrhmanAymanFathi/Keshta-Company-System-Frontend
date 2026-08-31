@@ -40,6 +40,7 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField
             v-model="filters.startDate"
+            @update:modelValue="loadReport"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
@@ -49,6 +50,7 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField
             v-model="filters.endDate"
+            @update:modelValue="loadReport"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
@@ -62,8 +64,8 @@
             :allItems="treasuryOptions"
             :placeholder="isRTL ? 'اختر الخزينة...' : 'Select Treasury...'"
             clearable
-            @select="(sel) => { filters.treasuryId = sel.id; treasurySearchText = sel.name }"
-            @clear="() => { filters.treasuryId = ''; treasurySearchText = '' }"
+            @select="(sel) => { filters.treasuryId = sel.id; treasurySearchText = sel.name; loadReport() }"
+            @clear="() => { filters.treasuryId = ''; treasurySearchText = ''; loadReport() }"
           />
         </div>
 
@@ -72,6 +74,7 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'نوع العملية' : 'Transaction Type' }}</label>
           <select
             v-model="filters.type"
+            @change="loadReport"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           >
             <option value="">{{ isRTL ? 'الكل' : 'All' }}</option>
@@ -87,6 +90,7 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'البحث في الوصف / البيان' : 'Search in Description' }}</label>
           <input
             v-model="filters.search"
+            @input="debouncedLoad"
             @keyup.enter="loadReport"
             type="text"
             :placeholder="isRTL ? 'ابحث في الوصف أو رقم المرجع...' : 'Search description or reference...'"
@@ -299,6 +303,13 @@ export default {
       loadReport()
     }
 
+    // Debounced version for text inputs (500ms)
+    let _loadTimer = null
+    const debouncedLoad = () => {
+      if (_loadTimer) clearTimeout(_loadTimer)
+      _loadTimer = setTimeout(() => { loadReport() }, 500)
+    }
+
     const clearFilters = () => {
       filters.startDate = ''
       filters.endDate = ''
@@ -418,6 +429,7 @@ export default {
       totalWithdrawals,
       netMovement,
       loadReport,
+      debouncedLoad,
       refresh,
       clearFilters,
       changePage,
