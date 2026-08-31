@@ -397,6 +397,20 @@ export default {
       }
     })
 
+    // Auto-apply filters on change (no need to press Search button)
+    watch(() => filters.type, () => { store.setTransactionPage(1); load() })
+    watch(() => filters.startDate, () => { store.setTransactionPage(1); load() })
+    watch(() => filters.endDate, () => { store.setTransactionPage(1); load() })
+
+    let _filterTimer = null
+    const debouncedLoad = () => {
+      if (_filterTimer) clearTimeout(_filterTimer)
+      _filterTimer = setTimeout(() => { store.setTransactionPage(1); load() }, 500)
+    }
+    watch(() => filters.search, debouncedLoad)
+    watch(() => filters.amountMin, debouncedLoad)
+    watch(() => filters.amountMax, debouncedLoad)
+
     return {
       store,
       loading,
@@ -420,8 +434,7 @@ export default {
       selectTreasury,
       applyFilters,
       downloadReport,
-      resetFilters,
-      onUpdatePage,
+      resetFilters,      onUpdatePage,
       onUpdatePageSize,
       t,
       isRTL,

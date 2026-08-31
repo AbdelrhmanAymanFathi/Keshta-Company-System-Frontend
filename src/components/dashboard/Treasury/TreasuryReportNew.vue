@@ -40,7 +40,6 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField
             v-model="filters.startDate"
-            @update:modelValue="loadReport"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
@@ -50,7 +49,6 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
           <DateField
             v-model="filters.endDate"
-            @update:modelValue="loadReport"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           />
         </div>
@@ -64,8 +62,8 @@
             :allItems="treasuryOptions"
             :placeholder="isRTL ? 'اختر الخزينة...' : 'Select Treasury...'"
             clearable
-            @select="(sel) => { filters.treasuryId = sel.id; treasurySearchText = sel.name; loadReport() }"
-            @clear="() => { filters.treasuryId = ''; treasurySearchText = ''; loadReport() }"
+            @select="(sel) => { filters.treasuryId = sel.id; treasurySearchText = sel.name }"
+            @clear="() => { filters.treasuryId = ''; treasurySearchText = '' }"
           />
         </div>
 
@@ -74,7 +72,6 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'نوع العملية' : 'Transaction Type' }}</label>
           <select
             v-model="filters.type"
-            @change="loadReport"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
           >
             <option value="">{{ isRTL ? 'الكل' : 'All' }}</option>
@@ -90,7 +87,6 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'البحث في الوصف / البيان' : 'Search in Description' }}</label>
           <input
             v-model="filters.search"
-            @input="debouncedLoad"
             @keyup.enter="loadReport"
             type="text"
             :placeholder="isRTL ? 'ابحث في الوصف أو رقم المرجع...' : 'Search description or reference...'"
@@ -222,7 +218,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import DateField from '@/components/shared/DateField.vue'
@@ -309,6 +305,16 @@ export default {
       if (_loadTimer) clearTimeout(_loadTimer)
       _loadTimer = setTimeout(() => { loadReport() }, 500)
     }
+
+    // Watch filters — ensures value is already updated before the API call
+    watch(() => filters.type, () => { page.value = 1; loadReport() })
+    watch(() => filters.startDate, () => { page.value = 1; loadReport() })
+    watch(() => filters.endDate, () => { page.value = 1; loadReport() })
+    watch(() => filters.treasuryId, () => { page.value = 1; loadReport() })
+    watch(() => filters.search, () => {
+      if (_loadTimer) clearTimeout(_loadTimer)
+      _loadTimer = setTimeout(() => { page.value = 1; loadReport() }, 500)
+    })
 
     const clearFilters = () => {
       filters.startDate = ''
