@@ -834,11 +834,12 @@ export const saveTreasuriesOrder = (data) =>
 export const getTreasurySummary = (treasuryId) =>
   axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/summary`);
 export const getTreasuryTransactions = (treasuryId, params = {}) => {
-  const { page = 1, pageSize = 20, startDate = '', endDate = '', type = '', search = '', amountMin = '', amountMax = '' } = params;
+  const { page = 1, pageSize = 20, startDate = '', endDate = '', type = '', search = '', amountMin = '', amountMax = '', sortOrder = '' } = params;
   const queryParams = new URLSearchParams(appendLangParam({
     page: page.toString(),
     pageSize: pageSize.toString()
   }));
+  if (sortOrder) queryParams.append('sortOrder', sortOrder);
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
   if (type) queryParams.append('type', type);
