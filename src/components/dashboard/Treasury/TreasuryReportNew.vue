@@ -1,7 +1,10 @@
-<template>
+﻿<template>
   <div class="space-y-6" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Page Header with Export Controls -->
-    <PageHeader :title="isRTL ? 'تقرير الخزينة والعهد' : 'Treasury & Custody Report'" :subtitle="isRTL ? 'تتبع وتصدير حركة الخزائن وحسابات العهد والمبالغ المصروفة والموردة' : 'Track and export treasury ledgers, custody accounts, and transaction flows'">
+    <PageHeader
+      :title="isRTL ? 'تقرير الخزينة والعهد' : 'Treasury & Custody Report'"
+      :subtitle="isRTL ? 'تتبع وتصدير حركة الخزائن وحسابات العهد والمبالغ المصروفة والموردة' : 'Track and export treasury ledgers, custody accounts, and transaction flows'"
+    >
       <div class="flex flex-wrap items-center gap-2">
         <button @click="refresh" :disabled="loading"
                 class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium theme-text-primary transition-colors hover:bg-slate-50 disabled:opacity-50 sm:px-4 sm:py-2 shadow-2xs">
@@ -82,8 +85,20 @@
           </select>
         </div>
 
+        <!-- Sort Order -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'الترتيب' : 'Sort Order' }}</label>
+          <select
+            v-model="filters.sortOrder"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm"
+          >
+            <option value="desc">{{ isRTL ? 'من الأحدث للأقدم' : 'Newest First' }}</option>
+            <option value="asc">{{ isRTL ? 'من الأقدم للأحدث' : 'Oldest First' }}</option>
+          </select>
+        </div>
+
         <!-- Search in Description -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-3">
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'البحث في الوصف / البيان' : 'Search in Description' }}</label>
           <input
             v-model="filters.search"
@@ -132,11 +147,11 @@
       <!-- Summary Metrics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl shadow-xs border-l-4 border-emerald-500 p-4">
-          <p class="text-xs font-semibold text-slate-500 uppercase">{{ isRTL ? 'إجمالي المقبوضات / الإيداعات' : 'Total Deposits / Receipts' }}</p>
+          <p class="text-xs font-semibold text-slate-500 uppercase">{{ isRTL ? 'إجمالي المدين (الإيداعات)' : 'Total Debit (Deposits)' }}</p>
           <p class="text-xl font-bold text-emerald-600 mt-1">{{ formatCurrency(totalDeposits) }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-xs border-l-4 border-red-500 p-4">
-          <p class="text-xs font-semibold text-slate-500 uppercase">{{ isRTL ? 'إجمالي السحوبات / المصروفات' : 'Total Withdrawals / Expenses' }}</p>
+          <p class="text-xs font-semibold text-slate-500 uppercase">{{ isRTL ? 'إجمالي الدائن (السحوبات)' : 'Total Credit (Withdrawals)' }}</p>
           <p class="text-xl font-bold text-red-600 mt-1">{{ formatCurrency(totalWithdrawals) }}</p>
         </div>
         <div class="bg-white rounded-xl shadow-xs border-l-4 border-indigo-500 p-4">
@@ -155,16 +170,25 @@
               <tr>
                 <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
                 <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.date') }}</th>
+                <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ isRTL ? 'تاريخ التسوية' : 'Settlement Date' }}</th>
                 <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ isRTL ? 'الخزينة / العهدة' : 'Treasury' }}</th>
                 <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ isRTL ? 'النوع' : 'Type' }}</th>
                 <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ isRTL ? 'البيان / الوصف' : 'Description' }}</th>
-                <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-emerald-700 uppercase tracking-wider whitespace-nowrap">{{ isRTL ? 'مدين (إيداع)' : 'Debit (In)' }}</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ isRTL ? 'دائن (سحب)' : 'Credit (Out)' }}</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
               <tr v-for="(item, index) in items" :key="item.id || index" class="hover:bg-slate-50">
                 <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ (page - 1) * pageSize + index + 1 }}</td>
                 <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(item.date) }}</td>
+                <!-- تاريخ التسوية -->
+                <td class="px-4 py-4 whitespace-nowrap text-sm">
+                  <span v-if="item.settlementDate" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+                    {{ formatDate(item.settlementDate) }}
+                  </span>
+                  <span v-else class="text-slate-400 text-xs">—</span>
+                </td>
                 <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200">
                     {{ item.treasury?.name || item.treasuryName || '-' }}
@@ -176,14 +200,19 @@
                   </span>
                 </td>
                 <td class="px-4 py-4 text-sm theme-text-primary max-w-sm truncate">{{ item.description || item.arDescription || '-' }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-bold" :class="Number(item.amount) >= 0 ? 'text-emerald-700' : 'text-red-600'">
-                  {{ formatCurrency(item.amount) }}
+                <!-- مدين: الإيداعات فقط (موجب) -->
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-center text-emerald-700">
+                  {{ Number(item.amount) > 0 ? formatCurrency(item.amount) : '' }}
+                </td>
+                <!-- دائن: السحوبات فقط (سالب يُعرض موجب) -->
+                <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-center text-red-600">
+                  {{ Number(item.amount) < 0 ? formatCurrency(Math.abs(Number(item.amount))) : '' }}
                 </td>
               </tr>
             </tbody>
             <tbody v-else>
               <tr>
-                <td colspan="6" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
+                <td colspan="8" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
               </tr>
             </tbody>
           </table>
@@ -253,7 +282,8 @@ export default {
       endDate: '',
       treasuryId: '',
       type: '',
-      search: ''
+      search: '',
+      sortOrder: 'desc'   // الافتراضي: الأحدث أولاً
     })
 
     const loadTreasuries = async () => {
@@ -273,7 +303,6 @@ export default {
       loading.value = true
       error.value = null
       try {
-        // If specific treasury is selected, query it; otherwise default to first treasury or all
         const selectedTreasury = filters.treasuryId || (treasuryOptions.value[0]?.id || 1)
         const params = {
           page: page.value,
@@ -282,6 +311,7 @@ export default {
           endDate: filters.endDate || undefined,
           type: filters.type || undefined,
           search: filters.search || undefined,
+          sortOrder: filters.sortOrder,
           lang: locale.value === 'ar' ? 'ar' : 'en'
         }
         const res = await getTreasuryTransactions(selectedTreasury, params)
@@ -295,22 +325,15 @@ export default {
       }
     }
 
-    const refresh = () => {
-      loadReport()
-    }
+    const refresh = () => { loadReport() }
 
-    // Debounced version for text inputs (500ms)
     let _loadTimer = null
-    const debouncedLoad = () => {
-      if (_loadTimer) clearTimeout(_loadTimer)
-      _loadTimer = setTimeout(() => { loadReport() }, 500)
-    }
 
-    // Watch filters — ensures value is already updated before the API call
-    watch(() => filters.type, () => { page.value = 1; loadReport() })
-    watch(() => filters.startDate, () => { page.value = 1; loadReport() })
-    watch(() => filters.endDate, () => { page.value = 1; loadReport() })
+    watch(() => filters.type,       () => { page.value = 1; loadReport() })
+    watch(() => filters.startDate,  () => { page.value = 1; loadReport() })
+    watch(() => filters.endDate,    () => { page.value = 1; loadReport() })
     watch(() => filters.treasuryId, () => { page.value = 1; loadReport() })
+    watch(() => filters.sortOrder,  () => { page.value = 1; loadReport() })
     watch(() => filters.search, () => {
       if (_loadTimer) clearTimeout(_loadTimer)
       _loadTimer = setTimeout(() => { page.value = 1; loadReport() }, 500)
@@ -322,6 +345,7 @@ export default {
       filters.treasuryId = ''
       filters.type = ''
       filters.search = ''
+      filters.sortOrder = 'desc'
       treasurySearchText.value = ''
       page.value = 1
       loadReport()
@@ -332,21 +356,21 @@ export default {
       loadReport()
     }
 
-    const totalDeposits = computed(() => {
-      return items.value
+    const totalDeposits = computed(() =>
+      items.value
         .filter(i => Number(i.amount) > 0)
         .reduce((sum, i) => sum + Number(i.amount), 0)
-    })
+    )
 
-    const totalWithdrawals = computed(() => {
-      return items.value
+    const totalWithdrawals = computed(() =>
+      items.value
         .filter(i => Number(i.amount) < 0)
         .reduce((sum, i) => sum + Math.abs(Number(i.amount)), 0)
-    })
+    )
 
-    const netMovement = computed(() => {
-      return items.value.reduce((sum, i) => sum + Number(i.amount || 0), 0)
-    })
+    const netMovement = computed(() =>
+      items.value.reduce((sum, i) => sum + Number(i.amount || 0), 0)
+    )
 
     const formatDate = (val) => {
       if (!val) return '-'
@@ -356,7 +380,10 @@ export default {
 
     const formatCurrency = (amt) => {
       const num = Number(amt || 0)
-      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num)
+      const formatted = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(num)
       return isRTL.value && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
@@ -364,11 +391,11 @@ export default {
       const t = String(type || '').toUpperCase()
       if (isRTL.value) {
         switch (t) {
-          case 'DEPOSIT': return 'إيداع'
-          case 'PAYMENT': return 'دفعة'
-          case 'WITHDRAW': return 'سحب'
+          case 'DEPOSIT':    return 'إيداع'
+          case 'PAYMENT':    return 'دفعة'
+          case 'WITHDRAW':   return 'سحب'
           case 'ADJUSTMENT': return 'تسوية'
-          default: return type || '-'
+          default:           return type || '-'
         }
       }
       return type || '-'
@@ -377,11 +404,11 @@ export default {
     const getTypeBadgeClass = (type) => {
       const t = String(type || '').toUpperCase()
       switch (t) {
-        case 'DEPOSIT': return 'bg-emerald-100 text-emerald-800'
-        case 'PAYMENT': return 'bg-blue-100 text-blue-800'
-        case 'WITHDRAW': return 'bg-red-100 text-red-800'
+        case 'DEPOSIT':    return 'bg-emerald-100 text-emerald-800'
+        case 'PAYMENT':    return 'bg-blue-100 text-blue-800'
+        case 'WITHDRAW':   return 'bg-red-100 text-red-800'
         case 'ADJUSTMENT': return 'bg-purple-100 text-purple-800'
-        default: return 'bg-slate-100 text-slate-700'
+        default:           return 'bg-slate-100 text-slate-700'
       }
     }
 
@@ -394,11 +421,16 @@ export default {
           endDate: filters.endDate || undefined,
           type: filters.type || undefined,
           search: filters.search || undefined,
+          sortOrder: filters.sortOrder,
           lang: locale.value === 'ar' ? 'ar' : 'en'
         }
         const res = await downloadTreasuryTransactions(selectedTreasury, params, format)
         const blob = new Blob([res.data], {
-          type: format === 'pdf' ? 'application/pdf' : format === 'csv' ? 'text/csv' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          type: format === 'pdf'
+            ? 'application/pdf'
+            : format === 'csv'
+              ? 'text/csv'
+              : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -435,7 +467,6 @@ export default {
       totalWithdrawals,
       netMovement,
       loadReport,
-      debouncedLoad,
       refresh,
       clearFilters,
       changePage,
