@@ -211,6 +211,7 @@
             <thead class="bg-slate-50/80">
               <tr>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.dateTime') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-amber-600', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'ت. التسوية' : 'Settlement' }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
@@ -222,6 +223,14 @@
             <tbody class="divide-y divide-gray-100 bg-white/70">
               <tr v-for="tx in visibleTransactions" :key="tx.id" class="transition hover:theme-hover-soft">
                 <td class="px-4 py-3 text-sm theme-text-primary">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
+                <!-- Settlement date -->
+                <td class="px-4 py-3 text-sm whitespace-nowrap">
+                  <span v-if="tx.settlementDate"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    {{ formatDate(tx.settlementDate) }}
+                  </span>
+                  <span v-else class="text-slate-300 text-xs">—</span>
+                </td>
                 <td class="px-4 py-3 text-sm">
                   <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="badgeClass(tx.type)">
                     {{ txTypeLabel(tx.type) }}
