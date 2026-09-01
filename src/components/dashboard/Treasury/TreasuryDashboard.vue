@@ -304,7 +304,7 @@
           <select v-model="depositForm.fromTreasuryId" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
             <option :value="null" disabled>{{ t('treasury.selectFromTreasury') }}</option>
             <option v-for="tItem in mainTreasuries" :key="tItem.id" :value="tItem.id">
-              {{ tItem.name }} ({{ formatCurrency(tItem.balance) }})
+              {{ displayTreasuryName(tItem) }} ({{ isRTL ? (tItem.type === 'CUSTODY' ? 'عهدة' : 'خزينة') : (tItem.type === 'CUSTODY' ? 'Custody' : 'Treasury') }} — {{ formatCurrency(tItem.balance) }})
             </option>
           </select>
         </div>
@@ -534,6 +534,10 @@ export default {
       return tx.description || tx.refType || '-'
     }
 
+    const displayTreasuryName = (treasury) => {
+      return treasury?.name || ''
+    }
+
     const showTreasuryError = (err, fallbackMessage = t('treasury.saveError') || 'Failed to save treasury') => {
       const serverMessage = err?.response?.data?.message || err?.response?.data?.error || err?.message
       const message = typeof serverMessage === 'string' && serverMessage.trim() ? serverMessage : fallbackMessage
@@ -564,7 +568,7 @@ export default {
       !!selectedTreasury.value && !selectedTreasuryIsArchived.value
     )
     const mainTreasuries = computed(() =>
-      (store.treasuries || []).filter((t) => !t.deletedAt && t.type !== 'CUSTODY')
+      (store.treasuries || []).filter((t) => !t.deletedAt && t.id !== store.selectedTreasuryId)
     )
 
     const loadTreasuries = async () => {
@@ -679,7 +683,9 @@ export default {
       depositForm.amount = 0
       depositForm.description = ''
       depositForm.date = new Date().toISOString().slice(0, 10)
-      depositForm.fromTreasuryId = isCustodySelected.value ? (mainTreasuries.value[0]?.id ?? null) : null
+      // Default: prefer a MAIN treasury as source, fall back to first available
+      const defaultSource = mainTreasuries.value.find(t => t.type === 'MAIN') ?? mainTreasuries.value[0]
+      depositForm.fromTreasuryId = isCustodySelected.value ? (defaultSource?.id ?? null) : null
       depositForm.sourceTreasuryId = null
       depositError.value = ''
       showDeposit.value = true
@@ -690,13 +696,35 @@ export default {
     const saveDeposit = async () => {
       if (!canDeposit.value || !store.selectedTreasuryId) return
 
-      // Custody deposit: requires fromTreasuryId (existing behaviour)
+      // Custody deposit: requires fromTreasuryId
       if (isCustodySelected.value && !depositForm.fromTreasuryId) {
         depositError.value = t('treasury.fromTreasuryRequired')
         return
       }
 
-      // Main treasury deposit with source: use transfer endpoint (Case 3)
+      // Custody deposit WITH source treasury → use transfer (deduct from source, add to custody)
+      if (isCustodySelected.value && depositForm.fromTreasuryId) {
+        try {
+          depositError.value = ''
+          const { transferBetweenTreasuries } = await import('@/api')
+          await transferBetweenTreasuries({
+            fromTreasuryId: depositForm.fromTreasuryId,
+            toTreasuryId: store.selectedTreasuryId,
+            amount: depositForm.amount,
+            description: depositForm.description || undefined,
+            date: depositForm.date || undefined,
+          })
+          showDeposit.value = false
+          await reloadSelected()
+          await loadTreasuries()
+        } catch (err) {
+          console.error('[TreasuryDashboard] saveDeposit (custody transfer) error:', err)
+          depositError.value = err?.response?.data?.message || err?.message || t('treasury.saveError')
+        }
+        return
+      }
+
+      // Main treasury deposit with source treasury → use transfer
       if (!isCustodySelected.value && depositForm.sourceTreasuryId) {
         if (depositForm.sourceTreasuryId === store.selectedTreasuryId) {
           depositError.value = t('treasury.sameAccountError') || 'لا يمكن التحويل من نفس الخزينة'
@@ -716,13 +744,13 @@ export default {
           await reloadSelected()
           await loadTreasuries()
         } catch (err) {
-          console.error('[TreasuryDashboard] saveDeposit (transfer) error:', err)
+          console.error('[TreasuryDashboard] saveDeposit (main transfer) error:', err)
           depositError.value = err?.response?.data?.message || err?.message || t('treasury.saveError')
         }
         return
       }
 
-      // Standard deposit (no source treasury)
+      // Standard direct deposit (no source treasury, main treasury only)
       try {
         depositError.value = ''
         await store.deposit(
@@ -730,7 +758,7 @@ export default {
           depositForm.description,
           depositForm.date,
           store.selectedTreasuryId,
-          isCustodySelected.value ? depositForm.fromTreasuryId : null
+          null
         )
         showDeposit.value = false
         await reloadSelected()
@@ -917,6 +945,7 @@ export default {
       selectedTreasuryIsArchived,
       isCustodySelected,
       canDeposit,
+      displayTreasuryName,
     }
   }
 }
