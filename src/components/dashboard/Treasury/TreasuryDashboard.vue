@@ -216,7 +216,6 @@
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.updatedBy') }}</th>
                 <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ t('treasury.amount') }}</th>
               </tr>
             </thead>
@@ -242,7 +241,6 @@
                 </td>
                 <td class="px-4 py-3 text-sm theme-text-primary">{{ displayDescription(tx) }}</td>
                 <td class="px-4 py-3 text-sm theme-text-secondary">{{ tx.createdBy?.name || tx.createdByName || '-' }}</td>
-                <td class="px-4 py-3 text-sm theme-text-secondary">{{ tx.updatedBy?.name || tx.updatedByName || '-' }}</td>
                 <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
                   {{ formatCurrency(tx.amount) }}
                 </td>
