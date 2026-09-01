@@ -341,6 +341,11 @@
           <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.date') }}</label>
           <DateField v-model="depositForm.date" />
         </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">تاريخ التسوية (اختياري)</label>
+          <DateField v-model="depositForm.settlementDate" />
+          <p class="mt-1 text-xs text-slate-500">التاريخ الفعلي للتسوية إذا كان مختلفاً عن تاريخ العملية.</p>
+        </div>
 
         <!-- Transaction Preview -->
         <div
@@ -468,7 +473,7 @@ export default {
     const showTransfer = ref(false)
     const modalMode = ref('create')
     const form = reactive({ id: null, name: '', type: 'MAIN' })
-    const depositForm = reactive({ amount: 0, description: '', date: '', fromTreasuryId: null, sourceTreasuryId: null })
+    const depositForm = reactive({ amount: 0, description: '', date: '', settlementDate: '', fromTreasuryId: null, sourceTreasuryId: null })
     const depositError = ref('')
     const transferForm = reactive({ fromTreasuryId: null, toTreasuryId: null, amount: 0, description: '', date: '' })
     const transferError = ref('')
@@ -683,6 +688,7 @@ export default {
       depositForm.amount = 0
       depositForm.description = ''
       depositForm.date = new Date().toISOString().slice(0, 10)
+      depositForm.settlementDate = ''
       // Default: prefer a MAIN treasury as source, fall back to first available
       const defaultSource = mainTreasuries.value.find(t => t.type === 'MAIN') ?? mainTreasuries.value[0]
       depositForm.fromTreasuryId = isCustodySelected.value ? (defaultSource?.id ?? null) : null
@@ -713,6 +719,7 @@ export default {
             amount: depositForm.amount,
             description: depositForm.description || undefined,
             date: depositForm.date || undefined,
+            settlementDate: depositForm.settlementDate || undefined,
           })
           showDeposit.value = false
           await reloadSelected()
@@ -739,6 +746,7 @@ export default {
             amount: depositForm.amount,
             description: depositForm.description || undefined,
             date: depositForm.date || undefined,
+            settlementDate: depositForm.settlementDate || undefined,
           })
           showDeposit.value = false
           await reloadSelected()
@@ -758,7 +766,8 @@ export default {
           depositForm.description,
           depositForm.date,
           store.selectedTreasuryId,
-          null
+          null,
+          depositForm.settlementDate || undefined,
         )
         showDeposit.value = false
         await reloadSelected()
