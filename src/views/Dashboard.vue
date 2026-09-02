@@ -401,7 +401,6 @@ export default {
         treasury: [
           { name: 'treasury', label: 'dashboard.treasury', routeName: 'treasury' },
           { name: 'companyTransactions', label: 'treasury.report', routeName: 'report-company-transactions' },
-          { name: 'treasuryReport', label: 'treasury.reportSimple', routeName: 'treasury-report' },
         ],
         reports: [
           { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' },
