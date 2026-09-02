@@ -32,6 +32,7 @@ const EquipmentReport = () => import('@/components/dashboard/Equipment/Equipment
 const EquipmentList = () => import('@/components/dashboard/Equipment/EquipmentList.vue')
 const TreasuryDashboard = () => import('@/components/dashboard/Treasury/TreasuryDashboard.vue')
 const TreasuryTransactions = () => import('@/components/dashboard/Treasury/TreasuryTransactions.vue')
+const TreasuryReportNew = () => import('@/components/dashboard/Treasury/TreasuryReportNew.vue')
 const ExpensesList = () => import('@/components/dashboard/Expenses/ExpensesList.vue')
 const ExpensesReport = () => import('@/components/dashboard/Expenses/ExpensesReportNew.vue')
 const ContractorsActivityReport = () => import('@/components/dashboard/ContractorsActivityReport.vue')
@@ -225,6 +226,12 @@ const routes = [
         name: 'company-transactions',
         component: TreasuryTransactions,
         meta: { title: 'transactions' }
+      },
+      {
+        path: 'treasury-report',
+        name: 'treasury-report',
+        component: TreasuryReportNew,
+        meta: { title: 'treasury.report' }
       },
       {
         path: 'expenses',

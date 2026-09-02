@@ -859,6 +859,18 @@ export const downloadTreasuryTransactions = (treasuryId, params = {}, format = '
     withCredentials: true
   });
 };
+export const downloadTreasurySummary = (treasuryId, params = {}, format = 'xlsx') => {
+  const sanitized = Object.fromEntries(
+    Object.entries({ ...params, format }).filter(([, value]) => value !== '' && value !== null && value !== undefined)
+  );
+  const queryParams = appendLangParam(sanitized);
+  const search = new URLSearchParams(queryParams).toString();
+  return axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/transactions/summary-export${search ? `?${search}` : ''}`, {
+    responseType: 'arraybuffer',
+    withCredentials: true
+  });
+};
+
 export const depositToTreasury = (treasuryId, data) =>
   axios.post(`${BASE_URL}/api/treasuries/${treasuryId}/deposit`, data);
 export const transferBetweenTreasuries = (data) =>

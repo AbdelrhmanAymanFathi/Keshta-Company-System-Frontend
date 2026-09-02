@@ -1644,6 +1644,7 @@
   },
   "treasury": {
     "report": "تقرير الخزينة",
+    "reportSimple": "التقرير المبسط للخزينة",
     "ledgerTitle": "دفتر الخزينة",
     "searchPlaceholder": "ابحث في الوصف أو المرجع...",
     "searchTreasuriesPlaceholder": "ابحث في الخزائن...",

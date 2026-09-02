@@ -1644,6 +1644,7 @@
   },
   "treasury": {
     "report": "Treasury Report",
+    "reportSimple": "Treasury Summary Report",
     "ledgerTitle": "Treasury ledger",
     "searchPlaceholder": "Search description or reference...",
     "searchTreasuriesPlaceholder": "Search treasuries...",

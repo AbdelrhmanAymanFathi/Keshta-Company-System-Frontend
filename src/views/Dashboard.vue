@@ -401,6 +401,7 @@ export default {
         treasury: [
           { name: 'treasury', label: 'dashboard.treasury', routeName: 'treasury' },
           { name: 'companyTransactions', label: 'treasury.report', routeName: 'report-company-transactions' },
+          { name: 'treasuryReport', label: 'treasury.reportSimple', routeName: 'treasury-report' },
         ],
         reports: [
           { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' },
@@ -593,7 +594,7 @@ export default {
       const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
-      const walletRoutes = ['treasury', 'company-transactions']
+      const walletRoutes = ['treasury', 'company-transactions', 'treasury-report']
       const expensesRoutes = ['expenses-list', 'expenses-terms', 'expenses-report']
       const paymentRoutes = ['payments']
       const reportsRoutes = ['reports-landing', 'contractors-activity-report', 'admin-reports-list', 'admin-reports-run']
