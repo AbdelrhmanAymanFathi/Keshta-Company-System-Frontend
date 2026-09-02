@@ -110,10 +110,10 @@
                 {{ isRTL ? 'الفرق' : 'Difference' }}
               </th>
               <th class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
-                {{ isRTL ? 'إجمالي' : 'Total Out' }}
+                {{ isRTL ? 'إجمالي (وارد)' : 'Total In' }}
               </th>
               <th class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
-                {{ isRTL ? 'إجمالي' : 'Total In' }}
+                {{ isRTL ? 'إجمالي (صادر)' : 'Total Out' }}
               </th>
               <th colspan="2" class="border border-gray-300 px-3 py-2"></th>
             </tr>
@@ -122,10 +122,10 @@
                 {{ formatNumber(totalIn - totalOut) }}
               </td>
               <td class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
-                {{ formatNumber(totalOut) }}
+                {{ formatNumber(totalIn) }}
               </td>
               <td class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
-                {{ formatNumber(totalIn) }}
+                {{ formatNumber(totalOut) }}
               </td>
               <td colspan="2" class="border border-gray-300 px-3 py-2"></td>
             </tr>
@@ -135,10 +135,10 @@
                 {{ isRTL ? 'البيـــــــــــان' : 'Description' }}
               </th>
               <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-32">
-                {{ isRTL ? 'المنصرف (سحب)' : 'Debit (Out)' }}
+                {{ isRTL ? 'الوارد (إيداع)' : 'Credit (In)' }}
               </th>
               <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-32">
-                {{ isRTL ? 'الوارد (إيداع)' : 'Credit (In)' }}
+                {{ isRTL ? 'المنصرف (سحب)' : 'Debit (Out)' }}
               </th>
               <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-32">
                 {{ isRTL ? 'الرصيد' : 'Balance' }}
@@ -173,11 +173,11 @@
               class="transition hover:bg-orange-50/40"
             >
               <td class="border border-gray-200 px-3 py-2 text-sm text-gray-800">{{ row.description }}</td>
-              <td class="border border-gray-200 px-3 py-2 text-center text-sm" :class="row.debit > 0 ? 'font-semibold text-red-600' : 'text-gray-300'">
-                {{ row.debit > 0 ? formatNumber(row.debit) : '—' }}
-              </td>
               <td class="border border-gray-200 px-3 py-2 text-center text-sm" :class="row.credit > 0 ? 'font-semibold text-emerald-700' : 'text-gray-300'">
                 {{ row.credit > 0 ? formatNumber(row.credit) : '—' }}
+              </td>
+              <td class="border border-gray-200 px-3 py-2 text-center text-sm" :class="row.debit > 0 ? 'font-semibold text-red-600' : 'text-gray-300'">
+                {{ row.debit > 0 ? formatNumber(row.debit) : '—' }}
               </td>
               <td class="border border-gray-200 px-3 py-2 text-center text-sm font-semibold" :class="row.runningBalance < 0 ? 'text-red-600' : 'text-indigo-700'">
                 {{ formatNumber(row.runningBalance) }}
