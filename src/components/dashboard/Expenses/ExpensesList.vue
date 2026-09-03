@@ -442,48 +442,7 @@
                       />
                     </div>
 
-                    <div v-if="isMainSourceTreasury">
-                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ $t('expenses.depositToCustody') }}
-                      </label>
-                      <SearchDropdown
-                        v-model="formDestinationTreasurySearch"
-                        :items="custodyTreasuryItems"
-                        :allItems="custodyTreasuryItems"
-                        :placeholder="$t('expenses.searchCustodyAccount')"
-                        :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                        teleportTarget="body"
-                        clearable
-                        @select="(sel) => { form.destinationTreasuryId = sel.id; formDestinationTreasurySearch = sel.name }"
-                        @clear="() => { form.destinationTreasuryId = null; formDestinationTreasurySearch = '' }"
-                      />
-                      <p class="mt-1 text-[11px] theme-text-muted">{{ $t('expenses.depositToCustodyHint') }}</p>
-                    </div>
-
-                    <!-- Case 1: Link expense to a contractor account (only when NO custody destination) -->
-                    <div v-if="form.treasuryId && !form.destinationTreasuryId">
-                      <label class="block text-xs font-medium theme-text-secondary mb-1.5" :class="isRTL ? 'text-right' : 'text-left'">
-                        {{ isRTL ? 'إيداع في حساب مقاول (اختياري)' : 'Credit Contractor Account (optional)' }}
-                      </label>
-                      <SearchDropdown
-                        v-model="formContractorSearch"
-                        :items="contractorItems"
-                        :allItems="contractorItems"
-                        :placeholder="isRTL ? 'اختر المقاول...' : 'Select contractor...'"
-                        :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
-                        teleportTarget="body"
-                        clearable
-                        @select="(sel) => { form.contractorId = sel.id; formContractorSearch = sel.name }"
-                        @clear="() => { form.contractorId = null; formContractorSearch = '' }"
-                      />
-                      <p v-if="form.contractorId" class="mt-1 text-[11px] text-emerald-600 font-medium">
-                        {{ isRTL ? `✓ سيُسجَّل إيداع تلقائي في حساب ${formContractorSearch}` : `✓ A deposit will be auto-created in ${formContractorSearch}'s account` }}
-                      </p>
-                      <p v-else class="mt-1 text-[11px] theme-text-muted">
-                        {{ isRTL ? 'إذا كان المصروف موجَّه لمقاول، اختره هنا حتى يُسجَّل في حسابه تلقائياً.' : 'If this expense goes to a contractor, select them to auto-credit their account.' }}
-                      </p>
-                    </div>
-                  </div>
+                </div>
                 </div>
 
                 <!-- Step 2: Editable expense rows with exact requested column structure -->
@@ -500,35 +459,35 @@
 
                   <div class="p-4 sm:p-5">
                     <div class="expense-rows-table-container relative overflow-x-auto overflow-y-visible rounded-xl border border-slate-200">
-                      <table ref="tableRef" class="expense-rows-table w-full border-collapse bg-white">
+                      <table ref="tableRef" class="expense-rows-table w-full border-collapse bg-white" style="table-layout:auto;min-width:max-content">
                         <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                           <tr>
                             <th class="w-10 px-2 py-2 text-center text-xs font-medium theme-text-secondary">#</th>
-                            <th class="expense-column-date px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.date') || 'التاريخ' }}</th>
-                            <th class="expense-column-amount px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.amount') }}</th>
-                            <th class="expense-column-description px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.statementOrDescription') }}</th>
-                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.subTerm') }}</th>
-                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.mainTerm') }}</th>
-                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.location') }}</th>
-                            <th class="expense-column-notes px-2 py-2 text-start text-xs font-medium theme-text-secondary">{{ $t('expenses.notes') }}</th>
-                            <th class="expense-column-settlement px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
-                            <th class="actions-col px-2 py-2 text-center text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('expenses.actions') }}</th>
+                            <th class="expense-column-date px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:8rem;width:8rem">{{ $t('expenses.date') || 'التاريخ' }}</th>
+                            <th class="expense-column-amount px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:7rem;width:7rem">{{ $t('expenses.amount') }}</th>
+                            <th class="expense-column-description px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:9rem">{{ $t('expenses.statementOrDescription') }}</th>
+                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:10rem">{{ $t('expenses.subTerm') }}</th>
+                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:10rem">{{ $t('expenses.mainTerm') }}</th>
+                            <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:9rem">{{ $t('expenses.location') }}</th>
+                            <th class="expense-column-notes px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:8rem">{{ $t('expenses.notes') }}</th>
+                            <th class="expense-column-settlement px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:7.5rem;width:7.5rem">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
+                            <th class="actions-col px-2 py-2 text-center text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:5rem;width:5rem">{{ $t('expenses.actions') }}</th>
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
                           <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
                             <td class="px-2 py-2 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
                             <!-- Row Date (Editable per row) -->
-                            <td class="expense-column-date px-2 py-2">
+                            <td class="expense-column-date px-2 py-2" style="min-width:8rem">
                               <DateField
                                 v-model="row.date"
-                                class="w-full min-w-[8.5rem] border border-gray-300 rounded-lg px-2 py-2 text-sm theme-input-focus"
+                                class="w-full min-w-[8rem] border border-gray-300 rounded-lg px-2 py-2 text-sm theme-input-focus"
                                 :class="isRTL ? 'text-right' : 'text-left'"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'date', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'date', $event)"
                               />
                             </td>
-                            <td class="expense-column-amount px-2 py-2">
+                            <td class="expense-column-amount px-2 py-2" style="min-width:7rem">
                               <input
                                 v-model="row.amount"
                                 type="number"
@@ -541,7 +500,7 @@
                                 @keydown.tab="handleFieldNavigation(index, 'amount', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2">
+                            <td class="px-2 py-2" style="min-width:9rem">
                               <input
                                 v-model="row.description"
                                 type="text"
@@ -552,28 +511,28 @@
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2">
+                            <td class="px-2 py-2" style="min-width:10rem">
                               <SearchDropdown
                                 v-model="row.subCategorySearch"
-                                :items="getRowSubcategories(row)"
-                                :allItems="getRowSubcategories(row)"
+                                :items="contractorItems"
+                                :allItems="contractorItems"
                                 :placeholder="$t('expenses.searchSubTerm')"
-                                :inputClass="'w-full min-w-[8.5rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[10rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
-                                @select="(sel) => onSelectRowSubcategory(row, sel)"
-                                @clear="() => onClearRowSubcategory(row)"
+                                @select="(sel) => onSelectRowContractor(row, sel)"
+                                @clear="() => onClearRowContractor(row)"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'subcategory', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2">
+                            <td class="px-2 py-2" style="min-width:10rem">
                               <SearchDropdown
                                 v-model="row.categorySearch"
                                 :items="getRowCategories(row)"
                                 :allItems="getRowCategories(row)"
                                 :placeholder="$t('expenses.searchMainTerm')"
-                                :inputClass="'w-full min-w-[8.5rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[10rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowCategory(row, sel)"
@@ -582,13 +541,13 @@
                                 @keydown.tab="handleFieldNavigation(index, 'category', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2">
+                            <td class="px-2 py-2" style="min-width:9rem">
                               <SearchDropdown
                                 v-model="row.locationSearch"
                                 :items="locations"
                                 :allItems="locations"
                                 :placeholder="$t('expenses.searchLocation')"
-                                :inputClass="'w-full min-w-[8.5rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[9rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => { row.locationId = sel.id; row.locationSearch = sel.name }"
@@ -597,7 +556,7 @@
                                 @keydown.tab="handleFieldNavigation(index, 'location', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2">
+                            <td class="px-2 py-2" style="min-width:8rem">
                               <textarea
                                 v-model="row.notes"
                                 rows="1"
@@ -609,10 +568,10 @@
                               ></textarea>
                             </td>
                             <!-- Settlement Date (Static from Step 1) -->
-                            <td class="expense-column-settlement px-2 py-2 text-sm theme-text-secondary whitespace-nowrap align-middle">
+                            <td class="expense-column-settlement px-2 py-2 text-sm theme-text-secondary whitespace-nowrap align-middle" style="min-width:7.5rem">
                               {{ formatDate(form.settlementDate || form.date) }}
                             </td>
-                            <td class="actions-col px-1 py-2 text-center">
+                            <td class="actions-col px-1 py-2 text-center" style="min-width:5rem;width:5rem">
                               <div class="flex justify-center gap-1">
                                 <button type="button" @click="duplicateRow(index)" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-emerald-700" title="Duplicate">
                                   ⧉
@@ -964,6 +923,18 @@ rows: [],
         id: c.id,
         name: c.name
       }))
+    },
+
+    // System modules — used as البند الرئيسي options
+    systemModuleItems() {
+      return [
+        { id: 'transport',  name: this.$t('navbar.transport')  || 'النقل' },
+        { id: 'extracts',   name: this.$t('navbar.extracts')   || 'المستخلصات' },
+        { id: 'supplies',   name: this.$t('navbar.supplies')   || 'التوريدات' },
+        { id: 'payments',   name: this.$t('navbar.payments')   || 'المدفوعات' },
+        { id: 'equipment',  name: this.$t('dashboard.equipmentLog') || 'سجل المعدات' },
+        { id: 'expenses',   name: this.$t('navbar.expenses')   || 'المصروفات' },
+      ]
     },
 
     // Payment method items for SearchDropdown
@@ -1544,10 +1515,10 @@ rows: [],
 
       return {
         id: Date.now() + Math.random(),
-        categoryId: null,
-        subCategoryId: null,
-        categorySearch: '',
-        subCategorySearch: '',
+        categoryId: prevRow?.categoryId ?? null,
+        subCategoryId: prevRow?.subCategoryId ?? null,
+        categorySearch: prevRow?.categorySearch ?? '',
+        subCategorySearch: prevRow?.subCategorySearch ?? '',
         locationId: rowLocationId,
         locationSearch: rowLocationSearch,
         description: '',
@@ -1646,26 +1617,58 @@ rows: [],
     },
 
     getRowCategories(row) {
-      if (row.subCategorySearch) {
-        // Find all parent categories that contain a subcategory matching row.subCategorySearch
-        const matchingCategories = []
-        this.expenseCategories.forEach(cat => {
-          const subCats = cat.subCategories || cat.subcategories || cat.children || []
-          const hasSub = subCats.some(sc => sc.name && String(sc.name).trim().toLowerCase() === String(row.subCategorySearch).trim().toLowerCase())
-          if (hasSub) {
-            matchingCategories.push(cat)
-          }
-        })
-        return matchingCategories.map(cat => ({ id: cat.id, name: cat.name }))
-      } else {
-        return this.expenseCategories.map(cat => ({ id: cat.id, name: cat.name }))
+      // البند الرئيسي = system modules filtered by the selected contractor's availability
+      if (row.subCategoryId) {
+        const contractor = (this.contractors || []).find(c => Number(c.id) === Number(row.subCategoryId))
+        if (contractor) {
+          return this.systemModuleItems.filter(m => {
+            if (m.id === 'transport')  return !!contractor.availableForTransports
+            if (m.id === 'extracts')   return !!contractor.availableForExtracts || !!contractor.availableForExports
+            if (m.id === 'supplies')   return !!contractor.availableForSupplies  || !!contractor.availableForExports
+            if (m.id === 'equipment')  return !!contractor.availableForRentals   || !!contractor.availableForEquipmentRental
+            if (m.id === 'payments')   return true
+            if (m.id === 'expenses')   return true
+            return true
+          })
+        }
       }
+      return this.systemModuleItems
+    },
+
+    // ── New: contractor as البند الفرعي ──────────────────────────────────────
+    onSelectRowContractor(row, sel) {
+      row.subCategoryId = sel.id
+      row.subCategorySearch = sel.name
+      // Auto-fill البند الرئيسي if contractor has exactly one available module
+      const contractor = (this.contractors || []).find(c => Number(c.id) === Number(sel.id))
+      if (contractor) {
+        const available = this.systemModuleItems.filter(m => {
+          if (m.id === 'transport')  return !!contractor.availableForTransports
+          if (m.id === 'extracts')   return !!contractor.availableForExtracts || !!contractor.availableForExports
+          if (m.id === 'supplies')   return !!contractor.availableForSupplies  || !!contractor.availableForExports
+          if (m.id === 'equipment')  return !!contractor.availableForRentals   || !!contractor.availableForEquipmentRental
+          return false
+        })
+        if (available.length === 1) {
+          row.categoryId = available[0].id
+          row.categorySearch = available[0].name
+        } else {
+          // Reset so user picks from the filtered list
+          row.categoryId = null
+          row.categorySearch = ''
+        }
+      }
+    },
+
+    onClearRowContractor(row) {
+      row.subCategoryId = null
+      row.subCategorySearch = ''
+      row.categoryId = null
+      row.categorySearch = ''
     },
 
     onSelectRowSubcategory(row, sel) {
       row.subCategorySearch = sel.name
-
-      // Find all categories containing a subcategory with this name
       const matchingCats = []
       const matchingSubcategories = []
 
@@ -1701,27 +1704,11 @@ rows: [],
     onSelectRowCategory(row, sel) {
       row.categoryId = sel.id
       row.categorySearch = sel.name
-
-      // If a subcategory search text exists, try to resolve subCategoryId under this category
-      if (row.subCategorySearch) {
-        const cat = this.expenseCategories.find(c => Number(c.id) === Number(sel.id))
-        const subCats = cat?.subCategories || cat?.subcategories || cat?.children || []
-        const matchedSub = subCats.find(sc => sc.name && String(sc.name).trim().toLowerCase() === String(row.subCategorySearch).trim().toLowerCase())
-        if (matchedSub) {
-          row.subCategoryId = matchedSub.id
-        } else {
-          // If it doesn't exist in this category, clear subcategory
-          row.subCategoryId = null
-          row.subCategorySearch = ''
-        }
-      }
     },
 
     onClearRowCategory(row) {
       row.categoryId = null
       row.categorySearch = ''
-      row.subCategoryId = null
-      row.subCategorySearch = ''
     },
 
     onClearRowSubcategory(row) {
@@ -2367,7 +2354,7 @@ rows: [],
   width: 100% !important;
   max-width: 100%;
   min-width: 0 !important;
-  table-layout: fixed;
+  table-layout: auto;
   border-collapse: collapse;
 }
 
@@ -2381,6 +2368,7 @@ rows: [],
   vertical-align: top;
   font-size: 0.75rem;
   line-height: 1.35;
+  overflow: visible;
 }
 
 .expenses-list-card :deep(th) {
@@ -2400,6 +2388,15 @@ rows: [],
 .expense-rows-table {
   width: 100%;
 }
+
+/* Column widths for the expense rows table */
+.expense-rows-table :deep(.expense-column-date)        { width: 8rem;  min-width: 8rem; }
+.expense-rows-table :deep(.expense-column-amount)      { width: 7rem;  min-width: 7rem; }
+.expense-rows-table :deep(.expense-column-description) { width: 10rem; min-width: 9rem; }
+.expense-rows-table :deep(.expense-column-category)    { width: 10rem; min-width: 9rem; }
+.expense-rows-table :deep(.expense-column-notes)       { width: 8rem;  min-width: 7rem; }
+.expense-rows-table :deep(.expense-column-settlement)  { width: 7.5rem; min-width: 7rem; }
+.expense-rows-table :deep(.actions-col)                { width: 5rem;  min-width: 5rem; }
 
 .expense-rows-table :deep(.date-field),
 .expense-rows-table .expense-amount-input {
