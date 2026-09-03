@@ -124,7 +124,7 @@ export function isDynamicReportTotalsRow(row) {
         const firstValue = Object.entries(row).find(([key]) => !String(key).startsWith('__'))?.[1]
         if (typeof firstValue === 'string') {
           const normalized = firstValue.trim().toLowerCase()
-          return normalized === 'total' || normalized === 'totals'
+          return normalized === 'total' || normalized === 'totals' || normalized === 'الإجمالي' || normalized === 'إجمالي'
         }
         return false
       })()
@@ -137,12 +137,15 @@ export function isContractorStatementTotalsRow(row) {
 
 export function splitFooterRow(rows = [], predicate = () => false) {
   const dataRows = []
-  let footerRow = null
+  const totalsRows = []
 
   rows.forEach((row) => {
-    if (!footerRow && predicate(row)) footerRow = row
+    if (predicate(row)) totalsRows.push(row)
     else dataRows.push(row)
   })
+
+  // Keep only the last totals row as the grand total footer
+  const footerRow = totalsRows.length > 0 ? totalsRows[totalsRows.length - 1] : null
 
   return { dataRows, footerRow }
 }
