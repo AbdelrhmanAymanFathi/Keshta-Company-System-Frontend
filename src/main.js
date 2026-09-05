@@ -13,6 +13,7 @@ import i18n from './i18n'
 import authManager from './auth'
 import { isAuthenticated, initializeAuthStore } from './composables/authStore'
 import { realtimeService } from './services/realtimeService'
+import { buildVersionService } from './services/buildVersionService'
 import { tokenManager } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
 
@@ -44,6 +45,9 @@ app.provide('authManager', authManager)
 // mount app
 app.mount('#app')
 installHeaderMotion(router)
+
+// Watch for new builds and force a hard refresh (Ctrl+F5 equivalent) automatically
+buildVersionService.start()
 
 // Initialize realtime SSE connection after mount
 if (isAuthenticated.value) {
