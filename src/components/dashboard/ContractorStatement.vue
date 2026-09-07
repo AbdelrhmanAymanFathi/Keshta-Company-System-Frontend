@@ -256,7 +256,7 @@
                     {{ getTypeLabel(row.type) }}
                   </span>
                   <Badge v-else :variant="getTypeVariant(row.type)">
-                    {{ getTypeLabel(row.type) }}
+                    {{ row.type === 'SUPPLY' && row.arDescription ? row.arDescription : getTypeLabel(row.type) }}
                   </Badge>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
