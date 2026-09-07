@@ -651,11 +651,7 @@ export default {
     onMounted(async () => {
       // const route = useRoute()
       await loadContractors()
-      // Set default date range to last 30 days
-      const endDate = new Date()
-      const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-      filters.value.endDate = formatToISODate(endDate)
-      filters.value.startDate = formatToISODate(startDate)
+      // No default date range — show all transactions by default
 
       // Check if contractor ID was passed via localStorage (from navigation)
       const storedContractorId = localStorage.getItem('contractor-statement-id')
