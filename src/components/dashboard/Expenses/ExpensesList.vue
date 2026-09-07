@@ -1845,10 +1845,15 @@ rows: [],
             const rowContractorId = isContractorRow
               ? (row._contractorRawId || null)
               : ((this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null)
+            // لما المقاول هو البند الفرعي، categoryId بيكون string زي 'expenses' → البيك إند بيرفضه
+            // فبنبعت category string بدل categoryId integer
+            const rowCategoryId = isContractorRow ? null : (row.categoryId || null)
+            const rowCategoryName = isContractorRow ? (row.categorySearch || undefined) : undefined
             return {
               date: rowExpenseDate,
               kind: this.form.kind || 'EXPENSE',
-              categoryId: row.categoryId,
+              categoryId: rowCategoryId,
+              category: rowCategoryName,
               subCategoryId: rowSubCategoryId,
               description: String(row.description || '').trim(),
               amount: Number.isFinite(amount) ? amount : 0,
@@ -2004,7 +2009,9 @@ rows: [],
 
       for (let index = 0; index < this.rows.length; index += 1) {
         const row = this.rows[index]
-        if (!row.categoryId) {
+        // لما بند فرعي من المصروفات → categoryId رقم حقيقي (مطلوب)
+        // لما مقاول → categoryId ممكن يكون string module id أو null (مقبول)
+        if (!row.categoryId && row._subItemType !== 'contractor') {
           this.showError(this.$t('expenses.validation.categoryRequired'))
           return false
         }
