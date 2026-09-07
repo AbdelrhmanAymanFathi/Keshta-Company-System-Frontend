@@ -514,13 +514,13 @@
                             <td class="px-2 py-2" style="min-width:10rem">
                               <SearchDropdown
                                 v-model="row.subCategorySearch"
-                                :items="contractorItems"
-                                :allItems="contractorItems"
+                                :items="combinedSubcategoryItems"
+                                :allItems="combinedSubcategoryItems"
                                 :placeholder="$t('expenses.searchSubTerm')"
                                 :inputClass="'w-full min-w-[10rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
-                                @select="(sel) => onSelectRowContractor(row, sel)"
+                                @select="(sel) => onSelectRowSubItem(row, sel)"
                                 @clear="() => onClearRowContractor(row)"
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'subcategory', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
@@ -923,6 +923,34 @@ rows: [],
         id: c.id,
         name: c.name
       }))
+    },
+
+    // Combined البند الفرعي: contractors + all expense sub-categories
+    combinedSubcategoryItems() {
+      const contractors = (this.contractors || []).map(c => ({
+        id: `contractor__${c.id}`,
+        name: c.name,
+        _type: 'contractor',
+        _rawId: c.id
+      }))
+
+      const expenseSubs = []
+      ;(this.expenseCategories || []).forEach(cat => {
+        const subs = cat.subCategories || cat.subcategories || cat.children || []
+        subs.forEach(sc => {
+          expenseSubs.push({
+            id: `expensesub__${sc.id}`,
+            name: `${sc.name} (${cat.name})`,
+            _type: 'expensesub',
+            _rawId: sc.id,
+            _categoryId: cat.id,
+            _categoryName: cat.name,
+            _subName: sc.name
+          })
+        })
+      })
+
+      return [...contractors, ...expenseSubs]
     },
 
     // System modules — used as البند الرئيسي options
@@ -1459,6 +1487,17 @@ rows: [],
       row.categorySearch = categoryName
       row.subCategoryId = finalSubCategoryId
       row.subCategorySearch = subCategoryName
+      // تحديد نوع البند الفرعي لما بنفتح للتعديل
+      if (finalSubCategoryId && (this.contractors || []).some(c => Number(c.id) === Number(finalSubCategoryId))) {
+        row._subItemType = 'contractor'
+        row._contractorRawId = finalSubCategoryId
+      } else if (finalSubCategoryId) {
+        row._subItemType = 'expensesub'
+        row._contractorRawId = null
+      } else {
+        row._subItemType = null
+        row._contractorRawId = null
+      }
       row.locationId = expense.locationId || expense.location?.id || null
       row.locationSearch = expense.location?.name || this.locations?.find(l => Number(l.id) === Number(expense.locationId))?.name || ''
       row.description = expense.description || ''
@@ -1517,6 +1556,8 @@ rows: [],
         id: Date.now() + Math.random(),
         categoryId: prevRow?.categoryId ?? null,
         subCategoryId: prevRow?.subCategoryId ?? null,
+        _subItemType: prevRow?._subItemType ?? null,
+        _contractorRawId: prevRow?._contractorRawId ?? null,
         categorySearch: prevRow?.categorySearch ?? '',
         subCategorySearch: prevRow?.subCategorySearch ?? '',
         locationId: rowLocationId,
@@ -1617,9 +1658,15 @@ rows: [],
     },
 
     getRowCategories(row) {
-      // البند الرئيسي = system modules filtered by the selected contractor's availability
-      if (row.subCategoryId) {
-        const contractor = (this.contractors || []).find(c => Number(c.id) === Number(row.subCategoryId))
+      // لو اختار بند فرعي من المصروفات → البند الرئيسي = العنصر الواحد من expenseCategories (غير قابل للتغيير)
+      if (row._subItemType === 'expensesub' && row.categoryId) {
+        const cat = (this.expenseCategories || []).find(c => Number(c.id) === Number(row.categoryId))
+        if (cat) return [{ id: cat.id, name: cat.name }]
+      }
+
+      // لو اختار مقاول → البند الرئيسي = system modules مفلترة حسب الـ flags
+      if (row._subItemType === 'contractor' && row._contractorRawId) {
+        const contractor = (this.contractors || []).find(c => Number(c.id) === Number(row._contractorRawId))
         if (contractor) {
           return this.systemModuleItems.filter(m => {
             if (m.id === 'transport')  return !!contractor.availableForTransports
@@ -1632,35 +1679,53 @@ rows: [],
           })
         }
       }
+
       return this.systemModuleItems
     },
 
-    // ── New: contractor as البند الفرعي ──────────────────────────────────────
-    onSelectRowContractor(row, sel) {
-      row.subCategoryId = sel.id
-      row.subCategorySearch = sel.name
-      // Auto-fill البند الرئيسي if contractor has exactly one available module
-      const contractor = (this.contractors || []).find(c => Number(c.id) === Number(sel.id))
-      if (contractor) {
-        const available = this.systemModuleItems.filter(m => {
-          if (m.id === 'transport')  return !!contractor.availableForTransports
-          if (m.id === 'extracts')   return !!contractor.availableForExtracts || !!contractor.availableForExports
-          if (m.id === 'supplies')   return !!contractor.availableForSupplies  || !!contractor.availableForExports
-          if (m.id === 'equipment')  return !!contractor.availableForRentals   || !!contractor.availableForEquipmentRental
-          return false
-        })
-        if (available.length === 1) {
-          row.categoryId = available[0].id
-          row.categorySearch = available[0].name
-        } else {
-          // Reset so user picks from the filtered list
-          row.categoryId = null
-          row.categorySearch = ''
+    // ── Unified handler: contractor OR expense sub-category as البند الفرعي ──
+    onSelectRowSubItem(row, sel) {
+      if (sel._type === 'expensesub') {
+        // ── بند فرعي من المصروفات ──
+        row._subItemType = 'expensesub'
+        row._contractorRawId = null
+        row.subCategoryId = sel._rawId
+        row.subCategorySearch = sel._subName  // الاسم بدون (اسم البند الرئيسي)
+        // البند الرئيسي يتملى تلقائياً ولا يتغير
+        row.categoryId = sel._categoryId
+        row.categorySearch = sel._categoryName
+      } else {
+        // ── مقاول ──
+        row._subItemType = 'contractor'
+        row._contractorRawId = sel._rawId
+        row.subCategoryId = sel._rawId
+        row.subCategorySearch = sel.name
+        // Auto-fill البند الرئيسي لو الـ module واحد بس
+        const contractor = (this.contractors || []).find(c => Number(c.id) === Number(sel._rawId))
+        if (contractor) {
+          const available = this.systemModuleItems.filter(m => {
+            if (m.id === 'transport')  return !!contractor.availableForTransports
+            if (m.id === 'extracts')   return !!contractor.availableForExtracts || !!contractor.availableForExports
+            if (m.id === 'supplies')   return !!contractor.availableForSupplies  || !!contractor.availableForExports
+            if (m.id === 'equipment')  return !!contractor.availableForRentals   || !!contractor.availableForEquipmentRental
+            if (m.id === 'payments')   return true
+            if (m.id === 'expenses')   return true
+            return false
+          })
+          if (available.length === 1) {
+            row.categoryId = available[0].id
+            row.categorySearch = available[0].name
+          } else {
+            row.categoryId = null
+            row.categorySearch = ''
+          }
         }
       }
     },
 
     onClearRowContractor(row) {
+      row._subItemType = null
+      row._contractorRawId = null
       row.subCategoryId = null
       row.subCategorySearch = ''
       row.categoryId = null
@@ -1773,11 +1838,18 @@ rows: [],
             const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
             const rowExpenseDate = row.date || getTodayISO()
             const rowSettlementDate = this.form.settlementDate || this.form.date || getTodayISO()
+            // لو البند الفرعي مقاول → subCategoryId = undefined، contractorId = الـ ID الحقيقي
+            // لو البند الفرعي من المصروفات → subCategoryId = الـ ID الحقيقي، contractorId من الـ form العلوي
+            const isContractorRow = row._subItemType === 'contractor'
+            const rowSubCategoryId = isContractorRow ? undefined : (row.subCategoryId || undefined)
+            const rowContractorId = isContractorRow
+              ? (row._contractorRawId || null)
+              : ((this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null)
             return {
               date: rowExpenseDate,
               kind: this.form.kind || 'EXPENSE',
               categoryId: row.categoryId,
-              subCategoryId: row.subCategoryId || undefined,
+              subCategoryId: rowSubCategoryId,
               description: String(row.description || '').trim(),
               amount: Number.isFinite(amount) ? amount : 0,
               flow: this.form.flow || 'OUT',
@@ -1788,8 +1860,7 @@ rows: [],
               paymentMethod: row.paymentMethod || 'CASH',
               notes: row.notes || '',
               settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString(),
-              // Case 1: optional contractor link — auto-credits contractor account
-              contractorId: (this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null,
+              contractorId: rowContractorId,
               contractorAccountType: this.form.contractorAccountType || 'GENERAL'
             }
           })
