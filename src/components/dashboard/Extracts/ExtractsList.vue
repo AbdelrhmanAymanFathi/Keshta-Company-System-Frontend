@@ -94,7 +94,11 @@
         <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateFrom') || 'Date From' }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
+              @click="sortBy('dateFrom')">
+              {{ $t('labels.dateFrom') || 'Date From' }}
+              <SortIcon :active="sortField === 'dateFrom'" :dir="sortOrder" />
+            </th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateTo') || 'Date To' }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.quantity') }}</th>
@@ -225,17 +229,20 @@ import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
 import DateField from '../../shared/DateField.vue'
+import SortIcon from '../../shared/SortIcon.vue'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'ExtractsList',
-  components: { ExtractsCreationModal, Pagination, SearchDropdown, TrashIcon, PencilIcon, DateField },
+  components: { ExtractsCreationModal, Pagination, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon },
   data() {
     return {
       extracts: [],
       page: 1,
       pageSize: 20,
+      sortField: 'dateFrom',
+      sortOrder: 'desc',
       total: 0,
       loading: false,
       contractors: [],
@@ -363,6 +370,7 @@ export default {
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
+          sortOrder: this.sortOrder,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
           contractorId: this.filters.contractorId,
@@ -491,7 +499,18 @@ export default {
         y: 0,
         item: null
       }
-    }
+    },
+
+    sortBy(field) {
+      if (this.sortField === field) {
+        this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc'
+      } else {
+        this.sortField = field
+        this.sortOrder = 'desc'
+      }
+      this.page = 1
+      this.loadExtracts()
+    },
   }
 }
 </script>

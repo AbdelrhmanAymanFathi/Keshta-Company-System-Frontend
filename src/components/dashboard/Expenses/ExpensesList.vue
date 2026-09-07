@@ -201,7 +201,10 @@
         <thead>
           <tr>
             <th>{{ $t('labels.#') }}</th>
-            <th>{{ $t('expenses.date') }}</th>
+            <th class="cursor-pointer select-none hover:opacity-80" @click="sortBy('date')">
+              {{ $t('expenses.date') }}
+              <SortIcon :active="sortField === 'date'" :dir="sortOrder" />
+            </th>
             <th>{{ $t('expenses.mainTerm') }}</th>
             <th>{{ $t('expenses.subTerm') }}</th>
             <th>{{ $t('expenses.description') }}</th>
@@ -791,6 +794,7 @@ import {
 } from '../../../api'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 import DateField from '@/components/shared/DateField.vue'
+import SortIcon from '@/components/shared/SortIcon.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
@@ -800,7 +804,7 @@ import { debounce } from '@/utils/debounce'
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
-  components: { AddFieldModal, DateField, PageHeader, SearchDropdown },
+  components: { AddFieldModal, DateField, PageHeader, SearchDropdown, SortIcon },
   data() {
     return {
       expenses: [],
@@ -883,6 +887,8 @@ rows: [],
       deleteConfirm: { open: false, item: null },
       currentPage: 1,
       pageSize: 20,
+      sortField: 'date',
+      sortOrder: 'desc',
       totalItems: 0,
       totalPages: 0
     }
@@ -1200,7 +1206,8 @@ rows: [],
         // Build params object with all filters (only non-empty values)
         const params = {
           page: this.currentPage,
-          pageSize: this.pageSize
+          pageSize: this.pageSize,
+          sortOrder: this.sortOrder
         }
         if (this.searchQuery) params.q = this.searchQuery
         if (this.amountSearch) params.amountSearch = String(this.amountSearch).trim()
@@ -1344,6 +1351,17 @@ rows: [],
     async onPageSizeChange() {
       this.currentPage = 1
       await this.loadExpenses()
+    },
+
+    sortBy(field) {
+      if (this.sortField === field) {
+        this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc'
+      } else {
+        this.sortField = field
+        this.sortOrder = 'desc'
+      }
+      this.currentPage = 1
+      this.loadExpenses()
     },
     
     getEmptyExpenseForm() {

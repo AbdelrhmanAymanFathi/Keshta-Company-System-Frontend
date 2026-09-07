@@ -151,9 +151,11 @@
             <thead class="theme-table-thead-gradient" :class="{ 'direction-rtl': isRTL }">
               <tr>
                 <th
-                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
-                  :class="{ 'text-right': isRTL }">
+                  class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
+                  :class="{ 'text-right': isRTL }"
+                  @click="sortBy('date')">
                   {{ $t('equipmentLog.date') }}
+                  <SortIcon :active="equipmentLogsStore.sortField === 'date'" :dir="equipmentLogsStore.sortOrder" />
                 </th>
                 <th
                   class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
@@ -515,6 +517,7 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance, nextTick } from 'vue'
 import { useEquipmentLogsStore } from '@/stores/useEquipmentLogsStore'
+import SortIcon from '@/components/shared/SortIcon.vue'
 import EquipmentLogDetail from './EquipmentLogDetail.vue'
 import Badge from '../../shared/Badge.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
@@ -528,7 +531,7 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField },
+  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon },
   setup() {
     const instance = getCurrentInstance()
     const equipmentLogsStore = useEquipmentLogsStore()
@@ -1320,6 +1323,12 @@ export default {
       loadDrivers()
     })
 
+    const sortBy = (field) => {
+      const newOrder = equipmentLogsStore.sortField === field && equipmentLogsStore.sortOrder === 'desc' ? 'asc' : 'desc'
+      equipmentLogsStore.setSortOrder(field, newOrder)
+      equipmentLogsStore.fetchRentals()
+    }
+
     return {
       equipmentLogsStore,
       showModal,
@@ -1350,6 +1359,7 @@ export default {
       setCompanyOwnedFilter,
       changePage,
       onPageSizeChange,
+      sortBy,
       openAddModal,
       openEditModal,
       openDetailModal,

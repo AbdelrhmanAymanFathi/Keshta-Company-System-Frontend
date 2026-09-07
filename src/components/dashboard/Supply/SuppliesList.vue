@@ -133,8 +133,11 @@
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               #</th>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.date') }}</th>
+              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
+              @click="sortBy('date')">
+              {{ $t('labels.date') }}
+              <SortIcon :active="sortField === 'date'" :dir="sortOrder" />
+            </th>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.item') }}</th>
@@ -463,6 +466,7 @@
 </template>
 
 <script>
+import SortIcon from '@/components/shared/SortIcon.vue'
 import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles, updateExport } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import TableModal from './SuppliesCreationModal.vue'
@@ -483,7 +487,8 @@ export default {
     TableModal,
     Pagination,
     SearchDropdown,
-    DateField
+    DateField,
+    SortIcon
     // PaymentModal,
     // SupplyDetailModal
   },
@@ -495,6 +500,8 @@ export default {
       form: {},
       page: 1,
       pageSize: 20,
+      sortField: 'date',
+      sortOrder: 'desc',
       total: 0,
       loading: false,
       contextMenu: {
@@ -680,6 +687,7 @@ export default {
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
+          sortOrder: this.sortOrder,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
           areaId: this.filters.areaId,
@@ -759,6 +767,17 @@ export default {
     },
 
     onPageSizeChange() {
+      this.page = 1
+      this.loadSupplies()
+    },
+
+    sortBy(field) {
+      if (this.sortField === field) {
+        this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc'
+      } else {
+        this.sortField = field
+        this.sortOrder = 'desc'
+      }
       this.page = 1
       this.loadSupplies()
     },

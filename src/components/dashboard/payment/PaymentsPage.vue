@@ -160,7 +160,10 @@
         <thead class="theme-table-thead-gradient text-left text-xs uppercase tracking-wide theme-text-muted">
           <tr>
             <th class="px-4 py-3">#</th>
-            <th class="px-4 py-3">{{ $t('labels.date') || 'Date' }}</th>
+            <th class="px-4 py-3 cursor-pointer select-none hover:opacity-80" @click="sortByDate">
+              {{ $t('labels.date') || 'Date' }}
+              <SortIcon :active="true" :dir="sortOrder" />
+            </th>
             <th class="px-4 py-3">{{ $t('labels.site') || 'Site' }}</th>
             <th class="px-4 py-3">{{ $t('payments.module') || 'Module' }}</th>
             <th class="px-4 py-3">{{ $t('labels.contractor') || 'Contractor' }}</th>
@@ -201,6 +204,7 @@ import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import SortIcon from '@/components/shared/SortIcon.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
 
@@ -216,7 +220,8 @@ export default {
   components: {
     PaymentCreationModal,
     DateField,
-    SearchDropdown
+    SearchDropdown,
+    SortIcon
   },
   setup() {
     const { locale, t } = useI18n()
@@ -224,6 +229,8 @@ export default {
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const paymentModalVisible = ref(false)
     const payments = ref([])
+    const sortField = ref('date')
+    const sortOrder = ref('desc')
     const reports = ref([])
     const locations = ref([])
     const treasuries = ref([])
@@ -339,6 +346,10 @@ export default {
         if (lowerMethod && !normalize(paymentMethodLabel(payment)).includes(lowerMethod)) return false
         if (lowerTreasury && !normalize(paymentTreasury(payment)).includes(lowerTreasury)) return false
         return true
+      }).sort((a, b) => {
+        const da = new Date(a.paidAt || a.date || 0).getTime()
+        const db = new Date(b.paidAt || b.date || 0).getTime()
+        return sortOrder.value === 'asc' ? da - db : db - da
       })
     })
 
@@ -454,6 +465,10 @@ export default {
       filters.value.treasurySearch = treasury?.name || ''
     }
 
+    const sortByDate = () => {
+      sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
+    }
+
     const resetFilters = () => {
       filters.value = createFilters()
       contractorFilterOptions.value = []
@@ -524,6 +539,9 @@ export default {
       filters,
       fieldClass,
       filteredPayments,
+      sortField,
+      sortOrder,
+      sortByDate,
       paymentReports,
       siteOptions,
       moduleOptions,

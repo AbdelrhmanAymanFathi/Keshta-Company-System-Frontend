@@ -16,6 +16,8 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 		page: 1,
 		pageSize: 20,
 		total: 0,
+		sortField: 'date',
+		sortOrder: 'desc',
 		filters: {
 			q: '',
 			isCompanyOwned: null, // null = all, true = company, false = external
@@ -48,6 +50,7 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 				const params = {
 					page: this.page,
 					pageSize: this.pageSize,
+					sortOrder: this.sortOrder,
 					q: this.filters.q,
 					...(this.filters.locationId != null && this.filters.locationId !== '' ? { locationId: this.filters.locationId } : {}),
 					...(this.filters.areaId != null && this.filters.areaId !== '' ? { areaId: this.filters.areaId } : {}),
@@ -181,6 +184,12 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 
 		setSearchQuery(q) {
 			this.filters.q = q
+			this.page = 1
+		},
+
+		setSortOrder(field, order) {
+			this.sortField = field
+			this.sortOrder = order
 			this.page = 1
 		},
 

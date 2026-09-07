@@ -115,7 +115,11 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.dateTime') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']"
+                  @click="toggleSortOrder">
+                  {{ t('treasury.dateTime') }}
+                  <SortIcon :active="true" :dir="sortOrder" />
+                </th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
@@ -190,10 +194,11 @@ import { downloadTreasuryTransactions, getExpense } from '@/api'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
+import SortIcon from '@/components/shared/SortIcon.vue'
 
 export default {
   name: 'TreasuryTransactions',
-  components: { DateField, Pagination },
+  components: { DateField, Pagination, SortIcon },
   setup() {
     const { t, locale } = useI18n()
     const { user } = useAuth()
@@ -273,6 +278,7 @@ export default {
       })
     })
     const filters = reactive({ startDate: '', endDate: '', type: '', amountMin: '', amountMax: '', search: '' })
+    const sortOrder = ref('desc')
 
     const formatCurrency = (value) => new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
     const formatDate = (value) => {
@@ -340,6 +346,7 @@ export default {
           amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
           amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
           search: filters.search || undefined,
+          sortOrder: sortOrder.value,
         }, store.selectedTreasuryId)
       } catch (err) {
         console.error('[TreasuryTransactions] load error:', err)
@@ -488,6 +495,8 @@ export default {
       exportingFormat,
       exportError,
       filters,
+      sortOrder,
+      toggleSortOrder: () => { sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'; load() },
       treasuryView,
       treasurySearch,
       visibleTreasuries,

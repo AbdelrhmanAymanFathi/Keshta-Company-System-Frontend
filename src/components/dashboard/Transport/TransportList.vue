@@ -113,8 +113,10 @@
         <thead class="theme-table-thead-gradient">
           <tr>
             <th
-              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
+              @click="sortBy('date')">
               {{ $t('transport.date') }}
+              <SortIcon :active="sortField === 'date'" :dir="sortOrder" />
             </th>
              <th
                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
@@ -310,6 +312,7 @@
 </template>
 
 <script>
+import SortIcon from '@/components/shared/SortIcon.vue'
 import { getTransports, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
@@ -331,7 +334,8 @@ export default {
     SearchDropdown,
     PaymentModal,
     DateField,
-    TrashIcon
+    TrashIcon,
+    SortIcon
   },
 
   data() {
@@ -341,6 +345,8 @@ export default {
       editingTransport: null,
       page: 1,
       pageSize: 20,
+      sortField: 'date',
+      sortOrder: 'desc',
       total: 0,
       loading: false,
       contextMenu: {
@@ -481,6 +487,7 @@ export default {
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
+          sortOrder: this.sortOrder,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
           contractorId: this.filters.contractorId,
@@ -679,6 +686,17 @@ export default {
       this.showPaymentModal = false
       await this.loadTransports()
       this.$toast?.success(this.$t('labels.paymentSaved') || 'Payment saved')
+    },
+
+    sortBy(field) {
+      if (this.sortField === field) {
+        this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc'
+      } else {
+        this.sortField = field
+        this.sortOrder = 'desc'
+      }
+      this.page = 1
+      this.loadTransports()
     },
   }
 }
