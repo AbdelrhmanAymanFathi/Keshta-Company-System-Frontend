@@ -511,13 +511,13 @@
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2" style="min-width:10rem">
+                            <td class="px-2 py-2" style="min-width:16rem">
                               <SearchDropdown
                                 v-model="row.subCategorySearch"
                                 :items="combinedSubcategoryItems"
                                 :allItems="combinedSubcategoryItems"
                                 :placeholder="$t('expenses.searchSubTerm')"
-                                :inputClass="'w-full min-w-[10rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[16rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowSubItem(row, sel)"
@@ -526,13 +526,13 @@
                                 @keydown.tab="handleFieldNavigation(index, 'subcategory', $event)"
                               />
                             </td>
-                            <td class="px-2 py-2" style="min-width:10rem">
+                            <td class="px-2 py-2" style="min-width:14rem">
                               <SearchDropdown
                                 v-model="row.categorySearch"
                                 :items="getRowCategories(row)"
                                 :allItems="getRowCategories(row)"
                                 :placeholder="$t('expenses.searchMainTerm')"
-                                :inputClass="'w-full min-w-[10rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
+                                :inputClass="'w-full min-w-[14rem] px-2 py-2 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm ' + (isRTL ? 'text-right' : 'text-left')"
                                 teleportTarget="body"
                                 clearable
                                 @select="(sel) => onSelectRowCategory(row, sel)"
