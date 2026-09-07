@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && node scripts/generate-build-version.js",
     "lint": "vue-cli-service lint",
     "demo": "npm run dev -w demo-dashboard",
     "docs": "npm run dev -w docs-site",
