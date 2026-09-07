@@ -119,6 +119,7 @@
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">تفاصيل العملية</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.updatedBy') }}</th>
                 <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ t('treasury.amount') }}</th>
@@ -135,6 +136,23 @@
                   <span v-else class="text-gray-700">{{ formatSource(tx) }}</span>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-700">{{ displayDescription(tx) }}</td>
+                <!-- عمود تفاصيل العملية -->
+                <td class="px-4 py-3 text-sm" style="min-width:160px">
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-semibold text-gray-400">النوع:</span>
+                      <span class="text-xs font-bold text-gray-700">{{ refTypeLabel(tx.refType) }}</span>
+                    </div>
+                    <div v-if="tx.refId" class="flex items-center gap-1.5">
+                      <span class="text-xs font-semibold text-gray-400">المرجع:</span>
+                      <span class="text-xs font-bold text-indigo-600">#{{ tx.refId }}</span>
+                    </div>
+                    <div v-if="tx.source" class="flex items-center gap-1.5">
+                      <span class="text-xs font-semibold text-gray-400">المصدر:</span>
+                      <span class="text-xs text-gray-700">{{ tx.source }}</span>
+                    </div>
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ tx.createdBy?.name || tx.createdByName || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ tx.updatedBy?.name || tx.updatedByName || '-' }}</td>
                 <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
@@ -159,6 +177,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -167,7 +186,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
-import { downloadTreasuryTransactions } from '@/api'
+import { downloadTreasuryTransactions, getExpense } from '@/api'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
@@ -193,6 +212,53 @@ export default {
     const totalPages = computed(() => store.totalPages)
     const exportingFormat = ref('')
     const exportError = ref('')
+
+    // ── Detail panel ───────────────────────────────────────────────────────
+    const detailPanel = reactive({
+      open: false,
+      tx: null,
+      linked: null,
+      loading: false,
+    })
+
+    const openDetail = async (tx) => {
+      detailPanel.open = true
+      detailPanel.tx = tx
+      detailPanel.linked = null
+      detailPanel.loading = false
+      if (tx.refType === 'EXPENSE' && tx.refId) {
+        detailPanel.loading = true
+        try {
+          const res = await getExpense(tx.refId)
+          detailPanel.linked = res.data || null
+        } catch (_) {
+          detailPanel.linked = null
+        } finally {
+          detailPanel.loading = false
+        }
+      }
+    }
+
+    const closeDetail = () => {
+      detailPanel.open = false
+      detailPanel.tx = null
+      detailPanel.linked = null
+    }
+
+    const refTypeLabel = (refType) => {
+      const map = { EXPENSE: 'مصروف', TRANSFER: 'تحويل', TOPUP: 'إيداع مباشر', PAYMENT: 'دفعة مقاول' }
+      return map[refType] || refType || '—'
+    }
+
+    const formatNumber = (v) =>
+      new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v || 0))
+
+    const formatDateShort = (value) => {
+      if (!value) return '—'
+      const d = new Date(value)
+      if (isNaN(d.getTime())) return String(value)
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`
+    }
     const treasuryView = ref('active')
     const treasurySearch = ref('')
     const normalizedSearch = computed(() => String(treasurySearch.value || '').trim().toLowerCase())
@@ -442,7 +508,24 @@ export default {
       displayDescription,
       loadTreasuries,
       isAdmin,
+      detailPanel,
+      openDetail,
+      closeDetail,
+      refTypeLabel,
+      formatNumber,
+      formatDateShort,
     }
   }
 }
 </script>
+
+<style scoped>
+.tx-fade-enter-active,
+.tx-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+.tx-fade-enter-from,
+.tx-fade-leave-to {
+  opacity: 0;
+}
+</style>

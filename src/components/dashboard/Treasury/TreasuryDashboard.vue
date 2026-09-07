@@ -215,12 +215,18 @@
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">تفاصيل العملية</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
                 <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ t('treasury.amount') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white/70">
-              <tr v-for="tx in visibleTransactions" :key="tx.id" class="transition hover:theme-hover-soft">
+              <template v-for="tx in visibleTransactions" :key="tx.id">
+              <tr
+                class="transition hover:theme-hover-soft cursor-pointer"
+                :class="expandedTxId === tx.id ? 'bg-indigo-50/40' : ''"
+                @click="toggleExpand(tx)"
+              >
                 <td class="px-4 py-3 text-sm theme-text-primary">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
                 <!-- Settlement date -->
                 <td class="px-4 py-3 text-sm whitespace-nowrap">
@@ -236,15 +242,111 @@
                   </span>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                  <span v-if="tx.refId" class="cursor-pointer font-medium text-blue-600 hover:text-blue-800 hover:underline" @click="navigateToSource(tx)">{{ formatSource(tx) }}</span>
+                  <span v-if="tx.refId" class="font-medium text-blue-600">{{ formatSource(tx) }}</span>
                   <span v-else class="theme-text-primary">{{ formatSource(tx) }}</span>
                 </td>
                 <td class="px-4 py-3 text-sm theme-text-primary">{{ displayDescription(tx) }}</td>
+                <!-- عمود تفاصيل العملية -->
+                <td class="px-4 py-3 text-sm" style="min-width:150px">
+                  <div class="space-y-0.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs text-gray-400">النوع:</span>
+                      <span class="text-xs font-bold text-gray-700">{{ refTypeLabel(tx.refType) }}</span>
+                    </div>
+                    <div v-if="tx.refId" class="flex items-center gap-1.5">
+                      <span class="text-xs text-gray-400">المرجع:</span>
+                      <span class="text-xs font-bold text-indigo-600">#{{ tx.refId }}</span>
+                    </div>
+                    <div v-if="tx.refId" class="flex items-center gap-1.5">
+                      <span class="text-xs text-gray-400">اسم المرجع:</span>
+                      <span class="text-xs text-gray-700">{{ extractTransferName(tx) }}</span>
+                    </div>
+                    <div class="text-xs text-indigo-400 mt-0.5">{{ expandedTxId === tx.id ? '▲ إخفاء' : '▼ المزيد' }}</div>
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-sm theme-text-secondary">{{ tx.createdBy?.name || tx.createdByName || '-' }}</td>
                 <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
                   {{ formatCurrency(tx.amount) }}
                 </td>
               </tr>
+
+              <!-- Expanded details row -->
+              <tr v-if="expandedTxId === tx.id" class="bg-slate-50/60">
+                <td colspan="8" class="px-6 py-4 border-b border-indigo-100">
+                  <div v-if="expandedLoading" class="flex items-center gap-2 text-sm text-gray-500">
+                    <div class="h-4 w-4 animate-spin rounded-full border-b-2 border-indigo-500"></div>
+                    جاري التحميل...
+                  </div>
+                  <div v-else class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm md:grid-cols-4" :dir="isRTL ? 'rtl' : 'ltr'">
+                    <!-- بيانات المعاملة دايماً -->
+                    <div>
+                      <p class="text-xs text-gray-400 mb-0.5">نوع العملية</p>
+                      <p class="font-semibold text-gray-800">{{ refTypeLabel(tx.refType) }}</p>
+                    </div>
+                    <div v-if="tx.refId">
+                      <p class="text-xs text-gray-400 mb-0.5">رقم المرجع</p>
+                      <p class="font-bold text-indigo-600">#{{ tx.refId }}</p>
+                      <p v-if="tx.source" class="text-xs text-gray-600 mt-0.5">{{ extractTransferName(tx) }}</p>
+                    </div>
+                    <div v-if="tx.source">
+                      <p class="text-xs text-gray-400 mb-0.5">المصدر</p>
+                      <p class="font-medium text-gray-800">{{ tx.source }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-400 mb-0.5">المبلغ</p>
+                      <p class="font-bold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">{{ formatCurrency(tx.amount) }}</p>
+                    </div>
+                    <div v-if="tx.createdBy?.name || tx.createdByName">
+                      <p class="text-xs text-gray-400 mb-0.5">أضافه</p>
+                      <p class="font-medium text-gray-800">{{ tx.createdBy?.name || tx.createdByName }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-400 mb-0.5">التاريخ</p>
+                      <p class="font-medium text-gray-800">{{ formatDateTime(tx.date || tx.createdAt) }}</p>
+                    </div>
+                    <div v-if="tx.settlementDate">
+                      <p class="text-xs text-gray-400 mb-0.5">تاريخ التسوية</p>
+                      <p class="font-medium text-gray-800">{{ formatDateShort(tx.settlementDate) }}</p>
+                    </div>
+
+                    <!-- تفاصيل المصروف المرتبط -->
+                    <template v-if="expandedLinked">
+                      <div class="col-span-2 md:col-span-4 border-t border-indigo-100 pt-2 mt-1">
+                        <p class="text-xs font-bold text-indigo-500 mb-2">تفاصيل المصروف</p>
+                      </div>
+                      <div v-if="expandedLinked.category">
+                        <p class="text-xs text-gray-400 mb-0.5">البند الرئيسي</p>
+                        <p class="font-semibold text-gray-800">{{ expandedLinked.category }}</p>
+                      </div>
+                      <div v-if="expandedLinked.classification">
+                        <p class="text-xs text-gray-400 mb-0.5">البند الفرعي</p>
+                        <p class="font-semibold text-gray-800">{{ expandedLinked.classification }}</p>
+                      </div>
+                      <div v-if="expandedLinked.description">
+                        <p class="text-xs text-gray-400 mb-0.5">البيان</p>
+                        <p class="font-medium text-gray-800">{{ expandedLinked.description }}</p>
+                      </div>
+                      <div v-if="expandedLinked.amount">
+                        <p class="text-xs text-gray-400 mb-0.5">مبلغ المصروف</p>
+                        <p class="font-bold text-red-600">{{ formatCurrency(expandedLinked.amount) }}</p>
+                      </div>
+                      <div v-if="expandedLinked.location?.name">
+                        <p class="text-xs text-gray-400 mb-0.5">الموقع</p>
+                        <p class="font-medium text-gray-800">{{ expandedLinked.location.name }}</p>
+                      </div>
+                      <div v-if="expandedLinked.paymentMethod">
+                        <p class="text-xs text-gray-400 mb-0.5">طريقة الدفع</p>
+                        <p class="font-medium text-gray-800">{{ paymentMethodLabel(expandedLinked.paymentMethod) }}</p>
+                      </div>
+                      <div v-if="expandedLinked.notes" class="col-span-2 md:col-span-4">
+                        <p class="text-xs text-gray-400 mb-0.5">ملاحظات</p>
+                        <p class="font-medium text-gray-700">{{ expandedLinked.notes }}</p>
+                      </div>
+                    </template>
+                  </div>
+                </td>
+              </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -431,7 +533,7 @@ import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
-import { transferBetweenTreasuries } from '@/api'
+import { transferBetweenTreasuries, getExpense } from '@/api'
 
 export default {
   name: 'TreasuryDashboard',
@@ -521,6 +623,63 @@ export default {
       const refId = tx.refId
       if (!label) return '-'
       return refId ? `${label} #${refId}` : label
+    }
+    const refTypeLabel = (refType) => {
+      const map = { EXPENSE: 'مصروف', TRANSFER: 'تحويل', TOPUP: 'إيداع مباشر', PAYMENT: 'دفعة مقاول' }
+      return map[refType] || refType || '—'
+    }
+
+    // استخرج اسم الطرف الآخر من الـ description (Transfer from X / Transfer to X)
+    const extractTransferName = (tx) => {
+      const desc = tx.arDescription || tx.description || ''
+      // لو عندنا arDescription عربي كامل نرجعه
+      if (tx.arDescription && !tx.arDescription.startsWith('Transfer')) return tx.arDescription
+      // استخراج الاسم من الإنجليزي
+      const fromMatch = desc.match(/^Transfer from\s+(.+)$/i)
+      if (fromMatch) return `من: ${fromMatch[1]}`
+      const toMatch = desc.match(/^Transfer to\s+(.+)$/i)
+      if (toMatch) return `إلى: ${toMatch[1]}`
+      // إيداع مباشر
+      if (tx.refType === 'TOPUP') return tx.arDescription || 'إيداع مباشر'
+      return desc || null
+    }
+
+    // ── Expand row لعرض التفاصيل الكاملة ──────────────────────────────────
+    const expandedTxId = ref(null)
+    const expandedLinked = ref(null)
+    const expandedLoading = ref(false)
+
+    const toggleExpand = async (tx) => {
+      if (expandedTxId.value === tx.id) {
+        expandedTxId.value = null
+        expandedLinked.value = null
+        return
+      }
+      expandedTxId.value = tx.id
+      expandedLinked.value = null
+      if (tx.refType === 'EXPENSE' && tx.refId) {
+        expandedLoading.value = true
+        try {
+          const res = await getExpense(tx.refId)
+          expandedLinked.value = res.data || null
+        } catch (_) {
+          expandedLinked.value = null
+        } finally {
+          expandedLoading.value = false
+        }
+      }
+    }
+
+    const paymentMethodLabel = (m) => {
+      const map = { CASH: 'نقداً', BANK_TRANSFER: 'تحويل بنكي', CHEQUE: 'شيك', CUSTODY_CASH: 'عهدة نقداً' }
+      return map[m] || m || '—'
+    }
+
+    const formatDateShort = (value) => {
+      if (!value) return '—'
+      const d = new Date(value)
+      if (isNaN(d.getTime())) return String(value)
+      return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`
     }
     const navigateToSource = (tx) => {
       if (!tx.refId) return
@@ -924,6 +1083,14 @@ export default {
       formatSource,
       navigateToSource,
       displayDescription,
+      refTypeLabel,
+      extractTransferName,
+      expandedTxId,
+      expandedLinked,
+      expandedLoading,
+      toggleExpand,
+      paymentMethodLabel,
+      formatDateShort,
       selectTreasury,
       reloadTreasuries,
       applyFilters,
