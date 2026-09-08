@@ -965,9 +965,7 @@ rows: [],
         { id: 'transport',  name: this.$t('navbar.transport')  || 'النقل' },
         { id: 'extracts',   name: this.$t('navbar.extracts')   || 'المستخلصات' },
         { id: 'supplies',   name: this.$t('navbar.supplies')   || 'التوريدات' },
-        { id: 'payments',   name: this.$t('navbar.payments')   || 'المدفوعات' },
         { id: 'equipment',  name: this.$t('dashboard.equipmentLog') || 'سجل المعدات' },
-        { id: 'expenses',   name: this.$t('navbar.expenses')   || 'المصروفات' },
       ]
     },
 
