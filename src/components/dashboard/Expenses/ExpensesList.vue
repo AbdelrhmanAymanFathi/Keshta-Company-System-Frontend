@@ -2176,6 +2176,10 @@ rows: [],
         if (sub?.name) return sub.name
       }
 
+      // لو مفيش بند فرعي، جرب اسم المقاول
+      const contractorName = expense?.contractorName || expense?.contractorRef?.name || expense?.contractor?.name
+      if (contractorName) return contractorName
+
       return expense?.subCategoryRef?.name || expense?.classification || '-'
     },
     
