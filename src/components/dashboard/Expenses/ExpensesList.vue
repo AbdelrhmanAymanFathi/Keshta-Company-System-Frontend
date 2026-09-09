@@ -1380,7 +1380,7 @@ rows: [],
         notes: '',
         settlementDate: getTodayISO(),
         contractorId: null,
-        contractorAccountType: 'GENERAL'
+        contractorAccountType: 'EXPENSE'
       }
     },
 
@@ -1493,7 +1493,7 @@ rows: [],
         notes: expense.notes || '',
         settlementDate: formattedSettlementDate,
         contractorId: expense.contractorId || null,
-        contractorAccountType: expense.contractorAccountType || 'GENERAL'
+        contractorAccountType: expense.contractorAccountType || 'EXPENSE'
       }
       this.modalStep = 1
 
@@ -1882,7 +1882,7 @@ rows: [],
               notes: row.notes || '',
               settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString(),
               contractorId: rowContractorId,
-              contractorAccountType: this.form.contractorAccountType || 'GENERAL'
+              contractorAccountType: this.form.contractorAccountType || 'EXPENSE'
             }
           })
 
