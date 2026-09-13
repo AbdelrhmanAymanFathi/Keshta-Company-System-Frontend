@@ -420,7 +420,7 @@ export default {
         EXPENSE: 'مصروف',
         TRANSFER: 'تحويل',
         TOPUP: 'إيداع مباشر',
-        PAYMENT: 'دفعة مقاول',
+        PAYMENT: 'سداد',
       }
       return map[refType] || refType || '—'
     }

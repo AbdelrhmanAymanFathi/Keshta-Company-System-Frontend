@@ -251,7 +251,7 @@ export default {
     }
 
     const refTypeLabel = (refType) => {
-      const map = { EXPENSE: 'مصروف', TRANSFER: 'تحويل', TOPUP: 'إيداع مباشر', PAYMENT: 'دفعة مقاول' }
+      const map = { EXPENSE: 'مصروف', TRANSFER: 'تحويل', TOPUP: 'إيداع مباشر', PAYMENT: 'سداد' }
       return map[refType] || refType || '—'
     }
 

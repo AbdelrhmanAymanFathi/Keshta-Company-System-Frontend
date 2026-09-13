@@ -255,8 +255,8 @@
                   <span v-if="isTotalsRow(row)" class="font-bold text-amber-900">
                     {{ getTypeLabel(row.type) }}
                   </span>
-                  <Badge v-else :variant="getTypeVariant(row.type)">
-                    {{ row.type === 'SUPPLY' && row.arDescription ? row.arDescription : getTypeLabel(row.type) }}
+                  <Badge v-else :variant="getTypeVariant(row.type, row)">
+                    {{ row.type === 'SUPPLY' && row.arDescription ? row.arDescription : getTypeLabel(row.type, row) }}
                   </Badge>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
@@ -451,7 +451,15 @@ export default {
       }).format(amount || 0)
     }
 
-    const getTypeVariant = (type) => {
+    const SETTLEMENT_KEYWORDS = ['سداد', 'دفعة', 'تسوية', 'payment', 'settlement']
+    const isSettlementRow = (row) => {
+      if (row.type !== 'EXPENSE') return false
+      const desc = String(row.arDescription || row.description || '').trim().toLowerCase()
+      return SETTLEMENT_KEYWORDS.some(kw => desc.includes(kw))
+    }
+
+    const getTypeVariant = (type, row = null) => {
+      if (row && isSettlementRow(row)) return 'warning'
       const variants = {
         'SUPPLY': 'info',
         'TRANSPORT': 'info',
@@ -471,7 +479,8 @@ export default {
       return (fallback && fallback !== fallbackKey) ? fallback : primaryKey
     }
 
-    const getTypeLabel = (type) => {
+    const getTypeLabel = (type, row = null) => {
+      if (row && isSettlementRow(row)) return 'سداد'
       const labels = {
         'SUPPLY': translateWithFallback('contractors.typeSupply', 'contractors.typeExport'),
         'TRANSPORT': translateWithFallback('contractors.typeTransport', 'contractors.typeTransport'),
