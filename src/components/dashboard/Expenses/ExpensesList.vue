@@ -936,6 +936,7 @@ rows: [],
       const contractors = (this.contractors || []).map(c => ({
         id: `contractor__${c.id}`,
         name: c.name,
+        label: c.name,
         _type: 'contractor',
         _rawId: c.id
       }))
@@ -946,7 +947,8 @@ rows: [],
         subs.forEach(sc => {
           expenseSubs.push({
             id: `expensesub__${sc.id}`,
-            name: `${sc.name} (${cat.name})`,
+            name: sc.name,
+            label: sc.name,
             _type: 'expensesub',
             _rawId: sc.id,
             _categoryId: cat.id,

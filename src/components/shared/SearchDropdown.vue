@@ -132,6 +132,10 @@ export default {
     filterFn: {
       type: Function,
       default: null
+    },
+    displayLabel: {
+      type: [String, Function],
+      default: null
     }
   },
   emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear'],
@@ -247,9 +251,16 @@ export default {
       highlightedIndex.value = -1
     }
 
+    const getDisplayLabel = (item) => {
+      if (!props.displayLabel) return getLabel(item)
+      if (typeof props.displayLabel === 'function') return props.displayLabel(item)
+      if (typeof item === 'object') return item?.[props.displayLabel] ?? getLabel(item)
+      return getLabel(item)
+    }
+
     const selectItem = (item) => {
       emit('select', item)
-      emit('update:modelValue', getLabel(item))
+      emit('update:modelValue', getDisplayLabel(item))
       closeDropdown()
     }
 
@@ -392,6 +403,7 @@ export default {
       hasValue,
       getKey,
       getLabel,
+      getDisplayLabel,
       handleInput,
       handleFocus,
       handleBlur,

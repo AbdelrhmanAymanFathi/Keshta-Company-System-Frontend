@@ -471,31 +471,38 @@
                         <tbody class="divide-y divide-slate-100 bg-white">
                           <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
                             <td class="px-3 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
+                            <!-- البند الرئيسي: يتعبى تلقائياً من الفرعي -->
                             <td class="px-3 py-2">
-                              <SearchDropdown
-                                v-model="row.categorySearch"
-                                :items="expenseCategories"
-                                :allItems="expenseCategories"
-                                placeholder="ابحث عن البند الرئيسي..."
-                                inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
-                                teleportTarget=".modal-body-container"
-                                clearable
-                                @select="(sel) => { row.categoryId = sel.id; row.categorySearch = sel.name; row.subCategoryId = null; row.subCategorySearch = '' }"
-                                @clear="() => { row.categoryId = null; row.categorySearch = ''; row.subCategoryId = null; row.subCategorySearch = '' }"
-                              />
+                              <div class="w-full px-3 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-sm text-gray-700 min-h-[42px] flex items-center">
+                                <span v-if="row.categoryName" class="font-medium">{{ row.categoryName }}</span>
+                                <span v-else class="text-gray-400 italic">يتعبى تلقائياً</span>
+                              </div>
                             </td>
+                            <!-- البند الفرعي: يبحث في كل البنود -->
                             <td class="px-3 py-2">
                               <SearchDropdown
                                 v-model="row.subCategorySearch"
-                                :items="getRowSubcategories(row)"
-                                :allItems="getRowSubcategories(row)"
-                                :disabled="!row.categoryId"
+                                :items="allSubCategories"
+                                :allItems="allSubCategories"
+                                itemLabel="label"
+                                displayLabel="name"
+                                :filterFn="(item, q) => item.label.toLowerCase().includes(q) || item.name.toLowerCase().includes(q)"
                                 placeholder="ابحث عن البند الفرعي..."
                                 inputClass="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm"
                                 teleportTarget=".modal-body-container"
                                 clearable
-                                @select="(sel) => { row.subCategoryId = sel.id; row.subCategorySearch = sel.name }"
-                                @clear="() => { row.subCategoryId = null; row.subCategorySearch = '' }"
+                                @select="(sel) => {
+                                  row.subCategoryId = sel.id;
+                                  row.subCategorySearch = sel.name;
+                                  row.categoryId = sel.categoryId;
+                                  row.categoryName = sel.categoryName;
+                                }"
+                                @clear="() => {
+                                  row.subCategoryId = null;
+                                  row.subCategorySearch = '';
+                                  row.categoryId = null;
+                                  row.categoryName = '';
+                                }"
                               />
                             </td>
                             <td class="px-3 py-2">
@@ -888,6 +895,24 @@ export default {
       return this.expenseCategories.find(c => c.id === this.form.categoryId)?.subCategories || []
     },
 
+    // ALL subcategories flattened from all categories — each item carries its parent info
+    allSubCategories() {
+      const result = []
+      for (const cat of (this.expenseCategories || [])) {
+        for (const sub of (cat.subCategories || [])) {
+          result.push({
+            id: sub.id,
+            name: sub.name,
+            // display label shown in the dropdown: "ديمكس أبيض (صيانة سيارات)"
+            label: `${sub.name} (${cat.name})`,
+            categoryId: cat.id,
+            categoryName: cat.name,
+          })
+        }
+      }
+      return result
+    },
+
     // Subcategory options computed from selected category
     subcategoryOptions() {
       const subcats = this.expenseCategories.find(c => c.id === this.selectedCategoryId)?.subCategories || []
@@ -1205,11 +1230,12 @@ export default {
       }
       this.modalStep = 1
       const parentCat = this.expenseCategories?.find(c => c.id === expense.categoryId)
+      const subCat = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)
       const row = this.createEmptyRow()
       row.categoryId = expense.categoryId || null
-      row.categorySearch = parentCat?.name || ''
+      row.categoryName = parentCat?.name || ''
       row.subCategoryId = expense.subCategoryId || null
-      row.subCategorySearch = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)?.name || ''
+      row.subCategorySearch = subCat?.name || ''
       row.description = expense.description || ''
       row.amount = expense.amount || ''
       row.paymentMethod = expense.paymentMethod || 'CASH'
@@ -1219,8 +1245,6 @@ export default {
       row.notes = expense.notes || ''
       this.rows = [row]
       this.formLocationSearch = expense.location?.name || this.locations?.find(l => l.id === expense.locationId)?.name || ''
-      this.formCategorySearch = parentCat?.name || ''
-      this.formSubcategorySearch = parentCat?.subCategories?.find(sc => sc.id === expense.subCategoryId)?.name || ''
       this.formPaymentMethodSearch = this.paymentMethodItems?.find(p => p.id === expense.paymentMethod)?.name || 'نقداً'
       this.formTreasurySearch = expense.treasury?.name ? `${expense.treasury.name} (${expense.treasury.type === 'CUSTODY' ? 'عهدة' : 'خزينة'})` : ''
       this.modalOpen = true
@@ -1257,9 +1281,9 @@ export default {
       return {
         id: Date.now() + Math.random(),
         categoryId: null,
+        categoryName: '',       // يتعبى تلقائياً من الفرعي
         subCategoryId: null,
-        categorySearch: '',
-        subCategorySearch: '',
+        subCategorySearch: '',  // نص البحث في البند الفرعي
         description: '',
         amount: '',
         paymentMethod: 'CASH',
