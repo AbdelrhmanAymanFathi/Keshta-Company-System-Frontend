@@ -931,32 +931,43 @@ rows: [],
       }))
     },
 
-    // Combined البند الفرعي: contractors + all expense sub-categories
+    // Combined البند الفرعي: contractors + all expense sub-categories (deduplicated by name)
     combinedSubcategoryItems() {
       const contractors = (this.contractors || []).map(c => ({
         id: `contractor__${c.id}`,
         name: c.name,
         label: c.name,
         _type: 'contractor',
-        _rawId: c.id
+        _rawId: c.id,
+        _allCategories: []
       }))
 
-      const expenseSubs = []
+      // Build a map: normalized name → { first item, allCategories[] }
+      const subMap = new Map()
       ;(this.expenseCategories || []).forEach(cat => {
         const subs = cat.subCategories || cat.subcategories || cat.children || []
         subs.forEach(sc => {
-          expenseSubs.push({
-            id: `expensesub__${sc.id}`,
-            name: sc.name,
-            label: sc.name,
-            _type: 'expensesub',
-            _rawId: sc.id,
-            _categoryId: cat.id,
-            _categoryName: cat.name,
-            _subName: sc.name
+          const key = String(sc.name || '').trim().toLowerCase()
+          if (!subMap.has(key)) {
+            subMap.set(key, {
+              id: `expensesub__${sc.id}`,
+              name: sc.name,
+              label: sc.name,
+              _type: 'expensesub',
+              _rawId: sc.id,        // id of the first match (used when only one category)
+              _subName: sc.name,
+              _allCategories: []    // all categories that have this sub-name
+            })
+          }
+          subMap.get(key)._allCategories.push({
+            id: cat.id,
+            name: cat.name,
+            _subRawId: sc.id       // the actual subCategoryId under this category
           })
         })
       })
+
+      const expenseSubs = Array.from(subMap.values())
 
       return [...contractors, ...expenseSubs]
     },
@@ -1576,6 +1587,7 @@ rows: [],
         subCategoryId: prevRow?.subCategoryId ?? null,
         _subItemType: prevRow?._subItemType ?? null,
         _contractorRawId: prevRow?._contractorRawId ?? null,
+        _allCategories: prevRow?._allCategories ?? [],
         categorySearch: prevRow?.categorySearch ?? '',
         subCategorySearch: prevRow?.subCategorySearch ?? '',
         locationId: rowLocationId,
@@ -1676,7 +1688,12 @@ rows: [],
     },
 
     getRowCategories(row) {
-      // لو اختار بند فرعي من المصروفات → البند الرئيسي = العنصر الواحد من expenseCategories (غير قابل للتغيير)
+      // لو اختار بند فرعي وعنده أكتر من كاتيجوري → يعرضهم للاختيار
+      if (row._subItemType === 'expensesub' && Array.isArray(row._allCategories) && row._allCategories.length > 1) {
+        return row._allCategories.map(c => ({ id: c.id, name: c.name }))
+      }
+
+      // لو اختار بند فرعي وكاتيجوري واحدة فقط → يعرضها ثابتة
       if (row._subItemType === 'expensesub' && row.categoryId) {
         const cat = (this.expenseCategories || []).find(c => Number(c.id) === Number(row.categoryId))
         if (cat) return [{ id: cat.id, name: cat.name }]
@@ -1707,11 +1724,22 @@ rows: [],
         // ── بند فرعي من المصروفات ──
         row._subItemType = 'expensesub'
         row._contractorRawId = null
-        row.subCategoryId = sel._rawId
-        row.subCategorySearch = sel._subName  // الاسم بدون (اسم البند الرئيسي)
-        // البند الرئيسي يتملى تلقائياً ولا يتغير
-        row.categoryId = sel._categoryId
-        row.categorySearch = sel._categoryName
+        row.subCategorySearch = sel._subName
+        // حفظ كل الكاتيجوريز المتاحة لهذا الاسم
+        row._allCategories = sel._allCategories || []
+
+        if (row._allCategories.length === 1) {
+          // كاتيجوري واحدة → تعبية تلقائية
+          const only = row._allCategories[0]
+          row.subCategoryId = only._subRawId
+          row.categoryId    = only.id
+          row.categorySearch = only.name
+        } else {
+          // أكتر من كاتيجوري → خلي الرئيسي فاضي للاختيار
+          row.subCategoryId  = null      // سيتحدد لما يختار الرئيسي
+          row.categoryId     = null
+          row.categorySearch = ''
+        }
       } else {
         // ── مقاول ──
         row._subItemType = 'contractor'
@@ -1744,6 +1772,7 @@ rows: [],
     onClearRowContractor(row) {
       row._subItemType = null
       row._contractorRawId = null
+      row._allCategories = []
       row.subCategoryId = null
       row.subCategorySearch = ''
       row.categoryId = null
@@ -1787,6 +1816,11 @@ rows: [],
     onSelectRowCategory(row, sel) {
       row.categoryId = sel.id
       row.categorySearch = sel.name
+      // لو الفرعي متحدد من قبل وعنده _allCategories، نحدد subCategoryId الصح لهذه الكاتيجوري
+      if (row._subItemType === 'expensesub' && Array.isArray(row._allCategories) && row._allCategories.length > 1) {
+        const match = row._allCategories.find(c => Number(c.id) === Number(sel.id))
+        if (match) row.subCategoryId = match._subRawId
+      }
     },
 
     onClearRowCategory(row) {
