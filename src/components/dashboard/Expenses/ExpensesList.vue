@@ -198,7 +198,7 @@
           <col style="width: 6%" />
           <col style="width: 7.5%" />
         </colgroup>
-        <thead>
+        <thead class="sticky top-0 z-10">
           <tr>
             <th>{{ $t('labels.#') }}</th>
             <th class="cursor-pointer select-none hover:opacity-80" @click="sortBy('date')">
@@ -2511,6 +2511,20 @@ rows: [],
   font-weight: 600;
   overflow-wrap: normal;
   word-break: keep-all;
+  background-color: inherit;
+}
+
+/* Freeze header row */
+.expenses-list-card thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f8fafc;
+}
+
+.expenses-list-card thead tr th {
+  background-color: #f8fafc;
+  box-shadow: 0 1px 0 0 #e2e8f0;
 }
 
 .expenses-list-card :deep(.actions-col) {
