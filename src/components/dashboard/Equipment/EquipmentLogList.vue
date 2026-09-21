@@ -713,10 +713,20 @@ export default {
 
     // Client-side filtered items based on ownership filter
     const filteredItems = computed(() => {
+      const source = [...equipmentLogsStore.items]
       const filter = localIsCompanyOwned.value
-      if (filter === null || filter === undefined) return equipmentLogsStore.items
 
-      return equipmentLogsStore.items.filter(item => {
+      const sorted = source.sort((a, b) => {
+        const rawA = a?.date || a?.createdAt || a?.updatedAt || 0
+        const rawB = b?.date || b?.createdAt || b?.updatedAt || 0
+        const timeA = Number.isNaN(new Date(rawA).getTime()) ? 0 : new Date(rawA).getTime()
+        const timeB = Number.isNaN(new Date(rawB).getTime()) ? 0 : new Date(rawB).getTime()
+        return equipmentLogsStore.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+      })
+
+      if (filter === null || filter === undefined) return sorted
+
+      return sorted.filter(item => {
         if (!item) return false
 
         // Primary source of truth: log-level isRental

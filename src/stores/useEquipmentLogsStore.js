@@ -50,6 +50,7 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 				const params = {
 					page: this.page,
 					pageSize: this.pageSize,
+					sortField: this.sortField,
 					sortOrder: this.sortOrder,
 					q: this.filters.q,
 					...(this.filters.locationId != null && this.filters.locationId !== '' ? { locationId: this.filters.locationId } : {}),

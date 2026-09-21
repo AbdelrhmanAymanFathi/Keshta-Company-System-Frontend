@@ -370,6 +370,7 @@ export default {
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
+          sortField: this.sortField,
           sortOrder: this.sortOrder,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
@@ -382,11 +383,27 @@ export default {
         const res = await getExtracts(cleanParams)
         const responseData = res.data
         if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          this.extracts = responseData.items.flatMap(this.normalizeExtractForList)
+          const normalized = responseData.items.flatMap(this.normalizeExtractForList)
+          normalized.sort((a, b) => {
+            const valA = a?.dateFrom || a?.date || 0
+            const valB = b?.dateFrom || b?.date || 0
+            const timeA = Number.isNaN(new Date(valA).getTime()) ? 0 : new Date(valA).getTime()
+            const timeB = Number.isNaN(new Date(valB).getTime()) ? 0 : new Date(valB).getTime()
+            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+          })
+          this.extracts = normalized
           this.total = responseData.meta?.total || responseData.total || this.extracts.length
           this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
         } else if (Array.isArray(res.data)) {
-          this.extracts = res.data.flatMap(this.normalizeExtractForList)
+          const normalized = res.data.flatMap(this.normalizeExtractForList)
+          normalized.sort((a, b) => {
+            const valA = a?.dateFrom || a?.date || 0
+            const valB = b?.dateFrom || b?.date || 0
+            const timeA = Number.isNaN(new Date(valA).getTime()) ? 0 : new Date(valA).getTime()
+            const timeB = Number.isNaN(new Date(valB).getTime()) ? 0 : new Date(valB).getTime()
+            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+          })
+          this.extracts = normalized
           this.total = res.data.length
         } else {
           this.extracts = []
@@ -476,11 +493,6 @@ export default {
       this.modalState.isEditing = false
       this.modalState.extractId = null
       this.modalState.show = false
-    },
-
-    onExtractSaved() {
-      this.loadExtracts()
-      this.onModalClosed()
     },
 
     openRowMenu(event, item) {

@@ -687,6 +687,7 @@ export default {
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
+          sortField: this.sortField,
           sortOrder: this.sortOrder,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
@@ -730,6 +731,15 @@ export default {
 
           // Normalize nested `item` objects so templates can rely on canonical fields
           newItems.forEach(s => { if (s && s.item) s.item = normalizeItem(s.item) })
+
+          newItems.sort((a, b) => {
+            const dateA = a?.date || a?.createdAt || 0
+            const dateB = b?.date || b?.createdAt || 0
+            const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+            const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+          })
+
           // In Vue 3, directly assign the array
           this.supplies = newItems
 

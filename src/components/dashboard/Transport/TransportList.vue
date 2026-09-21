@@ -487,6 +487,7 @@ export default {
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
+          sortField: this.sortField,
           sortOrder: this.sortOrder,
           startDate: this.filters.startDate,
           endDate: this.filters.endDate,
@@ -508,8 +509,15 @@ export default {
         // Extract items from response
         const responseData = res.data
         if (responseData && responseData.items && Array.isArray(responseData.items)) {
+          const sorted = [...responseData.items].sort((a, b) => {
+            const dateA = a?.date || a?.createdAt || 0
+            const dateB = b?.date || b?.createdAt || 0
+            const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+            const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+          })
           // In Vue 3, directly assign the array
-          this.transports = [...responseData.items]
+          this.transports = sorted
 
           this.total = responseData.total || this.transports.length
           this.pageSize = responseData.pageSize || this.pageSize

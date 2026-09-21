@@ -1004,13 +1004,18 @@ export const getDeliveries = (params = {}) => {
     locationId = '',
     crusherId = '',
     itemId = '',
-    vehicleId = ''
+    vehicleId = '',
+    sortField = 'date',
+    sortOrder = 'desc'
   } = params;
 
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+
+  if (sortField) queryParams.append('sortField', String(sortField));
+  if (sortOrder) queryParams.append('sortOrder', String(sortOrder));
 
   // Add optional filters if they have values
   if (q) queryParams.append('q', q);
@@ -1075,13 +1080,18 @@ export const getTransports = (params = {}) => {
     locationId = '',
     areaId = '',
     itemId = '',
-    vehicleId = ''
+    vehicleId = '',
+    sortField = 'date',
+    sortOrder = 'desc'
   } = params;
 
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+
+  if (sortField) queryParams.append('sortField', String(sortField));
+  if (sortOrder) queryParams.append('sortOrder', String(sortOrder));
 
   if (q) queryParams.append('q', q);
   if (startDate) queryParams.append('startDate', startDate);
@@ -1151,13 +1161,17 @@ export const getExtracts = (params = {}) => {
     locationId = '',
     crusherId = '',
     itemId = '',
-    vehicleId = ''
+    vehicleId = '',
+    sortField = 'dateFrom',
+    sortOrder = 'desc'
   } = params;
 
   const queryParams = new URLSearchParams({
     page: page.toString(),
     pageSize: pageSize.toString()
   });
+  if (sortField) queryParams.append('sortField', String(sortField));
+  if (sortOrder) queryParams.append('sortOrder', String(sortOrder));
   if (q) queryParams.append('q', q);
   if (startDate) queryParams.append('startDate', startDate);
   if (endDate) queryParams.append('endDate', endDate);
@@ -1229,8 +1243,23 @@ export const getRentalJobsSummary = (rentalId) => {
 // Equipment Logs (new API surface replacing rental jobs)
 // List: /api/equipment-logs?q=&equipmentId=&startDate=&endDate=&isRental=&driverId=&page=&pageSize=
 export const getEquipmentLogs = (params = {}) => {
-  const { page = 1, pageSize = 100, q = '', equipmentId, startDate, endDate, isRental, locationId, areaId, driverId } = params
+  const {
+    page = 1,
+    pageSize = 100,
+    q = '',
+    equipmentId,
+    startDate,
+    endDate,
+    isRental,
+    locationId,
+    areaId,
+    driverId,
+    sortField = 'date',
+    sortOrder = 'desc'
+  } = params
   const query = new URLSearchParams({ page: page.toString(), pageSize: pageSize.toString() })
+  if (sortField) query.append('sortField', String(sortField))
+  if (sortOrder) query.append('sortOrder', String(sortOrder))
   if (q) query.append('q', q)
   if (equipmentId !== undefined && equipmentId !== null) query.append('equipmentId', equipmentId)
   if (startDate) query.append('startDate', startDate)
@@ -1400,7 +1429,9 @@ export const getExpenses = (params = {}) => {
     paymentMethod,
     startDate, 
     endDate,
-    includeSummary 
+    includeSummary,
+    sortField = 'date',
+    sortOrder = 'desc'
   } = params;
   const subCategoryId = params.subCategoryId ?? params.subCategoryId;
   const queryParams = new URLSearchParams({
@@ -1408,6 +1439,8 @@ export const getExpenses = (params = {}) => {
     pageSize: pageSize.toString()
   });
   // Only append non-empty, non-null, non-undefined values
+  if (sortField) queryParams.append('sortField', String(sortField));
+  if (sortOrder) queryParams.append('sortOrder', String(sortOrder));
   if (q) queryParams.append('q', q);
   if (categoryId !== undefined && categoryId !== null && categoryId !== '') queryParams.append('categoryId', categoryId.toString());
   if (subCategoryId !== undefined && subCategoryId !== null && subCategoryId !== '') queryParams.append('subCategoryId', subCategoryId.toString());

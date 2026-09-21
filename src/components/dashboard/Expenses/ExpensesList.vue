@@ -1218,6 +1218,7 @@ rows: [],
         const params = {
           page: this.currentPage,
           pageSize: this.pageSize,
+          sortField: this.sortField,
           sortOrder: this.sortOrder
         }
         if (this.searchQuery) params.q = this.searchQuery
@@ -1236,7 +1237,15 @@ rows: [],
         if (this.selectedKind) params.kind = this.selectedKind
         
         const response = await getExpenses(params)
-        this.expenses = response.data.items || []
+        const items = response.data.items || []
+        items.sort((a, b) => {
+          const dateA = a?.date || a?.createdAt || 0
+          const dateB = b?.date || b?.createdAt || 0
+          const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+          const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+          return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
+        })
+        this.expenses = items
         this.totalItems = response.data.total || 0
         this.totalPages = response.data.pages || 1
       } catch (error) {
