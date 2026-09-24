@@ -242,7 +242,13 @@
                   </span>
                 </td>
                 <td class="px-4 py-3 text-sm">
-                  <span v-if="tx.refId" class="font-medium text-blue-600">{{ formatSource(tx) }}</span>
+                  <span v-if="tx.refType === 'TRANSFER' && tx.type === 'DEPOSIT'" class="font-medium text-emerald-700">
+                    {{ extractTransferName(tx) || formatSource(tx) }}
+                  </span>
+                  <span v-else-if="tx.refType === 'TRANSFER' && tx.type === 'WITHDRAW'" class="font-medium text-amber-600">
+                    {{ extractTransferName(tx) || formatSource(tx) }}
+                  </span>
+                  <span v-else-if="tx.refId" class="font-medium text-blue-600">{{ formatSource(tx) }}</span>
                   <span v-else class="theme-text-primary">{{ formatSource(tx) }}</span>
                 </td>
                 <td class="px-4 py-3 text-sm theme-text-primary">{{ displayDescription(tx) }}</td>
@@ -534,6 +540,7 @@ import Pagination from '@/components/shared/Pagination.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
 import { transferBetweenTreasuries, getExpense } from '@/api'
+import { playNotificationSound } from '@/utils/notificationSound'
 
 export default {
   name: 'TreasuryDashboard',
@@ -548,10 +555,15 @@ export default {
     useRealtime({
       channel: 'treasury',
       events: ['treasury_balance_changed', 'treasury_transaction_created'],
-      handler: debounce((eventName) => {
+      handler: debounce((eventName, data) => {
         store.fetchTreasuries()
         if (eventName === 'treasury_transaction_created') {
           store.fetchTransactions()
+          // شغّل الصوت عند إيداع جديد في الخزينة المختارة حاليًا
+          const isCurrentTreasury = !data?.treasuryId || String(data.treasuryId) === String(store.selectedTreasuryId)
+          if (isCurrentTreasury) {
+            playNotificationSound()
+          }
         }
       }, 300),
     })
@@ -619,6 +631,10 @@ export default {
       }
     }
     const formatSource = (tx) => {
+      // لو عندنا اسم الخزينة المصدر من الـ backend، نعرضه مباشرة
+      if (tx.fromTreasuryName && tx.refType === 'TRANSFER') {
+        return tx.type === 'DEPOSIT' ? `من: ${tx.fromTreasuryName}` : `إلى: ${tx.fromTreasuryName}`
+      }
       const label = tx.source || tx.refType || ''
       const refId = tx.refId
       if (!label) return '-'
@@ -631,6 +647,10 @@ export default {
 
     // استخرج اسم الطرف الآخر من الـ description (Transfer from X / Transfer to X)
     const extractTransferName = (tx) => {
+      // أولوية: استخدم اسم الخزينة المصدر من الـ backend مباشرة
+      if (tx.fromTreasuryName && tx.refType === 'TRANSFER') {
+        return tx.type === 'DEPOSIT' ? `من: ${tx.fromTreasuryName}` : `إلى: ${tx.fromTreasuryName}`
+      }
       const desc = tx.arDescription || tx.description || ''
       // لو عندنا arDescription عربي كامل نرجعه
       if (tx.arDescription && !tx.arDescription.startsWith('Transfer')) return tx.arDescription
