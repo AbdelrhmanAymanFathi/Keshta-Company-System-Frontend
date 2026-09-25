@@ -1049,11 +1049,11 @@ rows: [],
         )
       }
       
-      if (this.selectedCategoryId && !this.selectedSubcategoryId) {
+      if (this.selectedCategoryId) {
         filtered = filtered.filter(expense => Number(expense.categoryId) === Number(this.selectedCategoryId))
       }
       if (this.selectedSubcategoryId) {
-        const ids = this.sameNameSubcategoryIds(this.selectedSubcategoryId).map(Number)
+        const ids = this.sameNameSubcategoryIds(this.selectedSubcategoryId, this.selectedCategoryId).map(Number)
         filtered = filtered.filter(expense => ids.includes(Number(expense.subCategoryId ?? expense.subCategoryId)))
       }
       if (this.selectedKind) {
@@ -1227,7 +1227,7 @@ rows: [],
         if (this.filters?.endDate) params.endDate = this.filters.endDate
         if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
         if (this.filters?.settlementDateEnd) params.settlementDateEnd = this.filters.settlementDateEnd
-        if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined && !this.selectedSubcategoryId) {
+        if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) {
           params.categoryId = this.selectedCategoryId
         }
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
@@ -1654,15 +1654,19 @@ rows: [],
       if (this.selectedSubcategoryId != null) return
       const query = this.normalizeTermName(this.filterSubcategorySearch)
       if (!query) return
-      const match = this.flattenSubcategories().find(sc => this.normalizeTermName(sc?.name) === query)
-        || this.flattenSubcategories().find(sc => this.normalizeTermName(sc?.name).includes(query))
+      // لو البند الرئيسي متحدد → ابحث داخله بس عشان ما نختارش نفس الاسم من بند رئيسي تاني
+      const scoped = this.selectedCategoryId
+        ? this.flattenSubcategories(this.expenseCategories.filter(c => Number(c.id) === Number(this.selectedCategoryId)))
+        : this.flattenSubcategories()
+      const match = scoped.find(sc => this.normalizeTermName(sc?.name) === query)
+        || scoped.find(sc => this.normalizeTermName(sc?.name).includes(query))
       if (match?.id != null) {
         this.selectedSubcategoryId = match.id
         this.filterSubcategorySearch = match.name
       }
     },
 
-    sameNameSubcategoryIds(subCategoryId) {
+    sameNameSubcategoryIds(subCategoryId, categoryId = null) {
       if (subCategoryId == null) return []
       const all = this.flattenSubcategories()
       const selected = all.find(sc => Number(sc.id) === Number(subCategoryId))
@@ -1670,6 +1674,7 @@ rows: [],
       if (!key) return [Number(subCategoryId)]
       const ids = all
         .filter(sc => this.normalizeTermName(sc.name) === key)
+        .filter(sc => categoryId === null || categoryId === undefined || Number(sc.categoryId) === Number(categoryId))
         .map(sc => Number(sc.id))
       return ids.length ? ids : [Number(subCategoryId)]
     },
