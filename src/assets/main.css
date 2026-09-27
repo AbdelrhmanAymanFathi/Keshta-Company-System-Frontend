@@ -2050,6 +2050,56 @@ body,
   }
 }
 
+/* ── Freeze table header rows on every dashboard page (modals excluded) ──
+   A sticky header only sticks to its nearest scroll container:
+   - cards that are overflow-hidden just to round corners → overflow: clip keeps the
+     clipping without being a scroll container, so the header sticks to the page scroll.
+   - horizontally scrolling wrappers must stay scroll containers → cap their height so
+     the rows scroll inside them under the header. */
+.dashboard-module-content .overflow-hidden:has(table):not(.fixed, .fixed *) {
+  overflow: clip;
+}
+
+.dashboard-module-content :is(.overflow-auto, .overflow-x-auto):has(> table):not(.fixed *) {
+  max-height: calc(100dvh - 8rem);
+  overflow-y: auto;
+}
+
+.dashboard-module-content table > thead:not(.fixed *) {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Header backgrounds are translucent → give them a solid base so rows don't show through */
+:where(.dashboard-module-content) table > thead {
+  background-color: #fff;
+}
+
+.dashboard-module-content thead.theme-table-thead-gradient:not(.fixed *) {
+  background-color: #fff;
+}
+
+.dashboard-module-content thead:is(.theme-dashboard-bg-soft, .theme-table-thead):not(.fixed *) {
+  background-color: #fff;
+  background-image: linear-gradient(rgba(var(--theme-primary-rgb), 0.08), rgba(var(--theme-primary-rgb), 0.08));
+}
+
+@media (max-width: 767px) {
+  /* the mobile toolbar is fixed over the page, so page-level headers stick below it */
+  .dashboard-module-content table > thead:not(.fixed *) {
+    top: var(--mobile-toolbar-height);
+  }
+
+  .dashboard-module-content :is(.overflow-auto, .overflow-x-auto) > table > thead:not(.fixed *) {
+    top: 0;
+  }
+
+  .dashboard-module-content :is(.overflow-auto, .overflow-x-auto):has(> table):not(.fixed *) {
+    max-height: calc(100dvh - var(--mobile-toolbar-height) - 2rem);
+  }
+}
+
 [data-theme-preset='cyber-futuristic'] .theme-dashboard-header {
   box-shadow: var(--theme-shadow-md);
 }

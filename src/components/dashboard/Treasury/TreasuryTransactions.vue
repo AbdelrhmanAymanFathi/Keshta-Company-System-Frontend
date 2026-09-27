@@ -66,7 +66,7 @@
               <p class="text-xs text-gray-500">{{ t('treasury.filtersHint') }}</p>
             </div>
           </div>
-          <div class="grid gap-4 grid-cols-1 lg:grid-cols-5">
+          <div class="grid gap-4 grid-cols-1 lg:grid-cols-4">
             <div>
               <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateFrom') }}</label>
               <DateField v-model="filters.startDate" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
@@ -86,12 +86,8 @@
               </select>
             </div>
             <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amountFrom') }}</label>
-              <input v-model="filters.amountMin" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amountTo') }}</label>
-              <input v-model="filters.amountMax" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amount') }}</label>
+              <input v-model="filters.amount" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
             </div>
           </div>
           <div class="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-[1fr_auto_auto]">
@@ -277,7 +273,7 @@ export default {
         return true
       })
     })
-    const filters = reactive({ startDate: '', endDate: '', type: '', amountMin: '', amountMax: '', search: '' })
+    const filters = reactive({ startDate: '', endDate: '', type: '', amount: '', search: '' })
     const sortOrder = ref('desc')
 
     const formatCurrency = (value) => new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
@@ -343,8 +339,7 @@ export default {
           startDate: filters.startDate || undefined,
           endDate: filters.endDate || undefined,
           type: filters.type || undefined,
-          amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
-          amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
+          amount: filters.amount !== '' ? filters.amount : undefined,
           search: filters.search || undefined,
           sortOrder: sortOrder.value,
         }, store.selectedTreasuryId)
@@ -397,8 +392,7 @@ export default {
           startDate: filters.startDate || '',
           endDate: filters.endDate || '',
           type: filters.type || '',
-          amountMin: filters.amountMin !== '' ? filters.amountMin : '',
-          amountMax: filters.amountMax !== '' ? filters.amountMax : '',
+          amount: filters.amount !== '' ? filters.amount : '',
           search: filters.search || ''
         }
         const { data, headers } = await downloadTreasuryTransactions(store.selectedTreasuryId, params, format)
@@ -425,8 +419,7 @@ export default {
         filters.startDate = ''
         filters.endDate = ''
         filters.type = ''
-        filters.amountMin = ''
-        filters.amountMax = ''
+        filters.amount = ''
         filters.search = ''
         store.setTransactionPage(1)
         await load()
@@ -481,8 +474,7 @@ export default {
       _filterTimer = setTimeout(() => { store.setTransactionPage(1); load() }, 500)
     }
     watch(() => filters.search, debouncedLoad)
-    watch(() => filters.amountMin, debouncedLoad)
-    watch(() => filters.amountMax, debouncedLoad)
+    watch(() => filters.amount, debouncedLoad)
 
     return {
       store,

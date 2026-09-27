@@ -833,7 +833,7 @@ export const saveTreasuriesOrder = (data) =>
 export const getTreasurySummary = (treasuryId) =>
   axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/summary`);
 export const getTreasuryTransactions = (treasuryId, params = {}) => {
-  const { page = 1, pageSize = 20, startDate = '', endDate = '', type = '', search = '', amountMin = '', amountMax = '', sortOrder = '' } = params;
+  const { page = 1, pageSize = 20, startDate = '', endDate = '', type = '', search = '', amount = '', sortOrder = '' } = params;
   const queryParams = new URLSearchParams(appendLangParam({
     page: page.toString(),
     pageSize: pageSize.toString()
@@ -843,8 +843,7 @@ export const getTreasuryTransactions = (treasuryId, params = {}) => {
   if (endDate) queryParams.append('endDate', endDate);
   if (type) queryParams.append('type', type);
   if (search) queryParams.append('search', search);
-  if (amountMin !== '' && amountMin !== null && amountMin !== undefined) queryParams.append('amountMin', String(amountMin));
-  if (amountMax !== '' && amountMax !== null && amountMax !== undefined) queryParams.append('amountMax', String(amountMax));
+  if (amount !== '' && amount !== null && amount !== undefined) queryParams.append('amount', String(amount));
   return axios.get(`${BASE_URL}/api/treasuries/${treasuryId}/transactions?${queryParams.toString()}`);
 };
 export const downloadTreasuryTransactions = (treasuryId, params = {}, format = 'xlsx') => {

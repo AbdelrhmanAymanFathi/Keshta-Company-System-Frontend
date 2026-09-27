@@ -150,7 +150,7 @@
               <p class="text-xs theme-text-secondary">{{ t('treasury.filtersHint') }}</p>
             </div>
 
-            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateFrom') }}</label>
                 <DateField v-model="filters.startDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
@@ -169,13 +169,9 @@
                   <option value="ADJUSTMENT">{{ t('treasury.types.adjustment') }}</option>
                 </select>
               </div>
-              <div class="sm:col-span-1 xl:col-span-1">
-                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amountFrom') }}</label>
-                <input v-model="filters.amountMin" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
-              </div>
-              <div class="sm:col-span-1 xl:col-span-1">
-                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amountTo') }}</label>
-                <input v-model="filters.amountMax" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+              <div class="sm:col-span-2 xl:col-span-1">
+                <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amount') }}</label>
+                <input v-model="filters.amount" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
             </div>
 
@@ -208,7 +204,7 @@
         <div v-else-if="!visibleTransactions.length" class="px-6 py-12 text-center text-sm theme-text-secondary">{{ t('treasury.noTransactions') }}</div>
         <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-100">
-            <thead class="bg-slate-50/80">
+            <thead class="bg-slate-50">
               <tr>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.dateTime') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-amber-600', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'ت. التسوية' : 'Settlement' }}</th>
@@ -227,7 +223,11 @@
                 :class="expandedTxId === tx.id ? 'bg-indigo-50/40' : ''"
                 @click="toggleExpand(tx)"
               >
-                <td class="px-4 py-3 text-sm theme-text-primary">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
+                <!-- القائمة مترتبة بتاريخ العملية، فنعرضه هو، ووقت الإدخال تحته -->
+                <td class="px-4 py-3 text-sm theme-text-primary whitespace-nowrap">
+                  <div>{{ formatDate(tx.date || tx.createdAt) }}</div>
+                  <div v-if="tx.createdAt" class="text-[11px] theme-text-secondary">{{ isRTL ? 'أُدخل' : 'Entered' }}: {{ formatDateTime(tx.createdAt) }}</div>
+                </td>
                 <!-- Settlement date -->
                 <td class="px-4 py-3 text-sm whitespace-nowrap">
                   <span v-if="tx.settlementDate"
@@ -593,7 +593,7 @@ export default {
     const dragIndex = ref(null)
     const treasurySearch = ref('')
     const treasuryView = ref('active')
-    const filters = reactive({ startDate: '', endDate: '', type: '', amountMin: '', amountMax: '', search: '' })
+    const filters = reactive({ startDate: '', endDate: '', type: '', amount: '', search: '' })
 
     const formatCurrency = (value) => new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
     const formatDate = (value) => {
@@ -782,8 +782,7 @@ export default {
           startDate: filters.startDate || undefined,
           endDate: filters.endDate || undefined,
           type: filters.type || undefined,
-          amountMin: filters.amountMin !== '' ? filters.amountMin : undefined,
-          amountMax: filters.amountMax !== '' ? filters.amountMax : undefined,
+          amount: filters.amount !== '' ? filters.amount : undefined,
           search: filters.search || undefined,
         }, store.selectedTreasuryId)
       } catch (err) {
@@ -811,8 +810,7 @@ export default {
       filters.startDate = ''
       filters.endDate = ''
       filters.type = ''
-      filters.amountMin = ''
-      filters.amountMax = ''
+      filters.amount = ''
       filters.search = ''
       store.setTransactionPage(1)
       await reloadSelected()
