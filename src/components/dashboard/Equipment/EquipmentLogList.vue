@@ -120,7 +120,7 @@
 
     <!-- Rentals Table -->
     <!-- Rentals Table -->
-    <div v-else class="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40 overflow-hidden">
+    <div v-else class="bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
       <!-- No Results Message -->
       <div v-if="equipmentLogsStore.items.length === 0" class="text-center py-12">
         <svg class="mx-auto h-12 w-12 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,12 +145,29 @@
 
         <!-- Table Container with keyboard focus -->
         <div ref="tableContainer"
-          class="overflow-x-auto scroll-smooth focus:outline-none theme-input-focus focus:ring-inset rounded-xl"
+          class="scroll-smooth focus:outline-none theme-input-focus focus:ring-inset rounded-xl"
           tabindex="0" @keydown="handleTableKeydown" :title="$t('equipmentLog.useArrowKeys')">
-          <table class="min-w-full divide-y divide-gray-200">
+          <table v-app-table class="app-table divide-y divide-gray-200">
+            <colgroup>
+              <col style="width: 7%" />
+              <col style="width: 10%" />
+              <col style="width: 8%" />
+              <col style="width: 7%" />
+              <col style="width: 9%" />
+              <col style="width: 7%" />
+              <col style="width: 8%" />
+              <col style="width: 7%" />
+              <col style="width: 5%" />
+              <col style="width: 6%" />
+              <col style="width: 6%" />
+              <col style="width: 7%" />
+              <col style="width: 8%" />
+              <col style="width: 5%" />
+            </colgroup>
             <thead class="theme-table-thead-gradient" :class="{ 'direction-rtl': isRTL }">
               <tr>
                 <th
+                  data-col="subtitle"
                   class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
                   :class="{ 'text-right': isRTL }"
                   @click="sortBy('date')">
@@ -158,6 +175,7 @@
                   <SortIcon :active="equipmentLogsStore.sortField === 'date'" :dir="equipmentLogsStore.sortOrder" />
                 </th>
                 <th
+                  data-col="title"
                   class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.equipment') }}
@@ -209,6 +227,7 @@
                   {{ $t('labels.discount') || 'Discount' }}
                 </th>
                 <th
+                  data-col="amount"
                   class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"
                   :class="{ 'text-right': isRTL }">
                   {{ $t('equipmentLog.total') }}
@@ -232,14 +251,14 @@
                   {{ rental.equipment.name }}
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
-                  <div class="truncate max-w-xs">{{ rental.location?.name || '-' }}</div>
+                  <div>{{ rental.location?.name || '-' }}</div>
                 </td>
                 
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
-                  <div class="truncate max-w-xs">{{ rental.area?.name || '-' }}</div>
+                  <div>{{ rental.area?.name || '-' }}</div>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
-                  <div class="truncate max-w-xs">{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
+                  <div>{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
                   <span v-if="rental.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
@@ -250,7 +269,7 @@
                   </span>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
-                  <div class="truncate max-w-xs">{{ rental.driver?.name || rental.driverName || rental.driverLabel || '-' }}</div>
+                  <div>{{ rental.driver?.name || rental.driverName || rental.driverLabel || '-' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm">
                   <Badge :variant="!rental.isRental ? 'company' : 'external'">

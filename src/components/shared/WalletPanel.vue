@@ -38,15 +38,15 @@
       <div>
         <h4 class="font-semibold mb-2">{{ $t('labels.history') }}</h4>
         <div v-if="loadingHistory" class="theme-text-muted">{{ $t('labels.loading') }}</div>
-        <div v-else class="overflow-auto max-h-64 border rounded bg-white">
-          <table class="min-w-full text-sm">
+        <div v-else class="overflow-y-auto max-h-64 border rounded bg-white">
+          <table v-app-table class="app-table text-sm">
             <thead class="bg-gray-50">
                   <tr>
-                    <th :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.date') }}</th>
+                    <th data-col="subtitle" :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.date') }}</th>
                     <th :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.type') }}</th>
-                    <th :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-left' : 'text-right']">{{ $t('labels.signedAmount') || $t('labels.amount') }}</th>
+                    <th data-col="amount" :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-left' : 'text-right']">{{ $t('labels.signedAmount') || $t('labels.amount') }}</th>
                     <th :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-left' : 'text-right']">{{ $t('labels.balanceAfter') || 'Balance After' }}</th>
-                    <th :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-left' : 'text-right']">{{ $t('labels.description') }}</th>
+                    <th data-col="title" :class="['px-2 py-1 text-xs sm:text-sm sm:px-3 sm:py-2 whitespace-normal', isRTL ? 'text-left' : 'text-right']">{{ $t('labels.description') }}</th>
                   </tr>
                 </thead>
                 <tbody>

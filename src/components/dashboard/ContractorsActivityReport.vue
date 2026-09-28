@@ -234,85 +234,106 @@
     </div>
 
     <!-- Data Table -->
-    <div v-else class="bg-white border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-100 table-auto">
-          <thead class="bg-slate-50">
-            <tr v-if="!isDetailedMode">
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
-            </tr>
-            <tr v-else>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">ID</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') || 'Date' }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('actionType') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-100" v-if="items.length">
-            <template v-if="!isDetailedMode">
-              <tr v-for="(row, index) in items" :key="index" class="hover:bg-slate-50/50 transition-colors">
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                  <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
-                    {{ t(`modules.${row.module}`) }}
-                  </span>
-                </td>
-                <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
-                <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
-              </tr>
-            </template>
-            <template v-else>
-              <tr v-for="(row, index) in items" :key="row.id || index" class="hover:bg-slate-50/50 transition-colors">
-                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.id }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                  <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
-                    {{ t(`modules.${row.module}`) }}
-                  </span>
-                </td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                  {{ isRTL && row.arAction ? row.arAction : row.action }}
-                </td>
-                <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
-                <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
-                <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
-              </tr>
-            </template>
-          </tbody>
-          <tbody v-else>
-            <tr>
-              <td :colspan="isDetailedMode ? 11 : 8" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
-                {{ t('noData') }}
+    <div v-else class="bg-white border border-slate-100 shadow-sm rounded-2xl">
+      <table v-app-table class="app-table divide-y divide-slate-100 table-auto">
+        <colgroup v-if="!isDetailedMode">
+          <col style="width: 15%" />
+          <col style="width: 10%" />
+          <col style="width: 25%" />
+          <col style="width: 10%" />
+          <col style="width: 10%" />
+          <col style="width: 10%" />
+          <col style="width: 10%" />
+          <col style="width: 10%" />
+        </colgroup>
+        <colgroup v-else>
+          <col style="width: 5%" />
+          <col style="width: 8%" />
+          <col style="width: 11%" />
+          <col style="width: 8%" />
+          <col style="width: 8%" />
+          <col style="width: 18%" />
+          <col style="width: 9%" />
+          <col style="width: 8%" />
+          <col style="width: 8%" />
+          <col style="width: 9%" />
+          <col style="width: 8%" />
+        </colgroup>
+        <thead class="bg-slate-50">
+          <tr v-if="!isDetailedMode">
+            <th data-col="title" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
+          </tr>
+          <tr v-else>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">ID</th>
+            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') || 'Date' }}</th>
+            <th data-col="title" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('actionType') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-slate-100" v-if="items.length">
+          <template v-if="!isDetailedMode">
+            <tr v-for="(row, index) in items" :key="index" class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
+                  {{ t(`modules.${row.module}`) }}
+                </span>
               </td>
+              <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
+              <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
             </tr>
-          </tbody>
-        </table>
-      </div>
+          </template>
+          <template v-else>
+            <tr v-for="(row, index) in items" :key="row.id || index" class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.id }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
+                  {{ t(`modules.${row.module}`) }}
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+                {{ isRTL && row.arAction ? row.arAction : row.action }}
+              </td>
+              <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
+              <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
+            </tr>
+          </template>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td :colspan="isDetailedMode ? 11 : 8" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
+              {{ t('noData') }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Summary / Totals Row at End of Table -->
-      <div v-if="items.length > 0" class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div v-if="items.length > 0" class="rounded-b-2xl bg-slate-50 border-t border-slate-100 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
         <div class="flex items-center gap-2">
           <span class="text-sm font-semibold theme-text-secondary">{{ t('totals') }}:</span>
         </div>

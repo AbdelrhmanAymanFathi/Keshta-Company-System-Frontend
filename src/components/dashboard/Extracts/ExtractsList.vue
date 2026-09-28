@@ -89,18 +89,34 @@
     </div>
 
     <!-- table -->
-    <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <table class="min-w-full divide-y divide-gray-200">
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <colgroup>
+          <col style="width: 3%" />
+          <col style="width: 7%" />
+          <col style="width: 7%" />
+          <col style="width: 12%" />
+          <col style="width: 5%" />
+          <col style="width: 7%" />
+          <col style="width: 6%" />
+          <col style="width: 10%" />
+          <col style="width: 7%" />
+          <col style="width: 8%" />
+          <col style="width: 7%" />
+          <col style="width: 8%" />
+          <col style="width: 8%" />
+          <col style="width: 5%" />
+        </colgroup>
         <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
+            <th data-col="subtitle" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
               @click="sortBy('dateFrom')">
               {{ $t('labels.dateFrom') || 'Date From' }}
               <SortIcon :active="sortField === 'dateFrom'" :dir="sortOrder" />
             </th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateTo') || 'Date To' }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
+            <th data-col="title" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.quantity') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.price') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.discount') || 'Discount' }}</th>
@@ -108,7 +124,7 @@
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.status') || 'Status' }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.location') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.area') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') }}</th>
+            <th data-col="amount" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.total') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.actions') }}</th>
           </tr>
@@ -145,7 +161,7 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.areaName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(extract.total) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
-              <div class="max-w-xs truncate">{{ extract.notes || extract.note || '-' }}</div>
+              <div>{{ extract.notes || extract.note || '-' }}</div>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               <button

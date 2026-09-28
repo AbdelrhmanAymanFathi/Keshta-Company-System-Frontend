@@ -24,15 +24,15 @@
       />
     </div>
 
-    <!-- Desktop Table -->
-    <div class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
+    <!-- Table (stacked rows on phones, see "App tables" in main.css) -->
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
               {{ $t('labels.#') }}
             </th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
+            <th data-col="title" class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
               {{ $t('crushers.name') }}
             </th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-start">
@@ -75,39 +75,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- Mobile Cards -->
-    <div class="sm:hidden space-y-4">
-      <div
-        v-for="crusher in filtered"
-        :key="crusher.id"
-        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4 cursor-pointer"
-        @click="openContextMenu($event, crusher)"
-        @contextmenu.prevent="openContextMenu($event, crusher)"
-      >
-        <div class="flex items-center justify-between" :class="isRTL ? 'flex-row-reverse' : ''">
-          <div class="flex items-center gap-4" :class="isRTL ? 'flex-row-reverse' : 'flex-row'">
-            <div class="flex-shrink-0 h-12 w-12">
-              <div class="h-12 w-12 rounded-full bg-gradient-to-br theme-icon-bg flex items-center justify-center">
-                <CubeIcon class="h-7 w-7 theme-text-light" />
-              </div>
-            </div>
-            <div :class="isRTL ? 'text-right' : 'text-left'">
-              <div class="font-semibold theme-text-primary">{{ crusher.name }}</div>
-              <div class="text-sm theme-text-muted">ID: {{ crusher.id }}</div>
-            </div>
-          </div>
-          <div class="flex gap-4">
-            <button @click.stop="openEdit(crusher)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100">
-              <PencilSquareIcon class="h-5 w-5" />
-            </button>
-            <button @click.stop="confirmDelete(crusher)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100">
-              <TrashIcon class="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Pagination -->
@@ -210,11 +177,11 @@
 <script>
 import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../api'
 import Pagination from '@/components/shared/Pagination.vue'
-import { CubeIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
+import { ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'CrushersList',
-  components: { Pagination, CubeIcon, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: { Pagination, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   data() {
     return {
       q: '',

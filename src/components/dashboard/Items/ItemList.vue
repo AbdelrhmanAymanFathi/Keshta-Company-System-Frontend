@@ -10,26 +10,26 @@
     </div>
 
     <!-- Table -->
-    <div class="overflow-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
-      <table class="min-w-full divide-y divide-gray-200">
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               #</th>
-            <th
+            <th data-col="title"
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.itemName') || 'Item Name' }}</th>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.unit') || 'Unit' }}</th>
-            <th v-if="mode === 'supply' || mode === 'all'"
+            <th v-if="mode === 'supply' || mode === 'all'" :data-col="mode === 'all' ? null : 'amount'"
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultSupplyPrice') || 'Supply Price' }}</th>
-            <th v-if="mode === 'transport' || mode === 'all'"
+            <th v-if="mode === 'transport' || mode === 'all'" :data-col="mode === 'all' ? null : 'amount'"
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultTransportPrice') || 'Transport Price' }}</th>
-            <th v-if="mode === 'extracts' || mode === 'all'"
+            <th v-if="mode === 'extracts' || mode === 'all'" :data-col="mode === 'all' ? null : 'amount'"
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">
               {{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }}</th>
             <!-- <th

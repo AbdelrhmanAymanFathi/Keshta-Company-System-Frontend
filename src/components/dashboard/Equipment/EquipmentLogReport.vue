@@ -83,15 +83,15 @@
 
     <div v-else>
       <div v-if="report.rows.length === 0" class="text-center py-8 theme-text-muted">{{ $t('equipmentLog.noReportData') }}</div>
-      <div v-else class="bg-white rounded-lg p-4 border overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
+      <div v-else class="app-table-card">
+        <table v-app-table class="app-table divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.date') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.equipment') }}</th>
+              <th data-col="subtitle" class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.date') }}</th>
+              <th data-col="title" class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.equipment') }}</th>
               <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.hours') }}</th>
               <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.hourlyRate') }}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.total') }}</th>
+              <th data-col="amount" class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.total') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">

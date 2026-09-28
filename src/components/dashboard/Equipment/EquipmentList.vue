@@ -22,14 +22,14 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
-      <table :dir="isRTL ? 'rtl' : 'ltr'" class="min-w-full w-full table-auto md:table-fixed text-sm">
+    <div class="app-table-card">
+      <table v-app-table :dir="isRTL ? 'rtl' : 'ltr'" class="app-table w-full table-auto text-sm">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('equipment.name') || 'Name' }}</th>
+            <th data-col="title" class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('equipment.name') || 'Name' }}</th>
             <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.contractor') || 'Contractor' }}</th>
             <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.isCompanyOwned') || 'Company Owned' }}</th>
-            <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</th>
+            <th data-col="amount" class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</th>
             <th class="px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider text-start whitespace-normal">{{ $t('labels.actions') || 'Actions' }}</th>
           </tr>
         </thead>

@@ -16,58 +16,39 @@
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent"></div>
     </div>
 
-    <div v-if="!loading" class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="theme-table-thead-gradient">
-            <tr>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">#</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.name') || 'Name' }}</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.phone') || 'Phone' }}</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.nationalId') || 'National ID' }}</th>
-              <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="(d, idx) in drivers" :key="d.id" class="theme-table-row-hover">
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-accent-muted text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.name || '-' }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.phone || '-' }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.nationalId || '-' }}</td>
-              <td class="px-3 py-2 sm:px-6 sm:py-4">
-                <div class="flex gap-3 justify-end">
-                  <button @click.stop="openEdit(d)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" title="Edit">
-                    <PencilSquareIcon class="h-5 w-5" />
-                  </button>
-                  <button @click.stop="confirmDelete(d)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100" title="Delete">
-                    <TrashIcon class="h-5 w-5" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="drivers.length === 0">
-              <td colspan="5" class="px-3 py-2 text-start theme-text-muted">{{ $t('labels.noData') || 'No drivers found' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Mobile Cards -->
-    <div v-if="!loading" class="sm:hidden space-y-4">
-      <div v-for="d in drivers" :key="d.id" class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4">
-        <div class="flex justify-between">
-          <div>
-            <div class="font-semibold theme-text-primary">{{ d.name }}</div>
-            <div class="text-sm theme-text-muted">{{ d.phone || '-' }}</div>
-            <div class="text-sm theme-text-muted">{{ d.nationalId || '-' }}</div>
-          </div>
-          <div class="flex flex-col gap-2">
-            <button @click.stop="openEdit(d)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
-            <button @click.stop="confirmDelete(d)" class="text-red-600 text-xs">{{ $t('labels.delete') }}</button>
-          </div>
-        </div>
-      </div>
+    <div v-if="!loading" class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <thead class="theme-table-thead-gradient">
+          <tr>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">#</th>
+            <th data-col="title" class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.name') || 'Name' }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.phone') || 'Phone' }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('drivers.nationalId') || 'National ID' }}</th>
+            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap text-start">{{ $t('labels.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="(d, idx) in drivers" :key="d.id" class="theme-table-row-hover">
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-accent-muted text-start">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.phone || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary">{{ d.nationalId || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-4">
+              <div class="flex gap-3 justify-end">
+                <button @click.stop="openEdit(d)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" title="Edit">
+                  <PencilSquareIcon class="h-5 w-5" />
+                </button>
+                <button @click.stop="confirmDelete(d)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100" title="Delete">
+                  <TrashIcon class="h-5 w-5" />
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="drivers.length === 0">
+            <td colspan="5" class="px-3 py-2 text-start theme-text-muted">{{ $t('labels.noData') || 'No drivers found' }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <Pagination v-if="totalPages > 1" :current-page="page" :page-size="pageSize" :total="total" :total-pages="totalPages" @update:page="changePage" @update:pageSize="onPageSizeChange" />

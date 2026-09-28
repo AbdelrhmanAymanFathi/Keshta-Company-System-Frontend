@@ -206,74 +206,72 @@
     </div>
 
     <!-- Statement Table -->
-    <div v-if="report && report.rows && report.rows.length > 0" class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <div class="border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm theme-text-secondary">{{ $t('contractors.statementDescription') }}</div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="theme-table-thead-gradient">
-            <tr>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-                :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('labels.date') }}
-              </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-                :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('labels.type') }}
-              </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-                :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('contractors.refId') }}
-              </th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-                :class="isRTL ? 'text-right' : 'text-left'">
-                {{ $t('labels.description') }}
-              </th>
-              <th
-                class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
-                {{ translateWithFallback('contractors.debit', 'contractors.earnings') }}
-              </th>
-              <th
-                class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
-                {{ translateWithFallback('contractors.credit', 'contractors.payments') }}
-              </th>
-              <th
-                class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
-                {{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-200 bg-white">
-              <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
-              isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'theme-table-row-hover',
-              row.type === 'DEPOSIT' ? 'bg-emerald-50/70' : '',
-              row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'theme-dashboard-bg-soft opacity-70' : '',
-              row.type === 'OPENING' ? 'bg-slate-100' : '',
-              isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
-            ]">
-                <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.date }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                  <span v-if="isTotalsRow(row)" class="font-bold text-amber-900">
-                    {{ getTypeLabel(row.type) }}
-                  </span>
-                  <Badge v-else :variant="getTypeVariant(row.type, row)">
-                    {{ row.type === 'SUPPLY' && row.arDescription ? row.arDescription : getTypeLabel(row.type, row) }}
-                  </Badge>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
-                <td class="px-6 py-4 text-sm theme-text-primary">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
-                  {{ formatCurrency(getRowDebit(row)) }}
-                </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'theme-text')">
-                {{ formatCurrency(getRowCredit(row)) }}
+    <div v-if="report && report.rows && report.rows.length > 0" class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <div class="rounded-t-2xl border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm theme-text-secondary">{{ $t('contractors.statementDescription') }}</div>
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <thead class="theme-table-thead-gradient">
+          <tr>
+            <th data-col="subtitle" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
+              :class="isRTL ? 'text-right' : 'text-left'">
+              {{ $t('labels.date') }}
+            </th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
+              :class="isRTL ? 'text-right' : 'text-left'">
+              {{ $t('labels.type') }}
+            </th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
+              :class="isRTL ? 'text-right' : 'text-left'">
+              {{ $t('contractors.refId') }}
+            </th>
+            <th data-col="title" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
+              :class="isRTL ? 'text-right' : 'text-left'">
+              {{ $t('labels.description') }}
+            </th>
+            <th
+              class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
+              {{ translateWithFallback('contractors.debit', 'contractors.earnings') }}
+            </th>
+            <th
+              class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
+              {{ translateWithFallback('contractors.credit', 'contractors.payments') }}
+            </th>
+            <th
+              class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
+              {{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 bg-white">
+            <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
+            isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'theme-table-row-hover',
+            row.type === 'DEPOSIT' ? 'bg-emerald-50/70' : '',
+            row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'theme-dashboard-bg-soft opacity-70' : '',
+            row.type === 'OPENING' ? 'bg-slate-100' : '',
+            isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
+          ]">
+              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.date }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <span v-if="isTotalsRow(row)" class="font-bold text-amber-900">
+                  {{ getTypeLabel(row.type) }}
+                </span>
+                <Badge v-else :variant="getTypeVariant(row.type, row)">
+                  {{ row.type === 'SUPPLY' && row.arDescription ? row.arDescription : getTypeLabel(row.type, row) }}
+                </Badge>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'theme-text')">
-                {{ formatCurrency(getRowBalance(row)) }}
+              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
+              <td class="px-6 py-4 text-sm theme-text-primary">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
+                {{ formatCurrency(getRowDebit(row)) }}
               </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'theme-text')">
+              {{ formatCurrency(getRowCredit(row)) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'theme-text')">
+              {{ formatCurrency(getRowBalance(row)) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Pagination -->
       <Pagination v-if="totalPages > 1" :current-page="currentPage" :page-size="pageSize" :total="statementDataRows.length"

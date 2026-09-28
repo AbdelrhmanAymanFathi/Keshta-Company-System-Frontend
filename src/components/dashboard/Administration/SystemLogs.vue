@@ -3,7 +3,7 @@
     <PageHeader :title="$t('systemLogs.title')" :subtitle="$t('systemLogs.description')" />
 
     <div class="grid grid-cols-1 xl:grid-cols-[320px_minmax(0,1fr)] gap-6">
-      <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40 overflow-hidden">
+      <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
           <h3 class="text-base font-semibold theme-text-primary">{{ $t('systemLogs.filesTitle') }}</h3>
           <button @click="loadFiles" :disabled="filesLoading" class="flex items-center gap-2 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
@@ -22,12 +22,12 @@
           {{ $t('systemLogs.noFiles') }}
         </div>
 
-        <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-slate-200">
+        <div v-else>
+          <table v-app-table class="app-table divide-y divide-slate-200">
             <thead class="theme-table-thead-gradient">
               <tr>
-                <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('systemLogs.colName') }}</th>
-                <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('systemLogs.colModified') }}</th>
+                <th data-col="title" class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('systemLogs.colName') }}</th>
+                <th data-col="subtitle" class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('systemLogs.colModified') }}</th>
                 <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider text-right">{{ $t('systemLogs.colSize') }}</th>
               </tr>
             </thead>

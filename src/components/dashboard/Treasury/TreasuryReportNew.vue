@@ -95,43 +95,50 @@
       <div v-else-if="!selectedTreasury" class="rounded-2xl border border-gray-100 bg-white/80 px-6 py-16 text-center text-sm theme-text-secondary shadow-lg">
         {{ t('treasury.detailsHint') }}
       </div>
-      <div v-else class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg shadow-slate-200/50">
-        <table class="min-w-full border-collapse" style="direction: rtl;">
-          <!-- Treasury name title row -->
+      <div v-else class="rounded-2xl border border-gray-200 bg-white shadow-lg shadow-slate-200/50">
+        <!-- Treasury name + summary (kept apart so the ledger below can use the app-table layout) -->
+        <div class="overflow-hidden rounded-t-2xl">
+          <table class="min-w-full border-collapse" style="direction: rtl;">
+            <!-- Treasury name title row -->
+            <thead>
+              <tr>
+                <th colspan="6" class="border border-gray-300 bg-orange-100 px-4 py-3 text-center text-base font-bold text-gray-800">
+                  {{ selectedTreasury.name }}
+                </th>
+              </tr>
+              <!-- Summary row -->
+              <tr class="bg-orange-50">
+                <th colspan="2" class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
+                  {{ isRTL ? 'الفرق' : 'Difference' }}
+                </th>
+                <th class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
+                  {{ isRTL ? 'إجمالي (وارد)' : 'Total In' }}
+                </th>
+                <th class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
+                  {{ isRTL ? 'إجمالي (صادر)' : 'Total Out' }}
+                </th>
+                <th colspan="2" class="border border-gray-300 px-3 py-2"></th>
+              </tr>
+              <tr class="bg-white">
+                <td colspan="2" class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
+                  {{ formatNumber(totalIn - totalOut) }}
+                </td>
+                <td class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
+                  {{ formatNumber(totalIn) }}
+                </td>
+                <td class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
+                  {{ formatNumber(totalOut) }}
+                </td>
+                <td colspan="2" class="border border-gray-300 px-3 py-2"></td>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <table v-app-table class="app-table border-collapse" style="direction: rtl;">
           <thead>
-            <tr>
-              <th colspan="6" class="border border-gray-300 bg-orange-100 px-4 py-3 text-center text-base font-bold text-gray-800">
-                {{ selectedTreasury.name }}
-              </th>
-            </tr>
-            <!-- Summary row -->
-            <tr class="bg-orange-50">
-              <th colspan="2" class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
-                {{ isRTL ? 'الفرق' : 'Difference' }}
-              </th>
-              <th class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
-                {{ isRTL ? 'إجمالي (وارد)' : 'Total In' }}
-              </th>
-              <th class="border border-gray-300 px-3 py-2 text-center text-sm font-bold text-gray-700">
-                {{ isRTL ? 'إجمالي (صادر)' : 'Total Out' }}
-              </th>
-              <th colspan="2" class="border border-gray-300 px-3 py-2"></th>
-            </tr>
-            <tr class="bg-white">
-              <td colspan="2" class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
-                {{ formatNumber(totalIn - totalOut) }}
-              </td>
-              <td class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
-                {{ formatNumber(totalIn) }}
-              </td>
-              <td class="border border-gray-300 px-3 py-2 text-center text-lg font-bold text-gray-900">
-                {{ formatNumber(totalOut) }}
-              </td>
-              <td colspan="2" class="border border-gray-300 px-3 py-2"></td>
-            </tr>
             <!-- Column headers -->
             <tr class="bg-orange-100">
-              <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-56">
+              <th data-col="title" class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-56">
                 {{ isRTL ? 'البيـــــــــــان' : 'Description' }}
               </th>
               <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-32">
@@ -143,7 +150,7 @@
               <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-32">
                 {{ isRTL ? 'الرصيد' : 'Balance' }}
               </th>
-              <th class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-28">
+              <th data-col="subtitle" class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-28">
                 {{ isRTL ? 'التاريخ' : 'Date' }}
               </th>
             </tr>
@@ -200,7 +207,7 @@
             </tr>
 
             <!-- Empty rows to fill minimum visual rows (like Excel) -->
-            <tr v-for="n in emptyRows" :key="'empty-' + n" class="h-8">
+            <tr v-for="n in emptyRows" :key="'empty-' + n" class="hidden lg:table-row h-8">
               <td class="border border-gray-100 px-3 py-1"></td>
               <td class="border border-gray-100 px-3 py-1"></td>
               <td class="border border-gray-100 px-3 py-1"></td>

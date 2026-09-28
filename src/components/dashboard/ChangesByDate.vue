@@ -71,8 +71,8 @@
 
       <!-- Detailed View -->
       <div v-if="activeModule && changes[activeModule]?.items?.length > 0"
-        class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-        <div class="border-b border-slate-200 theme-table-thead-gradient px-6 py-4">
+        class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+        <div class="rounded-t-2xl border-b border-slate-200 theme-table-thead-gradient px-6 py-4">
           <h2 class="text-lg font-semibold theme-text-primary">
             {{ $t(`changes.modules.${activeModule}`) }} - {{ $t('changes.changesFor') }} {{ formatDate(selectedDateFrom) }}{{ selectedDateTo && selectedDateTo !== selectedDateFrom ? ' - ' + formatDate(selectedDateTo) : '' }}
           </h2>
@@ -80,27 +80,25 @@
             {{ $t('changes.totalChanges') }}: {{ changes[activeModule].count }}
           </p>
         </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="theme-table-thead-gradient">
-              <tr>
-                <th v-for="header in getHeadersForModule(activeModule)" :key="header"
-                  class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
-                  :class="isRTL ? 'text-right' : 'text-left'">
-                  {{ header }}
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200 bg-white">
-              <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="theme-table-row-hover">
-                <td v-for="field in getFieldsForModule(activeModule)" :key="field"
-                  class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">
-                  {{ formatField(item, field) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table v-app-table class="app-table divide-y divide-gray-200">
+          <thead class="theme-table-thead-gradient">
+            <tr>
+              <th v-for="header in getHeadersForModule(activeModule)" :key="header"
+                class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
+                :class="isRTL ? 'text-right' : 'text-left'">
+                {{ header }}
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 bg-white">
+            <tr v-for="(item, idx) in changes[activeModule].items" :key="item.id || idx" class="theme-table-row-hover">
+              <td v-for="field in getFieldsForModule(activeModule)" :key="field"
+                class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">
+                {{ formatField(item, field) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <!-- No Changes Message -->

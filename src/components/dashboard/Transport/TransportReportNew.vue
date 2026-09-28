@@ -74,74 +74,85 @@
     </div>
 
     <!-- Data Table -->
-    <div v-else class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div v-else class="bg-white shadow-sm rounded-lg">
       <div class="px-4 py-3 text-sm theme-text-secondary">{{ $t('transport.reportDescription') }}</div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="theme-dashboard-bg-soft">
-            <tr>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.date') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.contractor') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.fromLocation') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.toLocation') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.vehicleName') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.numTrips') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.distanceKm') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.firstKmPrice') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.perKmPrice') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.total') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('transport.notes') }}</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(transport, index) in items" :key="transport.ID || transport.id || index"
-              class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.date ?
-                formatDate(transport.date) : '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.contractor || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.from || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.to || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.vehicleName || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.numTrips || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.distance || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatCurrency(transport.firstKmPrice || 0) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatCurrency(transport.perKmPrice || 0) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">{{
-                formatCurrency(transport.total || 0) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-secondary">{{ transport.notes || '-' }}</td>
-            </tr>
-          </tbody>
-          <tbody v-else>
-            <tr>
-              <td colspan="11" class="px-6 py-2 text-start text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <colgroup>
+          <col style="width: 8%" />
+          <col style="width: 12%" />
+          <col style="width: 10%" />
+          <col style="width: 10%" />
+          <col style="width: 9%" />
+          <col style="width: 6%" />
+          <col style="width: 7%" />
+          <col style="width: 8%" />
+          <col style="width: 8%" />
+          <col style="width: 9%" />
+          <col style="width: 13%" />
+        </colgroup>
+        <thead class="theme-dashboard-bg-soft">
+          <tr>
+            <th data-col="subtitle"
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.date') }}</th>
+            <th data-col="title"
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.contractor') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.fromLocation') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.toLocation') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.vehicleName') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.numTrips') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.distanceKm') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.firstKmPrice') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.perKmPrice') }}</th>
+            <th data-col="amount"
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.total') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('transport.notes') }}</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
+          <tr v-for="(transport, index) in items" :key="transport.ID || transport.id || index"
+            class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.date ?
+              formatDate(transport.date) : '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.contractor || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.from || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.to || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.vehicleName || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.numTrips || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.distance || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatCurrency(transport.firstKmPrice || 0) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatCurrency(transport.perKmPrice || 0) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">{{
+              formatCurrency(transport.total || 0) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-secondary">{{ transport.notes || '-' }}</td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td colspan="11" class="px-6 py-2 text-start text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Summary Section -->
       <div v-if="items.length > 0" class="bg-gray-50 border-t border-gray-200 px-4 py-4">

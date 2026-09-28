@@ -108,17 +108,35 @@
     </div>
 
     <!-- table -->
-    <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <table class="min-w-full divide-y divide-gray-200">
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <colgroup>
+          <col style="width: 6.5%" />
+          <col style="width: 9%" />
+          <col style="width: 6.5%" />
+          <col style="width: 7%" />
+          <col style="width: 6.5%" />
+          <col style="width: 7%" />
+          <col style="width: 6.5%" />
+          <col style="width: 4%" />
+          <col style="width: 5%" />
+          <col style="width: 5%" />
+          <col style="width: 6%" />
+          <col style="width: 6%" />
+          <col style="width: 4.5%" />
+          <col style="width: 6.5%" />
+          <col style="width: 7.5%" />
+          <col style="width: 6.5%" />
+        </colgroup>
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th
+            <th data-col="subtitle"
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
               @click="sortBy('date')">
               {{ $t('transport.date') }}
               <SortIcon :active="sortField === 'date'" :dir="sortOrder" />
             </th>
-             <th
+             <th data-col="title"
                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
                {{ $t('transport.contractor') }}
              </th>
@@ -166,7 +184,7 @@
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('transport.discount') }}
             </th>
-            <th
+            <th data-col="amount"
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('transport.total') }}
             </th>
@@ -233,7 +251,7 @@
               {{ formatCurrency(transport.total) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
-              <div class="max-w-xs truncate">{{ transport.notes || transport.note || '-' }}</div>
+              <div>{{ transport.notes || transport.note || '-' }}</div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               <div class="flex gap-2" :class="isRTL ? 'justify-start' : 'justify-end'">

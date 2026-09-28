@@ -26,13 +26,13 @@
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <table class="min-w-full table-auto">
+    <div class="app-table-card">
+      <table v-app-table class="app-table table-auto">
         <thead class="border-b border-slate-200 theme-table-thead-gradient">
           <tr>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">#</th>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('units.symbol') || 'Symbol' }}</th>
-            <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('units.name') || 'Name' }}</th>
+            <th data-col="title" :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('units.name') || 'Name' }}</th>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('units.arName') || 'Arabic Name' }}</th>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('units.description') || 'Description' }}</th>
             <th :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">{{ $t('labels.actions') || 'Actions' }}</th>

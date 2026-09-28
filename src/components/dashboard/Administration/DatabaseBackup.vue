@@ -141,12 +141,12 @@
         <div v-for="n in 4" :key="n" class="animate-pulse h-4 rounded bg-slate-200 mb-3" :style="{ width: (100 - n * 15) + '%' }"></div>
       </div>
       <div v-else-if="!backupFiles.length" class="p-6 text-sm theme-text-muted text-center">{{ $t('databaseBackup.backupsEmpty') }}</div>
-      <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
+      <div v-else>
+        <table v-app-table class="app-table divide-y divide-slate-200">
           <thead class="theme-table-thead-gradient">
             <tr>
-              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colName') }}</th>
-              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colDate') }}</th>
+              <th data-col="title" class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colName') }}</th>
+              <th data-col="subtitle" class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colDate') }}</th>
               <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colSize') }}</th>
               <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colType') }}</th>
               <th class="px-5 py-3" />
@@ -199,12 +199,12 @@
         <div v-for="n in 4" :key="n" class="animate-pulse h-4 rounded bg-slate-200 mb-3" :style="{ width: (100 - n * 15) + '%' }"></div>
       </div>
       <div v-else-if="!logs.length" class="p-6 text-sm theme-text-muted text-center">{{ $t('databaseBackup.logsEmpty') }}</div>
-      <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200">
+      <div v-else>
+        <table v-app-table class="app-table divide-y divide-slate-200">
           <thead class="theme-table-thead-gradient">
             <tr>
-              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colDate') }}</th>
-              <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colAction') }}</th>
+              <th data-col="subtitle" class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colDate') }}</th>
+              <th data-col="title" class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colAction') }}</th>
               <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colStatus') }}</th>
               <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colFile') }}</th>
               <th class="px-5 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('databaseBackup.colSize') }}</th>

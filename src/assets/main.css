@@ -2103,3 +2103,198 @@ body,
 [data-theme-preset='cyber-futuristic'] .theme-dashboard-header {
   box-shadow: var(--theme-shadow-md);
 }
+
+/* =========================
+   App tables (same layout as the expenses list)
+   Markup: <table v-app-table class="app-table">, inside a card. Use <div class="app-table-card">
+   as that card when the table doesn't already sit in one (never inside overflow-x-auto:
+   the table must not scroll sideways and the sticky header needs a non-scrolling parent).
+   - lg and up: one card, every column visible, text wraps instead of scrolling sideways.
+   - below lg: each row's fields stacked "label: value" inside the same card.
+   Labels/roles are filled in by src/directives/appTable.js. Put data-col="title" |
+   "subtitle" | "amount" | "hide-mobile" on a header cell to control the phone layout.
+   ========================= */
+.app-table-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible !important; /* keeps the sticky header working */
+  background-color: #ffffff;
+  border: 1px solid rgb(226 232 240 / 0.8);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgb(226 232 240 / 0.4), 0 4px 6px -4px rgb(226 232 240 / 0.4);
+}
+
+table.app-table {
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 0 !important;
+}
+
+@media print, (min-width: 1024px) {
+  table.app-table {
+    table-layout: auto;
+    border-collapse: collapse;
+  }
+
+  table.app-table th,
+  table.app-table td {
+    min-width: 0 !important;
+    padding: 0.5rem 0.28rem !important;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    word-break: normal;
+    vertical-align: top;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    overflow: visible;
+  }
+
+  table.app-table th {
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-weight: 600;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    background-color: inherit;
+  }
+
+  /* Freeze header row */
+  table.app-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f8fafc;
+  }
+
+  table.app-table thead tr th {
+    background-color: #f8fafc;
+    box-shadow: 0 1px 0 0 #e2e8f0;
+  }
+
+  table.app-table [data-role='actions'] {
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: keep-all !important;
+  }
+}
+
+@media screen and (max-width: 1023.98px) {
+  table.app-table,
+  table.app-table > tbody {
+    display: block;
+  }
+
+  table.app-table > thead,
+  table.app-table > colgroup {
+    display: none;
+  }
+
+  /* One block per row, separated by a line (flex items are blockified, so cells
+     hidden with `hidden` / v-show stay hidden). */
+  table.app-table > tbody > tr:not(.hidden) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem 0.75rem;
+    padding: 1rem;
+    border-width: 1px 0 0 !important;
+    border-style: solid !important;
+    border-color: #f1f5f9 !important;
+  }
+
+  table.app-table > tbody:first-of-type > tr:first-child,
+  table.app-table > tbody:first-of-type > tr[style*='display: none']:first-child + tr {
+    border-top-width: 0 !important;
+  }
+
+  table.app-table > tbody > tr > :is(td, th) {
+    flex: 1 1 100%;
+    min-width: 0 !important;
+    width: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    text-align: start;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    letter-spacing: normal;
+  }
+
+  /* Keep "label: value" on one line even when the value is a badge or a <div>.
+     (:not(.hidden) so columns hidden on phones with `hidden md:table-cell` stay hidden.) */
+  table.app-table > tbody > tr > [data-label]:not(.hidden) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.25rem;
+  }
+
+  table.app-table > tbody > tr > [data-label]::before {
+    content: attr(data-label) ':';
+    color: var(--theme-text-muted);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 400;
+  }
+
+  /* Heading line: title on one side, amount on the other (like the expenses cards). */
+  table.app-table > tbody > tr > [data-role='select'] {
+    order: -4;
+    flex: 0 0 auto;
+  }
+
+  table.app-table > tbody > tr > [data-role='title'] {
+    order: -3;
+    flex: 1 1 0;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 600;
+    color: var(--theme-text-primary);
+  }
+
+  table.app-table > tbody > tr > [data-role='amount'] {
+    order: -2;
+    flex: 0 0 auto;
+    max-width: 50%;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 700;
+  }
+
+  table.app-table > tbody > tr > [data-role='subtitle'] {
+    order: -1;
+    margin-top: -0.375rem;
+    color: var(--theme-text-muted);
+  }
+
+  table.app-table > tbody > tr > [data-role='actions'] {
+    order: 99;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  table.app-table > tbody > tr > :is([data-role='index'], [data-role='hide-mobile']) {
+    display: none;
+  }
+
+  /* Empty state / expanded details: a single full-width cell. */
+  table.app-table > tbody > tr[data-full] > :is(td, th) {
+    text-align: center;
+  }
+}
+
+@media screen and (min-width: 640px) and (max-width: 1023.98px) {
+  /* Two detail columns on tablets, like the expenses cards. */
+  table.app-table > tbody > tr > :is(td, th):not([data-role]):not([data-wide]) {
+    flex-basis: calc(50% - 0.375rem);
+  }
+}
+
+/* Action buttons start-aligned in both layouts, like the expenses list. */
+table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
+  justify-content: flex-start;
+}

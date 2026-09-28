@@ -198,73 +198,84 @@
     </div>
 
     <!-- Data Table -->
-    <div v-else class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div v-else class="bg-white shadow-sm rounded-lg">
       <div class="px-4 py-3 text-sm theme-text-secondary">{{ $t('expenses.reportDescription') }}</div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 table-auto">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.date') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.treasuryOrCustody') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.subTerm') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.mainTerm') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.paymentMethod') }}</th>
-              <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') }}</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(expense, index) in items" :key="expense.id || expense.ID || index" class="hover:bg-gray-50">
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ index + 1 }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                  {{ expense.treasury }}
-                </span>
-                <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800">{{ formatCurrency(expense.amount || expense.expense || 0) }}</td>
-              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.description || '-' }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span v-if="expense.classification && expense.classification !== '-'" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
-                  {{ expense.classification }}
-                </span>
-                <span v-else class="text-xs theme-caption">-</span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
-                  {{ expense.category || '-' }}
-                </span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.settlementDate) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span v-if="expense.locationName || expense.location?.name" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
-                  {{ expense.locationName || expense.location?.name }}
-                </span>
-                <span v-else class="theme-caption">-</span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  {{ getPaymentMethodLabel(expense.paymentMethod) }}
-                </span>
-              </td>
-              <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.notes || '-' }}</td>
-            </tr>
-          </tbody>
-          <tbody v-else>
-            <tr>
-              <td colspan="11" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table v-app-table class="app-table divide-y divide-gray-200 table-auto">
+        <colgroup>
+          <col style="width: 3.5%" />
+          <col style="width: 8%" />
+          <col style="width: 12%" />
+          <col style="width: 10%" />
+          <col style="width: 13%" />
+          <col style="width: 9%" />
+          <col style="width: 9%" />
+          <col style="width: 8%" />
+          <col style="width: 9%" />
+          <col style="width: 8%" />
+          <col style="width: 10.5%" />
+        </colgroup>
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
+            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.date') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.treasuryOrCustody') }}</th>
+            <th data-col="amount" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
+            <th data-col="title" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.subTerm') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.mainTerm') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.location') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.paymentMethod') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.notes') }}</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
+          <tr v-for="(expense, index) in items" :key="expense.id || expense.ID || index" class="hover:bg-gray-50">
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ index + 1 }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+              <span v-if="expense.treasury" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                {{ expense.treasury }}
+              </span>
+              <span v-else class="text-xs theme-caption">{{ $t('expenses.mainExpensesFallback') }}</span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-bold text-slate-800">{{ formatCurrency(expense.amount || expense.expense || 0) }}</td>
+            <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.description || '-' }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+              <span v-if="expense.classification && expense.classification !== '-'" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                {{ expense.classification }}
+              </span>
+              <span v-else class="text-xs theme-caption">-</span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
+                {{ expense.category || '-' }}
+              </span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.settlementDate) }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+              <span v-if="expense.locationName || expense.location?.name" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium theme-badge">
+                {{ expense.locationName || expense.location?.name }}
+              </span>
+              <span v-else class="theme-caption">-</span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                {{ getPaymentMethodLabel(expense.paymentMethod) }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-sm theme-text-primary max-w-xs truncate">{{ expense.notes || '-' }}</td>
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td colspan="11" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Summary Section -->
-      <div v-if="items.length > 0" class="bg-gray-50 border-t border-gray-200 px-4 py-4">
+      <div v-if="items.length > 0" class="bg-gray-50 border-t border-gray-200 px-4 py-4 rounded-b-lg">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p class="text-xs theme-text-secondary">{{ $t('labels.totalRecords') }}</p>

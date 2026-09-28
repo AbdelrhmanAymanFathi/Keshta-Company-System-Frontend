@@ -142,89 +142,103 @@
     </div>
 
     <!-- Data Table -->
-    <div v-else class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div v-else class="bg-white shadow-sm rounded-lg">
       <div class="px-4 py-3 text-sm theme-text-secondary">Exports/Supplies Report</div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="theme-dashboard-bg-soft">
-            <tr>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.date') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.contractor') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.location') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.crusher') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.item') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.vehicle') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.companyTicket') }}</th>
-                              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.crusherTicket') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.companyCapacity') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.crusherCapacity') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.unitPrice') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.discount') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.rowTotal') }}</th>
-              <th
-                class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-                {{ $t('labels.accumulativeTotal') }}</th>
-              <!-- <th class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200" v-if="mappedItems.length">
-            <tr v-for="item in mappedItems" :key="item.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(item.date) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.contractor }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.location }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.crusher }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.item || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.vehicle || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.companyTicket }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.crusherTicket }}</td>
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <colgroup>
+          <col style="width: 7%" />
+          <col style="width: 10%" />
+          <col style="width: 8%" />
+          <col style="width: 7%" />
+          <col style="width: 7%" />
+          <col style="width: 7%" />
+          <col style="width: 6%" />
+          <col style="width: 6%" />
+          <col style="width: 6%" />
+          <col style="width: 6%" />
+          <col style="width: 7%" />
+          <col style="width: 6%" />
+          <col style="width: 8%" />
+          <col style="width: 9%" />
+        </colgroup>
+        <thead class="theme-dashboard-bg-soft">
+          <tr>
+            <th data-col="subtitle"
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.date') }}</th>
+            <th data-col="title"
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.contractor') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.location') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.crusher') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.item') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.vehicle') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.companyTicket') }}</th>
+                            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.crusherTicket') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.companyCapacity') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.crusherCapacity') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.unitPrice') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.discount') }}</th>
+            <th data-col="amount"
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.rowTotal') }}</th>
+            <th
+              class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              {{ $t('labels.accumulativeTotal') }}</th>
+            <!-- <th class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.notes') }}</th> -->
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200" v-if="mappedItems.length">
+          <tr v-for="item in mappedItems" :key="item.id" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(item.date) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.contractor }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.location }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.crusher }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.item || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.vehicle || '-' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.companyTicket }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.crusherTicket }}</td>
 
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatQuantity(item.companyCapacity) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatQuantity(item.crusherCapacity) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatCurrency(item.unitPrice) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :title="`Discount: ${item.discount}`">{{
-                formatCurrency(item.discount) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">{{
-                formatCurrency(item.rowTotal) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text"
-                :title="`Running total up to this row`">{{ formatCurrency(item.accumulativeTotal) }}</td>
-              <!-- <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.notes || '-' }}</td> -->
-            </tr>
-          </tbody>
-          <tbody v-else>
-            <tr>
-              <td colspan="14" class="px-6 py-2 text-start text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatQuantity(item.companyCapacity) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatQuantity(item.crusherCapacity) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatCurrency(item.unitPrice) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary" :title="`Discount: ${item.discount}`">{{
+              formatCurrency(item.discount) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text-primary">{{
+              formatCurrency(item.rowTotal) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold theme-text"
+              :title="`Running total up to this row`">{{ formatCurrency(item.accumulativeTotal) }}</td>
+            <!-- <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.notes || '-' }}</td> -->
+          </tr>
+        </tbody>
+        <tbody v-else>
+          <tr>
+            <td colspan="14" class="px-6 py-2 text-start text-sm theme-text-muted">{{ $t('labels.noData') }}</td>
+          </tr>
+        </tbody>
+      </table>
 
       <!-- Summary Section -->
       <div v-if="mappedItems.length > 0" class="bg-gray-50 border-t border-gray-200 px-4 py-4">

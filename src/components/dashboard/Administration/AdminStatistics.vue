@@ -177,19 +177,19 @@
           <DashboardSkeleton :lines="6" />
         </div>
         <DashboardEmpty v-else-if="!recentActivity?.length" :message="$t('adminStats.noTransactions')" />
-        <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-slate-200">
+        <div v-else>
+          <table v-app-table class="app-table divide-y divide-slate-200">
             <thead class="theme-table-thead-gradient">
               <tr>
-                <th class="px-5 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
+                <th data-col="subtitle" class="px-5 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
                     :class="isRTL ? 'text-right' : 'text-left'">{{ $t('adminStats.txDate') }}</th>
-                <th class="px-5 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
+                <th data-col="title" class="px-5 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
                     :class="isRTL ? 'text-right' : 'text-left'">{{ $t('adminStats.txDescription') }}</th>
                 <th class="px-5 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
                     :class="isRTL ? 'text-right' : 'text-left'">{{ $t('adminStats.txModule') }}</th>
                 <th class="px-5 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider"
                     :class="isRTL ? 'text-right' : 'text-left'">{{ $t('adminStats.txAction') }}</th>
-                <th class="px-5 py-3 text-right text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('adminStats.txAmount') }}</th>
+                <th data-col="amount" class="px-5 py-3 text-right text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('adminStats.txAmount') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">

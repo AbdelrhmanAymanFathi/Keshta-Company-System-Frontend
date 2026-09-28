@@ -12,12 +12,12 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-      <table class="min-w-full table-auto">
+    <div class="app-table-card">
+      <table v-app-table class="app-table table-auto">
         <thead class="theme-table-thead-gradient">
           <tr>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnKey') }}</th>
-            <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
+            <th data-col="title" :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnTitle') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnModule') }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.totalsLabel') || 'Totals' }}</th>
             <th :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ $t('reports.columnActive') }}</th>

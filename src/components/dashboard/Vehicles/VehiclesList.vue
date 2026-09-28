@@ -19,12 +19,12 @@
     </div> -->
 
     <!-- Table view -->
-    <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200/80 shadow-lg shadow-slate-200/40">
-      <table class="min-w-full text-sm">
+    <div class="app-table-card">
+      <table v-app-table class="app-table text-sm">
         <thead class="theme-table-thead-gradient">
           <tr>
             <!-- <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider text-start">ID</th> -->
-            <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
+            <th data-col="title" :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.truckName') || 'Truck Name' }}</th>
             <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.contractor') }}</th>
             <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.crusherNumber') }}</th>
             <th :class="['px-3 py-2 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-right' : 'text-left']">{{ $t('vehicles.companyCapacity') }}</th>
@@ -281,11 +281,11 @@
             <h4 class="text-sm font-semibold theme-text-primary">
               {{ $t('vehicles.ownershipHistory') }}
             </h4>
-            <div class="border rounded overflow-hidden bg-white">
-              <table class="min-w-full text-sm">
+            <div class="border rounded bg-white">
+              <table v-app-table class="app-table text-sm">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
+                    <th data-col="title" class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                       {{ $t('vehicles.owner') }}
                     </th>
                     <th class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">

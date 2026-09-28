@@ -30,152 +30,88 @@
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 theme-border-accent"></div>
     </div>
 
-    <!-- Desktop Table -->
-    <div v-if="!loading" class="hidden overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40 sm:block">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="theme-table-thead-gradient">
-            <tr>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('labels.#') }}</th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.name') }}</th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.email') }}</th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.phone') }}</th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.status') }}</th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.roles') }}</th>
-              <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('labels.actions') }}</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-slate-200">
-            <tr
-              v-for="(user, idx) in users"
-              :key="user.id"
-              class="transition-colors theme-table-row-hover"
-              @contextmenu.prevent="openContextMenu($event, user)"
-            >
-              <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ user.name }}</td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ user.email }}</td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ user.phone || '-' }}</td>
-              <td class="px-6 py-4 text-sm whitespace-nowrap" :class="textAlign">
-                <span
-                  :class="[
-                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                    user.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-                  ]"
-                >
-                  {{ user.isActive ? $t('users.active') : $t('users.inactive') }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm" :class="textAlign">
-                <div class="flex flex-wrap gap-1" :class="'justify-start'">
-                  <!-- <span
-                    :class="[
-                      'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
-                      isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 theme-text-secondary'
-                    ]"
-                  >
-                    {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
-                  </span> -->
-                  <span
-                    v-for="role in user.roles"
-                    :key="role.roleId || role.id"
-                    class="inline-flex items-center rounded-lg theme-icon-bg px-2 py-1 text-xs font-medium theme-accent-muted"
-                  >
-                    {{ role.role?.label || role.role?.name || 'N/A' }}
-                  </span>
-                  <span v-if="!user.roles || user.roles.length === 0" class="theme-caption text-xs">-</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex gap-3" :class="'justify-start'">
-                    <button @click.stop="openEdit(user)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                    <button @click.stop="openReset(user)" class="theme-text hover:theme-accent-muted" :title="$t('users.resetPassword')">
-                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 10-8 0v4M5 11h14v8H5z" />
-                      </svg>
-                    </button>
-                  <button @click.stop="confirmDelete(user)" class="text-red-600 hover:text-red-800" :title="$t('labels.delete')">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="users.length === 0">
-              <td colspan="7" class="px-6 py-12 text-center theme-text-muted">
-                {{ $t('users.noResults') }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Mobile Cards -->
-    <div v-if="!loading" class="sm:hidden space-y-4">
-      <div
-        v-for="user in users"
-        :key="user.id"
-        class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/30"
-        @contextmenu.prevent="openContextMenu($event, user)"
-      >
-        <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
-          <div :class="isRTL ? 'text-right' : 'text-left'">
-            <div class="font-semibold theme-text-primary">{{ user.name }}</div>
-            <div class="text-sm theme-text-muted mt-1">
-              {{ user.email }}<br>
-              {{ user.phone || '-' }}<br>
+    <!-- Users Table -->
+    <div v-if="!loading" class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <thead class="theme-table-thead-gradient">
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('labels.#') }}</th>
+            <th data-col="title" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.name') }}</th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.email') }}</th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.phone') }}</th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.status') }}</th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('users.roles') }}</th>
+            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider" :class="textAlign">{{ $t('labels.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-slate-200">
+          <tr
+            v-for="(user, idx) in users"
+            :key="user.id"
+            class="transition-colors theme-table-row-hover"
+            @contextmenu.prevent="openContextMenu($event, user)"
+          >
+            <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ user.name }}</td>
+            <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ user.email }}</td>
+            <td class="px-6 py-4 text-sm whitespace-nowrap theme-text-primary" :class="textAlign">{{ user.phone || '-' }}</td>
+            <td class="px-6 py-4 text-sm whitespace-nowrap" :class="textAlign">
               <span
                 :class="[
-                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1',
+                  'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
                   user.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                 ]"
               >
                 {{ user.isActive ? $t('users.active') : $t('users.inactive') }}
               </span>
-            </div>
-            <div v-if="user.roles && user.roles.length > 0" class="flex flex-wrap gap-1 mt-2" :class="isRTL ? 'justify-end' : 'justify-start'">
-              <span
-                :class="[
-                  'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
-                  isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 theme-text-secondary'
-                ]"
-              >
-                {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
-              </span>
-              <span
-                v-for="role in user.roles"
-                :key="role.roleId || role.id"
-                class="inline-flex items-center rounded-lg theme-icon-bg px-2 py-1 text-xs font-medium theme-accent-muted"
-              >
-                {{ role.role?.label || role.role?.name || 'N/A' }}
-              </span>
-            </div>
-            <div v-else class="flex flex-wrap gap-1 mt-2" :class="isRTL ? 'justify-end' : 'justify-start'">
-              <span
-                :class="[
-                  'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
-                  isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 theme-text-secondary'
-                ]"
-              >
-                {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
-              </span>
-            </div>
-          </div>
-          <div class="flex flex-col gap-3">
-            <button @click.stop="openEdit(user)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
-            <button @click.stop="confirmDelete(user)" class="text-red-600 text-xs">{{ $t('labels.delete') }}</button>
-          </div>
-        </div>
-      </div>
-      <div v-if="users.length === 0" class="text-center py-12 theme-text-muted">
-        {{ $t('users.noResults') }}
-      </div>
+            </td>
+            <td class="px-6 py-4 text-sm" :class="textAlign">
+              <div class="flex flex-wrap gap-1" :class="'justify-start'">
+                <!-- <span
+                  :class="[
+                    'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
+                    isUserAdmin(user) ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 theme-text-secondary'
+                  ]"
+                >
+                  {{ isUserAdmin(user) ? $t('users.admin') : $t('users.user') }}
+                </span> -->
+                <span
+                  v-for="role in user.roles"
+                  :key="role.roleId || role.id"
+                  class="inline-flex items-center rounded-lg theme-icon-bg px-2 py-1 text-xs font-medium theme-accent-muted"
+                >
+                  {{ role.role?.label || role.role?.name || 'N/A' }}
+                </span>
+                <span v-if="!user.roles || user.roles.length === 0" class="theme-caption text-xs">-</span>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex gap-3" :class="'justify-start'">
+                  <button @click.stop="openEdit(user)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                  <button @click.stop="openReset(user)" class="theme-text hover:theme-accent-muted" :title="$t('users.resetPassword')">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 10-8 0v4M5 11h14v8H5z" />
+                    </svg>
+                  </button>
+                <button @click.stop="confirmDelete(user)" class="text-red-600 hover:text-red-800" :title="$t('labels.delete')">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="users.length === 0">
+            <td colspan="7" class="px-6 py-12 text-center theme-text-muted">
+              {{ $t('users.noResults') }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Pagination -->

@@ -155,19 +155,30 @@
       </div>
     </div> -->
 
-    <div class="overflow-x-auto theme-surface rounded-3xl border border-gray-200 shadow-sm">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200 text-sm">
+        <colgroup>
+          <col style="width: 4%" />
+          <col style="width: 10%" />
+          <col style="width: 12%" />
+          <col style="width: 10%" />
+          <col style="width: 15%" />
+          <col style="width: 11%" />
+          <col style="width: 11%" />
+          <col style="width: 11%" />
+          <col style="width: 16%" />
+        </colgroup>
         <thead class="theme-table-thead-gradient text-left text-xs uppercase tracking-wide theme-text-muted">
           <tr>
             <th class="px-4 py-3">#</th>
-            <th class="px-4 py-3 cursor-pointer select-none hover:opacity-80" @click="sortByDate">
+            <th data-col="subtitle" class="px-4 py-3 cursor-pointer select-none hover:opacity-80" @click="sortByDate">
               {{ $t('labels.date') || 'Date' }}
               <SortIcon :active="true" :dir="sortOrder" />
             </th>
             <th class="px-4 py-3">{{ $t('labels.site') || 'Site' }}</th>
             <th class="px-4 py-3">{{ $t('payments.module') || 'Module' }}</th>
-            <th class="px-4 py-3">{{ $t('labels.contractor') || 'Contractor' }}</th>
-            <th class="px-4 py-3">{{ $t('labels.amount') || 'Amount' }}</th>
+            <th data-col="title" class="px-4 py-3">{{ $t('labels.contractor') || 'Contractor' }}</th>
+            <th data-col="amount" class="px-4 py-3">{{ $t('labels.amount') || 'Amount' }}</th>
             <th class="px-4 py-3">{{ $t('labels.paymentMethod') || 'Payment Method' }}</th>
             <th class="px-4 py-3">{{ $t('dashboard.treasury') || 'Treasury' }}</th>
             <th class="px-4 py-3">{{ $t('labels.notes') || 'Notes' }}</th>

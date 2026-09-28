@@ -107,22 +107,32 @@
         <div v-if="loading" class="px-6 py-12 text-center text-sm text-gray-500">{{ t('labels.loading') }}</div>
         <div v-else-if="error" class="px-6 py-12 text-center text-sm text-red-600">{{ error }}</div>
         <div v-else-if="!transactions.length" class="px-6 py-12 text-center text-sm text-gray-500">{{ t('treasury.noTransactions') }}</div>
-        <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
+        <div v-else>
+          <table v-app-table class="app-table divide-y divide-gray-200">
+            <colgroup>
+              <col style="width: 11%" />
+              <col style="width: 8%" />
+              <col style="width: 12%" />
+              <col style="width: 17%" />
+              <col style="width: 18%" />
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+              <col style="width: 14%" />
+            </colgroup>
             <thead class="bg-gray-50">
               <tr>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']"
+                <th data-col="subtitle" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']"
                   @click="toggleSortOrder">
                   {{ t('treasury.dateTime') }}
                   <SortIcon :active="true" :dir="sortOrder" />
                 </th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
+                <th data-col="title" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">تفاصيل العملية</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.updatedBy') }}</th>
-                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ t('treasury.amount') }}</th>
+                <th data-col="amount" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ t('treasury.amount') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">

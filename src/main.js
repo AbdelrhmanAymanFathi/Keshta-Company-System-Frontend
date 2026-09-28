@@ -16,6 +16,7 @@ import { realtimeService } from './services/realtimeService'
 import { buildVersionService } from './services/buildVersionService'
 import { tokenManager } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
+import appTable from './directives/appTable'
 
 // Initialize auth store immediately on app load
 initializeAuthStore()
@@ -25,6 +26,7 @@ const app = createApp(App)
 const pinia = createPinia()
 
 app.component('ThemeIcon', ThemeIcon)
+app.directive('app-table', appTable)
 app.provide(ICON_REVISION_KEY, iconRevision)
 app.provide(THEME_REVISION_KEY, themeRevision)
 

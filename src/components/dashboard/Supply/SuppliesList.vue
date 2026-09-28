@@ -125,14 +125,34 @@
     </div>
 
     <!-- table -->
-    <div class="overflow-auto rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <table class="min-w-full divide-y divide-gray-200">
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
+        <colgroup>
+          <col style="width: 2.5%" />
+          <col style="width: 6%" />
+          <col style="width: 6.5%" />
+          <col style="width: 8%" />
+          <col style="width: 6%" />
+          <col style="width: 6%" />
+          <col style="width: 6.5%" />
+          <col style="width: 6%" />
+          <col style="width: 6%" />
+          <col style="width: 5%" />
+          <col style="width: 5%" />
+          <col style="width: 4.5%" />
+          <col style="width: 4.5%" />
+          <col style="width: 6%" />
+          <col style="width: 4%" />
+          <col style="width: 6%" />
+          <col style="width: 5.5%" />
+          <col style="width: 6%" />
+        </colgroup>
         <thead class="theme-table-thead-gradient">
           <tr>
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               #</th>
-            <th
+            <th data-col="subtitle"
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
               @click="sortBy('date')">
               {{ $t('labels.date') }}
@@ -141,7 +161,7 @@
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.item') }}</th>
-             <th
+             <th data-col="title"
                class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
                {{ $t('labels.contractor') }}</th>
              <th
@@ -178,7 +198,7 @@
             <th
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.discount') }}</th>
-            <th
+            <th data-col="amount"
               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.total') }}</th>
 
@@ -219,7 +239,7 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
-              <div class="max-w-xs truncate">{{ supply.notes || '-' }}</div>
+              <div>{{ supply.notes || '-' }}</div>
             </td>
 
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">

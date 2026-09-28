@@ -31,13 +31,13 @@
         class="w-full px-4 py-2 border border-gray-300 rounded-lg theme-input-focus" />
     </div>
 
-    <!-- Desktop Table -->
-    <div class="hidden sm:block bg-white rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-200/80 overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
+    <!-- Table -->
+    <div class="app-table-card">
+      <table v-app-table class="app-table divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('labels.#') }}</th>
-            <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.name') }}</th>
+            <th data-col="title" class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.name') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.phone') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.bankName') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :class="textAlign">{{ $t('suppliers.accountNumber') }}</th>
@@ -87,42 +87,6 @@
           </tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- Mobile Cards -->
-    <div class="sm:hidden space-y-4">
-      <div
-        v-for="c in filtered"
-        :key="c.id"
-        class="bg-white rounded-2xl shadow-lg shadow-slate-200/30 border border-slate-200/80 p-3 sm:p-4 cursor-pointer"
-        @click="openContextMenu($event, c)"
-        @contextmenu.prevent="openContextMenu($event, c)"
-      >
-        <div class="flex justify-between items-start" :class="isRTL ? 'flex-row-reverse' : ''">
-          <div :class="isRTL ? 'text-right' : 'text-left'">
-            <div class="font-semibold theme-text-primary">
-              <button @click.stop="goToDetail(c)" class="theme-text hover:underline text-left">
-                {{ c.name }}
-              </button>
-            </div>
-            <div class="text-sm theme-text-muted">
-              {{ c.phone || '-' }}<br>
-              <span v-if="c.bankName">{{ $t('suppliers.bankName') }}: {{ c.bankName }}</span><br>
-              <span v-if="c.accountNumber">{{ $t('suppliers.accountNumber') }}: {{ c.accountNumber }}</span><br>
-              <span v-if="c.notes">{{ $t('suppliers.notes') }}: {{ c.notes }}</span>
-            </div>
-          </div>
-          <div class="flex flex-col gap-3">
-            <button @click.stop="openStatement(c)" class="theme-text text-xs">{{ $t('suppliers.statement') }}</button>
-            <button @click.stop="openWallet(c)" class="theme-text text-xs">{{ $t('suppliers.wallet') }}</button>
-            <button @click.stop="openEdit(c)" class="text-yellow-600 text-xs">{{ $t('labels.edit') }}</button>
-            <button @click.stop="confirmDelete(c)" class="text-red-600 text-xs">{{ $t('labels.delete') }}</button>
-          </div>
-        </div>
-      </div>
-      <div v-if="filtered.length === 0" class="text-center py-12 theme-text-muted">
-        {{ $t('suppliers.noResults') }}
-      </div>
     </div>
 
     <!-- Shared Pagination -->

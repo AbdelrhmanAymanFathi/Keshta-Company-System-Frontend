@@ -46,8 +46,8 @@
     </div>
 
     <!-- Main List/Table -->
-    <div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <div class="border-b border-slate-200 theme-table-thead-gradient px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+      <div class="rounded-t-2xl border-b border-slate-200 theme-table-thead-gradient px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 class="text-lg font-semibold theme-text-primary">
             {{ t('queueTitle') }} ({{ filteredApprovals.length }})
@@ -79,16 +79,26 @@
       </div>
 
       <!-- Approvals Table -->
-      <div v-else class="overflow-x-auto">
-        <table :dir="isRTL ? 'rtl' : 'ltr'" class="min-w-full divide-y divide-gray-200">
+      <div v-else>
+        <table v-app-table :dir="isRTL ? 'rtl' : 'ltr'" class="app-table divide-y divide-gray-200">
+          <colgroup>
+            <col style="width: 6%" />
+            <col style="width: 10%" />
+            <col style="width: 9%" />
+            <col :style="{ width: activeStatus !== 'PENDING' ? '12%' : '14%' }" />
+            <col :style="{ width: activeStatus !== 'PENDING' ? '29%' : '35%' }" />
+            <col :style="{ width: activeStatus !== 'PENDING' ? '11%' : '12%' }" />
+            <col v-if="activeStatus !== 'PENDING'" style="width: 11%" />
+            <col :style="{ width: activeStatus !== 'PENDING' ? '12%' : '14%' }" />
+          </colgroup>
           <thead class="bg-slate-50" :class="isRTL ? 'text-right' : 'text-left'">
             <tr :class="isRTL ? 'text-right' : 'text-left'">
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colId') }}</th>
+              <th data-col="title" class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colId') }}</th>
               <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colModule') }}</th>
               <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colAction') }}</th>
               <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colRequestedBy') }}</th>
               <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colDetails') }}</th>
-              <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colDate') }}</th>
+              <th data-col="subtitle" class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colDate') }}</th>
               <th v-if="activeStatus !== 'PENDING'" class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colResolvedBy') }}</th>
               <th class="px-6 py-4 text-xs font-semibold theme-text-muted uppercase tracking-wider text-start">{{ t('colActions') }}</th>
             </tr>
@@ -254,11 +264,11 @@
           </div>
 
           <!-- Comparison Table -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm" :dir="isRTL ? 'rtl' : 'ltr'">
-            <table class="min-w-full divide-y divide-slate-200">
+          <div class="border border-slate-200 rounded-xl shadow-sm" :dir="isRTL ? 'rtl' : 'ltr'">
+            <table v-app-table class="app-table divide-y divide-slate-200">
               <thead class="bg-slate-50">
                 <tr>
-                  <th class="px-4 py-3 text-start text-xs font-bold text-slate-500 uppercase tracking-wider w-1/3">{{ locale === 'ar' ? 'الحقل' : 'Property' }}</th>
+                  <th data-col="title" class="px-4 py-3 text-start text-xs font-bold text-slate-500 uppercase tracking-wider w-1/3">{{ locale === 'ar' ? 'الحقل' : 'Property' }}</th>
                   <th class="px-4 py-3 text-start text-xs font-bold text-slate-500 uppercase tracking-wider w-1/3">{{ locale === 'ar' ? 'الحالة السابقة' : 'Original State' }}</th>
                   <th class="px-4 py-3 text-start text-xs font-bold text-slate-500 uppercase tracking-wider w-1/3">{{ locale === 'ar' ? 'الحالة الجديدة' : 'New State' }}</th>
                 </tr>
@@ -273,7 +283,7 @@
                   </td>
                   <td class="px-4 py-2.5 text-sm font-mono" :class="isRTL ? 'text-right' : 'text-left'">
                     <template v-if="selectedApprovalForDetail.action === 'UPDATE'">
-                      <span v-if="hasFieldChanged(selectedApprovalForDetail, key)" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 block w-max">
+                      <span v-if="hasFieldChanged(selectedApprovalForDetail, key)" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 block w-fit max-w-full">
                         {{ getDisplayValue(selectedApprovalForDetail.afterState[key], key) }}
                       </span>
                       <span v-else class="text-slate-400">

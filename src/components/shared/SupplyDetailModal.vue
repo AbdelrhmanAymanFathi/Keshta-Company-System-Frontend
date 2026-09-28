@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="fixed inset-0 z-[2200] flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-lg p-6 w-full max-w-3xl overflow-auto max-h-[80vh]">
+    <div class="bg-white rounded-lg p-6 w-full max-w-3xl overflow-y-auto max-h-[80vh]">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold">{{ $t('supply.exportDetails') || 'Export Details' }}</h3>
         <div class="flex gap-2">
@@ -27,12 +27,24 @@
           <div><strong>{{ $t('labels.unpaid') }}:</strong> {{ formatCurrency(exportData.unpaid) }}</div>
         </div>
 
-        <div class="overflow-x-auto bg-gray-50 rounded p-2">
-          <table class="min-w-max divide-y divide-gray-200 whitespace-nowrap">
+        <div class="app-table-card">
+          <table v-app-table class="app-table divide-y divide-gray-200">
+            <colgroup>
+              <col style="width: 4%" />
+              <col style="width: 14%" />
+              <col style="width: 13%" />
+              <col style="width: 10%" />
+              <col style="width: 10%" />
+              <col style="width: 11%" />
+              <col style="width: 8%" />
+              <col style="width: 9%" />
+              <col style="width: 9%" />
+              <col style="width: 12%" />
+            </colgroup>
             <thead class="bg-gray-100">
               <tr>
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">#</th>
-                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.vehicle') }}</th>
+                <th data-col="title" class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.vehicle') }}</th>
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.crusher') }}</th>
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.crusherTicket') }}</th>
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.companyTicket') }}</th>
@@ -40,7 +52,7 @@
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.discount') }}</th>
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.companyCapacity') }}</th>
                 <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.crusherCapacity') }}</th>
-                <th class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.total') }}</th>
+                <th data-col="amount" class="px-4 py-2 text-start text-xs theme-text-secondary">{{ $t('labels.total') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -68,13 +80,12 @@
           </div>
           <div v-if="paymentsLoading">Loading payments...</div>
           <div v-else>
-            <div class="overflow-x-auto w-full">
-              <table class="min-w-full divide-y divide-gray-200">
+            <table v-app-table class="app-table divide-y divide-gray-200">
               <thead class="bg-gray-100">
                 <tr>
                   <th class="px-4 py-2 text-start text-xs">#</th>
                   <th class="px-4 py-2 text-start text-xs">{{ $t('payments.date') || 'Date' }}</th>
-                  <th class="px-4 py-2 text-start text-xs">{{ $t('payments.amount') || 'Amount' }}</th>
+                  <th data-col="amount" class="px-4 py-2 text-start text-xs">{{ $t('payments.amount') || 'Amount' }}</th>
                   <th class="px-4 py-2 text-start text-xs">{{ $t('payments.notes') || 'Notes' }}</th>
                 </tr>
               </thead>
@@ -89,8 +100,7 @@
                   <td class="px-3 py-2 text-xs" :colspan="4">{{ $t('payments.noPayments') || 'No payments found' }}</td>
                 </tr>
               </tbody>
-              </table>
-            </div>
+            </table>
           </div>
         </div>
       </div>
