@@ -5,6 +5,7 @@ import {
   updateTreasury,
   archiveTreasury,
   restoreTreasury,
+  purgeTreasury,
   saveTreasuriesOrder,
   getTreasurySummary,
   getTreasuryTransactions,
@@ -139,6 +140,14 @@ export const useTreasuryStore = defineStore('treasury', {
     },
     async unarchiveTreasuryItem(id) {
       return this.restoreTreasuryItem(id)
+    },
+    async purgeTreasuryItem(id) {
+      const response = await purgeTreasury(id)
+      if (String(this.selectedTreasuryId) === String(id)) {
+        this.selectedTreasuryId = null
+        this._rememberSelection(null)
+      }
+      return response.data
     },
     async saveOrder(items) {
       const response = await saveTreasuriesOrder({ items })

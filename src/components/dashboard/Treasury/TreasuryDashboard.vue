@@ -118,6 +118,14 @@
             >
               {{ t('treasury.unarchive') }}
             </button>
+            <button
+              v-if="isAdmin && selectedTreasury && selectedTreasury.type === 'CUSTODY'"
+              class="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 sm:w-auto"
+              :disabled="purging"
+              @click="purgeSelectedTreasury"
+            >
+              🗑 {{ purging ? t('treasury.purging') : t('treasury.purge') }}
+            </button>
           </div>
         </div>
       </div>
@@ -539,7 +547,7 @@ import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
-import { transferBetweenTreasuries, getExpense } from '@/api'
+import { transferBetweenTreasuries, getExpense, getTreasuryPurgePreview } from '@/api'
 import { playNotificationSound } from '@/utils/notificationSound'
 
 export default {
@@ -554,7 +562,7 @@ export default {
 
     useRealtime({
       channel: 'treasury',
-      events: ['treasury_balance_changed', 'treasury_transaction_created'],
+      events: ['treasury_balance_changed', 'treasury_transaction_created', 'treasury_deleted'],
       handler: debounce((eventName, data) => {
         store.fetchTreasuries()
         if (eventName === 'treasury_transaction_created') {
@@ -1023,6 +1031,50 @@ export default {
       }
     }
 
+    const purging = ref(false)
+    const formatSignedCurrency = (value) => `${Number(value) > 0 ? '+' : ''}${formatCurrency(value)}`
+
+    const purgeSelectedTreasury = async () => {
+      const treasury = selectedTreasury.value
+      if (!isAdmin.value || !treasury || purging.value) return
+      const toast = (message, type = 'error') => { if (window.$toast) window.$toast(message, type, 7000) }
+      purging.value = true
+      try {
+        const { data: preview } = await getTreasuryPurgePreview(treasury.id)
+        if (!preview.canPurge) {
+          toast(t(`treasury.purgeBlocked.${preview.blockedReason}`, { count: preview.payments }))
+          return
+        }
+        const effects = [
+          ...preview.treasuryEffects.map(e => t('treasury.purgeEffectLine', { name: e.name, amount: formatSignedCurrency(e.balanceChange) })),
+          ...preview.contractorEffects.map(e => t('treasury.purgeContractorEffectLine', { name: e.name, amount: formatSignedCurrency(e.balanceChange) })),
+        ]
+        const message = [
+          t('treasury.purgeConfirmTitle', { name: treasury.name }),
+          t('treasury.purgeConfirmExpenses', { count: preview.expenses.count, total: formatCurrency(preview.expenses.total) }),
+          t('treasury.purgeConfirmTransfers', { count: preview.transfers.count, total: formatCurrency(preview.transfers.total) }),
+          ...(effects.length ? ['', t('treasury.purgeConfirmEffects'), ...effects] : []),
+          '',
+          t('treasury.purgeConfirmIrreversible'),
+          t('treasury.purgeConfirmTypeName'),
+        ].join('\n')
+        const typed = window.prompt(message)
+        if (typed === null) return
+        if (typed.trim() !== treasury.name.trim()) {
+          toast(t('treasury.purgeNameMismatch'))
+          return
+        }
+        await store.purgeTreasuryItem(treasury.id)
+        await loadTreasuries()
+        toast(t('treasury.purgeSuccess', { name: treasury.name }), 'success')
+      } catch (err) {
+        console.error('[TreasuryDashboard] purgeSelectedTreasury error:', err)
+        toast(err?.response?.data?.message || t('treasury.purgeFailed'))
+      } finally {
+        purging.value = false
+      }
+    }
+
     const onDragStart = (index, event) => {
       if (!isAdmin.value || treasuryView.value !== 'active') return
       dragIndex.value = index
@@ -1128,6 +1180,8 @@ export default {
       executeTransfer,
       archiveSelectedTreasury,
       restoreSelectedTreasury,
+      purging,
+      purgeSelectedTreasury,
       onDragStart,
       onDrop,
       onDragEnd,

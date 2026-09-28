@@ -828,6 +828,10 @@ export const deleteTreasury = (id) =>
   archiveTreasury(id);
 export const restoreTreasury = (id) =>
   unarchiveTreasury(id);
+export const getTreasuryPurgePreview = (id) =>
+  axios.get(`${BASE_URL}/api/treasuries/${id}/purge-preview`);
+export const purgeTreasury = (id) =>
+  axios.delete(`${BASE_URL}/api/treasuries/${id}/purge`);
 export const saveTreasuriesOrder = (data) =>
   axios.post(`${BASE_URL}/api/treasuries/save-order`, data);
 export const getTreasurySummary = (treasuryId) =>
