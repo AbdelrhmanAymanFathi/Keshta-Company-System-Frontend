@@ -1477,6 +1477,7 @@
     "title": "Expenses",
     "addExpense": "Add Expense",
     "editExpense": "Edit Expense",
+    "editSettlement": "Edit Settlement",
     "deleteExpense": "Delete Expense",
     "date": "Date",
     "transactionDate": "Transaction Date",

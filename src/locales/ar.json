@@ -1477,6 +1477,7 @@
     "title": "المصروفات",
     "addExpense": "إضافة مصروف",
     "editExpense": "تعديل المصروف",
+    "editSettlement": "تعديل التسوية",
     "deleteExpense": "حذف المصروف",
     "date": "التاريخ",
     "transactionDate": "تاريخ المعاملة",

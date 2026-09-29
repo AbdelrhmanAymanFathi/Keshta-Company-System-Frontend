@@ -396,7 +396,7 @@
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
-                {{ editing ? ($t('expenses.editExpense') || 'تعديل مصروف') : ($t('expenses.addExpense') || 'إضافة مصروف جديد') }}
+                {{ editing ? (rows.length > 1 ? $t('expenses.editSettlement') : ($t('expenses.editExpense') || 'تعديل مصروف')) : ($t('expenses.addExpense') || 'إضافة مصروف جديد') }}
               </h2>
               <button @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</button>
             </div>
@@ -478,7 +478,7 @@
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
-                          <tr v-for="(row, index) in rows" :key="row.id" class="align-top">
+                          <tr v-for="(row, index) in rows" :key="row.id" class="align-top" :class="{ 'bg-amber-50': editing && row._expenseId != null && String(row._expenseId) === String(form.id) }">
                             <td class="px-2 py-2 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
                             <!-- Row Date (Editable per row) -->
                             <td class="expense-column-date px-2 py-2" style="min-width:8rem">
@@ -852,6 +852,8 @@ export default {
       modalOpen: false,
         modalStep: 1,
       editing: false,
+      editGroupLoading: false,
+      editOriginalIds: [],
       saving: false,
       deleting: false,
       downloading: false,
@@ -1447,11 +1449,47 @@ rows: [],
       this.modalOpen = true
     },
     
-    openEditModal(expense) {
-      this.editing = true
-      const formattedDate = expense.date ? (typeof expense.date === 'string' && expense.date.includes('T') ? expense.date.split('T')[0] : expense.date) : new Date().toISOString().split('T')[0]
-      const formattedSettlementDate = expense.settlementDate ? (typeof expense.settlementDate === 'string' && expense.settlementDate.includes('T') ? expense.settlementDate.split('T')[0] : expense.settlementDate) : formattedDate
+    toDateOnly(value) {
+      if (!value) return ''
+      return typeof value === 'string' && value.includes('T') ? value.split('T')[0] : value
+    },
 
+    // بنود التسوية = كل المصروفات اللي ليها نفس تاريخ التسوية ونفس الخزينة/العهدة (ونفس النوع والعهدة المحوّل لها)
+    async fetchSettlementGroup(expense) {
+      const settlementDate = this.toDateOnly(expense.settlementDate)
+      const treasuryId = expense.treasuryId || expense.treasury?.id || null
+      if (!settlementDate || !treasuryId) return [expense]
+
+      const destinationOf = e => Number(e.destinationTreasuryId || e.destinationTreasury?.id || 0)
+      const isSameSettlement = e =>
+        (e.kind || 'EXPENSE') === (expense.kind || 'EXPENSE') &&
+        destinationOf(e) === destinationOf(expense)
+
+      const items = []
+      let page = 1
+      let pages = 1
+      do {
+        const response = await getExpenses({
+          page,
+          pageSize: 100,
+          treasuryId,
+          settlementDateStart: settlementDate,
+          settlementDateEnd: settlementDate,
+          sortField: 'date',
+          sortOrder: 'asc'
+        })
+        items.push(...(response.data?.items || []))
+        pages = response.data?.pages || 1
+        page += 1
+      } while (page <= pages && page <= 20)
+
+      const group = items.filter(isSameSettlement)
+      if (!group.some(e => String(e.id) === String(expense.id))) group.push(expense)
+      const time = v => (v && !Number.isNaN(new Date(v).getTime()) ? new Date(v).getTime() : 0)
+      return group.sort((a, b) => time(a.date) - time(b.date) || time(a.createdAt) - time(b.createdAt))
+    },
+
+    resolveExpenseTerms(expense) {
       // 1. Resolve Category
       const catId = expense.categoryId || expense.categoryRef?.id || expense.category?.id || (typeof expense.category === 'object' ? expense.category.id : null)
       let parentCat = this.expenseCategories?.find(c => (catId && Number(c.id) === Number(catId)) || (expense.categoryRef?.name && c.name === expense.categoryRef.name) || (expense.category && c.name === (typeof expense.category === 'string' ? expense.category : expense.category?.name)))
@@ -1478,11 +1516,70 @@ rows: [],
         }
       }
 
-      const finalCategoryId = parentCat ? parentCat.id : (catId ? Number(catId) : null)
-      const finalSubCategoryId = subCat ? subCat.id : (subCatId ? Number(subCatId) : null)
+      return {
+        categoryId: parentCat ? parentCat.id : (catId ? Number(catId) : null),
+        subCategoryId: subCat ? subCat.id : (subCatId ? Number(subCatId) : null),
+        categoryName: parentCat?.name || expense.categoryRef?.name || (typeof expense.category === 'string' ? expense.category : expense.category?.name) || '',
+        subCategoryName: subCat?.name || expense.subCategoryRef?.name || expense.classification || (typeof expense.subCategory === 'string' ? expense.subCategory : expense.subCategory?.name) || ''
+      }
+    },
 
-      const categoryName = parentCat?.name || expense.categoryRef?.name || (typeof expense.category === 'string' ? expense.category : expense.category?.name) || ''
-      const subCategoryName = subCat?.name || expense.subCategoryRef?.name || expense.classification || (typeof expense.subCategory === 'string' ? expense.subCategory : expense.subCategory?.name) || ''
+    buildEditRow(expense) {
+      const formattedDate = this.toDateOnly(expense.date) || getTodayISO()
+      const terms = this.resolveExpenseTerms(expense)
+
+      const row = this.createEmptyRow()
+      row.date = formattedDate
+      row.categoryId = terms.categoryId
+      row.categorySearch = terms.categoryName
+      row.subCategoryId = terms.subCategoryId
+      row.subCategorySearch = terms.subCategoryName
+      // تحديد نوع البند الفرعي لما بنفتح للتعديل
+      if (terms.subCategoryId && (this.contractors || []).some(c => Number(c.id) === Number(terms.subCategoryId))) {
+        row._subItemType = 'contractor'
+        row._contractorRawId = terms.subCategoryId
+      } else if (terms.subCategoryId) {
+        row._subItemType = 'expensesub'
+        row._contractorRawId = null
+      } else {
+        row._subItemType = null
+        row._contractorRawId = null
+      }
+      row.locationId = expense.locationId || expense.location?.id || null
+      row.locationSearch = expense.location?.name || this.locations?.find(l => Number(l.id) === Number(expense.locationId))?.name || ''
+      row.description = expense.description || ''
+      row.amount = expense.amount || ''
+      row.paymentMethod = expense.paymentMethod || 'CASH'
+      row.paymentMethodSearch = this.paymentMethodItems?.find(p => p.id === row.paymentMethod)?.name || 'نقداً'
+      row.settlementDate = this.toDateOnly(expense.settlementDate) || formattedDate
+      row.notes = expense.notes || ''
+      // بيانات المصروف الأصلي — عشان نعرف نحدّث أنهي مصروف ومنغيّرش حقول مش ظاهرة في الجدول
+      row._expenseId = expense.id
+      row._origKind = expense.kind || 'EXPENSE'
+      row._origFlow = expense.flow || 'OUT'
+      row._origBranchId = expense.branchId || null
+      row._origContractorId = expense.contractorId || null
+      row._origContractorAccountType = expense.contractorAccountType || 'EXPENSE'
+      return row
+    },
+
+    async openEditModal(expense) {
+      if (!expense || this.editGroupLoading) return
+      this.hideExpenseContextMenu()
+      this.editGroupLoading = true
+      let group = [expense]
+      try {
+        group = await this.fetchSettlementGroup(expense)
+      } catch (error) {
+        console.error('Failed to load settlement items, editing single expense:', error)
+      } finally {
+        this.editGroupLoading = false
+      }
+
+      this.editing = true
+      const formattedDate = this.toDateOnly(expense.date) || new Date().toISOString().split('T')[0]
+      const formattedSettlementDate = this.toDateOnly(expense.settlementDate) || formattedDate
+      const terms = this.resolveExpenseTerms(expense)
 
       // 3. Resolve Treasury
       const targetTreasuryId = expense.treasuryId || expense.treasury?.id || null
@@ -1501,8 +1598,8 @@ rows: [],
       this.form = {
         id: expense.id,
         date: formattedSettlementDate,
-        categoryId: finalCategoryId,
-        subCategoryId: finalSubCategoryId,
+        categoryId: terms.categoryId,
+        subCategoryId: terms.subCategoryId,
         kind: expense.kind || 'EXPENSE',
         description: expense.description || '',
         amount: expense.amount || '',
@@ -1517,38 +1614,18 @@ rows: [],
         contractorId: expense.contractorId || null,
         contractorAccountType: expense.contractorAccountType || 'EXPENSE'
       }
-      this.modalStep = 1
+      // نفتح على جدول البنود مباشرة — يقدر يرجع للخطوة الأولى يغيّر تاريخ التسوية أو العهدة
+      this.modalStep = 2
 
-      const row = this.createEmptyRow()
-      row.date = formattedDate
-      row.categoryId = finalCategoryId
-      row.categorySearch = categoryName
-      row.subCategoryId = finalSubCategoryId
-      row.subCategorySearch = subCategoryName
-      // تحديد نوع البند الفرعي لما بنفتح للتعديل
-      if (finalSubCategoryId && (this.contractors || []).some(c => Number(c.id) === Number(finalSubCategoryId))) {
-        row._subItemType = 'contractor'
-        row._contractorRawId = finalSubCategoryId
-      } else if (finalSubCategoryId) {
-        row._subItemType = 'expensesub'
-        row._contractorRawId = null
-      } else {
-        row._subItemType = null
-        row._contractorRawId = null
-      }
-      row.locationId = expense.locationId || expense.location?.id || null
-      row.locationSearch = expense.location?.name || this.locations?.find(l => Number(l.id) === Number(expense.locationId))?.name || ''
-      row.description = expense.description || ''
-      row.amount = expense.amount || ''
-      row.paymentMethod = expense.paymentMethod || 'CASH'
-      row.paymentMethodSearch = this.paymentMethodItems?.find(p => p.id === row.paymentMethod)?.name || 'نقداً'
-      row.settlementDate = formattedSettlementDate
-      row.notes = expense.notes || ''
-      this.rows = [row]
+      this.rows = []
+      this.rows = group.map(item => this.buildEditRow(item))
+      // بصمة كل بند وقت الفتح — وقت الحفظ بنبعت بس البنود اللي اتغيرت (كل تعديل بيروح موافقة إدارية)
+      this.rows.forEach(row => { row._origSig = JSON.stringify(this.buildExpensePayload(row)) })
+      this.editOriginalIds = group.map(item => item.id)
 
       this.formLocationSearch = expense.location?.name || this.locations?.find(l => Number(l.id) === Number(expense.locationId))?.name || ''
-      this.formCategorySearch = categoryName
-      this.formSubcategorySearch = subCategoryName
+      this.formCategorySearch = terms.categoryName
+      this.formSubcategorySearch = terms.subCategoryName
       this.formPaymentMethodSearch = this.paymentMethodItems?.find(p => p.id === expense.paymentMethod)?.name || 'نقداً'
       this.formTreasurySearch = treasurySearchName
       const destTreasury = expense.destinationTreasury
@@ -1573,11 +1650,11 @@ rows: [],
         this.formContractorSearch = ''
       }
       this.modalOpen = true
-      this.hideExpenseContextMenu()
     },
-    
+
     closeModal() {
-      this.saveModalDraft()
+      // المسودة للإضافة بس — منخليش بنود التعديل تتحفظ وتظهر في "إضافة مصروف"
+      if (!this.editing) this.saveModalDraft()
       this.modalOpen = false
       this.modalStep = 1
     },
@@ -1624,7 +1701,10 @@ rows: [],
       const source = this.rows[index]
       const clone = {
         ...source,
-        id: Date.now() + Math.random()
+        id: Date.now() + Math.random(),
+        // النسخة بند جديد، مش نفس المصروف الأصلي
+        _expenseId: null,
+        _origSig: null
       }
       this.rows.splice(index + 1, 0, clone)
     },
@@ -1892,6 +1972,112 @@ rows: [],
       if (target?.select) target.select()
     },
     
+    buildExpensePayload(row) {
+      const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
+      const rowExpenseDate = row.date || getTodayISO()
+      const rowSettlementDate = this.form.settlementDate || this.form.date || getTodayISO()
+      // لو البند الفرعي مقاول → subCategoryId = undefined، contractorId = الـ ID الحقيقي
+      // لو البند الفرعي من المصروفات → subCategoryId = الـ ID الحقيقي، contractorId من المصروف الأصلي (في التعديل) أو من الـ form العلوي
+      const isContractorRow = row._subItemType === 'contractor'
+      const rowSubCategoryId = isContractorRow ? undefined : (row.subCategoryId || undefined)
+      const formContractorId = (!this.editing && this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null
+      const rowContractorId = isContractorRow
+        ? (row._contractorRawId || null)
+        : (row._origContractorId !== undefined ? row._origContractorId : formContractorId)
+      // لما المقاول هو البند الفرعي، categoryId بيكون string زي 'expenses' → البيك إند بيرفضه
+      // فبنبعت category string بدل categoryId integer
+      const rowCategoryId = isContractorRow ? null : (row.categoryId || null)
+      const rowCategoryName = isContractorRow ? (row.categorySearch || undefined) : undefined
+      return {
+        date: rowExpenseDate,
+        kind: row._origKind || this.form.kind || 'EXPENSE',
+        categoryId: rowCategoryId,
+        category: rowCategoryName,
+        subCategoryId: rowSubCategoryId,
+        description: String(row.description || '').trim(),
+        amount: Number.isFinite(amount) ? amount : 0,
+        flow: row._origFlow || this.form.flow || 'OUT',
+        branchId: row._origBranchId !== undefined ? row._origBranchId : (this.form.branchId || null),
+        locationId: row.locationId,
+        treasuryId: this.form.treasuryId ?? null,
+        destinationTreasuryId: this.isMainSourceTreasury ? (this.form.destinationTreasuryId ?? null) : null,
+        paymentMethod: row.paymentMethod || 'CASH',
+        notes: row.notes || '',
+        settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString(),
+        contractorId: rowContractorId,
+        contractorAccountType: row._origContractorAccountType || this.form.contractorAccountType || 'EXPENSE'
+      }
+    },
+
+    // حفظ تعديل التسوية: نبعت بس البنود اللي اتغيرت، نضيف الجديدة، ونحذف اللي اتشالت من الجدول
+    async saveSettlementEdits() {
+      const isPending = res => res?.status === 202 || res?.data?.status === 'PENDING'
+      const keptIds = new Set()
+      const ops = []
+
+      for (const row of this.rows) {
+        const payload = this.buildExpensePayload(row)
+        const sig = JSON.stringify(payload)
+        if (row._expenseId) {
+          keptIds.add(String(row._expenseId))
+          if (sig !== row._origSig) ops.push({ type: 'update', row, payload, sig })
+        } else {
+          ops.push({ type: 'create', row, payload, sig })
+        }
+      }
+      this.editOriginalIds
+        .filter(id => !keptIds.has(String(id)))
+        .forEach(id => ops.push({ type: 'delete', id }))
+
+      if (!ops.length) {
+        this.closeModal()
+        this.showSuccess('لا توجد تغييرات للحفظ')
+        return
+      }
+
+      let pendingCount = 0
+      const failures = []
+      for (const op of ops) {
+        try {
+          if (op.type === 'update') {
+            const res = await updateExpense(op.row._expenseId, op.payload)
+            if (isPending(res)) pendingCount += 1
+            op.row._origSig = op.sig
+          } else if (op.type === 'create') {
+            const res = await createExpense(op.payload)
+            op.row._expenseId = res.data?.id ?? null
+            op.row._origSig = op.sig
+            if (op.row._expenseId) this.editOriginalIds.push(op.row._expenseId)
+          } else {
+            const res = await deleteExpense(op.id)
+            if (isPending(res)) pendingCount += 1
+            this.editOriginalIds = this.editOriginalIds.filter(id => String(id) !== String(op.id))
+          }
+        } catch (error) {
+          if (isPending(error.response)) {
+            pendingCount += 1
+            continue
+          }
+          console.error(`Failed to ${op.type} settlement item:`, error)
+          failures.push(error.response?.data?.message || error.message || this.$t('expenses.saveError'))
+        }
+      }
+
+      await this.loadExpenses()
+
+      if (failures.length) {
+        // البنود اللي اتحفظت اتعلّمت فوق، فلو داس حفظ تاني هيتبعت الباقي بس
+        this.showError(`تعذر حفظ ${failures.length} من ${ops.length} تعديل: ${failures[0]}`)
+        return
+      }
+
+      this.modalOpen = false
+      this.modalStep = 1
+      this.showSuccess(pendingCount
+        ? 'تم تقديم طلبات التعديل للموافقة الإدارية بنجاح'
+        : this.$t('expenses.success.updated'))
+    },
+
     async saveExpense() {
       if (!this.validateStep1() || !this.validateRows()) return
       
@@ -1900,41 +2086,7 @@ rows: [],
       try {
         const payloads = this.rows
           .filter(row => String(row.description || '').trim() || row.amount || row.categoryId)
-          .map(row => {
-            const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
-            const rowExpenseDate = row.date || getTodayISO()
-            const rowSettlementDate = this.form.settlementDate || this.form.date || getTodayISO()
-            // لو البند الفرعي مقاول → subCategoryId = undefined، contractorId = الـ ID الحقيقي
-            // لو البند الفرعي من المصروفات → subCategoryId = الـ ID الحقيقي، contractorId من الـ form العلوي
-            const isContractorRow = row._subItemType === 'contractor'
-            const rowSubCategoryId = isContractorRow ? undefined : (row.subCategoryId || undefined)
-            const rowContractorId = isContractorRow
-              ? (row._contractorRawId || null)
-              : ((this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null)
-            // لما المقاول هو البند الفرعي، categoryId بيكون string زي 'expenses' → البيك إند بيرفضه
-            // فبنبعت category string بدل categoryId integer
-            const rowCategoryId = isContractorRow ? null : (row.categoryId || null)
-            const rowCategoryName = isContractorRow ? (row.categorySearch || undefined) : undefined
-            return {
-              date: rowExpenseDate,
-              kind: this.form.kind || 'EXPENSE',
-              categoryId: rowCategoryId,
-              category: rowCategoryName,
-              subCategoryId: rowSubCategoryId,
-              description: String(row.description || '').trim(),
-              amount: Number.isFinite(amount) ? amount : 0,
-              flow: this.form.flow || 'OUT',
-              branchId: this.form.branchId || null,
-              locationId: row.locationId,
-              treasuryId: this.form.treasuryId ?? null,
-              destinationTreasuryId: this.isMainSourceTreasury ? (this.form.destinationTreasuryId ?? null) : null,
-              paymentMethod: row.paymentMethod || 'CASH',
-              notes: row.notes || '',
-              settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString(),
-              contractorId: rowContractorId,
-              contractorAccountType: this.form.contractorAccountType || 'EXPENSE'
-            }
-          })
+          .map(row => this.buildExpensePayload(row))
 
         if (payloads.length === 0) {
           this.showError(this.$t('expenses.validation.descriptionRequired'))
@@ -1943,50 +2095,8 @@ rows: [],
         }
 
         if (this.editing) {
-          const expenseData = {
-            ...payloads[0]
-          }
-          try {
-            const res = await updateExpense(this.form.id, expenseData)
-            if (res.status === 202 || res.data?.status === 'PENDING') {
-              this.closeModal()
-              this.showSuccess('تم تقديم طلب التعديل للموافقة الإدارية بنجاح')
-              await this.loadExpenses()
-              return
-            }
-            const index = this.expenses.findIndex(e => e.id === this.form.id)
-            if (index !== -1) {
-              this.expenses.splice(index, 1, { ...this.expenses[index], ...expenseData })
-            }
-            await this.loadExpenses()
-          } catch (updateError) {
-            if (updateError.response?.status === 202 || updateError.response?.data?.status === 'PENDING') {
-              this.closeModal()
-              this.showSuccess('تم تقديم طلب التعديل للموافقة الإدارية بنجاح')
-              await this.loadExpenses()
-              return
-            }
-            if (updateError.response?.status === 409) {
-              const pendingMsg = updateError.response?.data?.message || 'This record already has a pending approval request. Please wait for it to be resolved before submitting another change.'
-              this.modalOpen = false
-              this.showError(pendingMsg)
-              await this.loadExpenses()
-              return
-            }
-            if (updateError.response?.status === 500 || updateError.code === 'ERR_NETWORK') {
-              console.log('Backend not available, simulating expense update')
-              const index = this.expenses.findIndex(e => e.id === this.form.id)
-              if (index !== -1) {
-                this.expenses.splice(index, 1, { 
-                  ...this.expenses[index], 
-                  ...expenseData,
-                  updatedAt: new Date().toISOString()
-                })
-              }
-            } else {
-              throw updateError
-            }
-          }
+          await this.saveSettlementEdits()
+          return
         } else {
           const createdExpenses = []
           for (const payload of payloads) {
