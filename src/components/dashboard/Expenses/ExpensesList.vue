@@ -595,7 +595,8 @@
                       </table>
                     </div>
 
-                    <div class="mt-4 flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <!-- الإجمالي ثابت تحت طول الوقت وهو بيسكرول في البنود -->
+                    <div class="sticky bottom-0 z-20 mt-4 flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-[0_-6px_16px_-6px_rgba(15,23,42,0.18)] sm:flex-row sm:items-center sm:justify-between">
                       <div class="text-sm theme-text-secondary">{{ rows.length }} سطر</div>
                       <div class="text-sm font-semibold theme-text-primary">الإجمالي: {{ formatCurrency(step2Total) }}</div>
                     </div>
