@@ -1478,6 +1478,13 @@
     "addExpense": "Add Expense",
     "editExpense": "Edit Expense",
     "editSettlement": "Edit Settlement",
+    "approval": {
+      "pendingUpdate": "⏳ Edit pending approval",
+      "pendingDelete": "⏳ Delete pending approval",
+      "rejectedUpdate": "✕ Edit rejected",
+      "rejectedDelete": "✕ Delete rejected",
+      "requestedAt": "Requested on"
+    },
     "deleteExpense": "Delete Expense",
     "date": "Date",
     "transactionDate": "Transaction Date",

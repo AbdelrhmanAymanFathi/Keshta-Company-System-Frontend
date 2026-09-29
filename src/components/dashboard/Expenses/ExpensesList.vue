@@ -218,7 +218,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
+          <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" :class="approvalRowClass(expense)" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
             <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
             <td>{{ formatDate(expense.date) }}</td>
             <td>
@@ -228,7 +228,10 @@
               <span v-if="getSubcategoryLabel(expense) !== '-'" class="expense-chip bg-slate-100 text-slate-700">{{ getSubcategoryLabel(expense) }}</span>
               <span v-else>-</span>
             </td>
-            <td>{{ expense.description }}</td>
+            <td>
+              {{ expense.description }}
+              <span v-if="approvalBadge(expense)" class="approval-badge" :class="approvalBadge(expense).cls" :title="approvalBadge(expense).title">{{ approvalBadge(expense).label }}</span>
+            </td>
             <td>
               <span v-if="expense.location" class="expense-chip theme-badge">{{ expense.location.name }}</span>
               <span v-else>-</span>
@@ -279,12 +282,14 @@
         v-for="expense in filteredExpenses"
         :key="expense.id"
         class="border-b border-slate-100 last:border-b-0 p-4"
+        :class="approvalRowClass(expense)"
         @contextmenu.prevent="showExpenseContextMenu($event, expense)"
       >
         <div class="flex items-start justify-between gap-3 mb-3">
           <div class="min-w-0">
             <h3 class="font-semibold theme-text-primary break-words">{{ expense.description }}</h3>
             <p class="text-sm theme-text-muted mt-1">{{ formatDate(expense.date) }}</p>
+            <span v-if="approvalBadge(expense)" class="approval-badge" :class="approvalBadge(expense).cls" :title="approvalBadge(expense).title">{{ approvalBadge(expense).label }}</span>
           </div>
           <span class="text-base font-bold text-slate-800 shrink-0">{{ formatCurrency(expense.amount) }}</span>
         </div>
@@ -478,7 +483,7 @@
                           </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
-                          <tr v-for="(row, index) in rows" :key="row.id" class="align-top" :class="{ 'bg-amber-50': editing && row._expenseId != null && String(row._expenseId) === String(form.id) }">
+                          <tr v-for="(row, index) in rows" :key="row.id" class="align-top" :class="{ 'bg-amber-50': editing && row._expenseId != null && String(row._expenseId) === String(form.id), 'opacity-60': isRowLocked(row) }" :inert="isRowLocked(row) || null">
                             <td class="px-2 py-2 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
                             <!-- Row Date (Editable per row) -->
                             <td class="expense-column-date px-2 py-2" style="min-width:8rem">
@@ -513,6 +518,7 @@
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
+                              <span v-if="approvalBadge({ approvalStatus: row._approvalStatus })" class="approval-badge" :class="approvalBadge({ approvalStatus: row._approvalStatus }).cls" :title="approvalBadge({ approvalStatus: row._approvalStatus }).title">{{ approvalBadge({ approvalStatus: row._approvalStatus }).label }}</span>
                             </td>
                             <td class="px-2 py-2" style="min-width:16rem">
                               <SearchDropdown
@@ -1174,10 +1180,14 @@ rows: [],
     await this.fetchTreasuries()
     await this.fetchContractors()
     this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], debounce(() => { this.loadExpenses() }, 300))
+    this.__approvalsUnsub = realtimeService.subscribe('approvals', ['approval_created', 'approval_completed', 'approval_rejected'], debounce((event, data) => {
+      if (!data?.module || data.module === 'EXPENSE') this.loadExpenses()
+    }, 300))
   },
   
   beforeUnmount() {
     if (this.__realtimeUnsub) { this.__realtimeUnsub(); this.__realtimeUnsub = null }
+    if (this.__approvalsUnsub) { this.__approvalsUnsub(); this.__approvalsUnsub = null }
   },
   
   methods: {
@@ -1560,6 +1570,7 @@ rows: [],
       row._origBranchId = expense.branchId || null
       row._origContractorId = expense.contractorId || null
       row._origContractorAccountType = expense.contractorAccountType || 'EXPENSE'
+      row._approvalStatus = expense.approvalStatus || null
       return row
     },
 
@@ -1704,7 +1715,8 @@ rows: [],
         id: Date.now() + Math.random(),
         // النسخة بند جديد، مش نفس المصروف الأصلي
         _expenseId: null,
-        _origSig: null
+        _origSig: null,
+        _approvalStatus: null
       }
       this.rows.splice(index + 1, 0, clone)
     },
@@ -2041,7 +2053,10 @@ rows: [],
         try {
           if (op.type === 'update') {
             const res = await updateExpense(op.row._expenseId, op.payload)
-            if (isPending(res)) pendingCount += 1
+            if (isPending(res)) {
+              pendingCount += 1
+              op.row._approvalStatus = { status: 'PENDING', action: 'UPDATE' }
+            }
             op.row._origSig = op.sig
           } else if (op.type === 'create') {
             const res = await createExpense(op.payload)
@@ -2289,6 +2304,39 @@ rows: [],
       }
       this.currentPage = 1
       this.loadExpenses()
+    },
+
+    // حالة طلب الموافقة على المصروف (من الـ backend: approvalStatus = آخر طلب لو لسه مستني أو اترفض)
+    approvalBadge(expense) {
+      const approval = expense?.approvalStatus
+      if (!approval) return null
+      const isDelete = approval.action === 'DELETE'
+      if (approval.status === 'PENDING') {
+        return {
+          label: this.$t(isDelete ? 'expenses.approval.pendingDelete' : 'expenses.approval.pendingUpdate'),
+          cls: 'bg-amber-100 text-amber-800 border border-amber-300',
+          title: approval.createdAt ? `${this.$t('expenses.approval.requestedAt')} ${this.formatDate(approval.createdAt)}` : ''
+        }
+      }
+      if (approval.status === 'REJECTED') {
+        return {
+          label: this.$t(isDelete ? 'expenses.approval.rejectedDelete' : 'expenses.approval.rejectedUpdate'),
+          cls: 'bg-red-100 text-red-700 border border-red-200',
+          title: approval.notes || ''
+        }
+      }
+      return null
+    },
+
+    approvalRowClass(expense) {
+      const status = expense?.approvalStatus?.status
+      if (status === 'PENDING') return 'expense-row-pending'
+      if (status === 'REJECTED') return 'expense-row-rejected'
+      return ''
+    },
+
+    isRowLocked(row) {
+      return this.editing && row?._approvalStatus?.status === 'PENDING'
     },
 
     getPaymentMethodLabel(method) {
@@ -2685,6 +2733,32 @@ rows: [],
 .expense-amount-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.approval-badge {
+  display: block;
+  width: fit-content;
+  margin-top: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.expense-row-pending > td,
+div.expense-row-pending {
+  background-color: #fffbeb !important;
+}
+
+.expense-row-pending > td:first-child,
+div.expense-row-pending {
+  box-shadow: inset -3px 0 0 #f59e0b;
+}
+
+.expense-row-rejected > td:first-child,
+div.expense-row-rejected {
+  box-shadow: inset -3px 0 0 #ef4444;
 }
 
 .expense-chip {

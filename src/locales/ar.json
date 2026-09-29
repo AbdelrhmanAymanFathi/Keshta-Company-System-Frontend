@@ -1478,6 +1478,13 @@
     "addExpense": "إضافة مصروف",
     "editExpense": "تعديل المصروف",
     "editSettlement": "تعديل التسوية",
+    "approval": {
+      "pendingUpdate": "⏳ في انتظار موافقة التعديل",
+      "pendingDelete": "⏳ في انتظار موافقة الحذف",
+      "rejectedUpdate": "✕ تم رفض التعديل",
+      "rejectedDelete": "✕ تم رفض الحذف",
+      "requestedAt": "تم الطلب في"
+    },
     "deleteExpense": "حذف المصروف",
     "date": "التاريخ",
     "transactionDate": "تاريخ المعاملة",
