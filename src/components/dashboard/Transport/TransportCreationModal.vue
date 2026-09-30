@@ -695,14 +695,15 @@ export default {
       // `discount` is measured in meters (reduces vehicle capacity).
       // Compute monetary discount by removing `appliedMeters` from capacity,
       // so it affects the whole base (firstKmPrice + perKmPrice*(distance-1)).
+      // The discount applies once to all trips in the row, not per trip.
       return this.rows.reduce((sum, row) => {
         const distance = Number(row.distanceKm || 0)
         const base = this.commonData.firstKmPrice + Math.max(0, (distance - 1)) * this.commonData.perKmPrice
         const discountMeters = Number(row.discount) || 0
         const capacity = Number(row.companyCapacity || this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
-        const appliedMeters = Math.min(discountMeters, Math.max(0, capacity))
         const count = Number(row.count || 1)
-        return sum + base * appliedMeters * count
+        const appliedMeters = Math.min(discountMeters, Math.max(0, capacity) * count)
+        return sum + base * appliedMeters
       }, 0)
     },
     grandTotal() {
@@ -1086,15 +1087,15 @@ export default {
       return base * capacity * (row.count || 1)
     },
     totalPerRow(row) {
-      // Calculate total after reducing vehicle capacity by discount meters.
+      // Calculate total after subtracting discount meters once from all trips combined.
       const distance = Number(row.distanceKm || 0)
       const base = this.commonData.firstKmPrice + Math.max(0, (distance - 1)) * this.commonData.perKmPrice
       const capacity = Number(row.companyCapacity || this.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
       const discountMeters = Number(row.discount) || 0
-      const appliedMeters = Math.min(discountMeters, Math.max(0, capacity))
-      const effectiveCapacity = Math.max(0, capacity - appliedMeters)
       const count = Number(row.count || 1)
-      return Math.max(0, base * effectiveCapacity * count)
+      const totalMeters = Math.max(0, capacity) * count
+      const appliedMeters = Math.min(discountMeters, totalMeters)
+      return Math.max(0, base * (totalMeters - appliedMeters))
     },
     formatNumber(v) {
       return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -1370,7 +1371,7 @@ export default {
         const row = this.createEmptyRow()
         row.vehicle = vehicle
         row.search = vehicle?.name || ''
-        row.discount = parseFloat(this.transport.discount) / (this.transport.numTrips || 1) || 0 // approximate per-row
+        row.discount = parseFloat(this.transport.discount) || 0
         row.companyCapacity = vehicle?.companyCapacity || 0
         row.count = Number(this.transport.numTrips) || 1
         row.distanceKm = parseFloat(this.transport.distanceKm) || this.commonData.distanceKm || 0
