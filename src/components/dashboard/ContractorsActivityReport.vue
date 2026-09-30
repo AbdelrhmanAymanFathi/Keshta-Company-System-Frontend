@@ -265,8 +265,8 @@
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
           </tr>
@@ -278,8 +278,8 @@
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('actionType') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
           </tr>
@@ -295,8 +295,8 @@
               </td>
               <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
               <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
             </tr>
@@ -316,8 +316,8 @@
               </td>
               <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
               <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
             </tr>
@@ -339,12 +339,12 @@
         </div>
         <div class="flex items-center gap-6 flex-wrap">
           <div class="flex items-center gap-2">
-            <span class="text-xs theme-text-secondary">{{ t('totalOfWork') }}:</span>
-            <span class="text-base font-bold text-emerald-600">{{ formatCurrency(totals.totalOfWork) }}</span>
-          </div>
-          <div class="flex items-center gap-2">
             <span class="text-xs theme-text-secondary">{{ t('totalPaid') }}:</span>
             <span class="text-base font-bold text-rose-600">{{ formatCurrency(totals.totalPaid) }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs theme-text-secondary">{{ t('totalOfWork') }}:</span>
+            <span class="text-base font-bold text-emerald-600">{{ formatCurrency(totals.totalOfWork) }}</span>
           </div>
         </div>
       </div>
@@ -416,8 +416,8 @@ export default {
           contractor: 'Contractor',
           module: 'Module',
           outstandingBefore: 'Outstanding Before',
-          totalOfWork: 'Debit (Owed)',
-          totalPaid: 'Credit (Paid)',
+          totalOfWork: 'Credit (Owed)',
+          totalPaid: 'Debit (Paid)',
           outstandingAfter: 'Outstanding After',
           notes: 'Notes',
           allModules: 'All Modules',
@@ -448,8 +448,8 @@ export default {
           contractor: 'المقاول',
           module: 'القسم',
           outstandingBefore: 'الرصيد السابق',
-          totalOfWork: 'مدين',
-          totalPaid: 'دائن',
+          totalOfWork: 'دائن',
+          totalPaid: 'مدين',
           outstandingAfter: 'الرصيد الحالي',
           notes: 'ملاحظات',
           allModules: 'كل الأقسام',
