@@ -208,12 +208,73 @@
     <!-- Statement Table -->
     <div v-if="report && report.rows && report.rows.length > 0" class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <div class="rounded-t-2xl border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm theme-text-secondary">{{ $t('contractors.statementDescription') }}</div>
+
+      <!-- Column Filters & Sort -->
+      <div class="space-y-3 border-b border-slate-200 px-4 py-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'الترتيب' : 'Sort' }}</label>
+            <select v-model="sortOrder"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
+              <option value="desc">{{ isRTL ? 'من الأحدث للأقدم' : 'Newest to oldest' }}</option>
+              <option value="asc">{{ isRTL ? 'من الأقدم للأحدث' : 'Oldest to newest' }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.date') }}</label>
+            <DateField v-model="columnFilters.date"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.type') }}</label>
+            <select v-model="columnFilters.type"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
+              <option value="">{{ $t('labels.all') }}</option>
+              <option v-for="opt in typeFilterOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.refId') }}</label>
+            <input v-model="columnFilters.refId" type="text" :placeholder="$t('labels.search')"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.description') }}</label>
+            <input v-model="columnFilters.description" type="text" :placeholder="$t('labels.search')"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</label>
+            <input v-model="columnFilters.debit" type="text" inputmode="decimal" :placeholder="$t('labels.search')"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</label>
+            <input v-model="columnFilters.credit" type="text" inputmode="decimal" :placeholder="$t('labels.search')"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium theme-text-secondary mb-1">{{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}</label>
+            <input v-model="columnFilters.balance" type="text" inputmode="decimal" :placeholder="$t('labels.search')"
+              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          </div>
+        </div>
+        <div v-if="hasColumnFilters" class="flex flex-wrap items-center gap-3 text-xs theme-text-muted">
+          <span>{{ isRTL ? `${filteredRows.length} من ${statementDataRows.length} حركة` : `${filteredRows.length} of ${statementDataRows.length} records` }}</span>
+          <button @click="clearColumnFilters"
+            class="rounded-xl border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium theme-text-secondary transition-colors hover:bg-slate-200">
+            {{ isRTL ? 'مسح فلاتر الجدول' : 'Clear table filters' }}
+          </button>
+        </div>
+      </div>
+
       <table v-app-table class="app-table divide-y divide-gray-200">
         <thead class="theme-table-thead-gradient">
           <tr>
-            <th data-col="subtitle" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-              :class="isRTL ? 'text-right' : 'text-left'">
+            <th data-col="subtitle" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap cursor-pointer select-none hover:opacity-80"
+              :class="isRTL ? 'text-right' : 'text-left'" @click="toggleSortOrder">
               {{ $t('labels.date') }}
+              <SortIcon :active="true" :dir="sortOrder" />
             </th>
             <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
               :class="isRTL ? 'text-right' : 'text-left'">
@@ -267,14 +328,17 @@
               {{ formatCurrency(getRowCredit(row)) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'theme-text')">
-              {{ formatCurrency(getRowBalance(row)) }}
+              {{ row.__filteredTotals ? '-' : formatCurrency(getRowBalance(row)) }}
             </td>
+          </tr>
+          <tr v-if="!filteredRows.length">
+            <td colspan="7" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noResults') }}</td>
           </tr>
         </tbody>
       </table>
 
       <!-- Pagination -->
-      <Pagination v-if="totalPages > 1" :current-page="currentPage" :page-size="pageSize" :total="statementDataRows.length"
+      <Pagination v-if="totalPages > 1" :current-page="currentPage" :page-size="pageSize" :total="filteredRows.length"
         :total-pages="totalPages" :page-size-options="[10, 20, 50, 100]" @update:page="currentPage = $event"
         @update:pageSize="onPageSizeChange" />
     </div>
@@ -288,10 +352,11 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, getCurrentInstance } from 'vue'
+import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue'
 import { getContractorReportData, getContractors, normalizeContractorAccountType } from '@/api'
 import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
+import SortIcon from '../shared/SortIcon.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import normalizeItem from '@/utils/normalizeItem'
@@ -302,7 +367,7 @@ import { isContractorStatementTotalsRow, splitFooterRow } from '@/utils/reportDe
 
 export default {
   name: 'ContractorStatement',
-  components: { Badge, Pagination, DateField },
+  components: { Badge, Pagination, DateField, SortIcon },
   props: {
     mode: {
       type: String,
@@ -326,6 +391,18 @@ export default {
     })
     const currentPage = ref(1)
     const pageSize = ref(50)
+    const emptyColumnFilters = () => ({
+      date: '',
+      type: '',
+      refId: '',
+      description: '',
+      debit: '',
+      credit: '',
+      balance: ''
+    })
+    const columnFilters = ref(emptyColumnFilters())
+    // Backend returns rows oldest → newest; keep that as the default order
+    const sortOrder = ref('asc')
 
     const isRTL = computed(() => {
       return instance && instance.proxy && instance.proxy.$i18n && instance.proxy.$i18n.locale === 'ar'
@@ -428,17 +505,98 @@ export default {
       return closing > 0 ? closing : 0
     })
 
+    // Settlement expenses are shown with their own "سداد" label, so filter them as their own type
+    const getRowTypeKey = (row) => (isSettlementRow(row) ? 'SETTLEMENT' : String(row?.type || ''))
+
+    const typeFilterOptions = computed(() => {
+      const seen = new Map()
+      statementDataRows.value.forEach((row) => {
+        const key = getRowTypeKey(row)
+        if (key && !seen.has(key)) seen.set(key, getTypeLabel(row.type, row))
+      })
+      return Array.from(seen, ([value, label]) => ({ value, label }))
+    })
+
+    const hasColumnFilters = computed(() => Object.values(columnFilters.value).some(v => String(v || '').trim() !== ''))
+
+    const includesText = (value, needle) => String(value ?? '').toLowerCase().includes(needle)
+
+    // Matches the typed number against the raw and formatted amount (e.g. "1500", "1,500", "1500.5")
+    const matchesAmount = (amount, needle) => {
+      const n = Number(amount) || 0
+      const plain = String(needle).replace(/,/g, '')
+      return [String(n), n.toFixed(2), n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })]
+        .some(v => v.includes(needle) || v.replace(/,/g, '').includes(plain))
+    }
+
+    const filteredRows = computed(() => {
+      const f = columnFilters.value
+      const date = String(f.date || '').trim()
+      const type = String(f.type || '').trim()
+      const refId = String(f.refId || '').trim().toLowerCase()
+      const description = String(f.description || '').trim().toLowerCase()
+      const debit = String(f.debit || '').trim()
+      const credit = String(f.credit || '').trim()
+      const balance = String(f.balance || '').trim()
+
+      const rows = statementDataRows.value.filter((row) => {
+        if (date && formatToISODate(row.date) !== date) return false
+        if (type && getRowTypeKey(row) !== type) return false
+        if (refId && !includesText(row.refId, refId)) return false
+        if (description && !includesText(row.description, description) && !includesText(row.arDescription, description)) return false
+        if (debit && !matchesAmount(getRowDebit(row), debit)) return false
+        if (credit && !matchesAmount(getRowCredit(row), credit)) return false
+        if (balance && !matchesAmount(getRowBalance(row), balance)) return false
+        return true
+      })
+
+      // Sort by date, keeping the backend order for rows on the same day so "desc" is the exact reverse of "asc"
+      const dir = sortOrder.value === 'desc' ? -1 : 1
+      const indexOf = new Map(statementDataRows.value.map((row, i) => [row, i]))
+      const dateKey = (row) => (row.type === 'OPENING' ? '' : formatToISODate(row.date))
+      return rows
+        .map(row => ({ row, key: dateKey(row), idx: indexOf.get(row) }))
+        .sort((a, b) => {
+          if (a.key !== b.key) return a.key < b.key ? -dir : dir
+          return (a.idx - b.idx) * dir
+        })
+        .map(item => item.row)
+    })
+
+    // With table filters on, the backend totals row no longer matches what is shown, so total the visible rows instead
+    const displayedTotalsRow = computed(() => {
+      if (!hasColumnFilters.value) return statementTotalsRow.value
+      if (!filteredRows.value.length) return null
+      return {
+        type: 'TOTAL',
+        description: isRTL.value ? 'إجمالي النتائج المفلترة' : 'Filtered totals',
+        debit: filteredRows.value.reduce((sum, row) => sum + getRowDebit(row), 0),
+        credit: filteredRows.value.reduce((sum, row) => sum + getRowCredit(row), 0),
+        __filteredTotals: true
+      }
+    })
+
     const paginatedRows = computed(() => {
       const start = (currentPage.value - 1) * pageSize.value
       const end = start + pageSize.value
-      const pageRows = statementDataRows.value.slice(start, end)
-      return statementTotalsRow.value ? [...pageRows, statementTotalsRow.value] : pageRows
+      const pageRows = filteredRows.value.slice(start, end)
+      return displayedTotalsRow.value ? [...pageRows, displayedTotalsRow.value] : pageRows
     })
 
     const totalPages = computed(() => {
-      if (!statementDataRows.value.length) return statementTotalsRow.value ? 1 : 0
-      return Math.ceil(statementDataRows.value.length / pageSize.value)
+      if (!filteredRows.value.length) return displayedTotalsRow.value ? 1 : 0
+      return Math.ceil(filteredRows.value.length / pageSize.value)
     })
+
+    watch([columnFilters, sortOrder], () => { currentPage.value = 1 }, { deep: true })
+
+    const toggleSortOrder = () => {
+      sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
+    }
+
+    const clearColumnFilters = () => {
+      columnFilters.value = emptyColumnFilters()
+    }
 
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat('en-US', {
@@ -641,6 +799,7 @@ export default {
         endDate: '',
         onlyAddedAndReversals: false
       }
+      clearColumnFilters()
       report.value = null
       currentPage.value = 1
     }
@@ -700,6 +859,13 @@ export default {
       isTotalsRow,
       paginatedRows,
       totalPages,
+      columnFilters,
+      sortOrder,
+      typeFilterOptions,
+      hasColumnFilters,
+      filteredRows,
+      toggleSortOrder,
+      clearColumnFilters,
       formatCurrency,
       getAmountClass,
       getRowDebit,
