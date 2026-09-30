@@ -121,14 +121,15 @@
               </div>
               <div class="border-t border-slate-100 p-2 flex items-center gap-2">
                 <button @click="markAllRead" :disabled="notificationStore.unreadCount === 0 || markingAllRead"
-                  class="flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 transition-all hover:bg-blue-100 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50">
+                  style="color: var(--theme-primary); border-color: var(--theme-primary);"
+                  class="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border bg-white px-3 py-2 text-sm font-medium transition-all hover:bg-slate-50 hover:shadow-md active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2 12.5l4.5 4.5L15 8.5M9.5 16.5l1 1L22 6" />
                   </svg>
                   {{ $t('notifications.markAllRead') || 'Mark all read' }}
                 </button>
                 <router-link :to="{ name: 'notifications' }" @click="notificationMenuOpen = false"
-                  class="theme-btn-primary flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all hover:shadow-md active:scale-[0.97]">
+                  class="theme-btn-primary flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all hover:shadow-md active:scale-[0.97]">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
