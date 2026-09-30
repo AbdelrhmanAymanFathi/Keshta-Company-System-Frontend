@@ -73,14 +73,10 @@
           <div v-if="notificationMenuOpen"
             class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100"
             :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
-            <div class="w-80 animate-fade-in rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
+            <div class="w-96 max-w-[calc(100vw-1.5rem)] animate-fade-in rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
               <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                 <span class="text-sm font-semibold theme-text-primary">{{ $t('notifications.title') || 'Notifications' }}</span>
                 <div class="flex items-center gap-2">
-                  <button v-if="notificationStore.unreadCount > 0" @click="markAllRead"
-                    class="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors">
-                    {{ $t('notifications.markAllRead') || 'Mark all read' }}
-                  </button>
                   <button @click="notificationMenuOpen = false" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -88,7 +84,7 @@
                   </button>
                 </div>
               </div>
-              <div v-if="notifLoading" class="flex items-center justify-center py-8">
+              <div v-if="notifLoading && notifItems.length === 0" class="flex items-center justify-center py-8">
                 <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -123,9 +119,16 @@
                   </div>
                 </div>
               </div>
-              <div class="border-t border-slate-100 p-2">
+              <div class="border-t border-slate-100 p-2 flex items-center gap-2">
+                <button @click="markAllRead" :disabled="notificationStore.unreadCount === 0 || markingAllRead"
+                  class="flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 transition-all hover:bg-blue-100 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2 12.5l4.5 4.5L15 8.5M9.5 16.5l1 1L22 6" />
+                  </svg>
+                  {{ $t('notifications.markAllRead') || 'Mark all read' }}
+                </button>
                 <router-link :to="{ name: 'notifications' }" @click="notificationMenuOpen = false"
-                  class="theme-btn-primary flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all hover:shadow-md active:scale-[0.97]">
+                  class="theme-btn-primary flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all hover:shadow-md active:scale-[0.97]">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
@@ -430,6 +433,7 @@ export default {
       userMenuOpen: false,
       notificationMenuOpen: false,
       notifLoading: false,
+      markingAllRead: false,
       notifItems: [],
       isMobile: window.innerWidth < 768,
       reports: []
@@ -735,7 +739,7 @@ export default {
     },
     toggleNotificationMenu() {
       this.notificationMenuOpen = !this.notificationMenuOpen
-      if (this.notificationMenuOpen && this.notifItems.length === 0) {
+      if (this.notificationMenuOpen) {
         this.fetchNotifPreview()
       }
     },
@@ -770,11 +774,15 @@ export default {
       if (route) this.router.push(route)
     },
     async markAllRead() {
+      if (this.markingAllRead) return
+      this.markingAllRead = true
       try {
         await markAllNotificationsRead()
         this.notificationStore.unreadCount = 0
         this.notifItems.forEach(item => { item.isRead = true })
-      } catch { /* ignore */ }
+      } catch { /* ignore */ } finally {
+        this.markingAllRead = false
+      }
     },
     typeColor(type) {
       const map = {
