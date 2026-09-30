@@ -199,7 +199,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" :class="['theme-table-row-hover', { 'row-pending-review': transport.hasPendingApproval }]"
+          <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" :data-focus-id="transport.id" :class="['theme-table-row-hover', { 'row-pending-review': transport.hasPendingApproval }]"
               @contextmenu.prevent="onRowContextMenu($event, transport)">
             <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}
@@ -331,7 +331,7 @@
 
 <script>
 import SortIcon from '@/components/shared/SortIcon.vue'
-import { getTransports, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
+import { getTransports, getTransport, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
@@ -342,6 +342,7 @@ import { TrashIcon } from '@acme/icon-packs/legacy'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
+import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
 export default {
   name: 'TransportList',
@@ -416,9 +417,16 @@ export default {
     
   },
 
+  watch: {
+    '$route.query.focus'() {
+      this.openFocusedTransport()
+    }
+  },
+
   async mounted() {
     await this.loadFilterData()
     await this.loadTransports()
+    this.openFocusedTransport()
     document.addEventListener('click', this.closeContextMenu)
     this.__realtimeUnsub = realtimeService.subscribe('transport', ['transport_created', 'transport_updated', 'transport_deleted'], debounce(() => { this.loadTransports() }, 300))
   },
@@ -650,6 +658,24 @@ export default {
       //   return `${transport.vehicleCubicCapacity} م³`
       // }
       return '-'
+    },
+
+    // Opened from a notification: flash the row if it's on this page, otherwise open it for editing
+    async openFocusedTransport() {
+      const id = getFocusId(this.$route)
+      if (!id) return
+      clearFocusQuery(this.$router, this.$route)
+      if (this.transports.some(t => Number(t.id) === id)) {
+        this.$nextTick(() => highlightRow(id))
+        return
+      }
+      try {
+        const { data } = await getTransport(id)
+        if (!data?.id) return notifyFocusMissing()
+        this.editTransport(data)
+      } catch {
+        notifyFocusMissing()
+      }
     },
 
     editTransport(transport) {

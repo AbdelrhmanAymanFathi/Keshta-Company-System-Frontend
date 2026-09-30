@@ -218,7 +218,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" :class="approvalRowClass(expense)" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
+          <tr v-for="(expense, index) in filteredExpenses" :key="expense.id" :data-focus-id="expense.id" :class="approvalRowClass(expense)" @contextmenu.prevent="showExpenseContextMenu($event, expense)">
             <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
             <td>{{ formatDate(expense.date) }}</td>
             <td>
@@ -281,6 +281,7 @@
       <div
         v-for="expense in filteredExpenses"
         :key="expense.id"
+        :data-focus-id="expense.id"
         class="border-b border-slate-100 last:border-b-0 p-4"
         :class="approvalRowClass(expense)"
         @contextmenu.prevent="showExpenseContextMenu($event, expense)"
@@ -786,6 +787,7 @@
 <script>
 import {
   getExpenses,
+  getExpense,
   getExpenseCategories,
   createExpenseCategory,
   createExpenseSubCategory,
@@ -807,6 +809,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
+import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
 export default {
   emits: ["navigateReport", "navigateStatement"],
@@ -1100,6 +1103,9 @@ rows: [],
   },
   
   watch: {
+    '$route.query.focus'() {
+      this.openFocusedExpense()
+    },
     searchQuery() {
       this.currentPage = 1
       clearTimeout(this.searchDebounceTimer)
@@ -1180,6 +1186,7 @@ rows: [],
     await this.fetchLocations()
     await this.fetchTreasuries()
     await this.fetchContractors()
+    this.openFocusedExpense()
     this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], debounce(() => { this.loadExpenses() }, 300))
     this.__approvalsUnsub = realtimeService.subscribe('approvals', ['approval_created', 'approval_completed', 'approval_rejected'], debounce((event, data) => {
       if (!data?.module || data.module === 'EXPENSE') this.loadExpenses()
@@ -1192,6 +1199,23 @@ rows: [],
   },
   
   methods: {
+    // Opened from a notification: flash the row if it's on this page, otherwise open it for editing
+    async openFocusedExpense() {
+      const id = getFocusId(this.$route)
+      if (!id) return
+      clearFocusQuery(this.$router, this.$route)
+      if (this.filteredExpenses.some(e => Number(e.id) === id)) {
+        this.$nextTick(() => highlightRow(id))
+        return
+      }
+      try {
+        const { data } = await getExpense(id)
+        if (!data?.id) return notifyFocusMissing()
+        this.openEditModal(data)
+      } catch {
+        notifyFocusMissing()
+      }
+    },
     async fetchTreasuries() {
       try {
         const response = await getTreasuries({ includeArchived: false })

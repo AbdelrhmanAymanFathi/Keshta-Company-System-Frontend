@@ -212,7 +212,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
-          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" :class="['theme-table-row-hover', { 'row-pending-review': supply.hasPendingApproval }]" @contextmenu.prevent="onRowContextMenu($event, supply)">
+          <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" :data-focus-id="supply.id" :class="['theme-table-row-hover', { 'row-pending-review': supply.hasPendingApproval }]" @contextmenu.prevent="onRowContextMenu($event, supply)">
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
@@ -487,7 +487,7 @@
 
 <script>
 import SortIcon from '@/components/shared/SortIcon.vue'
-import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles, updateExport } from '../../../api'
+import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles, updateExport, getExport } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import TableModal from './SuppliesCreationModal.vue'
 import Pagination from '../../shared/Pagination.vue'
@@ -499,6 +499,7 @@ import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
+import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
 export default {
   name: 'SuppliesList',
@@ -566,6 +567,9 @@ export default {
   },
 
   watch: {
+    '$route.query.focus'() {
+      this.openFocusedSupply()
+    },
     /* payment modal watcher commented out
     showPaymentModal(val) {
       // no-op: placeholder if needed
@@ -615,6 +619,7 @@ export default {
   async mounted() {
     await this.loadFilterData()
     await this.loadSupplies()
+    this.openFocusedSupply()
     // ensure payments modal data is reactive
     /* paymentTarget watcher commented out
     this.$watch(() => this.paymentTarget, (nv) => {}, { deep: true })
@@ -870,6 +875,24 @@ formatDate(dateString) {
         return (capacity * unitPrice) - discount
       } catch (e) {
         return 0
+      }
+    },
+
+    // Opened from a notification: flash the row if it's on this page, otherwise open it for editing
+    async openFocusedSupply() {
+      const id = getFocusId(this.$route)
+      if (!id) return
+      clearFocusQuery(this.$router, this.$route)
+      if (this.supplies.some(s => Number(s.id) === id)) {
+        this.$nextTick(() => highlightRow(id))
+        return
+      }
+      try {
+        const { data } = await getExport(id)
+        if (!data?.id) return notifyFocusMissing()
+        this.openEdit(data)
+      } catch {
+        notifyFocusMissing()
       }
     },
 

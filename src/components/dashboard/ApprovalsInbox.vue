@@ -104,7 +104,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 bg-white">
-            <tr v-for="app in filteredApprovals" :key="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)" @contextmenu.prevent="openRowContextMenu($event, app)">
+            <tr v-for="app in filteredApprovals" :key="app.id" :data-focus-id="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)" @contextmenu.prevent="openRowContextMenu($event, app)">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary text-start">
                 <button @click.stop="openDetailModal(app)" class="text-indigo-600 hover:text-indigo-900 underline font-semibold transition-colors">
                   #{{ app.id }}
@@ -363,6 +363,7 @@ import { useI18n } from 'vue-i18n';
 import { getApprovals, approveRequest, rejectRequest } from '@/api';
 import { useRealtime } from '@/composables/useRealtime';
 import { debounce } from '@/utils/debounce';
+import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord';
 
 export default {
   name: 'ApprovalsInbox',
@@ -507,6 +508,11 @@ export default {
       ];
     }
   },
+  watch: {
+    '$route.query.focus'() {
+      if (!this.loading) this.openFocusedApproval();
+    }
+  },
   mounted() {
     this.loadApprovals();
     this.closeContextMenuHandler = () => {
@@ -540,6 +546,18 @@ export default {
       } finally {
         this.loading = false;
       }
+      this.openFocusedApproval();
+    },
+    // Opened from a notification: switch to the approval's tab, flash its row and open its details
+    openFocusedApproval() {
+      const id = getFocusId(this.$route);
+      if (!id) return;
+      clearFocusQuery(this.$router, this.$route);
+      const app = this.approvals.find(a => Number(a.id) === id);
+      if (!app) return notifyFocusMissing();
+      this.activeStatus = app.status;
+      this.$nextTick(() => highlightRow(id));
+      this.openDetailModal(app);
     },
     getCount(status) {
       return this.approvals.filter(a => a.status === status).length;

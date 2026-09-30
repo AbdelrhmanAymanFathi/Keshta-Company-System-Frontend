@@ -307,7 +307,7 @@
         <!-- <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t(currentLabel) }}</h2> -->
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in" appear>
-            <div :key="$route.fullPath" class="w-full">
+            <div :key="routeViewKey" class="w-full">
               <component
                 :is="Component"
                 @navigate-report="navigateToReport"
@@ -441,6 +441,15 @@ export default {
     }
   },
   computed: {
+    // Like $route.fullPath, but ignores notification deep-link params (?focus, ?treasury)
+    // so clearing them after opening the record doesn't remount the page
+    routeViewKey() {
+      const query = { ...this.$route.query }
+      delete query.focus
+      delete query.treasury
+      const qs = new URLSearchParams(query).toString()
+      return this.$route.path + (qs ? `?${qs}` : '')
+    },
     isRTL() { return this.$i18n?.locale === 'ar' },
     iconTick() {
       return iconRevision.value

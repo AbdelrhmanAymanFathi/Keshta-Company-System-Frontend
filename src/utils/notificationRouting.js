@@ -12,11 +12,30 @@ const routeMap = {
   wallet: 'treasury',
 }
 
+// Types whose list page knows how to open a single record from ?focus=<id>
+const focusableTypes = new Set(['supply', 'transport', 'equipment', 'expense', 'payment', 'approval'])
+
 export function resolveNotificationRoute(item) {
-  const name = routeMap[item.type || item.entityType]
-  if (name) return { name }
-  if (item.route && item.route !== '#' && item.route !== null) {
-    return item.route.startsWith('/') ? item.route : { path: item.route }
+  const type = item.type || item.entityType
+  const id = item.entityId
+
+  // New notifications carry a ready-made frontend route
+  if (typeof item.route === 'string' && item.route.startsWith('/dashboard')) {
+    return item.route
   }
-  return null
+
+  if (type === 'extract' && id && !isDeleteNotification(item)) {
+    return { name: 'extracts-detail', params: { id: String(id) } }
+  }
+
+  const name = routeMap[type]
+  if (!name) return null
+  if (id && focusableTypes.has(type) && !isDeleteNotification(item)) {
+    return { name, query: { focus: String(id) } }
+  }
+  return { name }
+}
+
+function isDeleteNotification(item) {
+  return typeof item.title === 'string' && item.title.includes('حذف')
 }

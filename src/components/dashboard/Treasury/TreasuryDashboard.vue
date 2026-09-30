@@ -237,6 +237,7 @@
             <tbody class="divide-y divide-gray-100 bg-white/70">
               <template v-for="tx in visibleTransactions" :key="tx.id">
               <tr
+                :data-focus-id="tx.id"
                 class="transition hover:theme-hover-soft cursor-pointer"
                 :class="expandedTxId === tx.id ? 'bg-indigo-50/40' : ''"
                 @click="toggleExpand(tx)"
@@ -548,8 +549,9 @@
 </template>
 
 <script>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { getFocusId, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
@@ -1129,7 +1131,34 @@ export default {
       } catch (err) {
         console.error('[TreasuryDashboard] onMounted error:', err)
       }
+      openFocusedTransaction()
     })
+
+    // Opened from a notification (?treasury=<id>&focus=<txId>): select the treasury,
+    // then flash and expand the transaction
+    const route = useRoute()
+    const openFocusedTransaction = async () => {
+      const treasuryId = Number(route.query.treasury) || null
+      const txId = getFocusId(route)
+      if (!treasuryId && !txId) return
+      const rest = { ...route.query }
+      delete rest.treasury
+      delete rest.focus
+      router.replace({ query: rest }).catch(() => {})
+      if (treasuryId && Number(store.selectedTreasuryId) !== treasuryId) {
+        store.transactions.page = 1
+        await selectTreasury(treasuryId)
+      } else if (txId && store.transactions.page !== 1) {
+        store.transactions.page = 1
+        await reloadSelected()
+      }
+      if (!txId) return
+      const tx = visibleTransactions.value.find(t => Number(t.id) === txId)
+      if (!tx) return notifyFocusMissing()
+      if (expandedTxId.value !== tx.id) toggleExpand(tx)
+      nextTick(() => highlightRow(txId))
+    }
+    watch(() => [route.query.treasury, route.query.focus], openFocusedTransaction)
 
     return {
       store,

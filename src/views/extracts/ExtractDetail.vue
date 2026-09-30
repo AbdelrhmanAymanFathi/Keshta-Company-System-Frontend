@@ -27,12 +27,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { getExtract } from '@/services/extracts'
 
 const route = useRoute()
-const id = route.params.id
 const extract = ref(null)
 const isLoading = ref(false)
 const error = ref(null)
@@ -56,9 +55,11 @@ function formatItemWithUnit(item) {
   return `${name} (${unitName})`
 }
 
-onMounted(async () => {
+// Watch the id so navigating from one extract to another (e.g. via a notification) reloads
+watch(() => route.params.id, async (id) => {
   if (!id) return
   isLoading.value = true
+  error.value = null
   try {
     extract.value = await getExtract(id)
   } catch (e) {
@@ -66,5 +67,5 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
-})
+}, { immediate: true })
 </script>

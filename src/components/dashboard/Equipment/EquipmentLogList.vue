@@ -242,7 +242,7 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="rental in filteredItems" :key="rental.id" :class="['theme-table-row-hover', { 'row-pending-review': rental.hasPendingApproval }]"
+              <tr v-for="rental in filteredItems" :key="rental.id" :data-focus-id="rental.id" :class="['theme-table-row-hover', { 'row-pending-review': rental.hasPendingApproval }]"
                 @contextmenu.prevent="openContextMenu($event, rental)">
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   {{ formatDate(rental.date) }}
@@ -540,7 +540,9 @@ import SortIcon from '@/components/shared/SortIcon.vue'
 import EquipmentLogDetail from './EquipmentLogDetail.vue'
 import Badge from '../../shared/Badge.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
-import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers, getLocations } from '@/api'
+import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers, getLocations, getRental } from '@/api'
+import { useRoute, useRouter } from 'vue-router'
+import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 import EquipmentLogCreationModal from './EquipmentLogCreationModal.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import DateField from '../../shared/DateField.vue'
@@ -1077,6 +1079,27 @@ export default {
       showDetailModal.value = true
     }
 
+    // Opened from a notification: flash the row if it's on this page, otherwise open its details
+    const route = useRoute()
+    const router = useRouter()
+    const openFocusedLog = async () => {
+      const id = getFocusId(route)
+      if (!id) return
+      clearFocusQuery(router, route)
+      if (filteredItems.value.some(r => Number(r.id) === id)) {
+        nextTick(() => highlightRow(id))
+        return
+      }
+      try {
+        const { data } = await getRental(id)
+        if (!data?.id) return notifyFocusMissing()
+        openDetailModal(data)
+      } catch {
+        notifyFocusMissing()
+      }
+    }
+    watch(() => route.query.focus, openFocusedLog)
+
     const closeDetailModal = () => {
       showDetailModal.value = false
       selectedRentalForDetail.value = null
@@ -1324,7 +1347,7 @@ export default {
     }
 
     onMounted(() => {
-      equipmentLogsStore.fetchRentals()
+      Promise.resolve(equipmentLogsStore.fetchRentals()).finally(openFocusedLog)
       updateTableScrollVisibility()
       window.addEventListener('resize', updateTableScrollVisibility)
       document.addEventListener('click', closeContextMenu)

@@ -185,7 +185,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-          <tr v-for="(payment, index) in filteredPayments" :key="payment.id || index">
+          <tr v-for="(payment, index) in filteredPayments" :key="payment.id || index" :data-focus-id="payment.id">
             <td class="px-4 py-3 theme-text-primary">{{ index + 1 }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ formatDate(paymentDate(payment)) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentSite(payment) }}</td>
@@ -208,9 +208,9 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs } from '@/api'
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
 import DateField from '@/components/shared/DateField.vue'
@@ -218,6 +218,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
+import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
 const normalizeList = (payload) => {
   if (Array.isArray(payload)) return payload
@@ -393,7 +394,22 @@ export default {
       } finally {
         loading.value = false
       }
+      focusPayment()
     }
+
+    // Opened from a notification: flash the payment's row
+    const route = useRoute()
+    const focusPayment = () => {
+      const id = getFocusId(route)
+      if (!id || loading.value) return
+      clearFocusQuery(router, route)
+      if (filteredPayments.value.some(p => Number(p.id) === id)) {
+        nextTick(() => highlightRow(id))
+      } else {
+        notifyFocusMissing()
+      }
+    }
+    watch(() => route.query.focus, focusPayment)
 
     useRealtime({
       channel: 'payments',
