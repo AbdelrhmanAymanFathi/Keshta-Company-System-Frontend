@@ -134,8 +134,8 @@
             </select>
             <p class="mt-1 text-xs text-slate-500">
               {{ isRTL
-                ? 'إذا اخترت خزينة، سيُخصم المبلغ منها تلقائياً ويُضاف لحساب المقاول.'
-                : 'If selected, the amount will be atomically deducted from that treasury.' }}
+                ? 'إذا اخترت خزينة، يُعتبر المبلغ دفعة للمقاول: يُخصم من الخزينة ومن المستحق للمقاول (مدين).'
+                : 'If selected, the amount is a payment to the contractor: deducted from that treasury and from the amount owed (debit).' }}
             </p>
           </label>
 
@@ -149,7 +149,7 @@
             </div>
             <div class="flex justify-between">
               <span class="text-slate-500">{{ isRTL ? 'حساب المقاول' : 'Contractor Account' }}</span>
-              <span class="font-bold text-emerald-600">+{{ Number(deposit.amount).toLocaleString('en-US', {minimumFractionDigits:2}) }}</span>
+              <span class="font-bold text-red-600">−{{ Number(deposit.amount).toLocaleString('en-US', {minimumFractionDigits:2}) }}</span>
             </div>
           </div>
         </div>

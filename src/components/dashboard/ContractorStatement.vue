@@ -150,11 +150,11 @@
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</p>
-        <p class="text-lg font-semibold" :class="getAmountClass(totalDebits, 'text-green-600')">{{ formatCurrency(totalDebits) }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(totalDebits, 'theme-text')">{{ formatCurrency(totalDebits) }}</p>
       </div>
       <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
         <p class="text-xs theme-text-secondary mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</p>
-        <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'theme-text')">{{ formatCurrency(totalCredits) }}</p>
+        <p class="text-lg font-semibold" :class="getAmountClass(totalCredits, 'text-green-600')">{{ formatCurrency(totalCredits) }}</p>
       </div>
       <!-- <div class="bg-white rounded-lg shadow p-4">
         <p class="text-xs theme-text-secondary mb-1">{{ $t('contractors.totalEarnings') }}</p>
@@ -321,10 +321,10 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
               <td class="px-6 py-4 text-sm theme-text-primary">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'text-green-600')">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'theme-text')">
                 {{ formatCurrency(getRowDebit(row)) }}
               </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'theme-text')">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'text-green-600')">
               {{ formatCurrency(getRowCredit(row)) }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'theme-text')">
