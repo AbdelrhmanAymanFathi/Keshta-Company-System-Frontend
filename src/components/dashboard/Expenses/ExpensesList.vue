@@ -1570,9 +1570,16 @@ rows: [],
       row.subCategoryId = terms.subCategoryId
       row.subCategorySearch = terms.subCategoryName
       // تحديد نوع البند الفرعي لما بنفتح للتعديل
-      if (terms.subCategoryId && (this.contractors || []).some(c => Number(c.id) === Number(terms.subCategoryId))) {
+      // المقاول كبند فرعي بيتحفظ كـ contractorId من غير subCategoryId (شوف buildExpensePayload)
+      const expenseContractorId = expense.contractorId || expense.contractor?.id || null
+      if (!terms.subCategoryId && expenseContractorId) {
+        const contractor = (this.contractors || []).find(c => Number(c.id) === Number(expenseContractorId))
         row._subItemType = 'contractor'
-        row._contractorRawId = terms.subCategoryId
+        row._contractorRawId = expenseContractorId
+        row.subCategoryId = expenseContractorId
+        row.subCategorySearch = contractor?.name || expense.contractor?.name || expense.contractorName || ''
+        const module = this.systemModuleItems.find(m => m.name === terms.categoryName)
+        if (module) row.categoryId = module.id
       } else if (terms.subCategoryId) {
         row._subItemType = 'expensesub'
         row._contractorRawId = null
