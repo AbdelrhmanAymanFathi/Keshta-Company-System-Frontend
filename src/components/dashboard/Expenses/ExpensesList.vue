@@ -62,12 +62,12 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.mainTerm') }}</label>
           <SearchDropdown
             v-model="filterCategorySearch"
-            :items="expenseCategories"
-            :allItems="expenseCategories"
+            :items="filterMainTermItems"
+            :allItems="filterMainTermItems"
             :placeholder="$t('expenses.searchMainTerm')"
             clearable
-            @select="(sel) => { selectedCategoryId = sel.id; filterCategorySearch = sel.name; selectedSubcategoryId = null; filterSubcategorySearch = '' }"
-            @clear="() => { selectedCategoryId = null; filterCategorySearch = ''; selectedSubcategoryId = null; filterSubcategorySearch = '' }"
+            @select="onSelectFilterMainTerm"
+            @clear="onClearFilterMainTerm"
           />
         </div>
 
@@ -76,12 +76,12 @@
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('expenses.subTerm') }}</label>
           <SearchDropdown
             v-model="filterSubcategorySearch"
-            :items="filterSubcategories"
-            :allItems="filterSubcategories"
+            :items="filterSubTermItems"
+            :allItems="filterSubTermItems"
             :placeholder="$t('expenses.searchSubTerm')"
             clearable
-            @select="(sel) => { selectedSubcategoryId = sel.id; filterSubcategorySearch = sel.name }"
-            @clear="() => { selectedSubcategoryId = null; filterSubcategorySearch = '' }"
+            @select="onSelectFilterSubTerm"
+            @clear="() => { selectedSubcategoryId = null; selectedContractorId = null; filterSubcategorySearch = '' }"
           />
         </div>
 
@@ -831,6 +831,10 @@ export default {
       searchDebounceTimer: null,
       selectedCategoryId: null,
       selectedSubcategoryId: null,
+      // البند الرئيسي كموديول (سجل المعدات/النقل/...) → بيتحفظ كاسم في category
+      selectedModuleName: null,
+      // البند الفرعي كمقاول → بيتحفظ كـ contractorId
+      selectedContractorId: null,
       selectedLocationId: null,
       selectedTreasuryId: null,
       selectedPaymentMethod: '',
@@ -1020,6 +1024,23 @@ rows: [],
       })
     },
 
+    // البند الرئيسي في الفلتر: الموديولات (سجل المعدات/النقل/...) + بنود المصروفات
+    filterMainTermItems() {
+      const modules = this.systemModuleItems.map(m => ({ id: `module__${m.id}`, name: m.name, _moduleId: m.id }))
+      return [...modules, ...(this.expenseCategories || [])]
+    },
+
+    // البند الفرعي في الفلتر: المقاولين (مفلترين حسب الموديول لو متحدد) + البنود الفرعية
+    filterSubTermItems() {
+      const module = this.systemModuleItems.find(m => m.name === this.selectedModuleName)
+      const contractors = (this.contractors || [])
+        .filter(c => !module || this.contractorFitsModule(c, module.id))
+        .map(c => ({ id: `contractor__${c.id}`, name: c.name, _contractorId: c.id }))
+      if (module) return contractors
+      if (this.selectedCategoryId) return this.filterSubcategories
+      return [...contractors, ...this.filterSubcategories]
+    },
+
     // Subcategories for modal form (based on selected form category)
     formSubcategories() {
       if (!this.form.categoryId) return []
@@ -1067,6 +1088,12 @@ rows: [],
       if (this.selectedSubcategoryId) {
         const ids = this.sameNameSubcategoryIds(this.selectedSubcategoryId, this.selectedCategoryId).map(Number)
         filtered = filtered.filter(expense => ids.includes(Number(expense.subCategoryId ?? expense.subCategoryId)))
+      }
+      if (this.selectedModuleName) {
+        filtered = filtered.filter(expense => (expense.categoryRef?.name || expense.category) === this.selectedModuleName)
+      }
+      if (this.selectedContractorId) {
+        filtered = filtered.filter(expense => Number(expense.contractorId) === Number(this.selectedContractorId))
       }
       if (this.selectedKind) {
         filtered = filtered.filter(expense => expense.kind === this.selectedKind)
@@ -1127,6 +1154,14 @@ rows: [],
       this.loadExpenses()
     },
     selectedSubcategoryId() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedModuleName() {
+      this.currentPage = 1
+      this.loadExpenses()
+    },
+    selectedContractorId() {
       this.currentPage = 1
       this.loadExpenses()
     },
@@ -1268,6 +1303,8 @@ rows: [],
           params.categoryId = this.selectedCategoryId
         }
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
+        if (this.selectedModuleName) params.category = this.selectedModuleName
+        if (this.selectedContractorId) params.contractorId = this.selectedContractorId
         if (this.selectedLocationId !== null && this.selectedLocationId !== undefined) params.locationId = this.selectedLocationId
         if (this.selectedTreasuryId !== null && this.selectedTreasuryId !== undefined) params.treasuryId = this.selectedTreasuryId
         if (this.selectedPaymentMethod) params.paymentMethod = this.selectedPaymentMethod
@@ -1774,8 +1811,50 @@ rows: [],
       return list
     },
 
+    contractorFitsModule(contractor, moduleId) {
+      if (moduleId === 'transport') return !!contractor.availableForTransports
+      if (moduleId === 'extracts')  return !!contractor.availableForExtracts || !!contractor.availableForExports
+      if (moduleId === 'supplies')  return !!contractor.availableForSupplies || !!contractor.availableForExports
+      if (moduleId === 'equipment') return !!contractor.availableForRentals || !!contractor.availableForEquipmentRental
+      return true
+    },
+
+    onSelectFilterMainTerm(sel) {
+      if (sel._moduleId) {
+        this.selectedModuleName = sel.name
+        this.selectedCategoryId = null
+      } else {
+        this.selectedModuleName = null
+        this.selectedCategoryId = sel.id
+      }
+      this.filterCategorySearch = sel.name
+      this.selectedSubcategoryId = null
+      this.selectedContractorId = null
+      this.filterSubcategorySearch = ''
+    },
+
+    onClearFilterMainTerm() {
+      this.selectedCategoryId = null
+      this.selectedModuleName = null
+      this.filterCategorySearch = ''
+      this.selectedSubcategoryId = null
+      this.selectedContractorId = null
+      this.filterSubcategorySearch = ''
+    },
+
+    onSelectFilterSubTerm(sel) {
+      if (sel._contractorId) {
+        this.selectedSubcategoryId = null
+        this.selectedContractorId = sel._contractorId
+      } else {
+        this.selectedContractorId = null
+        this.selectedSubcategoryId = sel.id
+      }
+      this.filterSubcategorySearch = sel.name
+    },
+
     resolveSubcategoryFilterFromSearch() {
-      if (this.selectedSubcategoryId != null) return
+      if (this.selectedSubcategoryId != null || this.selectedContractorId != null) return
       const query = this.normalizeTermName(this.filterSubcategorySearch)
       if (!query) return
       // لو البند الرئيسي متحدد → ابحث داخله بس عشان ما نختارش نفس الاسم من بند رئيسي تاني
@@ -2318,6 +2397,8 @@ rows: [],
       this.amountSearch = ''
       this.selectedCategoryId = null
       this.selectedSubcategoryId = null
+      this.selectedModuleName = null
+      this.selectedContractorId = null
       this.selectedLocationId = null
       this.selectedTreasuryId = null
       this.selectedPaymentMethod = ''
@@ -2460,6 +2541,8 @@ rows: [],
         if (this.amountSearch) params.amountSearch = String(this.amountSearch).trim()
         if (this.selectedCategoryId !== null && this.selectedCategoryId !== undefined) params.categoryId = this.selectedCategoryId
         if (this.selectedSubcategoryId !== null && this.selectedSubcategoryId !== undefined) params.subCategoryId = this.selectedSubcategoryId
+        if (this.selectedModuleName) params.category = this.selectedModuleName
+        if (this.selectedContractorId) params.contractorId = this.selectedContractorId
         if (this.filters?.settlementDateStart) params.settlementDateStart = this.filters.settlementDateStart
         if (this.filters?.settlementDateEnd) params.settlementDateEnd = this.filters.settlementDateEnd
         if (this.selectedKind) params.kind = this.selectedKind
