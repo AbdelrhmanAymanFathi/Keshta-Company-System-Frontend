@@ -207,6 +207,7 @@
     "addItem": "إضافة بند"
   },
   "labels": {
+    "saveChanges": "حفظ التعديلات",
     "system": "النظام",
     "module": "الوحدة",
     "signOut": "تسجيل الخروج",

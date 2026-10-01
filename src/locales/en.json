@@ -206,6 +206,7 @@
     "addItem": "Add Item"
   },
   "labels": {
+    "saveChanges": "Save Changes",
     "system": "System",
     "module": "Module",
     "signOut": "Sign Out",
