@@ -765,6 +765,7 @@
       "vehicleCapacity": "Vehicle Capacity",
       "distanceKm": "Distance Km",
       "numTrips": "Num Trips",
+      "totalQuantity": "Total Quantity",
       "total": "Total",
       "amount": "Amount",
       "paymentMethod": "Payment Method",

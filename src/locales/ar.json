@@ -771,6 +771,7 @@
       "vehicleCapacity": "سعة المركبة",
       "distanceKm": "المسافة (كم)",
       "numTrips": "عدد الرحلات",
+      "totalQuantity": "إجمالي الكمية",
       "total": "المجموع",
       "amount": "المبلغ",
       "paymentMethod": "طريقة الدفع",
