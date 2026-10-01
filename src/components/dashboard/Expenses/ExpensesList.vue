@@ -479,7 +479,7 @@
                             <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:10rem">{{ $t('expenses.mainTerm') }}</th>
                             <th class="expense-column-category px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:9rem">{{ $t('expenses.location') }}</th>
                             <th class="expense-column-notes px-2 py-2 text-start text-xs font-medium theme-text-secondary" style="min-width:8rem">{{ $t('expenses.notes') }}</th>
-                            <th class="expense-column-settlement px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:7.5rem;width:7.5rem">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
+                            <th class="expense-column-settlement px-2 py-2 text-start text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:8rem;width:8rem">{{ $t('expenses.settlementDate') || 'تاريخ التسوية' }}</th>
                             <th class="actions-col px-2 py-2 text-center text-xs font-medium theme-text-secondary whitespace-nowrap" style="min-width:5rem;width:5rem">{{ $t('expenses.actions') }}</th>
                           </tr>
                         </thead>
@@ -577,9 +577,13 @@
                                 @keydown.tab="handleFieldNavigation(index, 'notes', $event)"
                               ></textarea>
                             </td>
-                            <!-- Settlement Date (Static from Step 1) -->
-                            <td class="expense-column-settlement px-2 py-2 text-sm theme-text-secondary whitespace-nowrap align-middle" style="min-width:7.5rem">
-                              {{ formatDate(form.settlementDate || form.date) }}
+                            <!-- Settlement Date (defaults to Step 1, editable per row) -->
+                            <td class="expense-column-settlement px-2 py-2" style="min-width:8rem">
+                              <DateField
+                                v-model="row.settlementDate"
+                                class="w-full min-w-[8rem] border border-gray-300 rounded-lg px-2 py-2 text-sm theme-input-focus"
+                                :class="isRTL ? 'text-right' : 'text-left'"
+                              />
                             </td>
                             <td class="actions-col px-1 py-2 text-center" style="min-width:5rem;width:5rem">
                               <div class="flex justify-center gap-1">
@@ -1197,6 +1201,12 @@ rows: [],
       this.currentPage = 1
       this.loadExpenses()
     },
+    // تاريخ التسوية في الخطوة الأولى بيمشي على البنود اللي لسه ماخدتش تاريخ تسوية خاص بيها
+    'form.settlementDate'(newDate, oldDate) {
+      (this.rows || []).forEach(row => {
+        if (!row.settlementDate || row.settlementDate === oldDate) row.settlementDate = newDate
+      })
+    },
     modalStep(newStep) {
       if (newStep === 2) {
         this.$nextTick(() => {
@@ -1763,6 +1773,7 @@ rows: [],
         paymentMethod: 'CASH',
         paymentMethodSearch: 'نقداً',
         date: rowDate,
+        settlementDate: prevRow?.settlementDate || this.form?.settlementDate || rowDate,
         notes: rowNotes
       }
     },
@@ -2098,7 +2109,7 @@ rows: [],
     buildExpensePayload(row) {
       const amount = parseFloat(String(row.amount || '').replace(/,/g, ''))
       const rowExpenseDate = row.date || getTodayISO()
-      const rowSettlementDate = this.form.settlementDate || this.form.date || getTodayISO()
+      const rowSettlementDate = row.settlementDate || this.form.settlementDate || this.form.date || getTodayISO()
       // لو البند الفرعي مقاول → subCategoryId = undefined، contractorId = الـ ID الحقيقي
       // لو البند الفرعي من المصروفات → subCategoryId = الـ ID الحقيقي، contractorId من المصروف الأصلي (في التعديل) أو من الـ form العلوي
       const isContractorRow = row._subItemType === 'contractor'
@@ -2830,7 +2841,7 @@ rows: [],
 .expense-rows-table :deep(.expense-column-description) { width: 10rem; min-width: 9rem; }
 .expense-rows-table :deep(.expense-column-category)    { width: 10rem; min-width: 9rem; }
 .expense-rows-table :deep(.expense-column-notes)       { width: 8rem;  min-width: 7rem; }
-.expense-rows-table :deep(.expense-column-settlement)  { width: 7.5rem; min-width: 7rem; }
+.expense-rows-table :deep(.expense-column-settlement)  { width: 8rem;  min-width: 8rem; }
 .expense-rows-table :deep(.actions-col)                { width: 5rem;  min-width: 5rem; }
 
 .expense-rows-table :deep(.date-field),
