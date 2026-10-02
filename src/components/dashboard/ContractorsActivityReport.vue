@@ -302,7 +302,22 @@
             <tr v-for="(row, index) in items" :key="index" class="hover:bg-slate-50/50 transition-colors">
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-muted">{{ index + 1 }}</td>
               <td class="px-4 py-4 text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
-              <td class="px-4 py-4 text-sm theme-text-secondary">{{ row.locationName || t('unassignedLocation') }}</td>
+              <td class="px-4 py-4 text-sm theme-text-secondary">
+                <template v-if="row.locationName">{{ row.locationName }}</template>
+                <button
+                  v-else-if="isAdmin && row.contractorId"
+                  type="button"
+                  @click="openPlacement(row)"
+                  :title="t('setLocation')"
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100"
+                >
+                  {{ t('unassignedLocation') }}
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 16.5 9 17l.5-3.5z"/>
+                  </svg>
+                </button>
+                <template v-else>{{ t('unassignedLocation') }}</template>
+              </td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
                 <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
                   {{ t(`modules.${row.module}`) }}
@@ -380,13 +395,76 @@
         </div>
       </div>
     </div>
+
+    <!-- Set the site of entries with no source record (opening balances, manual settlements) -->
+    <div v-if="placement.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closePlacement">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <h4 class="text-base font-bold theme-text-primary">{{ t('setLocation') }} — {{ placement.contractorName }}</h4>
+          <p class="text-xs theme-text-secondary mt-1">{{ t('setLocationHint') }}</p>
+        </div>
+
+        <div class="flex-1 overflow-auto px-6 py-4">
+          <div v-if="placement.loading" class="py-10 text-center text-sm theme-text-secondary">{{ t('loading') }}</div>
+          <p v-else-if="!placement.entries.length" class="py-10 text-center text-sm theme-text-muted">{{ t('noUnplacedEntries') }}</p>
+          <table v-else class="w-full text-sm">
+            <thead>
+              <tr class="text-xs theme-text-muted">
+                <th class="py-2 text-start font-semibold">{{ $t('labels.date') || 'Date' }}</th>
+                <th class="py-2 text-start font-semibold">{{ t('module') }}</th>
+                <th class="py-2 text-start font-semibold">{{ t('entryDescription') }}</th>
+                <th class="py-2 text-start font-semibold">{{ t('amount') }}</th>
+                <th class="py-2 text-start font-semibold">{{ t('location') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr v-for="entry in placement.entries" :key="entry.id">
+                <td class="py-2 whitespace-nowrap">{{ entry.date }}</td>
+                <td class="py-2 whitespace-nowrap">{{ t(`modules.${entry.accountType}`) }}</td>
+                <td class="py-2">{{ isRTL ? entry.arDescription : entry.description }}</td>
+                <td class="py-2 whitespace-nowrap font-medium" :class="entry.signedAmount < 0 ? 'text-rose-600' : 'theme-text-primary'">{{ formatCurrency(entry.signedAmount) }}</td>
+                <td class="py-2">
+                  <select
+                    v-model="placement.choices[entry.id]"
+                    class="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm focus:outline-none theme-input-focus"
+                  >
+                    <option value="">{{ t('unassignedLocation') }}</option>
+                    <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-if="placement.error" class="mt-3 text-sm text-rose-700">{{ placement.error }}</p>
+        </div>
+
+        <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+          <button
+            type="button"
+            @click="closePlacement"
+            class="px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 theme-text-secondary rounded-xl text-sm font-semibold"
+          >
+            {{ t('cancel') }}
+          </button>
+          <button
+            type="button"
+            @click="savePlacement"
+            :disabled="placement.saving || placement.loading || !placement.entries.length"
+            class="px-4 py-2 theme-button rounded-xl text-sm font-semibold theme-text-light disabled:opacity-50"
+          >
+            {{ placement.saving ? t('saving') : t('save') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getContractors, getContractorsActivityReportData, getLocations } from '@/api'
+import { getContractors, getContractorsActivityReportData, getLocations, getContractorUnplacedEntries, setContractorEntryLocation } from '@/api'
+import { useAuth } from '@/composables/useAuth'
 import DateField from '../shared/DateField.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
@@ -397,6 +475,8 @@ export default {
   setup() {
     const { locale } = useI18n()
     const isRTL = computed(() => locale.value === 'ar')
+    const { user } = useAuth()
+    const isAdmin = computed(() => (user.value?.roles || []).some(role => role.roleId === 1))
 
     const loading = ref(false)
     const downloading = ref(false)
@@ -485,6 +565,15 @@ export default {
           area: 'Area',
           allAreas: 'All Areas',
           unassignedLocation: 'Unassigned',
+          setLocation: 'Set location',
+          setLocationHint: 'Opening balances and manual settlements are not linked to a location. Choose the location of each entry.',
+          noUnplacedEntries: 'This contractor has no entries without a location.',
+          entryDescription: 'Description',
+          amount: 'Amount',
+          save: 'Save',
+          saving: 'Saving...',
+          cancel: 'Cancel',
+          saveLocationFailed: 'Failed to save the location',
           actionType: 'Type',
           index: '#',
           name: 'Name',
@@ -529,6 +618,15 @@ export default {
           area: 'المنطقة',
           allAreas: 'كل المناطق',
           unassignedLocation: 'غير محدد',
+          setLocation: 'تحديد الموقع',
+          setLocationHint: 'أرصدة أول المدة والتسويات اليدوية غير مرتبطة بموقع. اختر موقع كل قيد.',
+          noUnplacedEntries: 'لا توجد قيود بدون موقع لهذا المقاول.',
+          entryDescription: 'البيان',
+          amount: 'المبلغ',
+          save: 'حفظ',
+          saving: 'جاري الحفظ...',
+          cancel: 'إلغاء',
+          saveLocationFailed: 'تعذر حفظ الموقع',
           actionType: 'النوع',
           index: 'م',
           name: 'الاسم',
@@ -692,6 +790,44 @@ export default {
       }
     }
 
+    const placement = ref({ open: false, loading: false, saving: false, error: null, contractorId: null, contractorName: '', entries: [], choices: {} })
+
+    const openPlacement = async (row) => {
+      placement.value = { open: true, loading: true, saving: false, error: null, contractorId: row.contractorId, contractorName: row.contractorName, entries: [], choices: {} }
+      try {
+        const { data } = await getContractorUnplacedEntries(row.contractorId)
+        const entries = data.items || []
+        placement.value.entries = entries
+        placement.value.choices = Object.fromEntries(entries.map(e => [e.id, e.locationId ?? '']))
+      } catch (err) {
+        placement.value.error = err.response?.data?.message || t('saveLocationFailed')
+      } finally {
+        placement.value.loading = false
+      }
+    }
+
+    const closePlacement = () => {
+      placement.value.open = false
+    }
+
+    const savePlacement = async () => {
+      const { contractorId, entries, choices } = placement.value
+      const changed = entries.filter(e => (choices[e.id] || null) !== (e.locationId ?? null))
+      placement.value.saving = true
+      placement.value.error = null
+      try {
+        for (const entry of changed) {
+          await setContractorEntryLocation(contractorId, entry.id, choices[entry.id] || null)
+        }
+        placement.value.open = false
+        await loadReport()
+      } catch (err) {
+        placement.value.error = err.response?.data?.message || t('saveLocationFailed')
+      } finally {
+        placement.value.saving = false
+      }
+    }
+
     const setDefaultDates = () => {
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -707,6 +843,11 @@ export default {
 
     return {
       isRTL,
+      isAdmin,
+      placement,
+      openPlacement,
+      closePlacement,
+      savePlacement,
       loading,
       downloading,
       error,

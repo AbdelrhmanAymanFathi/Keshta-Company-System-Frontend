@@ -642,8 +642,15 @@ export const withdrawFromContractorWallet = async (contractorId, data) => {
   return axios.post(`${BASE_URL}/api/contractors/${contractorId}/wallet/withdraw`, payload);
 };
 
+// Contractor entries with no site from a source record (opening balances, manual settlements) — admin only
+export const getContractorUnplacedEntries = (contractorId) =>
+  axios.get(`${BASE_URL}/api/contractors/${contractorId}/unplaced-entries`);
+
+export const setContractorEntryLocation = (contractorId, transactionId, locationId) =>
+  axios.patch(`${BASE_URL}/api/contractors/${contractorId}/unplaced-entries/${transactionId}`, { locationId });
+
 // Contractor Report/Statement
-export const getContractorReportData = async (contractorId, params = {}, format = 'json', mode = null) => {
+export const getContractorReportData =async (contractorId, params = {}, format = 'json', mode = null) => {
   const url = `${BASE_URL}/api/contractors/${contractorId}/report`;
   let axiosParams = { ...params };
   const normalizedMode = normalizeContractorAccountType(mode || params.mode || params.transaction_type);
