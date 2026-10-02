@@ -41,11 +41,11 @@
     <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') || 'Filters' }}</h4>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <!-- Location Selection -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('location') }}</label>
-          <select 
+          <select
             v-model="filters.locationId"
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus"
           >
@@ -55,7 +55,20 @@
             </option>
           </select>
         </div>
-        
+
+        <!-- Area Selection (areas of the selected location) -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('area') }}</label>
+          <select
+            v-model="filters.areaId"
+            :disabled="!areas.length"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed"
+          >
+            <option value="">{{ t('allAreas') }}</option>
+            <option v-for="a in areas" :key="a.id" :value="a.id">{{ a.name }}</option>
+          </select>
+        </div>
+
         <!-- Module Selection -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('module') }}</label>
@@ -238,12 +251,13 @@
       <table v-app-table class="app-table divide-y divide-slate-100 table-auto">
         <colgroup v-if="!isDetailedMode">
           <col style="width: 5%" />
-          <col style="width: 22%" />
+          <col style="width: 20%" />
           <col style="width: 13%" />
-          <col style="width: 15%" />
-          <col style="width: 15%" />
-          <col style="width: 15%" />
-          <col style="width: 15%" />
+          <col style="width: 10%" />
+          <col style="width: 13%" />
+          <col style="width: 13%" />
+          <col style="width: 13%" />
+          <col style="width: 13%" />
         </colgroup>
         <colgroup v-else>
           <col style="width: 5%" />
@@ -262,6 +276,7 @@
           <tr v-if="!isDetailedMode">
             <th data-col="hide-mobile" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('index') }}</th>
             <th data-col="title" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('name') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('location') }}</th>
             <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('item') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('due') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('workDuringPeriod') }}</th>
@@ -287,6 +302,7 @@
             <tr v-for="(row, index) in items" :key="index" class="hover:bg-slate-50/50 transition-colors">
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-muted">{{ index + 1 }}</td>
               <td class="px-4 py-4 text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
+              <td class="px-4 py-4 text-sm theme-text-secondary">{{ row.locationName || t('unassignedLocation') }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
                 <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
                   {{ t(`modules.${row.module}`) }}
@@ -322,7 +338,7 @@
         </tbody>
         <tbody v-else>
           <tr>
-            <td :colspan="isDetailedMode ? 11 : 7" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
+            <td :colspan="isDetailedMode ? 11 : 8" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
               {{ t('noData') }}
             </td>
           </tr>
@@ -398,6 +414,7 @@ export default {
       contractorId: '',
       module: '',
       locationId: '',
+      areaId: '',
       startDate: '',
       endDate: '',
       onlyAddedAndReversals: false,
@@ -419,6 +436,15 @@ export default {
       set(val) {
         filters.value.reportVariant = val ? 'detailed' : 'simple'
       }
+    })
+
+    const areas = computed(() => {
+      const location = locations.value.find(l => l.id === filters.value.locationId)
+      return Array.isArray(location?.children) ? location.children : []
+    })
+
+    watch(() => filters.value.locationId, () => {
+      filters.value.areaId = ''
     })
 
     watch(() => filters.value.module, async (newVal) => {
@@ -456,14 +482,17 @@ export default {
           totals: 'Totals',
           location: 'Location',
           allLocations: 'All Locations',
+          area: 'Area',
+          allAreas: 'All Areas',
+          unassignedLocation: 'Unassigned',
           actionType: 'Type',
           index: '#',
           name: 'Name',
           item: 'Item',
-          due: 'Due',
+          due: 'Opening Balance',
           workDuringPeriod: 'Work During Period',
           paidDuringPeriod: 'Paid During Period',
-          totalDue: 'Total Due',
+          totalDue: 'Due',
           modules: {
             SUPPLY: 'Supply',
             TRANSPORT: 'Transport',
@@ -497,14 +526,17 @@ export default {
           totals: 'الإجماليات',
           location: 'الموقع',
           allLocations: 'كل المواقع',
+          area: 'المنطقة',
+          allAreas: 'كل المناطق',
+          unassignedLocation: 'غير محدد',
           actionType: 'النوع',
           index: 'م',
           name: 'الاسم',
           item: 'البند',
-          due: 'المستحق',
-          workDuringPeriod: 'اجمالي الأعمال خلال الفترة',
-          paidDuringPeriod: 'الواصل خلال الفترة',
-          totalDue: 'اجمالي المستحق',
+          due: 'رصيد أول المدة',
+          workDuringPeriod: 'الأعمال خلال المدة',
+          paidDuringPeriod: 'المسدد خلال الفترة',
+          totalDue: 'المستحق',
           modules: {
             SUPPLY: 'توريدات',
             TRANSPORT: 'نقل',
@@ -579,6 +611,7 @@ export default {
         contractorId: '',
         module: '',
         locationId: '',
+        areaId: '',
         startDate: '',
         endDate: '',
         onlyAddedAndReversals: false,
@@ -679,6 +712,7 @@ export default {
       error,
       contractors,
       locations,
+      areas,
       items,
       totals,
       duesTotals,
