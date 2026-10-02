@@ -237,14 +237,13 @@
     <div v-else class="bg-white border border-slate-100 shadow-sm rounded-2xl">
       <table v-app-table class="app-table divide-y divide-slate-100 table-auto">
         <colgroup v-if="!isDetailedMode">
+          <col style="width: 5%" />
+          <col style="width: 22%" />
+          <col style="width: 13%" />
           <col style="width: 15%" />
-          <col style="width: 10%" />
-          <col style="width: 25%" />
-          <col style="width: 10%" />
-          <col style="width: 10%" />
-          <col style="width: 10%" />
-          <col style="width: 10%" />
-          <col style="width: 10%" />
+          <col style="width: 15%" />
+          <col style="width: 15%" />
+          <col style="width: 15%" />
         </colgroup>
         <colgroup v-else>
           <col style="width: 5%" />
@@ -261,14 +260,13 @@
         </colgroup>
         <thead class="bg-slate-50">
           <tr v-if="!isDetailedMode">
-            <th data-col="title" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('description') || 'Description' }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingBefore') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalPaid') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalOfWork') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('outstandingAfter') }}</th>
-            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('notes') }}</th>
+            <th data-col="hide-mobile" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('index') }}</th>
+            <th data-col="title" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('name') }}</th>
+            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('item') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('due') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('workDuringPeriod') }}</th>
+            <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('paidDuringPeriod') }}</th>
+            <th data-col="amount" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('totalDue') }}</th>
           </tr>
           <tr v-else>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">ID</th>
@@ -287,18 +285,17 @@
         <tbody class="bg-white divide-y divide-slate-100" v-if="items.length">
           <template v-if="!isDetailedMode">
             <tr v-for="(row, index) in items" :key="index" class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-muted">{{ index + 1 }}</td>
+              <td class="px-4 py-4 text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
                 <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium" :class="getModuleClass(row.module)">
                   {{ t(`modules.${row.module}`) }}
                 </span>
               </td>
-              <td class="px-4 py-4 text-sm theme-text-primary min-w-[200px]">{{ isRTL && row.arDescription ? row.arDescription : row.description }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingBefore) }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ row.totalPaid !== 0 ? formatCurrency(row.totalPaid) : '-' }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ row.totalOfWork !== 0 ? formatCurrency(row.totalOfWork) : '-' }}</td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ formatCurrency(row.outstandingAfter) }}</td>
-              <td class="px-4 py-4 text-sm theme-text-secondary min-w-[150px]">{{ isRTL && row.arNotes ? row.arNotes : row.notes || '-' }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium" :class="row.outstandingBefore < 0 ? 'text-rose-600' : 'theme-text-primary'">{{ formatAmountOrDash(row.outstandingBefore) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">{{ formatAmountOrDash(row.totalOfWork) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-rose-600">{{ formatAmountOrDash(-row.totalPaid) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-bold" :class="row.outstandingAfter < 0 ? 'text-rose-600' : 'theme-text-primary'">{{ formatAmountOrDash(row.outstandingAfter) }}</td>
             </tr>
           </template>
           <template v-else>
@@ -325,7 +322,7 @@
         </tbody>
         <tbody v-else>
           <tr>
-            <td :colspan="isDetailedMode ? 11 : 8" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
+            <td :colspan="isDetailedMode ? 11 : 7" class="px-4 py-12 text-center text-sm theme-text-muted font-medium bg-slate-50/20">
               {{ t('noData') }}
             </td>
           </tr>
@@ -337,7 +334,25 @@
         <div class="flex items-center gap-2">
           <span class="text-sm font-semibold theme-text-secondary">{{ t('totals') }}:</span>
         </div>
-        <div class="flex items-center gap-6 flex-wrap">
+        <div v-if="!isDetailedMode" class="flex items-center gap-6 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="text-xs theme-text-secondary">{{ t('due') }}:</span>
+            <span class="text-base font-bold theme-text-primary">{{ formatCurrency(duesTotals.outstandingBefore) }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs theme-text-secondary">{{ t('workDuringPeriod') }}:</span>
+            <span class="text-base font-bold text-emerald-600">{{ formatCurrency(duesTotals.totalOfWork) }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs theme-text-secondary">{{ t('paidDuringPeriod') }}:</span>
+            <span class="text-base font-bold text-rose-600">{{ formatCurrency(duesTotals.paid) }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs theme-text-secondary">{{ t('totalDue') }}:</span>
+            <span class="text-base font-bold theme-text-primary">{{ formatCurrency(duesTotals.outstandingAfter) }}</span>
+          </div>
+        </div>
+        <div v-else class="flex items-center gap-6 flex-wrap">
           <div class="flex items-center gap-2">
             <span class="text-xs theme-text-secondary">{{ t('totalPaid') }}:</span>
             <span class="text-base font-bold text-rose-600">{{ formatCurrency(totals.totalPaid) }}</span>
@@ -389,6 +404,14 @@ export default {
       reportVariant: 'simple'
     })
 
+    const duesTotals = computed(() => items.value.reduce((acc, r) => {
+      acc.outstandingBefore += Number(r.outstandingBefore) || 0
+      acc.totalOfWork += Number(r.totalOfWork) || 0
+      acc.paid -= Number(r.totalPaid) || 0
+      acc.outstandingAfter += Number(r.outstandingAfter) || 0
+      return acc
+    }, { outstandingBefore: 0, totalOfWork: 0, paid: 0, outstandingAfter: 0 }))
+
     const isDetailedMode = computed({
       get() {
         return filters.value.reportVariant === 'detailed'
@@ -434,12 +457,21 @@ export default {
           location: 'Location',
           allLocations: 'All Locations',
           actionType: 'Type',
+          index: '#',
+          name: 'Name',
+          item: 'Item',
+          due: 'Due',
+          workDuringPeriod: 'Work During Period',
+          paidDuringPeriod: 'Paid During Period',
+          totalDue: 'Total Due',
           modules: {
             SUPPLY: 'Supply',
             TRANSPORT: 'Transport',
             RENTAL: 'Equipment Rental',
             EXTRACT: 'Extracts',
-            EXPENSE: 'Expenses'
+            EXPENSE: 'Expenses',
+            GENERAL: 'General',
+            OTHER: 'Other'
           }
         },
         ar: {
@@ -466,12 +498,21 @@ export default {
           location: 'الموقع',
           allLocations: 'كل المواقع',
           actionType: 'النوع',
+          index: 'م',
+          name: 'الاسم',
+          item: 'البند',
+          due: 'المستحق',
+          workDuringPeriod: 'اجمالي الأعمال خلال الفترة',
+          paidDuringPeriod: 'الواصل خلال الفترة',
+          totalDue: 'اجمالي المستحق',
           modules: {
             SUPPLY: 'توريدات',
             TRANSPORT: 'نقل',
             RENTAL: 'إيجار معدات',
             EXTRACT: 'مستخلصات',
-            EXPENSE: 'مصاريف'
+            EXPENSE: 'مصاريف',
+            GENERAL: 'عام',
+            OTHER: 'أخرى'
           }
         }
       }
@@ -607,6 +648,8 @@ export default {
       return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }
 
+    const formatAmountOrDash = (amount) => (Math.abs(Number(amount) || 0) < 0.005 ? '-' : formatCurrency(amount))
+
     const loadLocations = async () => {
       try {
         const res = await getLocations()
@@ -638,6 +681,7 @@ export default {
       locations,
       items,
       totals,
+      duesTotals,
       filters,
       isDetailedMode,
       t,
@@ -647,7 +691,8 @@ export default {
       downloadReport,
       getModuleClass,
       formatDate,
-      formatCurrency
+      formatCurrency,
+      formatAmountOrDash
     }
   }
 }
