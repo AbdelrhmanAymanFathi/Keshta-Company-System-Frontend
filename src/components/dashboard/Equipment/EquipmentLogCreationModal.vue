@@ -54,7 +54,7 @@
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" clearable :clearAriaLabel="$t('labels.clear')" @clear="() => selectEquipment(null)" />
+                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :itemLabel="equipmentOptionLabel" displayLabel="name" :filterFn="equipmentMatches" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" clearable :clearAriaLabel="$t('labels.clear')" @clear="() => selectEquipment(null)" />
                     </div>
                   </div>
                 </div>
@@ -688,6 +688,18 @@ export default {
           hourlyRate: Number(item.hourlyRate)
         }))
       }
+    },
+    // Several machines can share a name (e.g. «هراس» from different contractors), so each option shows its owner
+    equipmentContractorName(item) {
+      return item?.contractorName ?? item?.contractor?.name ?? ''
+    },
+    equipmentOptionLabel(item) {
+      const owner = this.equipmentContractorName(item)
+      return owner ? `${item?.name ?? ''} — ${owner}` : (item?.name ?? '')
+    },
+    equipmentMatches(item, query) {
+      const text = `${item?.name ?? ''} ${this.equipmentContractorName(item)}`.toLowerCase()
+      return text.includes(query)
     },
     equipmentIsRental(item) {
       if (!item) return false
