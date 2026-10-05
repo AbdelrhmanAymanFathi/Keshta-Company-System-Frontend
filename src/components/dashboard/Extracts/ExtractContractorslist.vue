@@ -150,9 +150,13 @@
             <div class="text-sm mb-1">{{ $t('extracts.accountNumber') }}</div>
             <input v-model="form.accountNumber" :placeholder="$t('extracts.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
-          <label v-if="!editing">
+          <label>
             <div class="text-sm mb-1">{{ $t('extracts.openingBalance') || 'Opening Balance' }}</div>
             <input v-model.number="form.openingBalance" type="number" :placeholder="$t('extracts.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded theme-input-focus" />
+            <p v-if="editing" class="mt-1 text-xs text-amber-700">
+              <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.openingBalance }}</template>
+              <template v-else>{{ $i18n.locale === 'ar' ? 'تعديل رصيد أول المدة يحتاج موافقة إدارية' : 'Changing the opening balance needs admin approval' }}</template>
+            </p>
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('extracts.notes') }}</div>
@@ -205,7 +209,7 @@
 
 <script>
 import * as XLSX from 'xlsx'
-import { getContractors, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
+import { getContractors, getContractorOpeningBalance, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
@@ -236,7 +240,9 @@ export default {
       page: 1,
       pageSize: 20,
       total: 0,
-      searchTimeout: null
+      searchTimeout: null,
+      openingBalanceOriginal: null,
+      openingBalancePending: null
     }
   },
   computed: {
@@ -312,6 +318,17 @@ export default {
       const rest = { ...(c || {}) }
       delete rest.openingBalance
       this.form = { ...rest }
+      this.form.openingBalance = ''
+      this.openingBalanceOriginal = null
+      this.openingBalancePending = null
+      getContractorOpeningBalance(c.id, 'EXTRACT')
+        .then(({ data }) => {
+          if (!this.editing || this.form.id !== c.id) return
+          this.openingBalanceOriginal = data.openingBalance
+          this.form.openingBalance = data.openingBalance
+          this.openingBalancePending = data.pendingApproval
+        })
+        .catch(err => console.error('Failed to load opening balance:', err))
       this.modalOpen = true
     },
     closeModal() {
@@ -329,13 +346,21 @@ export default {
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
       if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
+      // On an existing contractor a changed opening balance goes to admin approval
+      if (this.editing && this.openingBalanceOriginal !== null && this.form.openingBalance !== '' && Number(this.form.openingBalance) !== Number(this.openingBalanceOriginal)) {
+        payload.openingBalance = Number(this.form.openingBalance)
+        payload.openingBalanceAccountType = 'EXTRACT'
+      }
       // mark contractor available for extracts
       payload.availableForExtracts = true
       
       try {
         if (this.editing && this.form.id) {
-          await updateContractor(this.form.id, payload)
+          const res = await updateContractor(this.form.id, payload)
           if (window.$toast) window.$toast(this.$t('extracts.updateSuccess') || 'Supplier updated successfully', 'success')
+          if (res?.data?.openingBalanceApproval && window.$toast) {
+            window.$toast(this.$i18n.locale === 'ar' ? 'تم إرسال تعديل رصيد أول المدة للموافقة الإدارية' : 'Opening balance change sent for admin approval', 'info')
+          }
         } else {
           const res = await createContractor(payload)
           const created = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])

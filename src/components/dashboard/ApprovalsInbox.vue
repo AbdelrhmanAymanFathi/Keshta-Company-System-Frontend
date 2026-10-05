@@ -432,6 +432,9 @@ export default {
           originalValue: 'Original Value',
           notes: 'Reason/Notes',
           // Field mappings
+          openingBalance: 'Opening Balance',
+          accountType: 'Account',
+          contractorName: 'Contractor',
           total: 'Total Value',
           amount: 'Amount',
           discount: 'Discount',
@@ -478,6 +481,9 @@ export default {
           originalValue: 'القيمة الأصلية',
           notes: 'السبب/الملاحظات',
           // Field mappings
+          openingBalance: 'رصيد أول المدة',
+          accountType: 'الحساب',
+          contractorName: 'المقاول',
           total: 'إجمالي القيمة',
           amount: 'المبلغ',
           discount: 'الخصم',
@@ -568,9 +574,19 @@ export default {
         TRANSPORT: this.locale === 'ar' ? 'نقليات' : 'Transport',
         RENTAL: this.locale === 'ar' ? 'سجلات معدات' : 'Equipment Rental',
         EXTRACT: this.locale === 'ar' ? 'مستخلصات' : 'Extract',
-        EXPENSE: this.locale === 'ar' ? 'مصروفات' : 'Expense'
+        EXPENSE: this.locale === 'ar' ? 'مصروفات' : 'Expense',
+        CONTRACTOR: this.locale === 'ar' ? 'المقاولين' : 'Contractors'
       };
       return labels[mod] || mod;
+    },
+    getAccountTypeLabel(type) {
+      const labels = {
+        SUPPLY: this.locale === 'ar' ? 'توريدات' : 'Supply',
+        TRANSPORT: this.locale === 'ar' ? 'نقل' : 'Transport',
+        RENTAL: this.locale === 'ar' ? 'إيجار معدات' : 'Equipment Rental',
+        EXTRACT: this.locale === 'ar' ? 'مستخلصات' : 'Extracts'
+      };
+      return labels[type] || type;
     },
     getModuleClass(mod) {
       const classes = {
@@ -578,7 +594,8 @@ export default {
         TRANSPORT: 'bg-purple-50 text-purple-700 border border-purple-100',
         RENTAL: 'bg-teal-50 text-teal-700 border border-teal-100',
         EXTRACT: 'bg-indigo-50 text-indigo-700 border border-indigo-100',
-        EXPENSE: 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+        EXPENSE: 'bg-emerald-50 text-emerald-700 border border-emerald-100',
+        CONTRACTOR: 'bg-amber-50 text-amber-700 border border-amber-100'
       };
       return classes[mod] || 'bg-slate-50 text-slate-700';
     },
@@ -622,7 +639,8 @@ export default {
       if (typeof val === 'boolean') {
         return val ? (this.locale === 'ar' ? 'نعم' : 'Yes') : (this.locale === 'ar' ? 'لا' : 'No');
       }
-      if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate'].includes(key)) {
+      if (key === 'accountType') return this.getAccountTypeLabel(val);
+      if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate', 'openingBalance'].includes(key)) {
         const formatted = Number(val).toLocaleString('en-US', { style: 'currency', currency: 'EGP' }); return this.locale === 'ar' ? '\u200E' + formatted : formatted;
       }
       return val;
@@ -753,6 +771,8 @@ export default {
         unitPrice: this.locale === 'ar' ? 'سعر الفئة' : 'Unit Price',
         discount: this.locale === 'ar' ? 'الخصم' : 'Discount',
         total: this.locale === 'ar' ? 'الإجمالي' : 'Total',
+        openingBalance: this.locale === 'ar' ? 'رصيد أول المدة' : 'Opening Balance',
+        accountType: this.locale === 'ar' ? 'الحساب' : 'Account',
         notes: this.locale === 'ar' ? 'الملاحظات' : 'Notes',
         note: this.locale === 'ar' ? 'الملاحظات' : 'Notes',
       };
@@ -766,7 +786,8 @@ export default {
       if (typeof val === 'boolean') {
         return val ? (this.locale === 'ar' ? 'نعم' : 'Yes') : (this.locale === 'ar' ? 'لا' : 'No');
       }
-      if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate', 'firstKmPrice', 'perKmPrice'].includes(key)) {
+      if (key === 'accountType') return this.getAccountTypeLabel(val);
+      if (['total', 'amount', 'unitPrice', 'discount', 'hourlyRate', 'firstKmPrice', 'perKmPrice', 'openingBalance'].includes(key)) {
         const formatted = Number(val).toLocaleString('en-US', { style: 'currency', currency: 'EGP' }); return this.locale === 'ar' ? '\u200E' + formatted : formatted;
       }
       if (key === 'date' || key === 'createdAt' || key === 'updatedAt') {

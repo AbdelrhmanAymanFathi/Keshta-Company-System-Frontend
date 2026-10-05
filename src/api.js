@@ -383,6 +383,9 @@ export const updateContractor = (id, data) => {
 };
 // Fetch single contractor by id
 export const getContractor = (id) => axios.get(`${BASE_URL}/api/contractors/${id}`);
+// Contractor «رصيد أول المدة» on one account, with any change waiting for approval
+export const getContractorOpeningBalance = (id, accountType) =>
+  axios.get(`${BASE_URL}/api/contractors/${id}/opening-balance`, { params: { accountType } });
 // Delete contractor by id — backend expects RESTful resource path (/api/contractors/:id)
 // Note: many backends return 204 No Content for successful deletes; axios will resolve
 // with response.status === 204 and an empty body.
