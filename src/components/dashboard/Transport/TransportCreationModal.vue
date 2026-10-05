@@ -1154,7 +1154,7 @@ export default {
       console.log('Starting loadLookups...');
       try {
         const [cRes, cvRes, vRes] = await Promise.all([
-          getContractors({ mode: 'transport' }),
+          getContractors({ pageSize: 1000, mode: 'transport' }),
           typeof getContractorsWithVehicles === 'function'
             ? getContractorsWithVehicles({ mode: 'transport' })
             : Promise.resolve(null),

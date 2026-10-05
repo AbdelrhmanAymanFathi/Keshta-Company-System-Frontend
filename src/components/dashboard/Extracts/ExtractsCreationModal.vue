@@ -899,7 +899,7 @@ export default {
     async loadLookups() {
       try {
         const [contractorsRes, crushersRes] = await Promise.all([
-          getContractors({ mode: 'extracts' }),
+          getContractors({ pageSize: 1000, mode: 'extracts' }),
           getCrushers()
         ])
 

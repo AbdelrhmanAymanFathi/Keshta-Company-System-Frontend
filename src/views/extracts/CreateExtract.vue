@@ -345,7 +345,7 @@ export default {
     async function loadLookups() {
       try {
         const [cRes, cvRes, crushRes, vRes] = await Promise.all([
-          getContractors({ mode: 'extracts' }),
+          getContractors({ pageSize: 1000, mode: 'extracts' }),
           typeof getContractorsWithVehicles === 'function' ? getContractorsWithVehicles({ mode: 'extracts' }) : Promise.resolve(null),
           getCrushers(),
           getVehicles()

@@ -528,7 +528,7 @@ export default {
     },
     async loadContractors() {
       try {
-        const res = await getContractors({ mode: this.mode })
+        const res = await getContractors({ pageSize: 1000, mode: this.mode })
         const payload = res.data || {}
         this.contractors = Array.isArray(payload.items)
           ? payload.items
