@@ -812,7 +812,6 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
-import { normalizeTermName } from '@/utils/termName'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
 export default {
@@ -967,7 +966,7 @@ rows: [],
       ;(this.expenseCategories || []).forEach(cat => {
         const subs = cat.subCategories || cat.subcategories || cat.children || []
         subs.forEach(sc => {
-          const key = normalizeTermName(sc.name)
+          const key = String(sc.name || '').trim().toLowerCase()
           if (!subMap.has(key)) {
             subMap.set(key, {
               id: `expensesub__${sc.id}`,
@@ -1810,7 +1809,7 @@ rows: [],
     },
 
     normalizeTermName(value) {
-      return normalizeTermName(value)
+      return String(value || '').trim().replace(/\s+/g, ' ').toLowerCase()
     },
 
     flattenSubcategories(categories = this.expenseCategories) {
@@ -2014,7 +2013,7 @@ rows: [],
 
       this.expenseCategories.forEach(cat => {
         const subCats = cat.subCategories || cat.subcategories || cat.children || []
-        const found = subCats.find(sc => sc.name && normalizeTermName(sc.name) === normalizeTermName(sel.name))
+        const found = subCats.find(sc => sc.name && String(sc.name).trim().toLowerCase() === String(sel.name).trim().toLowerCase())
         if (found) {
           matchingCats.push(cat)
           matchingSubcategories.push(found)

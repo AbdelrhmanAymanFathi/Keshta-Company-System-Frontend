@@ -106,12 +106,6 @@
                 <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   {{ cat.subCategories ? cat.subCategories.length : 0 }} {{ $t('expenses.subcategoryCount') }}
                 </span>
-                <span
-                  v-if="cat.sharedWith && cat.sharedWith.length"
-                  class="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full"
-                >
-                  {{ $t('expenses.sharedWith') }}: {{ sharedNames(cat) }}
-                </span>
               </h3>
             </div>
           </div>
@@ -176,18 +170,8 @@
               </div>
 
               <div class="flex items-center gap-1">
-                <button
-                  v-if="cat.subCategories.length > 1"
-                  @click="openMergeModal(cat, subCat)"
-                  class="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors"
-                  :title="$t('expenses.mergeSubcategory')"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                  </svg>
-                </button>
-                <button
-                  @click="openEditSubCategoryModal(cat, subCat)"  
+                <button 
+                  @click="openEditSubCategoryModal(cat, subCat)" 
                   class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                   :title="$t('expenses.editSubcategory')"
                 >
@@ -196,7 +180,7 @@
                   </svg>
                 </button>
                 <button 
-                  @click="confirmDeleteSubCategory(cat, subCat)"  
+                  @click="confirmDeleteSubCategory(subCat)" 
                   class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                   :title="$t('expenses.deleteSubcategory')"
                 >
@@ -294,21 +278,6 @@
             </button>
           </div>
 
-          <!-- Shared sub-term list -->
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.subTermsList') }}</label>
-            <select
-              v-model="categoryModal.groupId"
-              class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl theme-input-focus text-sm bg-white"
-            >
-              <option :value="null">{{ $t('expenses.ownSubTermsList') }}</option>
-              <option v-for="g in groupOptions" :key="g.id" :value="g.id">
-                {{ $t('expenses.shareSubTermsWith', { names: g.label }) }}
-              </option>
-            </select>
-            <p class="text-xs text-slate-500 mt-1">{{ $t('expenses.shareSubTermsHint') }}</p>
-          </div>
-
           <!-- Buttons -->
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
             <button
@@ -341,7 +310,6 @@
           <div>
             <h3 class="font-bold text-lg">{{ subCategoryModal.isEdit ? $t('expenses.editSubcategory') : $t('expenses.addSubcategory') }}</h3>
             <p class="text-emerald-100 text-xs mt-0.5">{{ $t('expenses.parentCategoryLabel') }}: <span class="font-semibold text-white">{{ subCategoryModal.parentCategoryName }}</span></p>
-            <p v-if="subCategoryModal.sharedNames" class="text-emerald-100 text-xs mt-0.5">{{ $t('expenses.sharedWith') }}: <span class="font-semibold text-white">{{ subCategoryModal.sharedNames }}</span></p>
           </div>
           <button @click="subCategoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
         </div>
@@ -443,52 +411,6 @@
         </form>
       </div>
     </div>
-
-    <!-- Merge Modal (fold a duplicate / misspelled sub-term into the correct one) -->
-    <div v-if="mergeModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="mergeModal.open = false">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
-        <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white flex justify-between items-center">
-          <div>
-            <h3 class="font-bold text-lg">{{ $t('expenses.mergeSubcategory') }}</h3>
-            <p class="text-amber-50 text-xs mt-0.5">{{ mergeModal.source && mergeModal.source.name }}</p>
-          </div>
-          <button @click="mergeModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
-        </div>
-
-        <form @submit.prevent="saveMerge" class="p-6 space-y-4">
-          <p class="text-sm text-slate-600">{{ $t('expenses.mergeSubcategoryHint', { name: mergeModal.source && mergeModal.source.name }) }}</p>
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('expenses.mergeInto') }} <span class="text-red-500">*</span></label>
-            <select
-              v-model="mergeModal.targetId"
-              required
-              class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl theme-input-focus text-sm bg-white"
-            >
-              <option :value="null" disabled>{{ $t('expenses.selectMergeTarget') }}</option>
-              <option v-for="opt in mergeModal.options" :key="opt.id" :value="opt.id">{{ opt.name }}</option>
-            </select>
-          </div>
-
-          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
-            <button
-              type="button"
-              @click="mergeModal.open = false"
-              class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
-            >
-              {{ $t('labels.cancel') }}
-            </button>
-            <button
-              type="submit"
-              :disabled="saving || !mergeModal.targetId"
-              class="px-5 py-2 text-white bg-amber-600 rounded-xl hover:bg-amber-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
-            >
-              <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-              {{ $t('expenses.merge') }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -500,11 +422,9 @@ import {
   deleteExpenseCategory,
   createExpenseSubCategory,
   updateExpenseSubCategory,
-  deleteExpenseSubCategory,
-  mergeExpenseSubCategory
+  deleteExpenseSubCategory
 } from '../../../api'
 import PageHeader from '@/components/shared/PageHeader.vue'
-import { findSimilarTermNames } from '@/utils/termName'
 
 export default {
   name: 'TermsManagement',
@@ -522,9 +442,7 @@ export default {
         isEdit: false,
         id: null,
         name: '',
-        rows: [''],
-        groupId: null,
-        originalGroupId: null
+        rows: ['']
       },
       categoryRowRefs: [],
       subCategoryModal: {
@@ -533,17 +451,10 @@ export default {
         id: null,
         categoryId: null,
         parentCategoryName: '',
-        sharedNames: '',
         name: '',
         rows: ['']
       },
-      subCategoryRowRefs: [],
-      mergeModal: {
-        open: false,
-        source: null,
-        targetId: null,
-        options: []
-      }
+      subCategoryRowRefs: []
     }
   },
   computed: {
@@ -558,17 +469,6 @@ export default {
         const subMatch = cat.subCategories && cat.subCategories.some(sc => sc.name && sc.name.toLowerCase().includes(q))
         return catMatch || subMatch
       })
-    },
-    // Shared sub-term lists the category in the modal can use, labelled by the other categories using them
-    groupOptions() {
-      const groups = new Map()
-      this.categories.forEach(cat => {
-        if (!cat.group || cat.id === this.categoryModal.id) return
-        if (!groups.has(cat.group.id)) groups.set(cat.group.id, [])
-        groups.get(cat.group.id).push(cat.name)
-      })
-      return Array.from(groups, ([id, names]) => ({ id, label: names.join('، ') }))
-        .sort((a, b) => a.label.localeCompare(b.label, 'ar'))
     }
   },
   watch: {
@@ -649,25 +549,15 @@ export default {
       this.expandedCategoryIds = []
     },
 
-    sharedNames(cat) {
-      return (cat.sharedWith || []).map(c => c.name).join('، ')
-    },
-
-    // A category alone in its group has "its own list" (null); otherwise it uses its group
-    currentGroupId(cat) {
-      return cat.sharedWith && cat.sharedWith.length ? cat.group.id : null
-    },
-
     openAddCategoryModal() {
       this.categoryRowRefs = []
-      this.categoryModal = { open: true, isEdit: false, id: null, name: '', rows: [''], groupId: null, originalGroupId: null }
+      this.categoryModal = { open: true, isEdit: false, id: null, name: '', rows: [''] }
       this.$nextTick(() => {
         this.categoryRowRefs[0]?.focus()
       })
     },
     openEditCategoryModal(cat) {
-      const groupId = this.currentGroupId(cat)
-      this.categoryModal = { open: true, isEdit: true, id: cat.id, name: cat.name, rows: [cat.name], groupId, originalGroupId: groupId }
+      this.categoryModal = { open: true, isEdit: true, id: cat.id, name: cat.name, rows: [cat.name] }
     },
 
     // Tab on a row: move to next or create new
@@ -714,18 +604,7 @@ export default {
       try {
         if (this.categoryModal.isEdit) {
           if (!this.categoryModal.name.trim()) return
-          const payload = { name: this.categoryModal.name.trim() }
-          if (this.categoryModal.groupId !== this.categoryModal.originalGroupId) {
-            const message = this.categoryModal.groupId
-              ? this.$t('expenses.confirmJoinSubTermsList', {
-                  name: payload.name,
-                  names: this.groupOptions.find(g => g.id === this.categoryModal.groupId)?.label || ''
-                })
-              : this.$t('expenses.confirmLeaveSubTermsList', { name: payload.name })
-            if (!confirm(message)) return
-            payload.groupId = this.categoryModal.groupId
-          }
-          await updateExpenseCategory(this.categoryModal.id, payload)
+          await updateExpenseCategory(this.categoryModal.id, { name: this.categoryModal.name.trim() })
           this.categoryModal.open = false
           await this.loadCategories({ preserveExpanded: true, silent: true })
         } else {
@@ -737,7 +616,7 @@ export default {
           }
 
           const results = await Promise.allSettled(
-            names.map(name => createExpenseCategory({ name, groupId: this.categoryModal.groupId }).then(() => name))
+            names.map(name => createExpenseCategory({ name }).then(() => name))
           )
 
           const succeeded = []
@@ -791,7 +670,6 @@ export default {
         id: null,
         categoryId: parentCat.id,
         parentCategoryName: parentCat.name,
-        sharedNames: this.sharedNames(parentCat),
         name: '',
         rows: ['']
       }
@@ -806,7 +684,6 @@ export default {
         id: subCat.id,
         categoryId: parentCat.id,
         parentCategoryName: parentCat.name,
-        sharedNames: this.sharedNames(parentCat),
         name: subCat.name,
         rows: [subCat.name]
       }
@@ -870,24 +747,12 @@ export default {
             return
           }
 
-          // Catch near-misspellings of existing sub-terms ("نيسن" vs "نيسان") before they become a second item
-          const parent = this.categories.find(c => c.id === this.subCategoryModal.categoryId)
-          const existingNames = (parent?.subCategories || []).map(sc => sc.name)
-          const similar = names
-            .map(name => ({ name, matches: findSimilarTermNames(name, existingNames) }))
-            .filter(s => s.matches.length)
-          if (similar.length) {
-            const list = similar.map(s => `"${s.name}" ← ${s.matches.map(m => `"${m}"`).join('، ')}`).join('\n')
-            if (!confirm(this.$t('expenses.similarSubcategoriesWarning', { list }))) return
-          }
-
           const results = await Promise.allSettled(
             names.map(name => createExpenseSubCategory(this.subCategoryModal.categoryId, { name }).then(() => name))
           )
 
           const succeeded = []
           const failed = []
-          const reasons = []
 
           results.forEach((res, i) => {
             const name = names[i]
@@ -895,7 +760,6 @@ export default {
               succeeded.push(name)
             } else {
               failed.push(name)
-              reasons.push(res.reason?.response?.data?.message || `"${name}"`)
             }
           })
 
@@ -905,7 +769,8 @@ export default {
           if (failed.length > 0) {
             // Keep only the failed ones in the rows so user can edit and try again
             this.subCategoryModal.rows = failed
-            alert(`تم حفظ البنود الفرعية بنجاح ما عدا البنود التالية:\n${reasons.join('\n')}`)
+            const duplicateNames = failed.map(n => `"${n}"`).join('، ')
+            alert(`تم حفظ البنود الفرعية بنجاح ما عدا البنود التالية (قد تكون مكررة أو حدث خطأ): ${duplicateNames}`)
           } else {
             this.subCategoryModal.open = false
           }
@@ -917,40 +782,13 @@ export default {
       }
     },
 
-    async confirmDeleteSubCategory(parentCat, subCat) {
-      const shared = parentCat.sharedWith && parentCat.sharedWith.length
-        ? `\n${this.$t('expenses.sharedSubcategoryDeleteWarning', { names: this.sharedNames(parentCat) })}`
-        : ''
-      if (!confirm(`هل أنت تأكد من حذف البند الفرعي "${subCat.name}"؟${shared}`)) return
+    async confirmDeleteSubCategory(subCat) {
+      if (!confirm(`هل أنت تأكد من حذف البند الفرعي "${subCat.name}"؟`)) return
       try {
         await deleteExpenseSubCategory(subCat.id)
         await this.loadCategories({ preserveExpanded: true, silent: true })
       } catch (err) {
         alert(err.response?.data?.message || 'تعذر حذف البند الفرعي')
-      }
-    },
-
-    openMergeModal(parentCat, subCat) {
-      const options = (parentCat.subCategories || []).filter(sc => sc.id !== subCat.id)
-      this.mergeModal = {
-        open: true,
-        source: subCat,
-        targetId: options.length === 1 ? options[0].id : null,
-        options
-      }
-    },
-
-    async saveMerge() {
-      if (!this.mergeModal.targetId) return
-      this.saving = true
-      try {
-        await mergeExpenseSubCategory(this.mergeModal.source.id, this.mergeModal.targetId)
-        this.mergeModal.open = false
-        await this.loadCategories({ preserveExpanded: true, silent: true })
-      } catch (err) {
-        alert(err.response?.data?.message || 'تعذر دمج البند الفرعي')
-      } finally {
-        this.saving = false
       }
     },
 

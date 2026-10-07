@@ -795,10 +795,6 @@ export const updateExpenseSubCategory = (id, data) =>
 export const deleteExpenseSubCategory = (id) =>
   axios.delete(`${BASE_URL}/api/expense-categories/sub-categories/${id}`);
 
-// Folds a duplicate sub-category into targetId (its expenses move over, it is removed)
-export const mergeExpenseSubCategory = (id, targetId) =>
-  axios.post(`${BASE_URL}/api/expense-categories/sub-categories/${id}/merge`, { targetId });
-
 export const createLocation = (data) =>
   axios.post(`${BASE_URL}/api/locations`, data);
 export const updateLocation = (id, data) =>
