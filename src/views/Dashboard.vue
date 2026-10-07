@@ -71,9 +71,9 @@
           </button>
           <!-- Notification Dropdown -->
           <div v-if="notificationMenuOpen"
-            class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100"
-            :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
-            <div class="w-96 max-w-[calc(100vw-1.5rem)] animate-fade-in rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
+            class="fixed inset-x-3 top-16 transition-all duration-300 ease-out transform opacity-100 scale-100 sm:absolute sm:top-12"
+            :class="isRTL ? 'sm:left-0 sm:right-auto' : 'sm:right-0 sm:left-auto'" style="z-index: 60;">
+            <div class="mx-auto w-full max-w-md sm:w-96 animate-fade-in rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
               <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                 <span class="text-sm font-semibold theme-text-primary">{{ $t('notifications.title') || 'Notifications' }}</span>
                 <div class="flex items-center gap-2">
@@ -96,7 +96,7 @@
                 </svg>
                 <span class="text-sm">{{ $t('notifications.empty') || 'No notifications yet' }}</span>
               </div>
-              <div v-else class="max-h-96 overflow-y-auto divide-y divide-slate-50">
+              <div v-else class="max-h-[60vh] sm:max-h-96 overflow-y-auto divide-y divide-slate-50">
                 <div v-for="item in notifItems" :key="item.id"
                   @click="onNotifClick(item)"
                   class="flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors duration-150"
