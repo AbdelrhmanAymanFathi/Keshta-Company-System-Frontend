@@ -785,7 +785,14 @@ export const updateExpenseCategory = (id, data) =>
 export const deleteExpenseCategory = (id) =>
   axios.delete(`${BASE_URL}/api/expense-categories/${id}`);
 
-// Expense SubCategories CRUD (admin)
+// Expense SubCategories: one master list; each main category picks from it
+export const getExpenseSubCategories = () =>
+  axios.get(`${BASE_URL}/api/expense-categories/sub-categories`);
+
+export const createMasterExpenseSubCategory = (data) =>
+  axios.post(`${BASE_URL}/api/expense-categories/sub-categories`, data);
+
+// Picks a sub-item from the master list by name (created if missing) and links it to the category
 export const createExpenseSubCategory = (categoryId, data) =>
   axios.post(`${BASE_URL}/api/expense-categories/${categoryId}/sub-categories`, data);
 
