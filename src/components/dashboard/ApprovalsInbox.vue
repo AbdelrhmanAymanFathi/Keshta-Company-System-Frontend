@@ -435,6 +435,7 @@ export default {
           openingBalance: 'Opening Balance',
           accountType: 'Account',
           contractorName: 'Contractor',
+          locationName: 'Site',
           total: 'Total Value',
           amount: 'Amount',
           discount: 'Discount',
@@ -484,6 +485,7 @@ export default {
           openingBalance: 'رصيد أول المدة',
           accountType: 'الحساب',
           contractorName: 'المقاول',
+          locationName: 'الموقع',
           total: 'إجمالي القيمة',
           amount: 'المبلغ',
           discount: 'الخصم',
@@ -622,6 +624,8 @@ export default {
       if (!app.afterState || !app.beforeState) return {};
       const changes = {};
       Object.keys(app.afterState).forEach(key => {
+        // The site name is shown instead of its id when the request carries both
+        if (key === 'locationId' && 'locationName' in app.afterState) return;
         const oldVal = app.beforeState[key];
         const newVal = app.afterState[key];
         // Compare values, ignore formatting differences
