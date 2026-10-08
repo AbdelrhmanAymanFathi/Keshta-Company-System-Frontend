@@ -142,9 +142,16 @@
             <div class="text-sm mb-1">{{ $t('suppliers.openingBalance') || 'Opening Balance' }}</div>
             <input v-model.number="form.openingBalance" type="number" :placeholder="$t('suppliers.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded theme-input-focus" />
             <p v-if="editing" class="mt-1 text-xs text-amber-700">
-              <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.openingBalance }}</template>
+              <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.openingBalance }}<template v-if="openingBalancePending.locationName"> — {{ openingBalancePending.locationName }}</template></template>
               <template v-else>{{ $i18n.locale === 'ar' ? 'تعديل رصيد أول المدة يحتاج موافقة إدارية' : 'Changing the opening balance needs admin approval' }}</template>
             </p>
+          </label>
+          <label>
+            <div class="text-sm mb-1">{{ $i18n.locale === 'ar' ? 'موقع رصيد أول المدة' : 'Opening Balance Site' }}</div>
+            <select v-model="form.openingBalanceLocationId" :disabled="!Number(form.openingBalance)" class="w-full px-3 py-2 border rounded bg-white theme-input-focus disabled:opacity-60">
+              <option value="">{{ $i18n.locale === 'ar' ? 'بدون موقع' : 'No site' }}</option>
+              <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
+            </select>
           </label>
           <label>
             <div class="text-sm mb-1">{{ $t('suppliers.notes') }}</div>
@@ -197,7 +204,7 @@
 
 <script>
 import * as XLSX from 'xlsx'
-import { getContractors, getContractorOpeningBalance, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
+import { getContractors, getContractorOpeningBalance, getLocations, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
@@ -215,8 +222,9 @@ export default {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '' },
+      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '', openingBalanceLocationId: '' },
       contractors: [],
+      locations: [],
       deleteConfirm: { open: false, item: null },
       contextMenu: { open: false, x: 0, y: 0, item: null },
       walletModalOpen: false,
@@ -230,6 +238,7 @@ export default {
       total: 0,
       searchTimeout: null,
       openingBalanceOriginal: null,
+      openingBalanceLocationOriginal: null,
       openingBalancePending: null
     }
   },
@@ -256,6 +265,7 @@ export default {
   },
   mounted() {
     this.loadContractors()
+    this.loadLocations()
     document.addEventListener('click', this.closeContextMenu)
   },
   beforeUnmount() {
@@ -278,6 +288,14 @@ export default {
         this.total = 0
       }
     },
+    async loadLocations() {
+      try {
+        const res = await getLocations()
+        this.locations = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.data || [])
+      } catch (e) {
+        console.error('Failed to load locations:', e)
+      }
+    },
     changePage(p) {
       if (p >= 1 && p <= this.totalPages && p !== this.page) {
         this.page = p
@@ -298,7 +316,7 @@ export default {
     },
     openAdd() {
       this.editing = false
-      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '' }
+      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '', openingBalanceLocationId: '' }
       this.modalOpen = true
     },
     openEdit(c) {
@@ -307,13 +325,17 @@ export default {
       delete rest.openingBalance
       this.form = { ...rest }
       this.form.openingBalance = ''
+      this.form.openingBalanceLocationId = ''
       this.openingBalanceOriginal = null
+      this.openingBalanceLocationOriginal = null
       this.openingBalancePending = null
       getContractorOpeningBalance(c.id, 'RENTAL')
         .then(({ data }) => {
           if (!this.editing || this.form.id !== c.id) return
           this.openingBalanceOriginal = data.openingBalance
           this.form.openingBalance = data.openingBalance
+          this.openingBalanceLocationOriginal = data.locationId ?? null
+          this.form.openingBalanceLocationId = data.locationId ?? ''
           this.openingBalancePending = data.pendingApproval
         })
         .catch(err => console.error('Failed to load opening balance:', err))
@@ -333,11 +355,17 @@ export default {
       if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
-      if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') payload.openingBalance = Number(this.form.openingBalance)
-      // On an existing contractor a changed opening balance goes to admin approval
-      if (this.editing && this.openingBalanceOriginal !== null && this.form.openingBalance !== '' && Number(this.form.openingBalance) !== Number(this.openingBalanceOriginal)) {
+      const locationId = this.form.openingBalanceLocationId || null
+      if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') {
+        payload.openingBalance = Number(this.form.openingBalance)
+        if (locationId) payload.openingBalanceLocationId = locationId
+      }
+      // On an existing contractor a changed opening balance (amount or site) goes to admin approval
+      const openingBalanceChanged = Number(this.form.openingBalance) !== Number(this.openingBalanceOriginal) || locationId !== this.openingBalanceLocationOriginal
+      if (this.editing && this.openingBalanceOriginal !== null && this.form.openingBalance !== '' && openingBalanceChanged) {
         payload.openingBalance = Number(this.form.openingBalance)
         payload.openingBalanceAccountType = 'RENTAL'
+        payload.openingBalanceLocationId = locationId
       }
       // set availability flag based on mode (equipment / transport / export)
       if (!this.mode || this.mode === 'rentals' || this.mode === 'equipmentLogs') {

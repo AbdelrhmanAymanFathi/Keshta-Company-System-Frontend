@@ -60,8 +60,8 @@
             </div>
           </div>
 
-          <!-- Opening Balance and Notes - 2 columns on large screens -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Opening Balance, its Site and Notes - 3 columns on large screens -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('contractors.openingBalance') || 'Opening Balance' }}
@@ -73,6 +73,16 @@
                 :placeholder="$t('contractors.openingBalance') || 'Opening balance'"
                 class="w-full border rounded px-3 py-2"
               />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium theme-text-secondary mb-1">
+                {{ $i18n.locale === 'ar' ? 'موقع رصيد أول المدة' : 'Opening Balance Site' }}
+              </label>
+              <select v-model="form.openingBalanceLocationId" :disabled="!Number(form.openingBalance)" class="w-full border rounded px-3 py-2 bg-white disabled:opacity-60">
+                <option value="">{{ $i18n.locale === 'ar' ? 'بدون موقع' : 'No site' }}</option>
+                <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
+              </select>
             </div>
 
             <div>
@@ -114,7 +124,7 @@
 </template>
 
 <script>
-import { createContractor } from '../../../api'
+import { createContractor, getLocations } from '../../../api'
 
 export default {
   name: 'CreateContractorModal',
@@ -131,13 +141,26 @@ export default {
         bankName: '',
         accountNumber: '',
         openingBalance: '',
+        openingBalanceLocationId: '',
         notes: ''
       },
+      locations: [],
       loading: false,
       error: ''
     }
   },
+  mounted() {
+    this.loadLocations()
+  },
   methods: {
+    async loadLocations() {
+      try {
+        const res = await getLocations()
+        this.locations = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.data || [])
+      } catch (e) {
+        console.error('Failed to load locations:', e)
+      }
+    },
     async onSubmit() {
       this.error = ''
       const name = this.form.name?.trim()
@@ -153,7 +176,10 @@ export default {
         if (this.form.phone?.trim()) payload.phone = this.form.phone.trim()
         if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
         if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
-        if (this.form.openingBalance !== '' && this.form.openingBalance !== null) payload.openingBalance = Number(this.form.openingBalance)
+        if (this.form.openingBalance !== '' && this.form.openingBalance !== null) {
+          payload.openingBalance = Number(this.form.openingBalance)
+          if (this.form.openingBalanceLocationId) payload.openingBalanceLocationId = this.form.openingBalanceLocationId
+        }
         if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
         
         // Set availability flag based on mode
@@ -193,6 +219,7 @@ export default {
         bankName: '',
         accountNumber: '',
         openingBalance: '',
+        openingBalanceLocationId: '',
         notes: ''
       }
       this.error = ''
