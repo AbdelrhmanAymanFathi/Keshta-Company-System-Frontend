@@ -60,42 +60,19 @@
             </div>
           </div>
 
-          <!-- Opening Balance, its Site and Notes - 3 columns on large screens -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1">
-                {{ $t('contractors.openingBalance') || 'Opening Balance' }}
-              </label>
-              <input 
-                v-model="form.openingBalance" 
-                type="number" 
-                step="0.01"
-                :placeholder="$t('contractors.openingBalance') || 'Opening balance'"
-                class="w-full border rounded px-3 py-2"
-              />
-            </div>
+          <!-- Opening balance, one amount per site -->
+          <OpeningBalanceSitesField v-model="form.openingBalanceLines" :locations="locations" />
 
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1">
-                {{ $i18n.locale === 'ar' ? 'موقع رصيد أول المدة' : 'Opening Balance Site' }}
-              </label>
-              <select v-model="form.openingBalanceLocationId" :disabled="!Number(form.openingBalance)" class="w-full border rounded px-3 py-2 bg-white disabled:opacity-60">
-                <option value="">{{ $i18n.locale === 'ar' ? 'بدون موقع' : 'No site' }}</option>
-                <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-1">
-                {{ $t('labels.notes') || 'Notes' }}
-              </label>
-              <textarea 
-                v-model="form.notes" 
-                :placeholder="$t('labels.notes') || 'Notes'"
-                class="w-full border rounded px-3 py-2 resize-none"
-                rows="3"
-              />
-            </div>
+          <div>
+            <label class="block text-sm font-medium theme-text-secondary mb-1">
+              {{ $t('labels.notes') || 'Notes' }}
+            </label>
+            <textarea
+              v-model="form.notes"
+              :placeholder="$t('labels.notes') || 'Notes'"
+              class="w-full border rounded px-3 py-2 resize-none"
+              rows="3"
+            />
           </div>
 
           <div class="flex gap-3 justify-end">
@@ -125,9 +102,11 @@
 
 <script>
 import { createContractor, getLocations } from '../../../api'
+import OpeningBalanceSitesField, { emptyOpeningBalanceLine, openingBalanceLinesPayload } from '@/components/shared/OpeningBalanceSitesField.vue'
 
 export default {
   name: 'CreateContractorModal',
+  components: { OpeningBalanceSitesField },
   emits: ['created', 'cancel'],
   props: {
     isOpen: { type: Boolean, default: false },
@@ -140,8 +119,7 @@ export default {
         phone: '',
         bankName: '',
         accountNumber: '',
-        openingBalance: '',
-        openingBalanceLocationId: '',
+        openingBalanceLines: [emptyOpeningBalanceLine()],
         notes: ''
       },
       locations: [],
@@ -176,10 +154,8 @@ export default {
         if (this.form.phone?.trim()) payload.phone = this.form.phone.trim()
         if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
         if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
-        if (this.form.openingBalance !== '' && this.form.openingBalance !== null) {
-          payload.openingBalance = Number(this.form.openingBalance)
-          if (this.form.openingBalanceLocationId) payload.openingBalanceLocationId = this.form.openingBalanceLocationId
-        }
+        const openingBalanceLines = openingBalanceLinesPayload(this.form.openingBalanceLines)
+        if (openingBalanceLines.length) payload.openingBalanceLines = openingBalanceLines
         if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
         
         // Set availability flag based on mode
@@ -218,8 +194,7 @@ export default {
         phone: '',
         bankName: '',
         accountNumber: '',
-        openingBalance: '',
-        openingBalanceLocationId: '',
+        openingBalanceLines: [emptyOpeningBalanceLine()],
         notes: ''
       }
       this.error = ''

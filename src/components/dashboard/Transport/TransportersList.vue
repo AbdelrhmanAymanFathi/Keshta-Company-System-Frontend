@@ -151,24 +151,16 @@
             <input v-model="form.accountNumber" :placeholder="$t('transporters.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
           <label>
-            <div class="text-sm mb-1">{{ $t('transporters.openingBalance') || 'Opening Balance' }}</div>
-            <input v-model.number="form.openingBalance" type="number" :placeholder="$t('transporters.placeholders.openingBalance')" class="w-full px-3 py-2 border rounded theme-input-focus" />
-            <p v-if="editing" class="mt-1 text-xs text-amber-700">
-              <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.openingBalance }}<template v-if="openingBalancePending.locationName"> — {{ openingBalancePending.locationName }}</template></template>
-              <template v-else>{{ $i18n.locale === 'ar' ? 'تعديل رصيد أول المدة يحتاج موافقة إدارية' : 'Changing the opening balance needs admin approval' }}</template>
-            </p>
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $i18n.locale === 'ar' ? 'موقع رصيد أول المدة' : 'Opening Balance Site' }}</div>
-            <select v-model="form.openingBalanceLocationId" :disabled="!Number(form.openingBalance)" class="w-full px-3 py-2 border rounded bg-white theme-input-focus disabled:opacity-60">
-              <option value="">{{ $i18n.locale === 'ar' ? 'بدون موقع' : 'No site' }}</option>
-              <option v-for="l in locations" :key="l.id" :value="l.id">{{ l.name }}</option>
-            </select>
-          </label>
-          <label>
             <div class="text-sm mb-1">{{ $t('transporters.notes') }}</div>
             <input v-model="form.notes" :placeholder="$t('transporters.placeholders.notes')" class="w-full px-3 py-2 border rounded theme-input-focus" />
           </label>
+          <div class="sm:col-span-2 lg:col-span-3">
+            <OpeningBalanceSitesField v-model="form.openingBalanceLines" :locations="locations" />
+            <p v-if="editing" class="mt-1 text-xs text-amber-700">
+              <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.sites || openingBalancePending.openingBalance }}<template v-if="!openingBalancePending.sites && openingBalancePending.locationName"> — {{ openingBalancePending.locationName }}</template></template>
+              <template v-else>{{ $i18n.locale === 'ar' ? 'تعديل رصيد أول المدة يحتاج موافقة إدارية' : 'Changing the opening balance needs admin approval' }}</template>
+            </p>
+          </div>
           
         </div>
         <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
@@ -220,6 +212,7 @@ import { getContractors, getContractorOpeningBalance, getLocations, createContra
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
+import OpeningBalanceSitesField, { emptyOpeningBalanceLine, openingBalanceLinesFromApi, openingBalanceLinesPayload, sameOpeningBalanceLines } from '@/components/shared/OpeningBalanceSitesField.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
@@ -228,13 +221,13 @@ export default {
   props: {
     mode: { type: String, default: 'transport' }
   },
-  components: { Pagination, DateField, WalletPanel, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
+  components: { Pagination, DateField, WalletPanel, OpeningBalanceSitesField, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
   data() {
     return {
       q: '',
       modalOpen: false,
       editing: false,
-      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '', openingBalanceLocationId: '' },
+      form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalanceLines: [emptyOpeningBalanceLine()] },
       contractors: [],
       locations: [],
       deleteConfirm: { open: false, item: null },
@@ -249,8 +242,7 @@ export default {
       pageSize: 20,
       total: 0,
       searchTimeout: null,
-      openingBalanceOriginal: null,
-      openingBalanceLocationOriginal: null,
+      openingBalanceLinesOriginal: null,
       openingBalancePending: null
     }
   },
@@ -328,7 +320,7 @@ export default {
     },
     openAdd() {
       this.editing = false
-      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalance: '', openingBalanceLocationId: '' }
+      this.form = { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalanceLines: [emptyOpeningBalanceLine()] }
       this.modalOpen = true
     },
     openEdit(c) {
@@ -336,18 +328,14 @@ export default {
       const rest = { ...(c || {}) }
       delete rest.openingBalance
       this.form = { ...rest }
-      this.form.openingBalance = ''
-      this.form.openingBalanceLocationId = ''
-      this.openingBalanceOriginal = null
-      this.openingBalanceLocationOriginal = null
+      this.form.openingBalanceLines = [emptyOpeningBalanceLine()]
+      this.openingBalanceLinesOriginal = null
       this.openingBalancePending = null
       getContractorOpeningBalance(c.id, 'TRANSPORT')
         .then(({ data }) => {
           if (!this.editing || this.form.id !== c.id) return
-          this.openingBalanceOriginal = data.openingBalance
-          this.form.openingBalance = data.openingBalance
-          this.openingBalanceLocationOriginal = data.locationId ?? null
-          this.form.openingBalanceLocationId = data.locationId ?? ''
+          this.openingBalanceLinesOriginal = openingBalanceLinesFromApi(data.lines)
+          this.form.openingBalanceLines = openingBalanceLinesFromApi(data.lines)
           this.openingBalancePending = data.pendingApproval
         })
         .catch(err => console.error('Failed to load opening balance:', err))
@@ -367,17 +355,12 @@ export default {
       if (this.form.bankName?.trim()) payload.bankName = this.form.bankName.trim()
       if (this.form.accountNumber?.trim()) payload.accountNumber = this.form.accountNumber.trim()
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
-      const locationId = this.form.openingBalanceLocationId || null
-      if (!this.editing && this.form.openingBalance !== undefined && this.form.openingBalance !== null && this.form.openingBalance !== '') {
-        payload.openingBalance = Number(this.form.openingBalance)
-        if (locationId) payload.openingBalanceLocationId = locationId
-      }
+      const openingBalanceLines = openingBalanceLinesPayload(this.form.openingBalanceLines)
+      if (!this.editing && openingBalanceLines.length) payload.openingBalanceLines = openingBalanceLines
       // On an existing contractor a changed opening balance (amount or site) goes to admin approval
-      const openingBalanceChanged = Number(this.form.openingBalance) !== Number(this.openingBalanceOriginal) || locationId !== this.openingBalanceLocationOriginal
-      if (this.editing && this.openingBalanceOriginal !== null && this.form.openingBalance !== '' && openingBalanceChanged) {
-        payload.openingBalance = Number(this.form.openingBalance)
+      if (this.editing && this.openingBalanceLinesOriginal !== null && !sameOpeningBalanceLines(this.form.openingBalanceLines, this.openingBalanceLinesOriginal)) {
+        payload.openingBalanceLines = openingBalanceLines
         payload.openingBalanceAccountType = 'TRANSPORT'
-        payload.openingBalanceLocationId = locationId
       }
       // mark contractor available only for transports
       payload.availableForTransports = true

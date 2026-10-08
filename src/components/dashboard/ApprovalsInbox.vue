@@ -433,6 +433,7 @@ export default {
           notes: 'Reason/Notes',
           // Field mappings
           openingBalance: 'Opening Balance',
+          sites: 'Per Site',
           accountType: 'Account',
           contractorName: 'Contractor',
           locationName: 'Site',
@@ -483,6 +484,7 @@ export default {
           notes: 'السبب/الملاحظات',
           // Field mappings
           openingBalance: 'رصيد أول المدة',
+          sites: 'حسب الموقع',
           accountType: 'الحساب',
           contractorName: 'المقاول',
           locationName: 'الموقع',
@@ -626,6 +628,8 @@ export default {
       Object.keys(app.afterState).forEach(key => {
         // The site name is shown instead of its id when the request carries both
         if (key === 'locationId' && 'locationName' in app.afterState) return;
+        // Per-site opening balance lines are shown through their `sites` text
+        if (key === 'lines') return;
         const oldVal = app.beforeState[key];
         const newVal = app.afterState[key];
         // Compare values, ignore formatting differences
@@ -736,7 +740,7 @@ export default {
       ]);
       const excludeKeys = [
         'id', 'createdAt', 'updatedAt', 'createdById', 'updatedById', 'deletedAt',
-        'contractorId', 'locationId', 'areaId', 'itemId', 'vehicleId', 'driverId', 'crusherId',
+        'contractorId', 'locationId', 'areaId', 'itemId', 'vehicleId', 'driverId', 'crusherId', 'lines',
         'hasPendingApproval', 'availableForSupplies', 'availableForExports', 'availableForTransports'
       ];
       return Array.from(keys).filter(k => !excludeKeys.includes(k));
@@ -776,6 +780,7 @@ export default {
         discount: this.locale === 'ar' ? 'الخصم' : 'Discount',
         total: this.locale === 'ar' ? 'الإجمالي' : 'Total',
         openingBalance: this.locale === 'ar' ? 'رصيد أول المدة' : 'Opening Balance',
+        sites: this.locale === 'ar' ? 'حسب الموقع' : 'Per Site',
         accountType: this.locale === 'ar' ? 'الحساب' : 'Account',
         notes: this.locale === 'ar' ? 'الملاحظات' : 'Notes',
         note: this.locale === 'ar' ? 'الملاحظات' : 'Notes',
