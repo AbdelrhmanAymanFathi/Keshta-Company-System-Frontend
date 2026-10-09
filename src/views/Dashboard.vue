@@ -363,7 +363,6 @@ export default {
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
           { name: 'suppliesList', label: 'dashboard.suppliesList', routeName: 'supplies-list' },
-          { name: 'petroleumSupplies', label: 'dashboard.petroleumSupplies', routeName: 'petroleum-supplies-list' },
           { name: 'suppliersList', label: 'dashboard.suppliersList', routeName: 'suppliers-list' },
           { name: 'crushersList', label: 'dashboard.crushersList', routeName: 'crushers-list' },
           { name:'suppliesItemList', label: 'dashboard.itemsList', routeName: 'supplies-items-list' },
@@ -605,7 +604,7 @@ export default {
       // Extracts module routes
       const extractsRoutes = ['extracts-list', 'create-extract', 'extracts-detail', 'extracts-items', 'extracts-contractors-list', 'contractor-extract-statement']
       if (extractsRoutes.includes(routeName)) return 'extracts'
-      const suppliesRoutes = ['new-supply', 'supplies-list', 'petroleum-supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
+      const suppliesRoutes = ['new-supply', 'supplies-list', 'supplies-report', 'supliers-list', 'contractor-supply-statement', 'crushers-list', 'vehicles-list']
       const transportRoutes = ['transport-list', 'transport-report', 'transport-items-list', 'transport-contractors-list', 'transport-vehicles', 'transport-crushers-list', 'contractor-transport-statement']
       const equipmentRoutes = ['equipment-log-list', 'equipment-report', 'equipment-list', 'equipment-drivers-list', 'equipment-contractors-list', 'equipment-contractor-statement']
       const walletRoutes = ['treasury', 'company-transactions', 'treasury-report']

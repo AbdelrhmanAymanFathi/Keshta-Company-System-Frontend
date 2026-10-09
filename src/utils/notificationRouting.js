@@ -8,12 +8,12 @@ const routeMap = {
   extract: 'extracts-list',
   approval: 'approvals-inbox',
   rental: 'equipment-contractors-list',
-  'petroleum-supply': 'petroleum-supplies-list',
+  'petroleum-supply': 'supplies-list',
   wallet: 'treasury',
 }
 
 // Types whose list page knows how to open a single record from ?focus=<id>
-const focusableTypes = new Set(['supply', 'transport', 'equipment', 'expense', 'payment', 'approval', 'petroleum-supply'])
+const focusableTypes = new Set(['supply', 'transport', 'equipment', 'expense', 'payment', 'approval'])
 
 export function resolveNotificationRoute(item) {
   const type = item.type || item.entityType
