@@ -1653,6 +1653,20 @@ export const getBranchesChanges = (params) => {
   return axios.get(`${BASE_URL}/api/branches/changes?${query.toString()}`);
 };
 
+// Petroleum supplies (bitumen etc.): one record = material owed to the supplier + its haulage
+export const getPetroleumSupplies = (params = {}) =>
+  axios.get(`${BASE_URL}/api/petroleum-supplies`, { params });
+export const getPetroleumSupply = (id) =>
+  axios.get(`${BASE_URL}/api/petroleum-supplies/${id}`);
+export const createPetroleumSupply = (data) =>
+  axios.post(`${BASE_URL}/api/petroleum-supplies`, data);
+export const updatePetroleumSupply = (id, data) =>
+  axios.patch(`${BASE_URL}/api/petroleum-supplies/${id}`, data);
+export const deletePetroleumSupply = (id) =>
+  axios.delete(`${BASE_URL}/api/petroleum-supplies/${id}`);
+export const getPetroleumSuppliesReport = (params = {}, format = 'xlsx') =>
+  axios.get(`${BASE_URL}/api/petroleum-supplies/report`, { params: { ...params, format }, responseType: 'blob' });
+
 export const getPetroleumSuppliesChanges = (params) => {
   const query = buildChangesQuery(params);
   return axios.get(`${BASE_URL}/api/petroleum-supplies/changes?${query.toString()}`);

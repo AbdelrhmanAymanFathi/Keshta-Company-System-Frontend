@@ -14,6 +14,7 @@ const Dashboard = () => import("@/views/Dashboard.vue")
 // const NewSupply = () => import('@/components/dashboard/NewSupply.vue')
 const SuppliesList = () => import('@/components/dashboard/Supply/SuppliesList.vue')
 const SuppliesReport = () => import('@/components/dashboard/Supply/SuppliesReportNew.vue')
+const PetroleumSuppliesList = () => import('@/components/dashboard/Supply/PetroleumSuppliesList.vue')
 const SuppliersList = () => import('@/components/dashboard/Supply/SuppliersList.vue')
 const ContractorStatement = () => import('@/components/dashboard/ContractorStatement.vue')
 const ItemList = () => import('@/components/dashboard/Items/ItemList.vue')
@@ -76,6 +77,12 @@ const routes = [
         name: 'supplies-list',
         component: SuppliesList,
         meta: { title: 'dashboard.suppliesList' }
+      },
+      {
+        path: 'supplies/petroleum',
+        name: 'petroleum-supplies-list',
+        component: PetroleumSuppliesList,
+        meta: { title: 'dashboard.petroleumSupplies' }
       },
       {
         path: 'supplies/report',
