@@ -394,12 +394,38 @@ class RealtimeService {
       this._pageClosing = true
       this.close()
     }
+    // iOS Safari (and other mobile browsers) fire `pagehide` whenever the app
+    // is backgrounded, the tab is switched or the screen is locked — not only
+    // on a real navigation like desktop browsers. Without reviving on the way
+    // back the stream would stay permanently closed until a full reload.
+    const onPageShow = () => this.reviveConnection()
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') this.reviveConnection()
+    }
     window.addEventListener('beforeunload', onBeforeUnload)
     window.addEventListener('pagehide', onPageHide)
+    window.addEventListener('pageshow', onPageShow)
+    document.addEventListener('visibilitychange', onVisibilityChange)
     this._cleanupFns.push(() => {
       window.removeEventListener('beforeunload', onBeforeUnload)
       window.removeEventListener('pagehide', onPageHide)
+      window.removeEventListener('pageshow', onPageShow)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     })
+  }
+
+  reviveConnection() {
+    if (this._destroyed) return
+    this._pageClosing = false
+    if (this._exhausted) {
+      this._exhausted = false
+      this.connectionError.value = null
+      this._errorFired = false
+    }
+    if (this.isConnected.value || this.isConnecting) return
+    this.resetReconnectCounters()
+    this.close()
+    this.connect()
   }
 
   _teardownLifecycleHooks() {

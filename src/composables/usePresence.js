@@ -74,7 +74,7 @@ export function usePresence(page, recordId = null) {
     request('PUT', { ...baseBody(), x, y })
   }
 
-  function handleMouseMove(evt) {
+  function handlePointerMove(evt) {
     if (!active() || document.hidden) return
     const w = window.innerWidth || document.documentElement.clientWidth || 1
     const h = window.innerHeight || document.documentElement.clientHeight || 1
@@ -99,7 +99,9 @@ export function usePresence(page, recordId = null) {
   function attachCursor() {
     if (cursorAttached) return
     cursorAttached = true
-    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    // `pointermove` covers mouse, pen and touch input, so presence cursors now
+    // work on phones/tablets (iOS Safari fires pointer events for touch).
+    window.addEventListener('pointermove', handlePointerMove, { passive: true })
   }
 
   function onPresence(event, data) {
@@ -148,7 +150,7 @@ export function usePresence(page, recordId = null) {
     leave()
     unsub()
     if (cursorAttached) {
-      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('pointermove', handlePointerMove)
       cursorAttached = false
     }
     stopClientWatch()
