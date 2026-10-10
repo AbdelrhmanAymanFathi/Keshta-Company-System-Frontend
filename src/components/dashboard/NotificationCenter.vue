@@ -71,6 +71,7 @@
             <p v-if="item.message" class="mt-0.5 text-sm theme-text-secondary line-clamp-2">
               {{ item.message }}
             </p>
+            <NotificationChanges v-if="item.changes?.length" :changes="item.changes" class="max-w-xl" />
             <div class="mt-1 flex items-center gap-3 text-xs theme-text-muted">
               <span>{{ formatDate(item.createdAt) }}</span>
               <span :class="['inline-flex rounded-full px-2 py-0.5 text-xs font-medium', typeBadge(item.type)]">
@@ -111,10 +112,11 @@ import { useNotificationStore } from '@/stores/useNotificationStore'
 import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import Pagination from '@/components/shared/Pagination.vue'
+import NotificationChanges from '@/components/shared/NotificationChanges.vue'
 
 export default {
   name: 'NotificationCenter',
-  components: { PageHeader, Pagination },
+  components: { PageHeader, Pagination, NotificationChanges },
   setup() {
     const store = useNotificationStore()
     const router = useRouter()

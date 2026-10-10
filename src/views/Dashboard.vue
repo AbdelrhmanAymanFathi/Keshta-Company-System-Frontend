@@ -155,6 +155,7 @@
                       {{ item.title }}
                     </p>
                     <p class="text-xs text-slate-500 truncate mt-0.5">{{ item.message }}</p>
+                    <NotificationChanges v-if="item.changes?.length" :changes="item.changes" :limit="3" />
                     <p class="text-[10px] text-slate-400 mt-1">{{ formatNotifDate(item.createdAt) }}</p>
                   </div>
                   <div v-if="!item.isRead" class="shrink-0 mt-2">
@@ -418,6 +419,7 @@ import { themeRevision, loadTheme } from '@acme/theme-engine'
 import { useNotificationStore } from '@/stores/useNotificationStore'
 import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import { VueDraggable } from 'vue-draggable-plus'
+import NotificationChanges from '@/components/shared/NotificationChanges.vue'
 import {
   getSidebarAsideClasses,
   shouldShowBackdrop,
@@ -432,7 +434,7 @@ import {
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable },
+  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
