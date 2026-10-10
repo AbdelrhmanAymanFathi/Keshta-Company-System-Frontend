@@ -141,6 +141,18 @@
               </select>
             </label>
 
+            <!-- Supply type: decides which fields the supply wizard asks for -->
+            <label class="block" v-if="form.availableForSupplies">
+              <div class="text-sm font-medium mb-1">{{ $t('labels.supplyType') }}</div>
+              <select v-model="form.supplyType"
+                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus">
+                <option v-if="!editingItem" value="">{{ $t('labels.supplyTypeAuto') }}</option>
+                <option value="AGGREGATE">{{ $t('labels.supplyTypeAggregate') }}</option>
+                <option value="PRECAST">{{ $t('labels.supplyTypePrecast') }}</option>
+                <option value="PETROLEUM">{{ $t('labels.supplyTypePetroleum') }}</option>
+              </select>
+            </label>
+
             <!-- Prices (mode-specific) -->
             <label class="block" v-if="mode === 'supply' || mode === 'all'">
               <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</div>
@@ -284,7 +296,8 @@ export default {
         isActive: true,
         availableForSupplies: false,
         availableForExtracts: false,
-        availableForTransports: false
+        availableForTransports: false,
+        supplyType: ''
       },
       errors: {
         name: '',
@@ -400,6 +413,7 @@ export default {
       this.form.availableForSupplies = !!item.availableForSupplies
       this.form.availableForTransports = !!item.availableForTransports
       this.form.availableForExtracts = !!item.availableForExtracts
+      this.form.supplyType = item.supplyType || 'AGGREGATE'
       this.modalOpen = true
     },
 
@@ -415,7 +429,8 @@ export default {
         isActive: true,
         availableForSupplies: false,
         availableForExtracts: false,
-        availableForTransports: false
+        availableForTransports: false,
+        supplyType: ''
       }
       this.errors = {
         name: '',
@@ -512,6 +527,8 @@ export default {
         if (this.form.availableForSupplies) {
           payload.defaultSupplyPrice = this.form.defaultSupplyPrice
           payload.availableForSupplies = true
+          // Left empty, the server picks the type from the item name
+          if (this.form.supplyType) payload.supplyType = this.form.supplyType
         }
         if (this.form.availableForTransports) {
           payload.defaultTransportPrice = this.form.defaultTransportPrice

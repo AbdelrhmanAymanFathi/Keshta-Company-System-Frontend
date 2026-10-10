@@ -77,7 +77,7 @@
                 <!-- Price (السعر) -->
                 <div>
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">
-                    {{ $t('labels.price') }} <span class="text-red-600">*</span>
+                    {{ isPetroleum ? $t('labels.tonPrice') : $t('labels.price') }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative">
                     <CurrencyDollarIcon
@@ -146,10 +146,10 @@
                   </div>
                 </div>
 
-                <!-- Contractor (المقاول) -->
+                <!-- Contractor (المقاول), the material supplier (المورد) for precast and petroleum items -->
                 <div>
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">
-                    {{ $t('labels.contractor') }} <span class="text-red-600">*</span>
+                    {{ contractorLabel }} <span class="text-red-600">*</span>
                   </label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
@@ -175,8 +175,8 @@
                   </div>
                 </div>
 
-                <!-- Crusher (الكسارة) -->
-                <div>
+                <!-- Crusher (الكسارة): aggregates only -->
+                <div v-if="isAggregate">
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">
                     {{ $t('labels.crusher') }} <span class="text-red-600">*</span>
                   </label>
@@ -256,7 +256,7 @@
                   <dd class="theme-text-primary mt-1">{{ commonData.item?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.price') }}:</dt>
+                  <dt class="font-semibold theme-text-secondary">{{ isPetroleum ? $t('labels.tonPrice') : $t('labels.price') }}:</dt>
                   <dd class="theme-text-primary mt-1">{{ formatNumber(commonData.price) }}</dd>
                 </div>
                 <div class="flex flex-col">
@@ -268,10 +268,10 @@
                   <dd class="theme-text-primary mt-1">{{ commonData.area?.name || '-' }}</dd>
                 </div>
                 <div class="flex flex-col">
-                  <dt class="font-semibold theme-text-secondary">{{ $t('labels.contractor') }}:</dt>
+                  <dt class="font-semibold theme-text-secondary">{{ contractorLabel }}:</dt>
                   <dd class="theme-text-primary mt-1">{{ commonData.contractor?.name || '-' }}</dd>
                 </div>
-                <div class="flex flex-col">
+                <div v-if="isAggregate" class="flex flex-col">
                   <dt class="font-semibold theme-text-secondary">{{ $t('labels.crusher') }}:</dt>
                   <dd class="theme-text-primary mt-1">{{ commonData.crusher?.name || '-' }}</dd>
                 </div>
@@ -301,21 +301,51 @@
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary w-12">{{ $t('#') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.vehicle') }}</th>
-                      <!-- <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.price') }}</th> -->
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.crusherTicket') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.companyTicket') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.discount') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.companyCapacity') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.crusherCapacity') }}</th>
-                      <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
-                        $t('labels.total') }}</th>
+                      <template v-if="isAggregate">
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.vehicle') }}</th>
+                        <!-- <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{ $t('labels.price') }}</th> -->
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.crusherTicket') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.companyTicket') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.discount') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.companyCapacity') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.crusherCapacity') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.total') }}</th>
+                      </template>
+                      <template v-else-if="isPrecast">
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.supplyPermitNo') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.receiptNo') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.quantity') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.discount') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.total') }}</th>
+                      </template>
+                      <template v-else>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.supplyPermitNo') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.vehicleNumber') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.loadTons') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.transportContractor') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.transportPricePerTon') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.supplierDue') }}</th>
+                        <th class="px-4 py-3 text-start text-xs font-medium theme-text-secondary whitespace-nowrap">{{
+                          $t('labels.transportTotal') }}</th>
+                      </template>
                       <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary">{{ $t('labels.actions') }}
                       </th>
                     </tr>
@@ -324,8 +354,9 @@
                     <tr v-for="(row, index) in rows" :key="row.id">
                       <td class="px-4 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
 
-                      <!-- ======================== first column 
+                      <!-- ======================== first column
                      in step 2 ================ -->
+                      <template v-if="isAggregate">
                       <!-- Vehicle -->
                       <td class="px-3 py-2" :ref="el => row.vehicleCell = el">
                         <div class="relative">
@@ -397,7 +428,7 @@
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.crusherCapacity" step="0.01"
                           @keydown.enter.prevent="handleEnterKey(index)"
-                          @keydown.tab="onCrusherCapacityTab(index, $event)"
+                          @keydown.tab="onLastFieldTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
@@ -405,6 +436,71 @@
                       <td class="px-3 py-2 text-sm font-semibold theme-text">
                         {{ formatNumber(totalPerRow(row)) }}
                       </td>
+                      </template>
+
+                      <!-- Precast (انترلوك / بردورة) -->
+                      <template v-else-if="isPrecast">
+                        <td class="px-3 py-2">
+                          <input type="text" v-model="row.supplyPermitNo" @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input type="text" v-model="row.receiptNo" @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input type="number" v-model.number="row.companyCapacity" step="0.01"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input type="number" v-model.number="row.discount" step="0.01"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.tab="onLastFieldTab(index, $event)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
+                        </td>
+                        <td class="px-3 py-2 text-sm font-semibold theme-text">
+                          {{ formatNumber(totalPerRow(row)) }}
+                        </td>
+                      </template>
+
+                      <!-- Petroleum (بتومين / MC / RC) -->
+                      <template v-else>
+                        <td class="px-3 py-2">
+                          <input type="text" v-model="row.supplyPermitNo" @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input type="text" v-model="row.vehicleNumber" @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
+                        </td>
+                        <td class="px-3 py-2">
+                          <input type="number" v-model.number="row.companyCapacity" step="0.01"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
+                        </td>
+                        <!-- Transport is optional: the supplier may deliver the load itself -->
+                        <td class="px-3 py-2">
+                          <select v-model="row.transportContractorId" @change="onTransportContractorChange(row)"
+                            class="w-full min-w-40 border border-gray-300 rounded px-2 py-1 bg-white text-sm theme-input-focus">
+                            <option :value="null">{{ $t('labels.withoutTransport') }}</option>
+                            <option v-for="c in transportContractors" :key="c.id" :value="c.id">{{ c.name }}</option>
+                          </select>
+                        </td>
+                        <td class="px-3 py-2">
+                          <input type="number" v-model.number="row.transportPrice" step="0.01" min="0"
+                            :disabled="!row.transportContractorId"
+                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.tab="onLastFieldTab(index, $event)"
+                            class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner disabled:bg-gray-100 disabled:cursor-not-allowed" />
+                        </td>
+                        <td class="px-3 py-2 text-sm font-semibold theme-text">
+                          {{ formatNumber(totalPerRow(row)) }}
+                        </td>
+                        <td class="px-3 py-2 text-sm font-semibold theme-text">
+                          {{ formatNumber(transportPerRow(row)) }}
+                        </td>
+                      </template>
 
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
@@ -428,19 +524,32 @@
             <!-- Totals -->
             <div
               class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
-              <div class="flex items-center justify-end gap-3">
-                <span class="theme-text-secondary">{{ $t('labels.subtotal') }}:</span>
-                <span class="theme-text-primary min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
-              </div>
-              <div class="flex items-center justify-end gap-3">
-                <span class="theme-text-secondary">{{ $t('labels.totalDiscount') }}:</span>
-                <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
-              </div>
-              <div
-                class="flex items-center justify-end gap-3 text-lg theme-accent-strong border-s-4 theme-border-accent ps-6">
-                <span class="theme-accent-muted">{{ $t('labels.grandTotal') }}:</span>
-                <span class="theme-accent-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
-              </div>
+              <template v-if="isPetroleum">
+                <div class="flex items-center justify-end gap-3">
+                  <span class="theme-text-secondary">{{ $t('labels.transportTotal') }}:</span>
+                  <span class="theme-text-primary min-w-32 text-end">{{ formatNumber(transportGrandTotal) }}</span>
+                </div>
+                <div
+                  class="flex items-center justify-end gap-3 text-lg theme-accent-strong border-s-4 theme-border-accent ps-6">
+                  <span class="theme-accent-muted">{{ $t('labels.supplierDue') }}:</span>
+                  <span class="theme-accent-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+                </div>
+              </template>
+              <template v-else>
+                <div class="flex items-center justify-end gap-3">
+                  <span class="theme-text-secondary">{{ $t('labels.subtotal') }}:</span>
+                  <span class="theme-text-primary min-w-32 text-end">{{ formatNumber(subtotal) }}</span>
+                </div>
+                <div class="flex items-center justify-end gap-3">
+                  <span class="theme-text-secondary">{{ $t('labels.totalDiscount') }}:</span>
+                  <span class="text-red-600 min-w-32 text-end">-{{ formatNumber(totalDiscount) }}</span>
+                </div>
+                <div
+                  class="flex items-center justify-end gap-3 text-lg theme-accent-strong border-s-4 theme-border-accent ps-6">
+                  <span class="theme-accent-muted">{{ $t('labels.grandTotal') }}:</span>
+                  <span class="theme-accent-muted min-w-40 text-end font-bold">{{ formatNumber(grandTotal) }}</span>
+                </div>
+              </template>
             </div>
 
             <!-- Save / Back Buttons -->
@@ -678,6 +787,7 @@ export default {
       allLocations: [],
       rows: [],
       contractors: [],
+      transportContractors: [],
       contractorsWithVehicles: [],
       crushers: [],
       vehicles: [],
@@ -769,6 +879,27 @@ export default {
     },
 
 
+    // AGGREGATE (سن/رمل/بودرة/تربة), PRECAST (انترلوك/بردورة) or PETROLEUM (بتومين/MC/RC)
+    supplyType() {
+      return this.commonData.item?.supplyType || 'AGGREGATE'
+    },
+    isAggregate() {
+      return this.supplyType === 'AGGREGATE'
+    },
+    isPrecast() {
+      return this.supplyType === 'PRECAST'
+    },
+    isPetroleum() {
+      return this.supplyType === 'PETROLEUM'
+    },
+    contractorLabel() {
+      return this.isAggregate ? this.$t('labels.contractor') : this.$t('labels.supplierName')
+    },
+
+    transportGrandTotal() {
+      return this.rows.reduce((sum, row) => sum + this.transportPerRow(row), 0)
+    },
+
     subtotal() {
       return this.rows.reduce((sum, row) => {
         const p = Number(this.commonData.price || 0)
@@ -849,7 +980,7 @@ export default {
     },
 
     // Add new row when Tab is pressed on last field
-    onCrusherCapacityTab(index, event) {
+    onLastFieldTab(index, event) {
       // Allow Shift+Tab for backwards navigation
       if (event.shiftKey) return;
 
@@ -859,7 +990,7 @@ export default {
         const newRowIndex = this.rows.length;
         this.addRow();
 
-        // Focus on vehicle input in the new row with a small timeout
+        // Focus on the first input in the new row with a small timeout
         setTimeout(() => {
           this.$nextTick(() => {
             if (!this.tableRef) return;
@@ -877,12 +1008,14 @@ export default {
     },
     // ============ Step Control ============
     isStep1Valid() {
-      return this.commonData.date &&
+      const base = this.commonData.date &&
         this.commonData.item &&
         this.commonData.price > 0 &&
         this.commonData.site &&
-        this.commonData.contractor &&
-        this.commonData.crusher
+        this.commonData.contractor
+      if (!base) return false
+      if (this.isAggregate) return !!this.commonData.crusher
+      return true
     },
 
     async goToStep2() {
@@ -1018,6 +1151,7 @@ export default {
 
     // ============ Row Management ============
     createEmptyRow() {
+      const prev = this.rows[this.rows.length - 1]
       const row = {
         id: Date.now() + Math.random(),
         date: this.commonData.date,
@@ -1038,6 +1172,11 @@ export default {
         item: this.commonData.item,
         crusherTicket: '',
         companyTicket: '',
+        supplyPermitNo: '',
+        receiptNo: '',
+        vehicleNumber: '',
+        transportContractorId: prev?.transportContractorId ?? null,
+        transportPrice: prev?.transportPrice ?? 0,
         discount: 0,
         price: this.commonData.price,
         companyCapacity: 0,
@@ -1055,6 +1194,9 @@ export default {
     isRowEmpty(row) {
       return !row.crusherTicket?.trim() &&
         !row.companyTicket?.trim() &&
+        !row.supplyPermitNo?.trim() &&
+        !row.receiptNo?.trim() &&
+        !row.vehicleNumber?.trim() &&
         !row.discount &&
         !row.companyCapacity &&
         !row.crusherCapacity &&
@@ -1063,15 +1205,26 @@ export default {
 
     getMissingRequiredFields(row) {
       const missing = []
-      if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
-      if (!row.crusherTicket?.trim()) missing.push(this.$t('labels.crusherTicket'))
-      if (!row.companyTicket?.trim()) missing.push(this.$t('labels.companyTicket'))
+      if (this.isAggregate) {
+        if (!row.vehicle) missing.push(this.$t('labels.vehicle'))
+        if (!row.crusherTicket?.trim()) missing.push(this.$t('labels.crusherTicket'))
+        if (!row.companyTicket?.trim()) missing.push(this.$t('labels.companyTicket'))
+      } else {
+        if (!row.supplyPermitNo?.trim()) missing.push(this.$t('labels.supplyPermitNo'))
+        if (this.isPrecast && !row.receiptNo?.trim()) missing.push(this.$t('labels.receiptNo'))
+        if (this.isPetroleum && row.transportContractorId && !(Number(row.transportPrice) > 0)) {
+          missing.push(this.$t('labels.transportPricePerTon') + ' (> 0)')
+        }
+      }
 
       const discount = Number(row.discount || 0)
       const companyCapacity = Number(row.companyCapacity || 0)
+      const quantityLabel = this.isAggregate
+        ? this.$t('vehicles.companyCapacity')
+        : (this.isPetroleum ? this.$t('labels.loadTons') : this.$t('labels.quantity'))
 
       if (discount < 0) missing.push(this.$t('labels.discount') + ' (≥ 0)')
-      if (companyCapacity <= 0) missing.push(this.$t('vehicles.companyCapacity') + ' (> 0)')
+      if (companyCapacity <= 0) missing.push(quantityLabel + ' (> 0)')
 
       return missing
     },
@@ -1108,6 +1261,9 @@ export default {
       copy.open = false
       copy.crusherTicket = ''
       copy.companyTicket = ''
+      copy.supplyPermitNo = ''
+      copy.receiptNo = ''
+      copy.vehicleNumber = ''
       copy.discount = 0
       copy.companyCapacity = 0
       copy.crusherCapacity = ''
@@ -1318,6 +1474,16 @@ export default {
       return total
     },
 
+    // Petroleum loads: transport contractor is paid per ton hauled
+    transportPerRow(row) {
+      if (!this.isPetroleum || !row.transportContractorId) return 0
+      return Number(row.transportPrice || 0) * Number(row.companyCapacity || 0)
+    },
+
+    onTransportContractorChange(row) {
+      if (!row.transportContractorId) row.transportPrice = 0
+    },
+
     formatNumber(v) {
       // Always show numbers in English
       return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })
@@ -1422,13 +1588,14 @@ export default {
 
     async loadLookups() {
       try {
-        const [cRes, cvRes, crushRes, vRes] = await Promise.all([
+        const [cRes, cvRes, crushRes, vRes, tRes] = await Promise.all([
           getContractors({ mode: 'supply', pageSize: 1000 }),
           typeof getContractorsWithVehicles === 'function'
             ? getContractorsWithVehicles({ mode: 'supply' })
             : Promise.resolve(null),
           getCrushers(),
-          getVehicles({ mode: 'supply', pageSize: 1000 })
+          getVehicles({ mode: 'supply', pageSize: 1000 }),
+          getContractors({ mode: 'transport', pageSize: 1000 })
         ])
 
         const extractArray = (res) => {
@@ -1443,6 +1610,7 @@ export default {
         }
 
         this.contractors = extractArray(cRes)
+        this.transportContractors = extractArray(tRes)
         this.contractorsWithVehicles = extractArray(cvRes)
         this.crushers = extractArray(crushRes)
         const vehiclesFromList = extractArray(vRes).map(vehicle => this.normalizeVehicle(vehicle))
@@ -1578,9 +1746,11 @@ export default {
       this.creatingExportItem = true
       this.exportItemDialogError = ''
       try {
+        // Without availableForSupplies the new item is filtered out of the supply item list
         const res = await createExportItem({
           name: name.trim(),
-          currentPrice: Number(currentPrice)
+          defaultSupplyPrice: Number(currentPrice),
+          availableForSupplies: true
         })
         const newItem = res?.data
         if (!newItem || !newItem.id) throw new Error('Invalid response')
@@ -1642,16 +1812,21 @@ export default {
             locationId: this.commonData.site?.id || (this.commonData.location?.id || null),
             areaId: this.commonData.area?.id || null,
             contractorId: this.commonData.contractor?.id ? Number(this.commonData.contractor.id) : null,
-            crusherId: this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
+            crusherId: this.isAggregate && this.commonData.crusher?.id ? Number(this.commonData.crusher.id) : null,
             itemId: this.commonData.item?.id ? Number(this.commonData.item.id) : null,
             notes: this.commonData.notes || undefined,
-            vehicleId: r.vehicle?.id ? Number(r.vehicle.id) : undefined,
+            vehicleId: this.isAggregate && r.vehicle?.id ? Number(r.vehicle.id) : undefined,
             crusherTicket: r.crusherTicket?.trim() || undefined,
             companyTicket: r.companyTicket?.trim() || undefined,
             companyCapacity: r.companyCapacity !== undefined && r.companyCapacity !== null ? Number(r.companyCapacity) : undefined,
             crusherCapacity: r.crusherCapacity !== undefined && r.crusherCapacity !== null ? Number(r.crusherCapacity) : undefined,
             unitPrice: (r.unitPrice !== undefined && r.unitPrice !== null) ? Number(r.unitPrice) : (this.commonData.price !== undefined ? Number(this.commonData.price) : undefined),
-            discount: r.discount !== undefined && r.discount !== null ? Number(r.discount) : undefined
+            discount: r.discount !== undefined && r.discount !== null ? Number(r.discount) : undefined,
+            supplyPermitNo: r.supplyPermitNo?.trim() || undefined,
+            receiptNo: r.receiptNo?.trim() || undefined,
+            vehicleNumber: r.vehicleNumber?.trim() || undefined,
+            transportContractorId: this.isPetroleum && r.transportContractorId ? Number(r.transportContractorId) : undefined,
+            transportPricePerTon: this.isPetroleum && r.transportContractorId ? Number(r.transportPrice || 0) : undefined
           }
 
           // If editing a single export (modal opened for edit), prefer update for that specific export id
@@ -1670,6 +1845,8 @@ export default {
 
         // capture the step-1 data so we can pass it to transport modal if needed
         const step1 = JSON.parse(JSON.stringify(this.commonData || {}))
+        // Petroleum transport is entered with the supply itself
+        const offerTransport = !this.isPetroleum
 
         // Reset
         this.currentStep = 1
@@ -1683,7 +1860,7 @@ export default {
         try {
           const itemObj = step1 && step1.item && (typeof step1.item === 'object') ? step1.item : (this.exportItems || []).find(i => i.id === step1.item)
           const availableForTransport = itemObj && (itemObj.availableForTransport === true || itemObj.availableForTransports === true || itemObj.availableForTransports === 1 || itemObj.availableForTransport === 1)
-          if (step1 && itemObj && availableForTransport) {
+          if (offerTransport && step1 && itemObj && availableForTransport) {
             // Map supply step-1 fields to a transport draft payload
             this.transportModalPayload = {
               // location/area naming in transport modal uses `location`/`area`
