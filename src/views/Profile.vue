@@ -51,7 +51,48 @@
           </div>
         </div>
 
-        
+        <!-- Live Presence Card -->
+        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <div class="flex items-center gap-3">
+              <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                <svg class="w-6 h-6 theme-text-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+                </svg>
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.presenceTitle') || 'Live Presence' }}</h2>
+            </div>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-4">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.presenceDescription') || 'Show your live cursor and avatar to other users on the same page — and see theirs — in real time (like Figma).' }}</p>
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold theme-text-primary">{{ $t('profile.presenceToggleLabel') || 'Enable live presence & cursor' }}</p>
+                <p class="text-xs theme-caption">
+                  {{ presenceEnabled
+                    ? ($t('profile.presenceOn') || 'On — others can see your cursor and avatar')
+                    : ($t('profile.presenceOff') || 'Off — you are hidden from other users') }}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="presenceEnabled"
+                :aria-label="$t('profile.presenceToggleLabel') || 'Enable live presence'"
+                @click="togglePresence"
+                :class="presenceEnabled ? 'bg-green-500' : 'bg-gray-300'"
+                class="relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200"
+              >
+                <span
+                  class="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all duration-200"
+                  :class="presenceEnabled ? 'start-0.5' : 'end-0.5'"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -139,6 +180,7 @@
 <script>
 import TotpManager from '@/components/auth/TotpManager.vue'
 import { useAuth } from '@/composables/useAuth'
+import { presenceEnabled, savePresenceSettings } from '@/composables/usePresenceSettings'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { changePassword } from '@/api'
@@ -174,6 +216,10 @@ export default {
     function closeChangeModal() {
       showChangeModal.value = false
       clearPasswordForm()
+    }
+
+    function togglePresence() {
+      savePresenceSettings(!presenceEnabled.value)
     }
 
     /* theme moved to Settings view */
@@ -212,6 +258,8 @@ export default {
       showTotpModal,
       closeChangeModal,
       isRTL,
+      presenceEnabled,
+      togglePresence,
       t
     }
   }

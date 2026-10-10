@@ -205,6 +205,27 @@
                 <WrenchScrewdriverIcon class="w-4 h-4" />
                 {{ $t('settings') || 'Settings' }}
               </button>
+              <div
+                @click="togglePresence()"
+                role="menuitemcheckbox"
+                :aria-checked="presenceEnabled"
+                :aria-label="$t('profile.presenceToggleLabel') || 'Enable live presence'"
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200 cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+                </svg>
+                <span class="flex-1">{{ $t('profile.presenceTitle') || 'Live Presence' }}</span>
+                <span
+                  class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200"
+                  :class="presenceEnabled ? 'bg-green-500' : 'bg-gray-300'"
+                >
+                  <span
+                    class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all duration-200"
+                    :class="presenceEnabled ? 'start-0.5' : 'end-0.5'"
+                  ></span>
+                </span>
+              </div>
               <button @click="showLogoutDialog = true; userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,6 +438,7 @@ import { computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { usePresence } from '@/composables/usePresence'
+import { presenceEnabled, savePresenceSettings } from '@/composables/usePresenceSettings'
 import PresenceCursors from '@/components/shared/PresenceCursors.vue'
 import { getReportDefs, getNotifications, markNotificationRead, markAllNotificationsRead, getUserPreference, saveUserPreference } from '@/api'
 import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
@@ -487,7 +509,11 @@ export default {
     const presenceRecord = computed(() => presenceRecordForRoute(router.currentRoute.value))
     const { members: presenceMembers } = usePresence(presencePage, presenceRecord)
 
-    return { authLogout, user, router, notificationStore, presenceMembers }
+    const togglePresence = () => {
+      savePresenceSettings(!presenceEnabled.value)
+    }
+
+    return { authLogout, user, router, notificationStore, presenceMembers, presenceEnabled, togglePresence }
   },
   data() {
     return {
