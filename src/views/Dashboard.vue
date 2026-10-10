@@ -184,6 +184,9 @@
           </div>
         </div>
 
+        <!-- Presence avatars (Figma-style) -->
+        <PresenceAvatars :members="presenceMembers" class="hidden md:flex" />
+
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
           <button @click="toggleUserMenu"
@@ -404,14 +407,21 @@
 
     <!-- Logout Dialog -->
     <AuthLogout v-if="showLogoutDialog" @cancel="showLogoutDialog = false" @logout-success="handleLogoutSuccess" />
+
+    <!-- Live cursors of other users on the same page/record -->
+    <PresenceCursors :members="presenceMembers" />
   </div>
 </template>
 
 <script>
 import AuthLogout from '@/components/auth/Logout.vue'
 import { ThemeIcon } from '@acme/icon-packs'
+import { computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
+import { usePresence } from '@/composables/usePresence'
+import PresenceAvatars from '@/components/shared/PresenceAvatars.vue'
+import PresenceCursors from '@/components/shared/PresenceCursors.vue'
 import { getReportDefs, getNotifications, markNotificationRead, markAllNotificationsRead, getUserPreference, saveUserPreference } from '@/api'
 import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
 import { iconRevision, getMenuIcon } from '@acme/icon-packs'
@@ -432,14 +442,56 @@ import {
   lockBodyScroll
 } from '@acme/layout-engine'
 
+// Presence rooms are per actual page (route), not per module, so that users
+// only see each other when they are on the exact same screen (Figma-like).
+// Routes listed here are excluded from presence (personal / non-business pages).
+const PRESENCE_EXCLUDED_ROUTES = new Set([
+  'login',
+  'profile',
+  'settings',
+  'theme-studio',
+  'notifications'
+])
+
+const PRESENCE_RECORD_ROUTES = new Set([
+  'contractor-supply-statement',
+  'contractor-transport-statement',
+  'equipment-contractor-statement',
+  'contractor-extract-statement',
+  'contractor-detail',
+  'extracts-detail',
+  'edit-extract',
+  'admin-reports-run',
+  'reports-run',
+  'admin-reports-from-table'
+])
+
+function presencePageForRoute(route) {
+  const name = route?.name
+  if (!name || PRESENCE_EXCLUDED_ROUTES.has(name)) return ''
+  return name
+}
+
+function presenceRecordForRoute(route) {
+  const name = route?.name
+  if (!name || !PRESENCE_RECORD_ROUTES.has(name)) return null
+  const id = route?.params?.id
+  return id && !isNaN(Number(id)) ? Number(id) : null
+}
+
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges },
+  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges, PresenceAvatars, PresenceCursors },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
     const notificationStore = useNotificationStore()
-    return { authLogout, user, router, notificationStore }
+
+    const presencePage = computed(() => presencePageForRoute(router.currentRoute.value))
+    const presenceRecord = computed(() => presenceRecordForRoute(router.currentRoute.value))
+    const { members: presenceMembers } = usePresence(presencePage, presenceRecord)
+
+    return { authLogout, user, router, notificationStore, presenceMembers }
   },
   data() {
     return {
