@@ -651,7 +651,17 @@
     "fair": "متوسط",
     "low": "منخفض",
     "high": "مرتفع",
-    "medium": "متوسط"
+    "medium": "متوسط",
+    "locationBreakdown": "الإجماليات حسب الموقع",
+    "locationTotals": "إجمالي حسب الموقع",
+    "locationTotalsDesc": "إجمالي التوريدات والنقل والمصروفات والمستخلصات لكل موقع",
+    "location": "الموقع",
+    "allLocations": "كل المواقع",
+    "totalSupplies": "إجمالي التوريدات",
+    "totalTransports": "إجمالي النقل",
+    "totalExtracts": "إجمالي المستخلصات",
+    "records": "عدد السجلات",
+    "unassignedLocation": "غير محدد"
   },
   "admin": {
     "reports": "التقارير",

@@ -2144,6 +2144,12 @@ export const getTopContractors = (params = {}) =>
 export const getModuleActivity = (params = {}) =>
   axios.get(`${BASE_URL}/api/dashboard/module-activity`, { params: dashParams(params) })
 
+export const getLocationTotals = (params = {}) => {
+  const q = dashParams(params)
+  if (params.locationId != null && params.locationId !== '') q.locationId = params.locationId
+  return axios.get(`${BASE_URL}/api/dashboard/location-totals`, { params: q })
+}
+
 export const getPetroleumTrend = (params = {}) =>
   axios.get(`${BASE_URL}/api/dashboard/petroleum-trend`, { params: { ...dashParams(params), groupBy: params.groupBy || 'month' } })
 

@@ -649,7 +649,17 @@
     "fair": "Fair",
     "low": "Low",
     "high": "High",
-    "medium": "Medium"
+    "medium": "Medium",
+    "locationBreakdown": "Totals by Location",
+    "locationTotals": "Totals by Location",
+    "locationTotalsDesc": "Total supplies, transports, expenses and extracts per location",
+    "location": "Location",
+    "allLocations": "All Locations",
+    "totalSupplies": "Total Supplies",
+    "totalTransports": "Total Transports",
+    "totalExtracts": "Total Extracts",
+    "records": "Records",
+    "unassignedLocation": "Unassigned"
   },
   "admin": {
     "reports": "Reports",

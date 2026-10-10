@@ -63,6 +63,12 @@
       />
     </DashboardGrid>
 
+    <!-- Location Breakdown -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-semibold theme-text-primary px-1">{{ $t('adminStats.locationBreakdown') }}</h3>
+      <LocationTotals :from-date="fromDate" :to-date="toDate" />
+    </div>
+
     <!-- Financial Analytics -->
     <div class="space-y-4">
       <h3 class="text-lg font-semibold theme-text-primary px-1">{{ $t('adminStats.financialAnalytics') }}</h3>
@@ -228,6 +234,7 @@ import GaugeCard from './GaugeCard.vue'
 import DirectionGauge from './DirectionGauge.vue'
 import DashboardSkeleton from './DashboardSkeleton.vue'
 import DashboardEmpty from './DashboardEmpty.vue'
+import LocationTotals from './LocationTotals.vue'
 import VueApexCharts from 'vue3-apexcharts'
 
 export default {
@@ -235,7 +242,7 @@ export default {
   components: {
     PageHeader, DateRangeToolbar, DashboardGrid,
     StatisticsCard, ChartCard, GaugeCard, DirectionGauge,
-    DashboardSkeleton, DashboardEmpty,
+    DashboardSkeleton, DashboardEmpty, LocationTotals,
     apexchart: VueApexCharts
   },
   setup() {

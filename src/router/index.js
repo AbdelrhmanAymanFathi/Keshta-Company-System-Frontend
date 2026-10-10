@@ -3,6 +3,14 @@ import { isAuthenticated, user, loading } from '@/composables/authStore'
 import { watch } from 'vue'
 import { startRouteLoading, stopRouteLoading } from '@/composables/useRouteLoader'
 
+function isAdminUser(u) {
+  return Array.isArray(u?.roles) && u.roles.some(role => role.roleId === 1)
+}
+
+function landingRoute(u) {
+  return isAdminUser(u) ? { name: 'admin-statistics' } : { name: 'supplies-list' }
+}
+
 // Auth Pages
 const Login = () => import('@/views/Login.vue')
 // const Register = () => import('@/components/auth/Register.vue')
@@ -440,7 +448,7 @@ const routes = [
       },
 
       // ==================== Default Redirect ====================
-      { path: '', redirect: 'supplies/new' }
+      { path: '', redirect: () => (isAdminUser(user.value) ? 'admin-statistics' : 'supplies/new') }
     ]
   },
 
@@ -448,7 +456,8 @@ const routes = [
   {
     path: '/',
     redirect: () => {
-      return isAuthenticated.value ? '/dashboard/supplies/new' : '/login'
+      if (!isAuthenticated.value) return '/login'
+      return isAdminUser(user.value) ? '/dashboard/admin-statistics' : '/dashboard/supplies/new'
     }
   },
 
@@ -499,9 +508,9 @@ router.beforeEach(async (to, from, next) => {
     return
   }
 
-  // If authenticated and trying to access auth pages (login/register), redirect to dashboard
+  // If authenticated and trying to access auth pages (login/register), redirect to role landing
   if (!requiresAuth && isAuthenticated.value && ['login', 'register'].includes(to.name)) {
-    next({ name: 'supplies-list' })
+    next(landingRoute(user.value))
     return
   }
 

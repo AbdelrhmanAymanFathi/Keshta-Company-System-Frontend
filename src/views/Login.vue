@@ -173,7 +173,7 @@
 <script>
 import { useAuth } from '@/composables/useAuth'
 import { useI18n } from 'vue-i18n'
-import { isAuthenticated } from '@/composables/authStore';
+import { isAuthenticated, user } from '@/composables/authStore';
 import router from '@/router';
 import { login as apiLogin, loginWith2fa, tokenManager } from '@/api'
 import authManager from '@/auth'
@@ -217,6 +217,12 @@ export default {
     }
   },
   methods: {
+    landingRoute(user) {
+      const roles = Array.isArray(user?.roles) ? user.roles : []
+      return roles.some(role => role.roleId === 1)
+        ? { name: 'admin-statistics' }
+        : { name: 'supplies-list' }
+    },
     async submit() {
       this.clearErrors()
 
@@ -260,7 +266,7 @@ export default {
           if (this.rememberMe) localStorage.setItem('rememberMe', 'true')
           else localStorage.removeItem('rememberMe')
 
-          this.$router.push({ name: 'supplies-list' })
+          this.$router.push(this.landingRoute(data.user || user.value))
         } else {
           throw new Error('Invalid login response')
         }
@@ -289,7 +295,7 @@ export default {
             authManager.setAuthState(true, null)
           }
           if (window.$toast) window.$toast(this.$t('auth.login.success'), 'success')
-          this.$router.push({ name: 'supplies-list' })
+          this.$router.push(this.landingRoute(data.user || user.value))
         } else {
           throw new Error('Invalid 2FA response')
         }

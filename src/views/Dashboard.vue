@@ -522,11 +522,9 @@ export default {
       return this.sidebarType === 'horizontal'
     },
     filteredTopMenus() {
-      const menus = { ...this.topMenus }
-      if (!this.isAdmin) {
-        delete menus.admin
-      }
-      return menus
+      const { admin, ...rest } = this.topMenus
+      if (!this.isAdmin) return rest
+      return { admin, ...rest }
     },
     filteredVerticalMenu() {
       // Notifications page — no sidebar
