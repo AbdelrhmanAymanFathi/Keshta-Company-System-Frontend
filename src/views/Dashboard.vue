@@ -23,16 +23,59 @@
           <div class="truncate text-sm font-bold whitespace-nowrap sm:text-base lg:text-lg">{{ $t('appName') }}</div>
         </div>
         <!-- Top menus (desktop) -->
-        <nav class="hidden md:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2">
-          <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm', selectedTop === key ? 'bg-white theme-text-primary shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200']">
+        <VueDraggable
+          v-model="menuOrder"
+          tag="nav"
+          handle=".menu-drag-handle"
+          draggable=".top-nav-item"
+          :animation="150"
+          :disabled="!editLayout"
+          :class="editLayout ? 'hidden md:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'hidden md:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2'"
+          @end="onLayoutEnd"
+        >
+          <button v-for="key in menuOrder" :key="key" @click="selectTop(key)"
+            class="top-nav-item flex items-center gap-1 rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm"
+            :class="selectedTop === key ? 'bg-white theme-text-primary shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200'">
             {{ $t('navbar.' + key) }}
+            <span v-if="editLayout" @click.stop.prevent class="menu-drag-handle inline-flex cursor-grab opacity-70 hover:opacity-100" title="">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+            </span>
           </button>
-        </nav>
+        </VueDraggable>
       </div>
 
       <!-- Right side: Language + User Avatar -->
       <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+        <!-- Edit menu layout -->
+        <button
+          @click="toggleEditLayout"
+          :title="$t('dashboard.editLayout')"
+          :class="[
+            'relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10',
+            editLayout
+              ? 'border-amber-300/60 bg-amber-400/20 text-amber-200'
+              : 'border-white/15 bg-white/10 hover:bg-white/16 theme-text-light'
+          ]"
+        >
+          <svg v-if="editLayout" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          <svg v-else class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+          </svg>
+          <span v-if="layoutSaving" class="absolute -top-0.5 -end-0.5 h-3 w-3 rounded-full border-2 border-white bg-amber-400 animate-pulse"></span>
+        </button>
+        <button
+          v-if="editLayout"
+          @click="resetLayout"
+          :title="$t('dashboard.resetLayout')"
+          class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition-all duration-200 hover:scale-105 hover:bg-white/16 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </button>
+
         <!-- Language Switcher -->
         <div
           class="flex items-center gap-1 rounded-xl border border-white/10 bg-white/10 p-1 shadow-md shadow-slate-950/10 backdrop-blur-sm transition-all duration-300 hover:bg-white/14 hover:shadow-lg"
@@ -177,20 +220,31 @@
     </header>
 
     <div v-if="isHorizontal" class="border-b border-slate-200 bg-slate-50 px-3 py-2 sm:px-4 lg:px-6">
-      <div class="flex flex-wrap items-center gap-2">
-        <button
-          v-for="item in filteredVerticalMenu"
-          :key="item.routeName"
-          type="button"
-          @click="selectVertical(item.routeName)"
-          :class="[
-            'rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md hover:scale-[1.02]',
-            currentRouteName === item.routeName ? 'theme-sidebar-item-active' : 'theme-sidebar-item'
-          ]"
-        >
-          {{ $t(item.label) }}
-        </button>
-      </div>
+      <VueDraggable
+        v-model="currentModuleOrder"
+        handle=".menu-drag-handle"
+        draggable=".horiz-nav-item"
+        :animation="150"
+        :disabled="!editLayout"
+        class="flex flex-wrap items-center gap-2"
+        @end="onLayoutEnd"
+      >
+        <span v-for="item in filteredVerticalMenu" :key="item.routeName" class="horiz-nav-item inline-flex items-center gap-1">
+          <button
+            type="button"
+            @click="selectVertical(item.routeName)"
+            :class="[
+              'rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md hover:scale-[1.02]',
+              currentRouteName === item.routeName ? 'theme-sidebar-item-active' : 'theme-sidebar-item'
+            ]"
+          >
+            {{ $t(item.label) }}
+          </button>
+          <span v-if="editLayout" class="menu-drag-handle cursor-grab text-slate-500 opacity-70 hover:opacity-100">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+          </span>
+        </span>
+      </VueDraggable>
     </div>
 
     <div class="layout-shell">
@@ -245,15 +299,40 @@
 
         <!-- Mobile Top Menu -->
         <div v-if="isMobile" class="mb-4 space-y-1 md:hidden">
-          <button v-for="(labelKey, key) in filteredTopMenus" :key="key" @click="selectTop(key)"
-            :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'theme-sidebar-item-active' : 'theme-sidebar-item']">
-            {{ $t('navbar.' + key) }}
-          </button>
+          <VueDraggable
+            v-model="menuOrder"
+            handle=".menu-drag-handle"
+            draggable=".mobile-top-item"
+            :animation="150"
+            :disabled="!editLayout"
+            tag="div"
+            class="space-y-1"
+            @end="onLayoutEnd"
+          >
+            <div v-for="key in menuOrder" :key="key" class="mobile-top-item flex items-center gap-2">
+              <button @click="selectTop(key)"
+                :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'theme-sidebar-item-active' : 'theme-sidebar-item']">
+                {{ $t('navbar.' + key) }}
+              </button>
+              <span v-if="editLayout" class="menu-drag-handle cursor-grab opacity-70 hover:opacity-100">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+              </span>
+            </div>
+          </VueDraggable>
         </div>
 
         <!-- Vertical Menu -->
-        <ul class="space-y-2.5">
-          <li v-for="item in filteredVerticalMenu" :key="item.name">
+        <VueDraggable
+          v-model="currentModuleOrder"
+          handle=".menu-drag-handle"
+          draggable=".vertical-item"
+          :animation="150"
+          :disabled="!editLayout || selectedTop === ''"
+          tag="ul"
+          class="space-y-2.5"
+          @end="onLayoutEnd"
+        >
+          <li v-for="item in filteredVerticalMenu" :key="item.name" class="vertical-item">
             <button
               @click="selectVertical(item.routeName)"
               :title="effectiveCollapsed ? $t(item.label) : undefined"
@@ -267,10 +346,14 @@
               <span v-if="showSidebarLabels" class="sidebar-label-text truncate text-sm font-medium">
                 {{ $t(item.label) }}
               </span>
+              <span v-if="editLayout" @click.stop.prevent class="menu-drag-handle cursor-grab opacity-70 hover:opacity-100 ml-auto">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
+              </span>
             </button>
           </li>
+        </VueDraggable>
           <!-- Transport module: show dynamic reports inline under the transport menu -->
-          <li v-if="reportsForModule && reportsForModule.length">
+          <li v-if="reportsForModule && reportsForModule.length" class="mt-2">
             <h4 v-if="showSidebarLabels" class="sidebar-label-text px-4 text-xs uppercase theme-text-muted tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
             <ul class=" space-y-2 ">
               <li v-for="r in reportsForModule" :key="r.id">
@@ -289,7 +372,6 @@
               </li>
             </ul>
           </li>
-        </ul>
 
         
       </aside>
@@ -329,12 +411,13 @@ import AuthLogout from '@/components/auth/Logout.vue'
 import { ThemeIcon } from '@acme/icon-packs'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
-import { getReportDefs, getNotifications, markNotificationRead, markAllNotificationsRead } from '@/api'
+import { getReportDefs, getNotifications, markNotificationRead, markAllNotificationsRead, getUserPreference, saveUserPreference } from '@/api'
 import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
 import { iconRevision, getMenuIcon } from '@acme/icon-packs'
 import { themeRevision, loadTheme } from '@acme/theme-engine'
 import { useNotificationStore } from '@/stores/useNotificationStore'
 import { resolveNotificationRoute } from '@/utils/notificationRouting'
+import { VueDraggable } from 'vue-draggable-plus'
 import {
   getSidebarAsideClasses,
   shouldShowBackdrop,
@@ -349,7 +432,7 @@ import {
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon },
+  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
@@ -437,7 +520,12 @@ export default {
       markingAllRead: false,
       notifItems: [],
       isMobile: window.innerWidth < 768,
-      reports: []
+      reports: [],
+      menuOrder: [],
+      moduleOrders: {},
+      layoutLoaded: false,
+      layoutSaving: false,
+      editLayout: false
     }
   },
   computed: {
@@ -521,10 +609,18 @@ export default {
     isHorizontal() {
       return this.sidebarType === 'horizontal'
     },
-    filteredTopMenus() {
-      const { admin, ...rest } = this.topMenus
-      if (!this.isAdmin) return rest
-      return { admin, ...rest }
+    defaultTopKeys() {
+      const keys = Object.keys(this.topMenus)
+      if (this.isAdmin) return ['admin'].concat(keys.filter(k => k !== 'admin'))
+      return keys.filter(k => k !== 'admin')
+    },
+    currentModuleOrder: {
+      get() {
+        return this.moduleOrders[this.selectedTop] || []
+      },
+      set(value) {
+        this.moduleOrders = { ...this.moduleOrders, [this.selectedTop]: value }
+      }
     },
     filteredVerticalMenu() {
       // Notifications page — no sidebar
@@ -620,7 +716,18 @@ export default {
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'
     },
-    verticalMenu() { return this.menuMap[this.selectedTop] || [] }
+    verticalMenu() {
+      const items = this.menuMap[this.selectedTop] || []
+      const order = this.moduleOrders[this.selectedTop] || []
+      if (!order.length) return items
+      const ordered = []
+      for (const routeName of order) {
+        const item = items.find(i => i.routeName === routeName)
+        if (item) ordered.push(item)
+      }
+      const rest = items.filter(i => !order.includes(i.routeName))
+      return ordered.concat(rest)
+    }
   },
   watch: {
     collapsedSidebar(v) { localStorage.setItem('sidebarCollapsed', JSON.stringify(v)) },
@@ -632,7 +739,22 @@ export default {
     },
     isMobile() {
       this.syncSidebarOpenState()
+    },
+    defaultTopKeys() {
+      this.menuOrder = this.mergeByOrder(this.menuOrder, this.defaultTopKeys)
+    },
+    selectedTop() {
+      const key = this.selectedTop
+      if (!key || !this.layoutLoaded) return
+      const defaults = (this.menuMap[key] || []).map(i => i.routeName)
+      this.moduleOrders = {
+        ...this.moduleOrders,
+        [key]: this.mergeByOrder(this.moduleOrders[key] || [], defaults)
+      }
     }
+  },
+  created() {
+    this.menuOrder = [...this.defaultTopKeys]
   },
   methods: {
     normalizeDashboardModule(moduleName) {
@@ -828,6 +950,69 @@ export default {
       this.isMobile = window.innerWidth < 768
     }
     ,
+    mergeByOrder(stored, defaults) {
+      const known = stored.filter(k => defaults.includes(k))
+      const missing = defaults.filter(k => !known.includes(k))
+      return known.concat(missing)
+    },
+    resetToDefaultOrders() {
+      const modules = {}
+      for (const key of Object.keys(this.menuMap)) {
+        modules[key] = (this.menuMap[key] || []).map(i => i.routeName)
+      }
+      this.moduleOrders = modules
+    },
+    async loadMenuLayout() {
+      try {
+        const res = await getUserPreference('menuLayout')
+        const layout = res?.data?.value || {}
+        this.menuOrder = this.mergeByOrder(
+          Array.isArray(layout.menus) ? layout.menus : [],
+          this.defaultTopKeys
+        )
+        const modules = {}
+        for (const key of Object.keys(this.menuMap)) {
+          const stored = layout.modules?.[key]
+          modules[key] = this.mergeByOrder(
+            Array.isArray(stored) ? stored : [],
+            (this.menuMap[key] || []).map(i => i.routeName)
+          )
+        }
+        this.moduleOrders = modules
+      } catch (e) {
+        this.menuOrder = [...this.defaultTopKeys]
+        this.resetToDefaultOrders()
+      } finally {
+        this.layoutLoaded = true
+      }
+    },
+    async persistLayout() {
+      if (this.layoutSaving) return
+      this.layoutSaving = true
+      try {
+        await saveUserPreference('menuLayout', {
+          menus: this.menuOrder,
+          modules: this.moduleOrders
+        })
+        if (window.$toast) window.$toast(this.$t('dashboard.layoutSaved'), 'success')
+      } catch (e) {
+        if (window.$toast) window.$toast(this.$t('dashboard.layoutSaveError'), 'error')
+      } finally {
+        this.layoutSaving = false
+      }
+    },
+    toggleEditLayout() {
+      this.editLayout = !this.editLayout
+    },
+    onLayoutEnd() {
+      this.persistLayout()
+    },
+    resetLayout() {
+      if (!window.confirm(this.$t('dashboard.resetLayoutConfirm'))) return
+      this.menuOrder = [...this.defaultTopKeys]
+      this.resetToDefaultOrders()
+      this.persistLayout()
+    },
     async loadReports() {
       try {
         const res = await getReportDefs()
@@ -859,6 +1044,7 @@ export default {
     this.onResize()
     document.addEventListener('keydown', this.onSidebarEscape)
     this.loadReports()
+    this.loadMenuLayout()
     document.addEventListener('click', (e) => {
       const relatives = this.$el.querySelectorAll('.relative')
       const inside = Array.from(relatives).some(el => el.contains(e.target))

@@ -87,7 +87,12 @@
     "newExtract": "مستخلص جديد" ,
     "extractItems": "بنود المستخلصات",
     "report": "التقرير",
-    "notifications": "الإشعارات"
+    "notifications": "الإشعارات",
+    "editLayout": "تعديل ترتيب القوائم",
+    "resetLayout": "استعادة الترتيب الافتراضي",
+    "resetLayoutConfirm": "هل تريد استعادة الترتيب الافتراضي للقوائم؟",
+    "layoutSaved": "تم حفظ الترتيب بنجاح",
+    "layoutSaveError": "حدث خطأ أثناء حفظ الترتيب"
   },
   "equipmentLog": {
     "deletedSuccessfully":"تم الحذف بنجاح",

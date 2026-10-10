@@ -2150,6 +2150,12 @@ export const getLocationTotals = (params = {}) => {
   return axios.get(`${BASE_URL}/api/dashboard/location-totals`, { params: q })
 }
 
+export const getUserPreference = (key) =>
+  axios.get(`${BASE_URL}/api/preferences/${encodeURIComponent(key)}`)
+
+export const saveUserPreference = (key, value) =>
+  axios.put(`${BASE_URL}/api/preferences/${encodeURIComponent(key)}`, { value })
+
 export const getPetroleumTrend = (params = {}) =>
   axios.get(`${BASE_URL}/api/dashboard/petroleum-trend`, { params: { ...dashParams(params), groupBy: params.groupBy || 'month' } })
 

@@ -87,7 +87,12 @@
       "newExtract": "New Extract",
       "extractItems": "Extract Items",
       "report": "Report",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "editLayout": "Edit menu layout",
+      "resetLayout": "Reset to default layout",
+      "resetLayoutConfirm": "Reset menus to their default order?",
+      "layoutSaved": "Layout saved successfully",
+      "layoutSaveError": "Failed to save layout"
     },
   "equipmentLog": {
     "deletedSuccessfully": "Deleted successfully",
