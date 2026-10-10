@@ -184,9 +184,6 @@
           </div>
         </div>
 
-        <!-- Presence avatars (Figma-style) -->
-        <PresenceAvatars :members="presenceMembers" class="hidden md:flex" />
-
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
           <button @click="toggleUserMenu"
@@ -420,7 +417,6 @@ import { computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { usePresence } from '@/composables/usePresence'
-import PresenceAvatars from '@/components/shared/PresenceAvatars.vue'
 import PresenceCursors from '@/components/shared/PresenceCursors.vue'
 import { getReportDefs, getNotifications, markNotificationRead, markAllNotificationsRead, getUserPreference, saveUserPreference } from '@/api'
 import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
@@ -481,7 +477,7 @@ function presenceRecordForRoute(route) {
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges, PresenceAvatars, PresenceCursors },
+  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges, PresenceCursors },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
