@@ -52,19 +52,30 @@ installHeaderMotion(router)
 buildVersionService.start()
 
 // Initialize realtime SSE connection after mount
-if (isAuthenticated.value) {
+let unsubscribeChatNotifications = null
+function startRealtime() {
   realtimeService.init(() => {
     try { return tokenManager.getToken() } catch { return null }
   })
+  unsubscribeChatNotifications?.()
+  unsubscribeChatNotifications = realtimeService.subscribe('chat', ['message.new', 'call.incoming'], (event) => {
+    if (typeof Notification === 'undefined' || document.visibilityState === 'visible' || Notification.permission !== 'granted') return
+    const title = event === 'call.incoming' ? 'Incoming call' : 'New message'
+    new Notification(title, { body: 'Open Keshta Company to respond.' })
+  })
+}
+
+if (isAuthenticated.value) {
+  startRealtime()
 }
 
 // Watch auth changes to init/destroy SSE
 watch(isAuthenticated, (val) => {
   if (val) {
-    realtimeService.init(() => {
-      try { return tokenManager.getToken() } catch { return null }
-    })
+    startRealtime()
   } else {
+    unsubscribeChatNotifications?.()
+    unsubscribeChatNotifications = null
     realtimeService.destroy()
   }
 })

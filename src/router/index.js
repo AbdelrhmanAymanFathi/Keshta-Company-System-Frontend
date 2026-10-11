@@ -53,6 +53,7 @@ const Settings = () => import('@/views/Settings.vue')
 const ThemeStudio = () => import('@/views/ThemeStudio.vue')
 const ExtractsPage = () => import('@/views/extracts/ExtractsPage.vue')
 const NotificationCenter = () => import('@/components/dashboard/NotificationCenter.vue')
+const MessagingPage = () => import('@/components/dashboard/MessagingPage.vue')
 const CreateExtract = () => import('@/views/extracts/CreateExtract.vue')
 const ExtractDetail = () => import('@/views/extracts/ExtractDetail.vue')
 // const ExtractItemsManager = () => import('@/components/dashboard/Extracts/ExtractItemsManager.vue')
@@ -451,6 +452,12 @@ const routes = [
         name: 'notifications',
         component: NotificationCenter,
         meta: { title: 'الإشعارات', module: 'notifications' }
+      },
+      {
+        path: 'messaging',
+        name: 'messaging',
+        component: MessagingPage,
+        meta: { title: 'messaging.title', module: 'messaging' }
       },
 
       // ==================== Default Redirect ====================

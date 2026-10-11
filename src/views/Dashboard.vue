@@ -517,8 +517,11 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', reports: 'reports', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', reports: 'reports', messaging: 'messaging', admin: 'admin' },
       menuMap: {
+        messaging: [
+          { name: 'messaging', label: 'messaging.title', routeName: 'messaging' }
+        ],
         supplies: [
           // { name: 'newSupply', label: 'dashboard.newSupply', routeName: 'new-supply' },
           { name: 'suppliesList', label: 'dashboard.suppliesList', routeName: 'supplies-list' },
@@ -783,6 +786,7 @@ export default {
       const paymentRoutes = ['payments']
       const reportsRoutes = ['reports-landing', 'contractors-activity-report', 'admin-reports-list', 'admin-reports-run']
       const adminRoutes = ['admin-statistics', 'admin-database-backup', 'admin-system-logs', 'admin-active-users', 'changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
+      if (routeName === 'messaging') return 'messaging'
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
       if (equipmentRoutes.includes(routeName)) return 'equipmentLog'
