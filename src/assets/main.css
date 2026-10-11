@@ -143,6 +143,40 @@ body,
   color: var(--theme-heading-color);
 }
 
+.chat-avatar {
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.35);
+}
+
+.chat-presence-dot--online {
+  background-color: #22c55e !important;
+}
+
+.chat-presence-dot--offline {
+  background-color: #ef4444 !important;
+}
+
+.message-bubble--sent {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%) !important;
+  border: 1px solid #4338ca;
+}
+
+.message-bubble--received {
+  color: #172033 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1;
+}
+
+.message-bubble--sent .message-bubble__footer {
+  color: #eef2ff !important;
+}
+
+.message-bubble--received .message-bubble__footer {
+  color: #475569 !important;
+}
+
 .theme-link {
   color: var(--theme-link-color);
 }

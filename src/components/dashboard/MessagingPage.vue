@@ -1,12 +1,9 @@
 <template>
   <div class="messaging-page" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
-    <header class="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-      <div class="flex items-center gap-3">
-        <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-xl font-bold text-white shadow-lg shadow-indigo-200">K</span>
-        <div>
-          <h1 class="text-xl font-bold text-slate-900">{{ t('messaging.title') }}</h1>
-          <p class="text-sm text-slate-500">{{ t('messaging.conversations') }}</p>
-        </div>
+    <header class="app-page-header mb-4 flex items-center justify-between rounded-2xl theme-page-header-bar p-4 shadow-lg shadow-slate-200/50 sm:p-5">
+      <div>
+        <h1 class="text-2xl font-semibold theme-text-primary">{{ t('messaging.title') }}</h1>
+        <p class="mt-1 theme-text-secondary">{{ t('messaging.conversations') }}</p>
       </div>
       <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold"
         :class="realtimeService.isConnected.value ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'">
@@ -44,10 +41,10 @@
             :class="selectedConversationId === conversation.id ? 'bg-indigo-500/25 shadow-[inset_3px_0_0_0_#818cf8]' : ''"
             @click="selectConversation(conversation)"
           >
-            <span class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-300 to-sky-400 font-semibold text-slate-900 shadow-md">
+            <span :style="avatarStyle(conversation)" class="chat-avatar relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-semibold shadow-md">
               {{ initials(conversation.name) }}
-              <span v-if="conversation.type === 'DIRECT'" class="absolute -bottom-0.5 -end-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#20204b]"
-                :class="conversation.members.find((member) => member.id !== currentUserId)?.online ? 'bg-emerald-400' : 'bg-slate-500'"></span>
+              <span v-if="conversation.type === 'DIRECT'" class="chat-presence-dot absolute -bottom-0.5 -end-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#20204b]"
+                :class="conversation.members.find((member) => member.id !== currentUserId)?.online ? 'chat-presence-dot--online' : 'chat-presence-dot--offline'"></span>
             </span>
             <span class="min-w-0 flex-1">
               <span class="flex items-center justify-between gap-2">
@@ -73,8 +70,8 @@
               </div>
             </div>
             <div v-if="selectedConversation.type === 'DIRECT'" class="flex items-center gap-1">
-              <button class="rounded-xl border border-slate-200 p-2.5 text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50" :aria-label="t('messaging.callAudio')" :title="t('messaging.callAudio')" @click="startCall('AUDIO')">☎</button>
-              <button class="rounded-xl border border-slate-200 p-2.5 text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50" :aria-label="t('messaging.callVideo')" :title="t('messaging.callVideo')" @click="startCall('VIDEO')">▣</button>
+              <button class="rounded-xl border border-slate-200 p-2.5 text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50" :aria-label="t('messaging.callAudio')" :title="t('messaging.callAudio')" @click="startCall('AUDIO')"><PhoneIcon class="h-5 w-5" /></button>
+              <button class="rounded-xl border border-slate-200 p-2.5 text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50" :aria-label="t('messaging.callVideo')" :title="t('messaging.callVideo')" @click="startCall('VIDEO')"><VideoCameraIcon class="h-5 w-5" /></button>
             </div>
           </header>
 
@@ -94,8 +91,8 @@
               class="flex"
               :class="message.senderId === currentUserId ? 'justify-end' : 'justify-start'"
             >
-              <div class="max-w-[88%] rounded-2xl px-4 py-3 shadow-sm sm:max-w-[75%]"
-                :class="message.senderId === currentUserId ? 'rounded-ee-md bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-indigo-200/70' : 'rounded-es-md border border-slate-200 bg-white text-slate-800 shadow-slate-200/80'">
+              <div class="message-bubble max-w-[88%] rounded-2xl px-4 py-3 shadow-sm sm:max-w-[75%]"
+                :class="message.senderId === currentUserId ? 'message-bubble--sent rounded-ee-md' : 'message-bubble--received rounded-es-md'">
                 <p v-if="selectedConversation.type === 'GROUP' && message.senderId !== currentUserId" class="mb-1 text-xs font-semibold text-indigo-700">{{ message.sender?.name }}</p>
                 <button v-if="message.replyTo" class="mb-1 block max-w-full truncate border-s-2 border-current ps-2 text-start text-xs opacity-75" @click="scrollToMessage(message.replyTo.id)">
                   {{ message.replyTo.text || t('messaging.file') }}
@@ -112,7 +109,7 @@
                     </button>
                   </div>
                 </template>
-                <footer class="mt-1 flex items-center justify-end gap-2 text-[10px] opacity-75">
+                <footer class="message-bubble__footer mt-1 flex items-center justify-end gap-2 text-[10px]">
                   <span>{{ formatTime(message.createdAt) }} <span v-if="message.editedAt">· {{ t('messaging.edited') }}</span></span>
                   <span v-if="message.senderId === currentUserId && message.readBy?.length">✓✓</span>
                   <button v-if="!message.deletedAt" class="underline" @click="replyTo(message)">{{ t('messaging.reply') }}</button>
@@ -126,21 +123,21 @@
 
           <div v-if="replyTarget" class="flex items-center justify-between border-t border-slate-200 bg-blue-50 px-4 py-2 text-xs">
             <span class="truncate">{{ t('messaging.reply') }}: {{ replyTarget.text || t('messaging.file') }}</span>
-            <button class="px-2" @click="replyTarget = null">×</button>
+            <button class="rounded-lg p-1 text-slate-500 transition hover:bg-blue-100 hover:text-slate-800" :aria-label="t('messaging.cancelReply')" :title="t('messaging.cancelReply')" @click="replyTarget = null"><XMarkIcon class="h-4 w-4" /></button>
           </div>
           <div class="border-t border-slate-200 bg-white p-3">
             <div v-if="recordingKind" class="mb-2 flex items-center justify-between rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
               <span>{{ recordingKind === 'video' ? t('messaging.callVideo') : t('messaging.recording') }} · {{ recordingSeconds }}s</span>
               <div class="flex gap-2">
-                <button class="underline" @click="cancelRecording">{{ t('messaging.cancelRecording') }}</button>
-                <button class="font-semibold underline" @click="stopRecording">{{ t('messaging.sendRecording') }}</button>
+                <button class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-red-100" @click="cancelRecording"><XMarkIcon class="h-4 w-4" />{{ t('messaging.cancelRecording') }}</button>
+                <button class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 font-semibold transition hover:bg-red-100" @click="stopRecording"><StopIcon class="h-4 w-4" />{{ t('messaging.sendRecording') }}</button>
               </div>
             </div>
             <div class="flex items-end gap-2">
               <input ref="fileInput" type="file" class="hidden" accept="image/*,application/pdf,text/plain,text/csv,audio/*,video/*,.docx,.xlsx" @change="onFileSelected">
-              <button class="rounded-lg p-2 text-slate-600 hover:bg-slate-100" :aria-label="t('messaging.attach')" :title="t('messaging.attach')" @click="$refs.fileInput.click()">＋</button>
-              <button v-if="!recordingKind" class="rounded-lg p-2 text-slate-600 hover:bg-slate-100" :title="t('messaging.startRecording')" @click="startRecording('audio')">🎙</button>
-              <button v-if="!recordingKind && selectedConversation.type === 'DIRECT'" class="rounded-lg p-2 text-slate-600 hover:bg-slate-100" :title="t('messaging.callVideo')" @click="startRecording('video')">▣</button>
+              <button class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-700" :aria-label="t('messaging.attach')" :title="t('messaging.attach')" @click="$refs.fileInput.click()"><PaperClipIcon class="h-5 w-5" /></button>
+              <button v-if="!recordingKind" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-rose-600" :aria-label="t('messaging.startRecording')" :title="t('messaging.startRecording')" @click="startRecording('audio')"><MicrophoneIcon class="h-5 w-5" /></button>
+              <button v-if="!recordingKind && selectedConversation.type === 'DIRECT'" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-700" :aria-label="t('messaging.videoNote')" :title="t('messaging.videoNote')" @click="startRecording('video')"><VideoCameraIcon class="h-5 w-5" /></button>
               <textarea
                 v-model="draft"
                 rows="1"
@@ -149,7 +146,8 @@
                 @input="onDraftInput"
                 @keydown.enter.exact.prevent="sendMessage"
               ></textarea>
-              <button :disabled="!draft.trim() || sending" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 disabled:opacity-50" @click="sendMessage">
+              <button :disabled="!draft.trim() || sending" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 disabled:opacity-50" @click="sendMessage">
+                <PaperAirplaneIcon class="h-4 w-4" />
                 {{ t('messaging.send') }}
               </button>
             </div>
@@ -203,8 +201,31 @@
           <p class="mt-2 text-sm text-slate-300">{{ callStatusText }}</p>
         </div>
         <div class="mt-5 flex items-center justify-center gap-3">
-          <button class="rounded-2xl border border-white/10 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/20" @click="toggleMicrophone">{{ localStream?.getAudioTracks()[0]?.enabled ? t('messaging.mute') : t('messaging.unmute') }}</button>
-          <button v-if="activeCall.type === 'VIDEO'" class="rounded-2xl border border-white/10 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/20" @click="toggleCamera">{{ localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraOff') : t('messaging.cameraOn') }}</button>
+          <button
+            class="inline-flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition"
+            :class="localStream?.getAudioTracks()[0]?.enabled ? 'border-white/10 bg-white/10 text-white hover:bg-white/20' : 'border-rose-400/40 bg-rose-500/20 text-rose-100 hover:bg-rose-500/30'"
+            :aria-label="localStream?.getAudioTracks()[0]?.enabled ? t('messaging.mute') : t('messaging.unmute')"
+            :title="localStream?.getAudioTracks()[0]?.enabled ? t('messaging.mute') : t('messaging.unmute')"
+            @click="toggleMicrophone"
+          >
+            <span class="relative inline-flex">
+              <MicrophoneIcon class="h-5 w-5" />
+              <NoSymbolIcon v-if="!localStream?.getAudioTracks()[0]?.enabled" class="absolute -end-1 -top-1 h-3 w-3 text-rose-300" />
+            </span>
+            {{ localStream?.getAudioTracks()[0]?.enabled ? t('messaging.microphoneActive') : t('messaging.microphoneMuted') }}
+          </button>
+          <button
+            v-if="activeCall.type === 'VIDEO'"
+            class="inline-flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition"
+            :class="localStream?.getVideoTracks()[0]?.enabled ? 'border-white/10 bg-white/10 text-white hover:bg-white/20' : 'border-rose-400/40 bg-rose-500/20 text-rose-100 hover:bg-rose-500/30'"
+            :aria-label="localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraOff') : t('messaging.cameraOn')"
+            :title="localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraOff') : t('messaging.cameraOn')"
+            @click="toggleCamera"
+          >
+            <VideoCameraIcon v-if="localStream?.getVideoTracks()[0]?.enabled" class="h-5 w-5" />
+            <VideoCameraSlashIcon v-else class="h-5 w-5" />
+            {{ localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraActive') : t('messaging.cameraDisabled') }}
+          </button>
           <button class="rounded-2xl bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-950/30 transition hover:bg-rose-500" @click="endCall">{{ t('messaging.endCall') }}</button>
         </div>
       </div>
@@ -216,6 +237,10 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import {
+  MicrophoneIcon, NoSymbolIcon, PaperAirplaneIcon, PaperClipIcon, PhoneIcon,
+  StopIcon, VideoCameraIcon, VideoCameraSlashIcon, XMarkIcon
+} from '@heroicons/vue/24/outline'
 import {
   createChatCall, createDirectConversation, deleteChatMessage, downloadChatMedia,
   editChatMessage, ensureOrganizationConversation, getActiveChatCalls,
@@ -292,6 +317,17 @@ function decodeSubject() {
 
 function initials(name) {
   return String(name || '?').trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('') || '?'
+}
+
+function avatarStyle(conversation) {
+  const identity = conversation.type === 'DIRECT'
+    ? conversation.members.find((member) => member.id !== currentUserId.value)?.id
+    : conversation.id
+  const value = String(identity || conversation.name || '')
+  let hash = 0
+  for (let index = 0; index < value.length; index += 1) hash = (hash * 31 + value.charCodeAt(index)) >>> 0
+  const hue = (hash * 137.508) % 360
+  return { backgroundColor: `hsl(${hue.toFixed(2)} 72% 38%)` }
 }
 
 function formatTime(value) {
@@ -555,7 +591,7 @@ async function sendFile(file, durationMs) {
     await loadConversations()
   } catch (error) {
     console.error('Failed to send chat attachment', error)
-    showError(error.response?.data?.message || t('messaging.uploadFailed'))
+    showError('messaging.uploadFailed')
   } finally {
     sending.value = false
   }
