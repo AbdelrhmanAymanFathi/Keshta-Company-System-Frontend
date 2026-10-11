@@ -59,9 +59,13 @@
                     <button
                       type="button"
                       class="block text-xs theme-accent-strong hover:underline disabled:opacity-50"
-                      :disabled="activityReportLoading"
-                      @click="loadActivityReport(u)"
-                    >{{ $t('activeUsers.activityReport') }}</button>
+                      :disabled="activityReportLoadingUserId !== null"
+                      @click="downloadActivityReportPdf(u)"
+                    >{{ $t(activityReportLoadingUserId === u.userId ? 'activeUsers.downloadingPdf' : 'activeUsers.activityReport') }}</button>
+                    <span
+                      v-if="activityReportError && activityReportErrorUserId === u.userId"
+                      class="block text-xs text-red-600"
+                    >{{ activityReportError }}</span>
                   </div>
                 </div>
               </td>
@@ -81,68 +85,6 @@
       </div>
     </div>
 
-    <section v-if="activityReportUser" class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-200/40">
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 class="text-base font-semibold theme-text-primary">
-            {{ $t('activeUsers.activityReportTitle', { name: activityReportUser.name }) }}
-          </h3>
-          <p class="text-xs theme-text-muted">{{ $t('activeUsers.activityReportRange') }}</p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button
-            v-if="activityReport"
-            type="button"
-            class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-            :disabled="activityReportPdfLoading"
-            @click="downloadActivityReportPdf"
-          >{{ $t(activityReportPdfLoading ? 'activeUsers.downloadingPdf' : 'activeUsers.downloadPdf') }}</button>
-          <button type="button" class="text-sm theme-text-secondary hover:theme-text-primary" @click="clearActivityReport">
-            {{ $t('activeUsers.closeReport') }}
-          </button>
-        </div>
-      </div>
-
-      <div v-if="activityReportLoading" class="animate-pulse h-5 w-40 rounded bg-slate-200"></div>
-      <p v-else-if="activityReportError" class="text-sm text-red-600">{{ activityReportError }}</p>
-      <template v-else-if="activityReport">
-        <p v-if="activityReportPdfError" class="mb-3 text-sm text-red-600">{{ activityReportPdfError }}</p>
-        <p v-if="activityReport.truncated" class="mb-3 text-xs text-amber-700">{{ $t('activeUsers.activityReportTruncated') }}</p>
-        <div class="mb-5">
-          <h4 class="mb-2 text-sm font-semibold theme-text-primary">{{ $t('activeUsers.sessions') }}</h4>
-          <p v-if="!activityReport.sessions.length" class="text-sm theme-text-muted">{{ $t('activeUsers.noSessions') }}</p>
-          <ul v-else class="space-y-2">
-            <li v-for="(session, index) in activityReport.sessions" :key="session.id" class="rounded-lg bg-slate-50 px-3 py-2 text-sm theme-text-secondary">
-              <span>{{ $t('activeUsers.onlinePeriod', { from: formatDate(session.startedAt, isRTL), to: formatDate(session.endedAt, isRTL) }) }}</span>
-              <span v-if="offlinePeriod(session, index, activityReport.sessions)" class="ms-2 text-xs theme-text-muted">
-                {{ $t('activeUsers.offlinePeriod', offlinePeriod(session, index, activityReport.sessions)) }}
-              </span>
-              <span v-if="session.lastPage" class="block text-xs theme-text-muted">
-                {{ pageSection(session.lastPage) }}<span v-if="pageSection(session.lastPage)"> › </span>{{ pageLabel(session.lastPage) }}
-                <span v-if="session.lastRecordId">{{ $t('activeUsers.recordNumber', { id: session.lastRecordId }) }}</span>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 class="mb-2 text-sm font-semibold theme-text-primary">{{ $t('activeUsers.actions') }}</h4>
-          <p v-if="!activityReport.events.length" class="text-sm theme-text-muted">{{ $t('activeUsers.noActions') }}</p>
-          <ul v-else class="space-y-2">
-            <li v-for="event in activityReport.events" :key="event.id" class="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-slate-50 px-3 py-2 text-sm">
-              <time class="text-xs theme-text-muted">{{ formatDate(event.occurredAt, isRTL) }}</time>
-              <span class="font-medium theme-text-primary">{{ $t(`activeUsers.actionsMap.${event.action}`, event.action) }}</span>
-              <span class="theme-text-secondary">{{ resourceLabel(event.resource) }}</span>
-              <span v-if="event.resourceId" class="text-xs theme-text-muted">#{{ event.resourceId }}</span>
-              <span v-if="event.fileFormat" class="rounded bg-white px-2 py-0.5 text-xs theme-text-muted">{{ event.fileFormat.toUpperCase() }}</span>
-              <span v-if="event.changedFields?.length" class="w-full text-xs theme-text-muted">
-                {{ $t('activeUsers.changedFields') }}: {{ event.changedFields.map(fieldLabel).join(', ') }}
-              </span>
-            </li>
-          </ul>
-        </div>
-      </template>
-    </section>
   </div>
 </template>
 
@@ -152,7 +94,7 @@ import { useI18n } from 'vue-i18n'
 import router from '@/router'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import { useActiveUsers } from '@/composables/useActiveUsers'
-import { downloadUserActivityReportPdf, getUserActivityReport } from '@/api'
+import { downloadUserActivityReportPdf } from '@/api'
 import { downloadBlobData, getFilenameFromResponse } from '@/utils/downloadFile'
 
 const PALETTE = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6', '#ef4444', '#14b8a6']
@@ -163,16 +105,12 @@ export default {
   setup() {
     const { locale, t, te } = useI18n()
     const { users, loading, refresh } = useActiveUsers()
-    const activityReportUser = ref(null)
-    const activityReport = ref(null)
-    const activityReportLoading = ref(false)
+    const activityReportLoadingUserId = ref(null)
     const activityReportError = ref('')
-    const activityReportPdfLoading = ref(false)
-    const activityReportPdfError = ref('')
+    const activityReportErrorUserId = ref(null)
     return {
       locale, t, te, users, loading, refresh,
-      activityReportUser, activityReport, activityReportLoading, activityReportError,
-      activityReportPdfLoading, activityReportPdfError
+      activityReportLoadingUserId, activityReportError, activityReportErrorUserId
     }
   },
   computed: {
@@ -200,77 +138,24 @@ export default {
       const key = `activeUsers.sectionLabels.${moduleName}`
       return moduleName && this.te(key) ? this.t(key) : ''
     },
-    async loadActivityReport(user) {
-      this.activityReportUser = user
-      this.activityReport = null
+    async downloadActivityReportPdf(user) {
+      if (this.activityReportLoadingUserId !== null) return
+      this.activityReportLoadingUserId = user.userId
       this.activityReportError = ''
-      this.activityReportPdfError = ''
-      this.activityReportLoading = true
-      try {
-        const { data } = await getUserActivityReport(user.userId)
-        this.activityReport = data
-      } catch (error) {
-        this.activityReportError = this.t('activeUsers.activityReportError')
-      } finally {
-        this.activityReportLoading = false
-      }
-    },
-    async downloadActivityReportPdf() {
-      if (!this.activityReportUser || this.activityReportPdfLoading) return
-      this.activityReportPdfLoading = true
-      this.activityReportPdfError = ''
+      this.activityReportErrorUserId = null
       try {
         const { data, headers } = await downloadUserActivityReportPdf(
-          this.activityReportUser.userId,
+          user.userId,
           this.isRTL ? 'ar' : 'en'
         )
-        const filename = getFilenameFromResponse(
-          headers,
-          `user-activity-${this.activityReportUser.userId}.pdf`
-        )
+        const filename = getFilenameFromResponse(headers, `user-activity-${user.userId}.pdf`)
         downloadBlobData(data, filename, 'application/pdf')
       } catch (error) {
-        this.activityReportPdfError = this.t('activeUsers.pdfDownloadError')
+        this.activityReportError = this.t('activeUsers.activityReportError')
+        this.activityReportErrorUserId = user.userId
       } finally {
-        this.activityReportPdfLoading = false
+        this.activityReportLoadingUserId = null
       }
-    },
-    clearActivityReport() {
-      this.activityReportUser = null
-      this.activityReport = null
-      this.activityReportError = ''
-      this.activityReportPdfError = ''
-    },
-    formatDate(value, rtl) {
-      if (!value) return this.t('activeUsers.now')
-      const date = new Date(value)
-      if (Number.isNaN(date.getTime())) return this.t('activeUsers.unknownTime')
-      return date.toLocaleString(rtl ? 'ar-EG' : 'en-US', {
-        dateStyle: 'short',
-        timeStyle: 'short'
-      })
-    },
-    offlinePeriod(session, index, sessions) {
-      if (!session.endedAt) return null
-      const newerSession = sessions[index - 1]
-      return {
-        from: this.formatDate(session.endedAt, this.isRTL),
-        to: newerSession ? this.formatDate(newerSession.startedAt, this.isRTL) : this.t('activeUsers.now')
-      }
-    },
-    resourceLabel(resource) {
-      const key = `activeUsers.resourceLabels.${resource.split('/').join('.')}`
-      if (this.te(key)) return this.t(key)
-      return resource.split('/').map(segment => {
-        const resourceKey = `activeUsers.resourceLabels.${segment}`
-        if (this.te(resourceKey)) return this.t(resourceKey)
-        const sectionKey = `activeUsers.sectionLabels.${segment}`
-        return this.te(sectionKey) ? this.t(sectionKey) : segment
-      }).join(' / ')
-    },
-    fieldLabel(field) {
-      const key = `activeUsers.fieldLabels.${field}`
-      return this.te(key) ? this.t(key) : field
     },
     formatActivity(user, rtl) {
       if (user.online !== false) return this.t('activeUsers.onlineNow')
