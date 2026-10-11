@@ -1,78 +1,85 @@
 <template>
   <div class="messaging-page" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
-    <header class="mb-4 flex items-center justify-between gap-3">
-      <div>
-        <h1 class="text-2xl font-bold theme-text-primary">{{ t('messaging.title') }}</h1>
-        <p class="text-sm theme-text-muted">{{ t('messaging.conversations') }}</p>
+    <header class="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+      <div class="flex items-center gap-3">
+        <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-xl font-bold text-white shadow-lg shadow-indigo-200">K</span>
+        <div>
+          <h1 class="text-xl font-bold text-slate-900">{{ t('messaging.title') }}</h1>
+          <p class="text-sm text-slate-500">{{ t('messaging.conversations') }}</p>
+        </div>
       </div>
-      <span class="text-xs" :class="realtimeService.isConnected.value ? 'text-emerald-600' : 'text-slate-400'">
+      <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold"
+        :class="realtimeService.isConnected.value ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'">
+        <span class="h-2 w-2 rounded-full" :class="realtimeService.isConnected.value ? 'bg-emerald-500' : 'bg-amber-500'"></span>
         {{ realtimeService.isConnected.value ? t('messaging.online') : t('messaging.offline') }}
       </span>
     </header>
 
-    <div class="grid min-h-[65vh] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[21rem_minmax(0,1fr)]">
-      <aside :class="['border-b border-slate-200 bg-slate-50 lg:border-b-0 lg:border-e', mobileChatOpen ? 'hidden lg:block' : '']">
-        <div class="space-y-3 border-b border-slate-200 p-4">
+    <div class="grid min-h-[70vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70 lg:grid-cols-[21rem_minmax(0,1fr)]">
+      <aside :class="['border-b border-slate-200 bg-[#20204b] text-white lg:border-b-0 lg:border-e lg:border-e-white/10', mobileChatOpen ? 'hidden lg:block' : '']">
+        <div class="space-y-3 border-b border-white/10 p-4">
           <input
             v-model="search"
-            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"
+            class="w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-indigo-100/60 focus:border-indigo-300 focus:bg-white/15"
             :placeholder="t('messaging.search')"
           >
-          <select v-model="newUserId" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+          <select v-model="newUserId" class="w-full rounded-xl border border-white/15 bg-[#2a2a5b] px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-300">
             <option value="">{{ t('messaging.startDirect') }}</option>
             <option v-for="person in filteredUsers" :key="person.id" :value="person.id">{{ person.name }}</option>
           </select>
           <button
             v-if="newUserId"
-            class="w-full rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            class="w-full rounded-xl bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
             @click="startDirectConversation"
           >{{ t('messaging.startDirect') }}</button>
         </div>
 
-        <div v-if="loadingConversations" class="p-4 text-sm theme-text-muted">{{ t('messaging.conversations') }}...</div>
-        <div v-else-if="!filteredConversations.length" class="p-4 text-sm theme-text-muted">{{ t('messaging.emptyConversations') }}</div>
+        <div v-if="loadingConversations" class="p-4 text-sm text-indigo-100/70">{{ t('messaging.conversations') }}...</div>
+        <div v-else-if="!filteredConversations.length" class="p-4 text-sm text-indigo-100/70">{{ t('messaging.emptyConversations') }}</div>
         <div v-else class="max-h-[70vh] overflow-y-auto">
           <button
             v-for="conversation in filteredConversations"
             :key="conversation.id"
-            class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-start transition hover:bg-blue-50"
-            :class="selectedConversationId === conversation.id ? 'bg-blue-50' : ''"
+            class="flex w-full items-center gap-3 border-b border-white/5 px-4 py-3 text-start transition hover:bg-white/10"
+            :class="selectedConversationId === conversation.id ? 'bg-indigo-500/25 shadow-[inset_3px_0_0_0_#818cf8]' : ''"
             @click="selectConversation(conversation)"
           >
-            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700">
+            <span class="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-300 to-sky-400 font-semibold text-slate-900 shadow-md">
               {{ initials(conversation.name) }}
+              <span v-if="conversation.type === 'DIRECT'" class="absolute -bottom-0.5 -end-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#20204b]"
+                :class="conversation.members.find((member) => member.id !== currentUserId)?.online ? 'bg-emerald-400' : 'bg-slate-500'"></span>
             </span>
             <span class="min-w-0 flex-1">
               <span class="flex items-center justify-between gap-2">
-                <span class="truncate text-sm font-semibold theme-text-primary">{{ conversation.name }}</span>
-                <span v-if="conversation.unreadCount" class="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white">{{ conversation.unreadCount }}</span>
+                <span class="truncate text-sm font-semibold text-white">{{ conversation.name }}</span>
+                <span v-if="conversation.unreadCount" class="rounded-full bg-sky-400 px-2 py-0.5 text-xs font-bold text-slate-950">{{ conversation.unreadCount }}</span>
               </span>
-              <span class="block truncate text-xs theme-text-muted">{{ previewText(conversation.lastMessage) }}</span>
+              <span class="block truncate text-xs text-indigo-100/65">{{ previewText(conversation.lastMessage) }}</span>
             </span>
           </button>
         </div>
       </aside>
 
-      <section :class="['flex min-w-0 flex-col', !mobileChatOpen ? 'hidden lg:flex' : '']">
+      <section :class="['flex min-w-0 flex-col bg-[#f4f5fa]', !mobileChatOpen ? 'hidden lg:flex' : '']">
         <template v-if="selectedConversation">
-          <header class="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+          <header class="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3.5 shadow-sm">
             <div class="flex min-w-0 items-center gap-3">
               <button class="rounded-lg px-2 py-1 text-sm text-blue-700 lg:hidden" @click="mobileChatOpen = false">‹</button>
               <div class="min-w-0">
-                <h2 class="truncate font-semibold theme-text-primary">{{ selectedConversation.name }}</h2>
-                <p class="text-xs theme-text-muted">
+                <h2 class="truncate font-semibold text-slate-900">{{ selectedConversation.name }}</h2>
+                <p class="text-xs text-slate-500">
                   {{ selectedConversation.isOrganizationGroup ? `${selectedConversation.members.length} ${t('messaging.groupMembers')}` : (selectedConversation.members.find((member) => member.id !== currentUserId)?.online ? t('messaging.online') : t('messaging.offline')) }}
                 </p>
               </div>
             </div>
             <div v-if="selectedConversation.type === 'DIRECT'" class="flex items-center gap-1">
-              <button class="rounded-lg px-3 py-2 text-sm hover:bg-slate-100" :title="t('messaging.callAudio')" @click="startCall('AUDIO')">☎</button>
-              <button class="rounded-lg px-3 py-2 text-sm hover:bg-slate-100" :title="t('messaging.callVideo')" @click="startCall('VIDEO')">▣</button>
+              <button class="rounded-xl border border-slate-200 p-2.5 text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50" :aria-label="t('messaging.callAudio')" :title="t('messaging.callAudio')" @click="startCall('AUDIO')">☎</button>
+              <button class="rounded-xl border border-slate-200 p-2.5 text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50" :aria-label="t('messaging.callVideo')" :title="t('messaging.callVideo')" @click="startCall('VIDEO')">▣</button>
             </div>
           </header>
 
-          <div ref="messageScroller" class="relative flex-1 space-y-3 overflow-y-auto bg-slate-50/70 p-4" @scroll="onMessageScroll">
-            <button v-if="newMessagesAvailable" class="sticky top-1 z-10 mx-auto block rounded-full bg-blue-600 px-3 py-1 text-xs text-white shadow" @click="jumpToLatest">
+          <div ref="messageScroller" class="relative flex-1 space-y-3 overflow-y-auto bg-[#f4f5fa] p-4" @scroll="onMessageScroll">
+            <button v-if="newMessagesAvailable" class="sticky top-1 z-10 mx-auto block rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-200" @click="jumpToLatest">
               {{ t('messaging.newMessages') }}
             </button>
             <button v-if="hasMoreMessages" class="mx-auto block rounded-lg px-3 py-1 text-xs text-blue-700 hover:bg-blue-50" @click="loadOlderMessages">
@@ -87,9 +94,9 @@
               class="flex"
               :class="message.senderId === currentUserId ? 'justify-end' : 'justify-start'"
             >
-              <div class="max-w-[88%] rounded-2xl px-3 py-2 shadow-sm sm:max-w-[75%]"
-                :class="message.senderId === currentUserId ? 'bg-blue-600 text-white' : 'border border-slate-200 bg-white theme-text-primary'">
-                <p v-if="selectedConversation.type === 'GROUP' && message.senderId !== currentUserId" class="mb-1 text-xs font-semibold text-blue-700">{{ message.sender?.name }}</p>
+              <div class="max-w-[88%] rounded-2xl px-4 py-3 shadow-sm sm:max-w-[75%]"
+                :class="message.senderId === currentUserId ? 'rounded-ee-md bg-gradient-to-br from-indigo-600 to-blue-600 text-white shadow-indigo-200/70' : 'rounded-es-md border border-slate-200 bg-white text-slate-800 shadow-slate-200/80'">
+                <p v-if="selectedConversation.type === 'GROUP' && message.senderId !== currentUserId" class="mb-1 text-xs font-semibold text-indigo-700">{{ message.sender?.name }}</p>
                 <button v-if="message.replyTo" class="mb-1 block max-w-full truncate border-s-2 border-current ps-2 text-start text-xs opacity-75" @click="scrollToMessage(message.replyTo.id)">
                   {{ message.replyTo.text || t('messaging.file') }}
                 </button>
@@ -137,12 +144,12 @@
               <textarea
                 v-model="draft"
                 rows="1"
-                class="max-h-32 min-h-10 flex-1 resize-y rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+                class="max-h-32 min-h-10 flex-1 resize-y rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                 :placeholder="t('messaging.messagePlaceholder')"
                 @input="onDraftInput"
                 @keydown.enter.exact.prevent="sendMessage"
               ></textarea>
-              <button :disabled="!draft.trim() || sending" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" @click="sendMessage">
+              <button :disabled="!draft.trim() || sending" class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 disabled:opacity-50" @click="sendMessage">
                 {{ t('messaging.send') }}
               </button>
             </div>
@@ -153,33 +160,52 @@
       </section>
     </div>
 
-    <div v-if="incomingCall" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div class="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl">
-        <p class="text-sm theme-text-muted">{{ t('messaging.incomingCall') }}</p>
-        <h2 class="my-2 text-xl font-bold">{{ callerName(incomingCall) }}</h2>
-        <p class="mb-5">{{ incomingCall.type === 'VIDEO' ? t('messaging.callVideo') : t('messaging.callAudio') }}</p>
-        <div class="flex justify-center gap-3">
-          <button class="rounded-xl bg-emerald-600 px-5 py-2 text-white" @click="answerCall">{{ t('messaging.answer') }}</button>
-          <button class="rounded-xl bg-red-600 px-5 py-2 text-white" @click="rejectCall">{{ t('messaging.reject') }}</button>
+    <div v-if="incomingCall" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
+      <div class="w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-slate-900 p-6 text-center text-white shadow-2xl">
+        <span class="mx-auto flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-blue-600 text-2xl font-bold">{{ initials(callerName(incomingCall)) }}</span>
+        <p class="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">{{ t('messaging.incomingCall') }}</p>
+        <h2 class="my-2 text-2xl font-bold">{{ callerName(incomingCall) }}</h2>
+        <p class="mb-6 text-sm text-slate-300">{{ incomingCall.type === 'VIDEO' ? t('messaging.callVideo') : t('messaging.callAudio') }}</p>
+        <div class="flex justify-center gap-5">
+          <button class="flex flex-col items-center gap-2 text-sm text-slate-300" @click="answerCall">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-xl">☎</span>{{ t('messaging.answer') }}
+          </button>
+          <button class="flex flex-col items-center gap-2 text-sm text-slate-300" @click="rejectCall">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-600 text-xl">✕</span>{{ t('messaging.reject') }}
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-if="activeCall" class="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/80 p-4">
-      <div class="w-full max-w-3xl rounded-2xl bg-white p-4 shadow-2xl">
-        <div class="mb-3 flex items-center justify-between">
+    <div v-if="activeCall" class="fixed inset-0 z-40 flex items-center justify-center bg-[#090a15]/95 p-3 backdrop-blur-md sm:p-6">
+      <div class="flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#1d1e2d] p-4 text-white shadow-2xl sm:p-6">
+        <div class="mb-4 flex items-center justify-between gap-3">
           <div>
-            <p class="font-semibold">{{ activeCall.type === 'VIDEO' ? t('messaging.callVideo') : t('messaging.callAudio') }}</p>
-            <p class="text-xs theme-text-muted">{{ callStatusText }}</p>
+            <p class="font-semibold text-white">{{ activeCall.type === 'VIDEO' ? t('messaging.callVideo') : t('messaging.callAudio') }}</p>
+            <p class="mt-1 inline-flex items-center gap-2 text-xs text-slate-300"><span class="h-2 w-2 rounded-full" :class="callStatusText === t('messaging.callConnected') ? 'bg-emerald-400' : 'animate-pulse bg-amber-400'"></span>{{ callStatusText }}</p>
           </div>
-          <button class="rounded-xl bg-red-600 px-4 py-2 text-sm text-white" @click="endCall">{{ t('messaging.endCall') }}</button>
+          <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">{{ callPeerName(activeCall) }}</span>
         </div>
-        <video ref="remoteVideoElement" autoplay playsinline class="max-h-[60vh] w-full rounded-xl bg-black" :class="activeCall.type === 'AUDIO' ? 'hidden' : ''"></video>
         <audio ref="remoteAudioElement" autoplay></audio>
-        <video ref="localVideoElement" autoplay muted playsinline class="mt-2 max-h-40 rounded-lg bg-black" :class="activeCall.type === 'VIDEO' ? '' : 'hidden'"></video>
-        <div class="mt-3 flex justify-center gap-3">
-          <button class="rounded-lg border px-3 py-2 text-sm" @click="toggleMicrophone">{{ localStream?.getAudioTracks()[0]?.enabled ? t('messaging.mute') : t('messaging.unmute') }}</button>
-          <button v-if="activeCall.type === 'VIDEO'" class="rounded-lg border px-3 py-2 text-sm" @click="toggleCamera">{{ localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraOff') : t('messaging.cameraOn') }}</button>
+        <div v-if="activeCall.type === 'VIDEO'" class="grid min-h-0 flex-1 gap-3 overflow-hidden md:grid-cols-2">
+          <div class="relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-slate-950">
+            <video ref="remoteVideoElement" autoplay playsinline class="h-full max-h-[65vh] min-h-56 w-full object-cover"></video>
+            <span class="absolute bottom-3 start-3 rounded-lg bg-black/55 px-3 py-1 text-sm text-white">{{ callPeerName(activeCall) }}</span>
+          </div>
+          <div class="relative min-h-56 overflow-hidden rounded-2xl border border-white/10 bg-slate-950">
+            <video ref="localVideoElement" autoplay muted playsinline class="h-full max-h-[65vh] min-h-56 w-full object-cover"></video>
+            <span class="absolute bottom-3 start-3 rounded-lg bg-black/55 px-3 py-1 text-sm text-white">{{ t('messaging.you') }}</span>
+          </div>
+        </div>
+        <div v-else class="flex min-h-64 flex-1 flex-col items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-[#292b43] to-[#151624]">
+          <span class="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-blue-600 text-3xl font-bold shadow-xl shadow-indigo-950/50">{{ initials(callerName(activeCall)) }}</span>
+          <p class="mt-5 text-xl font-semibold">{{ callPeerName(activeCall) }}</p>
+          <p class="mt-2 text-sm text-slate-300">{{ callStatusText }}</p>
+        </div>
+        <div class="mt-5 flex items-center justify-center gap-3">
+          <button class="rounded-2xl border border-white/10 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/20" @click="toggleMicrophone">{{ localStream?.getAudioTracks()[0]?.enabled ? t('messaging.mute') : t('messaging.unmute') }}</button>
+          <button v-if="activeCall.type === 'VIDEO'" class="rounded-2xl border border-white/10 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/20" @click="toggleCamera">{{ localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraOff') : t('messaging.cameraOn') }}</button>
+          <button class="rounded-2xl bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-950/30 transition hover:bg-rose-500" @click="endCall">{{ t('messaging.endCall') }}</button>
         </div>
       </div>
     </div>
@@ -189,6 +215,7 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import {
   createChatCall, createDirectConversation, deleteChatMessage, downloadChatMedia,
   editChatMessage, ensureOrganizationConversation, getActiveChatCalls,
@@ -197,8 +224,11 @@ import {
 } from '@/api'
 import { realtimeService } from '@/services/realtimeService'
 import { user } from '@/composables/authStore'
+import { playChatSound, startChatRingtone, stopChatRingtone } from '@/utils/notificationSound'
 
 const { t, locale } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const users = ref([])
 const conversations = ref([])
 const selectedConversationId = ref('')
@@ -249,6 +279,7 @@ let unsubscribe = null
 let recordingTimer = null
 let isHandlingOffer = false
 let destroyed = false
+let answeringCallId = ''
 
 function decodeSubject() {
   try {
@@ -494,6 +525,7 @@ async function sendMessage() {
       ...(replyTarget.value ? { replyToId: replyTarget.value.id } : {}),
     })
     addMessage(data.message)
+    playChatSound('messageSent')
     draft.value = ''
     replyTarget.value = null
     await sendActivity('typing', false)
@@ -518,6 +550,7 @@ async function sendFile(file, durationMs) {
       ...(replyTarget.value ? { replyToId: replyTarget.value.id } : {}),
     })
     addMessage(data.message)
+    playChatSound('messageSent')
     replyTarget.value = null
     await loadConversations()
   } catch (error) {
@@ -694,7 +727,7 @@ async function createPeerConnection(servers) {
   }
   peerConnection.value.onconnectionstatechange = () => {
     if (peerConnection.value?.connectionState === 'failed') callStatusText.value = t('messaging.callFailed')
-    if (peerConnection.value?.connectionState === 'connected') callStatusText.value = t('messaging.online')
+    if (peerConnection.value?.connectionState === 'connected') callStatusText.value = t('messaging.callConnected')
   }
   await nextTick()
   if (localVideoElement.value && localStream.value) localVideoElement.value.srcObject = localStream.value
@@ -707,6 +740,7 @@ async function startCall(type) {
     const { data } = await createChatCall(selectedConversationId.value, type)
     activeCall.value = data.call
     callStatusText.value = t('messaging.calling')
+    startChatRingtone('outgoingCall')
     await createPeerConnection(data.iceServers)
   } catch (error) {
     console.error('Failed to start chat call', error)
@@ -717,31 +751,45 @@ async function startCall(type) {
 
 async function answerCall() {
   const offeredCall = incomingCall.value
-  if (!offeredCall) return
+  if (!offeredCall || answeringCallId === offeredCall.id) return
+  answeringCallId = offeredCall.id
   try {
     localStream.value = await navigator.mediaDevices.getUserMedia({ audio: true, video: offeredCall.type === 'VIDEO' })
     const { data } = await updateChatCall(offeredCall.id, 'accept')
     activeCall.value = { ...offeredCall, status: 'ACCEPTED' }
     incomingCall.value = null
+    stopChatRingtone()
     callStatusText.value = t('messaging.calling')
     await createPeerConnection(data.iceServers)
   } catch (error) {
     console.error('Failed to accept chat call', error)
     showError('messaging.callFailed')
     stopLocalCallMedia()
+  } finally {
+    answeringCallId = ''
   }
 }
 
 async function rejectCall() {
   const call = incomingCall.value
-  incomingCall.value = null
-  if (call) await updateChatCall(call.id, 'reject').catch((error) => console.error('Failed to reject chat call', error))
+  if (call) {
+    try {
+      await updateChatCall(call.id, 'reject')
+      incomingCall.value = null
+    } catch (error) {
+      console.error('Failed to reject chat call', error)
+      showError('messaging.callFailed')
+      return
+    }
+    stopChatRingtone()
+  }
 }
 
 async function handleCallAccepted() {
   if (!activeCall.value || activeCall.value.createdById !== currentUserId.value || !peerConnection.value) return
   try {
     callStatusText.value = t('messaging.calling')
+    stopChatRingtone()
     const offer = await peerConnection.value.createOffer()
     await peerConnection.value.setLocalDescription(offer)
     await waitForIceGatheringComplete(peerConnection.value)
@@ -808,6 +856,7 @@ function closePeerConnection() {
 }
 
 function closeCall() {
+  stopChatRingtone()
   closePeerConnection()
   stopLocalCallMedia()
   activeCall.value = null
@@ -827,6 +876,10 @@ function toggleCamera() {
 
 function callerName(call) {
   return call.participants?.find((participant) => participant.userId === call.createdById)?.user?.name || ''
+}
+
+function callPeerName(call) {
+  return call.participants?.find((participant) => participant.userId !== currentUserId.value)?.user?.name || callerName(call)
 }
 
 function handleRealtime(event, data) {
@@ -870,6 +923,7 @@ function handleRealtime(event, data) {
   }
   if (event === 'call.incoming' && data.call?.createdById !== currentUserId.value) {
     incomingCall.value = data.call
+    startChatRingtone('incomingCall')
     const conversation = conversations.value.find((item) => item.id === data.call.conversationId)
     if (conversation) void selectConversation(conversation)
   }
@@ -884,6 +938,7 @@ function handleRealtime(event, data) {
   }
   if (event === 'call.updated' && incomingCall.value?.id === data.callId && ['REJECTED', 'MISSED', 'ENDED'].includes(data.status)) {
     incomingCall.value = null
+    stopChatRingtone()
   }
   if (event === 'call.signal') void handleCallSignal(data)
 }
@@ -895,8 +950,23 @@ async function restoreActiveCalls() {
       const call = entry.call
       if (call.createdById !== currentUserId.value && call.status === 'RINGING' && !activeCall.value) {
         incomingCall.value = call
+        startChatRingtone('incomingCall')
         const conversation = conversations.value.find((item) => item.id === call.conversationId)
-        if (conversation) void selectConversation(conversation)
+        if (conversation) {
+          await selectConversation(conversation)
+          if (route.query.answerCall === call.id) {
+            const query = { ...route.query }
+            delete query.answerCall
+            await router.replace({ name: 'messaging', query })
+            await answerCall()
+          }
+          if (route.query.answerCall === call.id) {
+            const query = { ...route.query }
+            delete query.answerCall
+            await router.replace({ name: 'messaging', query })
+            await answerCall()
+          }
+        }
       }
     }
   } catch (error) {
@@ -935,6 +1005,7 @@ onUnmounted(() => {
   if (recordingKind.value) void sendActivity('recording', false)
   if (selectedConversationId.value) void sendActivity('typing', false)
   if (recorder.value && recorder.value.state !== 'inactive') recorder.value.stop()
+  stopChatRingtone()
   stopRecordingTracks()
   closeCall()
   Object.values(mediaUrls.value).forEach((url) => URL.revokeObjectURL(url))

@@ -1,8 +1,11 @@
 let audioCtx = null
+let ringtoneTimer = null
 
 function initAudioCtx() {
   if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext
+    if (!AudioContextClass) return
+    audioCtx = new AudioContextClass()
   }
   if (audioCtx.state === 'suspended') {
     audioCtx.resume()
@@ -14,37 +17,58 @@ if (typeof window !== 'undefined') {
   window.addEventListener('touchstart', initAudioCtx, { once: true })
 }
 
+function playTones(frequencies, duration, volume) {
+  if (!audioCtx || audioCtx.state !== 'running') return
+  const ctx = audioCtx
+  const now = ctx.currentTime
+  frequencies.forEach((frequency, index) => {
+    const start = now + index * 0.16
+    const oscillator = ctx.createOscillator()
+    const gain = ctx.createGain()
+    oscillator.type = 'sine'
+    oscillator.frequency.value = frequency
+    gain.gain.setValueAtTime(0.0001, start)
+    gain.gain.linearRampToValueAtTime(volume, start + 0.025)
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration)
+    oscillator.connect(gain)
+    gain.connect(ctx.destination)
+    oscillator.start(start)
+    oscillator.stop(start + duration + 0.01)
+  })
+}
+
 export function playNotificationSound() {
   try {
-    if (!audioCtx) return
-    if (audioCtx.state === 'suspended') return
-    const ctx = audioCtx
-    const now = ctx.currentTime
+    playTones([523.25, 659.25], 0.2, 0.07)
+  } catch (error) {
+    console.warn('Notification sound could not be played:', error)
+  }
+}
 
-    const osc1 = ctx.createOscillator()
-    const gain1 = ctx.createGain()
-    osc1.type = 'sine'
-    osc1.frequency.value = 523.25
-    gain1.gain.setValueAtTime(0.0001, now)
-    gain1.gain.linearRampToValueAtTime(0.08, now + 0.02)
-    gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.2)
-    osc1.connect(gain1)
-    gain1.connect(ctx.destination)
-    osc1.start(now)
-    osc1.stop(now + 0.2)
+export function playChatSound(type) {
+  try {
+    const patterns = {
+      messageReceived: { frequencies: [784, 988], duration: 0.16, volume: 0.07 },
+      messageSent: { frequencies: [659], duration: 0.16, volume: 0.07 },
+      incomingCall: { frequencies: [880, 660], duration: 0.24, volume: 0.12 },
+      outgoingCall: { frequencies: [440, 480], duration: 0.24, volume: 0.12 },
+    }
+    const pattern = patterns[type]
+    if (pattern) playTones(pattern.frequencies, pattern.duration, pattern.volume)
+  } catch (error) {
+    console.warn('Chat sound could not be played:', error)
+  }
+}
 
-    const osc2 = ctx.createOscillator()
-    const gain2 = ctx.createGain()
-    osc2.type = 'sine'
-    osc2.frequency.value = 659.25
-    gain2.gain.setValueAtTime(0.0001, now + 0.1)
-    gain2.gain.linearRampToValueAtTime(0.06, now + 0.12)
-    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.35)
-    osc2.connect(gain2)
-    gain2.connect(ctx.destination)
-    osc2.start(now + 0.1)
-    osc2.stop(now + 0.35)
-  } catch (e) {
-    // audio non-critical
+export function startChatRingtone(type) {
+  stopChatRingtone()
+  playChatSound(type)
+  ringtoneTimer = window.setInterval(() => playChatSound(type), 1800)
+}
+
+export function stopChatRingtone() {
+  if (ringtoneTimer) {
+    window.clearInterval(ringtoneTimer)
+    ringtoneTimer = null
   }
 }

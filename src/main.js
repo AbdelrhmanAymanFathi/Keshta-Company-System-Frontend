@@ -11,12 +11,13 @@ import { iconRevision, ICON_REVISION_KEY } from '@acme/icon-packs'
 import { themeRevision, THEME_REVISION_KEY } from '@acme/theme-engine'
 import i18n from './i18n'
 import authManager from './auth'
-import { isAuthenticated, initializeAuthStore } from './composables/authStore'
+import { isAuthenticated, initializeAuthStore, user } from './composables/authStore'
 import { realtimeService } from './services/realtimeService'
 import { buildVersionService } from './services/buildVersionService'
 import { tokenManager } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
 import appTable from './directives/appTable'
+import { playChatSound } from './utils/notificationSound'
 
 // Initialize auth store immediately on app load
 initializeAuthStore()
@@ -58,10 +59,29 @@ function startRealtime() {
     try { return tokenManager.getToken() } catch { return null }
   })
   unsubscribeChatNotifications?.()
-  unsubscribeChatNotifications = realtimeService.subscribe('chat', ['message.new', 'call.incoming'], (event) => {
+  unsubscribeChatNotifications = realtimeService.subscribe('chat', ['message.new', 'call.incoming'], (event, data) => {
+    if (event === 'message.new' && data?.message?.senderId !== Number(user.value?.id || user.value?.userId)) {
+      playChatSound('messageReceived')
+    }
     if (typeof Notification === 'undefined' || document.visibilityState === 'visible' || Notification.permission !== 'granted') return
-    const title = event === 'call.incoming' ? 'Incoming call' : 'New message'
-    new Notification(title, { body: 'Open Keshta Company to respond.' })
+    if (event === 'call.incoming') {
+      const call = data?.call
+      const caller = call?.participants?.find((participant) => participant.userId === call?.createdById)?.user?.name
+      const notification = new Notification(i18n.global.t('messaging.incomingCall'), {
+        body: `${caller || i18n.global.t('messaging.unknownCaller')} · ${i18n.global.t(call?.type === 'VIDEO' ? 'messaging.callVideo' : 'messaging.callAudio')}`,
+        tag: `chat-call-${call?.id || 'incoming'}`,
+      })
+      notification.onclick = () => {
+        window.focus()
+        notification.close()
+      }
+    } else {
+      const notification = new Notification(i18n.global.t('messaging.title'), { body: i18n.global.t('messaging.newMessages') })
+      notification.onclick = () => {
+        window.focus()
+        notification.close()
+      }
+    }
   })
 }
 
