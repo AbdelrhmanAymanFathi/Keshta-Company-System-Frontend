@@ -310,6 +310,12 @@ const routes = [
         meta: { title: 'systemLogs.title', roles: ['admin'] }
       },
       {
+        path: 'admin/active-users',
+        name: 'admin-active-users',
+        component: () => import('@/components/dashboard/Administration/ActiveUsers.vue'),
+        meta: { title: 'activeUsers.title', roles: ['admin'] }
+      },
+      {
         path: 'admin/reports',
         name: 'admin-reports-list',
         component: () => import('@/components/admin/ReportsList.vue'),

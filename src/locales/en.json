@@ -690,6 +690,7 @@
   "admin": {
     "reports": "Reports",
     "databaseBackup": "Database Backup & Restore",
+    "activeUsers": "Active Users",
     "newReport": "New Report",
     "createReport": "Create Report",
     "editReport": "Edit Report",
@@ -770,6 +771,32 @@
     "download": "Download",
     "downloadSuccess": "Log file downloaded.",
     "downloadError": "Failed to download log file."
+  },
+  "activeUsers": {
+    "title": "Active Users",
+    "description": "Live list of users currently connected to the system, with the page each one has open.",
+    "connectedUsers": "Connected Users",
+    "refresh": "Refresh",
+    "empty": "No users are currently connected.",
+    "colName": "User",
+    "colPage": "Current Page",
+    "colSince": "Connected Since",
+    "noPage": "—",
+    "pageLabels": {
+      "dashboard": "Dashboard",
+      "expenses": "Expenses",
+      "payments": "Payments",
+      "supplies": "Supplies",
+      "transport": "Transport",
+      "treasury": "Treasury",
+      "extracts": "Extracts",
+      "approvals": "Approvals",
+      "notifications": "Notifications",
+      "equipment-log": "Equipment Log",
+      "petroleum-supply": "Petroleum Supplies",
+      "rentals": "Rentals",
+      "users-list": "Users"
+    }
   },
   "reports": {
     "columns": {

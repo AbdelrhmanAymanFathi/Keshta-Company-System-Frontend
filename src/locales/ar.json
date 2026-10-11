@@ -692,6 +692,7 @@
   "admin": {
     "reports": "التقارير",
     "databaseBackup": "النسخ الاحتياطي واستعادة قاعدة البيانات",
+    "activeUsers": "المستخدمون النشطون",
     "newReport": "تقرير جديد",
     "createReport": "إنشاء تقرير",
     "editReport": "تعديل التقرير",
@@ -772,6 +773,32 @@
     "download": "تنزيل",
     "downloadSuccess": "تم تنزيل ملف السجل.",
     "downloadError": "فشل تنزيل ملف السجل."
+  },
+  "activeUsers": {
+    "title": "المستخدمون النشطون",
+    "description": "قائمة مباشرة بالمستخدمين المتصلين بالنظام حاليًا، مع الصفحة المفتوحة لكل منهم.",
+    "connectedUsers": "المستخدمون المتصلون",
+    "refresh": "تحديث",
+    "empty": "لا يوجد مستخدمون متصلون حاليًا.",
+    "colName": "المستخدم",
+    "colPage": "الصفحة الحالية",
+    "colSince": "وقت الاتصال",
+    "noPage": "—",
+    "pageLabels": {
+      "dashboard": "لوحة التحكم",
+      "expenses": "المصروفات",
+      "payments": "المدفوعات",
+      "supplies": "التوريدات",
+      "transport": "النقل",
+      "treasury": "الخزينة",
+      "extracts": "الخلاصات",
+      "approvals": "الاعتمادات",
+      "notifications": "الإشعارات",
+      "equipment-log": "سجل المعدات",
+      "petroleum-supply": "توريدات الوقود",
+      "rentals": "الإيجارات",
+      "users-list": "المستخدمون"
+    }
   },
   "reports": {
     "columns": {

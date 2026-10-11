@@ -2232,3 +2232,8 @@ export const getServerLogFile = (name, lines = 200) =>
 export const downloadServerLogFile = (name) =>
   axios.get(`${BASE_URL}/api/admin/logs/files/${encodeURIComponent(name)}/download`, { responseType: 'blob', timeout: 0 })
 
+// Admin: active users (name + current page). Live updates arrive on the `admin`
+// SSE channel; this endpoint provides the initial snapshot.
+export const getActiveUsers = () =>
+  axios.get(`${BASE_URL}/api/realtime/active-users`)
+
