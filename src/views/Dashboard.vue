@@ -493,8 +493,8 @@ function presencePageForRoute(route) {
 function presenceRecordForRoute(route) {
   const name = route?.name
   if (!name || !PRESENCE_RECORD_ROUTES.has(name)) return null
-  const id = route?.params?.id
-  return id && !isNaN(Number(id)) ? Number(id) : null
+  const id = Number(route?.params?.id)
+  return Number.isSafeInteger(id) && id > 0 ? id : null
 }
 
 export default {
