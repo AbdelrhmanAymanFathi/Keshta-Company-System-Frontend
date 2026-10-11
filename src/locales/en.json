@@ -788,7 +788,9 @@
       "expenses": "Expenses",
       "payments": "Payments",
       "supplies": "Supplies",
+      "supplies-list": "Supplies List",
       "transport": "Transport",
+      "transport-list": "Transport List",
       "treasury": "Treasury",
       "extracts": "Extracts",
       "approvals": "Approvals",
@@ -797,6 +799,7 @@
       "petroleum-supply": "Petroleum Supplies",
       "rentals": "Rentals",
       "users-list": "Users",
+      "admin-statistics": "Administration Statistics",
       "admin-active-users": "Active Users"
     },
     "sectionLabels": {

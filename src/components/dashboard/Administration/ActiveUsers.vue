@@ -161,7 +161,7 @@ export default {
   name: 'ActiveUsers',
   components: { PageHeader },
   setup() {
-    const { locale, t } = useI18n()
+    const { locale, t, te } = useI18n()
     const { users, loading, refresh } = useActiveUsers()
     const activityReportUser = ref(null)
     const activityReport = ref(null)
@@ -170,7 +170,7 @@ export default {
     const activityReportPdfLoading = ref(false)
     const activityReportPdfError = ref('')
     return {
-      locale, t, users, loading, refresh,
+      locale, t, te, users, loading, refresh,
       activityReportUser, activityReport, activityReportLoading, activityReportError,
       activityReportPdfLoading, activityReportPdfError
     }
@@ -182,8 +182,7 @@ export default {
   methods: {
     pageLabel(page) {
       const key = 'activeUsers.pageLabels.' + page
-      const label = this.t(key)
-      if (label && label !== key) return label
+      if (this.te(key)) return this.t(key)
 
       const route = router.getRoutes().find(candidate => candidate.name === page)
       const titleKey = route?.meta?.title
@@ -199,8 +198,7 @@ export default {
       const routePath = typeof route?.path === 'string' ? route.path : ''
       const moduleName = routePath.split('/').filter(Boolean)[1]
       const key = `activeUsers.sectionLabels.${moduleName}`
-      const label = moduleName ? this.t(key) : ''
-      return label && label !== key ? label : ''
+      return moduleName && this.te(key) ? this.t(key) : ''
     },
     async loadActivityReport(user) {
       this.activityReportUser = user
@@ -262,21 +260,17 @@ export default {
     },
     resourceLabel(resource) {
       const key = `activeUsers.resourceLabels.${resource.split('/').join('.')}`
-      const translated = this.t(key)
-      if (translated !== key) return translated
+      if (this.te(key)) return this.t(key)
       return resource.split('/').map(segment => {
         const resourceKey = `activeUsers.resourceLabels.${segment}`
-        const resourceLabel = this.t(resourceKey)
-        if (resourceLabel !== resourceKey) return resourceLabel
+        if (this.te(resourceKey)) return this.t(resourceKey)
         const sectionKey = `activeUsers.sectionLabels.${segment}`
-        const label = this.t(sectionKey)
-        return label === sectionKey ? segment : label
+        return this.te(sectionKey) ? this.t(sectionKey) : segment
       }).join(' / ')
     },
     fieldLabel(field) {
       const key = `activeUsers.fieldLabels.${field}`
-      const translated = this.t(key)
-      return translated === key ? field : translated
+      return this.te(key) ? this.t(key) : field
     },
     formatActivity(user, rtl) {
       if (user.online !== false) return this.t('activeUsers.onlineNow')

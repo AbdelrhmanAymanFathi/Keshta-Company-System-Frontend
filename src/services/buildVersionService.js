@@ -48,7 +48,7 @@ class BuildVersionService {
   }
 
   start() {
-    if (this.timer) return
+    if (this.timer || process.env.NODE_ENV !== 'production') return
     this.readVersion().then((id) => {
       if (this.reloading) return
       this.baseline = id

@@ -789,7 +789,9 @@
       "expenses": "المصروفات",
       "payments": "المدفوعات",
       "supplies": "التوريدات",
+      "supplies-list": "قائمة التوريدات",
       "transport": "النقل",
+      "transport-list": "قائمة النقل",
       "treasury": "الخزينة",
       "extracts": "الخلاصات",
       "approvals": "الاعتمادات",
@@ -798,6 +800,7 @@
       "petroleum-supply": "توريدات الوقود",
       "rentals": "الإيجارات",
       "users-list": "المستخدمون",
+      "admin-statistics": "إحصائيات الإدارة",
       "admin-active-users": "المستخدمون النشطون"
     },
     "sectionLabels": {
