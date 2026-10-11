@@ -2237,3 +2237,11 @@ export const downloadServerLogFile = (name) =>
 export const getActiveUsers = () =>
   axios.get(`${BASE_URL}/api/realtime/active-users`)
 
+export const getUserActivityReport = (userId, params = {}) =>
+  axios.get(`${BASE_URL}/api/admin/user-activity/${encodeURIComponent(userId)}`, { params })
+
+export const downloadUserActivityReportPdf = (userId, lang = 'ar', params = {}) =>
+  axios.get(`${BASE_URL}/api/admin/user-activity/${encodeURIComponent(userId)}/pdf`, {
+    params: { ...params, lang },
+    responseType: 'blob'
+  })
