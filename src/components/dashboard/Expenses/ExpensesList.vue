@@ -814,6 +814,9 @@ import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
+// البند الرئيسي الثابت لبنود تغذية العهدة (بيتحفظ كاسم، مش بند من بنود المصروفات)
+const CUSTODY_FEED_CATEGORY = { id: 'custody_feed', name: 'تغذية عهدة' }
+
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
@@ -950,7 +953,7 @@ rows: [],
       }))
     },
 
-    // Combined البند الفرعي: contractors + all expense sub-categories (deduplicated by name)
+    // Combined البند الفرعي: contractors + custodies + all expense sub-categories (deduplicated by name)
     combinedSubcategoryItems() {
       const contractors = (this.contractors || []).map(c => ({
         id: `contractor__${c.id}`,
@@ -988,7 +991,19 @@ rows: [],
 
       const expenseSubs = Array.from(subMap.values())
 
-      return [...contractors, ...expenseSubs]
+      // العهد = تغذية عهدة من الخزينة الرئيسية، فبتظهر بس لما المصدر خزينة رئيسية
+      const custodies = this.isMainSourceTreasury
+        ? this.custodyTreasuryItems.map(tr => ({
+            id: `custody__${tr.id}`,
+            name: tr.name,
+            label: tr.name,
+            _type: 'custody',
+            _rawId: tr.id,
+            _allCategories: []
+          }))
+        : []
+
+      return [...contractors, ...custodies, ...expenseSubs]
     },
 
     // System modules — used as البند الرئيسي options
@@ -1535,16 +1550,13 @@ rows: [],
       return typeof value === 'string' && value.includes('T') ? value.split('T')[0] : value
     },
 
-    // بنود التسوية = كل المصروفات اللي ليها نفس تاريخ التسوية ونفس الخزينة/العهدة (ونفس النوع والعهدة المحوّل لها)
+    // بنود التسوية = كل المصروفات اللي ليها نفس تاريخ التسوية ونفس الخزينة/العهدة ونفس النوع (تغذية العهد جزء منها)
     async fetchSettlementGroup(expense) {
       const settlementDate = this.toDateOnly(expense.settlementDate)
       const treasuryId = expense.treasuryId || expense.treasury?.id || null
       if (!settlementDate || !treasuryId) return [expense]
 
-      const destinationOf = e => Number(e.destinationTreasuryId || e.destinationTreasury?.id || 0)
-      const isSameSettlement = e =>
-        (e.kind || 'EXPENSE') === (expense.kind || 'EXPENSE') &&
-        destinationOf(e) === destinationOf(expense)
+      const isSameSettlement = e => (e.kind || 'EXPENSE') === (expense.kind || 'EXPENSE')
 
       const items = []
       let page = 1
@@ -1618,7 +1630,18 @@ rows: [],
       // تحديد نوع البند الفرعي لما بنفتح للتعديل
       // المقاول كبند فرعي بيتحفظ كـ contractorId من غير subCategoryId (شوف buildExpensePayload)
       const expenseContractorId = expense.contractorId || expense.contractor?.id || null
-      if (!terms.subCategoryId && expenseContractorId) {
+      const destinationId = expense.destinationTreasuryId || expense.destinationTreasury?.id || null
+      row._custodyId = null
+      if (destinationId) {
+        const custody = (this.treasuries || []).find(tr => Number(tr.id) === Number(destinationId))
+        row._subItemType = 'custody'
+        row._custodyId = destinationId
+        row._contractorRawId = null
+        row.subCategoryId = null
+        row.subCategorySearch = `${custody?.name || expense.destinationTreasury?.name || ''} (عهدة)`
+        row.categoryId = CUSTODY_FEED_CATEGORY.id
+        row.categorySearch = CUSTODY_FEED_CATEGORY.name
+      } else if (!terms.subCategoryId && expenseContractorId) {
         const contractor = (this.contractors || []).find(c => Number(c.id) === Number(expenseContractorId))
         row._subItemType = 'contractor'
         row._contractorRawId = expenseContractorId
@@ -1762,6 +1785,7 @@ rows: [],
         subCategoryId: prevRow?.subCategoryId ?? null,
         _subItemType: prevRow?._subItemType ?? null,
         _contractorRawId: prevRow?._contractorRawId ?? null,
+        _custodyId: prevRow?._custodyId ?? null,
         _allCategories: prevRow?._allCategories ?? [],
         categorySearch: prevRow?.categorySearch ?? '',
         subCategorySearch: prevRow?.subCategorySearch ?? '',
@@ -1915,6 +1939,8 @@ rows: [],
     },
 
     getRowCategories(row) {
+      if (row._subItemType === 'custody') return [CUSTODY_FEED_CATEGORY]
+
       // لو اختار بند فرعي وعنده أكتر من كاتيجوري → يعرضهم للاختيار
       if (row._subItemType === 'expensesub' && Array.isArray(row._allCategories) && row._allCategories.length > 1) {
         return row._allCategories.map(c => ({ id: c.id, name: c.name }))
@@ -1947,7 +1973,18 @@ rows: [],
 
     // ── Unified handler: contractor OR expense sub-category as البند الفرعي ──
     onSelectRowSubItem(row, sel) {
-      if (sel._type === 'expensesub') {
+      row._custodyId = null
+      if (sel._type === 'custody') {
+        // ── تغذية عهدة: المبلغ يخرج من الخزينة الرئيسية ويدخل رصيد العهدة ──
+        row._subItemType = 'custody'
+        row._custodyId = sel._rawId
+        row._contractorRawId = null
+        row._allCategories = []
+        row.subCategoryId = null
+        row.subCategorySearch = sel.name
+        row.categoryId = CUSTODY_FEED_CATEGORY.id
+        row.categorySearch = CUSTODY_FEED_CATEGORY.name
+      } else if (sel._type === 'expensesub') {
         // ── بند فرعي من المصروفات ──
         row._subItemType = 'expensesub'
         row._contractorRawId = null
@@ -1999,6 +2036,7 @@ rows: [],
     onClearRowContractor(row) {
       row._subItemType = null
       row._contractorRawId = null
+      row._custodyId = null
       row._allCategories = []
       row.subCategoryId = null
       row.subCategorySearch = ''
@@ -2112,15 +2150,18 @@ rows: [],
       // لو البند الفرعي مقاول → subCategoryId = undefined، contractorId = الـ ID الحقيقي
       // لو البند الفرعي من المصروفات → subCategoryId = الـ ID الحقيقي، contractorId من المصروف الأصلي (في التعديل) أو من الـ form العلوي
       const isContractorRow = row._subItemType === 'contractor'
-      const rowSubCategoryId = isContractorRow ? undefined : (row.subCategoryId || undefined)
+      const isCustodyRow = row._subItemType === 'custody'
+      const rowSubCategoryId = isContractorRow || isCustodyRow ? undefined : (row.subCategoryId || undefined)
       const formContractorId = (!this.editing && this.form.contractorId && !this.form.destinationTreasuryId) ? this.form.contractorId : null
-      const rowContractorId = isContractorRow
-        ? (row._contractorRawId || null)
-        : (row._origContractorId !== undefined ? row._origContractorId : formContractorId)
+      const rowContractorId = isCustodyRow
+        ? null
+        : isContractorRow
+          ? (row._contractorRawId || null)
+          : (row._origContractorId !== undefined ? row._origContractorId : formContractorId)
       // لما المقاول هو البند الفرعي، categoryId بيكون string زي 'expenses' → البيك إند بيرفضه
       // فبنبعت category string بدل categoryId integer
-      const rowCategoryId = isContractorRow ? null : (row.categoryId || null)
-      const rowCategoryName = isContractorRow ? (row.categorySearch || undefined) : undefined
+      const rowCategoryId = isContractorRow || isCustodyRow ? null : (row.categoryId || null)
+      const rowCategoryName = isContractorRow || isCustodyRow ? (row.categorySearch || undefined) : undefined
       return {
         date: rowExpenseDate,
         kind: row._origKind || this.form.kind || 'EXPENSE',
@@ -2133,7 +2174,7 @@ rows: [],
         branchId: row._origBranchId !== undefined ? row._origBranchId : (this.form.branchId || null),
         locationId: row.locationId,
         treasuryId: this.form.treasuryId ?? null,
-        destinationTreasuryId: this.isMainSourceTreasury ? (this.form.destinationTreasuryId ?? null) : null,
+        destinationTreasuryId: isCustodyRow ? (row._custodyId ?? null) : null,
         paymentMethod: row.paymentMethod || 'CASH',
         notes: row.notes || '',
         settlementDate: new Date(rowSettlementDate + 'T00:00:00Z').toISOString(),
@@ -2323,6 +2364,10 @@ rows: [],
         const row = this.rows[index]
         // لما بند فرعي من المصروفات → categoryId رقم حقيقي (مطلوب)
         // لما مقاول → categoryId ممكن يكون string module id أو null (مقبول)
+        if (row._subItemType === 'custody' && !this.isMainSourceTreasury) {
+          this.showError('تغذية العهدة بتكون من خزينة رئيسية — غيّر الخزينة في الخطوة الأولى أو اختار بند فرعي تاني')
+          return false
+        }
         if (!row.categoryId && row._subItemType !== 'contractor') {
           this.showError(this.$t('expenses.validation.categoryRequired'))
           return false
