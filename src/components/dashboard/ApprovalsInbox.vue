@@ -131,20 +131,11 @@
                     🏢 {{ t('contractor') }}: {{ app.contractor?.name }}
                   </div>
                   
-                  <div class="text-xs text-slate-700 bg-slate-50 rounded-lg p-2.5 space-y-1 font-mono border border-slate-100 max-h-40 overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
-                    <!-- Update state diff -->
-                    <template v-if="app.action === 'UPDATE'">
-                      <div v-for="(newVal, key) in getChangedFields(app)" :key="key" class="flex gap-4 py-0.5" :class="isRTL ? 'flex-row-reverse' : ''">
-                        <span class="text-slate-500 font-sans">{{ getFieldLabel(key) }}:</span>
-                        <span :class="isRTL ? 'text-left' : 'text-right'">
-                          <span class="line-through text-red-500 text-xxs block sm:inline">{{ formatValue(app.beforeState[key], key) }}</span>
-                          <span class="mx-1 text-slate-400 hidden sm:inline">➔</span>
-                          <span class="text-emerald-600 font-bold block sm:inline">{{ formatValue(newVal, key) }}</span>
-                        </span>
-                      </div>
-                    </template>
+                  <!-- Update state diff (ids already resolved to names by the server) -->
+                  <NotificationChanges v-if="app.action === 'UPDATE'" :changes="app.changes || []" class="max-h-40 overflow-y-auto" />
+                  <div v-else class="text-xs text-slate-700 bg-slate-50 rounded-lg p-2.5 space-y-1 font-mono border border-slate-100 max-h-40 overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
                     <!-- Delete state -->
-                    <template v-else-if="app.action === 'DELETE'">
+                    <template v-if="app.action === 'DELETE'">
                       <div class="text-red-500 font-bold text-start font-sans py-1">
                         🗑️ {{ t('deletionNotice') }}
                       </div>
@@ -274,21 +265,22 @@
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-slate-100">
-                <tr v-for="key in getDetailKeys(selectedApprovalForDetail)" :key="key" class="hover:bg-slate-50/50 transition-colors">
+                <tr v-for="row in getDetailRows(selectedApprovalForDetail)" :key="row.key" class="hover:bg-slate-50/50 transition-colors">
                   <td class="px-4 py-2.5 text-sm font-semibold text-slate-600" :class="isRTL ? 'text-right' : 'text-left'">
-                    {{ getDetailKeyLabel(key) }}
+                    {{ row.label }}
                   </td>
-                  <td class="px-4 py-2.5 text-sm text-slate-700 font-mono" :class="isRTL ? 'text-right' : 'text-left'">
-                    {{ getDisplayValue(selectedApprovalForDetail.beforeState[key], key) }}
+                  <td class="px-4 py-2.5 text-sm font-mono" :class="isRTL ? 'text-right' : 'text-left'">
+                    <span v-if="row.changed" class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100 block w-fit max-w-full">
+                      {{ row.before }}
+                    </span>
+                    <span v-else class="text-slate-700">{{ row.before }}</span>
                   </td>
                   <td class="px-4 py-2.5 text-sm font-mono" :class="isRTL ? 'text-right' : 'text-left'">
                     <template v-if="selectedApprovalForDetail.action === 'UPDATE'">
-                      <span v-if="hasFieldChanged(selectedApprovalForDetail, key)" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 block w-fit max-w-full">
-                        {{ getDisplayValue(selectedApprovalForDetail.afterState[key], key) }}
+                      <span v-if="row.changed" class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 block w-fit max-w-full">
+                        {{ row.after }}
                       </span>
-                      <span v-else class="text-slate-400">
-                        {{ getDisplayValue(selectedApprovalForDetail.beforeState[key], key) }}
-                      </span>
+                      <span v-else class="text-slate-700">{{ row.after }}</span>
                     </template>
                     <template v-else>
                       <span class="text-slate-400">-</span>
@@ -364,9 +356,11 @@ import { getApprovals, approveRequest, rejectRequest } from '@/api';
 import { useRealtime } from '@/composables/useRealtime';
 import { debounce } from '@/utils/debounce';
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord';
+import NotificationChanges from '@/components/shared/NotificationChanges.vue';
 
 export default {
   name: 'ApprovalsInbox',
+  components: { NotificationChanges },
   setup() {
     const { locale } = useI18n();
     const instance = getCurrentInstance()
@@ -619,29 +613,6 @@ export default {
       };
       return classes[act] || 'bg-slate-50 text-slate-700';
     },
-    getFieldLabel(field) {
-      return this.t(field) || field;
-    },
-    getChangedFields(app) {
-      if (!app.afterState || !app.beforeState) return {};
-      const changes = {};
-      Object.keys(app.afterState).forEach(key => {
-        // The site name is shown instead of its id when the request carries both
-        if (key === 'locationId' && 'locationName' in app.afterState) return;
-        // Per-site opening balance lines are shown through their `sites` text
-        if (key === 'lines') return;
-        const oldVal = app.beforeState[key];
-        const newVal = app.afterState[key];
-        // Compare values, ignore formatting differences
-        if (oldVal !== newVal && String(oldVal) !== String(newVal)) {
-          // Ignore fields like audit properties
-          if (!['updatedAt', 'updatedById', 'createdById', 'createdAt', 'deletedAt'].includes(key)) {
-            changes[key] = newVal;
-          }
-        }
-      });
-      return changes;
-    },
     formatValue(val, key) {
       if (val === null || val === undefined) return '-';
       if (typeof val === 'boolean') {
@@ -743,13 +714,40 @@ export default {
         'contractorId', 'locationId', 'areaId', 'itemId', 'vehicleId', 'driverId', 'crusherId', 'lines',
         'hasPendingApproval', 'availableForSupplies', 'availableForExports', 'availableForTransports'
       ];
-      return Array.from(keys).filter(k => !excludeKeys.includes(k));
+      // Raw relation ids are never shown; a changed relation comes in with names via app.changes
+      return Array.from(keys).filter(k => !excludeKeys.includes(k) && !k.endsWith('Id'));
     },
-    hasFieldChanged(app, key) {
-      if (!app.afterState || !app.beforeState) return false;
-      const oldVal = app.beforeState[key];
-      const newVal = app.afterState[key];
-      return oldVal !== newVal && String(oldVal) !== String(newVal);
+    // Rows of the details table; relations whose id changed show the server-resolved names
+    getDetailRows(app) {
+      const isUpdate = app.action === 'UPDATE';
+      const idChanges = new Map(
+        (isUpdate ? app.changes || [] : [])
+          .filter(c => c.field.endsWith('Id'))
+          .map(c => [c.field.slice(0, -2), c])
+      );
+      const rows = [];
+      const emitted = new Set();
+      const pushIdChange = (base) => {
+        if (emitted.has(base)) return;
+        emitted.add(base);
+        const c = idChanges.get(base);
+        rows.push({
+          key: c.field,
+          label: this.getDetailKeyLabel(base),
+          before: this.getDisplayValue(c.before, c.field),
+          after: this.getDisplayValue(c.after, c.field),
+          changed: true
+        });
+      };
+      for (const key of this.getDetailKeys(app)) {
+        const base = key.endsWith('Name') ? key.slice(0, -4) : key;
+        if (idChanges.has(base)) { pushIdChange(base); continue; }
+        const before = this.getDisplayValue(app.beforeState[key], key);
+        const after = isUpdate && app.afterState ? this.getDisplayValue(app.afterState[key], key) : before;
+        rows.push({ key, label: this.getDetailKeyLabel(key), before, after, changed: isUpdate && before !== after });
+      }
+      idChanges.forEach((_, base) => pushIdChange(base));
+      return rows;
     },
     getDetailKeyLabel(key) {
       const mappings = {
@@ -782,6 +780,13 @@ export default {
         openingBalance: this.locale === 'ar' ? 'رصيد أول المدة' : 'Opening Balance',
         sites: this.locale === 'ar' ? 'حسب الموقع' : 'Per Site',
         accountType: this.locale === 'ar' ? 'الحساب' : 'Account',
+        category: this.locale === 'ar' ? 'التصنيف' : 'Category',
+        subCategory: this.locale === 'ar' ? 'التصنيف الفرعي' : 'Sub-category',
+        treasury: this.locale === 'ar' ? 'الخزينة' : 'Treasury',
+        destinationTreasury: this.locale === 'ar' ? 'الخزينة المحول إليها' : 'Destination Treasury',
+        branch: this.locale === 'ar' ? 'الفرع' : 'Branch',
+        equipment: this.locale === 'ar' ? 'المعدة' : 'Equipment',
+        transportContractor: this.locale === 'ar' ? 'مقاول النقل' : 'Transport Contractor',
         notes: this.locale === 'ar' ? 'الملاحظات' : 'Notes',
         note: this.locale === 'ar' ? 'الملاحظات' : 'Notes',
       };

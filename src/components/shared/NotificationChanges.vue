@@ -27,6 +27,7 @@ const LABELS = {
     unitPrice: 'سعر الوحدة', discount: 'الخصم', hours: 'عدد الساعات', hourlyRate: 'سعر الساعة',
     companyCapacity: 'كمية الشركة', crusherCapacity: 'كمية الكسارة', numTrips: 'عدد النقلات',
     distanceKm: 'المسافة (كم)', isRental: 'مستأجر', settlementDate: 'تاريخ التسوية',
+    areaId: 'المنطقة', equipmentId: 'المعدة', transportContractorId: 'مقاول النقل',
   },
   en: {
     date: 'Date', amount: 'Amount', total: 'Total', notes: 'Notes', description: 'Description',
@@ -38,6 +39,7 @@ const LABELS = {
     unitPrice: 'Unit Price', discount: 'Discount', hours: 'Hours', hourlyRate: 'Hourly Rate',
     companyCapacity: 'Company Qty', crusherCapacity: 'Crusher Qty', numTrips: 'Trips',
     distanceKm: 'Distance (Km)', isRental: 'Rented', settlementDate: 'Settlement Date',
+    areaId: 'Area', equipmentId: 'Equipment', transportContractorId: 'Transport Contractor',
   },
 }
 

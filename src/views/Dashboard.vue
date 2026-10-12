@@ -517,7 +517,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', reports: 'reports', messaging: 'messaging', admin: 'admin' },
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', reports: 'reports', admin: 'admin' }, // messaging: 'messaging' (hidden for now)
       menuMap: {
         messaging: [
           { name: 'messaging', label: 'messaging.title', routeName: 'messaging' }
