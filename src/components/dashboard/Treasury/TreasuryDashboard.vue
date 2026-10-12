@@ -221,6 +221,7 @@
               <col style="width: 19%" />
               <col style="width: 11%" />
               <col style="width: 15%" />
+              <col v-if="isAdmin" style="width: 7%" />
             </colgroup>
             <thead class="bg-slate-50">
               <tr>
@@ -232,6 +233,7 @@
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">تفاصيل العملية</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
                 <th data-col="amount" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ t('treasury.amount') }}</th>
+                <th v-if="isAdmin" class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ isRTL ? 'إجراءات' : 'Actions' }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white/70">
@@ -293,11 +295,26 @@
                 <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
                   {{ formatCurrency(tx.amount) }}
                 </td>
+                <td v-if="isAdmin" class="px-4 py-3 text-center" @click.stop>
+                  <div v-if="rowEditKind(tx)" class="flex items-center justify-center gap-1.5">
+                    <button type="button" class="theme-text" :title="t('labels.edit')" @click="editRow(tx)">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button type="button" class="text-red-600" :title="t('labels.delete')" @click="deleteRow(tx)">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <span v-else class="text-xs text-slate-300" :title="isRTL ? 'بتتعدل من صفحة المدفوعات' : 'Managed from the payments page'">—</span>
+                </td>
               </tr>
 
               <!-- Expanded details row -->
               <tr v-if="expandedTxId === tx.id" class="bg-slate-50/60">
-                <td colspan="8" class="px-6 py-4 border-b border-indigo-100">
+                <td :colspan="isAdmin ? 9 : 8" class="px-6 py-4 border-b border-indigo-100">
                   <div v-if="expandedLoading" class="flex items-center gap-2 text-sm text-gray-500">
                     <div class="h-4 w-4 animate-spin rounded-full border-b-2 border-indigo-500"></div>
                     جاري التحميل...
@@ -546,6 +563,42 @@
       </form>
     </div>
   </div>
+
+  <!-- Edit a direct deposit / transfer from the ledger -->
+  <div v-if="movementForm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeMovementModal">
+    <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm" :dir="isRTL ? 'rtl' : 'ltr'">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div>
+          <h3 class="text-lg font-semibold theme-text-primary">{{ isRTL ? 'تعديل' : 'Edit' }} {{ refTypeLabel(movementForm.refType) }}</h3>
+          <p v-if="movementForm.refType === 'TRANSFER'" class="mt-1 text-xs theme-text-secondary">{{ isRTL ? 'التعديل بيتطبق على الخزينتين (المحوِّل والمحوَّل له).' : 'Applies to both treasuries of the transfer.' }}</p>
+        </div>
+        <button class="theme-caption transition hover:theme-text-secondary" @click="closeMovementModal">×</button>
+      </div>
+      <form class="mt-4 space-y-4" @submit.prevent="saveMovement">
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.amount') }}</label>
+          <input v-model.number="movementForm.amount" type="number" min="0.01" step="0.01" required class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.description') }}</label>
+          <input v-model="movementForm.description" type="text" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.date') }}</label>
+          <DateField v-model="movementForm.date" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium theme-text-secondary">{{ t('treasury.settlementDate') }}</label>
+          <DateField v-model="movementForm.settlementDate" />
+        </div>
+        <div v-if="movementForm.error" class="rounded-lg bg-red-50 p-3 text-xs font-medium text-red-600">{{ movementForm.error }}</div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeMovementModal">{{ t('labels.cancel') }}</button>
+          <button type="submit" :disabled="movementForm.saving" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button disabled:opacity-60">{{ t('labels.save') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -559,7 +612,7 @@ import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
-import { transferBetweenTreasuries, getExpense, getTreasuryPurgePreview } from '@/api'
+import { transferBetweenTreasuries, getExpense, getTreasuryPurgePreview, updateTreasuryMovement, deleteTreasuryMovement, deleteExpense } from '@/api'
 import { playNotificationSound } from '@/utils/notificationSound'
 
 export default {
@@ -574,9 +627,10 @@ export default {
 
     useRealtime({
       channel: 'treasury',
-      events: ['treasury_balance_changed', 'treasury_transaction_created', 'treasury_deleted'],
+      events: ['treasury_balance_changed', 'treasury_transaction_created', 'treasury_transaction_changed', 'treasury_deleted'],
       handler: debounce((eventName, data) => {
         store.fetchTreasuries()
+        if (eventName === 'treasury_transaction_changed') store.fetchTransactions()
         if (eventName === 'treasury_transaction_created') {
           store.fetchTransactions()
           // شغّل الصوت عند إيداع جديد في الخزينة المختارة حاليًا
@@ -731,6 +785,111 @@ export default {
       const path = routeMap[String(tx.refType || '').toUpperCase()]
       if (path) router.push(path)
     }
+    // ── Edit / delete from the ledger ────────────────────────────────────
+    // Direct deposits and transfers belong to the treasury; expenses are edited on their page
+    // (through admin approval). Contractor payments are left to the payments page.
+    const rowEditKind = (tx) => {
+      const refType = String(tx.refType || '').toUpperCase()
+      if (refType === 'TOPUP') return 'movement'
+      if (refType === 'TRANSFER' && (tx.transferId || tx.refId)) return 'movement'
+      if (refType === 'EXPENSE' && tx.refId) return 'expense'
+      return null
+    }
+    const toDateInput = (value) => {
+      if (!value) return ''
+      const d = new Date(value)
+      return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10)
+    }
+    const movementForm = reactive({ open: false, id: null, refType: '', amount: 0, description: '', originalDescription: '', date: '', settlementDate: '', saving: false, error: '' })
+    const toast = (message, type = 'error') => { if (window.$toast) window.$toast(message, type, 5000) }
+
+    const refreshAfterChange = async () => {
+      await reloadSelected()
+      await loadTreasuries()
+    }
+
+    const editRow = (tx) => {
+      const kind = rowEditKind(tx)
+      if (kind === 'expense') {
+        router.push({ name: 'expenses-list', query: { focus: String(tx.refId), edit: '1' } })
+        return
+      }
+      if (kind !== 'movement') return
+      const description = tx.arDescription || tx.description || ''
+      Object.assign(movementForm, {
+        open: true,
+        id: tx.id,
+        refType: String(tx.refType || '').toUpperCase(),
+        amount: Math.abs(Number(tx.amount) || 0),
+        description,
+        originalDescription: description,
+        date: toDateInput(tx.date || tx.createdAt),
+        settlementDate: toDateInput(tx.settlementDate),
+        saving: false,
+        error: '',
+      })
+    }
+    const closeMovementModal = () => { movementForm.open = false }
+
+    const saveMovement = async () => {
+      if (!(Number(movementForm.amount) > 0)) {
+        movementForm.error = isRTL.value ? 'المبلغ لازم يكون أكبر من صفر' : 'Amount must be greater than zero'
+        return
+      }
+      movementForm.saving = true
+      movementForm.error = ''
+      try {
+        const payload = {
+          amount: movementForm.amount,
+          date: movementForm.date || undefined,
+          settlementDate: movementForm.settlementDate || null,
+        }
+        // Only send the description when it was changed, so a transfer keeps its "from / to" texts
+        if (movementForm.description.trim() !== movementForm.originalDescription.trim()) {
+          payload.description = movementForm.description
+        }
+        await updateTreasuryMovement(movementForm.id, payload)
+        movementForm.open = false
+        toast(isRTL.value ? 'تم حفظ التعديل' : 'Saved', 'success')
+        await refreshAfterChange()
+      } catch (err) {
+        movementForm.error = err?.response?.data?.message || err?.message || t('treasury.saveError')
+      } finally {
+        movementForm.saving = false
+      }
+    }
+
+    const deleteRow = async (tx) => {
+      const kind = rowEditKind(tx)
+      if (!kind) return
+      const amount = formatCurrency(Math.abs(Number(tx.amount) || 0))
+      if (kind === 'expense') {
+        if (!window.confirm(isRTL.value
+          ? `مسح المصروف #${tx.refId} (${amount})؟\nالطلب هيروح للموافقة الإدارية قبل ما يتنفذ.`
+          : `Delete expense #${tx.refId} (${amount})? It will be sent for admin approval.`)) return
+        try {
+          await deleteExpense(tx.refId)
+          toast(isRTL.value ? 'تم إرسال طلب الحذف للموافقة' : 'Delete request sent for approval', 'success')
+          await refreshAfterChange()
+        } catch (err) {
+          toast(err?.response?.data?.message || err?.message || 'Delete failed')
+        }
+        return
+      }
+      const isTransfer = String(tx.refType || '').toUpperCase() === 'TRANSFER'
+      if (!window.confirm(isRTL.value
+        ? `مسح ${refTypeLabel(tx.refType)} بمبلغ ${amount}؟${isTransfer ? '\nالتحويل هيتمسح من الخزينتين والرصيد هيرجع زي ما كان.' : '\nالمبلغ هيتخصم من رصيد الخزينة.'}`
+        : `Delete this ${isTransfer ? 'transfer' : 'deposit'} of ${amount}?`)) return
+      try {
+        await deleteTreasuryMovement(tx.id)
+        if (expandedTxId.value === tx.id) expandedTxId.value = null
+        toast(isRTL.value ? 'تم المسح' : 'Deleted', 'success')
+        await refreshAfterChange()
+      } catch (err) {
+        toast(err?.response?.data?.message || err?.message || 'Delete failed')
+      }
+    }
+
     const displayDescription = (tx) => {
       if (locale.value?.startsWith('ar')) return tx.arDescription || tx.description || tx.refType || '-'
       return tx.description || tx.refType || '-'
@@ -1191,6 +1350,12 @@ export default {
       badgeClass,
       formatSource,
       navigateToSource,
+      rowEditKind,
+      editRow,
+      deleteRow,
+      movementForm,
+      closeMovementModal,
+      saveMovement,
       displayDescription,
       refTypeLabel,
       extractTransferName,

@@ -894,6 +894,11 @@ export const depositToTreasury = (treasuryId, data) =>
   axios.post(`${BASE_URL}/api/treasuries/${treasuryId}/deposit`, data);
 export const transferBetweenTreasuries = (data) =>
   axios.post(`${BASE_URL}/api/treasuries/transfer`, data);
+// Direct deposits and transfers, edited/deleted from the treasury ledger
+export const updateTreasuryMovement = (transactionId, data) =>
+  axios.patch(`${BASE_URL}/api/treasuries/transactions/${transactionId}`, data);
+export const deleteTreasuryMovement = (transactionId) =>
+  axios.delete(`${BASE_URL}/api/treasuries/transactions/${transactionId}`);
 
 // Branch Wallet APIs
 export const getBranchWalletSummary = (branchId) =>

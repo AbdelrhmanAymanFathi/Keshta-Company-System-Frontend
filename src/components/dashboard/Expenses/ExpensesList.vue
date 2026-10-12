@@ -1258,12 +1258,21 @@ rows: [],
   },
   
   methods: {
-    // Opened from a notification: flash the row if it's on this page, otherwise open it for editing
+    // Opened from a notification: flash the row if it's on this page, otherwise open it for editing.
+    // ?edit=1 (from the treasury ledger) always opens it for editing.
     async openFocusedExpense() {
       const id = getFocusId(this.$route)
       if (!id) return
-      clearFocusQuery(this.$router, this.$route)
-      if (this.filteredExpenses.some(e => Number(e.id) === id)) {
+      const wantsEdit = this.$route.query.edit === '1'
+      if (wantsEdit) {
+        const rest = { ...this.$route.query }
+        delete rest.focus
+        delete rest.edit
+        this.$router.replace({ query: rest }).catch(() => {})
+      } else {
+        clearFocusQuery(this.$router, this.$route)
+      }
+      if (!wantsEdit && this.filteredExpenses.some(e => Number(e.id) === id)) {
         this.$nextTick(() => highlightRow(id))
         return
       }
