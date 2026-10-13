@@ -42,20 +42,28 @@ export default {
     notificationStore.fetchUnreadCount()
 
     const debouncedFetchUnread = debounce(() => notificationStore.fetchUnreadCount(), 300)
+    // A burst (e.g. saving 20 rows at once) shows a single popup
+    const debouncedAlert = debounce(() => {
+      if (window.$toast) {
+        window.$toast('إشعار جديد', 'info', 5000)
+      }
+      playNotificationSound()
+    }, 500)
 
     useRealtime({
       channel: 'notifications',
       events: ['notification_created'],
       handler: (eventName, data) => {
+        const myId = currentUser.value?.id
         // Only process notifications for the current user or broadcast (userId: null)
-        if (data?.userId && data.userId !== currentUser.value?.id) {
+        if (data?.userId && data.userId !== myId) {
           return
         }
-        if (window.$toast) {
-          window.$toast('إشعار جديد', 'info', 5000)
-        }
-        playNotificationSound()
         debouncedFetchUnread()
+        // Broadcast activity from other users only updates the bell, so it never covers someone's work
+        if (data?.userId || (myId && data?.actorId === myId)) {
+          debouncedAlert()
+        }
       },
     })
     
