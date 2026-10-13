@@ -42,6 +42,7 @@
                         :placeholder="searchLocationPlaceholder"
                         :inputClass="fieldClass"
                         :dir="isRTL ? 'rtl' : 'ltr'"
+                        teleportTarget="body"
                         clearable
                         :clearAriaLabel="clearLabel"
                         @select="handleSiteSelect"
