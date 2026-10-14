@@ -4,7 +4,7 @@
       v-for="m in activeCursors"
       :key="m.userId"
       class="pcursor"
-      :style="{ left: m.cursor.x + '%', top: m.cursor.y + '%', '--pc': colorFor(m.userId) }"
+      :style="{ left: displayX(m.cursor.x) + '%', top: m.cursor.y + '%', '--pc': colorFor(m.userId) }"
     >
       <svg class="pcursor__arrow" width="18" height="18" viewBox="0 0 18 18">
         <path d="M1 1 L16 7.5 L9.5 9.5 L7.5 16 Z" fill="currentColor" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round" />
@@ -39,14 +39,15 @@ export default {
       void tick.value
       const myId = user.value?.id
       const list = (props.members || []).filter((m) => m.userId !== myId && m.cursor)
-      if (!list.length) return []
-      // Server clock is the reference: fade members whose last move is older
-      // than the most recent activity in the room (Figma-style idle fade).
-      const newestAt = Math.max(...list.map((m) => m.cursor.at || 0))
-      return list.filter((m) => newestAt - (m.cursor.at || 0) <= IDLE_MS)
+      const now = Date.now()
+      return list.filter((m) => now - m.cursor.at <= IDLE_MS)
     })
 
-    return { activeCursors, colorFor, initials }
+    function displayX(logicalX) {
+      return document.documentElement.dir === 'rtl' ? 100 - logicalX : logicalX
+    }
+
+    return { activeCursors, colorFor, displayX, initials }
   }
 }
 </script>

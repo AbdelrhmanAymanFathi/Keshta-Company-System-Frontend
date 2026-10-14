@@ -79,7 +79,8 @@ export function usePresence(page, recordId = null) {
     if (!active() || document.hidden) return
     const w = window.innerWidth || document.documentElement.clientWidth || 1
     const h = window.innerHeight || document.documentElement.clientHeight || 1
-    const x = Math.max(0, Math.min(100, Math.round((evt.clientX / w) * 1000) / 10))
+    const physicalX = Math.max(0, Math.min(100, Math.round((evt.clientX / w) * 1000) / 10))
+    const x = document.documentElement.dir === 'rtl' ? 100 - physicalX : physicalX
     const y = Math.max(0, Math.min(100, Math.round((evt.clientY / h) * 1000) / 10))
     const now = Date.now()
     if (now - lastCursorAt < CURSOR_THROTTLE_MS) return
