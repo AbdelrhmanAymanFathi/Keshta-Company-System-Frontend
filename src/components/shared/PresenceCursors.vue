@@ -37,8 +37,11 @@ export default {
 
     const activeCursors = computed(() => {
       void tick.value
-      const myId = user.value?.id
-      const list = (props.members || []).filter((m) => m.userId !== myId && m.cursor)
+      const myId = Number(user.value?.id)
+      const list = (props.members || []).filter((m) => {
+        const memberId = Number(m.userId)
+        return !(Number.isSafeInteger(myId) && Number.isSafeInteger(memberId) && memberId === myId) && m.cursor
+      })
       const now = Date.now()
       return list.filter((m) => now - m.cursor.at <= IDLE_MS)
     })
