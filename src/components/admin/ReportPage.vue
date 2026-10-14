@@ -1,7 +1,7 @@
 <!-- eslint-disable no-useless-escape -->
 <template>
   <div
-    class="report-page min-h-full sm:p-6 lg:p-8 overflow-visible"
+    class="report-page min-h-full p-0 sm:p-0.5 md:p-1 lg:p-0 overflow-visible"
     :dir="isRTL ? 'rtl' : 'ltr'"
     :class="{ 'direction-rtl': isRTL }"
   >
