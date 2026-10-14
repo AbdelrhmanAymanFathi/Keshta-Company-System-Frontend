@@ -279,6 +279,7 @@
   },
   "labels": {
     "saveChanges": "حفظ التعديلات",
+    "sortByDate": "ترتيب حسب التاريخ",
     "system": "النظام",
     "module": "الوحدة",
     "signOut": "تسجيل الخروج",

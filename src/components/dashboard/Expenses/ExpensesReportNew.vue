@@ -217,7 +217,11 @@
         <thead class="bg-gray-50">
           <tr>
             <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.date') }}</th>
+            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                {{ $t('expenses.date') }}
+              </SortableDateHeader>
+            </th>
             <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.treasuryOrCustody') }}</th>
             <th data-col="amount" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.amount') }}</th>
             <th data-col="title" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.description') }}</th>
@@ -230,7 +234,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-          <tr v-for="(expense, index) in items" :key="expense.id || expense.ID || index" class="hover:bg-gray-50">
+          <tr v-for="(expense, index) in sortedRows" :key="expense.id || expense.ID || index" class="hover:bg-gray-50">
             <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ index + 1 }}</td>
             <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
             <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
@@ -306,18 +310,22 @@ import { getExpensesReportData, downloadExpensesReport, getExpenseCategories, ge
 import DateField from '../../shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'ExpensesReport',
-  components: { DateField, PageHeader, SearchDropdown },
+  components: { DateField, PageHeader, SearchDropdown, SortableDateHeader },
   setup() {
     const { locale } = useI18n()
     const downloading = ref(false)
     const error = ref(null)
     const loading = ref(false)
     const items = ref([])
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(items, (expense) => expense.date || expense.expenseDate || expense['التاريخ'])
 
     const categories = ref([])
     const locations = ref([])
@@ -561,6 +569,9 @@ export default {
       error,
       loading,
       items,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       categories,
       locations,
       treasuries,

@@ -278,6 +278,7 @@
   },
   "labels": {
     "saveChanges": "Save Changes",
+    "sortByDate": "Sort by date",
     "system": "System",
     "module": "Module",
     "signOut": "Sign Out",

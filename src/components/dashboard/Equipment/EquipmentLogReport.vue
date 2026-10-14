@@ -87,7 +87,11 @@
         <table v-app-table class="app-table divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th data-col="subtitle" class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.date') }}</th>
+              <th data-col="subtitle" class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
+                <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                  {{ $t('equipmentLog.date') }}
+                </SortableDateHeader>
+              </th>
               <th data-col="title" class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.equipment') }}</th>
               <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.hours') }}</th>
               <th class="px-6 py-3 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">{{ $t('equipmentLog.hourlyRate') }}</th>
@@ -95,7 +99,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="row in report.rows" :key="row.id">
+            <tr v-for="row in sortedRows" :key="row.id">
               <td class="px-6 py-4 text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
               <td class="px-6 py-4 text-sm theme-text-primary">{{ equipmentName(row) || '-' }}</td>
               <td class="px-6 py-4 text-sm theme-text-primary">{{ row.hours }}</td>
@@ -114,10 +118,12 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getEquipmentLogs, getEquipments, getBranches } from '@/api'
 import DateField from '@/components/shared/DateField.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 
 export default {
   name: 'EquipmentLogReport',
-  components: { DateField },
+  components: { DateField, SortableDateHeader },
   setup() {
     const { locale } = useI18n()
     const filters = ref({ from: '', to: '', equipmentId: '', companyId: '', isRental: '' })
@@ -125,6 +131,8 @@ export default {
     const report = ref({ rows: [] })
     const equipments = ref([])
     const companies = ref([])
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(() => report.value.rows, (row) => row.date)
 
     const buildQueryParams = (page) => ({
       page,
@@ -227,7 +235,7 @@ export default {
       await runReport()
     })
 
-    return { filters, loading, report, runReport, equipments, companies, clearFilters, exportCsv, formatDate, formatCurrency, equipmentName }
+    return { filters, loading, report, sortedRows, dateSortOrder, toggleDateSort, runReport, equipments, companies, clearFilters, exportCsv, formatDate, formatCurrency, equipmentName }
   }
 }
 </script>

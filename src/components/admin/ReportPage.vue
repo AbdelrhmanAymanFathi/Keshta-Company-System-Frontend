@@ -309,7 +309,16 @@
                 :key="col"
                 class="whitespace-nowrap px-4 py-3.5 text-start text-xs font-semibold uppercase tracking-wider theme-text-muted sm:px-6"
               >
-                {{ getHeaderLabel(col) }}
+                <SortableDateHeader
+                  v-if="col === dateColumn"
+                  :active="!!dateSortOrder"
+                  :dir="dateSortOrder || 'asc'"
+                  :title="$t('labels.sortByDate')"
+                  @toggle="toggleDateSort"
+                >
+                  {{ getHeaderLabel(col) }}
+                </SortableDateHeader>
+                <template v-else>{{ getHeaderLabel(col) }}</template>
               </th>
             </tr>
           </thead>
@@ -331,7 +340,7 @@
               </td>
             </tr>
             <tr
-              v-for="(row, idx) in tableData"
+              v-for="(row, idx) in sortedTableData"
               :key="idx"
               :class="[
                 'transition-colors',
@@ -365,6 +374,8 @@ import { useI18n } from 'vue-i18n'
 import { getReportDef, executeReport, getReportParamOptions } from '@/api'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 import {
   isDynamicReportTotalsRow,
   normalizeReportTotals,
@@ -393,6 +404,7 @@ export default {
   components: {
     SearchDropdown,
     DateField,
+    SortableDateHeader,
     ArrowPathIcon,
     ArrowUturnLeftIcon,
     ChartBarSquareIcon,
@@ -573,6 +585,30 @@ export default {
     })
 
     const isTotalsRow = (row) => isDynamicReportTotalsRow(row)
+
+    const dateColumn = computed(() => {
+      const cols = columns.value
+      if (!cols.length) return null
+
+      const dateField = reportSelectFields.value.find(
+        (field) => String(field?.type || '').toUpperCase() === 'DATE' && cols.includes(field.name)
+      )
+      if (dateField) return dateField.name
+
+      return cols.find((col) => /date/i.test(String(col))) || null
+    })
+
+    const { dateSortOrder, sortedRows: sortedDataRows, toggleDateSort } = useDateSort(
+      () => tableData.value.filter((row) => !isTotalsRow(row)),
+      (row) => (dateColumn.value ? row[dateColumn.value] : null)
+    )
+
+    const sortedTableData = computed(() => {
+      if (!dateColumn.value || !dateSortOrder.value) return tableData.value
+
+      const footerRows = tableData.value.filter((row) => isTotalsRow(row))
+      return [...sortedDataRows.value, ...footerRows]
+    })
 
     const totalsRowLabel = computed(() => t('reports.totalsLabel') || 'Totals')
 
@@ -972,6 +1008,10 @@ export default {
       onSelectOptionGeneric,
       clear,
       columns,
+      dateColumn,
+      dateSortOrder,
+      toggleDateSort,
+      sortedTableData,
       effectiveTotalsColumns,
       isTotalsRow,
       isRTL,

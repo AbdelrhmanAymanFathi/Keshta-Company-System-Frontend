@@ -151,7 +151,9 @@
                 {{ isRTL ? 'الرصيد' : 'Balance' }}
               </th>
               <th data-col="subtitle" class="border border-gray-300 px-3 py-2 text-center text-xs font-bold text-gray-700 w-28">
-                {{ isRTL ? 'التاريخ' : 'Date' }}
+                <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="t('labels.sortByDate')" @toggle="toggleDateSort">
+                  {{ isRTL ? 'التاريخ' : 'Date' }}
+                </SortableDateHeader>
               </th>
             </tr>
           </thead>
@@ -175,7 +177,7 @@
 
             <!-- Transaction rows -->
             <tr
-              v-for="(row, i) in reportRows"
+              v-for="(row, i) in sortedRows"
               :key="row.id || i"
               class="transition hover:bg-orange-50/70 cursor-pointer"
               @click="openDetail(row)"
@@ -370,12 +372,14 @@ import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import { downloadTreasurySummary, getExpense } from '@/api'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 import DateField from '@/components/shared/DateField.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 
 const MIN_ROWS = 15
 
 export default {
   name: 'TreasuryReportNew',
-  components: { DateField },
+  components: { DateField, SortableDateHeader },
   setup() {
     const { t, locale } = useI18n()
     const store = useTreasuryStore()
@@ -481,6 +485,8 @@ export default {
       const txNet = allTransactions.value.reduce((s, tx) => s + Number(tx.amount || 0), 0)
       return Number(store.summary?.balance || 0) - txNet
     })
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(reportRows, (r) => r.date)
 
     const totalIn = computed(() => reportRows.value.reduce((s, r) => s + r.credit, 0))
     const totalOut = computed(() => reportRows.value.reduce((s, r) => s + r.debit, 0))
@@ -593,6 +599,9 @@ export default {
       treasurySearch,
       filters,
       reportRows,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       openingBalance,
       totalIn,
       totalOut,

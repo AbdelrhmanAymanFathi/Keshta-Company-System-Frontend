@@ -105,7 +105,11 @@
           <thead class="bg-gray-50">
             <tr>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') }}</th>
+              <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
+                <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                  {{ $t('labels.date') }}
+                </SortableDateHeader>
+              </th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.type') || 'Type' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('expenses.settlementDate') || 'Settlement Date' }}</th>
               <th class="table-cell px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" style="display: table-cell !important;">{{ $t('expenses.branch') || 'Branch' }}</th>
@@ -117,7 +121,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-            <tr v-for="(expense, index) in items" :key="expense.ID || expense.id || index" class="hover:bg-gray-50">
+            <tr v-for="(expense, index) in sortedRows" :key="expense.ID || expense.id || index" class="hover:bg-gray-50">
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.id || expense.ID || index + 1 }}</td>
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(expense.date || expense.expenseDate || expense['التاريخ']) }}</td>
               <td class="table-cell px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ expense.type || '-' }}</td>
@@ -178,12 +182,14 @@ import { useI18n } from 'vue-i18n'
 import { getExpensesReportData, downloadExpensesReport } from '@/api'
 import DateField from '../shared/DateField.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'ExpensesReport',
-  components: { DateField, PageHeader },
+  components: { DateField, PageHeader, SortableDateHeader },
   setup() {
     const { locale } = useI18n()
     const isRTL = computed(() => locale.value?.startsWith('ar'))
@@ -191,6 +197,8 @@ export default {
     const error = ref(null)
     const loading = ref(false)
     const items = ref([])
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(items, (expense) => expense.date || expense.expenseDate || expense['التاريخ'])
     const filters = ref({
       q: '',
       startDate: '',
@@ -386,6 +394,9 @@ export default {
       error,
       loading,
       items,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       filters,
       totalAmount,
       averageExpense,

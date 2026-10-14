@@ -94,7 +94,10 @@
           <tr>
             <th data-col="subtitle"
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('transport.date') }}</th>
+              <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                {{ $t('transport.date') }}
+              </SortableDateHeader>
+            </th>
             <th data-col="title"
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('transport.contractor') }}</th>
@@ -128,7 +131,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200" v-if="items.length">
-          <tr v-for="(transport, index) in items" :key="transport.ID || transport.id || index"
+          <tr v-for="(transport, index) in sortedRows" :key="transport.ID || transport.id || index"
             class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ transport.date ?
               formatDate(transport.date) : '-' }}</td>
@@ -188,16 +191,20 @@ import { ref, computed, onMounted } from 'vue'
 import { getTransportReportData, downloadTransportReport } from '@/api'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import DateField from '@/components/shared/DateField.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'TransportReport',
-  components: { DateField },
+  components: { DateField, SortableDateHeader },
   setup() {
     const downloading = ref(false)
     const error = ref(null)
     const loading = ref(false)
     const items = ref([])
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(items, (row) => row.date)
     const filters = ref({
       q: '',
       startDate: '',
@@ -418,6 +425,9 @@ export default {
       error,
       loading,
       items,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       filters,
       totalAmount,
       totalDistance,

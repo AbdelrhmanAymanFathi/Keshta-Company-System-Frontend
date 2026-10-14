@@ -72,7 +72,11 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th :class="['px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">{{ $t('labels.date') || 'Date' }}</th>
+              <th :class="['px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">
+                <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                  {{ $t('labels.date') || 'Date' }}
+                </SortableDateHeader>
+              </th>
               <th :class="['px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">{{ $t('labels.type') || 'Type' }}</th>
               <th :class="['px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">{{ $t('labels.description') || 'Description' }}</th>
               <th :class="['px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider', isRTL ? 'text-end' : 'text-start']">{{ $t('dashboard.companyWallet') || 'Branch' }}</th>
@@ -81,7 +85,7 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="tx in transactions.items" :key="tx.id" class="hover:bg-gray-50">
+            <tr v-for="tx in sortedRows" :key="tx.id" class="hover:bg-gray-50">
               <td :class="['px-6 py-4 whitespace-nowrap text-sm theme-text-primary', isRTL ? 'text-end' : 'text-start']">{{ formatDate(tx.date) }}</td>
               <td :class="['px-6 py-4 whitespace-nowrap text-sm', isRTL ? 'text-end' : 'text-start']">
                 <BadgeComponent :variant="badgeVariant(tx.type)">{{ badgeLabel(tx.type) }}</BadgeComponent>
@@ -119,10 +123,12 @@ import { useI18n } from 'vue-i18n'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
 import BadgeComponent from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
+import SortableDateHeader from '../shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 
 export default {
   name: 'CompanyTransactions',
-  components: { BadgeComponent, Pagination },
+  components: { BadgeComponent, Pagination, SortableDateHeader },
   setup() {
     const store = useCompanyFinanceStore()
 
@@ -131,6 +137,8 @@ export default {
     const summary = computed(() => store.summary || { balance: 0, last30dIn: 0, last30dOut: 0 })
 
     const transactions = computed(() => store.transactions)
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(() => transactions.value.items, (tx) => tx.date)
     const loading = computed(() => store.loading)
     const error = computed(() => store.error)
 
@@ -217,6 +225,9 @@ export default {
 
     return {
       transactions,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       loading,
       error,
       formatDate,

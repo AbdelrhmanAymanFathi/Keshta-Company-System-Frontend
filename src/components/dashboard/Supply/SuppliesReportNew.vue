@@ -165,7 +165,10 @@
           <tr>
             <th data-col="subtitle"
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.date') }}</th>
+              <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                {{ $t('labels.date') }}
+              </SortableDateHeader>
+            </th>
             <th data-col="title"
               class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
               {{ $t('labels.contractor') }}</th>
@@ -209,7 +212,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200" v-if="mappedItems.length">
-          <tr v-for="item in mappedItems" :key="item.id" class="hover:bg-gray-50">
+          <tr v-for="item in sortedRows" :key="item.id" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(item.date) }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.contractor }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ item.location }}</td>
@@ -270,12 +273,14 @@ import { ref, computed, onMounted } from 'vue'
 import { getSuppliesReportData, downloadSuppliesReport, getContractors, getLocations, getVehicles, getExportItems } from '@/api'
 import normalizeItem from '@/utils/normalizeItem'
 import DateField from '@/components/shared/DateField.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'SuppliesReport',
-  components: { DateField },
+  components: { DateField, SortableDateHeader },
   setup() {
     const downloading = ref(false)
     const error = ref(null)
@@ -422,6 +427,8 @@ export default {
           return parseDate(a.date) - parseDate(b.date)
         })
     })
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(mappedItems, (item) => item.date)
 
     /**
      * Summary Calculations
@@ -696,6 +703,9 @@ const formatDate = (dateString) => {
       error,
       loading,
       mappedItems,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       filters,
       contractors,
       locations,

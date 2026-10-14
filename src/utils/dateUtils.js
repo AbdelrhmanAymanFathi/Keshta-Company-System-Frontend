@@ -76,6 +76,21 @@ export function getTodayISO() {
   return formatToISODate(new Date())
 }
 
+/**
+ * Compare two date-like values regardless of their original format
+ * (ISO, DD/MM/YYYY, Date objects, timestamps). Empty/invalid dates
+ * always sort to the end.
+ * Returns -1, 0 or 1 so it can be used directly with Array.prototype.sort.
+ */
+export function compareDates(a, b) {
+  const isoA = formatToISODate(a)
+  const isoB = formatToISODate(b)
+  if (!isoA && !isoB) return 0
+  if (!isoA) return 1
+  if (!isoB) return -1
+  return isoA < isoB ? -1 : isoA > isoB ? 1 : 0
+}
+
 export function formatDateTime(value) {
   if (value === null || value === undefined || value === '') return ''
   const d = value instanceof Date ? value : new Date(value)
@@ -103,7 +118,8 @@ export default {
   parseDateDMY,
   formatToISODate,
   parseISODateToDate,
-  getTodayISO
-  , formatDateTime, formatDateTimeCairo
+  getTodayISO,
+  compareDates,
+  formatDateTime, formatDateTimeCairo
 }
 

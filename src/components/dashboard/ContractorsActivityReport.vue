@@ -285,7 +285,11 @@
           </tr>
           <tr v-else>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">ID</th>
-            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.date') || 'Date' }}</th>
+            <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">
+              <SortableDateHeader :active="!!dateSortOrder" :dir="dateSortOrder || 'asc'" :title="$t('labels.sortByDate')" @toggle="toggleDateSort">
+                {{ $t('labels.date') || 'Date' }}
+              </SortableDateHeader>
+            </th>
             <th data-col="title" class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('contractor') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('module') }}</th>
             <th class="px-4 py-3 text-start text-xs font-semibold theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ t('actionType') }}</th>
@@ -330,7 +334,7 @@
             </tr>
           </template>
           <template v-else>
-            <tr v-for="(row, index) in items" :key="row.id || index" class="hover:bg-slate-50/50 transition-colors">
+            <tr v-for="(row, index) in sortedRows" :key="row.id || index" class="hover:bg-slate-50/50 transition-colors">
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.id }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">{{ formatDate(row.date) }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
@@ -466,12 +470,14 @@ import { useI18n } from 'vue-i18n'
 import { getContractors, getContractorsActivityReportData, getLocations, getContractorUnplacedEntries, setContractorEntryLocation } from '@/api'
 import { useAuth } from '@/composables/useAuth'
 import DateField from '../shared/DateField.vue'
+import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
+import { useDateSort } from '@/composables/useDateSort'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 
 export default {
   name: 'ContractorsActivityReport',
-  components: { DateField },
+  components: { DateField, SortableDateHeader },
   setup() {
     const { locale } = useI18n()
     const isRTL = computed(() => locale.value === 'ar')
@@ -489,6 +495,8 @@ export default {
       totalOfWork: 0,
       totalPaid: 0
     })
+
+    const { dateSortOrder, sortedRows, toggleDateSort } = useDateSort(items, (row) => row.date)
 
     const filters = ref({
       contractorId: '',
@@ -855,6 +863,9 @@ export default {
       locations,
       areas,
       items,
+      sortedRows,
+      dateSortOrder,
+      toggleDateSort,
       totals,
       duesTotals,
       filters,
