@@ -640,6 +640,50 @@ export default {
       if (raw === null || raw === undefined) return ''
       if (typeof raw === 'object') return JSON.stringify(raw)
 
+      if (typeof raw === 'string') {
+        const columnName = String(col).split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '')
+        const value = raw.trim().toLowerCase().replace(/[^a-z0-9]/g, '')
+        const translateKnownValue = (key) => {
+          const translated = t(key)
+          return translated && translated !== key ? translated : null
+        }
+
+        if (['paymentmethod', 'paymenttype', 'method'].includes(columnName)) {
+          const paymentMethodKeys = {
+            cash: 'payments.methods.cash',
+            bank: 'payments.methods.bank',
+            banktransfer: 'expenses.paymentMethodBankTransfer',
+            cheque: 'expenses.paymentMethodCheque',
+            check: 'expenses.paymentMethodCheque',
+            custodycash: 'expenses.paymentMethodCustodyCash'
+          }
+          const translationKey = paymentMethodKeys[value]
+          const translated = translationKey && translateKnownValue(translationKey)
+          if (translated) return translated
+        }
+
+        if (['module', 'accounttype', 'paymentmodule', 'unit'].includes(columnName)) {
+          const moduleKeys = {
+            supply: 'payments.modules.supply',
+            supplies: 'payments.modules.supply',
+            export: 'payments.modules.supply',
+            exports: 'payments.modules.supply',
+            transport: 'payments.modules.transport',
+            transports: 'payments.modules.transport',
+            rental: 'payments.modules.rentals',
+            rentals: 'payments.modules.rentals',
+            equipment: 'payments.modules.rentals',
+            equipmentlog: 'payments.modules.rentals',
+            equipmentlogs: 'payments.modules.rentals',
+            extract: 'payments.modules.extract',
+            extracts: 'payments.modules.extract'
+          }
+          const translationKey = moduleKeys[value]
+          const translated = translationKey && translateKnownValue(translationKey)
+          if (translated) return translated
+        }
+      }
+
       return String(raw)
     }
 
