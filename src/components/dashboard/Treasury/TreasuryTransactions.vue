@@ -110,22 +110,25 @@
         <div v-else>
           <table v-app-table class="app-table divide-y divide-gray-200">
             <colgroup>
+              <col style="width: 9%" />
               <col style="width: 11%" />
               <col style="width: 8%" />
+              <col style="width: 11%" />
+              <col style="width: 15%" />
+              <col style="width: 16%" />
+              <col style="width: 9%" />
+              <col style="width: 9%" />
               <col style="width: 12%" />
-              <col style="width: 17%" />
-              <col style="width: 18%" />
-              <col style="width: 10%" />
-              <col style="width: 10%" />
-              <col style="width: 14%" />
             </colgroup>
             <thead class="bg-gray-50">
               <tr>
+                <!-- The list is ordered by the operation date, so the sort toggle lives on it -->
                 <th data-col="subtitle" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']"
                   @click="toggleSortOrder">
-                  {{ t('treasury.dateTime') }}
+                  {{ isRTL ? 'تاريخ العملية' : 'Operation date' }}
                   <SortIcon :active="true" :dir="sortOrder" />
                 </th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'تاريخ التسجيل' : 'Entered at' }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th data-col="title" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
@@ -137,7 +140,8 @@
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
               <tr v-for="tx in transactions" :key="tx.id" class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-700">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
+                <td class="px-4 py-3 text-sm font-medium text-gray-800 whitespace-nowrap">{{ formatDate(tx.date || tx.createdAt) }}</td>
+                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
                 <td class="px-4 py-3 text-sm">
                   <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="badgeClass(tx.type)">{{ txTypeLabel(tx.type) }}</span>
                 </td>
