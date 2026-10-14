@@ -124,7 +124,7 @@ export default {
   },
   methods: {
     formatValue(v) {
-      const formatted = new Intl.NumberFormat(this.locale).format(v)
+      const formatted = new Intl.NumberFormat('en-US').format(v)
       const rtl = String(this.$i18n?.locale || '').startsWith('ar')
       return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
     }

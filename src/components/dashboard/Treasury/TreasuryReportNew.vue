@@ -492,7 +492,7 @@ export default {
 
     // ── Formatters ─────────────────────────────────────────────────────────
     const formatCurrency = (v) =>
-      new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(v || 0))
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(v || 0))
 
     const formatNumber = (v) =>
       new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v || 0))

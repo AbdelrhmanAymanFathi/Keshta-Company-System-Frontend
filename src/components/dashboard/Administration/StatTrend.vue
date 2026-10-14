@@ -37,9 +37,8 @@ export default {
     formatted() {
       if (this.value == null) return ''
       const abs = Math.abs(this.value)
-      const loc = this.locale || 'en-US'
       try {
-        const formatted = new Intl.NumberFormat(loc, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(abs)
+        const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(abs)
         return `${this.prefix}${formatted}${this.suffix}`
       } catch {
         return `${this.prefix}${abs.toFixed(1)}${this.suffix}`

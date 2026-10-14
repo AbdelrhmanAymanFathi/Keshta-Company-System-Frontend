@@ -194,7 +194,7 @@ export default {
     displayFormatter(v) {
       const num = Number(v)
       if (!Number.isFinite(num)) return ''
-      const formatted = new Intl.NumberFormat(this.locale, {
+      const formatted = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(num)
@@ -204,7 +204,7 @@ export default {
     formatStat(v) {
       const num = Number(v)
       if (!Number.isFinite(num)) return '\u2014'
-      const formatted = new Intl.NumberFormat(this.locale, {
+      const formatted = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(num)

@@ -139,7 +139,7 @@ export default {
   methods: {
     formatLoc(v, decimals) {
       try {
-        const formatted = new Intl.NumberFormat(this.locale, {
+        const formatted = new Intl.NumberFormat('en-US', {
           minimumFractionDigits: decimals,
           maximumFractionDigits: decimals || 2
         }).format(v)

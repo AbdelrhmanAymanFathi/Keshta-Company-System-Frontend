@@ -301,7 +301,17 @@ export default {
       return translationKey ? t(translationKey) : textValue(payment.module || payment.accountType || payment.type || '-')
     }
     const paymentContractor = (payment) => textValue(payment.contractorName || payment.contractor?.name || payment.contractor || '-')
-    const paymentMethodLabel = (payment) => textValue(payment.method || payment.paymentMethod || payment.type || payment.payment_type || '-')
+    const paymentMethodLabel = (payment) => {
+      const rawValue = String(payment.method || payment.paymentMethod || payment.payment_type || '').trim().toLowerCase()
+
+      const methodKeyMap = {
+        cash: 'payments.cash',
+        bank: 'payments.bank'
+      }
+
+      const translationKey = methodKeyMap[rawValue]
+      return translationKey ? t(translationKey) : textValue(payment.method || payment.paymentMethod || payment.type || payment.payment_type || '-')
+    }
     const paymentTreasury = (payment) => textValue(payment.treasury || payment.treasuryRef?.name || payment.sourceAccount || payment.wallet || '-')
     const paymentNotes = (payment) => textValue(payment.notes || '-')
     const uniqueByName = (items = [], labelKey = 'name') => {
@@ -527,7 +537,7 @@ export default {
     const formatAmount = (value) => {
       const amount = Number(value)
       if (Number.isNaN(amount)) return textValue(value)
-      return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     }
 
     const paymentReports = computed(() => reports.value.filter(report => normalize(report?.module) === 'payments'))

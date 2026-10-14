@@ -290,7 +290,7 @@ export default {
     const filters = reactive({ startDate: '', endDate: '', type: '', amount: '', search: '' })
     const sortOrder = ref('desc')
 
-    const formatCurrency = (value) => new Intl.NumberFormat(locale.value || 'en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
+    const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
     const formatDate = (value) => {
       if (!value) return '-'
       const d = new Date(value)

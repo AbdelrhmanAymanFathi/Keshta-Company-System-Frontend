@@ -30,7 +30,7 @@
                 </h3>
 
                 <div class="mx-auto max-w-6xl">
-                  <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         {{ siteLabel }}
@@ -104,6 +104,26 @@
                         </button>
                       </div>
                     </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        {{ treasuryLabel }}
+                      </label>
+                      <SearchDropdown
+                        v-model="selectedTreasurySearch"
+                        :items="treasuryOptions"
+                        itemLabel="name"
+                        :placeholder="treasuryPlaceholder"
+                        :inputClass="fieldClass"
+                        :dir="isRTL ? 'rtl' : 'ltr'"
+                        teleportTarget="body"
+                        clearable
+                        :clearAriaLabel="clearLabel"
+                        :disabled="!treasuryOptions.length"
+                        @select="handleTreasurySelect"
+                        @clear="clearTreasury"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -133,7 +153,6 @@
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ contractorLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ amountLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ paymentMethodLabel }}</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ treasuryLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ notesLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ actionsLabel }}</th>
                       </tr>
@@ -187,22 +206,7 @@
                           </select>
                         </td>
 
-                        <td class="px-3 py-2">
-                          <SearchDropdown
-                            v-model="row._treasurySearch"
-                            :items="treasuryOptions"
-                            itemLabel="name"
-                            :placeholder="treasuryPlaceholder"
-                            :inputClass="fieldClass"
-                            :dir="isRTL ? 'rtl' : 'ltr'"
-                            :disabled="!treasuryOptions.length"
-                            teleportTarget="body"
-                            clearable
-                            :clearAriaLabel="clearLabel"
-                            @select="(treasury) => selectTreasury(row, treasury)"
-                            @clear="() => { row.treasury = null; row._treasurySearch = ''; row.treasuryId = null }"
-                          />
-                        </td>
+
 
                         <td class="px-3 py-2">
                           <input
@@ -331,6 +335,8 @@ export default {
     const selectedSite = ref(null)
     const selectedDate = ref('')
     const selectedModule = ref('')
+    const selectedTreasury = ref(null)
+    const selectedTreasurySearch = ref('')
     const submitError = ref('')
     const isSaving = ref(false)
     const skipPersistOnClose = ref(false)
@@ -345,9 +351,8 @@ export default {
       _contractorSearch: '',
       amount: '',
       paymentMethod: 'cash',
-      treasury: null,
-      treasuryId: null,
-      _treasurySearch: '',
+      treasury: selectedTreasury.value || null,
+      treasuryId: selectedTreasury.value?.id ?? null,
       notes: '',
       contractors: [],
       ...overrides
@@ -385,18 +390,18 @@ export default {
 
     const treasuryOptions = computed(() => treasuries.value)
 
-    const isStep1Valid = computed(() => Boolean(selectedSite.value && selectedDate.value && selectedModule.value))
+    const isStep1Valid = computed(() => Boolean(selectedSite.value && selectedDate.value && selectedModule.value && selectedTreasury.value))
 
     const rowsToSave = computed(() => rows.value.filter(row => !isRowEmpty(row)))
 
     const isSubmitDisabled = computed(() => {
       if (!rowsToSave.value.length) return true
-      return rowsToSave.value.some(row => !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod || !row.treasuryId)
+      return rowsToSave.value.some(row => !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod)
     })
 
     const totalAmount = computed(() => rowsToSave.value.reduce((sum, row) => sum + (Number(row.amount) || 0), 0))
 
-    const totalAmountDisplay = computed(() => totalAmount.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+    const totalAmountDisplay = computed(() => totalAmount.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
 
     const enterPaymentTitle = computed(() => labelFor('payments.enterPayment', 'Enter payment'))
     const step1Title = computed(() => labelFor('labels.step1BasicData', 'Step 1: Basic data'))
@@ -488,6 +493,16 @@ export default {
       selectedModule.value = ''
     }
 
+    const handleTreasurySelect = (treasury) => {
+      selectedTreasury.value = treasury
+      selectedTreasurySearch.value = treasury?.name || ''
+    }
+
+    const clearTreasury = () => {
+      selectedTreasury.value = null
+      selectedTreasurySearch.value = ''
+    }
+
     const handleStep1FieldKeydown = (event, field) => {
       if (event.key !== 'Delete') return
 
@@ -500,6 +515,12 @@ export default {
       if (field === 'module' && selectedModule.value) {
         event.preventDefault()
         clearModule()
+        return
+      }
+
+      if (field === 'treasury' && selectedTreasury.value) {
+        event.preventDefault()
+        clearTreasury()
       }
     }
 
@@ -515,12 +536,6 @@ export default {
       row._contractorSearch = contractor?.name || ''
     }
 
-    const selectTreasury = (row, treasury) => {
-      row.treasury = treasury
-      row.treasuryId = treasury?.id ?? null
-      row._treasurySearch = treasury?.name || ''
-    }
-
     const duplicateRow = (index) => {
       const source = rows.value[index]
       if (!source) return
@@ -531,9 +546,6 @@ export default {
         _contractorSearch: source._contractorSearch,
         amount: source.amount,
         paymentMethod: source.paymentMethod,
-        treasury: source.treasury,
-        treasuryId: source.treasuryId,
-        _treasurySearch: source._treasurySearch,
         notes: source.notes,
         contractors: [...(source.contractors || [])]
       }))
@@ -552,6 +564,8 @@ export default {
       selectedSite.value = null
       selectedDate.value = ''
       selectedModule.value = ''
+      selectedTreasury.value = null
+      selectedTreasurySearch.value = ''
       submitError.value = ''
       rows.value = [createRow()]
       filters.value.siteSearch = ''
@@ -564,6 +578,7 @@ export default {
           selectedSite: selectedSite.value,
           selectedDate: selectedDate.value,
           selectedModule: selectedModule.value,
+          selectedTreasury: selectedTreasury.value,
           rows: rows.value.map(row => ({
             id: row.id,
             date: row.date,
@@ -571,8 +586,6 @@ export default {
             contractor: row.contractor,
             amount: row.amount,
             paymentMethod: row.paymentMethod,
-            treasury: row.treasury,
-            treasuryId: row.treasuryId,
             notes: row.notes
           }))
         }
@@ -602,12 +615,16 @@ export default {
           selectedModule.value = payload.selectedModule
         }
 
+        if (payload.selectedTreasury?.id) {
+          const treasury = treasuryOptions.value.find(item => idsEqual(item.id, payload.selectedTreasury.id))
+          if (treasury) {
+            selectedTreasury.value = treasury
+            selectedTreasurySearch.value = treasury.name || ''
+          }
+        }
+
         if (Array.isArray(payload.rows) && payload.rows.length) {
           rows.value = payload.rows.map(row => {
-            const treasury = row.treasuryId
-              ? treasuryOptions.value.find(item => idsEqual(item.id, row.treasuryId))
-              : null
-
             return createRow({
               id: row.id,
               date: row.date,
@@ -616,9 +633,6 @@ export default {
               _contractorSearch: row.contractor?.name || '',
               amount: row.amount,
               paymentMethod: row.paymentMethod || 'cash',
-              treasury: treasury || null,
-              treasuryId: treasury?.id ?? row.treasuryId ?? null,
-              _treasurySearch: treasury?.name || '',
               notes: row.notes
             })
           })
@@ -631,9 +645,6 @@ export default {
     function isRowEmpty(row) {
       return !row.contractor &&
         !row.amount &&
-        !row.paymentMethod &&
-        !row.treasury &&
-        !row.treasuryId &&
         !row.notes
     }
 
@@ -662,6 +673,8 @@ export default {
       rows.value.forEach(row => {
         row.module = selectedModule.value
         row.date = selectedDate.value
+        row.treasury = selectedTreasury.value
+        row.treasuryId = selectedTreasury.value?.id ?? null
         row.contractor = null
         row._contractorSearch = ''
         row.contractors = []
@@ -693,7 +706,7 @@ export default {
         return
       }
 
-      if (filtered.some(row => !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod || !row.treasuryId)) {
+      if (filtered.some(row => !row.date || !row.module || !row.amount || !row.contractor || !row.paymentMethod)) {
         submitError.value = labelFor('common.fillRequiredFields', 'Fill all required fields')
         return
       }
@@ -753,7 +766,7 @@ export default {
       }
     })
 
-    watch([selectedSite, selectedDate, selectedModule, rows], () => saveToStorage(), { deep: true })
+    watch([selectedSite, selectedDate, selectedModule, selectedTreasury, rows], () => saveToStorage(), { deep: true })
 
     onMounted(async () => {
       if (internalVisible.value) {
@@ -781,10 +794,11 @@ export default {
       clearSite,
       clearDate,
       clearModule,
+      handleTreasurySelect,
+      clearTreasury,
       handleStep1FieldKeydown,
       handleRowModuleChange,
       selectContractor,
-      selectTreasury,
       duplicateRow,
       removeRow,
       goToStep2,
@@ -795,6 +809,8 @@ export default {
       isSaving,
       selectedDate,
       selectedModule,
+      selectedTreasury,
+      selectedTreasurySearch,
       handleEnterKey,
       onLastFieldTab,
       ArrowRightIcon,

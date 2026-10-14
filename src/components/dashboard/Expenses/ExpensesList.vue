@@ -2591,7 +2591,7 @@ rows: [],
     },
     
     formatCurrency(amount) {
-      return new Intl.NumberFormat(this.isRTL ? 'ar-SA' : 'en-US', {
+      return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'EGP'
       }).format(amount)
