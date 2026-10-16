@@ -159,14 +159,15 @@
       <table v-app-table class="app-table divide-y divide-gray-200 text-sm">
         <colgroup>
           <col style="width: 4%" />
+          <col style="width: 9%" />
+          <col style="width: 11%" />
+          <col style="width: 9%" />
+          <col style="width: 14%" />
           <col style="width: 10%" />
-          <col style="width: 12%" />
           <col style="width: 10%" />
-          <col style="width: 15%" />
-          <col style="width: 11%" />
-          <col style="width: 11%" />
-          <col style="width: 11%" />
-          <col style="width: 16%" />
+          <col style="width: 10%" />
+          <col style="width: 13%" />
+          <col style="width: 10%" />
         </colgroup>
         <thead class="theme-table-thead-gradient text-left text-xs uppercase tracking-wide theme-text-muted">
           <tr>
@@ -182,6 +183,7 @@
             <th class="px-4 py-3">{{ $t('labels.paymentMethod') || 'Payment Method' }}</th>
             <th class="px-4 py-3">{{ $t('dashboard.treasury') || 'Treasury' }}</th>
             <th class="px-4 py-3">{{ $t('labels.notes') || 'Notes' }}</th>
+            <th class="px-4 py-3">{{ $t('labels.actions') || 'Actions' }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
@@ -195,15 +197,46 @@
             <td class="px-4 py-3 theme-text-primary">{{ paymentMethodLabel(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentTreasury(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentNotes(payment) }}</td>
+            <td class="px-4 py-3">
+              <button
+                type="button"
+                class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                :disabled="cancellingId === payment.id"
+                @click="confirmCancel(payment)"
+              >
+                {{ cancellingId === payment.id ? ($t('labels.loading') || 'Loading...') : ($t('payments.cancelPayment') || 'Cancel') }}
+              </button>
+            </td>
           </tr>
           <tr v-if="!filteredPayments.length">
-            <td class="px-4 py-6 text-center theme-text-secondary" :colspan="9">{{ $t('payments.noPayments') || 'No payments found' }}</td>
+            <td class="px-4 py-6 text-center theme-text-secondary" :colspan="10">{{ $t('payments.noPayments') || 'No payments found' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <PaymentCreationModal v-model:visible="paymentModalVisible" @saved="onPaymentCreated" />
+
+    <!-- Cancel Confirmation Modal -->
+    <div v-if="showCancelConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="theme-surface rounded-lg p-6 w-96 max-w-md shadow-xl">
+        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirm') || 'Confirm' }}</h3>
+        <p class="theme-text-secondary mb-4">{{ $t('payments.confirmCancelPayment') || 'Are you sure you want to cancel this payment?' }}</p>
+        <div v-if="paymentToCancel" class="mb-6 rounded-lg border border-gray-200 theme-dashboard-bg-soft p-3 text-sm">
+          <p class="theme-text-primary font-medium">{{ paymentContractor(paymentToCancel) }}</p>
+          <p class="theme-text-secondary mt-1">{{ formatDate(paymentDate(paymentToCancel)) }} - {{ formatAmount(paymentToCancel.amount) }}</p>
+          <p v-if="paymentSite(paymentToCancel) && paymentSite(paymentToCancel) !== '-'" class="theme-text-secondary mt-1">{{ paymentSite(paymentToCancel) }}</p>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button @click="closeCancelConfirm" class="rounded-md border border-gray-200 px-4 py-2 theme-text-secondary hover:theme-hover-soft">
+            {{ $t('labels.cancel') || 'Cancel' }}
+          </button>
+          <button @click="confirmCancelAction" :disabled="cancellingId === paymentToCancel?.id" class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:opacity-50">
+            {{ cancellingId === paymentToCancel?.id ? ($t('labels.loading') || 'Loading...') : ($t('labels.confirm') || 'Confirm') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -211,13 +244,14 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
-import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs } from '@/api'
+import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs, deletePayment } from '@/api'
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
+import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
 const normalizeList = (payload) => {
@@ -240,6 +274,9 @@ export default {
     const router = useRouter()
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const paymentModalVisible = ref(false)
+    const cancellingId = ref(null)
+    const showCancelConfirm = ref(false)
+    const paymentToCancel = ref(null)
     const payments = ref([])
     const sortField = ref('date')
     const sortOrder = ref('desc')
@@ -524,6 +561,43 @@ export default {
       await loadPayments()
     }
 
+    const confirmCancel = (payment) => {
+      if (!payment?.id) return
+      paymentToCancel.value = payment
+      showCancelConfirm.value = true
+    }
+
+    const closeCancelConfirm = () => {
+      showCancelConfirm.value = false
+      paymentToCancel.value = null
+    }
+
+    const confirmCancelAction = async () => {
+      const payment = paymentToCancel.value
+      if (!payment?.id) return
+      cancellingId.value = payment.id
+      try {
+        const res = await deletePayment(payment.id)
+        if (isPendingApproval(res)) {
+          if (typeof window !== 'undefined' && window.$toast) {
+            window.$toast(pendingApprovalToast(isRTL.value), 'info')
+          }
+        } else {
+          payments.value = payments.value.filter(item => item.id !== payment.id)
+          if (typeof window !== 'undefined' && window.$toast) {
+            window.$toast(t('payments.cancelSuccess') || 'Payment cancelled', 'success')
+          }
+        }
+        closeCancelConfirm()
+      } catch (error) {
+        console.error('Failed to cancel payment', error)
+        const message = error?.response?.data?.message || t('payments.cancelFailed') || 'Failed to cancel payment'
+        if (typeof window !== 'undefined' && window.alert) window.alert(message)
+      } finally {
+        cancellingId.value = null
+      }
+    }
+
     const formatDate = (value) => {
       if (!value) return '-'
       const date = new Date(value)
@@ -572,6 +646,12 @@ export default {
     return {
       isRTL,
       paymentModalVisible,
+      cancellingId,
+      showCancelConfirm,
+      paymentToCancel,
+      confirmCancel,
+      closeCancelConfirm,
+      confirmCancelAction,
       reportsLoading,
       filters,
       fieldClass,

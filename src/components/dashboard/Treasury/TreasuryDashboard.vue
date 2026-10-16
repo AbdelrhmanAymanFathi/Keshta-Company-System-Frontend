@@ -42,7 +42,7 @@
               </div>
             </div>
             <div class="shrink-0">
-              <button v-if="isAdmin && !treasury.deletedAt" class="rounded-md px-2 py-1 text-xs theme-text-secondary transition hover:bg-gray-100" @click.stop="openEditModal(treasury)">{{ t('treasury.edit') }}</button>
+              <button v-if="!treasury.deletedAt" class="rounded-md px-2 py-1 text-xs theme-text-secondary transition hover:bg-gray-100" @click.stop="openEditModal(treasury)">{{ t('treasury.edit') }}</button>
             </div>
           </button>
         </div>
@@ -95,7 +95,7 @@
               💸 {{ t('treasury.transferFunds') }}
             </button>
             <button
-              v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
+              v-if="selectedTreasury && !selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto"
               :disabled="!selectedTreasury"
               @click="openEditModal(selectedTreasury)"
@@ -103,7 +103,7 @@
               {{ t('treasury.edit') }}
             </button>
             <button
-              v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
+              v-if="selectedTreasury && !selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-amber-200 px-4 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50 sm:w-auto"
               :disabled="!selectedTreasury"
               @click="archiveSelectedTreasury"
@@ -111,7 +111,7 @@
               {{ t('treasury.archive') }}
             </button>
             <button
-              v-if="isAdmin && selectedTreasury && selectedTreasury.deletedAt"
+              v-if="selectedTreasury && selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-emerald-200 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 sm:w-auto"
               :disabled="!selectedTreasury"
               @click="restoreSelectedTreasury"
@@ -119,7 +119,7 @@
               {{ t('treasury.unarchive') }}
             </button>
             <button
-              v-if="isAdmin && selectedTreasury && selectedTreasury.type === 'CUSTODY'"
+              v-if="selectedTreasury && selectedTreasury.type === 'CUSTODY'"
               class="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 sm:w-auto"
               :disabled="purging"
               @click="purgeSelectedTreasury"
@@ -221,11 +221,16 @@
               <col style="width: 19%" />
               <col style="width: 11%" />
               <col style="width: 15%" />
-              <col v-if="isAdmin" style="width: 7%" />
+              <col style="width: 7%" />
             </colgroup>
             <thead class="bg-slate-50">
               <tr>
-                <th data-col="subtitle" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.dateTime') }}</th>
+                <th data-col="subtitle" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']" @click="toggleSortOrder">
+                  <span class="inline-flex items-center gap-1">
+                    {{ t('treasury.dateTime') }}
+                    <SortIcon :active="true" :dir="sortOrder" />
+                  </span>
+                </th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-amber-600', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'ت. التسوية' : 'Settlement' }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
@@ -233,7 +238,7 @@
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">تفاصيل العملية</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
                 <th data-col="amount" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ t('treasury.amount') }}</th>
-                <th v-if="isAdmin" class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ isRTL ? 'إجراءات' : 'Actions' }}</th>
+                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ isRTL ? 'إجراءات' : 'Actions' }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white/70">
@@ -295,7 +300,7 @@
                 <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
                   {{ formatCurrency(tx.amount) }}
                 </td>
-                <td v-if="isAdmin" class="px-4 py-3 text-center" @click.stop>
+                <td class="px-4 py-3 text-center" @click.stop>
                   <div v-if="rowEditKind(tx)" class="flex items-center justify-center gap-1.5">
                     <button type="button" class="theme-text" :title="t('labels.edit')" @click="editRow(tx)">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,7 +319,7 @@
 
               <!-- Expanded details row -->
               <tr v-if="expandedTxId === tx.id" class="bg-slate-50/60">
-                <td :colspan="isAdmin ? 9 : 8" class="px-6 py-4 border-b border-indigo-100">
+                <td :colspan="9" class="px-6 py-4 border-b border-indigo-100">
                   <div v-if="expandedLoading" class="flex items-center gap-2 text-sm text-gray-500">
                     <div class="h-4 w-4 animate-spin rounded-full border-b-2 border-indigo-500"></div>
                     جاري التحميل...
@@ -610,15 +615,17 @@ import { useAuth } from '@/composables/useAuth'
 import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
+import SortIcon from '@/components/shared/SortIcon.vue'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
 import { transferBetweenTreasuries, getExpense, getTreasuryPurgePreview, updateTreasuryMovement, deleteTreasuryMovement, deleteExpense } from '@/api'
 import { playNotificationSound } from '@/utils/notificationSound'
+import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 
 export default {
   name: 'TreasuryDashboard',
   emits: ['navigateReport', 'navigateStatement'],
-  components: { DateField, Pagination },
+  components: { DateField, Pagination, SortIcon },
   setup() {
     const { t, locale } = useI18n()
     const { user } = useAuth()
@@ -668,6 +675,7 @@ export default {
     const treasurySearch = ref('')
     const treasuryView = ref('active')
     const filters = reactive({ startDate: '', endDate: '', type: '', amount: '', search: '' })
+    const sortOrder = ref('desc')
 
     const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 2 }).format(Number(value || 0))
     const formatDate = (value) => {
@@ -848,9 +856,10 @@ export default {
         if (movementForm.description.trim() !== movementForm.originalDescription.trim()) {
           payload.description = movementForm.description
         }
-        await updateTreasuryMovement(movementForm.id, payload)
+        const res = await updateTreasuryMovement(movementForm.id, payload)
         movementForm.open = false
-        toast(isRTL.value ? 'تم حفظ التعديل' : 'Saved', 'success')
+        if (isPendingApproval(res)) toast(pendingApprovalToast(isRTL.value), 'info')
+        else toast(isRTL.value ? 'تم حفظ التعديل' : 'Saved', 'success')
         await refreshAfterChange()
       } catch (err) {
         movementForm.error = err?.response?.data?.message || err?.message || t('treasury.saveError')
@@ -881,9 +890,10 @@ export default {
         ? `مسح ${refTypeLabel(tx.refType)} بمبلغ ${amount}؟${isTransfer ? '\nالتحويل هيتمسح من الخزينتين والرصيد هيرجع زي ما كان.' : '\nالمبلغ هيتخصم من رصيد الخزينة.'}`
         : `Delete this ${isTransfer ? 'transfer' : 'deposit'} of ${amount}?`)) return
       try {
-        await deleteTreasuryMovement(tx.id)
+        const res = await deleteTreasuryMovement(tx.id)
         if (expandedTxId.value === tx.id) expandedTxId.value = null
-        toast(isRTL.value ? 'تم المسح' : 'Deleted', 'success')
+        if (isPendingApproval(res)) toast(pendingApprovalToast(isRTL.value), 'info')
+        else toast(isRTL.value ? 'تم المسح' : 'Deleted', 'success')
         await refreshAfterChange()
       } catch (err) {
         toast(err?.response?.data?.message || err?.message || 'Delete failed')
@@ -963,10 +973,17 @@ export default {
           type: filters.type || undefined,
           amount: filters.amount !== '' ? filters.amount : undefined,
           search: filters.search || undefined,
+          sortOrder: sortOrder.value,
         }, store.selectedTreasuryId)
       } catch (err) {
         console.error('[TreasuryDashboard] reloadSelected error:', err)
       }
+    }
+
+    const toggleSortOrder = async () => {
+      sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
+      store.setTransactionPage(1)
+      await reloadSelected()
     }
 
     const reloadTreasuries = async () => {
@@ -1014,7 +1031,7 @@ export default {
     }
 
     const openEditModal = (treasury) => {
-      if (!isAdmin.value || !treasury) return
+      if (!treasury) return
       modalMode.value = 'edit'
       form.id = treasury.id
       form.name = treasury.name || ''
@@ -1027,9 +1044,11 @@ export default {
     const saveTreasury = async () => {
       try {
         const payload = { name: form.name, type: form.type }
-        if (modalMode.value === 'create') await store.createTreasuryItem(payload)
-        else await store.updateTreasuryItem(form.id, payload)
+        let res
+        if (modalMode.value === 'create') res = await store.createTreasuryItem(payload)
+        else res = await store.updateTreasuryItem(form.id, payload)
         showModal.value = false
+        if (isPendingApproval(res)) toast(pendingApprovalToast(isRTL.value), 'info')
         await loadTreasuries()
       } catch (err) {
         console.error('[TreasuryDashboard] saveTreasury error:', err)
@@ -1181,10 +1200,11 @@ export default {
     }
 
     const archiveSelectedTreasury = async () => {
-      if (!isAdmin.value || !store.selectedTreasuryId) return
+      if (!store.selectedTreasuryId) return
       if (!window.confirm(t('treasury.archiveConfirm'))) return
       try {
-        await store.archiveTreasuryItem(store.selectedTreasuryId)
+        const res = await store.archiveTreasuryItem(store.selectedTreasuryId)
+        if (isPendingApproval(res)) toast(pendingApprovalToast(isRTL.value), 'info')
         await loadTreasuries()
       } catch (err) {
         console.error('[TreasuryDashboard] archiveSelectedTreasury error:', err)
@@ -1192,10 +1212,11 @@ export default {
     }
 
     const restoreSelectedTreasury = async () => {
-      if (!isAdmin.value || !store.selectedTreasuryId) return
+      if (!store.selectedTreasuryId) return
       if (!window.confirm(t('treasury.restoreConfirm'))) return
       try {
-        await store.restoreTreasuryItem(store.selectedTreasuryId)
+        const res = await store.restoreTreasuryItem(store.selectedTreasuryId)
+        if (isPendingApproval(res)) toast(pendingApprovalToast(isRTL.value), 'info')
         await loadTreasuries()
       } catch (err) {
         console.error('[TreasuryDashboard] restoreSelectedTreasury error:', err)
@@ -1207,7 +1228,7 @@ export default {
 
     const purgeSelectedTreasury = async () => {
       const treasury = selectedTreasury.value
-      if (!isAdmin.value || !treasury || purging.value) return
+      if (!treasury || purging.value) return
       const toast = (message, type = 'error') => { if (window.$toast) window.$toast(message, type, 7000) }
       purging.value = true
       try {
@@ -1235,9 +1256,10 @@ export default {
           toast(t('treasury.purgeNameMismatch'))
           return
         }
-        await store.purgeTreasuryItem(treasury.id)
+        const res = await store.purgeTreasuryItem(treasury.id)
         await loadTreasuries()
-        toast(t('treasury.purgeSuccess', { name: treasury.name }), 'success')
+        if (isPendingApproval(res)) toast(pendingApprovalToast(isRTL.value), 'info')
+        else toast(t('treasury.purgeSuccess', { name: treasury.name }), 'success')
       } catch (err) {
         console.error('[TreasuryDashboard] purgeSelectedTreasury error:', err)
         toast(err?.response?.data?.message || t('treasury.purgeFailed'))
@@ -1370,6 +1392,8 @@ export default {
       applyFilters,
       debouncedApply,
       resetFilters,
+      sortOrder,
+      toggleSortOrder,
       onUpdatePage,
       onUpdatePageSize,
       openCreateModal,

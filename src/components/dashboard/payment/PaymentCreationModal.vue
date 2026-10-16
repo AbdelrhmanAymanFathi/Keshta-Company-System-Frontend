@@ -30,7 +30,7 @@
                 </h3>
 
                 <div class="mx-auto max-w-6xl">
-                  <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
+                  <div class="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
                     <div>
                       <label class="mb-1.5 block text-sm font-medium text-gray-700">
                         {{ siteLabel }}
@@ -124,6 +124,23 @@
                         @clear="clearTreasury"
                       />
                     </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                        {{ paymentMethodLabel }}
+                      </label>
+                      <div class="relative">
+                        <select
+                          v-model="selectedPaymentMethod"
+                          :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
+                          :dir="isRTL ? 'rtl' : 'ltr'"
+                        >
+                          <option v-for="option in paymentMethodOptions" :key="option.value" :value="option.value">
+                            {{ option.label }}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -152,7 +169,6 @@
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">#</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ contractorLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ amountLabel }}</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ paymentMethodLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ notesLabel }}</th>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ actionsLabel }}</th>
                       </tr>
@@ -192,21 +208,6 @@
                             @keydown.enter.prevent="handleEnterKey(index)"
                           />
                         </td>
-
-                        <td class="px-3 py-2">
-                          <select
-                            v-model="row.paymentMethod"
-                            :class="[fieldClass, isRTL ? 'text-right' : 'text-left']"
-                            :dir="isRTL ? 'rtl' : 'ltr'"
-                            @keydown.enter.prevent="handleEnterKey(index)"
-                          >
-                            <option v-for="option in paymentMethodOptions" :key="option.value" :value="option.value">
-                              {{ option.label }}
-                            </option>
-                          </select>
-                        </td>
-
-
 
                         <td class="px-3 py-2">
                           <input
@@ -337,6 +338,7 @@ export default {
     const selectedModule = ref('')
     const selectedTreasury = ref(null)
     const selectedTreasurySearch = ref('')
+    const selectedPaymentMethod = ref('cash')
     const submitError = ref('')
     const isSaving = ref(false)
     const skipPersistOnClose = ref(false)
@@ -350,7 +352,7 @@ export default {
       contractor: null,
       _contractorSearch: '',
       amount: '',
-      paymentMethod: 'cash',
+      paymentMethod: selectedPaymentMethod.value || 'cash',
       treasury: selectedTreasury.value || null,
       treasuryId: selectedTreasury.value?.id ?? null,
       notes: '',
@@ -390,7 +392,7 @@ export default {
 
     const treasuryOptions = computed(() => treasuries.value)
 
-    const isStep1Valid = computed(() => Boolean(selectedSite.value && selectedDate.value && selectedModule.value && selectedTreasury.value))
+    const isStep1Valid = computed(() => Boolean(selectedSite.value && selectedDate.value && selectedModule.value && selectedTreasury.value && selectedPaymentMethod.value))
 
     const rowsToSave = computed(() => rows.value.filter(row => !isRowEmpty(row)))
 
@@ -566,6 +568,7 @@ export default {
       selectedModule.value = ''
       selectedTreasury.value = null
       selectedTreasurySearch.value = ''
+      selectedPaymentMethod.value = 'cash'
       submitError.value = ''
       rows.value = [createRow()]
       filters.value.siteSearch = ''
@@ -579,6 +582,7 @@ export default {
           selectedDate: selectedDate.value,
           selectedModule: selectedModule.value,
           selectedTreasury: selectedTreasury.value,
+          selectedPaymentMethod: selectedPaymentMethod.value,
           rows: rows.value.map(row => ({
             id: row.id,
             date: row.date,
@@ -613,6 +617,10 @@ export default {
 
         if (payload.selectedModule) {
           selectedModule.value = payload.selectedModule
+        }
+
+        if (payload.selectedPaymentMethod) {
+          selectedPaymentMethod.value = payload.selectedPaymentMethod
         }
 
         if (payload.selectedTreasury?.id) {
@@ -675,6 +683,7 @@ export default {
         row.date = selectedDate.value
         row.treasury = selectedTreasury.value
         row.treasuryId = selectedTreasury.value?.id ?? null
+        row.paymentMethod = selectedPaymentMethod.value || 'cash'
         row.contractor = null
         row._contractorSearch = ''
         row.contractors = []
@@ -766,7 +775,7 @@ export default {
       }
     })
 
-    watch([selectedSite, selectedDate, selectedModule, selectedTreasury, rows], () => saveToStorage(), { deep: true })
+    watch([selectedSite, selectedDate, selectedModule, selectedTreasury, selectedPaymentMethod, rows], () => saveToStorage(), { deep: true })
 
     onMounted(async () => {
       if (internalVisible.value) {
@@ -811,6 +820,7 @@ export default {
       selectedModule,
       selectedTreasury,
       selectedTreasurySearch,
+      selectedPaymentMethod,
       handleEnterKey,
       onLastFieldTab,
       ArrowRightIcon,

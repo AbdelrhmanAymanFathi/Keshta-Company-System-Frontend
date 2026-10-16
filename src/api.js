@@ -1934,6 +1934,10 @@ export const getExportPayments = (exportId) => {
   return axios.get(withLangQuery(`${BASE_URL}/api/supplies/${exportId}/payments`));
 };
 
+// Cancel (delete) a payment. Backend reverses the treasury, company wallet and contractor wallet.
+export const deletePayment = (id) =>
+  axios.delete(withLangQuery(`${BASE_URL}/api/payments/${id}`));
+
 function getCurrentApiLang() {
   try {
     const locale = localStorage.getItem('app-locale') || 'en';

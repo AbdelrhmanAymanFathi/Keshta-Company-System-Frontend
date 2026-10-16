@@ -1349,33 +1349,74 @@ export default {
       // Adapt for multi-row if needed; for now, assume single row edit or draft
       if (!this.transport) return
 
-      // Always populate header/common fields from the provided transport draft/object
-      this.commonData.date = this.transport.date?.split('T')[0] || ''
-      this.commonData.item = this.items.find(i => i.id === this.transport.itemId) || this.transport.item || null
-      this.commonData.location = this.locations.find(l => l.id === this.transport.fromLocId) || this.transport.location || null
-      this.commonData.area = this.locations.find(l => l.id === this.transport.toLocId) || this.transport.area || null
-      this.commonData.contractor = this.contractors.find(c => c.id === this.transport.contractorId) || this.transport.contractor || null
-      this.commonData.distanceKm = parseFloat(this.transport.distanceKm) || 0
-      this.commonData.firstKmPrice = parseFloat(this.transport.pricing?.firstKmPrice) || parseFloat(this.transport.firstKmPrice) || 0
-      this.commonData.perKmPrice = parseFloat(this.transport.pricing?.perKmPrice) || parseFloat(this.transport.perKmPrice) || 0
-      this.commonData.notes = this.transport.notes || ''
+      const t = this.transport
+
+      // Resolve the parent location from the hierarchy list so it carries its
+      // `children` (areas). The relation returned by the API has no children,
+      // which is why the Area dropdown used to be empty on edit.
+      let location =
+        this.locations.find(l => l.id === t.locationId) ||
+        this.locations.find(l => l.id === t.location?.id) ||
+        t.location ||
+        null
+      if (location && !Array.isArray(location.children)) {
+        location = { ...location, children: [] }
+      }
+
+      // Resolve the area from the parent's children first, then fall back to
+      // a flat lookup / the nested relation.
+      let area = null
+      if (t.areaId != null && Array.isArray(location?.children)) {
+        area = location.children.find(c => c.id === t.areaId) || null
+      }
+      if (!area && t.areaId != null) {
+        area = this.locations.find(l => l.id === t.areaId) || null
+      }
+      if (!area) area = t.area || null
+
+      // Guarantee the selected area is selectable in the To-Location dropdown.
+      if (location && area && !location.children.some(c => c.id === area.id)) {
+        location = { ...location, children: [...location.children, area] }
+      }
+
+      const item = this.items.find(i => i.id === t.itemId) || t.item || null
+      const contractor = this.contractors.find(c => c.id === t.contractorId) || t.contractor || null
+      const vehicle = this.vehicles.find(v => v.id === t.vehicleId) || t.vehicle || null
+
+      // Header/common fields
+      this.commonData.date = t.date?.split('T')[0] || ''
+      this.commonData.item = item
+      this.commonData.location = location
+      this.commonData.area = area
+      this.commonData.contractor = contractor
+      this.commonData.vehicle = vehicle
+      this.commonData.distanceKm = parseFloat(t.distanceKm) || 0
+      this.commonData.firstKmPrice = parseFloat(t.pricing?.firstKmPrice) || parseFloat(t.firstKmPrice) || 0
+      this.commonData.perKmPrice = parseFloat(t.pricing?.perKmPrice) || parseFloat(t.perKmPrice) || 0
+      this.commonData.notes = t.notes || ''
+
+      // Keep the visible SearchDropdown inputs in sync with the resolved objects
+      this.filters.commonItemSearch = item?.name || ''
+      this.filters.commonFromLocSearch = location ? this.locLabel(location) : ''
+      this.filters.commonToLocSearch = area?.name || ''
+      this.filters.commonContractorSearch = contractor?.name || ''
+      this.filters.commonVehicleSearch = vehicle?.name || ''
 
       // If this is an existing transport (has id), populate the editable row and switch to Step 2
-      if (this.transport.id) {
+      if (t.id) {
         this.currentStep = 2
-        const vehicle = this.vehicles.find(v => v.id === this.transport.vehicleId)
-        this.commonData.vehicle = vehicle || null
-        this.filters.commonVehicleSearch = vehicle?.name || ''
-        // set header-level vehicle capacity for editing
-        this.vehicleCompanyCapacity = Number(vehicle?.companyCapacity || 0)
+        // set header-level vehicle capacity for editing (prefer stored snapshot)
+        this.vehicleCompanyCapacity = Number(
+          t.vehicleCompanyCapacity ?? vehicle?.companyCapacity ?? 0
+        )
         const row = this.createEmptyRow()
         row.vehicle = vehicle
         row.search = vehicle?.name || ''
-        row.discount = parseFloat(this.transport.discount) || 0
-        row.companyCapacity = vehicle?.companyCapacity || 0
-        row.count = Number(this.transport.numTrips) || 1
-        row.distanceKm = parseFloat(this.transport.distanceKm) || this.commonData.distanceKm || 0
-        row.date = this.transport.date?.split('T')[0] || this.commonData.date || new Date().toISOString().split('T')[0]
+        row.discount = parseFloat(t.discount) || 0
+        row.companyCapacity = Number(t.vehicleCompanyCapacity ?? vehicle?.companyCapacity ?? 0)
+        row.count = Number(t.numTrips) || 1
+        row.distanceKm = parseFloat(t.distanceKm) || this.commonData.distanceKm || 0
+        row.date = t.date?.split('T')[0] || this.commonData.date || new Date().toISOString().split('T')[0]
         this.rows = [row]
       } else {
         // Draft: ensure the modal stays on Step 1 so user can confirm header data first

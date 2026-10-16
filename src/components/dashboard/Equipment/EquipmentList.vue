@@ -162,6 +162,7 @@
 
 <script>
 import { getEquipments, createEquipment, updateEquipment, deleteEquipment, getContractors } from '../../../api'
+import { isPendingApproval, pendingApprovalToast } from '../../../utils/approval'
 import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
@@ -279,8 +280,12 @@ export default {
         if (this.form.hourlyRate !== null && this.form.hourlyRate !== '') payload.hourlyRate = Number(this.form.hourlyRate)
 
         if (this.editingEquipment) {
-          await updateEquipment(this.editingEquipment.id, payload)
-          if (window.$toast) window.$toast(this.$t('equipment.updateSuccess') || 'Equipment updated', 'success')
+          const res = await updateEquipment(this.editingEquipment.id, payload)
+          if (isPendingApproval(res)) {
+            if (window.$toast) window.$toast(pendingApprovalToast(this.$i18n?.locale?.startsWith('ar')), 'info')
+          } else if (window.$toast) {
+            window.$toast(this.$t('equipment.updateSuccess') || 'Equipment updated', 'success')
+          }
         } else {
           await createEquipment(payload)
           if (window.$toast) window.$toast(this.$t('equipment.createSuccess') || 'Equipment created', 'success')
@@ -297,8 +302,12 @@ export default {
     async confirmDelete() {
       if (!this.deleteTarget) return
       try {
-        await deleteEquipment(this.deleteTarget.id)
-        if (window.$toast) window.$toast(this.$t('equipment.deleteSuccess') || 'Deleted', 'success')
+        const res = await deleteEquipment(this.deleteTarget.id)
+        if (isPendingApproval(res)) {
+          if (window.$toast) window.$toast(pendingApprovalToast(this.$i18n?.locale?.startsWith('ar')), 'info')
+        } else if (window.$toast) {
+          window.$toast(this.$t('equipment.deleteSuccess') || 'Deleted', 'success')
+        }
         await this.loadEquipments()
       } catch (e) {
         if (window.$toast) window.$toast(this.extractErrorMessage(e), 'error', 5000)

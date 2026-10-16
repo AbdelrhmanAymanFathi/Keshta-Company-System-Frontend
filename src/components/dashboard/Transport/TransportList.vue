@@ -216,10 +216,10 @@
                </span>
              </td>
              <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-               <div class=""><span class="">{{ transport.location.name || '-' }}</span></div>
+               <div class=""><span class="">{{ transport.location?.name || '-' }}</span></div>
              </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              <div class=""><span class="">{{ transport.area.name || '-' }}</span></div>
+              <div class=""><span class="">{{ transport.area?.name || '-' }}</span></div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
               <div class="">{{ getVehicleDisplay(transport) }}</div>
@@ -545,8 +545,8 @@ export default {
           // In Vue 3, directly assign the array
           this.transports = sorted
 
-          this.total = responseData.total || this.transports.length
-          this.pageSize = responseData.pageSize || this.pageSize
+          this.total = responseData.meta?.total ?? responseData.total ?? this.transports.length
+          this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
 
           console.log('✓ Transports updated:', this.transports.length, 'items')
         } else {
