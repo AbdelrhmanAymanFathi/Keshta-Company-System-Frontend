@@ -197,6 +197,7 @@
 <script>
 import * as XLSX from 'xlsx'
 import { getContractors, getContractorOpeningBalance, getLocations, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
+import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
@@ -363,7 +364,11 @@ export default {
       try {
         if (this.editing && this.form.id) {
           const res = await updateContractor(this.form.id, payload)
-          if (window.$toast) window.$toast(this.$t('suppliers.updateSuccess') || 'Supplier updated successfully', 'success')
+          if (isPendingApproval(res) || res?.data?.pendingApproval) {
+            if (window.$toast) window.$toast(pendingApprovalToast(this.$i18n.locale === 'ar'), 'info')
+          } else if (window.$toast) {
+            window.$toast(this.$t('suppliers.updateSuccess') || 'Supplier updated successfully', 'success')
+          }
           if (res?.data?.openingBalanceApproval && window.$toast) {
             window.$toast(this.$i18n.locale === 'ar' ? 'تم إرسال تعديل رصيد أول المدة للموافقة الإدارية' : 'Opening balance change sent for admin approval', 'info')
           }
@@ -393,6 +398,12 @@ export default {
         const params = {}
         if (this.mode === 'supply' || this.mode === 'transport') params.mode = this.mode
         const res = await deleteContractor(this.deleteConfirm.item.id, params)
+        if (isPendingApproval(res)) {
+          if (window.$toast) window.$toast(pendingApprovalToast(this.$i18n.locale === 'ar'), 'info')
+          await this.loadContractors()
+          this.cancelDelete()
+          return
+        }
         const data = res?.data ?? null
         if ((res && res.status === 204) || (data && data.deletedAt)) {
           if (window.$toast) window.$toast(this.$t('suppliers.deleteSuccess') || 'Supplier deleted', 'success')
