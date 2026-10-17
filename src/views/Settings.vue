@@ -414,6 +414,56 @@
           </div>
         </div>
 
+        <div class="settings-card">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <div class="flex items-center gap-3">
+              <div class="bg-white bg-opacity-20 rounded-lg p-2">
+                <svg class="w-5 h-5 theme-text-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11 5 6 9H2v6h4l5 4V5z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
+              </div>
+              <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.startupSoundTitle') || 'Startup Sound' }}</h2>
+            </div>
+          </div>
+          <div class="settings-card__body space-y-4">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.startupSoundDescription') || 'Play a short cinematic intro with the company name the first time the app opens.' }}</p>
+
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold theme-text-primary">{{ $t('profile.startupSoundToggleLabel') || 'Enable startup intro sound' }}</p>
+                <p class="text-xs theme-caption">
+                  {{ introEnabled
+                    ? ($t('profile.startupSoundOn') || 'On — plays once on your first visit')
+                    : ($t('profile.startupSoundOff') || 'Off — the app opens silently') }}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                :aria-checked="introEnabled"
+                :aria-label="$t('profile.startupSoundToggleLabel') || 'Enable startup intro sound'"
+                @click="toggleStartupSound(!introEnabled)"
+                :class="introEnabled ? 'bg-green-500' : 'bg-gray-300'"
+                class="relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200"
+              >
+                <span
+                  class="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all duration-200"
+                  :class="introEnabled ? 'start-0.5' : 'end-0.5'"
+                ></span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              @click="previewStartupSound"
+              class="theme-button rounded-xl px-4 py-2 text-sm font-medium transition hover:theme-hover-soft"
+            >
+              {{ $t('profile.startupSoundPreview') || 'Preview intro sound' }}
+            </button>
+          </div>
+        </div>
+
         <div class="settings-actions px-1 pb-2">
 
           <button type="button" @click="resetThemeColor" class="theme-button w-full sm:w-auto px-4 py-3 font-medium rounded-lg transition shadow-sm hover:shadow-md">
@@ -470,6 +520,7 @@ import {
 import { getIconPackOptions, ThemeIcon } from '@acme/icon-packs'
 import { getSidebarOptions } from '@acme/layout-engine'
 import { presenceEnabled, savePresenceSettings } from '@/composables/usePresenceSettings'
+import { introEnabled, toggleStartupSound, previewStartupSound } from '@/composables/useStartupIntro'
 
 
 
@@ -795,6 +846,12 @@ export default {
       presenceEnabled,
 
       togglePresence,
+
+      introEnabled,
+
+      toggleStartupSound,
+
+      previewStartupSound,
 
       getIconPackLabel,
 

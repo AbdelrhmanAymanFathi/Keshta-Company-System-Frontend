@@ -1,6 +1,10 @@
 {
   "settings": "Settings",
   "appName": "Keshta Company System",
+  "intro": {
+    "brand": "Keshta General Contracting Management System",
+    "playButton": "Play Intro Sound"
+  },
   "Reports": "Reports",
   "transactions": "Transactions",
   "noTransactions": "No transactions",
@@ -565,6 +569,12 @@
     "presenceToggleLabel": "Enable live presence & cursor",
     "presenceOn": "On — others can see your cursor and avatar",
     "presenceOff": "Off — you are hidden from other users",
+    "startupSoundTitle": "Startup Sound",
+    "startupSoundDescription": "Play a short cinematic intro — a subtle futuristic sound followed by the spoken company name — the first time the app opens. It runs once and never replays.",
+    "startupSoundToggleLabel": "Enable startup intro sound",
+    "startupSoundOn": "On — plays once on your first visit",
+    "startupSoundOff": "Off — the app opens silently",
+    "startupSoundPreview": "Preview intro sound",
     "iconPackTitle": "Icon Pack",
     "iconPackDescription": "Switch the entire app icon style instantly — sidebar, tables, and actions.",
     "themePersonality": "Quick personality",
