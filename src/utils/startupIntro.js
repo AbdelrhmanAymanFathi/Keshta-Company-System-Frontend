@@ -10,7 +10,8 @@
  *      available English voice.
  *
  * Rules enforced here:
- *   - runs only on the user's first visit (localStorage flag)
+ *   - runs once per browser tab session (sessionStorage flag): it plays when a
+ *     tab is opened and replays when the tab is closed and opened again
  *   - never replays on refresh / route change / component remount
  *   - honours the browser autoplay policy: when blocked we do NOT mark the intro
  *     as played, so the UI can offer a "Play Intro Sound" button instead
@@ -46,17 +47,25 @@ function write(key, value) {
   try { window.localStorage.setItem(key, value) } catch (e) { /* storage unavailable */ }
 }
 
+function readSession(key) {
+  try { return window.sessionStorage.getItem(key) } catch (e) { return null }
+}
+
+function writeSession(key, value) {
+  try { window.sessionStorage.setItem(key, value) } catch (e) { /* storage unavailable */ }
+}
+
 export function hasPlayedIntro() {
-  return read(PLAYED_KEY) === '1'
+  return readSession(PLAYED_KEY) === '1'
 }
 
 export function markIntroPlayed() {
-  write(PLAYED_KEY, '1')
+  writeSession(PLAYED_KEY, '1')
 }
 
 /** Exposed for QA / manual testing only. */
 export function resetIntroPlayed() {
-  try { window.localStorage.removeItem(PLAYED_KEY) } catch (e) { /* noop */ }
+  try { window.sessionStorage.removeItem(PLAYED_KEY) } catch (e) { /* noop */ }
 }
 
 export function isStartupSoundEnabled() {
