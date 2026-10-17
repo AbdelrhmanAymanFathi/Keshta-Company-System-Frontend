@@ -40,7 +40,7 @@
       <DashboardError v-else-if="error" :message="error" @retry="load" />
       <div v-else class="space-y-5">
         <!-- Totals tiles -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div
             v-for="tile in tiles"
             :key="tile.key"
@@ -79,6 +79,9 @@
                 <th class="px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-muted" :class="isRTL ? 'text-right' : 'text-left'">
                   {{ $t('adminStats.totalExtracts') }}
                 </th>
+                <th class="px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-muted" :class="isRTL ? 'text-right' : 'text-left'">
+                  {{ $t('adminStats.totalPayments') }}
+                </th>
                 <th class="px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-muted text-right">
                   {{ $t('adminStats.total') }}
                 </th>
@@ -97,10 +100,11 @@
                 <td class="px-4 py-3 whitespace-nowrap text-sm theme-text-secondary">{{ formatAmount(row.transports.total) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm theme-text-secondary">{{ formatAmount(row.expenses.total) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm theme-text-secondary">{{ formatAmount(row.extracts.total) }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm theme-text-secondary">{{ formatAmount(row.payments?.total) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-right theme-text-primary">{{ formatAmount(row.total) }}</td>
               </tr>
               <tr v-if="!rows.length">
-                <td colspan="6" class="px-4 py-6 text-center text-sm theme-text-muted">{{ $t('adminStats.noData') }}</td>
+                <td colspan="7" class="px-4 py-6 text-center text-sm theme-text-muted">{{ $t('adminStats.noData') }}</td>
               </tr>
             </tbody>
             <tfoot v-if="rows.length" class="bg-slate-50">
@@ -110,11 +114,15 @@
                 <td class="px-4 py-3 text-sm">{{ formatAmount(totals.transports.total) }}</td>
                 <td class="px-4 py-3 text-sm">{{ formatAmount(totals.expenses.total) }}</td>
                 <td class="px-4 py-3 text-sm">{{ formatAmount(totals.extracts.total) }}</td>
+                <td class="px-4 py-3 text-sm">{{ formatAmount(totals.payments.total) }}</td>
                 <td class="px-4 py-3 text-sm text-right">{{ formatAmount(totals.total) }}</td>
               </tr>
             </tfoot>
           </table>
         </div>
+
+        <!-- Charts -->
+        <LocationCharts :rows="rows" :totals="totals" :loading="loading" />
       </div>
     </div>
   </div>
@@ -124,17 +132,19 @@
 import { getLocations, getLocationTotals } from '@/api'
 import DashboardSkeleton from './DashboardSkeleton.vue'
 import DashboardError from './DashboardError.vue'
+import LocationCharts from './LocationCharts.vue'
 
 const ICONS = {
   supplies: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V11.25c0-2.828-2.172-6.444-4.688-7.5" />',
   transports: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" />',
   expenses: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />',
-  extracts: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25" />'
+  extracts: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25" />',
+  payments: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />'
 }
 
 export default {
   name: 'LocationTotals',
-  components: { DashboardSkeleton, DashboardError },
+  components: { DashboardSkeleton, DashboardError, LocationCharts },
   props: {
     fromDate: { type: String, default: '' },
     toDate: { type: String, default: '' }
@@ -158,6 +168,7 @@ export default {
         transports: { total: 0, count: 0 },
         expenses: { total: 0, count: 0 },
         extracts: { total: 0, count: 0 },
+        payments: { total: 0, count: 0 },
         total: 0
       }
     },
@@ -166,7 +177,8 @@ export default {
         { key: 'supplies', label: this.$t('adminStats.totalSupplies'), total: this.totals.supplies.total, count: this.totals.supplies.count, bg: 'bg-blue-100', fg: 'text-blue-600', icon: ICONS.supplies },
         { key: 'transports', label: this.$t('adminStats.totalTransports'), total: this.totals.transports.total, count: this.totals.transports.count, bg: 'bg-amber-100', fg: 'text-amber-600', icon: ICONS.transports },
         { key: 'expenses', label: this.$t('adminStats.totalExpenses'), total: this.totals.expenses.total, count: this.totals.expenses.count, bg: 'bg-rose-100', fg: 'text-rose-600', icon: ICONS.expenses },
-        { key: 'extracts', label: this.$t('adminStats.totalExtracts'), total: this.totals.extracts.total, count: this.totals.extracts.count, bg: 'bg-cyan-100', fg: 'text-cyan-600', icon: ICONS.extracts }
+        { key: 'extracts', label: this.$t('adminStats.totalExtracts'), total: this.totals.extracts.total, count: this.totals.extracts.count, bg: 'bg-cyan-100', fg: 'text-cyan-600', icon: ICONS.extracts },
+        { key: 'payments', label: this.$t('adminStats.totalPayments'), total: this.totals.payments.total, count: this.totals.payments.count, bg: 'bg-violet-100', fg: 'text-violet-600', icon: ICONS.payments }
       ]
     }
   },

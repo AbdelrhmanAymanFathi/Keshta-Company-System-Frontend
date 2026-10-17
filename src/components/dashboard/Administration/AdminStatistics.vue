@@ -155,7 +155,7 @@
         <ChartCard :title="$t('adminStats.expenseClassification')" :subtitle="$t('adminStats.expenseClassificationDesc')"
           :loading="loading" :empty="!expenseClassifications?.length" :empty-message="$t('adminStats.noData')">
           <template #chart>
-            <apexchart v-if="expenseClassifications?.length" :key="'ec-' + expenseClassifications.length" type="bar" height="360" :options="classificationOptions" :series="classificationSeries" />
+            <apexchart v-if="expenseClassifications?.length" :key="'ec-' + classificationChart.labels.join('|')" type="bar" :height="classificationHeight" :options="classificationOptions" :series="classificationSeries" />
           </template>
         </ChartCard>
       </DashboardGrid>
@@ -447,21 +447,61 @@ export default {
       }
     },
 
+    classificationChart() {
+      const mapped = (this.expenseClassifications || [])
+        .map(c => ({
+          label: c?.classification ? String(c.classification) : this.$t('adminStats.unclassified'),
+          value: this.safeNum(c?.total) || 0
+        }))
+        .filter(x => x.value > 0)
+        .sort((a, b) => b.value - a.value)
+      const TOP = 10
+      if (mapped.length <= TOP) {
+        return { labels: mapped.map(x => x.label), values: mapped.map(x => x.value) }
+      }
+      const top = mapped.slice(0, TOP)
+      const rest = mapped.slice(TOP).reduce((s, x) => s + x.value, 0)
+      return {
+        labels: [...top.map(x => x.label), this.$t('adminStats.otherCategories')],
+        values: [...top.map(x => x.value), rest]
+      }
+    },
+    classificationHeight() {
+      const n = this.classificationChart?.labels?.length || 1
+      return Math.max(360, n * 34 + 64)
+    },
     classificationSeries() {
-      if (!this.expenseClassifications?.length) return []
-      return [{ name: this.$t('adminStats.total'), data: this.expenseClassifications.map(c => this.safeNum(c?.total) || 0) }]
+      const c = this.classificationChart
+      if (!c?.values?.length) return []
+      return [{ name: this.$t('adminStats.total'), data: c.values }]
     },
     classificationOptions() {
-      const d = this.expenseClassifications || []
+      const labels = this.classificationChart?.labels || []
       return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 } },
-        colors: ['#6366f1', '#f59e0b', '#06b6d4', '#10b981'],
-        plotOptions: { bar: { borderRadius: 4, horizontal: true } },
-        dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
-        xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
-        labels: d.map(c => this.safeLabel(c?.classification)),
+        chart: { toolbar: { show: true }, animations: { speed: 500 }, fontFamily: 'inherit' },
+        colors: ['#6366f1', '#8b5cf6', '#0ea5e9', '#06b6d4', '#14b8a6', '#22c55e', '#eab308', '#f59e0b', '#f97316', '#ef4444', '#94a3b8'],
+        plotOptions: {
+          bar: { borderRadius: 4, borderRadiusApplication: 'end', horizontal: true, barHeight: '58%', distributed: true }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: v => this.formatChartNumber(v),
+          offsetX: 8,
+          textAnchor: 'start',
+          style: { fontSize: '11px', fontWeight: 600, colors: ['#334155'] }
+        },
+        stroke: { show: true, width: 1, colors: ['transparent'] },
+        xaxis: {
+          categories: labels,
+          labels: { formatter: v => this.formatChartNumber(v), style: { fontSize: '11px' } }
+        },
+        yaxis: { labels: { style: { fontSize: '12px' }, maxWidth: 150 } },
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
-        legend: { show: false }
+        legend: { show: false },
+        grid: { borderColor: '#e2e8f0', strokeDashArray: 4, padding: { left: 6, right: 28 } },
+        responsive: [
+          { breakpoint: 640, options: { chart: { height: 360 }, dataLabels: { enabled: false }, yaxis: { labels: { maxWidth: 100 } } } }
+        ]
       }
     },
 
