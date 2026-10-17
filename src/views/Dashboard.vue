@@ -16,11 +16,12 @@
           </svg>
         </button>
         <!-- Brand -->
-        <div class="flex min-w-0 items-center gap-2 sm:gap-3">
-          <div class="h-8 w-14 rounded-md flex items-center justify-center overflow-hidden sm:h-9 sm:w-16 shadow-md">
-            <img src="../assets/logo.png" alt="Keshta Logo" class="w-full h-full object-fill transition-transform duration-300 hover:scale-110">
-          </div>
-          <div class="truncate text-sm font-bold whitespace-nowrap sm:text-base lg:text-lg">{{ $t('appName') }}</div>
+        <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+          <img
+            src="../assets/logo.png"
+            alt="Keshta Logo"
+            class="h-11 w-auto shrink-0 sm:h-12 transition-transform duration-300 hover:scale-105"
+          />
         </div>
         <!-- Top menus (desktop) -->
         <VueDraggable
@@ -30,7 +31,7 @@
           draggable=".top-nav-item"
           :animation="150"
           :disabled="!editLayout"
-          :class="editLayout ? 'hidden md:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'hidden md:flex ml-2 max-w-full items-center gap-1 whitespace-nowrap lg:ml-4 lg:gap-2'"
+          :class="editLayout ? 'hidden md:flex ml-2 min-w-0 max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'hidden md:flex ml-2 min-w-0 max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap lg:ml-4 lg:gap-2'"
           @end="onLayoutEnd"
         >
           <button v-for="key in menuOrder" :key="key" @click="selectTop(key)"
