@@ -265,6 +265,13 @@ export const logout = () => {
   return axios.post(`${BASE_URL}/api/auth/logout`);
 };
 
+// --- Global search (Ctrl+H command palette) ---
+export const globalSearch = (query, params = {}) => {
+  const { limit = 5 } = params;
+  const qs = new URLSearchParams({ q: String(query ?? ''), limit: String(limit) });
+  return axios.get(`${BASE_URL}/api/search?${qs.toString()}`);
+};
+
 // Users
 export const getUsers = (params = {}) => {
   const { page = 1, pageSize = 20, q = '' } = params;

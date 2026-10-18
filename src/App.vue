@@ -11,6 +11,8 @@
     <!-- Global error overlay (e.g. 502 Bad Gateway from backend) -->
     <ErrorOverlay />
     <GlobalIncomingCallHost v-if="isLoggedIn" />
+    <!-- Global search (Ctrl+H) command palette -->
+    <GlobalSearchModal v-if="isLoggedIn" />
     <!-- First-visit startup splash + "Play Intro Sound" fallback (non-blocking) -->
     <StartupIntroOverlay />
   </div>
@@ -21,6 +23,7 @@ import Toast from './components/shared/Toast.vue'
 import ErrorOverlay from './components/shared/ErrorOverlay.vue'
 import AppLoader from './components/shared/AppLoader.vue'
 import GlobalIncomingCallHost from './components/shared/GlobalIncomingCallHost.vue'
+import GlobalSearchModal from './components/shared/GlobalSearchModal.vue'
 import StartupIntroOverlay from './components/shared/StartupIntroOverlay.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -33,7 +36,7 @@ import { debounce } from './utils/debounce'
 
 export default {
   name: 'AppRoot',
-  components: { Toast, ErrorOverlay, AppLoader, GlobalIncomingCallHost, StartupIntroOverlay },
+  components: { Toast, ErrorOverlay, AppLoader, GlobalIncomingCallHost, GlobalSearchModal, StartupIntroOverlay },
   setup() {
     const { locale, t } = useI18n()
     const { isLoggedIn, isLoading, currentUser } = useAuth()

@@ -2,7 +2,15 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" :class="isRTL ? 'direction-rtl' : ''" class="space-y-6">
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('vehicles.title') }}</h2>
-      <div></div>
+      <div class="flex-1 max-w-md mx-4">
+        <input
+          v-model="q"
+          type="text"
+          :placeholder="$t('placeholders.search')"
+          class="w-full px-3 py-1.5 rounded-xl border theme-border bg-white/90 theme-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-slate-300"
+          @input="onSearchInput"
+        />
+      </div>
       <div>
         <button
           @click="openCreateModal"
@@ -372,8 +380,9 @@ export default {
       // driver assignment removed
       page: 1,
       pageSize: 20,
-      total: 0
-      ,
+      total: 0,
+      q: '',
+      searchTimeout: null,
       // Context menu state for right-click menu
       contextMenu: {
         visible: false,
@@ -395,8 +404,7 @@ export default {
       editLoading: false,
       // Delete confirmation modal
       deleteConfirmVehicle: null,
-      deleteLoading: false
-      ,
+      deleteLoading: false,
       showCreateModal: false
     }
   },
@@ -464,7 +472,8 @@ export default {
         const res = await getVehicles({
           page: this.page,
           pageSize: this.pageSize,
-          mode: this.mode
+          mode: this.mode,
+          q: this.q
         });
         const payload = res.data || {}
         this.vehicles = Array.isArray(payload.items)
@@ -496,6 +505,13 @@ export default {
     onPageSizeChange() {
       this.page = 1
       this.loadVehicles()
+    },
+    onSearchInput() {
+      clearTimeout(this.searchTimeout)
+      this.searchTimeout = setTimeout(() => {
+        this.page = 1
+        this.loadVehicles()
+      }, 300)
     },
     async loadCrushers() {
       try {
@@ -849,22 +865,26 @@ export default {
       this.selectedVehicle = merged
     }
   },
-  async mounted() {
+  async created() {
+    const q = this.$route.query.q
+    if (typeof q === 'string' && q.trim()) {
+      this.q = q.trim()
+    }
     try {
       await this.loadVehicles()
       await this.loadContractors()
       await this.loadCrushers()
-      // register global listeners for hiding context menu
-      document.addEventListener('click', this.onGlobalClick)
-      document.addEventListener('keydown', this.onGlobalKeydown)
     } catch (e) {
       this.vehicles = []
     }
-  }
+  },
 
-  ,
+  mounted() {
+    document.addEventListener('click', this.onGlobalClick)
+    document.addEventListener('keydown', this.onGlobalKeydown)
+  },
   beforeUnmount() {
-    // cleanup listeners
+    clearTimeout(this.searchTimeout)
     document.removeEventListener('click', this.onGlobalClick)
     document.removeEventListener('keydown', this.onGlobalKeydown)
   }

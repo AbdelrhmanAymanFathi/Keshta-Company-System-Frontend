@@ -1,6 +1,16 @@
 {
   "settings": "Settings",
   "appName": "Keshta Company System",
+  "globalSearch": {
+    "placeholder": "Search everywhere... (contractor, vehicle, item, supply, expense, treasury)",
+    "searching": "Searching...",
+    "hintStart": "Type at least 2 characters to search the whole system",
+    "noResults": "No results found for \"{query}\"",
+    "foundCount": "{count} found in this section",
+    "navigate": "to navigate",
+    "open": "to open",
+    "shortcutHint": "Press Ctrl + H anytime"
+  },
   "intro": {
     "brand": "Keshta General Contracting Management System",
     "playButton": "Play Intro Sound"
