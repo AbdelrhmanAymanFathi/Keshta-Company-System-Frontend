@@ -211,7 +211,10 @@
             <th>{{ $t('expenses.location') }}</th>
             <th>{{ $t('expenses.paymentMethod') }}</th>
             <th>{{ $t('expenses.treasuryOrCustody') }}</th>
-            <th>{{ $t('expenses.settlementDate') }}</th>
+            <th class="cursor-pointer select-none hover:opacity-80" @click="sortBy('settlementDate')">
+              {{ $t('expenses.settlementDate') }}
+              <SortIcon :active="sortField === 'settlementDate'" :dir="sortOrder" />
+            </th>
             <th>{{ $t('expenses.amount') }}</th>
             <th>{{ $t('expenses.notes') }}</th>
             <th class="actions-col">{{ $t('expenses.actions') }}</th>
@@ -1345,11 +1348,16 @@ rows: [],
         
         const response = await getExpenses(params)
         const items = response.data.items || []
+        const sortKey = this.sortField === 'settlementDate' ? 'settlementDate' : 'date'
         items.sort((a, b) => {
-          const dateA = a?.date || a?.createdAt || 0
-          const dateB = b?.date || b?.createdAt || 0
-          const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
-          const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+          const rawA = sortKey === 'settlementDate' ? a?.settlementDate : (a?.date || a?.createdAt || 0)
+          const rawB = sortKey === 'settlementDate' ? b?.settlementDate : (b?.date || b?.createdAt || 0)
+          // Keep unset settlement dates at the end regardless of direction
+          if (!rawA && !rawB) return 0
+          if (!rawA) return 1
+          if (!rawB) return -1
+          const timeA = Number.isNaN(new Date(rawA).getTime()) ? 0 : new Date(rawA).getTime()
+          const timeB = Number.isNaN(new Date(rawB).getTime()) ? 0 : new Date(rawB).getTime()
           return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
         })
         this.expenses = items

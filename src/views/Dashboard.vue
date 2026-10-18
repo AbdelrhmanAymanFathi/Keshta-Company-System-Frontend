@@ -585,6 +585,9 @@ export default {
           { name: 'usersList', label: 'users.title', routeName: 'users-list' },
           { name: 'locations', label: 'locations.title', routeName: 'locations' },
           { name: 'units', label: 'units.title', routeName: 'admin-units-list' },
+          { name: 'modulesChart', label: 'orgCharts.modulesTitle', routeName: 'admin-org-chart-modules' },
+          { name: 'contractorsChart', label: 'orgCharts.contractorsTitle', routeName: 'admin-org-chart-contractors' },
+          { name: 'treasuriesChart', label: 'orgCharts.treasuriesTitle', routeName: 'admin-org-chart-treasuries' },
           { name: 'databaseBackup', label: 'admin.databaseBackup', routeName: 'admin-database-backup' },
           { name: 'systemLogs', label: 'systemLogs.title', routeName: 'admin-system-logs' },
           { name: 'activeUsers', label: 'admin.activeUsers', routeName: 'admin-active-users' },
@@ -786,7 +789,7 @@ export default {
       const expensesRoutes = ['expenses-list', 'expenses-terms', 'expenses-report']
       const paymentRoutes = ['payments']
       const reportsRoutes = ['reports-landing', 'contractors-activity-report', 'admin-reports-list', 'admin-reports-run']
-      const adminRoutes = ['admin-statistics', 'admin-database-backup', 'admin-system-logs', 'admin-active-users', 'changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
+      const adminRoutes = ['admin-statistics', 'admin-database-backup', 'admin-system-logs', 'admin-active-users', 'changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run', 'admin-org-chart-modules', 'admin-org-chart-contractors', 'admin-org-chart-treasuries']
       if (routeName === 'messaging') return 'messaging'
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'

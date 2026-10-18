@@ -317,6 +317,24 @@ const routes = [
         meta: { title: 'activeUsers.title', roles: ['admin'] }
       },
       {
+        path: 'admin/org-chart/modules',
+        name: 'admin-org-chart-modules',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/ModulesOrgChart.vue'),
+        meta: { title: 'orgCharts.modulesTitle', roles: ['admin'] }
+      },
+      {
+        path: 'admin/org-chart/contractors',
+        name: 'admin-org-chart-contractors',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/ContractorsOrgChart.vue'),
+        meta: { title: 'orgCharts.contractorsTitle', roles: ['admin'] }
+      },
+      {
+        path: 'admin/org-chart/treasuries',
+        name: 'admin-org-chart-treasuries',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/TreasuriesOrgChart.vue'),
+        meta: { title: 'orgCharts.treasuriesTitle', roles: ['admin'] }
+      },
+      {
         path: 'admin/reports',
         name: 'admin-reports-list',
         component: () => import('@/components/admin/ReportsList.vue'),
