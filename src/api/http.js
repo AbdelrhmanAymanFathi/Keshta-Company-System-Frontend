@@ -4,7 +4,7 @@ import axios from 'axios'
 // import * as XLSX from 'xlsx';
 
 // Base URL for API requests - loaded from .env file
-export const BASE_URL = process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000';
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 // Token management utilities
 export class TokenManager {
