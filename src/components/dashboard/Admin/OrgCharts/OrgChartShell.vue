@@ -210,7 +210,7 @@ export default {
     // items: flat tree list -> [{ id, parentId|null, tone, icon, title, subtitle, badge, stats: [{label, value}], details: [{label, value}], link, linkLabel, searchableText }]
     items: { type: Array, default: () => [] }
   },
-  emits: ['refresh', 'open-link'],
+  emits: ['refresh', 'open-link', 'node-select'],
   setup() {
     const { fitView } = useVueFlow()
     return { fitViewFlow: fitView }
@@ -270,8 +270,9 @@ export default {
   watch: {
     items: {
       handler() {
-        this.collapsedIds = []
-        this.selectedId = null
+        const validIds = new Set(this.items.map(i => i.id))
+        this.collapsedIds = this.collapsedIds.filter(id => validIds.has(id))
+        if (this.selectedId && !validIds.has(this.selectedId)) this.selectedId = null
         this.rebuildGraph()
         this.$nextTick(() => this.fitViewFlow({ padding: 0.15, duration: 200 }))
       },
@@ -344,7 +345,8 @@ export default {
             subtitle: item.subtitle,
             badge: item.badge,
             stats: item.stats,
-            hasChildren: (this.childrenMap.get(item.id) || []).length > 0,
+            hasChildren: (this.childrenMap.get(item.id) || []).length > 0 || !!item.lazyChildren,
+            loading: !!item.loadingChildren,
             collapsed: this.collapsedIds.includes(item.id),
             matched: searching && matched.has(item.id),
             dimmed: searching && !matched.has(item.id),
@@ -365,16 +367,23 @@ export default {
         }))
     },
     toggleCollapse(id) {
+      const wasCollapsed = this.collapsedIds.includes(id)
       const next = [...this.collapsedIds]
       const idx = next.indexOf(id)
       if (idx >= 0) next.splice(idx, 1)
       else next.push(id)
       this.collapsedIds = next
+      if (wasCollapsed) this.emitNodeSelect(id)
       this.$nextTick(() => this.fitViewFlow({ padding: 0.15, duration: 200 }))
+    },
+    emitNodeSelect(id) {
+      const item = this.itemById.get(id)
+      if (item) this.$emit('node-select', item)
     },
     selectNode(id) {
       this.selectedId = this.selectedId === id ? null : id
       this.rebuildGraph()
+      this.emitNodeSelect(id)
     },
     onNodeClick({ node }) {
       this.selectNode(node.id)

@@ -2,7 +2,7 @@
   <div
     class="org-chart-node w-60 rounded-2xl border bg-white shadow-sm transition-all duration-200 cursor-pointer select-none"
     :class="cardClass"
-    @click="handleClick"
+    @click.stop="handleClick"
   >
     <Handle type="target" :position="Position.Top" class="!bg-emerald-500 !border-emerald-600" />
 
@@ -24,7 +24,19 @@
       </div>
 
       <button
-        v-if="data.hasChildren"
+        v-if="data.loading"
+        type="button"
+        disabled
+        class="w-6 h-6 shrink-0 rounded-lg bg-slate-100 border border-slate-200 text-slate-400 flex items-center justify-center"
+        :title="$t('orgCharts.loadingChildren')"
+      >
+        <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+      </button>
+      <button
+        v-else-if="data.hasChildren"
         type="button"
         class="w-6 h-6 shrink-0 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-transform duration-200"
         :class="{ 'rotate-90': !data.collapsed }"
