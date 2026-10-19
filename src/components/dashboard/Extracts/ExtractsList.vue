@@ -164,22 +164,7 @@
               <div>{{ extract.notes || extract.note || '-' }}</div>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <button
-                @click.stop="openEdit(extract.id)"
-                :disabled="extract.hasPendingApproval"
-                class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mr-1"
-                :title="$t('labels.edit') || 'Edit'"
-              >
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button
-                @click.stop="openDeleteConfirm(extract)"
-                :disabled="extract.hasPendingApproval"
-                :title="$t('labels.delete')"
-                class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-              >
-                <TrashIcon class="w-4 h-4" />
-              </button>
+              <RowActions :actions="rowActions(extract)" />
             </td>
           </tr>
           <tr v-if="extracts.length === 0">
@@ -244,6 +229,7 @@ import Pagination from '../../shared/Pagination.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 import DateField from '../../shared/DateField.vue'
 import SortIcon from '../../shared/SortIcon.vue'
 import { realtimeService } from '@/services/realtimeService'
@@ -251,7 +237,7 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'ExtractsList',
-  components: { ExtractsCreationModal, Pagination, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon },
+  components: { ExtractsCreationModal, Pagination, RowActions, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon },
   data() {
     return {
       extracts: [],
@@ -450,6 +436,12 @@ export default {
       this.filters.areaSearch = area.name
     },
 
+    rowActions(extract) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit') || 'Edit', tone: 'edit', disabled: extract.hasPendingApproval, onClick: () => this.openEdit(extract.id) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', disabled: extract.hasPendingApproval, onClick: () => this.openDeleteConfirm(extract) },
+      ]
+    },
     openDeleteConfirm(item) {
       this.closeContextMenu()
       this.deleteConfirmModal = { show: true, id: item.id }

@@ -20,6 +20,9 @@ const BaseIP = process.env.VUE_APP_PUBLIC_IP
 module.exports = {
   lintOnSave: false,
 
+  // Never ship source maps to production (they leaked full source in dist/).
+  productionSourceMap: false,
+
   devServer: {
     host: '0.0.0.0',
     port: 8080,

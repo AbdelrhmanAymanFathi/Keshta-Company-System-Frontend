@@ -479,7 +479,7 @@ const routes = [
       },
 
       // ==================== Default Redirect ====================
-      { path: '', redirect: () => (isAdminUser(user.value) ? 'admin-statistics' : 'supplies/new') }
+      { path: '', redirect: () => (isAdminUser(user.value) ? { name: 'admin-statistics' } : { name: 'supplies-list' }) }
     ]
   },
 
@@ -488,7 +488,7 @@ const routes = [
     path: '/',
     redirect: () => {
       if (!isAuthenticated.value) return '/login'
-      return isAdminUser(user.value) ? '/dashboard/admin-statistics' : '/dashboard/supplies/new'
+      return isAdminUser(user.value) ? { name: 'admin-statistics' } : { name: 'supplies-list' }
     }
   },
 

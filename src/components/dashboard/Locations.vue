@@ -24,13 +24,7 @@
               <td :class="['px-4 py-3 font-medium', isRTL ? 'text-right' : 'text-left']">{{ loc.name }}</td>
               <td class="px-4 py-3">{{ $t('locations.site') || 'Site' }}</td>
               <td :class="['px-4 py-3', isRTL ? 'text-right' : 'text-left']">
-                <button @click="openAddArea(loc)" :class="['theme-text hover:theme-accent-muted transition', isRTL ? 'ml-3' : 'mr-3']" :title="$t('locations.addArea')">{{ $t('locations.addArea') || 'Add Area' }}</button>
-                <button @click="openEdit(loc)" :class="['theme-text hover:theme-accent-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
-                  <PencilIcon class="w-4 h-4" />
-                </button>
-                <button @click="confirmDelete(loc)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
-                  <TrashIcon class="w-4 h-4" />
-                </button>
+                <RowActions :actions="rowActions(loc)" />
               </td>
             </tr>
 
@@ -39,12 +33,7 @@
               <td :class="['px-4 py-2 ps-8', isRTL ? 'text-right' : 'text-left']">— {{ child.name }}</td>
               <td class="px-4 py-2">{{ $t('locations.area') || 'Area' }}</td>
               <td :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">
-                <button @click="openEdit(child, loc)" :class="['theme-text hover:theme-accent-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
-                  <PencilIcon class="w-4 h-4" />
-                </button>
-                <button @click="confirmDelete(child)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
-                  <TrashIcon class="w-4 h-4" />
-                </button>
+                <RowActions :actions="rowActions(child, loc)" />
               </td>
             </tr>
           </template>
@@ -95,13 +84,16 @@
 
 <script>
 import { getLocations, createLocation, updateLocation, deleteLocation } from '@/api'
-import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
+import { PencilIcon, TrashIcon, PlusIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'Location-List',
   components: {
+    RowActions,
     PencilIcon,
-    TrashIcon
+    TrashIcon,
+    PlusIcon
   },
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' }
@@ -152,6 +144,15 @@ export default {
       this.showModal = true
     },
 
+    rowActions(loc, parent = null) {
+      const actions = []
+      if (!parent) {
+        actions.push({ key: 'addArea', icon: PlusIcon, label: this.$t('locations.addArea') || 'Add Area', tone: 'default', showLabel: true, onClick: () => this.openAddArea(loc) })
+      }
+      actions.push({ key: 'edit', icon: PencilIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => (parent ? this.openEdit(loc, parent) : this.openEdit(loc)) })
+      actions.push({ key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(loc) })
+      return actions
+    },
     openAddArea(site) {
       this.editing = false
       this.form = { id: null, name: '', parentId: site.id }

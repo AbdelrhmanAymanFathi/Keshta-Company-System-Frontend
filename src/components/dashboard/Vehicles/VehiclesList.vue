@@ -52,25 +52,8 @@
             <td class="px-3 py-3 theme-text-secondary">{{ v.companyCapacity != null && v.companyCapacity !== '' ? v.companyCapacity : '—' }}</td>
             <td class="px-3 py-3 theme-text-secondary">{{ v.crusherCapacity != null && v.crusherCapacity !== '' ? v.crusherCapacity : '—' }}</td>
             <!-- driver cell removed -->
-            <td class="px-3 py-3 flex gap-2">
-              <button
-                class="px-3 py-1.5 text-sm rounded-xl theme-button inline-flex items-center gap-1.5 shadow-sm "
-                @click="openVehicleDetails(v)">
-                <ArrowsRightLeftIcon class="w-4 h-4" />
-                {{ $t('vehicles.changeOwner') }}
-              </button>
-              <button
-                class="p-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
-                @click="openEditModal(v)"
-                :title="$t('labels.edit') || 'Edit'">
-                <PencilSquareIcon class="w-4 h-4" />
-              </button>
-              <button
-                class="p-2 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
-                @click="openDeleteConfirm(v)"
-                :title="$t('labels.delete') || 'Delete'">
-                <TrashIcon class="w-4 h-4" />
-              </button>
+            <td class="px-3 py-3">
+              <RowActions :actions="rowActions(v)" />
             </td>
           </tr>
 
@@ -357,6 +340,7 @@ import Pagination from '../../shared/Pagination.vue'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
 import { normalizeVehicleName } from '@/utils/normalizeVehicleName'
 import { ArrowsRightLeftIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 
 export default {
   name: 'VehiclesList',
@@ -364,7 +348,7 @@ export default {
     mode: { type: String, default: 'transport' }
   },
   emits: ["navigateReport", "navigateStatement"],
-  components: { ArrowsRightLeftIcon, CreateVehicle, DateTimeField, Pagination, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: { ArrowsRightLeftIcon, CreateVehicle, DateTimeField, Pagination, PencilSquareIcon, PlusIcon, RowActions, TrashIcon, XMarkIcon },
   data() {
     return {
       vehicles: [],
@@ -557,6 +541,13 @@ export default {
         console.error('Error loading contractors', e)
         this.contractors = []
       }
+    },
+    rowActions(v) {
+      return [
+        { key: 'owner', icon: ArrowsRightLeftIcon, label: this.$t('vehicles.changeOwner'), tone: 'default', showLabel: true, onClick: () => this.openVehicleDetails(v) },
+        { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit') || 'Edit', tone: 'edit', onClick: () => this.openEditModal(v) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete') || 'Delete', tone: 'delete', onClick: () => this.openDeleteConfirm(v) },
+      ]
     },
     async openVehicleDetails(vehicle) {
       this.selectedVehicle = vehicle

@@ -58,14 +58,7 @@
               </div>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-4">
-              <div class="flex gap-4" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openEdit(crusher)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100">
-                  <PencilSquareIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="confirmDelete(crusher)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100">
-                  <TrashIcon class="h-5 w-5" />
-                </button>
-              </div>
+              <RowActions :actions="rowActions(crusher)" />
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
@@ -177,11 +170,12 @@
 <script>
 import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../api'
 import Pagination from '@/components/shared/Pagination.vue'
+import RowActions from '@/components/shared/RowActions.vue'
 import { ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'CrushersList',
-  components: { Pagination, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: { Pagination, RowActions, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   data() {
     return {
       q: '',
@@ -254,6 +248,12 @@ export default {
         this.page = 1
         this.loadCrushers()
       }, 500)
+    },
+    rowActions(crusher) {
+      return [
+        { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEdit(crusher) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(crusher) },
+      ]
     },
     openAdd() {
       this.editing = false

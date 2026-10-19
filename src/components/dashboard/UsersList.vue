@@ -86,22 +86,8 @@
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="flex gap-3" :class="'justify-start'">
-                  <button @click.stop="openEdit(user)" class="text-yellow-600 hover:text-yellow-800" :title="$t('labels.edit')">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                  <button @click.stop="openReset(user)" class="theme-text hover:theme-accent-muted" :title="$t('users.resetPassword')">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7a4 4 0 10-8 0v4M5 11h14v8H5z" />
-                    </svg>
-                  </button>
-                <button @click.stop="confirmDelete(user)" class="text-red-600 hover:text-red-800" :title="$t('labels.delete')">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+              <div class="flex" :class="isRTL ? 'justify-end flex-row-reverse' : 'justify-start'">
+                <RowActions :actions="rowActions(user)" />
               </div>
             </td>
           </tr>
@@ -313,11 +299,14 @@
 import { useI18n } from 'vue-i18n'
 import { getUsers, getUserRoles, createUser, updateUser, deleteUser, adminResetUserPassword } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
+import RowActions from '@/components/shared/RowActions.vue'
+import { PencilIcon, TrashIcon, KeyIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'UsersList',
   components: {
-    Pagination
+    Pagination,
+    RowActions
   },
   setup() {
     const { locale } = useI18n()
@@ -453,6 +442,13 @@ export default {
       }
       this.editingUserId = null
       this.modalOpen = true
+    },
+    rowActions(user) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEdit(user) },
+        { key: 'reset', icon: KeyIcon, label: this.$t('users.resetPassword'), tone: 'wallet', onClick: () => this.openReset(user) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(user) },
+      ]
     },
     openEdit(user) {
       const roles = this.getAssignedRoleIds(user)

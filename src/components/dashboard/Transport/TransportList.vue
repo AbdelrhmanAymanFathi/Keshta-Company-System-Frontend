@@ -254,18 +254,8 @@
               <div>{{ transport.notes || transport.note || '-' }}</div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <div class="flex gap-2" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="editTransport(transport)" :disabled="transport.hasPendingApproval" class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                  :title="$t('common.edit') || 'Edit'">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                <button @click.stop="openDeleteConfirm(transport)" :disabled="transport.hasPendingApproval" class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                  :title="$t('common.delete')">
-                  <TrashIcon class="h-4 h-4" />
-                </button>
+              <div class="flex" :class="isRTL ? 'justify-start' : 'justify-end'">
+                <RowActions :actions="rowActions(transport)" />
               </div>
             </td>
           </tr>
@@ -338,7 +328,8 @@ import DateField from '@/components/shared/DateField.vue'
 import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
-import { TrashIcon } from '@acme/icon-packs/legacy'
+import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
@@ -350,6 +341,7 @@ export default {
   components: {
     Pagination,
     TransportModal,
+    RowActions,
     SearchDropdown,
     PaymentModal,
     DateField,
@@ -678,6 +670,12 @@ export default {
       }
     },
 
+    rowActions(transport) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('common.edit') || 'Edit', tone: 'edit', disabled: transport.hasPendingApproval, onClick: () => this.editTransport(transport) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('common.delete'), tone: 'delete', disabled: transport.hasPendingApproval, onClick: () => this.openDeleteConfirm(transport) },
+      ]
+    },
     editTransport(transport) {
       this.editingTransport = { ...transport }
       this.showAddModal = true

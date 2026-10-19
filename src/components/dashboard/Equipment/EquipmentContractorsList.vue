@@ -52,20 +52,7 @@
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ c.accountNumber || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary text-start">{{ c.notes || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4">
-              <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('suppliers.statement')">
-                  <DocumentTextIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="openWallet(c)" class="rounded-lg border theme-border theme-dashboard-bg-soft p-2 theme-accent-strong hover:theme-icon-bg" :title="$t('transporters.wallet')">
-                  <WalletIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="openEdit(c)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" :title="$t('labels.edit')">
-                  <PencilSquareIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="confirmDelete(c)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100" :title="$t('labels.delete')">
-                  <TrashIcon class="h-5 w-5" />
-                </button>
-              </div>
+              <RowActions :actions="rowActions(c)" />
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
@@ -202,6 +189,7 @@ import Pagination from '@/components/shared/Pagination.vue'
 import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
 import OpeningBalanceSitesField, { emptyOpeningBalanceLine, openingBalanceLinesFromApi, openingBalanceLinesPayload, sameOpeningBalanceLines } from '@/components/shared/OpeningBalanceSitesField.vue'
+import RowActions from '@/components/shared/RowActions.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
@@ -210,7 +198,7 @@ export default {
   props: {
     mode: { type: String, default: 'rentals' }
   },
-  components: { Pagination, DateField, WalletPanel, OpeningBalanceSitesField, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
+  components: { Pagination, DateField, WalletPanel, OpeningBalanceSitesField, RowActions, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
   data() {
     return {
       q: '',
@@ -306,6 +294,14 @@ export default {
         this.page = 1
         this.loadContractors()
       }, 500)
+    },
+    rowActions(c) {
+      return [
+        { key: 'statement', icon: DocumentTextIcon, label: this.$t('suppliers.statement'), tone: 'statement', onClick: () => this.openStatement(c) },
+        { key: 'wallet', icon: WalletIcon, label: this.$t('transporters.wallet'), tone: 'wallet', onClick: () => this.openWallet(c) },
+        { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEdit(c) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(c) },
+      ]
     },
     openAdd() {
       this.editing = false

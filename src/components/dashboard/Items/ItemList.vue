@@ -78,14 +78,7 @@
               {{ formatDate(item.createdAt) }}</td>
             <td
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start flex gap-2">
-              <button @click="editItem(item)"
-                class="px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm">
-                <PencilIcon class="w-5 h-5" />
-              </button>
-              <button @click="confirmDelete(item)"
-                class="px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 text-sm">
-                <TrashIcon class="w-5 h-5" />
-              </button>
+              <RowActions :actions="rowActions(item)" />
             </td>
           </tr>
           <tr v-if="items.length === 0 && !loading">
@@ -263,11 +256,12 @@ import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
 import { PencilIcon, PlusIcon, TrashIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 
 export default {
   name: 'ItemList',
   emits: ['saved'],
-  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, Toast, TrashIcon },
+  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, Toast, TrashIcon },
   props: {
     mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'extracts' | 'all'
   },
@@ -399,6 +393,12 @@ export default {
       this.modalOpen = true
     },
 
+    rowActions(item) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.editItem(item) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(item) },
+      ]
+    },
     editItem(item) {
       this.editingItem = item
       this.form.name = item.name
