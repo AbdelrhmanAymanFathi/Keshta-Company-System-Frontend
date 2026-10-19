@@ -644,7 +644,6 @@ export default {
         window.$toast(message, type, 3000)
       } else {
         // Fallback to console if toast not available
-        console.log(`[${type.toUpperCase()}] ${message}`)
       }
     },
 

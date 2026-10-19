@@ -266,7 +266,6 @@
     <SupplyDetailModal :visible="showDetailModal" :exportId="detailExportId" @close="() => { showDetailModal = false; detailExportId = null }" />
     -->
 
-
     <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages"
       :pageSizeOptions="[10, 20, 50, 100]" @update:page="(p) => { page = p; loadSupplies() }"
       @update:pageSize="(size) => { pageSize = size; page = 1; loadSupplies() }" />
@@ -648,13 +647,6 @@ export default {
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         this.vehicles = Array.isArray(vehiclesData) ? vehiclesData : []
 
-        console.log('✓ Filter data loaded:', {
-          contractors: this.contractors.length,
-          locations: this.locations.length,
-          crushers: this.crushers.length,
-          items: this.items.length,
-          vehicles: this.vehicles.length
-        })
       } catch (err) {
         console.error('✗ Error loading filter data:', err)
       }
@@ -704,33 +696,16 @@ export default {
         }
 
         const cleanParams = buildQueryParams(queryParams)
-        console.log('🔵 Loading supplies with params:', queryParams)
-        console.log('🔵 Clean params sent to API:', cleanParams)
         const res = await getDeliveries(cleanParams)
-
-        console.log('Response received:', res)
-        console.log('Response data:', res.data)
 
         // Extract items from response
         const responseData = res.data
         if (responseData && responseData.items && Array.isArray(responseData.items)) {
           // Explicitly create new array and use splice to trigger reactivity
           const newItems = [...responseData.items]
-          console.log('📊 New items to load:', newItems)
-          console.log('📊 First 3 items:', newItems.slice(0, 3))
-          console.log('📊 First item details:', {
-            id: newItems[0]?.id,
-            date: newItems[0]?.date,
-            item: newItems[0]?.item?.name,
-            contractor: newItems[0]?.contractor?.name
-          })
 
           // Log comparison with old items
-          console.log('🔄 Old supplies count:', this.supplies.length)
-          console.log('🔄 New supplies count:', newItems.length)
           if (this.supplies.length > 0) {
-            console.log('🔄 Old first item ID:', this.supplies[0].id)
-            console.log('🔄 New first item ID:', newItems[0]?.id)
           }
 
           // Normalize nested `item` objects so templates can rely on canonical fields
@@ -750,9 +725,6 @@ export default {
           this.total = responseData.total || newItems.length
           this.pageSize = responseData.pageSize || this.pageSize
 
-          console.log('✓ Supplies updated:', this.supplies.length, 'items')
-          console.log('✓ Supplies array is now:', this.supplies)
-          console.log('✓ Component supplies data:', this.$data.supplies)
         } else {
           console.warn('⚠ Unexpected response format:', responseData)
           this.supplies = []
@@ -768,7 +740,6 @@ export default {
     },
 
     async onSupplySaved() {
-      console.log('SUPPLY SAVED EVENT FIRED')
       this.page = 1
       await this.loadSupplies()
     },

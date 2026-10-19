@@ -891,7 +891,6 @@
       </div>
     </div>
 
-
       <!-- Transfer Modal -->
       <div   v-if="showTransferModal"
   class="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50 px-4"
@@ -1830,7 +1829,6 @@ export default {
         console.error('No branch provided to openEditBranch')
         return
       }
-      console.log('Opening edit modal for branch:', branch)
       if (!branch.id) {
         console.error('Branch missing ID:', branch)
         if (window.$toast) window.$toast('Branch ID is missing', 'error')
@@ -1860,7 +1858,6 @@ export default {
       }
       editBranchProcessing.value = true
       try {
-        console.log('Updating branch:', branchId, 'with name:', name)
         const res = await updateBranch(branchId, { name })
         const updated = res?.data || { ...editBranchTarget.value, name }
         const idx = branches.value.findIndex(b => b.id === branchId)
@@ -1884,7 +1881,6 @@ export default {
         editBranchProcessing.value = false
       }
     }
-
 
     const handleTransfer = async () => {
       if (!transferForm.value.amount || transferForm.value.amount <= 0) {
@@ -2284,7 +2280,6 @@ export default {
     }
   }
 }
-
 
 </script>
 

@@ -86,10 +86,7 @@ export const getEquipmentLogs = (params = {}) => {
   if (driverId !== undefined && driverId !== null && driverId !== '') query.append('driverId', String(driverId))
   if (locationId !== undefined && locationId !== null && locationId !== '') query.append('locationId', String(locationId))
   if (areaId !== undefined && areaId !== null && areaId !== '') query.append('areaId', String(areaId))
-  // Log params and the final URL so we can trace why filters may be missing
-  try { console.log('[api] getEquipmentLogs params:', params) } catch (e) { /* ignore */ }
   const url = withLangQuery(`${BASE_URL}/api/equipment-logs`, Object.fromEntries(query.entries()))
-  try { console.log('[api] getEquipmentLogs URL:', url) } catch (e) { /* ignore in old browsers */ }
   return axios.get(url)
 }
 

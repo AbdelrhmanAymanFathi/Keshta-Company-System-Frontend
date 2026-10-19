@@ -811,7 +811,6 @@ export default {
       this.currentStep = 1
     },
     async openModal() {
-      console.log('openModal triggered')
       this.currentStep = 1
       this.rows = []
       this.saveError = ''
@@ -859,7 +858,6 @@ export default {
               found = this.locations.find(l => l.id === data.area.id) || null
             }
             this.commonData.area = found
-            console.log('Loaded area from storage:', data.area, 'Matched area:', this.commonData.area)
             if (this.commonData.area) this.filters.commonToLocSearch = this.commonData.area.name
           }
           if (data.contractor?.id) {
@@ -1071,7 +1069,6 @@ export default {
       return 'z-50 dropdown-container' // added class for global click detection
     },
     selectVehicle(row, vehicle) {
-      console.log('Vehicle selected:', vehicle)
       row.vehicle = vehicle
       row.search = vehicle.name
       row.open = false
@@ -1101,13 +1098,10 @@ export default {
       return Number(v || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })
     },
     async refreshLocations() {
-      console.log('Starting refreshLocations...');
       try {
         const res = await getLocations()
-        console.log('getLocations raw response:', res);
         const payload = res.data || []
         const list = Array.isArray(payload) ? payload : (Array.isArray(payload.items) ? payload.items : [])
-        console.log('Processed locations list length:', list.length);
         const byId = {}
         list.forEach(l => { if (l && l.id) byId[l.id] = l.name })
         this.locations = list.map(l => ({ ...l, parentName: l && l.parentId ? byId[l.parentId] : null }))
@@ -1151,7 +1145,6 @@ export default {
       }
     },
     async loadLookups() {
-      console.log('Starting loadLookups...');
       try {
         const [cRes, cvRes, vRes] = await Promise.all([
           getContractors({ pageSize: 1000, mode: 'transport' }),
@@ -1160,8 +1153,6 @@ export default {
             : Promise.resolve(null),
           getVehicles({ mode: 'transport', pageSize: 1000 })
         ])
-        console.log('getContractors response:', cRes)
-        console.log('getContractorsWithVehicles response:', cvRes)
         // Improved parsing
         const extractArray = (res) => {
           const payload = res?.data ?? res
@@ -1185,8 +1176,6 @@ export default {
           if (vehicle?.id) vehiclesById.set(Number(vehicle.id), vehicle)
         })
         this.vehicles = Array.from(vehiclesById.values())
-        console.log('Processed contractors:', this.contractors.length)
-        console.log('Processed vehicles:', this.vehicles.length)
         // update rows' available vehicles if any
         this.rows.forEach(r => {
           r.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
@@ -1196,12 +1185,9 @@ export default {
       }
     },
     async loadItems() {
-      console.log('Starting loadItems...');
       try {
         const res = await getItems({ mode: 'transport', pageSize: 1000 })
-        console.log('getItems raw response:', res)
         this.items = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : [])
-        console.log('Processed items length:', this.items.length)
       } catch (err) {
         console.error('loadItems failed:', err)
       }
@@ -1245,7 +1231,6 @@ export default {
         }
         const res = await createVehicle(payload)
         if (res?.data?.id) {
-          console.log('Vehicle created with ID:', res.data.id)
         }
         await this.loadLookups()
         this.showAddVehicleDialog = false

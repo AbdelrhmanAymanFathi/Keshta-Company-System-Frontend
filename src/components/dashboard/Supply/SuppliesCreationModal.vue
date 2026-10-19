@@ -878,7 +878,6 @@ export default {
       return this.allLocations.filter(l => l.parentId === this.commonData.site.id)
     },
 
-
     // AGGREGATE (سن/رمل/بودرة/تربة), PRECAST (انترلوك/بردورة) or PETROLEUM (بتومين/MC/RC)
     supplyType() {
       return this.commonData.item?.supplyType || 'AGGREGATE'
@@ -946,7 +945,6 @@ export default {
     },
 
     onAddVehicleClicked(row) {
-      console.log('SuppliesCreationModal: Add Vehicle clicked for row', row && row.id)
       try {
         // Open the vehicle creation modal directly (same as the button above table)
         this.showAddVehicleDialog = true
@@ -1035,11 +1033,8 @@ export default {
       this.currentStep = 1
       this.rows = []
       this.saveError = ''
-      console.log('🔄 Opening modal...')
       await this.loadInitialData()
-      console.log('✅ Initial data loaded')
       this.loadCommonDataFromStorage()
-      console.log('✅ Common data restored from storage:', this.commonData)
     },
 
     closeModal() {
@@ -1078,14 +1073,12 @@ export default {
         const saved = localStorage.getItem('suppliesCreationModalCommonData')
         if (saved) {
           const data = JSON.parse(saved)
-          console.log('📦 Loaded from storage:', data)
           this.commonData.date = data.date || ''
 
           // Restore site
           if (data.site?.id) {
             this.commonData.site = this.allLocations.find(l => l.id === data.site.id) || null
             if (this.commonData.site) this.filters.commonSiteSearch = this.commonData.site.name
-            console.log('✅ Restored site:', this.commonData.site)
           }
 
           // Restore area — prefer searching the site's `children` if present
@@ -1098,33 +1091,28 @@ export default {
             if (!found) found = this.allLocations.find(l => l.id === data.area.id) || null
             this.commonData.area = found
             if (this.commonData.area) this.filters.commonAreaSearch = this.commonData.area.name
-            console.log('✅ Restored area:', this.commonData.area)
           }
 
           // Restore contractor
           if (data.contractor?.id) {
             this.commonData.contractor = this.contractors.find(c => c.id === data.contractor.id) || null
             if (this.commonData.contractor) this.filters.commonContractorSearch = this.commonData.contractor.name
-            console.log('✅ Restored contractor:', this.commonData.contractor)
           }
 
           // Restore crusher
           if (data.crusher?.id) {
             this.commonData.crusher = this.crushers.find(c => c.id === data.crusher.id) || null
             if (this.commonData.crusher) this.filters.commonCrusherSearch = this.commonData.crusher.name
-            console.log('✅ Restored crusher:', this.commonData.crusher)
           }
 
           // Restore item
           if (data.item?.id) {
             this.commonData.item = this.exportItems.find(i => i.id === data.item.id) || null
             if (this.commonData.item) this.filters.commonItemSearch = this.commonData.item.name
-            console.log('✅ Restored item:', this.commonData.item)
           }
 
           this.commonData.price = data.price || 0
           this.commonData.notes = data.notes || ''
-          console.log('📦 Final commonData:', this.commonData)
         }
       } catch (err) {
         console.warn('Failed to load common data:', err)
@@ -1324,7 +1312,6 @@ export default {
       const parsed = Number(maybePrice)
       if (!Number.isNaN(parsed)) {
         this.commonData.price = parsed
-        console.log('✅ Auto-filled price from item:', this.commonData.price)
       }
     },
 
@@ -1395,7 +1382,6 @@ export default {
     },
 
     selectVehicle(row, vehicle) {
-      console.log('✅ Vehicle selected:', vehicle)
       row.vehicle = vehicle
       row.search = vehicle.name
       row.open = false
@@ -1495,7 +1481,6 @@ export default {
         const res = await getLocations()
         this.allLocations = Array.isArray(res.data) ? res.data : []
         this.sites = this.allLocations.filter(l => !l.parentId)
-        console.log('✅ Locations refreshed. Sites:', this.sites, 'All locations:', this.allLocations)
       } catch (err) {
         console.warn('Failed to refresh locations', err)
       }
@@ -1511,16 +1496,13 @@ export default {
         if (created?.id) {
           const newSite = this.allLocations.find(l => l.id === created.id)
           if (newSite) {
-            console.log('✅ Created and found site:', newSite)
             // If called from Step 1
             if (this.currentStep === 1 && !this.pendingRow) {
               this.commonData.site = newSite
-              console.log('✅ Set commonData.site:', newSite)
             }
             // If called from Step 2 row (via pendingRow)
             if (this.pendingRow) {
               this.pendingRow.site = newSite
-              console.log('✅ Set pendingRow.site:', newSite)
             }
           }
         }
@@ -1552,14 +1534,11 @@ export default {
         if (created?.id) {
           const newArea = this.allLocations.find(l => l.id === created.id)
           if (newArea) {
-            console.log('✅ Created and found area:', newArea)
             if (this.currentStep === 1 && !this.pendingRow) {
               this.commonData.area = newArea
-              console.log('✅ Set commonData.area:', newArea)
             }
             if (this.pendingRow) {
               this.pendingRow.area = newArea
-              console.log('✅ Set pendingRow.area:', newArea)
             }
           }
         }
@@ -1580,7 +1559,6 @@ export default {
         const res = await getExportItems({ mode: 'supply' })
         const raw = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.data || [])
         this.exportItems = raw.map(normalizeItem)
-        console.log('✅ Export items loaded (normalized):', this.exportItems)
       } catch (err) {
         console.warn('Failed to load export items', err)
       }
@@ -1599,7 +1577,6 @@ export default {
         ])
 
         const extractArray = (res) => {
-          console.log('🔍 Raw response:', res)
           const payload = res?.data ?? res
           if (Array.isArray(payload)) return payload
           if (Array.isArray(payload?.items)) return payload.items
@@ -1625,10 +1602,6 @@ export default {
         })
         this.vehicles = Array.from(vehiclesById.values())
 
-        console.log('✅ Loaded contractors:', this.contractors)
-        console.log('✅ Loaded crushers:', this.crushers)
-        console.log('✅ Loaded vehicles:', this.vehicles)
-
         this.rows.forEach(row => {
           row.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
         })
@@ -1648,8 +1621,6 @@ export default {
         const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
         if (!createdList || createdList.length === 0) throw new Error('Invalid response')
 
-        console.log('✅ Created contractor(s):', createdList)
-
         // Reload all lookups to get fresh data
         await this.loadLookups()
 
@@ -1658,7 +1629,6 @@ export default {
         const updatedContractor = this.contractors.find(c => c.id === chosen.id)
         if (updatedContractor && this.currentStep === 1) {
           this.commonData.contractor = updatedContractor
-          console.log('✅ Set commonData.contractor:', updatedContractor)
         }
 
         this.newContractorName = ''
@@ -1681,8 +1651,6 @@ export default {
         const nc = res?.data
         if (!nc || !nc.id) throw new Error('Invalid response')
 
-        console.log('✅ Created crusher:', nc)
-
         // Reload all lookups to get fresh data
         await this.loadLookups()
 
@@ -1690,7 +1658,6 @@ export default {
         const updatedCrusher = this.crushers.find(c => c.id === nc.id)
         if (updatedCrusher && this.currentStep === 1) {
           this.commonData.crusher = updatedCrusher
-          console.log('✅ Set commonData.crusher:', updatedCrusher)
         }
 
         this.newCrusherName = ''
@@ -1721,11 +1688,8 @@ export default {
         const nv = res?.data
         if (!nv || !nv.id) throw new Error('Invalid response')
 
-        console.log('✅ Created vehicle:', nv)
-
         // Reload all lookups to get fresh data
         await this.loadLookups()
-        console.log('✅ Vehicles after reload:', this.vehicles)
 
         this.newVehicleForm = { name: '', contractorId: '', companyCapacity: '', crusherCapacity: '' }
         this.showAddVehicleDialog = false
@@ -1755,11 +1719,8 @@ export default {
         const newItem = res?.data
         if (!newItem || !newItem.id) throw new Error('Invalid response')
 
-        console.log('✅ Created export item:', newItem)
-
         // Reload export items to get fresh data
         await this.loadExportItems()
-        console.log('✅ Export items after reload:', this.exportItems)
 
         // After reload, find and set the new item if in Step 1
         if (this.currentStep === 1) {
@@ -1767,7 +1728,6 @@ export default {
           if (updatedItem) {
             this.commonData.item = updatedItem
             this.onCommonItemSelect()
-            console.log('✅ Set commonData.item:', updatedItem)
           }
         }
 

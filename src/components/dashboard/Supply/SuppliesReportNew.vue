@@ -336,12 +336,6 @@ export default {
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         vehicles.value = Array.isArray(vehiclesData) ? vehiclesData : []
 
-        console.log('✓ Filter data loaded:', {
-          contractors: contractors.value.length,
-          locations: locations.value.length,
-          items: items.value.length,
-          vehicles: vehicles.value.length
-        })
       } catch (err) {
         console.error('✗ Error loading filter data:', err)
       }
@@ -596,9 +590,7 @@ const formatDate = (dateString) => {
         const items = extractItemsFromResponse(response)
         rawItems.value = items
 
-        console.log('✓ Loaded items count:', items.length)
         if (items.length > 0) {
-          console.log('✓ First mapped item:', mapItem(items[0]))
         }
       } catch (err) {
         console.error('✗ Error loading supplies report:', err)

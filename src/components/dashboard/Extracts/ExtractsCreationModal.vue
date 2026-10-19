@@ -1289,7 +1289,6 @@ export default {
         const saved = localStorage.getItem('extractsCreationModalCommonData')
         if (saved) {
           const data = JSON.parse(saved)
-          console.log('📦 Loaded extracts data from storage:', data)
           this.commonData.dateFrom = data.dateFrom || ''
           this.commonData.dateTo = data.dateTo || ''
           this.commonData.notes = data.notes || ''

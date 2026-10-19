@@ -2450,7 +2450,6 @@ rows: [],
         
         // If backend is not available, simulate deletion
         if (error.response?.status === 500 || error.code === 'ERR_NETWORK') {
-          console.log('Backend not available, simulating expense deletion')
           this.expenses = this.expenses.filter(e => e.id !== this.deleteConfirm.item.id)
           this.totalItems--
           this.cancelDelete()
@@ -2679,7 +2678,6 @@ rows: [],
       }
     },
 
-
     addCategoryPrompt() {
       this.fieldModal = { open: true, type: 'category', name: '', category: '', parentId: null }
     },
@@ -2809,7 +2807,6 @@ rows: [],
       if (window.$toast) {
         window.$toast(message, 'success')
       } else {
-        console.log('Success:', message)
       }
     },
     

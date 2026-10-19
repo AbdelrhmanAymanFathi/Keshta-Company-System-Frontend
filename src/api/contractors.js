@@ -86,7 +86,6 @@ export const createContractor = (data) =>
     return res;
   });
 export const updateContractor = (id, data) => {
-  console.log('[API] Updating contractor:', id, 'Data:', data, 'URL:', `${BASE_URL}/api/contractors/${id}`);
   return axios.patch(`${BASE_URL}/api/contractors/${id}`, data);
 };
 // Fetch single contractor by id
@@ -264,7 +263,6 @@ export const getContractorWalletTransactions = async (contractorId, params = {})
 
 export const depositToContractorWallet = async (contractorId, data) => {
   const payload = withContractorAccountContext(data);
-  console.debug('[API] depositToContractorWallet called', { contractorId, payload });
 
   // Case 2: if sourceTreasuryId is provided, use the direct wallet/deposit endpoint
   // which handles the atomic treasury deduction on the backend.

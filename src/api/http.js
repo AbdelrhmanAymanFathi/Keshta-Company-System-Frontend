@@ -111,7 +111,6 @@ export class TokenManager {
   //   }
   // }
 
-
   // new functhion 
   async _performRefresh() {
   const TIMEOUT_MS = 10000; // 10s timeout
@@ -121,7 +120,6 @@ export class TokenManager {
   if (controller) timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    console.log('[API] Refreshing token (using fetch with abort support)...');
 
     const resp = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: 'POST',
@@ -132,8 +130,6 @@ export class TokenManager {
     });
 
     if (timeoutId) clearTimeout(timeoutId);
-
-    console.debug('[API][refresh][fetch] status:', resp.status);
 
     // try parse as json
     let data = null;
@@ -147,14 +143,12 @@ export class TokenManager {
 
     if (newToken) {
       this.setToken(newToken);
-      console.log('[API] Token refreshed successfully (via fetch)');
       this.scheduleTokenRefresh(newToken);
       return newToken;
     }
 
     // cookie-based refresh: 200 OK and empty/absent body
     if (resp.status === 200 && (!data || Object.keys(data).length === 0)) {
-      console.log('[API][refresh] 200 OK with empty body — server may use httpOnly cookie for session.');
       return null;
     }
 
@@ -178,7 +172,6 @@ export class TokenManager {
   }
 }
 
-
   // Schedule automatic token refresh
   scheduleTokenRefresh(token) {
     this.clearRefreshTimer();
@@ -197,7 +190,6 @@ export class TokenManager {
         });
       }, refreshTime);
       
-      console.log(`Next token refresh scheduled in ${Math.floor(refreshTime / 1000 / 60)} minutes`);
     }
   }
 
@@ -289,7 +281,6 @@ axios.interceptors.request.use(
     
     // Check if token is expired before making request
     if (token && tokenManager.isTokenExpired(token)) {
-      console.log('Token expired, refreshing before request...');
       // Don't wait for refresh, let response interceptor handle it
     } else if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -298,13 +289,6 @@ axios.interceptors.request.use(
     // Debug logging for PATCH/PUT requests to contractors
     if ((config.method === 'patch' || config.method === 'put') && config.url && config.url.includes('/api/contractors/')) {
       // config.url is already the full URL when using BASE_URL in the function
-      console.log(`[API Request] ${config.method.toUpperCase()} to contractors:`, {
-        url: config.url,
-        baseURL: config.baseURL,
-        fullURL: config.url.startsWith('http') ? config.url : `${config.baseURL || BASE_URL}${config.url}`,
-        headers: config.headers,
-        data: config.data
-      });
     }
     
     return config;
@@ -368,7 +352,6 @@ axios.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        console.log('Attempting to refresh token due to 401 error...');
         await tokenManager.refreshToken();
         
         // Update the authorization header with new token

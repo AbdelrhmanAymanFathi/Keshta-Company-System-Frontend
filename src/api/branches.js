@@ -11,7 +11,6 @@ export const updateBranch = (id, data) => {
   if (!id) {
     return Promise.reject(new Error('Branch ID is required'))
   }
-  console.log('[API] Updating branch:', id, 'Data:', data, 'URL:', `${BASE_URL}/api/branches/${id}`)
   return axios.patch(`${BASE_URL}/api/branches/${id}`, data);
 };
 export const deleteBranch = (id) =>

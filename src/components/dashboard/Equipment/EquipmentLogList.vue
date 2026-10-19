@@ -639,14 +639,12 @@ export default {
       }
 
       // copy local filters into the store and refresh
-      try { console.log('[component] applyFilters local filters BEFORE copy:', JSON.parse(JSON.stringify(filters.value))) } catch(e) { console.log('[component] applyFilters local filters BEFORE copy:', filters.value) }
       equipmentLogsStore.filters.startDate = filters.value.startDate || ''
       equipmentLogsStore.filters.endDate = filters.value.endDate || ''
       equipmentLogsStore.filters.equipmentId = filters.value.equipmentId || ''
       equipmentLogsStore.filters.driverId = filters.value.driverId || ''
       equipmentLogsStore.filters.locationId = filters.value.locationId || ''
       equipmentLogsStore.filters.areaId = filters.value.areaId || ''
-      try { console.log('[component] applyFilters store filters AFTER copy:', JSON.parse(JSON.stringify(equipmentLogsStore.filters))) } catch(e) { console.log('[component] applyFilters store filters AFTER copy:', equipmentLogsStore.filters) }
       equipmentLogsStore.setPage(1)
       if (typeof equipmentLogsStore.fetchRentals === 'function') equipmentLogsStore.fetchRentals()
     }
@@ -818,13 +816,6 @@ export default {
       })
     })
 
-    // Debug: log ownership filter changes and filtered count
-    try {
-      watch(localIsCompanyOwned, (v) => {
-        try { console.log('[component] localIsCompanyOwned changed:', v, 'filtered length:', filteredItems.value.length) } catch(e) { void 0 }
-      })
-    } catch (e) { void 0 }
-
     // Calculate total sum of all visible filtered items
     const resolveRentalTotal = (item) => {
       if (item && Object.prototype.hasOwnProperty.call(item, 'total')) {
@@ -875,7 +866,6 @@ export default {
     }
 
     const setCompanyOwnedFilter = (value) => {
-      try { console.log('[component] setCompanyOwnedFilter called, value:', value, 'current:', localIsCompanyOwned.value) } catch(e) { void 0 }
       // update local UI state
       localIsCompanyOwned.value = value
 
@@ -888,8 +878,6 @@ export default {
       // update store and reset to first page; watcher will trigger fetch
       equipmentLogsStore.filters.isRental = isRentalValue
       equipmentLogsStore.setPage(1)
-
-      try { console.log('[component] setCompanyOwnedFilter updated localIsCompanyOwned to:', localIsCompanyOwned.value, 'and equipmentLogsStore.filters.isRental to:', equipmentLogsStore.filters.isRental) } catch(e) { void 0 }
     }
 
     const changePage = (page) => {

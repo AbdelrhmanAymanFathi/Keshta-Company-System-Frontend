@@ -123,7 +123,6 @@ watch(
 
 // Listen for auth state changes
 authManager.addListener((event, data) => {
-  console.log('Auth event:', event, data);
   
   if (event === 'auth:logout') {
     realtimeService.destroy()

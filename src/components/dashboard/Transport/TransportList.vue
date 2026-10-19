@@ -453,12 +453,6 @@ export default {
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         this.vehicles = Array.isArray(vehiclesData) ? vehiclesData : []
 
-        console.log('✓ Filter data loaded:', {
-          contractors: this.contractors.length,
-          locations: this.locations.length,
-          items: this.items.length,
-          vehicles: this.vehicles.length
-        })
       } catch (err) {
         console.error('✗ Error loading filter data:', err)
       }
@@ -500,8 +494,6 @@ export default {
         await new Promise((res) => setTimeout(res, 20))
         this.syncFilterIdsFromSearch()
 
-        console.debug('Filters before request:', JSON.parse(JSON.stringify(this.filters)))
-
         const queryParams = {
           page: this.page,
           pageSize: this.pageSize,
@@ -517,12 +509,7 @@ export default {
         }
 
         const cleanParams = buildQueryParams(queryParams)
-        console.log('🔵 Loading transports with params:', queryParams)
-        console.log('🔵 Clean params sent to API:', cleanParams)
         const res = await getTransports(cleanParams)
-
-        console.log('Response received:', res)
-        console.log('Response data:', res.data)
 
         // Extract items from response
         const responseData = res.data
@@ -540,7 +527,6 @@ export default {
           this.total = responseData.meta?.total ?? responseData.total ?? this.transports.length
           this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
 
-          console.log('✓ Transports updated:', this.transports.length, 'items')
         } else {
           console.warn('⚠ Unexpected response format:', responseData)
           this.transports = []

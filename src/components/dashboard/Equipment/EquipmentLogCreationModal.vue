@@ -268,7 +268,6 @@
               </div>
             </div>
 
-
             <!-- Totals -->
             <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
               <div class="flex items-center justify-end gap-3">
@@ -1026,7 +1025,6 @@ export default {
         const saved = localStorage.getItem(key)
         if (saved) {
           const data = JSON.parse(saved)
-          console.log('📦 Loaded equipment log data from storage:', data)
           this.form.date = data.date || this.form.date
           this.form.equipmentId = data.equipmentId || ''
           this.form.equipmentLabel = data.equipmentLabel || ''

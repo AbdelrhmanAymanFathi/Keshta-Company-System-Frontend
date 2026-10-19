@@ -119,7 +119,6 @@ export default {
           }
         } else {
           // No QR info available
-          console.debug('[TOTP] start register response had no QR/otpauth:', res.data)
           error.value = 'No QR code data received from server'
         }
 
