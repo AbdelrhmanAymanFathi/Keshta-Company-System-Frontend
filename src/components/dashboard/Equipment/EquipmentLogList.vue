@@ -535,7 +535,7 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon, RowActions, PencilSquareIcon, TrashIcon },
+  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon, RowActions },
   setup() {
     const instance = getCurrentInstance()
     const equipmentLogsStore = useEquipmentLogsStore()

@@ -809,7 +809,7 @@ const CUSTODY_FEED_CATEGORY = { id: 'custody_feed', name: 'تغذية عهدة' 
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
-  components: { AddFieldModal, DateField, PageHeader, SearchDropdown, SortIcon, RowActions, PencilSquareIcon, TrashIcon },
+  components: { AddFieldModal, DateField, PageHeader, SearchDropdown, SortIcon, RowActions },
   data() {
     return {
       expenses: [],

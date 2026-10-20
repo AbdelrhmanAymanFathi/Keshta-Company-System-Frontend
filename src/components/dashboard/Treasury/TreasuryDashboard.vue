@@ -2,54 +2,99 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex flex-col gap-6 lg:flex-row">
     <aside class="h-fit w-full rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm theme-surface lg:sticky lg:top-4 lg:w-80">
       <div class="flex items-center justify-between gap-3 border-b border-gray-100 pb-3">
-        <div>
+        <div class="min-w-0">
           <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
           <p class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</p>
         </div>
-        <button class="rounded-lg px-3 py-2 text-sm font-medium text-white shadow-sm transition theme-button" @click="openCreateModal">+ {{ t('treasury.add') }}</button>
-      </div>
-
-      <div class="mt-4 space-y-3 border-b border-gray-100 pb-4">
-        <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.search') }}</label>
-          <input v-model="treasurySearch" type="text" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
-        </div>
-        <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.view') }}</label>
-          <select v-model="treasuryView" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus">
-            <option value="active">{{ t('treasury.viewActive') }}</option>
-            <option value="archived">{{ t('treasury.viewArchived') }}</option>
-            <option value="all">{{ t('treasury.viewAll') }}</option>
-          </select>
+        <div class="flex shrink-0 items-center gap-2">
+          <ActionButton
+            :icon="ArrowPathIcon"
+            :label="t('treasury.refresh')"
+            tone="default"
+            size="sm"
+            :loading="reloading"
+            @click="reloadTreasuries"
+          />
+          <button class="theme-button rounded-lg px-3 py-2 text-sm font-medium text-white shadow-sm transition" @click="openCreateModal">+ {{ t('treasury.add') }}</button>
         </div>
       </div>
 
-      <div class="mt-4 space-y-2">
-        <div v-for="(treasury, index) in visibleTreasuries" :key="treasury.id" :draggable="isAdmin && treasuryView === 'active'" @dragstart="onDragStart(index, $event)" @dragover.prevent @drop.prevent="onDrop(index, $event)" @dragend="onDragEnd">
-          <button @click="selectTreasury(treasury.id)" :class="['flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition', selectedId === treasury.id ? 'border-transparent bg-indigo-50/80 ring-1 ring-indigo-200/70' : 'border-gray-200 bg-white/70 hover:theme-hover-soft']">
-            <span v-if="isAdmin && treasuryView === 'active'" class="cursor-grab text-gray-400">⋮⋮</span>
+      <div v-if="visibleTreasuries.length > 0" class="mt-3 flex items-center justify-between rounded-xl border border-emerald-100 bg-emerald-50/70 px-3 py-2.5">
+        <span class="text-xs font-semibold uppercase tracking-wide text-emerald-700">{{ t('treasury.balance') }}</span>
+        <span class="text-sm font-bold tabular-nums" :class="totalVisibleBalance < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(totalVisibleBalance) }}</span>
+      </div>
+
+      <div class="mt-3 space-y-2.5 border-b border-gray-100 pb-3">
+        <div class="relative">
+          <MagnifyingGlassIcon class="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-gray-400" aria-hidden="true" />
+          <input
+            v-model="treasurySearch"
+            type="text"
+            class="theme-input-focus w-full rounded-xl border border-gray-200 py-2 pe-3 ps-9 text-sm"
+            :placeholder="t('treasury.searchTreasuriesPlaceholder')"
+          />
+        </div>
+        <div class="flex gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+          <button
+            v-for="opt in viewOptions"
+            :key="opt.value"
+            type="button"
+            class="flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition"
+            :class="treasuryView === opt.value ? 'bg-white text-indigo-700 shadow-sm ring-1 ring-indigo-200/60' : 'text-gray-500 hover:text-gray-700'"
+            @click="treasuryView = opt.value"
+          >{{ opt.label }}</button>
+        </div>
+      </div>
+
+      <div v-if="!visibleTreasuries.length" class="mt-4 rounded-xl border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-400">
+        {{ t('labels.noData') }}
+      </div>
+
+      <div v-else class="mt-3 space-y-2">
+        <div
+          v-for="(treasury, index) in visibleTreasuries"
+          :key="treasury.id"
+          :draggable="isAdmin && treasuryView === 'active'"
+          @dragstart="onDragStart(index, $event)"
+          @dragover.prevent
+          @drop.prevent="onDrop(index, $event)"
+          @dragend="onDragEnd"
+        >
+          <div
+            role="button"
+            tabindex="0"
+            :class="['group flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-indigo-300', selectedId === treasury.id ? 'border-transparent bg-indigo-50/80 ring-1 ring-indigo-200/70' : 'border-gray-200 bg-white/70 hover:theme-hover-soft']"
+            @click="selectTreasury(treasury.id)"
+            @keydown.enter.prevent="selectTreasury(treasury.id)"
+            @keydown.space.prevent="selectTreasury(treasury.id)"
+          >
+            <span v-if="isAdmin && treasuryView === 'active'" class="cursor-grab text-gray-400" aria-hidden="true">⋮⋮</span>
             <div class="min-w-0 flex-1">
               <div class="flex items-center justify-between gap-2">
                 <p class="truncate text-sm font-medium theme-text-primary">{{ treasury.name }}</p>
-                <span class="text-xs font-semibold" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
+                <span
+                  class="shrink-0 text-[15px] font-bold tabular-nums"
+                  :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'"
+                >{{ formatCurrency(treasury.balance) }}</span>
               </div>
               <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] theme-text-secondary">
-                <span>#{{ index + 1 }}</span>
                 <span v-if="treasury.type === 'CUSTODY'" class="rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">{{ t('treasury.typeCustody') }}</span>
                 <span v-else class="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">{{ t('treasury.typeMain') }}</span>
                 <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
                 <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
               </div>
             </div>
-            <div class="shrink-0">
-              <button v-if="!treasury.deletedAt" class="rounded-md px-2 py-1 text-xs theme-text-secondary transition hover:bg-gray-100" @click.stop="openEditModal(treasury)">{{ t('treasury.edit') }}</button>
+            <div v-if="!treasury.deletedAt" class="shrink-0 opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
+              <ActionButton
+                :icon="PencilSquareIcon"
+                :label="t('treasury.edit')"
+                tone="edit"
+                size="sm"
+                @click="openEditModal(treasury)"
+              />
             </div>
-          </button>
+          </div>
         </div>
-      </div>
-
-      <div class="mt-4 flex gap-2">
-        <button class="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="reloadTreasuries">{{ t('treasury.refresh') }}</button>
       </div>
     </aside>
 
@@ -616,6 +661,8 @@ import { useTreasuryStore } from '@/stores/useTreasuryStore'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
+import ActionButton from '@/components/shared/ActionButton.vue'
+import { ArrowPathIcon, MagnifyingGlassIcon, PencilSquareIcon } from '@acme/icon-packs/legacy'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
 import { transferBetweenTreasuries, getExpense, getTreasuryPurgePreview, updateTreasuryMovement, deleteTreasuryMovement, deleteExpense } from '@/api'
@@ -625,7 +672,7 @@ import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 export default {
   name: 'TreasuryDashboard',
   emits: ['navigateReport', 'navigateStatement'],
-  components: { DateField, Pagination, SortIcon },
+  components: { DateField, Pagination, SortIcon, ActionButton, MagnifyingGlassIcon },
   setup() {
     const { t, locale } = useI18n()
     const { user } = useAuth()
@@ -934,6 +981,14 @@ export default {
       })
     })
     const selectedTreasuryIsArchived = computed(() => !!selectedTreasury.value?.deletedAt)
+    const viewOptions = computed(() => [
+      { value: 'active', label: t('treasury.viewActive') },
+      { value: 'archived', label: t('treasury.viewArchived') },
+      { value: 'all', label: t('treasury.viewAll') },
+    ])
+    const totalVisibleBalance = computed(() =>
+      visibleTreasuries.value.reduce((sum, treasury) => sum + (Number(treasury.balance) || 0), 0)
+    )
     const isCustodySelected = computed(() => selectedTreasury.value?.type === 'CUSTODY')
     const canDeposit = computed(() =>
       !!selectedTreasury.value && !selectedTreasuryIsArchived.value
@@ -986,8 +1041,15 @@ export default {
       await reloadSelected()
     }
 
+    const reloading = ref(false)
     const reloadTreasuries = async () => {
-      await loadTreasuries()
+      if (reloading.value) return
+      reloading.value = true
+      try {
+        await loadTreasuries()
+      } finally {
+        reloading.value = false
+      }
     }
 
     const applyFilters = async () => {
@@ -1365,7 +1427,12 @@ export default {
       transferSubmitting,
       treasurySearch,
       treasuryView,
+      viewOptions,
+      totalVisibleBalance,
+      reloading,
       isAdmin,
+      ArrowPathIcon,
+      PencilSquareIcon,
       formatCurrency,
       formatDate,
       formatDateTime,
