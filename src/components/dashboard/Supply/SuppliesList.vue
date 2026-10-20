@@ -933,7 +933,7 @@ formatDate(dateString) {
         this.closeDeleteConfirm()
       } catch (e) {
         console.error('Failed to delete export', e)
-        alert(this.$t('common.deleteError') || 'Failed to delete')
+        void(window.$toast ? window.$toast(this.$t('common.deleteError') || 'Failed to delete', 'error') : alert(this.$t('common.deleteError') || 'Failed to delete'))
       } finally {
         this.deleting = false
       }

@@ -871,13 +871,13 @@ export default {
             // Keep only the failed ones in the rows so user can edit and try again
             this.categoryModal.rows = failed
             const duplicateNames = failed.map(n => `"${n}"`).join('، ')
-            alert(`تم حفظ البنود بنجاح ما عدا البنود التالية (قد تكون مكررة أو حدث خطأ): ${duplicateNames}`)
+            void(window.$toast ? window.$toast(`تم حفظ البنود بنجاح ما عدا البنود التالية (قد تكون مكررة أو حدث خطأ): ${duplicateNames}`, 'error') : alert(`تم حفظ البنود بنجاح ما عدا البنود التالية (قد تكون مكررة أو حدث خطأ): ${duplicateNames}`))
           } else {
             this.categoryModal.open = false
           }
         }
       } catch (err) {
-        alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الرئيسي')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الرئيسي', 'error') : alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الرئيسي'))
       } finally {
         this.saving = false
       }
@@ -888,7 +888,7 @@ export default {
         await deleteExpenseCategory(cat.id)
         await this.refresh()
       } catch (err) {
-        alert(err.response?.data?.message || 'تعذر حذف البند الرئيسي')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'تعذر حذف البند الرئيسي', 'error') : alert(err.response?.data?.message || 'تعذر حذف البند الرئيسي'))
       }
     },
 
@@ -963,13 +963,13 @@ export default {
 
           if (failed.length > 0) {
             this.subCategoryModal.rows = failed.map(f => f.name)
-            alert(`تم الحفظ ما عدا:\n${failed.map(f => `"${f.name}"${f.reason ? ` — ${f.reason}` : ''}`).join('\n')}`)
+            void(window.$toast ? window.$toast(`تم الحفظ ما عدا:\n${failed.map(f => `"${f.name}"${f.reason ? ` — ${f.reason}` : ''}`).join('\n')}`, 'error') : alert(`تم الحفظ ما عدا:\n${failed.map(f => `"${f.name}"${f.reason ? ` — ${f.reason}` : ''}`).join('\n')}`))
           } else {
             this.subCategoryModal.open = false
           }
         }
       } catch (err) {
-        alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي', 'error') : alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي'))
       } finally {
         this.saving = false
       }
@@ -977,7 +977,7 @@ export default {
 
     async confirmDeleteSubCategory(subCat) {
       if (subCat.expenseCount > 0) {
-        alert(`لا يمكن حذف "${subCat.name}" لأن عليه ${subCat.expenseCount} مصروف. احذف المصروفات أولاً.`)
+        void(window.$toast ? window.$toast(`لا يمكن حذف "${subCat.name}" لأن عليه ${subCat.expenseCount} مصروف. احذف المصروفات أولاً.`, 'error') : alert(`لا يمكن حذف "${subCat.name}" لأن عليه ${subCat.expenseCount} مصروف. احذف المصروفات أولاً.`))
         return
       }
       if (!confirm(`هل أنت تأكد من حذف البند الفرعي "${subCat.name}" من القائمة ومن كل البنود الرئيسية؟`)) return
@@ -985,7 +985,7 @@ export default {
         await deleteExpenseSubCategory(subCat.id)
         await this.refresh()
       } catch (err) {
-        alert(err.response?.data?.message || 'تعذر حذف البند الفرعي')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'تعذر حذف البند الفرعي', 'error') : alert(err.response?.data?.message || 'تعذر حذف البند الفرعي'))
       }
     },
 
@@ -996,7 +996,7 @@ export default {
         await updateExpenseCategory(cat.id, { subCategoryIds })
         await this.refresh()
       } catch (err) {
-        alert(err.response?.data?.message || 'تعذر إزالة البند الفرعي')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'تعذر إزالة البند الفرعي', 'error') : alert(err.response?.data?.message || 'تعذر إزالة البند الفرعي'))
       }
     },
 
@@ -1023,7 +1023,7 @@ export default {
         this.pickerModal.selected.push(res.data.id)
         this.pickerModal.search = ''
       } catch (err) {
-        alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي', 'error') : alert(err.response?.data?.message || 'حدث خطأ أثناء حفظ البند الفرعي'))
       } finally {
         this.saving = false
       }
@@ -1039,7 +1039,7 @@ export default {
         }
         await this.refresh()
       } catch (err) {
-        alert(err.response?.data?.message || 'تعذر حفظ البنود الفرعية')
+        void(window.$toast ? window.$toast(err.response?.data?.message || 'تعذر حفظ البنود الفرعية', 'error') : alert(err.response?.data?.message || 'تعذر حفظ البنود الفرعية'))
       } finally {
         this.saving = false
       }

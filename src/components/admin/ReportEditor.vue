@@ -399,18 +399,18 @@ export default {
         }
       } catch (err) {
         console.error('Save failed', err)
-        alert(t('reports.saveFailed') + ': ' + (err?.message || err))
+        void(window.$toast ? window.$toast(t('reports.saveFailed') + ': ' + (err?.message || err), 'error') : alert(t('reports.saveFailed') + ': ' + (err?.message || err)))
       }
     }
 
     async function previewOptions(paramName) {
-      if (!id || id === 'new') { alert(t('reports.saveFirstToPreview')); return }
+      if (!id || id === 'new') { void(window.$toast ? window.$toast(t('reports.saveFirstToPreview'), 'error') : alert(t('reports.saveFirstToPreview'))); return }
       try {
         const res = await getReportParamOptions(id, paramName, '')
-        alert(t('reports.previewRows') + '\n' + JSON.stringify(res.data?.slice(0,10) || res.data || [], null, 2))
+        void(window.$toast ? window.$toast(t('reports.previewRows') + '\n' + JSON.stringify(res.data?.slice(0,10) || res.data || [], null, 2), 'error') : alert(t('reports.previewRows') + '\n' + JSON.stringify(res.data?.slice(0,10) || res.data || [], null, 2)))
       } catch (err) {
         console.error('Preview options failed', err)
-        alert(t('reports.previewFailed') + ': ' + (err?.response?.data?.message || err.message))
+        void(window.$toast ? window.$toast(t('reports.previewFailed') + ': ' + (err?.response?.data?.message || err.message), 'error') : alert(t('reports.previewFailed') + ': ' + (err?.response?.data?.message || err.message)))
       }
     }
 

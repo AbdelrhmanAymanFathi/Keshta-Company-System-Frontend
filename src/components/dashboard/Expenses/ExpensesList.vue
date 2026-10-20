@@ -2814,7 +2814,7 @@ rows: [],
       if (window.$toast) {
         window.$toast(message, 'error')
       } else {
-        alert(message)
+        void(window.$toast ? window.$toast(message, 'error') : alert(message))
       }
     }
   }

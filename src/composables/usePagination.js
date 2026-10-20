@@ -28,7 +28,7 @@ export function usePagination(fetchFn, { initialPage = 1, initialPageSize = 20, 
       total.value = payload.length
       totalPages.value = Math.max(1, Math.ceil(total.value / pageSize.value))
 
-      if (process.env.NODE_ENV !== 'production') {
+      if (import.meta.env.DEV) {
         const label = resourceName || 'resource'
         // eslint-disable-next-line no-console
         console.warn(

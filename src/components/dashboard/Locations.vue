@@ -222,7 +222,7 @@ export default {
         this.closeDeleteConfirm()
       } catch (err) {
         console.error('Delete failed', err)
-        alert(err?.response?.data?.message || err.message || 'Failed to delete')
+        void(window.$toast ? window.$toast(err?.response?.data?.message || err.message || 'Failed to delete', 'error') : alert(err?.response?.data?.message || err.message || 'Failed to delete'))
       } finally {
         this.deleting = false
       }

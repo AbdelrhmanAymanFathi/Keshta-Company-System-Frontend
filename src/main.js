@@ -1,7 +1,7 @@
 // src/main.js
 import { createApp, watch } from 'vue'
 import { createPinia } from 'pinia'
-import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
+import { VueQueryPlugin, QueryClient, QueryCache } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
@@ -31,8 +31,29 @@ app.directive('app-table', appTable)
 app.provide(ICON_REVISION_KEY, iconRevision)
 app.provide(THEME_REVISION_KEY, themeRevision)
 
-// Register TanStack Vue Query plugin (optional - install @tanstack/vue-query)
-const queryClient = new QueryClient()
+// TanStack Vue Query — sensible defaults for an authenticated dashboard
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000,
+      gcTime: 5 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true
+    },
+    mutations: {
+      retry: 0
+    }
+  },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      // Global query error hook — surface non-auth errors
+      if (error?.response?.status !== 401 && window.$toast) {
+        window.$toast(error?.response?.data?.message || error?.message || 'Query failed', 'error')
+      }
+    }
+  })
+})
 app.use(VueQueryPlugin, { queryClient })
 
 // use pinia
