@@ -199,6 +199,8 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import * as XLSX from 'xlsx'
 import { getContractors, getContractorOpeningBalance, getLocations, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
@@ -215,13 +217,38 @@ export default {
     mode: { type: String, default: 'supply' }
   },
   components: { Pagination, DateField, WalletPanel, OpeningBalanceSitesField, RowActions, DocumentTextIcon, PencilSquareIcon, PlusIcon, WalletIcon, TrashIcon, XMarkIcon },
+  setup(props) {
+    const q = ref('')
+    const searchTimeout = ref(null)
+
+    const { items: contractors, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      async (p, ps, extra) => {
+        const res = await getContractors({ page: p, pageSize: ps, q: extra.q ?? q.value, mode: props.mode || 'supply' })
+        const payload = res.data || {}
+        const arr = Array.isArray(payload.items) ? payload.items :
+                    Array.isArray(payload.data) ? payload.data :
+                    Array.isArray(payload) ? payload : []
+        return { items: arr, total: payload.meta?.total ?? payload.total }
+      },
+      { initialPageSize: 20, resourceName: 'suppliers' }
+    )
+
+    const loadContractors = async () => {
+      try {
+        await load({ q: q.value })
+      } catch (e) {
+        contractors.value = []
+        total.value = 0
+      }
+    }
+
+    return { q, searchTimeout, contractors, page, pageSize, total, totalPages, loading, loadContractors, setPage, setPageSize }
+  },
   data() {
     return {
-      q: '',
       modalOpen: false,
       editing: false,
       form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalanceLines: [emptyOpeningBalanceLine()] },
-      contractors: [],
       locations: [],
       deleteConfirm: { open: false, item: null },
       contextMenu: { open: false, x: 0, y: 0, item: null },
@@ -231,10 +258,6 @@ export default {
       selectedContractor: null,
       selectedWalletAccount: null,
       depositForm: { amount: '', description: '', date: '' },
-      page: 1,
-      pageSize: 20,
-      total: 0,
-      searchTimeout: null,
       openingBalanceLinesOriginal: null,
       openingBalancePending: null
     }
@@ -255,9 +278,6 @@ export default {
         (c.bankName || '').toLowerCase().includes(s) ||
         (c.accountNumber || '').toLowerCase().includes(s)
       )
-    },
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
     }
   },
   mounted() {
@@ -269,20 +289,6 @@ export default {
     document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {
-    async loadContractors() {
-      try {
-        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode || 'supply' })
-        const payload = res.data || {}
-        this.contractors = Array.isArray(payload.items) ? payload.items :
-                         Array.isArray(payload.data) ? payload.data :
-                         Array.isArray(payload) ? payload : []
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.contractors.length
-      } catch (e) {
-        this.contractors = []
-        this.total = 0
-      }
-    },
     async loadLocations() {
       try {
         const res = await getLocations()
@@ -293,13 +299,12 @@ export default {
     },
     changePage(p) {
       if (p >= 1 && p <= this.totalPages && p !== this.page) {
-        this.page = p
+        this.setPage(p)
         this.loadContractors()
       }
     },
     onPageSizeChange(size) {
-      this.pageSize = size
-      this.page = 1
+      this.setPageSize(size)
       this.loadContractors()
     },
     onSearchInput() {

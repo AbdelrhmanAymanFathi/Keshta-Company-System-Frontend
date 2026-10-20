@@ -462,6 +462,7 @@
 
 <script>
 import SortIcon from '@/components/shared/SortIcon.vue'
+import { usePagination } from '@/composables/usePagination'
 import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles, updateExport, getExport } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import TableModal from './SuppliesCreationModal.vue'
@@ -492,17 +493,60 @@ export default {
     // SupplyDetailModal
   },
 
+  setup() {
+    const { items: supplies, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      async (p, ps, extra) => {
+        const queryParams = {
+          page: p,
+          pageSize: ps,
+          sortField: extra.sortField,
+          sortOrder: extra.sortOrder,
+          startDate: extra.filters.startDate,
+          endDate: extra.filters.endDate,
+          areaId: extra.filters.areaId,
+          contractorId: extra.filters.contractorId,
+          locationId: extra.filters.locationId,
+          crusherId: extra.filters.crusherId,
+          itemId: extra.filters.itemId,
+          vehicleId: extra.filters.vehicleId
+        }
+
+        const cleanParams = buildQueryParams(queryParams)
+        const res = await getDeliveries(cleanParams)
+
+        const responseData = res.data
+        if (!responseData || !Array.isArray(responseData.items)) {
+          console.warn('⚠ Unexpected response format:', responseData)
+          return []
+        }
+
+        const newItems = [...responseData.items]
+        // Normalize nested `item` objects so templates can rely on canonical fields
+        newItems.forEach(s => { if (s && s.item) s.item = normalizeItem(s.item) })
+
+        const order = extra.sortOrder
+        newItems.sort((a, b) => {
+          const dateA = a?.date || a?.createdAt || 0
+          const dateB = b?.date || b?.createdAt || 0
+          const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+          const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+          return order === 'asc' ? timeA - timeB : timeB - timeA
+        })
+
+        return { ...responseData, items: newItems }
+      },
+      { initialPageSize: 20, resourceName: 'supplies' }
+    )
+
+    return { supplies, page, pageSize, total, totalPages, loading, load, setPage, setPageSize }
+  },
+
   data() {
     return {
-      supplies: [],
       modalOpen: false,
       form: {},
-      page: 1,
-      pageSize: 20,
       sortField: 'date',
       sortOrder: 'desc',
-      total: 0,
-      loading: false,
       contextMenu: {
         visible: false,
         x: 0,
@@ -556,9 +600,6 @@ export default {
   },
 
   computed: {
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
-    },
     visiblePages() {
       const pages = []
       const maxVisible = 5
@@ -678,64 +719,11 @@ export default {
 
     async loadSupplies() {
       try {
-        this.loading = true
-
-        const queryParams = {
-          page: this.page,
-          pageSize: this.pageSize,
-          sortField: this.sortField,
-          sortOrder: this.sortOrder,
-          startDate: this.filters.startDate,
-          endDate: this.filters.endDate,
-          areaId: this.filters.areaId,
-          contractorId: this.filters.contractorId,
-          locationId: this.filters.locationId,
-          crusherId: this.filters.crusherId,
-          itemId: this.filters.itemId,
-          vehicleId: this.filters.vehicleId
-        }
-
-        const cleanParams = buildQueryParams(queryParams)
-        const res = await getDeliveries(cleanParams)
-
-        // Extract items from response
-        const responseData = res.data
-        if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          // Explicitly create new array and use splice to trigger reactivity
-          const newItems = [...responseData.items]
-
-          // Log comparison with old items
-          if (this.supplies.length > 0) {
-          }
-
-          // Normalize nested `item` objects so templates can rely on canonical fields
-          newItems.forEach(s => { if (s && s.item) s.item = normalizeItem(s.item) })
-
-          newItems.sort((a, b) => {
-            const dateA = a?.date || a?.createdAt || 0
-            const dateB = b?.date || b?.createdAt || 0
-            const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
-            const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
-            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
-          })
-
-          // In Vue 3, directly assign the array
-          this.supplies = newItems
-
-          this.total = responseData.total || newItems.length
-          this.pageSize = responseData.pageSize || this.pageSize
-
-        } else {
-          console.warn('⚠ Unexpected response format:', responseData)
-          this.supplies = []
-          this.total = 0
-        }
+        await this.load({ filters: { ...this.filters }, sortField: this.sortField, sortOrder: this.sortOrder })
       } catch (e) {
         console.error('✗ Error loading supplies:', e)
         this.supplies = []
         this.total = 0
-      } finally {
-        this.loading = false
       }
     },
 
@@ -746,13 +734,13 @@ export default {
 
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {
-        this.page = newPage
+        this.setPage(newPage)
         this.loadSupplies()
       }
     },
 
-    onPageSizeChange() {
-      this.page = 1
+    onPageSizeChange(size) {
+      this.setPageSize(size)
       this.loadSupplies()
     },
 

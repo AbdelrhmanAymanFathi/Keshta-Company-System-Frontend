@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import { ref, watch } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import Pagination from '@/components/shared/Pagination.vue'
 import RowActions from '@/components/shared/RowActions.vue'
 import { getDrivers, createDriver, updateDriver, deleteDriver as apiDeleteDriver } from '@/api'
@@ -97,14 +99,22 @@ import { PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-pac
 export default {
   name: 'DriversList',
   components: { Pagination, RowActions, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  setup() {
+    const q = ref('')
+
+    const { items: drivers, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getDrivers({ page: p, pageSize: ps, q: extra.q ?? q.value }),
+      { initialPageSize: 20, resourceName: 'drivers' }
+    )
+
+    const loadDrivers = () => load({ q: q.value })
+
+    watch(q, () => { setPage(1); loadDrivers() })
+
+    return { q, drivers, page, pageSize, total, totalPages, loading, loadDrivers, setPage, setPageSize }
+  },
   data() {
     return {
-      drivers: [],
-      loading: false,
-      q: '',
-      page: 1,
-      pageSize: 20,
-      total: 0,
       modalOpen: false,
       editing: false,
       form: { id: null, name: '', phone: '', nationalId: '' },
@@ -115,33 +125,15 @@ export default {
     }
   },
   computed: {
-    isRTL() { return this.$i18n?.locale === 'ar' },
-    totalPages() { return Math.ceil(this.total / this.pageSize) }
-  },
-  watch: {
-    q() { this.page = 1; this.loadDrivers() }
+    isRTL() { return this.$i18n?.locale === 'ar' }
   },
   mounted() {
     this.loadDrivers()
   },
   methods: {
-    async loadDrivers() {
-      this.loading = true
-      try {
-        const res = await getDrivers({ page: this.page, pageSize: this.pageSize, q: this.q })
-        const payload = res.data || {}
-        this.drivers = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.drivers.length
-      } catch (e) {
-        console.error('Error loading drivers', e)
-        this.drivers = []
-        this.total = 0
-      } finally { this.loading = false }
-    },
     onSearchInput() {},
-    changePage(newPage) { this.page = newPage; this.loadDrivers() },
-    onPageSizeChange(newSize) { this.pageSize = newSize; this.page = 1; this.loadDrivers() },
+    changePage(newPage) { this.setPage(newPage); this.loadDrivers() },
+    onPageSizeChange(newSize) { this.setPageSize(newSize); this.loadDrivers() },
     rowActions(d) {
       return [
         { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEdit(d) },

@@ -296,6 +296,8 @@
 </template>
 
 <script>
+import { ref, watch } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import { useI18n } from 'vue-i18n'
 import { getUsers, getUserRoles, createUser, updateUser, deleteUser, adminResetUserPassword } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
@@ -310,17 +312,23 @@ export default {
   },
   setup() {
     const { locale } = useI18n()
-    return { locale }
+    const q = ref('')
+
+    const { items: users, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getUsers({ page: p, pageSize: ps, q: extra.q ?? q.value }),
+      { initialPageSize: 20, resourceName: 'users' }
+    )
+
+    const loadUsers = async () => {
+      try { await load({ q: q.value }) } catch (e) { console.error('Error loading users:', e) }
+    }
+
+    watch(q, () => { setPage(1); loadUsers() })
+
+    return { locale, q, users, page, pageSize, total, totalPages, loading, loadUsers, setPage, setPageSize }
   },
   data() {
     return {
-      users: [],
-      loading: false,
-      q: '',
-      page: 1,
-      pageSize: 20,
-      total: 0,
-      totalPages: 0,
       modalOpen: false,
       editing: false,
       editingUserId: null,
@@ -397,37 +405,15 @@ export default {
         this.rolesLoading = false
       }
     },
-    async loadUsers() {
-      this.loading = true
-      try {
-        const response = await getUsers({
-          page: this.page,
-          pageSize: this.pageSize,
-          q: this.q
-        })
-        const data = response.data
-        this.users = data.items || []
-        this.total = data.total || 0
-        this.totalPages = data.totalPages || Math.ceil(this.total / this.pageSize)
-      } catch (error) {
-        console.error('Error loading users:', error)
-        if (window.$toast) {
-          window.$toast(this.$t('users.loadError'), 'error')
-        }
-      } finally {
-        this.loading = false
-      }
-    },
     onSearchInput() {
       // Debounce handled by watch
     },
     changePage(newPage) {
-      this.page = newPage
+      this.setPage(newPage)
       this.loadUsers()
     },
     onPageSizeChange(newSize) {
-      this.pageSize = newSize
-      this.page = 1
+      this.setPageSize(newSize)
       this.loadUsers()
     },
     openAdd() {

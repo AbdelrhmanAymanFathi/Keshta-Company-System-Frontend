@@ -321,6 +321,7 @@
 
 <script>
 import SortIcon from '@/components/shared/SortIcon.vue'
+import { usePagination } from '@/composables/usePagination'
 import { getTransports, getTransport, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
@@ -349,17 +350,55 @@ export default {
     SortIcon
   },
 
+  setup() {
+    const { items: transports, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      async (p, ps, extra) => {
+        const queryParams = {
+          page: p,
+          pageSize: ps,
+          sortField: extra.sortField,
+          sortOrder: extra.sortOrder,
+          startDate: extra.filters.startDate,
+          endDate: extra.filters.endDate,
+          contractorId: extra.filters.contractorId,
+          locationId: extra.filters.locationId,
+          areaId: extra.filters.areaId,
+          itemId: extra.filters.itemId,
+          vehicleId: extra.filters.vehicleId
+        }
+
+        const cleanParams = buildQueryParams(queryParams)
+        const res = await getTransports(cleanParams)
+
+        const responseData = res.data
+        if (!responseData || !Array.isArray(responseData.items)) {
+          console.warn('⚠ Unexpected response format:', responseData)
+          return []
+        }
+
+        const order = extra.sortOrder
+        const sorted = [...responseData.items].sort((a, b) => {
+          const dateA = a?.date || a?.createdAt || 0
+          const dateB = b?.date || b?.createdAt || 0
+          const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+          const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+          return order === 'asc' ? timeA - timeB : timeB - timeA
+        })
+
+        return { ...responseData, items: sorted }
+      },
+      { initialPageSize: 20, resourceName: 'transports' }
+    )
+
+    return { transports, page, pageSize, total, totalPages, loading, load, setPage, setPageSize }
+  },
+
   data() {
     return {
-      transports: [],
       showAddModal: false,
       editingTransport: null,
-      page: 1,
-      pageSize: 20,
       sortField: 'date',
       sortOrder: 'desc',
-      total: 0,
-      loading: false,
       contextMenu: {
         visible: false,
         x: 0,
@@ -400,9 +439,6 @@ export default {
   },
 
   computed: {
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
-    },
     isRTL() {
       return this.$i18n?.locale === 'ar'
     },
@@ -486,58 +522,17 @@ export default {
     },
 
     async loadTransports() {
+      // ensure any pending input/select updates are applied (allow emitted select/update events to propagate)
+      await this.$nextTick()
+      await new Promise((res) => setTimeout(res, 20))
+      this.syncFilterIdsFromSearch()
+
       try {
-        this.loading = true
-
-        // ensure any pending input/select updates are applied (allow emitted select/update events to propagate)
-        await this.$nextTick()
-        await new Promise((res) => setTimeout(res, 20))
-        this.syncFilterIdsFromSearch()
-
-        const queryParams = {
-          page: this.page,
-          pageSize: this.pageSize,
-          sortField: this.sortField,
-          sortOrder: this.sortOrder,
-          startDate: this.filters.startDate,
-          endDate: this.filters.endDate,
-          contractorId: this.filters.contractorId,
-          locationId: this.filters.locationId,
-          areaId: this.filters.areaId,
-          itemId: this.filters.itemId,
-          vehicleId: this.filters.vehicleId
-        }
-
-        const cleanParams = buildQueryParams(queryParams)
-        const res = await getTransports(cleanParams)
-
-        // Extract items from response
-        const responseData = res.data
-        if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          const sorted = [...responseData.items].sort((a, b) => {
-            const dateA = a?.date || a?.createdAt || 0
-            const dateB = b?.date || b?.createdAt || 0
-            const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
-            const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
-            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
-          })
-          // In Vue 3, directly assign the array
-          this.transports = sorted
-
-          this.total = responseData.meta?.total ?? responseData.total ?? this.transports.length
-          this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
-
-        } else {
-          console.warn('⚠ Unexpected response format:', responseData)
-          this.transports = []
-          this.total = 0
-        }
+        await this.load({ filters: { ...this.filters }, sortField: this.sortField, sortOrder: this.sortOrder })
       } catch (e) {
         console.error('✗ Error loading transports:', e)
         this.transports = []
         this.total = 0
-      } finally {
-        this.loading = false
       }
     },
 

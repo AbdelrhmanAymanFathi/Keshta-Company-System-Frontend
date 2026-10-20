@@ -326,6 +326,8 @@
 </template>
 
 <script>
+import { ref, watch } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import {
   getVehicles,
   getContractors,
@@ -349,9 +351,29 @@ export default {
   },
   emits: ["navigateReport", "navigateStatement"],
   components: { ArrowsRightLeftIcon, CreateVehicle, DateTimeField, Pagination, PencilSquareIcon, PlusIcon, RowActions, TrashIcon, XMarkIcon },
+  setup(props) {
+    const q = ref('')
+
+    const { items: vehicles, page, pageSize, total, totalPages, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getVehicles({ page: p, pageSize: ps, q: extra.q ?? q.value, mode: props.mode }),
+      { initialPageSize: 20, resourceName: 'vehicles' }
+    )
+
+    const loadVehicles = async () => {
+      try { await load({ q: q.value }) } catch (e) {
+        console.error('Error loading vehicles', e)
+        if (window.$toast) {
+          window.$toast(e?.response?.data?.message || e?.message || 'An error occurred', 'error', 5000)
+        }
+      }
+    }
+
+    watch(q, () => { setPage(1); loadVehicles() })
+
+    return { q, vehicles, page, pageSize, total, totalPages, loadVehicles, setPage, setPageSize }
+  },
   data() {
     return {
-      vehicles: [],
       contractors: [],
       selectedVehicle: null,
       ownershipHistory: [],
@@ -362,11 +384,6 @@ export default {
         effectiveDate: ''
       },
       // driver assignment removed
-      page: 1,
-      pageSize: 20,
-      total: 0,
-      q: '',
-      searchTimeout: null,
       // Context menu state for right-click menu
       contextMenu: {
         visible: false,
@@ -395,22 +412,6 @@ export default {
   computed: {
     isRTL() {
       return this.$i18n && this.$i18n.locale === 'ar'
-    },
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
-    },
-    visiblePages() {
-      const pages = []
-      const maxVisible = 5
-      let start = Math.max(1, this.page - Math.floor(maxVisible / 2))
-      let end = Math.min(this.totalPages, start + maxVisible - 1)
-      if (end - start < maxVisible - 1) {
-        start = Math.max(1, end - maxVisible + 1)
-      }
-      for (let i = start; i <= end; i++) {
-        pages.push(i)
-      }
-      return pages
     },
     filteredCrushers() {
       if (!this.crusherSearch) return this.crushers
@@ -451,51 +452,15 @@ export default {
       }
       return this.$t('errors.unknown') || 'An error occurred'
     },
-    async loadVehicles() {
-      try {
-        const res = await getVehicles({
-          page: this.page,
-          pageSize: this.pageSize,
-          mode: this.mode,
-          q: this.q
-        });
-        const payload = res.data || {}
-        this.vehicles = Array.isArray(payload.items)
-          ? payload.items
-          : Array.isArray(payload.data)
-            ? payload.data
-            : Array.isArray(payload)
-              ? payload
-              : [];
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.vehicles.length
-        this.page = meta.page ?? this.page
-        this.pageSize = meta.pageSize ?? meta.perPage ?? payload.pageSize ?? payload.perPage ?? this.pageSize
-      } catch (e) {
-        console.error('Error loading vehicles', e)
-        const errorMsg = this.extractErrorMessage(e)
-        if (window.$toast) {
-          window.$toast(errorMsg, 'error', 5000)
-        }
-        this.vehicles = []
-      }
-    },
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {
-        this.page = newPage
+        this.setPage(newPage)
         this.loadVehicles()
       }
     },
-    onPageSizeChange() {
-      this.page = 1
+    onPageSizeChange(size) {
+      this.setPageSize(size)
       this.loadVehicles()
-    },
-    onSearchInput() {
-      clearTimeout(this.searchTimeout)
-      this.searchTimeout = setTimeout(() => {
-        this.page = 1
-        this.loadVehicles()
-      }, 300)
     },
     async loadCrushers() {
       try {
@@ -875,7 +840,6 @@ export default {
     document.addEventListener('keydown', this.onGlobalKeydown)
   },
   beforeUnmount() {
-    clearTimeout(this.searchTimeout)
     document.removeEventListener('click', this.onGlobalClick)
     document.removeEventListener('keydown', this.onGlobalKeydown)
   }

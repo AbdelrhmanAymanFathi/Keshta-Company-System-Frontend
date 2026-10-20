@@ -142,6 +142,8 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import { getEquipments, createEquipment, updateEquipment, deleteEquipment, getContractors } from '../../../api'
 import { isPendingApproval, pendingApprovalToast } from '../../../utils/approval'
 import Pagination from '../../shared/Pagination.vue'
@@ -153,14 +155,23 @@ import RowActions from '@/components/shared/RowActions.vue'
 export default {
   name: 'EquipmentList',
   components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, SearchDropdown, TrashIcon, XMarkIcon },
+  setup() {
+    const q = ref('')
+
+    const { items: equipments, page, pageSize, total, totalPages, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getEquipments({ page: p, pageSize: ps, q: extra.q ?? q.value }),
+      { initialPageSize: 20, resourceName: 'equipments' }
+    )
+
+    const loadEquipments = async () => {
+      try { await load({ q: q.value }) } catch (e) { console.error('Error loading equipments', e) }
+    }
+
+    return { q, equipments, page, pageSize, total, totalPages, loadEquipments, setPage, setPageSize }
+  },
   data() {
     return {
-      equipments: [],
       contractors: [],
-      q: '',
-      page: 1,
-      pageSize: 20,
-      total: 0,
       showCreateModal: false,
       editingEquipment: null,
       form: { name: '', contractorId: '', contractorLabel: '', isCompanyOwned: false, hourlyRate: null },
@@ -177,8 +188,6 @@ export default {
   },
   computed: {
     isRTL() { return this.$i18n && this.$i18n.locale === 'ar' },
-    totalPages() { return Math.ceil(this.total / this.pageSize) }
-    ,
     deleteMessage() {
       if (this.deleteTarget && this.deleteTarget.name) {
         return `${this.$t('labels.confirmDelete')} "${this.deleteTarget.name}"?`
@@ -198,19 +207,6 @@ export default {
     }
   },
   methods: {
-    async loadEquipments() {
-      try {
-        const res = await getEquipments({ page: this.page, pageSize: this.pageSize, q: this.q })
-        const payload = res.data || {}
-        this.equipments = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.equipments.length
-      } catch (e) {
-        console.error('Error loading equipments', e)
-        this.equipments = []
-        if (window.$toast) window.$toast(this.extractErrorMessage(e), 'error', 5000)
-      }
-    },
     async loadContractors() {
       try {
         const res = await getContractors({ pageSize: 1000, mode: 'rentals' })
@@ -222,7 +218,7 @@ export default {
       this.form.contractorId = item?.id ?? ''
       this.form.contractorLabel = item ? (item.name || '') : ''
     },
-    search() { this.page = 1; this.loadEquipments() },
+    search() { this.setPage(1); this.loadEquipments() },
     clearSearch() { this.q = ''; this.search() },
     openCreateModal() { this.resetForm(); this.showCreateModal = true },
     openContextMenu(event, equipment) {
