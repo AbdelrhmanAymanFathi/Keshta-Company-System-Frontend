@@ -1,15 +1,15 @@
 /**
  * Fetch every record from a paginated list endpoint by walking pages.
  *
- * The backend caps `pageSize` at 100 for most list routes, so charts that
- * need the full dataset (org structures) must loop instead of asking for
- * one huge page.
+ * The backend caps `pageSize` at 1000 for list routes, so charts that need
+ * the full dataset (org structures) request large pages and loop only when
+ * the result set exceeds one page.
  *
  * @param {(params: object) => Promise<any>} fetcher  API call, e.g. getTransports
  * @param {object} [baseParams]  extra query params merged into every request
- * @param {number} [pageSize]    page size per request (backend max is 100)
+ * @param {number} [pageSize]    page size per request (backend max is 1000)
  */
-export async function fetchAllPages(fetcher, baseParams = {}, pageSize = 100) {
+export async function fetchAllPages(fetcher, baseParams = {}, pageSize = 1000) {
   const all = []
   let page = 1
   let totalPages = 1
