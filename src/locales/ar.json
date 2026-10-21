@@ -836,6 +836,7 @@
     "closePanel": "إغلاق اللوحة",
     "openDetails": "فتح صفحة التفاصيل",
     "openContractorPage": "فتح صفحة المقاول",
+    "openStatement": "كشف الحساب",
     "noResults": "لا توجد نتائج مطابقة",
     "empty": "لا توجد بيانات لعرضها",
     "drillHint": "اضغط على أي خزينة لعرض تفاصيلها المحاسبية والوصول لمستوى الشجرة المحاسبية",
@@ -886,7 +887,14 @@
     "expensesUngrouped": "مصروفات غير مصنفة",
     "expensesCategory": "التصنيف",
     "expensesBranch": "الفرع",
-    "expensesLocation": "الموقع"
+    "expensesLocation": "الموقع",
+    "kpiTreasuryBalance": "إجمالي أرصدة الخزائن",
+    "kpiContractors": "عدد المقاولين",
+    "kpiActiveContractors": "مقاولون مرتبطون بوحدات",
+    "kpiSupplies": "إجمالي التوريدات",
+    "kpiExpenses": "إجمالي المصروفات",
+    "activityReport": "تقرير نشاط المقاولين",
+    "loadingKpi": "جاري تحميل المؤشرات..."
   },
   "databaseBackup": {
     "title": "النسخ الاحتياطي واستعادة قاعدة البيانات",

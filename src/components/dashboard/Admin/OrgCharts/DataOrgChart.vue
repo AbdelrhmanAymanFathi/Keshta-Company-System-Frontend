@@ -45,6 +45,7 @@ export default {
     itemDetails: { type: Function, default: () => [] },
     itemLink: { type: Function, default: () => null },
     itemLinkLabelKey: { type: String, default: 'orgCharts.openDetails' },
+    itemActions: { type: Function, default: () => [] },
   },
   data() {
     return {
@@ -132,6 +133,7 @@ export default {
         details: this.itemDetails(record),
         link: this.itemLink(record),
         linkLabel: this.$t(this.itemLinkLabelKey),
+        actions: this.itemActions(record) || [],
       }
     },
     openLink(link) {

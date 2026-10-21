@@ -835,6 +835,7 @@
     "closePanel": "Close panel",
     "openDetails": "Open details page",
     "openContractorPage": "Open contractor page",
+    "openStatement": "Statement",
     "noResults": "No matching results",
     "empty": "Nothing to show",
     "drillHint": "Click any treasury to reveal its accounting details down to the accounting tree level",
@@ -885,7 +886,14 @@
     "expensesUngrouped": "Unclassified expenses",
     "expensesCategory": "Category",
     "expensesBranch": "Branch",
-    "expensesLocation": "Location"
+    "expensesLocation": "Location",
+    "kpiTreasuryBalance": "Total treasury balances",
+    "kpiContractors": "Contractors",
+    "kpiActiveContractors": "Contractors in modules",
+    "kpiSupplies": "Total supplies",
+    "kpiExpenses": "Total expenses",
+    "activityReport": "Contractors activity report",
+    "loadingKpi": "Loading metrics..."
   },
   "databaseBackup": {
     "title": "Database Backup & Restore",
