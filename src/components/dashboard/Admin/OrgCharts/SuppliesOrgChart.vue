@@ -17,6 +17,7 @@
 <script>
 import DataOrgChart from './DataOrgChart.vue'
 import { getSupplies } from '../../../../api'
+import { fetchAllPages } from '../../../../utils/fetchAllPages'
 
 export default {
   name: 'SuppliesOrgChart',
@@ -36,12 +37,7 @@ export default {
       return name.includes('نقل') || name.includes('تحميل') || name.includes('transport')
     },
     async fetchSupplies() {
-      const res = await getSupplies({ page: 1, pageSize: 1000 })
-      const payload = res.data
-      if (Array.isArray(payload)) return payload
-      if (payload && Array.isArray(payload.items)) return payload.items
-      if (payload && Array.isArray(payload.data)) return payload.data
-      return []
+      return fetchAllPages((params) => getSupplies(params))
     },
     itemTitle(r) {
       return r.contractor?.name || r.contractorName || this.$t('orgCharts.unknownEntity')

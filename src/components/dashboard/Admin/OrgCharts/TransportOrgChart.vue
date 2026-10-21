@@ -17,6 +17,7 @@
 <script>
 import DataOrgChart from './DataOrgChart.vue'
 import { getTransports } from '../../../../api'
+import { fetchAllPages } from '../../../../utils/fetchAllPages'
 
 export default {
   name: 'TransportOrgChart',
@@ -34,12 +35,7 @@ export default {
       return r.isCompanyOwned === true || r.vehicle?.isCompanyOwned === true
     },
     async fetchTransports() {
-      const res = await getTransports({ page: 1, pageSize: 1000 })
-      const payload = res.data
-      if (Array.isArray(payload)) return payload
-      if (payload && Array.isArray(payload.items)) return payload.items
-      if (payload && Array.isArray(payload.data)) return payload.data
-      return []
+      return fetchAllPages((params) => getTransports(params))
     },
     itemTitle(r) {
       return r.contractor?.name || r.contractorName || this.$t('orgCharts.unknownEntity')

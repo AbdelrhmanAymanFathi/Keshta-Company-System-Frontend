@@ -16,6 +16,7 @@
 <script>
 import DataOrgChart from './DataOrgChart.vue'
 import { getExpenses } from '../../../../api'
+import { fetchAllPages } from '../../../../utils/fetchAllPages'
 
 export default {
   name: 'ExpensesOrgChart',
@@ -39,12 +40,7 @@ export default {
       return name.includes('تشغيل') || name.includes('operating') || name.includes('صيانة') || name.includes('maintenance')
     },
     async fetchExpenses() {
-      const res = await getExpenses({ page: 1, pageSize: 1000 })
-      const payload = res.data
-      if (Array.isArray(payload)) return payload
-      if (payload && Array.isArray(payload.items)) return payload.items
-      if (payload && Array.isArray(payload.data)) return payload.data
-      return []
+      return fetchAllPages((params) => getExpenses(params))
     },
     itemTitle(r) {
       return r.mainCategory?.name || r.category?.name || r.categoryName || this.$t('orgCharts.expensesOther')
