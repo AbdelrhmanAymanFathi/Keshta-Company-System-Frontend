@@ -808,7 +808,7 @@
     "runReport": "Run Report"
   },
   "orgCharts": {
-    "modulesTitle": "Organizational Modules",
+    "modulesTitle": "Modules Tree",
     "modulesSubtitle": "Company operating modules and the contractors available for each",
     "contractorsTitle": "Contractors Structure",
     "contractorsSubtitle": "Contractors grouped by the operating modules they serve",

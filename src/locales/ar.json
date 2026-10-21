@@ -809,7 +809,7 @@
     "runReport": "تشغيل التقرير"
   },
   "orgCharts": {
-    "modulesTitle": "الوحدات التنظيمية",
+    "modulesTitle": "شجرة الوحدات",
     "modulesSubtitle": "هيكل الوحدات التشغيلية للشركة والمقاولين المتاحين لكل وحدة",
     "contractorsTitle": "هيكل المقاولين",
     "contractorsSubtitle": "المقاولين موزعين حسب الوحدات التشغيلية التي يعملون بها",
