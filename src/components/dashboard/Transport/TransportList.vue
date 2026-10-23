@@ -254,18 +254,8 @@
               <div>{{ transport.notes || transport.note || '-' }}</div>
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <div class="flex gap-2" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="editTransport(transport)" :disabled="transport.hasPendingApproval" class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                  :title="$t('common.edit') || 'Edit'">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                <button @click.stop="openDeleteConfirm(transport)" :disabled="transport.hasPendingApproval" class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                  :title="$t('common.delete')">
-                  <TrashIcon class="h-4 h-4" />
-                </button>
+              <div class="flex" :class="isRTL ? 'justify-start' : 'justify-end'">
+                <RowActions :actions="rowActions(transport)" />
               </div>
             </td>
           </tr>
@@ -331,6 +321,7 @@
 
 <script>
 import SortIcon from '@/components/shared/SortIcon.vue'
+import { usePagination } from '@/composables/usePagination'
 import { getTransports, getTransport, deleteTransport, getContractors, getLocations, getItems, getVehicles } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
@@ -338,7 +329,8 @@ import DateField from '@/components/shared/DateField.vue'
 import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
-import { TrashIcon } from '@acme/icon-packs/legacy'
+import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
@@ -350,6 +342,7 @@ export default {
   components: {
     Pagination,
     TransportModal,
+    RowActions,
     SearchDropdown,
     PaymentModal,
     DateField,
@@ -357,17 +350,55 @@ export default {
     SortIcon
   },
 
+  setup() {
+    const { items: transports, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      async (p, ps, extra) => {
+        const queryParams = {
+          page: p,
+          pageSize: ps,
+          sortField: extra.sortField,
+          sortOrder: extra.sortOrder,
+          startDate: extra.filters.startDate,
+          endDate: extra.filters.endDate,
+          contractorId: extra.filters.contractorId,
+          locationId: extra.filters.locationId,
+          areaId: extra.filters.areaId,
+          itemId: extra.filters.itemId,
+          vehicleId: extra.filters.vehicleId
+        }
+
+        const cleanParams = buildQueryParams(queryParams)
+        const res = await getTransports(cleanParams)
+
+        const responseData = res.data
+        if (!responseData || !Array.isArray(responseData.items)) {
+          console.warn('⚠ Unexpected response format:', responseData)
+          return []
+        }
+
+        const order = extra.sortOrder
+        const sorted = [...responseData.items].sort((a, b) => {
+          const dateA = a?.date || a?.createdAt || 0
+          const dateB = b?.date || b?.createdAt || 0
+          const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+          const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+          return order === 'asc' ? timeA - timeB : timeB - timeA
+        })
+
+        return { ...responseData, items: sorted }
+      },
+      { initialPageSize: 20, resourceName: 'transports' }
+    )
+
+    return { transports, page, pageSize, total, totalPages, loading, load, setPage, setPageSize }
+  },
+
   data() {
     return {
-      transports: [],
       showAddModal: false,
       editingTransport: null,
-      page: 1,
-      pageSize: 20,
       sortField: 'date',
       sortOrder: 'desc',
-      total: 0,
-      loading: false,
       contextMenu: {
         visible: false,
         x: 0,
@@ -408,9 +439,6 @@ export default {
   },
 
   computed: {
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
-    },
     isRTL() {
       return this.$i18n?.locale === 'ar'
     },
@@ -461,12 +489,6 @@ export default {
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         this.vehicles = Array.isArray(vehiclesData) ? vehiclesData : []
 
-        console.log('✓ Filter data loaded:', {
-          contractors: this.contractors.length,
-          locations: this.locations.length,
-          items: this.items.length,
-          vehicles: this.vehicles.length
-        })
       } catch (err) {
         console.error('✗ Error loading filter data:', err)
       }
@@ -500,66 +522,17 @@ export default {
     },
 
     async loadTransports() {
+      // ensure any pending input/select updates are applied (allow emitted select/update events to propagate)
+      await this.$nextTick()
+      await new Promise((res) => setTimeout(res, 20))
+      this.syncFilterIdsFromSearch()
+
       try {
-        this.loading = true
-
-        // ensure any pending input/select updates are applied (allow emitted select/update events to propagate)
-        await this.$nextTick()
-        await new Promise((res) => setTimeout(res, 20))
-        this.syncFilterIdsFromSearch()
-
-        console.debug('Filters before request:', JSON.parse(JSON.stringify(this.filters)))
-
-        const queryParams = {
-          page: this.page,
-          pageSize: this.pageSize,
-          sortField: this.sortField,
-          sortOrder: this.sortOrder,
-          startDate: this.filters.startDate,
-          endDate: this.filters.endDate,
-          contractorId: this.filters.contractorId,
-          locationId: this.filters.locationId,
-          areaId: this.filters.areaId,
-          itemId: this.filters.itemId,
-          vehicleId: this.filters.vehicleId
-        }
-
-        const cleanParams = buildQueryParams(queryParams)
-        console.log('🔵 Loading transports with params:', queryParams)
-        console.log('🔵 Clean params sent to API:', cleanParams)
-        const res = await getTransports(cleanParams)
-
-        console.log('Response received:', res)
-        console.log('Response data:', res.data)
-
-        // Extract items from response
-        const responseData = res.data
-        if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          const sorted = [...responseData.items].sort((a, b) => {
-            const dateA = a?.date || a?.createdAt || 0
-            const dateB = b?.date || b?.createdAt || 0
-            const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
-            const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
-            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
-          })
-          // In Vue 3, directly assign the array
-          this.transports = sorted
-
-          this.total = responseData.meta?.total ?? responseData.total ?? this.transports.length
-          this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
-
-          console.log('✓ Transports updated:', this.transports.length, 'items')
-        } else {
-          console.warn('⚠ Unexpected response format:', responseData)
-          this.transports = []
-          this.total = 0
-        }
+        await this.load({ filters: { ...this.filters }, sortField: this.sortField, sortOrder: this.sortOrder })
       } catch (e) {
         console.error('✗ Error loading transports:', e)
         this.transports = []
         this.total = 0
-      } finally {
-        this.loading = false
       }
     },
 
@@ -678,6 +651,12 @@ export default {
       }
     },
 
+    rowActions(transport) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('common.edit') || 'Edit', tone: 'edit', disabled: transport.hasPendingApproval, onClick: () => this.editTransport(transport) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('common.delete'), tone: 'delete', disabled: transport.hasPendingApproval, onClick: () => this.openDeleteConfirm(transport) },
+      ]
+    },
     editTransport(transport) {
       this.editingTransport = { ...transport }
       this.showAddModal = true
@@ -723,7 +702,7 @@ export default {
         this.closeDeleteConfirm()
       } catch (e) {
         console.error('Failed to delete transport', e)
-        alert(this.$t('common.deleteError') || 'Failed to delete')
+        void(window.$toast ? window.$toast(this.$t('common.deleteError') || 'Failed to delete', 'error') : alert(this.$t('common.deleteError') || 'Failed to delete'))
       } finally {
         this.deleting = false
       }

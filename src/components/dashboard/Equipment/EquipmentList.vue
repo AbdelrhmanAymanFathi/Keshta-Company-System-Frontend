@@ -48,26 +48,7 @@
             </td>
             <td class="px-3 py-3 theme-text-secondary text-start">{{ e.hourlyRate != null ? e.hourlyRate : '—' }}</td>
             <td class="px-3 py-3">
-              <div class="flex gap-2 items-center" :class="isRTL ? 'flex-row-reverse' : ''">
-                <button
-                  type="button"
-                  class="inline-flex items-center justify-center rounded-lg border theme-border-accent theme-dashboard-bg-soft p-2 theme-text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                  :title="$t('labels.edit') || 'Edit'"
-                  :aria-label="$t('labels.edit') || 'Edit'"
-                  @click.stop="openEditModal(e)"
-                >
-                  <PencilIcon class="w-5 h-5 theme-text-secondary transition-colors duration-300" />
-                </button>
-                <button
-                  type="button"
-                  class="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-2 text-rose-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-md"
-                  :title="$t('labels.delete') || 'Delete'"
-                  :aria-label="$t('labels.delete') || 'Delete'"
-                  @click.stop="openDeleteConfirm(e)"
-                >
-                  <TrashIcon class="w-5 h-5 text-rose-500 transition-colors duration-300" />
-                </button>
-              </div>
+              <RowActions :actions="rowActions(e)" />
             </td>
           </tr>
           <tr v-if="equipments.length === 0">
@@ -161,24 +142,36 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import { getEquipments, createEquipment, updateEquipment, deleteEquipment, getContractors } from '../../../api'
 import { isPendingApproval, pendingApprovalToast } from '../../../utils/approval'
 import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { PencilIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 
 export default {
   name: 'EquipmentList',
-  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, SearchDropdown, TrashIcon, XMarkIcon },
+  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, SearchDropdown, TrashIcon, XMarkIcon },
+  setup() {
+    const q = ref('')
+
+    const { items: equipments, page, pageSize, total, totalPages, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getEquipments({ page: p, pageSize: ps, q: extra.q ?? q.value }),
+      { initialPageSize: 20, resourceName: 'equipments' }
+    )
+
+    const loadEquipments = async () => {
+      try { await load({ q: q.value }) } catch (e) { console.error('Error loading equipments', e) }
+    }
+
+    return { q, equipments, page, pageSize, total, totalPages, loadEquipments, setPage, setPageSize }
+  },
   data() {
     return {
-      equipments: [],
       contractors: [],
-      q: '',
-      page: 1,
-      pageSize: 20,
-      total: 0,
       showCreateModal: false,
       editingEquipment: null,
       form: { name: '', contractorId: '', contractorLabel: '', isCompanyOwned: false, hourlyRate: null },
@@ -195,8 +188,6 @@ export default {
   },
   computed: {
     isRTL() { return this.$i18n && this.$i18n.locale === 'ar' },
-    totalPages() { return Math.ceil(this.total / this.pageSize) }
-    ,
     deleteMessage() {
       if (this.deleteTarget && this.deleteTarget.name) {
         return `${this.$t('labels.confirmDelete')} "${this.deleteTarget.name}"?`
@@ -216,19 +207,6 @@ export default {
     }
   },
   methods: {
-    async loadEquipments() {
-      try {
-        const res = await getEquipments({ page: this.page, pageSize: this.pageSize, q: this.q })
-        const payload = res.data || {}
-        this.equipments = Array.isArray(payload.items) ? payload.items : (Array.isArray(payload.data) ? payload.data : (Array.isArray(payload) ? payload : []))
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.equipments.length
-      } catch (e) {
-        console.error('Error loading equipments', e)
-        this.equipments = []
-        if (window.$toast) window.$toast(this.extractErrorMessage(e), 'error', 5000)
-      }
-    },
     async loadContractors() {
       try {
         const res = await getContractors({ pageSize: 1000, mode: 'rentals' })
@@ -240,7 +218,7 @@ export default {
       this.form.contractorId = item?.id ?? ''
       this.form.contractorLabel = item ? (item.name || '') : ''
     },
-    search() { this.page = 1; this.loadEquipments() },
+    search() { this.setPage(1); this.loadEquipments() },
     clearSearch() { this.q = ''; this.search() },
     openCreateModal() { this.resetForm(); this.showCreateModal = true },
     openContextMenu(event, equipment) {
@@ -258,6 +236,12 @@ export default {
       const row = this.contextMenu.equipment
       this.contextMenu.visible = false
       if (row) this.openDeleteConfirm(row)
+    },
+    rowActions(e) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit') || 'Edit', tone: 'edit', onClick: () => this.openEditModal(e) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete') || 'Delete', tone: 'delete', onClick: () => this.openDeleteConfirm(e) },
+      ]
     },
     openEditModal(e) {
       this.editingEquipment = e

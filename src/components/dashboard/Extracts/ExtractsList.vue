@@ -13,108 +13,49 @@
       />
     </div>
 
-    <!-- Filters Section -->
     <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div>
           <label class="block text-[11px] font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
-          <DateField v-model="filters.startDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
+          <DateField v-model="filters.startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
-
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
-          <DateField v-model="filters.endDate"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
+          <DateField v-model="filters.endDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
         </div>
-
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.contractor') }}</label>
-          <SearchDropdown
-            v-model="filters.contractorSearch"
-            :items="contractors"
-            :allItems="contractors"
-            :placeholder="$t('placeholders.searchContractor')"
-            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            @select="(sel) => { filters.contractorId = sel.id; filters.contractorSearch = sel.name }"
-          />
+          <SearchDropdown v-model="filters.contractorSearch" :items="contractors" :allItems="contractors" :placeholder="$t('placeholders.searchContractor')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.contractorId = sel.id; filters.contractorSearch = sel.name }" />
         </div>
-
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.location') }}</label>
-          <SearchDropdown
-            v-model="filters.locationSearch"
-            :items="locations"
-            :allItems="locations"
-            :placeholder="$t('placeholders.searchLocation')"
-            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            @select="(sel) => selectLocation(sel)"
-          />
+          <SearchDropdown v-model="filters.locationSearch" :items="locations" :allItems="locations" :placeholder="$t('placeholders.searchLocation')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => selectLocation(sel)" />
         </div>
-
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.area') }}</label>
-          <SearchDropdown
-            v-model="filters.areaSearch"
-            :items="availableAreas"
-            :allItems="availableAreas"
-            :placeholder="$t('placeholders.searchArea')"
-            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            @select="(sel) => selectArea(sel)"
-          />
+          <SearchDropdown v-model="filters.areaSearch" :items="availableAreas" :allItems="availableAreas" :placeholder="$t('placeholders.searchArea')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => selectArea(sel)" />
         </div>
-
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.item') }}</label>
-          <SearchDropdown
-            v-model="filters.itemSearch"
-            :items="items"
-            :allItems="items"
-            :placeholder="$t('placeholders.searchItem')"
-            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            @select="(sel) => { filters.itemId = sel.id; filters.itemSearch = sel.name }"
-          />
+          <SearchDropdown v-model="filters.itemSearch" :items="items" :allItems="items" :placeholder="$t('placeholders.searchItem')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.itemId = sel.id; filters.itemSearch = sel.name }" />
         </div>
-
       </div>
-
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <button @click="page = 1; loadExtracts()" :disabled="loading"
-          class="w-full sm:w-auto px-3 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm ">
-          {{ $t('labels.search') }}</button>
-        <button @click="clearFilters"
-          class="w-full sm:w-auto px-3 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">{{ $t('labels.clear') }}</button>
+        <button @click="page = 1; loadExtracts()" :disabled="loading" class="w-full sm:w-auto px-3 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm ">{{ $t('labels.search') }}</button>
+        <button @click="clearFilters" class="w-full sm:w-auto px-3 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">{{ $t('labels.clear') }}</button>
       </div>
     </div>
 
-    <!-- table -->
     <div class="app-table-card">
       <table v-app-table class="app-table divide-y divide-gray-200">
         <colgroup>
-          <col style="width: 3%" />
-          <col style="width: 7%" />
-          <col style="width: 7%" />
-          <col style="width: 12%" />
-          <col style="width: 5%" />
-          <col style="width: 7%" />
-          <col style="width: 6%" />
-          <col style="width: 10%" />
-          <col style="width: 7%" />
-          <col style="width: 8%" />
-          <col style="width: 7%" />
-          <col style="width: 8%" />
-          <col style="width: 8%" />
-          <col style="width: 5%" />
+          <col style="width: 3%" /><col style="width: 7%" /><col style="width: 7%" /><col style="width: 12%" /><col style="width: 5%" /><col style="width: 7%" /><col style="width: 6%" /><col style="width: 10%" /><col style="width: 7%" /><col style="width: 8%" /><col style="width: 7%" /><col style="width: 8%" /><col style="width: 8%" /><col style="width: 5%" />
         </colgroup>
         <thead class="theme-table-thead-gradient">
           <tr>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
-            <th data-col="subtitle" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
-              @click="sortBy('dateFrom')">
-              {{ $t('labels.dateFrom') || 'Date From' }}
-              <SortIcon :active="sortField === 'dateFrom'" :dir="sortOrder" />
-            </th>
+            <th data-col="subtitle" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary" @click="sortBy('dateFrom')">{{ $t('labels.dateFrom') || 'Date From' }}<SortIcon :active="sortField === 'dateFrom'" :dir="sortOrder" /></th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.dateTo') || 'Date To' }}</th>
             <th data-col="title" class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.item') }}</th>
             <th class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">{{ $t('labels.quantity') }}</th>
@@ -130,98 +71,39 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr
-            v-for="(extract, idx) in extracts"
-            :key="extract.rowKey || `extract-${extract.id}`"
-            :class="['theme-table-row-hover', 'cursor-pointer', { 'row-pending-review': extract.hasPendingApproval }]"
-            @click.stop="openRowMenu($event, extract)"
-            @contextmenu.prevent.stop="openRowMenu($event, extract)"
-          >
+          <tr v-for="(extract, idx) in extracts" :key="extract.rowKey || `extract-${extract.id}`" :class="['theme-table-row-hover', 'cursor-pointer', { 'row-pending-review': extract.hasPendingApproval }]" @click.stop="openRowMenu($event, extract)" @contextmenu.prevent.stop="openRowMenu($event, extract)">
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateFrom || extract.date) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(extract.dateTo || extract.date) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
-              {{ formatItemWithUnit(extract.item) || extract.itemName || '-' }}
-            </td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ formatItemWithUnit(extract.item) || extract.itemName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.itemQuantity !== null && extract.itemQuantity !== undefined ? extract.itemQuantity : '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.itemPrice !== null && extract.itemPrice !== undefined ? formatCurrency(extract.itemPrice) : '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ extract.itemDiscount !== null && extract.itemDiscount !== undefined ? formatCurrency(extract.itemDiscount) : '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
-              {{ extract.contractorName || '-' }}
-            </td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.contractorName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-              <span v-if="extract.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
-                {{ $t('labels.pendingReview') || 'Pending Review' }}
-              </span>
-              <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
-                {{ $t('labels.approved') || 'Approved' }}
-              </span>
+              <span v-if="extract.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">{{ $t('labels.pendingReview') || 'Pending Review' }}</span>
+              <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">{{ $t('labels.approved') || 'Approved' }}</span>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.locationName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.areaName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(extract.total) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
-              <div>{{ extract.notes || extract.note || '-' }}</div>
-            </td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <button
-                @click.stop="openEdit(extract.id)"
-                :disabled="extract.hasPendingApproval"
-                class="inline-flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-2 text-indigo-700 shadow-sm shadow-indigo-100/70 transition-all hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 mr-1"
-                :title="$t('labels.edit') || 'Edit'"
-              >
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button
-                @click.stop="openDeleteConfirm(extract)"
-                :disabled="extract.hasPendingApproval"
-                :title="$t('labels.delete')"
-                class="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 p-2 text-red-700 shadow-sm shadow-red-100/70 transition-all hover:-translate-y-0.5 hover:bg-red-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-              >
-                <TrashIcon class="w-4 h-4" />
-              </button>
-            </td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider"><div>{{ extract.notes || extract.note || '-' }}</div></td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap"><RowActions :actions="rowActions(extract)" /></td>
           </tr>
           <tr v-if="extracts.length === 0">
-              <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="14">
-              {{ $t('extracts.noExtractsFound') || 'No extracts found' }}
-            </td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="14">{{ $t('extracts.noExtractsFound') || 'No extracts found' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages"
-      :pageSizeOptions="[10,20,50,100]" @update:page="(p) => { page = p; loadExtracts() }" @update:pageSize="(size) => { pageSize = size; page = 1; loadExtracts() }" />
+    <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages" :pageSizeOptions="[10,20,50,100]" @update:page="changePage" @update:pageSize="onPageSizeChange" />
 
-    <!-- Row Action Menu -->
-    <div
-      v-if="contextMenu.visible"
-      :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }"
-      class="fixed z-50 min-w-[9rem] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10"
-      @click.stop
-    >
-      <button
-        type="button"
-        :disabled="contextMenu.item?.hasPendingApproval"
-        class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border-b border-slate-100"
-        @click="openEdit(contextMenu.item.id); closeContextMenu()"
-      >
-        <PencilIcon class="h-4 w-4 text-slate-500" />
-        {{ $t('labels.edit') || 'Edit' }}
-      </button>
-      <button
-        type="button"
-        :disabled="contextMenu.item?.hasPendingApproval"
-        class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-        @click="openDeleteConfirm(contextMenu.item); closeContextMenu()"
-      >
-        <TrashIcon class="h-4 w-4" />
-        {{ $t('labels.delete') || 'Delete' }}
-      </button>
+    <div v-if="contextMenu.visible" :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }" class="fixed z-50 min-w-[9rem] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10" @click.stop>
+      <button type="button" :disabled="contextMenu.item?.hasPendingApproval" class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border-b border-slate-100" @click="openEdit(contextMenu.item.id); closeContextMenu()"><PencilIcon class="h-4 w-4 text-slate-500" />{{ $t('labels.edit') || 'Edit' }}</button>
+      <button type="button" :disabled="contextMenu.item?.hasPendingApproval" class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed" @click="openDeleteConfirm(contextMenu.item); closeContextMenu()"><TrashIcon class="h-4 w-4" />{{ $t('labels.delete') || 'Delete' }}</button>
     </div>
 
-    <!-- Delete Confirm Modal -->
     <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50" style="margin-top:0;">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 sm:p-6 w-full max-w-sm">
         <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
@@ -236,6 +118,8 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import { deleteExtract, getExtracts } from '@/services/extracts'
 import { getContractors, getLocations, getExportItems } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
@@ -244,6 +128,7 @@ import Pagination from '../../shared/Pagination.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { TrashIcon, PencilIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 import DateField from '../../shared/DateField.vue'
 import SortIcon from '../../shared/SortIcon.vue'
 import { realtimeService } from '@/services/realtimeService'
@@ -251,48 +136,40 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'ExtractsList',
-  components: { ExtractsCreationModal, Pagination, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon },
+  components: { ExtractsCreationModal, Pagination, RowActions, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon },
+  setup() {
+    const filters = ref({
+      startDate: '', endDate: '', contractorId: '', contractorSearch: '', locationId: '', locationSearch: '', areaId: '', areaSearch: '', itemId: '', itemSearch: ''
+    })
+    const sortField = ref('dateFrom')
+    const sortOrder = ref('desc')
+
+    const fetchFn = (p, ps) => {
+      const queryParams = {
+        page: p, pageSize: ps, sortField: sortField.value, sortOrder: sortOrder.value,
+        startDate: filters.value.startDate, endDate: filters.value.endDate,
+        contractorId: filters.value.contractorId, locationId: filters.value.locationId,
+        areaId: filters.value.areaId, itemId: filters.value.itemId
+      }
+      const cleanParams = buildQueryParams(queryParams)
+      return getExtracts(cleanParams)
+    }
+
+    const { items: extracts, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(fetchFn, { initialPageSize: 20, resourceName: 'extracts' })
+
+    const loadExtracts = () => load()
+
+    return { extracts, page, pageSize, total, totalPages, loading, loadExtracts, setPage, setPageSize, filters, sortField, sortOrder }
+  },
   data() {
     return {
-      extracts: [],
-      page: 1,
-      pageSize: 20,
-      sortField: 'dateFrom',
-      sortOrder: 'desc',
-      total: 0,
-      loading: false,
-      contractors: [],
-      locations: [],
-      items: [],
-      deleting: false,
-      contextMenu: {
-        visible: false,
-        x: 0,
-        y: 0,
-        item: null
-      },
+      contractors: [], locations: [], items: [], deleting: false,
+      contextMenu: { visible: false, x: 0, y: 0, item: null },
       deleteConfirmModal: { show: false, id: null },
-      modalState: {
-        show: false,
-        isEditing: false,
-        extractId: null
-      },
-      filters: {
-        startDate: '',
-        endDate: '',
-        contractorId: '',
-        contractorSearch: '',
-        locationId: '',
-        locationSearch: '',
-        areaId: '',
-        areaSearch: '',
-        itemId: '',
-        itemSearch: ''
-      }
+      modalState: { show: false, isEditing: false, extractId: null }
     }
   },
   computed: {
-    totalPages() { return Math.ceil(this.total / this.pageSize) },
     isRTL() { return this.$i18n?.locale === 'ar' },
     availableAreas() {
       if (!this.filters.locationId) return []
@@ -314,7 +191,6 @@ export default {
   methods: {
     normalizeExtractForList(extract) {
       const lines = Array.isArray(extract?.lines) ? extract.lines : []
-
       if (!lines.length) {
         return [{
           ...extract,
@@ -330,10 +206,8 @@ export default {
           extractTotal: extract?.total
         }]
       }
-
       return lines.map((line) => {
         const normalizedItem = normalizeItem(line?.item || null)
-
         return {
           ...extract,
           line,
@@ -355,15 +229,11 @@ export default {
       try {
         const contractorsRes = await getContractors({ pageSize: 1000, mode: 'extract' })
         const payload = contractorsRes.data || {}
-        const contractorsData = Array.isArray(payload.items) ? payload.items
-          : Array.isArray(payload.data) ? payload.data
-          : Array.isArray(payload) ? payload : []
+        const contractorsData = Array.isArray(payload.items) ? payload.items : Array.isArray(payload.data) ? payload.data : Array.isArray(payload) ? payload : []
         this.contractors = contractorsData
-
         const locationsRes = await getLocations()
         const locationsData = locationsRes.data?.data || locationsRes.data || []
         this.locations = Array.isArray(locationsData) ? locationsData : []
-
         const itemsRes = await getExportItems({ mode: 'extracts' })
         const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
         this.items = Array.isArray(itemsData) ? itemsData.map(normalizeItem) : []
@@ -371,174 +241,34 @@ export default {
         console.error('Error loading filter data:', err)
       }
     },
-
     clearFilters() {
-      this.filters = {
-        startDate: '', endDate: '', contractorId: '', contractorSearch: '', locationId: '', locationSearch: '', areaId: '', areaSearch: '', itemId: '', itemSearch: ''
-      }
+      this.filters = { startDate: '', endDate: '', contractorId: '', contractorSearch: '', locationId: '', locationSearch: '', areaId: '', areaSearch: '', itemId: '', itemSearch: '' }
       this.page = 1
       this.loadExtracts()
     },
-
-    async loadExtracts() {
-      try {
-        this.loading = true
-        const queryParams = {
-          page: this.page,
-          pageSize: this.pageSize,
-          sortField: this.sortField,
-          sortOrder: this.sortOrder,
-          startDate: this.filters.startDate,
-          endDate: this.filters.endDate,
-          contractorId: this.filters.contractorId,
-          locationId: this.filters.locationId,
-          areaId: this.filters.areaId,
-          itemId: this.filters.itemId
-        }
-        const cleanParams = buildQueryParams(queryParams)
-        const res = await getExtracts(cleanParams)
-        const responseData = res.data
-        if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          const normalized = responseData.items.flatMap(this.normalizeExtractForList)
-          normalized.sort((a, b) => {
-            const valA = a?.dateFrom || a?.date || 0
-            const valB = b?.dateFrom || b?.date || 0
-            const timeA = Number.isNaN(new Date(valA).getTime()) ? 0 : new Date(valA).getTime()
-            const timeB = Number.isNaN(new Date(valB).getTime()) ? 0 : new Date(valB).getTime()
-            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
-          })
-          this.extracts = normalized
-          this.total = responseData.meta?.total || responseData.total || this.extracts.length
-          this.pageSize = responseData.meta?.pageSize || responseData.pageSize || this.pageSize
-        } else if (Array.isArray(res.data)) {
-          const normalized = res.data.flatMap(this.normalizeExtractForList)
-          normalized.sort((a, b) => {
-            const valA = a?.dateFrom || a?.date || 0
-            const valB = b?.dateFrom || b?.date || 0
-            const timeA = Number.isNaN(new Date(valA).getTime()) ? 0 : new Date(valA).getTime()
-            const timeB = Number.isNaN(new Date(valB).getTime()) ? 0 : new Date(valB).getTime()
-            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
-          })
-          this.extracts = normalized
-          this.total = res.data.length
-        } else {
-          this.extracts = []
-          this.total = 0
-        }
-      } catch (e) {
-        console.error('Error loading extracts:', e)
-        this.extracts = []
-        this.total = 0
-      } finally {
-        this.loading = false
-      }
-    },
-
-    onExtractSaved() {
-      this.page = 1
-      this.loadExtracts()
-    },
-
-    selectLocation(location) {
-      this.filters.locationId = location.id
-      this.filters.locationSearch = location.name
-      this.filters.areaId = ''
-      this.filters.areaSearch = ''
-    },
-    selectArea(area) {
-      this.filters.areaId = area.id
-      this.filters.areaSearch = area.name
-    },
-
-    openDeleteConfirm(item) {
-      this.closeContextMenu()
-      this.deleteConfirmModal = { show: true, id: item.id }
-    },
+    changePage(newPage) { this.setPage(newPage); this.loadExtracts() },
+    onPageSizeChange(newSize) { this.setPageSize(newSize); this.loadExtracts() },
+    onExtractSaved() { this.page = 1; this.loadExtracts() },
+    selectLocation(location) { this.filters.locationId = location.id; this.filters.locationSearch = location.name; this.filters.areaId = ''; this.filters.areaSearch = '' },
+    selectArea(area) { this.filters.areaId = area.id; this.filters.areaSearch = area.name },
+    rowActions(extract) { return [ { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit') || 'Edit', tone: 'edit', disabled: extract.hasPendingApproval, onClick: () => this.openEdit(extract.id) }, { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', disabled: extract.hasPendingApproval, onClick: () => this.openDeleteConfirm(extract) } ] },
+    openDeleteConfirm(item) { this.closeContextMenu(); this.deleteConfirmModal = { show: true, id: item.id } },
     closeDeleteConfirm() { this.deleteConfirmModal = { show: false, id: null } },
     async handleDelete(id) {
       this.deleting = true
-      try {
-        await deleteExtract(id)
-        await this.loadExtracts()
-        this.closeDeleteConfirm()
-      } catch (e) {
-        console.error('Failed to delete extract', e)
-        alert(this.$t('common.deleteError') || 'Failed to delete')
-      } finally {
-        this.deleting = false
-      }
+      try { await deleteExtract(id); await this.loadExtracts(); this.closeDeleteConfirm() }
+      catch (e) { console.error('Failed to delete extract', e); void(window.$toast ? window.$toast(this.$t('common.deleteError') || 'Failed to delete', 'error') : alert(this.$t('common.deleteError') || 'Failed to delete')) }
+      finally { this.deleting = false }
     },
-
-    formatDate(dateString) {
-      if (!dateString) return '-'
-      try { return new Intl.DateTimeFormat('en-GB').format(new Date(dateString)) } catch (e) { return dateString }
-    },
-
-    // formatNumber(v) { return Number(v).toLocaleString(this.isRTL ? 'ar-EG' : 'en-US', { maximumFractionDigits: 2 }) },
-    formatCurrency(v) {
-      if (v === undefined || v === null || v === '') return '-'
-      const n = Number(v)
-      if (Number.isNaN(n)) return v
-      const rtl = this.$i18n?.locale === 'ar'
-      const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
-      return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted
-    },
-
-    formatItemWithUnit(item) {
-      if (!item) return ''
-      const name = item?.name || ''
-      const unitName = item?.unit?.name || item?.unitName || item?.unit_name || ''
-      if (!name && !unitName) return ''
-      if (!unitName) return name
-      if (!name) return unitName
-      return `${name} (${unitName})`
-    },
-
-    openDetail(id) {
-      this.$router.push({ name: 'extracts-detail', params: { id } })
-    },
-
-    openEdit(id) {
-      this.modalState.isEditing = true
-      this.modalState.extractId = id
-      this.modalState.show = true
-      this.$refs.creationModal?.openModal()
-    },
-
-    onModalClosed() {
-      this.modalState.isEditing = false
-      this.modalState.extractId = null
-      this.modalState.show = false
-    },
-
-    openRowMenu(event, item) {
-      this.contextMenu = {
-        visible: true,
-        x: event.clientX,
-        y: event.clientY,
-        item
-      }
-    },
-
-    closeContextMenu() {
-      this.contextMenu = {
-        visible: false,
-        x: 0,
-        y: 0,
-        item: null
-      }
-    },
-
-    sortBy(field) {
-      if (this.sortField === field) {
-        this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc'
-      } else {
-        this.sortField = field
-        this.sortOrder = 'desc'
-      }
-      this.page = 1
-      this.loadExtracts()
-    },
+    formatDate(dateString) { if (!dateString) return '-'; try { return new Intl.DateTimeFormat('en-GB').format(new Date(dateString)) } catch (e) { return dateString } },
+    formatCurrency(v) { if (v === undefined || v === null || v === '') return '-'; const n = Number(v); if (Number.isNaN(n)) return v; const rtl = this.$i18n?.locale === 'ar'; const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n); return rtl && formatted.startsWith('-') ? '\u200E' + formatted : formatted },
+    formatItemWithUnit(item) { if (!item) return ''; const name = item?.name || ''; const unitName = item?.unit?.name || item?.unitName || item?.unit_name || ''; if (!name && !unitName) return ''; if (!unitName) return name; if (!name) return unitName; return `${name} (${unitName})` },
+    openDetail(id) { this.$router.push({ name: 'extracts-detail', params: { id } }) },
+    openEdit(id) { this.modalState.isEditing = true; this.modalState.extractId = id; this.modalState.show = true; this.$refs.creationModal?.openModal() },
+    onModalClosed() { this.modalState.isEditing = false; this.modalState.extractId = null; this.modalState.show = false },
+    openRowMenu(event, item) { this.contextMenu = { visible: true, x: event.clientX, y: event.clientY, item } },
+    closeContextMenu() { this.contextMenu = { visible: false, x: 0, y: 0, item: null } },
+    sortBy(field) { if (this.sortField === field) { this.sortOrder = this.sortOrder === 'desc' ? 'asc' : 'desc' } else { this.sortField = field; this.sortOrder = 'desc' } this.page = 1; this.loadExtracts() }
   }
 }
 </script>

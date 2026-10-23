@@ -43,32 +43,7 @@
             </td>
             <td :class="isRTL ? 'text-right p-2' : 'text-left p-2'">{{ r.active ? $t('labels.active') : $t('labels.inactive') }}</td>
             <td :class="isRTL ? 'text-left p-2' : 'text-right p-2'">
-              <div :class="isRTL ? 'flex items-center justify-start gap-2' : 'flex items-center justify-end gap-2'">
-                <router-link
-                  :to="{ name: 'admin-reports-run', params: { id: r.id } }"
-                  :title="$t('admin.run')"
-                  :aria-label="$t('admin.run')"
-                  class="inline-flex items-center rounded-lg theme-button p-2 theme-text-light transition "
-                >
-                  <PlayIcon class="h-4 w-4" />
-                </router-link>
-                <router-link
-                  :to="{ name: 'admin-reports-from-table', params: { id: r.id } }"
-                  :title="$t('labels.edit')"
-                  :aria-label="$t('labels.edit')"
-                  class="inline-flex items-center rounded-lg bg-slate-700 p-2 theme-text-light transition hover:bg-slate-800"
-                >
-                  <PencilSquareIcon class="h-4 w-4" />
-                </router-link>
-                <button
-                  @click="remove(r.id)"
-                  :title="$t('labels.delete')"
-                  :aria-label="$t('labels.delete')"
-                  class="inline-flex items-center rounded-lg bg-red-600 p-2 theme-text-light transition hover:bg-red-700"
-                >
-                  <TrashIcon class="h-4 w-4" />
-                </button>
-              </div>
+              <RowActions :actions="rowActions(r)" />
             </td>
           </tr>
         </tbody>
@@ -81,18 +56,19 @@
 <script>
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PencilSquareIcon, PlayIcon, TrashIcon } from '@acme/icon-packs/legacy'
+import { useRouter } from 'vue-router'
+import { PlayIcon, PencilSquareIcon, TrashIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 import { getReportDefs, deleteReportDef } from '@/api'
 import { normalizeReportTotals } from '@/utils/reportDefinitions'
 
 export default {
   components: {
-    PencilSquareIcon,
-    PlayIcon,
-    TrashIcon
+    RowActions
   },
   setup() {
     const { locale, t } = useI18n()
+    const router = useRouter()
     const isRTL = computed(() => locale.value === 'ar')
     const reports = ref([])
 
@@ -117,12 +93,36 @@ export default {
       }
     }
 
+    const rowActions = (r) => [
+      {
+        key: 'run',
+        icon: PlayIcon,
+        label: t('admin.run'),
+        tone: 'success',
+        onClick: () => router.push({ name: 'admin-reports-run', params: { id: r.id } })
+      },
+      {
+        key: 'edit',
+        icon: PencilSquareIcon,
+        label: t('labels.edit'),
+        tone: 'edit',
+        onClick: () => router.push({ name: 'admin-reports-from-table', params: { id: r.id } })
+      },
+      {
+        key: 'delete',
+        icon: TrashIcon,
+        label: t('labels.delete'),
+        tone: 'delete',
+        onClick: () => remove(r.id)
+      }
+    ]
+
     const getTotalsColumns = (report) => normalizeReportTotals(report || {})
 
     // legacy modal handlers removed; route-based editor used instead
 
     onMounted(load)
-    return { reports, remove, getTotalsColumns, isRTL, locale }
+    return { reports, rowActions, getTotalsColumns, isRTL, locale }
   }
 }
 </script>

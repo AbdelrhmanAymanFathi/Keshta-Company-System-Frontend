@@ -78,14 +78,7 @@
               {{ formatDate(item.createdAt) }}</td>
             <td
               class="px-3 py-2 sm:px-6 sm:py-3 text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap text-start flex gap-2">
-              <button @click="editItem(item)"
-                class="px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 text-sm">
-                <PencilIcon class="w-5 h-5" />
-              </button>
-              <button @click="confirmDelete(item)"
-                class="px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 text-sm">
-                <TrashIcon class="w-5 h-5" />
-              </button>
+              <RowActions :actions="rowActions(item)" />
             </td>
           </tr>
           <tr v-if="items.length === 0 && !loading">
@@ -257,29 +250,56 @@
 </template>
 
 <script>
+import { usePagination } from '@/composables/usePagination'
 import { getItems, createItem, updateItem, deleteItem, getUnits } from '@/api'
 import normalizeItem from '@/utils/normalizeItem'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
 import { PencilIcon, PlusIcon, TrashIcon } from '@acme/icon-packs/legacy'
+import RowActions from '@/components/shared/RowActions.vue'
 
 export default {
   name: 'ItemList',
   emits: ['saved'],
-  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, Toast, TrashIcon },
+  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, Toast, TrashIcon },
   props: {
     mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'extracts' | 'all'
+  },
+  setup(props) {
+    const { items, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      (p, ps) => getItems({ page: p, pageSize: ps, mode: props.mode === 'extract' ? 'extracts' : props.mode }).then(res => {
+        const payload = res.data
+        let raw = []
+        if (Array.isArray(payload)) raw = payload
+        else if (payload && payload.items) raw = payload.items
+        else if (payload && payload.data) raw = payload.data
+        const mapped = raw.map(normalizeItem)
+        const meta = (payload && payload.meta) || payload || {}
+        const metaTotalPages = (meta.totalPages !== undefined && meta.totalPages !== null)
+          ? meta.totalPages
+          : (meta.pages !== undefined ? meta.pages : undefined)
+        return {
+          items: mapped,
+          meta: {
+            ...meta,
+            total: (meta.total !== undefined && meta.total !== null) ? meta.total : mapped.length,
+            totalPages: metaTotalPages
+          }
+        }
+      }),
+      { initialPageSize: 10, resourceName: 'items' }
+    )
+
+    const loadItems = async () => {
+      try { await load() } catch (e) { console.error(e) }
+    }
+
+    return { items, page, pageSize, total, totalPages, loading, loadItems, setPage, setPageSize }
   },
   data() {
     return {
       units: [],
-      items: [],
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      totalPages: 0,
-      loading: false,
       modalOpen: false,
       deleteDialogOpen: false,
       submitting: false,
@@ -342,33 +362,6 @@ export default {
     }
   },
   methods: {
-    async loadItems() {
-      this.loading = true
-      try {
-        const params = {
-          page: this.page,
-          pageSize: this.pageSize,
-          mode: this.effectiveMode
-        }
-        const response = await getItems(params)
-
-        // Normalize response into an items array
-        let raw = []
-        if (Array.isArray(response.data)) raw = response.data
-        else if (response.data && response.data.items) raw = response.data.items
-        else if (response.data && response.data.data) raw = response.data.data
-
-        this.items = raw.map(normalizeItem)
-        const meta = response.data?.meta || response.data || {}
-        this.total = (meta.total !== undefined && meta.total !== null) ? meta.total : this.items.length
-        this.totalPages = (meta.totalPages !== undefined && meta.totalPages !== null) ? meta.totalPages : (meta.pages !== undefined ? meta.pages : Math.ceil(this.total / this.pageSize))
-      } catch (error) {
-        this.showToast(error.response?.data?.message || this.$t('labels.failedLoadItems') || 'Failed to load items', 'error')
-      } finally {
-        this.loading = false
-      }
-    },
-
     openCreateModal(preset = {}) {
       this.editingItem = null
       this.resetForm()
@@ -399,6 +392,12 @@ export default {
       this.modalOpen = true
     },
 
+    rowActions(item) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.editItem(item) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(item) },
+      ]
+    },
     editItem(item) {
       this.editingItem = item
       this.form.name = item.name
@@ -644,7 +643,6 @@ export default {
         window.$toast(message, type, 3000)
       } else {
         // Fallback to console if toast not available
-        console.log(`[${type.toUpperCase()}] ${message}`)
       }
     },
 

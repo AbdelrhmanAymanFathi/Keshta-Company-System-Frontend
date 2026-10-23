@@ -320,19 +320,43 @@ const routes = [
         path: 'admin/org-chart/modules',
         name: 'admin-org-chart-modules',
         component: () => import('@/components/dashboard/Admin/OrgCharts/ModulesOrgChart.vue'),
-        meta: { title: 'orgCharts.modulesTitle', roles: ['admin'] }
+        meta: { title: 'orgCharts.modulesTitle' }
       },
       {
         path: 'admin/org-chart/contractors',
         name: 'admin-org-chart-contractors',
         component: () => import('@/components/dashboard/Admin/OrgCharts/ContractorsOrgChart.vue'),
-        meta: { title: 'orgCharts.contractorsTitle', roles: ['admin'] }
+        meta: { title: 'orgCharts.contractorsTitle' }
       },
       {
         path: 'admin/org-chart/treasuries',
         name: 'admin-org-chart-treasuries',
         component: () => import('@/components/dashboard/Admin/OrgCharts/TreasuriesOrgChart.vue'),
-        meta: { title: 'orgCharts.treasuriesTitle', roles: ['admin'] }
+        meta: { title: 'orgCharts.treasuriesTitle' }
+      },
+      {
+        path: 'org-charts/supplies',
+        name: 'org-chart-supplies',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/SuppliesOrgChart.vue'),
+        meta: { title: 'orgCharts.suppliesTitle' }
+      },
+      {
+        path: 'org-charts/transport',
+        name: 'org-chart-transport',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/TransportOrgChart.vue'),
+        meta: { title: 'orgCharts.transportTitle' }
+      },
+      {
+        path: 'org-charts/equipment',
+        name: 'org-chart-equipment',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/EquipmentOrgChart.vue'),
+        meta: { title: 'orgCharts.equipmentTitle' }
+      },
+      {
+        path: 'org-charts/expenses',
+        name: 'org-chart-expenses',
+        component: () => import('@/components/dashboard/Admin/OrgCharts/ExpensesOrgChart.vue'),
+        meta: { title: 'orgCharts.expensesTitle' }
       },
       {
         path: 'admin/reports',
@@ -479,7 +503,7 @@ const routes = [
       },
 
       // ==================== Default Redirect ====================
-      { path: '', redirect: () => (isAdminUser(user.value) ? 'admin-statistics' : 'supplies/new') }
+      { path: '', redirect: () => (isAdminUser(user.value) ? { name: 'admin-statistics' } : { name: 'supplies-list' }) }
     ]
   },
 
@@ -488,7 +512,7 @@ const routes = [
     path: '/',
     redirect: () => {
       if (!isAuthenticated.value) return '/login'
-      return isAdminUser(user.value) ? '/dashboard/admin-statistics' : '/dashboard/supplies/new'
+      return isAdminUser(user.value) ? { name: 'admin-statistics' } : { name: 'supplies-list' }
     }
   },
 

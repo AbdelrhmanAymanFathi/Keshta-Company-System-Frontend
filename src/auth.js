@@ -154,7 +154,6 @@ class AuthManager {
         // Try to refresh token in the background
         tokenManager.refreshToken()
           .then(() => {
-            console.log('[Auth] Token refreshed successfully during initialization');
             // Auth state already set, just ensure it's still true
             this.setAuthState(true, this.user);
           })
@@ -175,7 +174,6 @@ class AuthManager {
 
   // Handle token refresh failure
   handleTokenRefreshFailure() {
-    console.log('Token refresh failed, logging out user');
     this.logout();
   }
 }
@@ -195,5 +193,4 @@ authManager.initialize();
 
 export default authManager;
 export { AuthManager };
-
 

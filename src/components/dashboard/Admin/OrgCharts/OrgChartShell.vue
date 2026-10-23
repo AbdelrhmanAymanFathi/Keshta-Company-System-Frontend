@@ -3,6 +3,16 @@
     <PageHeader :title="title" :subtitle="subtitle">
       <div class="flex items-center gap-2">
         <button
+          v-for="(action, i) in headerActions"
+          :key="'hdr-' + i"
+          type="button"
+          class="px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+          :class="actionClass(action.tone)"
+          @click="$emit('header-action', action)"
+        >
+          {{ action.label }}
+        </button>
+        <button
           type="button"
           class="px-3 py-1.5 text-xs sm:text-sm font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center gap-1.5"
           :disabled="exporting"
@@ -75,6 +85,21 @@
           </svg>
           {{ $t('orgCharts.collapseAll') }}
         </button>
+      </div>
+    </div>
+
+    <!-- KPI summary -->
+    <div
+      v-if="summary && summary.length"
+      class="grid grid-cols-2 lg:grid-cols-4 gap-3"
+    >
+      <div
+        v-for="(card, i) in summary"
+        :key="'kpi-' + i"
+        class="bg-white rounded-2xl shadow-sm border border-slate-200/80 px-4 py-3"
+      >
+        <p class="text-[11px] font-semibold theme-text-secondary">{{ card.label }}</p>
+        <p class="text-lg font-bold text-slate-800 mt-0.5 tabular-nums">{{ card.value }}</p>
       </div>
     </div>
 
@@ -174,6 +199,25 @@
             {{ selectedDetails.linkLabel || $t('orgCharts.openDetails') }}
           </button>
         </div>
+
+        <div v-if="selectedDetails.actions && selectedDetails.actions.length" class="pt-1 space-y-2">
+          <button
+            v-for="(action, i) in selectedDetails.actions"
+            :key="'action-' + i"
+            type="button"
+            class="w-full px-4 py-2.5 text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+            :class="actionClass(action.tone)"
+            @click="$emit('open-link', action.link)"
+          >
+            <svg v-if="action.tone === 'warning'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            {{ action.label }}
+          </button>
+        </div>
       </aside>
     </div>
   </div>
@@ -208,9 +252,13 @@ export default {
     fileName: { type: String, default: 'org-chart' },
     loading: { type: Boolean, default: false },
     // items: flat tree list -> [{ id, parentId|null, tone, icon, title, subtitle, badge, stats: [{label, value}], details: [{label, value}], link, linkLabel, searchableText }]
-    items: { type: Array, default: () => [] }
+    items: { type: Array, default: () => [] },
+    // summary: KPI strip -> [{ label, value }]
+    summary: { type: Array, default: () => [] },
+    // headerActions: extra header buttons -> [{ label, tone, name }]
+    headerActions: { type: Array, default: () => [] }
   },
-  emits: ['refresh', 'open-link', 'node-select'],
+  emits: ['refresh', 'open-link', 'node-select', 'header-action'],
   setup() {
     const { fitView } = useVueFlow()
     return { fitViewFlow: fitView }
@@ -249,7 +297,8 @@ export default {
         badge: item.badge,
         fields: item.details || [],
         link: item.link,
-        linkLabel: item.linkLabel
+        linkLabel: item.linkLabel,
+        actions: item.actions || []
       }
     },
     childrenMap() {
@@ -286,6 +335,14 @@ export default {
     }
   },
   methods: {
+    actionClass(tone) {
+      const tones = {
+        primary: 'text-white bg-emerald-600 hover:bg-emerald-700',
+        secondary: 'theme-text-secondary bg-slate-100 hover:bg-slate-200',
+        warning: 'text-white bg-amber-600 hover:bg-amber-700',
+      }
+      return tones[tone] || tones.secondary
+    },
     isHiddenByCollapse(itemId) {
       let current = this.itemById.get(itemId)
       while (current && current.parentId) {

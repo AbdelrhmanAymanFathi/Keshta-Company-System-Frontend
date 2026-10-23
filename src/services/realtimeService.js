@@ -41,7 +41,7 @@ class RealtimeService {
   }
 
   get apiBaseUrl() {
-    return this.baseUrl || process.env.VUE_APP_API_BASE_URL || 'http://localhost:3000'
+    return this.baseUrl || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
   }
 
   buildUrl() {

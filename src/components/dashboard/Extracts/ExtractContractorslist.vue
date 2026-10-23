@@ -4,17 +4,6 @@
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('extracts.title') }}</h2>
       <div class="flex items-center gap-3">
-        <!-- Import Excel -->
-        <!-- <label class="theme-button px-4 py-2 rounded  inline-flex items-center cursor-pointer transition-colors">
-          <input ref="fileInput" type="file" accept=".xlsx,.xls" class="hidden" @change="onFileChange" />
-          <svg class="w-5 h-5" :class="isRTL ? 'ml-2' : 'mr-2'" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M12 3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 7l4-4 4 4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="3" y="13" width="18" height="8" rx="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          {{ $t('transporters.importExcel') }}
-        </label> -->
-        <!-- Add Button -->
         <button @click="openAdd"
           class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm ">
           <PlusIcon class="w-5 h-5" />
@@ -51,7 +40,7 @@
             @click="openContextMenu($event, c)"
             @contextmenu.prevent="openContextMenu($event, c)"
           >
-            <td class="px-6 py-4 text-sm theme-accent-muted" :class="textAlign">{{ idx + 1 }}</td>
+            <td class="px-6 py-4 text-sm theme-accent-muted" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-6 py-4 text-sm theme-text-primary" :class="textAlign">
               <button @click.stop="goToDetail(c)" class="theme-accent-muted hover:underline">{{ c.name }}</button>
             </td>
@@ -60,20 +49,7 @@
             <td class="px-6 py-4 text-sm theme-text-primary" :class="textAlign">{{ c.accountNumber || '-' }}</td>
             <td class="px-6 py-4 text-sm theme-text-primary" :class="textAlign">{{ c.notes || '-' }}</td>
             <td class="px-6 py-4">
-              <div class="flex gap-3" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openStatement(c)" class="rounded-lg theme-icon-button p-2" :title="$t('extracts.statement')">
-                  <DocumentTextIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="openWallet(c)" class="rounded-lg border theme-border theme-dashboard-bg-soft p-2 theme-accent-strong hover:theme-icon-bg" :title="$t('extracts.wallet')">
-                  <WalletIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="openEdit(c)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100" :title="$t('labels.edit')">
-                  <PencilSquareIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="confirmDelete(c)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100" :title="$t('labels.delete')">
-                  <TrashIcon class="h-5 w-5" />
-                </button>
-              </div>
+              <RowActions :actions="rowActions(c)" />
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
@@ -207,14 +183,15 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue'
+import { usePagination } from '@/composables/usePagination'
 import * as XLSX from 'xlsx'
 import { getContractors, getContractorOpeningBalance, getLocations, createContractor, updateContractor, deleteContractor, getContractorWallet, getContractorWalletHistory, getContractorAccounts, depositToContractorWallet, normalizeContractorAccountType } from '../../../api'
 import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 import Pagination from '@/components/shared/Pagination.vue'
-import DateField from '@/components/shared/DateField.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
 import OpeningBalanceSitesField, { emptyOpeningBalanceLine, openingBalanceLinesFromApi, openingBalanceLinesPayload, sameOpeningBalanceLines } from '@/components/shared/OpeningBalanceSitesField.vue'
-import normalizeItem from '@/utils/normalizeItem'
+import RowActions from '@/components/shared/RowActions.vue'
 import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
@@ -222,14 +199,36 @@ export default {
   props: {
     mode: { type: String, default: 'extract' }
   },
-  components: { Pagination, DateField, WalletPanel, OpeningBalanceSitesField, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
+  components: { Pagination, WalletPanel, OpeningBalanceSitesField, RowActions, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
+  setup(props) {
+    const q = ref('')
+    const { items: contractorsAll, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getContractors({ page: p, pageSize: ps, q: extra.q ?? q.value, mode: props.mode || 'extract' }),
+      { initialPageSize: 20, resourceName: 'contractors-extract' }
+    )
+
+    const loadContractors = () => load({ q: q.value })
+
+    const filtered = computed(() => {
+      if (!q.value) return contractorsAll.value
+      const s = q.value.toLowerCase()
+      return contractorsAll.value.filter(c =>
+        (c.name || '').toLowerCase().includes(s) ||
+        (c.phone || '').toLowerCase().includes(s) ||
+        (c.bankName || '').toLowerCase().includes(s) ||
+        (c.accountNumber || '').toLowerCase().includes(s)
+      )
+    })
+
+    const contractors = computed(() => contractorsAll.value)
+
+    return { q, contractors, filtered, page, pageSize, total, totalPages, loading, loadContractors, setPage, setPageSize, contractorsAll }
+  },
   data() {
     return {
-      q: '',
       modalOpen: false,
       editing: false,
       form: { id: null, name: '', phone: '', bankName: '', accountNumber: '', notes: '', openingBalanceLines: [emptyOpeningBalanceLine()] },
-      contractors: [],
       locations: [],
       deleteConfirm: { open: false, item: null },
       contextMenu: { open: false, x: 0, y: 0, item: null },
@@ -239,9 +238,6 @@ export default {
       selectedContractor: null,
       selectedWalletAccount: null,
       depositForm: { amount: '', description: '', date: '' },
-      page: 1,
-      pageSize: 20,
-      total: 0,
       searchTimeout: null,
       openingBalanceLinesOriginal: null,
       openingBalancePending: null
@@ -253,19 +249,6 @@ export default {
     },
     textAlign() {
       return this.isRTL ? 'text-right' : 'text-left'
-    },
-    filtered() {
-      if (!this.q) return this.contractors
-      const s = this.q.toLowerCase()
-      return this.contractors.filter(c =>
-        (c.name || '').toLowerCase().includes(s) ||
-        (c.phone || '').toLowerCase().includes(s) ||
-        (c.bankName || '').toLowerCase().includes(s) ||
-        (c.accountNumber || '').toLowerCase().includes(s)
-      )
-    },
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
     }
   },
   mounted() {
@@ -277,22 +260,6 @@ export default {
     document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {
-    async loadContractors() {
-      try {
-        const res = await getContractors({ page: this.page, pageSize: this.pageSize, q: this.q, mode: this.mode || 'extract' })
-        const payload = res.data || {}
-        const items = Array.isArray(payload.items) ? payload.items :
-                         Array.isArray(payload.data) ? payload.data :
-                         Array.isArray(payload) ? payload : []
-
-        this.contractors = items.map(normalizeItem)
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.contractors.length
-      } catch (e) {
-        this.contractors = []
-        this.total = 0
-      }
-    },
     async loadLocations() {
       try {
         const res = await getLocations()
@@ -303,21 +270,28 @@ export default {
     },
     changePage(p) {
       if (p >= 1 && p <= this.totalPages && p !== this.page) {
-        this.page = p
+        this.setPage(p)
         this.loadContractors()
       }
     },
     onPageSizeChange(size) {
-      this.pageSize = size
-      this.page = 1
+      this.setPageSize(size)
       this.loadContractors()
     },
     onSearchInput() {
       clearTimeout(this.searchTimeout)
       this.searchTimeout = setTimeout(() => {
-        this.page = 1
+        this.setPage(1)
         this.loadContractors()
       }, 500)
+    },
+    rowActions(c) {
+      return [
+        { key: 'statement', icon: DocumentTextIcon, label: this.$t('extracts.statement'), tone: 'statement', onClick: () => this.openStatement(c) },
+        { key: 'wallet', icon: WalletIcon, label: this.$t('extracts.wallet'), tone: 'wallet', onClick: () => this.openWallet(c) },
+        { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEdit(c) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(c) },
+      ]
     },
     openAdd() {
       this.editing = false
@@ -358,14 +332,11 @@ export default {
       if (this.form.notes?.trim()) payload.notes = this.form.notes.trim()
       const openingBalanceLines = openingBalanceLinesPayload(this.form.openingBalanceLines)
       if (!this.editing && openingBalanceLines.length) payload.openingBalanceLines = openingBalanceLines
-      // On an existing contractor a changed opening balance (amount or site) goes to admin approval
       if (this.editing && this.openingBalanceLinesOriginal !== null && !sameOpeningBalanceLines(this.form.openingBalanceLines, this.openingBalanceLinesOriginal)) {
         payload.openingBalanceLines = openingBalanceLines
         payload.openingBalanceAccountType = 'EXTRACT'
       }
-      // mark contractor available for extracts
       payload.availableForExtracts = true
-      
       try {
         if (this.editing && this.form.id) {
           const res = await updateContractor(this.form.id, payload)
@@ -380,7 +351,7 @@ export default {
         } else {
           const res = await createContractor(payload)
           const created = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
-          created.forEach(c => this.contractors.push(c))
+          created.forEach(c => this.contractorsAll.push(c))
           this.total += created.length
           if (created.length > 1) {
             if (window.$toast) window.$toast(this.$t('extracts.addMultipleSuccess') || 'Created separate contractor records for Extract', 'info')
@@ -439,10 +410,8 @@ export default {
       this.walletLoading = true
       try {
         const accountType = normalizeContractorAccountType(this.mode)
-        // Step 1: fetch wallet summary (no filter — same as WalletPanel.loadSummary)
         const wRes = await getContractorWallet(contractorId)
         this.wallet = wRes.data || null
-        // Step 2: always fetch all accounts explicitly so we have IDs for deposit
         try {
           const accRes = await getContractorAccounts(contractorId)
           const raw = accRes?.data || []
@@ -450,11 +419,9 @@ export default {
           if (acctArr.length > 0) {
             this.wallet = this.wallet || {}
             this.wallet.accounts = acctArr
-            // pre-select matching account for this mode
             this.selectedWalletAccount = acctArr.find(a => normalizeContractorAccountType(a.accountType) === accountType) || acctArr[0]
           }
-        } catch (e) { /* ignore — fallback without accounts */ }
-        // Step 3: fetch history for the selected account (or fallback)
+        } catch (e) { /* ignore */ }
         try {
           const hRes = await getContractorWalletHistory(contractorId, { accountType })
           const historyData = hRes?.data || hRes
@@ -463,7 +430,7 @@ export default {
             else if (historyData?.entries) this.wallet.entries = historyData.entries
             else if (Array.isArray(historyData)) this.wallet.entries = historyData
           }
-        } catch (e) { /* ignore history errors */ }
+        } catch (e) { /* ignore */ }
       } catch (err) {
         console.error('Error fetching wallet', err)
         if (window.$toast) window.$toast(this.$t('extracts.walletFetchError') || 'Error fetching wallet', 'error')
@@ -480,7 +447,6 @@ export default {
       }
       try {
         const accountType = normalizeContractorAccountType(this.mode)
-        // Use the pre-selected account (loaded in fetchWallet) — mirrors WalletPanel doDeposit
         const acct = this.selectedWalletAccount
         const payload = {
           amount,
@@ -545,7 +511,6 @@ export default {
             bankName: (colIdx.bankName !== -1 && r[colIdx.bankName]) ? r[colIdx.bankName].toString().trim() : '',
             accountNumber: (colIdx.accountNumber !== -1 && r[colIdx.accountNumber]) ? r[colIdx.accountNumber].toString().trim() : '',
             notes: (colIdx.notes !== -1 && r[colIdx.notes]) ? r[colIdx.notes].toString().trim() : '',
-            // set both new and legacy flags for compatibility
             availableForSupplies: isSupplierFlag,
             availableForExports: isSupplierFlag,
             availableForExtracts: isSupplierFlag
@@ -589,8 +554,7 @@ export default {
       if (action === 'wallet') this.openWallet(c)
       if (action === 'statement') this.openStatement(c)
       this.closeContextMenu()
-    }
-    ,
+    },
     goToDetail(c) {
       if (!c || !c.id) return
       try {

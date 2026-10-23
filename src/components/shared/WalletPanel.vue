@@ -205,7 +205,7 @@ export default {
         const res = await getContractorWallet(props.contractorId)
         wallet.value = res?.data || null
         // If rental billing feature is enabled, try to fetch accounts and ensure RENTAL account is visible
-        const rentalBillingEnabled = (window.__APP_CONFIG__ && window.__APP_CONFIG__.RENTAL_BILLING_ENABLED) || (process.env && process.env.VUE_APP_RENTAL_BILLING_ENABLED === 'true')
+        const rentalBillingEnabled = (window.__APP_CONFIG__ && window.__APP_CONFIG__.RENTAL_BILLING_ENABLED) || (import.meta.env.VITE_RENTAL_BILLING_ENABLED === 'true')
         if (rentalBillingEnabled) {
           try {
             const accRes = await getContractorAccounts(props.contractorId)

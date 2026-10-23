@@ -518,7 +518,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', reports: 'reports', admin: 'admin' }, // messaging: 'messaging' (hidden for now)
+      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', orgCharts: 'orgCharts', reports: 'reports', admin: 'admin' }, // messaging: 'messaging' (hidden for now)
       menuMap: {
         messaging: [
           { name: 'messaging', label: 'messaging.title', routeName: 'messaging' }
@@ -578,6 +578,15 @@ export default {
           { name: 'expensesReport', label: 'expenses.report', routeName: 'report-expenses-report' },
           { name: 'companyTransactions', label: 'treasury.report', routeName: 'report-company-transactions' },
         ],
+        orgCharts: [
+          { name: 'modulesChart', label: 'orgCharts.modulesTitle', routeName: 'admin-org-chart-modules' },
+          { name: 'contractorsChart', label: 'orgCharts.contractorsTitle', routeName: 'admin-org-chart-contractors' },
+          { name: 'treasuriesChart', label: 'orgCharts.treasuriesTitle', routeName: 'admin-org-chart-treasuries' },
+          { name: 'suppliesChart', label: 'orgCharts.suppliesTitle', routeName: 'org-chart-supplies' },
+          { name: 'transportChart', label: 'orgCharts.transportTitle', routeName: 'org-chart-transport' },
+          { name: 'equipmentChart', label: 'orgCharts.equipmentTitle', routeName: 'org-chart-equipment' },
+          { name: 'expensesChart', label: 'orgCharts.expensesTitle', routeName: 'org-chart-expenses' },
+        ],
         admin: [
           { name: 'adminStatistics', label: 'adminStats.title', routeName: 'admin-statistics' },
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
@@ -585,9 +594,6 @@ export default {
           { name: 'usersList', label: 'users.title', routeName: 'users-list' },
           { name: 'locations', label: 'locations.title', routeName: 'locations' },
           { name: 'units', label: 'units.title', routeName: 'admin-units-list' },
-          { name: 'modulesChart', label: 'orgCharts.modulesTitle', routeName: 'admin-org-chart-modules' },
-          { name: 'contractorsChart', label: 'orgCharts.contractorsTitle', routeName: 'admin-org-chart-contractors' },
-          { name: 'treasuriesChart', label: 'orgCharts.treasuriesTitle', routeName: 'admin-org-chart-treasuries' },
           { name: 'databaseBackup', label: 'admin.databaseBackup', routeName: 'admin-database-backup' },
           { name: 'systemLogs', label: 'systemLogs.title', routeName: 'admin-system-logs' },
           { name: 'activeUsers', label: 'admin.activeUsers', routeName: 'admin-active-users' },
@@ -789,7 +795,8 @@ export default {
       const expensesRoutes = ['expenses-list', 'expenses-terms', 'expenses-report']
       const paymentRoutes = ['payments']
       const reportsRoutes = ['reports-landing', 'contractors-activity-report', 'admin-reports-list', 'admin-reports-run']
-      const adminRoutes = ['admin-statistics', 'admin-database-backup', 'admin-system-logs', 'admin-active-users', 'changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run', 'admin-org-chart-modules', 'admin-org-chart-contractors', 'admin-org-chart-treasuries']
+      const adminRoutes = ['admin-statistics', 'admin-database-backup', 'admin-system-logs', 'admin-active-users', 'changes-by-date', 'approvals-inbox', 'users-list', 'locations', 'admin-units-list', 'admin-reports-list', 'admin-reports-edit', 'admin-reports-run']
+      const orgChartRoutes = ['admin-org-chart-modules', 'admin-org-chart-contractors', 'admin-org-chart-treasuries', 'org-chart-supplies', 'org-chart-transport', 'org-chart-equipment', 'org-chart-expenses']
       if (routeName === 'messaging') return 'messaging'
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
@@ -798,6 +805,7 @@ export default {
       if (expensesRoutes.includes(routeName)) return 'expenses'
       if (walletRoutes.includes(routeName)) return 'treasury'
       if (reportsRoutes.includes(routeName)) return 'reports'
+      if (orgChartRoutes.includes(routeName)) return 'orgCharts'
       if (adminRoutes.includes(routeName)) return 'admin'
       return 'supplies'
     },

@@ -248,7 +248,6 @@ export default {
       }).format(d)
     }
 
-
     const formatCurrency = (amount) => {
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -288,7 +287,6 @@ export default {
 
         // Destructure data and headers from response
         const { data, headers } = response
-        console.log('Raw response:', { data, headers })
 
         // Handle various response formats:
         // 1. Direct array: [...]
@@ -357,8 +355,6 @@ export default {
         })
 
         items.value = normalized
-        console.log('Parsed items count:', normalized.length)
-        console.log('First item:', normalized[0])
       } catch (err) {
         console.error('Error loading transport report:', err)
         error.value = err.response?.data?.message || 'Failed to load report'

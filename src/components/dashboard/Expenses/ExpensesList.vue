@@ -255,18 +255,7 @@
             <td class="amount-cell">{{ formatCurrency(expense.amount) }}</td>
             <td>{{ expense.notes || '-' }}</td>
             <td class="actions-col">
-              <div class="flex gap-1.5">
-                <button type="button" @click="openEditModal(expense)" class="theme-text" :title="$t('labels.edit')">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                </button>
-                <button type="button" @click="confirmDelete(expense)" class="text-red-600" :title="$t('labels.delete')">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                </button>
-              </div>
+              <RowActions :actions="rowActions(expense)" />
             </td>
           </tr>
           <tr v-if="filteredExpenses.length === 0">
@@ -311,12 +300,7 @@
         </div>
         <p v-if="expense.notes" class="text-sm theme-text-secondary mt-3 break-words">{{ expense.notes }}</p>
         <div class="flex gap-2 mt-3">
-          <button type="button" @click="openEditModal(expense)" class="p-2 theme-text" :title="$t('labels.edit')">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-          </button>
-          <button type="button" @click="confirmDelete(expense)" class="p-2 text-red-600" :title="$t('labels.delete')">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          </button>
+          <RowActions :actions="rowActions(expense)" />
         </div>
       </div>
       <div v-if="filteredExpenses.length === 0" class="text-center py-12 theme-text-muted">{{ $t('expenses.noResults') }}</div>
@@ -812,6 +796,8 @@ import DateField from '@/components/shared/DateField.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
+import RowActions from '@/components/shared/RowActions.vue'
+import { PencilSquareIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import { getTodayISO, formatToISODate, parseISODateToDate } from '@/utils/dateUtils'
 import { realtimeService } from '@/services/realtimeService'
 import { debounce } from '@/utils/debounce'
@@ -823,7 +809,7 @@ const CUSTODY_FEED_CATEGORY = { id: 'custody_feed', name: 'تغذية عهدة' 
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
-  components: { AddFieldModal, DateField, PageHeader, SearchDropdown, SortIcon },
+  components: { AddFieldModal, DateField, PageHeader, SearchDropdown, SortIcon, RowActions },
   data() {
     return {
       expenses: [],
@@ -1261,6 +1247,12 @@ rows: [],
   },
   
   methods: {
+    rowActions(expense) {
+      return [
+        { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEditModal(expense) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(expense) }
+      ]
+    },
     // Opened from a notification: flash the row if it's on this page, otherwise open it for editing.
     // ?edit=1 (from the treasury ledger) always opens it for editing.
     async openFocusedExpense() {
@@ -2450,7 +2442,6 @@ rows: [],
         
         // If backend is not available, simulate deletion
         if (error.response?.status === 500 || error.code === 'ERR_NETWORK') {
-          console.log('Backend not available, simulating expense deletion')
           this.expenses = this.expenses.filter(e => e.id !== this.deleteConfirm.item.id)
           this.totalItems--
           this.cancelDelete()
@@ -2679,7 +2670,6 @@ rows: [],
       }
     },
 
-
     addCategoryPrompt() {
       this.fieldModal = { open: true, type: 'category', name: '', category: '', parentId: null }
     },
@@ -2809,7 +2799,6 @@ rows: [],
       if (window.$toast) {
         window.$toast(message, 'success')
       } else {
-        console.log('Success:', message)
       }
     },
     
@@ -2817,7 +2806,7 @@ rows: [],
       if (window.$toast) {
         window.$toast(message, 'error')
       } else {
-        alert(message)
+        void(window.$toast ? window.$toast(message, 'error') : alert(message))
       }
     }
   }

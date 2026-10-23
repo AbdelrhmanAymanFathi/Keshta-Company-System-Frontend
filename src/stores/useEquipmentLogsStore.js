@@ -61,7 +61,6 @@ export const useEquipmentLogsStore = defineStore('equipmentLogs', {
 					...(this.filters.startDate ? { startDate: this.filters.startDate } : {}),
 					...(this.filters.endDate ? { endDate: this.filters.endDate } : {})
 				}
-				console.log('[equipmentLogsStore] fetchRentals params:', params)
 				const response = await getEquipmentLogs(params)
 				const payload = response?.data || {}
 				const items = Array.isArray(payload.items)

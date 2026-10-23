@@ -58,14 +58,7 @@
               </div>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-4">
-              <div class="flex gap-4" :class="isRTL ? 'justify-start' : 'justify-end'">
-                <button @click.stop="openEdit(crusher)" class="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700 hover:bg-amber-100">
-                  <PencilSquareIcon class="h-5 w-5" />
-                </button>
-                <button @click.stop="confirmDelete(crusher)" class="rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100">
-                  <TrashIcon class="h-5 w-5" />
-                </button>
-              </div>
+              <RowActions :actions="rowActions(crusher)" />
             </td>
           </tr>
           <tr v-if="filtered.length === 0">
@@ -175,27 +168,36 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../api'
+import { usePagination } from '@/composables/usePagination'
 import Pagination from '@/components/shared/Pagination.vue'
+import RowActions from '@/components/shared/RowActions.vue'
 import { ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'CrushersList',
-  components: { Pagination, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: { Pagination, RowActions, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  setup() {
+    const q = ref('')
+    const searchTimeout = ref(null)
+
+    const { items: crushers, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      (p, ps, extra) => getCrushers({ page: p, pageSize: ps, q: extra.q ?? q.value }),
+      { initialPageSize: 20, resourceName: 'crushers' }
+    )
+
+    const loadCrushers = () => load({ q: q.value })
+
+    return { q, searchTimeout, crushers, page, pageSize, total, totalPages, loading, loadCrushers, setPage, setPageSize }
+  },
   data() {
     return {
-      q: '',
       modalOpen: false,
       editing: false,
-      loading: false,
       form: { id: null, name: '' },
-      crushers: [],
       deleteConfirm: { open: false, item: null },
-      contextMenu: { open: false, x: 0, y: 0, item: null },
-      page: 1,
-      pageSize: 20,
-      total: 0,
-      searchTimeout: null
+      contextMenu: { open: false, x: 0, y: 0, item: null }
     }
   },
   computed: {
@@ -209,9 +211,6 @@ export default {
       if (!this.q) return this.crushers
       const s = this.q.toLowerCase()
       return this.crushers.filter(c => c.name.toLowerCase().includes(s))
-    },
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
     }
   },
   mounted() {
@@ -222,38 +221,28 @@ export default {
     document.removeEventListener('click', this.closeContextMenu)
   },
   methods: {
-    async loadCrushers() {
-      try {
-        const res = await getCrushers({ page: this.page, pageSize: this.pageSize, q: this.q })
-        const payload = res.data || {}
-        this.crushers = Array.isArray(payload.items) ? payload.items :
-                         Array.isArray(payload.data) ? payload.data :
-                         Array.isArray(payload) ? payload : []
-        const meta = payload.meta || {}
-        this.total = meta.total ?? payload.total ?? this.crushers.length
-      } catch (e) {
-        console.error(e)
-        this.crushers = []
-        this.total = 0
-      }
-    },
     changePage(p) {
       if (p >= 1 && p <= this.totalPages && p !== this.page) {
-        this.page = p
+        this.setPage(p)
         this.loadCrushers()
       }
     },
     onPageSizeChange(size) {
-      this.pageSize = size
-      this.page = 1
+      this.setPageSize(size)
       this.loadCrushers()
     },
     onSearchInput() {
       clearTimeout(this.searchTimeout)
       this.searchTimeout = setTimeout(() => {
-        this.page = 1
+        this.setPage(1)
         this.loadCrushers()
       }, 500)
+    },
+    rowActions(crusher) {
+      return [
+        { key: 'edit', icon: PencilSquareIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEdit(crusher) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(crusher) },
+      ]
     },
     openAdd() {
       this.editing = false
@@ -271,7 +260,7 @@ export default {
     async saveCrusher() {
   const name = (this.form.name || '').trim()
   if (!name) {
-    alert(this.$t('crushers.validationName'))
+    void(window.$toast ? window.$toast(this.$t('crushers.validationName'), 'error') : alert(this.$t('crushers.validationName')))
     return
   }
   this.loading = true
@@ -293,7 +282,7 @@ export default {
     await this.loadCrushers()
   } catch (e) {
     console.error('Error saving crusher:', e)
-    alert(this.$t('crushers.saveError') || 'حدث خطأ أثناء الحفظ')
+    void(window.$toast ? window.$toast(this.$t('crushers.saveError') || 'حدث خطأ أثناء الحفظ', 'error') : alert(this.$t('crushers.saveError') || 'حدث خطأ أثناء الحفظ'))
   } finally {
     this.loading = false
   }
@@ -312,7 +301,7 @@ export default {
     this.cancelDelete()
   } catch (e) {
     console.error('Error deleting crusher:', e)
-    alert(this.$t('crushers.deleteError') || 'حدث خطأ أثناء الحذف')
+    void(window.$toast ? window.$toast(this.$t('crushers.deleteError') || 'حدث خطأ أثناء الحذف', 'error') : alert(this.$t('crushers.deleteError') || 'حدث خطأ أثناء الحذف'))
   } finally {
     this.loading = false
   }

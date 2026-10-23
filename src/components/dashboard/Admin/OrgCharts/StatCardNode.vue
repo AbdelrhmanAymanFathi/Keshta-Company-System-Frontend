@@ -91,7 +91,9 @@ const TONE_ICONS = {
   equipment: Square3Stack3DIcon,
   contractor: UserGroupIcon,
   treasury: BanknotesIcon,
-  custody: WalletIcon
+  custody: WalletIcon,
+  expenses: BanknotesIcon,
+  other: CubeIcon
 }
 
 const TONE_STYLES = {
@@ -134,6 +136,16 @@ const TONE_STYLES = {
     card: 'border-rose-200',
     icon: 'bg-rose-100 text-rose-700 border-rose-200',
     badge: 'bg-rose-100 text-rose-700'
+  },
+  expenses: {
+    card: 'border-orange-200',
+    icon: 'bg-orange-100 text-orange-700 border-orange-200',
+    badge: 'bg-orange-100 text-orange-700'
+  },
+  other: {
+    card: 'border-slate-200',
+    icon: 'bg-slate-100 text-slate-600 border-slate-200',
+    badge: 'bg-slate-100 text-slate-600'
   }
 }
 

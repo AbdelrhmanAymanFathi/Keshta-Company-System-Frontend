@@ -50,12 +50,7 @@
             <td :class="['px-4 py-3 font-medium', isRTL ? 'text-right' : 'text-left']">{{ unit.arName || '-' }}</td>
             <td :class="['px-4 py-3 text-slate-500', isRTL ? 'text-right' : 'text-left']">{{ unit.description || '-' }}</td>
             <td :class="['px-4 py-3', isRTL ? 'text-right' : 'text-left']">
-              <button @click="openEditModal(unit)" :class="['theme-text hover:theme-accent-muted transition inline-flex items-center gap-1', isRTL ? 'ml-3' : 'mr-3']" :title="$t('labels.edit')">
-                <PencilIcon class="w-4 h-4" />
-              </button>
-              <button @click="confirmDelete(unit)" class="text-red-600 hover:text-red-700 transition inline-flex items-center gap-1" :title="$t('labels.delete')">
-                <TrashIcon class="w-4 h-4" />
-              </button>
+              <RowActions :actions="rowActions(unit)" />
             </td>
           </tr>
         </tbody>
@@ -129,11 +124,13 @@
 
 <script>
 import { getUnits, createUnit, updateUnit, deleteUnit } from '@/api'
+import RowActions from '@/components/shared/RowActions.vue'
 import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'Units-List',
   components: {
+    RowActions,
     PencilIcon,
     TrashIcon
   },
@@ -197,6 +194,12 @@ export default {
       this.form = { id: null, symbol: '', name: '', arName: '', description: '' }
       this.error = ''
       this.showModal = true
+    },
+    rowActions(unit) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => this.openEditModal(unit) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(unit) },
+      ]
     },
     openEditModal(unit) {
       this.editing = true

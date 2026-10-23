@@ -243,31 +243,7 @@
             </td>
 
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <div class="flex items-center gap-2">
-                <!-- Edit Button -->
-                <button
-                  @click.stop="openEdit(supply)"
-                  :disabled="supply.hasPendingApproval"
-                  :title="$t('labels.edit') || 'Edit'"
-                  class="inline-flex items-center justify-center rounded-lg border theme-border-accent theme-dashboard-bg-soft p-2 theme-text-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                >
-                  <svg class="w-4 h-4 theme-text-secondary transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-
-                <!-- Delete Button -->
-                <button
-                  @click.stop="openDeleteConfirm(supply)"
-                  :disabled="supply.hasPendingApproval"
-                  :title="$t('labels.delete')"
-                  class="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-2 text-rose-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-                >
-                  <svg class="w-4 h-4 text-rose-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
+              <RowActions :actions="rowActions(supply)" />
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
@@ -289,7 +265,6 @@
     <!--
     <SupplyDetailModal :visible="showDetailModal" :exportId="detailExportId" @close="() => { showDetailModal = false; detailExportId = null }" />
     -->
-
 
     <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages"
       :pageSizeOptions="[10, 20, 50, 100]" @update:page="(p) => { page = p; loadSupplies() }"
@@ -487,6 +462,7 @@
 
 <script>
 import SortIcon from '@/components/shared/SortIcon.vue'
+import { usePagination } from '@/composables/usePagination'
 import { getDeliveries, deleteDelivery, getContractors, getLocations, getCrushers, getExportItems, getVehicles, updateExport, getExport } from '../../../api'
 import normalizeItem from '@/utils/normalizeItem'
 import TableModal from './SuppliesCreationModal.vue'
@@ -498,6 +474,8 @@ import DateField from '@/components/shared/DateField.vue'
 import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
+import RowActions from '@/components/shared/RowActions.vue'
+import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import { debounce } from '@/utils/debounce'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
 
@@ -507,6 +485,7 @@ export default {
   components: {
     TableModal,
     Pagination,
+    RowActions,
     SearchDropdown,
     DateField,
     SortIcon
@@ -514,17 +493,60 @@ export default {
     // SupplyDetailModal
   },
 
+  setup() {
+    const { items: supplies, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
+      async (p, ps, extra) => {
+        const queryParams = {
+          page: p,
+          pageSize: ps,
+          sortField: extra.sortField,
+          sortOrder: extra.sortOrder,
+          startDate: extra.filters.startDate,
+          endDate: extra.filters.endDate,
+          areaId: extra.filters.areaId,
+          contractorId: extra.filters.contractorId,
+          locationId: extra.filters.locationId,
+          crusherId: extra.filters.crusherId,
+          itemId: extra.filters.itemId,
+          vehicleId: extra.filters.vehicleId
+        }
+
+        const cleanParams = buildQueryParams(queryParams)
+        const res = await getDeliveries(cleanParams)
+
+        const responseData = res.data
+        if (!responseData || !Array.isArray(responseData.items)) {
+          console.warn('⚠ Unexpected response format:', responseData)
+          return []
+        }
+
+        const newItems = [...responseData.items]
+        // Normalize nested `item` objects so templates can rely on canonical fields
+        newItems.forEach(s => { if (s && s.item) s.item = normalizeItem(s.item) })
+
+        const order = extra.sortOrder
+        newItems.sort((a, b) => {
+          const dateA = a?.date || a?.createdAt || 0
+          const dateB = b?.date || b?.createdAt || 0
+          const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
+          const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
+          return order === 'asc' ? timeA - timeB : timeB - timeA
+        })
+
+        return { ...responseData, items: newItems }
+      },
+      { initialPageSize: 20, resourceName: 'supplies' }
+    )
+
+    return { supplies, page, pageSize, total, totalPages, loading, load, setPage, setPageSize }
+  },
+
   data() {
     return {
-      supplies: [],
       modalOpen: false,
       form: {},
-      page: 1,
-      pageSize: 20,
       sortField: 'date',
       sortOrder: 'desc',
-      total: 0,
-      loading: false,
       contextMenu: {
         visible: false,
         x: 0,
@@ -578,9 +600,6 @@ export default {
   },
 
   computed: {
-    totalPages() {
-      return Math.ceil(this.total / this.pageSize)
-    },
     visiblePages() {
       const pages = []
       const maxVisible = 5
@@ -669,13 +688,6 @@ export default {
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         this.vehicles = Array.isArray(vehiclesData) ? vehiclesData : []
 
-        console.log('✓ Filter data loaded:', {
-          contractors: this.contractors.length,
-          locations: this.locations.length,
-          crushers: this.crushers.length,
-          items: this.items.length,
-          vehicles: this.vehicles.length
-        })
       } catch (err) {
         console.error('✗ Error loading filter data:', err)
       }
@@ -707,102 +719,28 @@ export default {
 
     async loadSupplies() {
       try {
-        this.loading = true
-
-        const queryParams = {
-          page: this.page,
-          pageSize: this.pageSize,
-          sortField: this.sortField,
-          sortOrder: this.sortOrder,
-          startDate: this.filters.startDate,
-          endDate: this.filters.endDate,
-          areaId: this.filters.areaId,
-          contractorId: this.filters.contractorId,
-          locationId: this.filters.locationId,
-          crusherId: this.filters.crusherId,
-          itemId: this.filters.itemId,
-          vehicleId: this.filters.vehicleId
-        }
-
-        const cleanParams = buildQueryParams(queryParams)
-        console.log('🔵 Loading supplies with params:', queryParams)
-        console.log('🔵 Clean params sent to API:', cleanParams)
-        const res = await getDeliveries(cleanParams)
-
-        console.log('Response received:', res)
-        console.log('Response data:', res.data)
-
-        // Extract items from response
-        const responseData = res.data
-        if (responseData && responseData.items && Array.isArray(responseData.items)) {
-          // Explicitly create new array and use splice to trigger reactivity
-          const newItems = [...responseData.items]
-          console.log('📊 New items to load:', newItems)
-          console.log('📊 First 3 items:', newItems.slice(0, 3))
-          console.log('📊 First item details:', {
-            id: newItems[0]?.id,
-            date: newItems[0]?.date,
-            item: newItems[0]?.item?.name,
-            contractor: newItems[0]?.contractor?.name
-          })
-
-          // Log comparison with old items
-          console.log('🔄 Old supplies count:', this.supplies.length)
-          console.log('🔄 New supplies count:', newItems.length)
-          if (this.supplies.length > 0) {
-            console.log('🔄 Old first item ID:', this.supplies[0].id)
-            console.log('🔄 New first item ID:', newItems[0]?.id)
-          }
-
-          // Normalize nested `item` objects so templates can rely on canonical fields
-          newItems.forEach(s => { if (s && s.item) s.item = normalizeItem(s.item) })
-
-          newItems.sort((a, b) => {
-            const dateA = a?.date || a?.createdAt || 0
-            const dateB = b?.date || b?.createdAt || 0
-            const timeA = Number.isNaN(new Date(dateA).getTime()) ? 0 : new Date(dateA).getTime()
-            const timeB = Number.isNaN(new Date(dateB).getTime()) ? 0 : new Date(dateB).getTime()
-            return this.sortOrder === 'asc' ? timeA - timeB : timeB - timeA
-          })
-
-          // In Vue 3, directly assign the array
-          this.supplies = newItems
-
-          this.total = responseData.total || newItems.length
-          this.pageSize = responseData.pageSize || this.pageSize
-
-          console.log('✓ Supplies updated:', this.supplies.length, 'items')
-          console.log('✓ Supplies array is now:', this.supplies)
-          console.log('✓ Component supplies data:', this.$data.supplies)
-        } else {
-          console.warn('⚠ Unexpected response format:', responseData)
-          this.supplies = []
-          this.total = 0
-        }
+        await this.load({ filters: { ...this.filters }, sortField: this.sortField, sortOrder: this.sortOrder })
       } catch (e) {
         console.error('✗ Error loading supplies:', e)
         this.supplies = []
         this.total = 0
-      } finally {
-        this.loading = false
       }
     },
 
     async onSupplySaved() {
-      console.log('SUPPLY SAVED EVENT FIRED')
       this.page = 1
       await this.loadSupplies()
     },
 
     changePage(newPage) {
       if (newPage >= 1 && newPage <= this.totalPages) {
-        this.page = newPage
+        this.setPage(newPage)
         this.loadSupplies()
       }
     },
 
-    onPageSizeChange() {
-      this.page = 1
+    onPageSizeChange(size) {
+      this.setPageSize(size)
       this.loadSupplies()
     },
 
@@ -896,6 +834,12 @@ formatDate(dateString) {
       }
     },
 
+    rowActions(supply) {
+      return [
+        { key: 'edit', icon: PencilIcon, label: this.$t('labels.edit') || 'Edit', tone: 'edit', disabled: supply.hasPendingApproval, onClick: () => this.openEdit(supply) },
+        { key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', disabled: supply.hasPendingApproval, onClick: () => this.openDeleteConfirm(supply) },
+      ]
+    },
     openEdit(supply) {
       this.form = {
         id: supply.id,
@@ -977,7 +921,7 @@ formatDate(dateString) {
         this.closeDeleteConfirm()
       } catch (e) {
         console.error('Failed to delete export', e)
-        alert(this.$t('common.deleteError') || 'Failed to delete')
+        void(window.$toast ? window.$toast(this.$t('common.deleteError') || 'Failed to delete', 'error') : alert(this.$t('common.deleteError') || 'Failed to delete'))
       } finally {
         this.deleting = false
       }

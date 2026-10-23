@@ -292,26 +292,7 @@
                   {{ rental.notes || rental.note || '-' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div class="flex gap-2 items-center">
-                    <button @click="openEditModal(rental)"
-                      :disabled="rental.hasPendingApproval"
-                      class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      :title="$t('labels.edit') || 'Edit'">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
-                    </button>
-                    <button @click="confirmDelete(rental)"
-                      :disabled="rental.hasPendingApproval"
-                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      :title="$t('labels.delete')">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                        </path>
-                      </svg>
-                    </button>
-                  </div>
+                  <RowActions :actions="rowActions(rental)" />
                 </td>
               </tr>
             </tbody>
@@ -537,6 +518,8 @@
 import { ref, computed, onMounted, onUnmounted, watch, getCurrentInstance, nextTick } from 'vue'
 import { useEquipmentLogsStore } from '@/stores/useEquipmentLogsStore'
 import SortIcon from '@/components/shared/SortIcon.vue'
+import RowActions from '@/components/shared/RowActions.vue'
+import { PencilSquareIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import EquipmentLogDetail from './EquipmentLogDetail.vue'
 import Badge from '../../shared/Badge.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
@@ -552,7 +535,7 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon },
+  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon, RowActions },
   setup() {
     const instance = getCurrentInstance()
     const equipmentLogsStore = useEquipmentLogsStore()
@@ -639,14 +622,12 @@ export default {
       }
 
       // copy local filters into the store and refresh
-      try { console.log('[component] applyFilters local filters BEFORE copy:', JSON.parse(JSON.stringify(filters.value))) } catch(e) { console.log('[component] applyFilters local filters BEFORE copy:', filters.value) }
       equipmentLogsStore.filters.startDate = filters.value.startDate || ''
       equipmentLogsStore.filters.endDate = filters.value.endDate || ''
       equipmentLogsStore.filters.equipmentId = filters.value.equipmentId || ''
       equipmentLogsStore.filters.driverId = filters.value.driverId || ''
       equipmentLogsStore.filters.locationId = filters.value.locationId || ''
       equipmentLogsStore.filters.areaId = filters.value.areaId || ''
-      try { console.log('[component] applyFilters store filters AFTER copy:', JSON.parse(JSON.stringify(equipmentLogsStore.filters))) } catch(e) { console.log('[component] applyFilters store filters AFTER copy:', equipmentLogsStore.filters) }
       equipmentLogsStore.setPage(1)
       if (typeof equipmentLogsStore.fetchRentals === 'function') equipmentLogsStore.fetchRentals()
     }
@@ -818,13 +799,6 @@ export default {
       })
     })
 
-    // Debug: log ownership filter changes and filtered count
-    try {
-      watch(localIsCompanyOwned, (v) => {
-        try { console.log('[component] localIsCompanyOwned changed:', v, 'filtered length:', filteredItems.value.length) } catch(e) { void 0 }
-      })
-    } catch (e) { void 0 }
-
     // Calculate total sum of all visible filtered items
     const resolveRentalTotal = (item) => {
       if (item && Object.prototype.hasOwnProperty.call(item, 'total')) {
@@ -875,7 +849,6 @@ export default {
     }
 
     const setCompanyOwnedFilter = (value) => {
-      try { console.log('[component] setCompanyOwnedFilter called, value:', value, 'current:', localIsCompanyOwned.value) } catch(e) { void 0 }
       // update local UI state
       localIsCompanyOwned.value = value
 
@@ -888,8 +861,6 @@ export default {
       // update store and reset to first page; watcher will trigger fetch
       equipmentLogsStore.filters.isRental = isRentalValue
       equipmentLogsStore.setPage(1)
-
-      try { console.log('[component] setCompanyOwnedFilter updated localIsCompanyOwned to:', localIsCompanyOwned.value, 'and equipmentLogsStore.filters.isRental to:', equipmentLogsStore.filters.isRental) } catch(e) { void 0 }
     }
 
     const changePage = (page) => {
@@ -1033,6 +1004,11 @@ export default {
       rentalToDelete.value = rental
       showDeleteModal.value = true
     }
+
+    const rowActions = (rental) => [
+      { key: 'edit', icon: PencilSquareIcon, label: t('labels.edit'), tone: 'edit', disabled: rental.hasPendingApproval, onClick: () => openEditModal(rental) },
+      { key: 'delete', icon: TrashIcon, label: t('labels.delete'), tone: 'delete', disabled: rental.hasPendingApproval, onClick: () => confirmDelete(rental) }
+    ]
 
     const deleteRental = async () => {
       deleting.value = true
@@ -1427,6 +1403,7 @@ export default {
       savePayout,
       deletePayout,
       confirmDelete,
+      rowActions,
       deleteRental,
       formatDate,
       formatCurrency,
