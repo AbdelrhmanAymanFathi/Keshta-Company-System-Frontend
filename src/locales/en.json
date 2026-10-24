@@ -136,6 +136,7 @@
   },
   "dashboard": {
     "toggleSidebar": "Toggle sidebar",
+    "closeSidebar": "Close sidebar",
     "userMenu": "User menu",
     "newItem": "New Item",
     "payments": "Payments",

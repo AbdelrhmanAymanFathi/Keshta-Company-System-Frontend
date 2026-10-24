@@ -136,6 +136,7 @@
   },
   "dashboard": {
     "toggleSidebar": "طي أو توسيع الشريط الجانبي",
+    "closeSidebar": "إغلاق الشريط الجانبي",
     "userMenu": "قائمة المستخدم",
     "newSupply": "توريدة جديدة",
     "payments": "المدفوعات",
