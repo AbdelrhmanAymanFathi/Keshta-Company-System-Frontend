@@ -33,7 +33,7 @@
           draggable=".top-nav-item"
           :animation="150"
           :disabled="!editLayout"
-          :class="editLayout ? 'hidden md:flex ml-2 min-w-0 max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'hidden md:flex ml-2 min-w-0 max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap lg:ml-4 lg:gap-2'"
+          :class="editLayout ? 'top-nav-scroll hidden md:flex ml-2 min-w-0 max-w-full flex-1 flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain scroll-smooth whitespace-nowrap [&>.top-nav-item]:shrink-0 lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'top-nav-scroll hidden md:flex ml-2 min-w-0 max-w-full flex-1 flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain scroll-smooth whitespace-nowrap [&>.top-nav-item]:shrink-0 lg:ml-4 lg:gap-2'"
           @end="onLayoutEnd"
         >
           <Button variant="ghost" v-for="key in menuOrder" :key="key" @click="selectTop(key)"
@@ -1236,6 +1236,24 @@ export default {
 
 .dashboard-shell .top-nav-item:focus-visible {
   outline-color: rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-shell .top-nav-scroll {
+  scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+  scrollbar-width: thin;
+}
+
+.dashboard-shell .top-nav-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.dashboard-shell .top-nav-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.dashboard-shell .top-nav-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.56);
 }
 
 .sidebar-link {

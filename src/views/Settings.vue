@@ -430,7 +430,7 @@
                 :checked="presenceEnabled"
                 :aria-label="$t('profile.presenceToggleLabel') || 'Enable live presence'"
                 class="shrink-0"
-                @update:checked="savePresenceSettings"
+                @update:checked="togglePresence"
               />
             </div>
           </div>
@@ -805,8 +805,8 @@ export default {
       return t(`profile.preset_${personalityId}`) || t(`profile.personality_${personalityId}`) || personalityId
     }
 
-    function togglePresence() {
-      savePresenceSettings(!presenceEnabled.value)
+    function togglePresence(enabled) {
+      savePresenceSettings(enabled)
     }
 
     return {
