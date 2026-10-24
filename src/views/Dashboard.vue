@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
+  <div class="dashboard-shell flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
     <header :class="headerClasses">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
@@ -1158,6 +1158,35 @@ export default {
 <style scoped>
 .direction-rtl {
   direction: rtl;
+}
+
+.dashboard-shell > header {
+  min-height: 4rem;
+  border-radius: 0 0 0.875rem 0.875rem;
+  backdrop-filter: blur(14px);
+}
+
+.dashboard-shell > header :deep(button:focus-visible),
+.dashboard-shell .layout-sidebar :deep(button:focus-visible) {
+  outline: 2px solid rgba(var(--theme-primary-rgb), 0.7);
+  outline-offset: 2px;
+}
+
+.dashboard-shell .layout-sidebar {
+  border-inline-end: 1px solid rgba(var(--theme-primary-rgb), 0.14);
+  box-shadow: 8px 0 28px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-shell .layout-sidebar :deep(.sidebar-link) {
+  border-radius: 0.75rem;
+}
+
+.dashboard-shell .top-nav-item {
+  border: 1px solid transparent;
+}
+
+.dashboard-shell .top-nav-item:hover {
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .sidebar-link {

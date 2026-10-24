@@ -2,7 +2,7 @@
   <Sonner
     v-if="host"
     class="shadcn-ui"
-    position="top-right"
+    :position="position"
     :rich-colors="true"
     :dir="direction"
   />
@@ -23,6 +23,7 @@ export default {
   setup(props) {
     const { locale } = useI18n()
     const direction = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr')
+    const position = computed(() => direction.value === 'rtl' ? 'top-left' : 'top-right')
 
     function showToast(message, type = 'info', duration = 3000) {
       const options = { duration: duration === 0 ? Infinity : duration }
@@ -38,7 +39,7 @@ export default {
       if (props.host && window.$toast === showToast) delete window.$toast
     })
 
-    return { direction }
+    return { direction, position }
   }
 }
 </script>

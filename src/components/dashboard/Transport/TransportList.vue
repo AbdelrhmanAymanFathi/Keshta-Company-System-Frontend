@@ -15,8 +15,8 @@
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Start Date -->
-        <div>
+          <!-- Start Date -->
+          <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
@@ -105,7 +105,8 @@
           {{ $t('labels.clear') }}
         </Button>
       </div>
-    </div>
+      </CardContent>
+    </Card>
 
     <!-- table -->
     <div class="app-table-card">
@@ -318,6 +319,7 @@ import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import StatusBadge from '@/components/shared/StatusBadge.vue'
 import TransportModal from './TransportCreationModal.vue'
@@ -343,6 +345,10 @@ export default {
     PaymentModal,
     DateField,
     Button,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
     TrashIcon,
     SortIcon
   },

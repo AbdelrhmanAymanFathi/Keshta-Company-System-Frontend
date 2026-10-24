@@ -41,15 +41,15 @@ const delegatedProps = reactiveOmit(props, "class", "toastOptions");
   <Sonner
     :class="cn('toaster group', props.class)"
     :style="{
-      '--normal-bg': 'var(--popover)',
-      '--normal-text': 'var(--popover-foreground)',
-      '--normal-border': 'var(--border)',
-      '--border-radius': 'var(--radius)',
-      '--gray2': 'hsl(var(--popover) / 0.9)',
-      '--gray3': 'var(--border)',
-      '--gray4': 'var(--border)',
-      '--gray5': 'var(--border)',
-      '--gray12': 'var(--popover-foreground)',
+      '--normal-bg': 'hsl(var(--shadcn-popover, 0 0% 100%))',
+      '--normal-text': 'hsl(var(--shadcn-popover-foreground, 240 10% 3.9%))',
+      '--normal-border': 'hsl(var(--shadcn-border, 240 5.9% 90%))',
+      '--border-radius': '0.75rem',
+      '--gray2': 'hsl(var(--shadcn-popover, 0 0% 100%) / 0.9)',
+      '--gray3': 'hsl(var(--shadcn-border, 240 5.9% 90%))',
+      '--gray4': 'hsl(var(--shadcn-border, 240 5.9% 90%))',
+      '--gray5': 'hsl(var(--shadcn-border, 240 5.9% 90%))',
+      '--gray12': 'hsl(var(--shadcn-popover-foreground, 240 10% 3.9%))',
     }"
     :toast-options="
       props.toastOptions ?? {
