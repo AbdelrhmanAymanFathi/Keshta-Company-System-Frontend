@@ -31,6 +31,7 @@ function handleUpdate(value) {
 <template>
   <SwitchRoot
     v-bind="{ id, name, disabled, required }"
+    dir="ltr"
     :checked="checkedValue"
     :default-checked="defaultChecked"
     data-slot="switch"
@@ -42,7 +43,7 @@ function handleUpdate(value) {
   >
     <SwitchThumb
       :class="cn(
-        'pointer-events-none block size-6 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 rtl:data-[state=checked]:translate-x-0 rtl:data-[state=unchecked]:-translate-x-5'
+        'pointer-events-none block size-6 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0'
       )"
     />
   </SwitchRoot>

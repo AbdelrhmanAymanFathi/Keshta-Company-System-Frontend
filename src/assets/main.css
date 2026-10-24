@@ -7,6 +7,7 @@ body {
   min-width: 0;
   font-family: var(--theme-font-family);
   color: var(--theme-text-primary);
+  background-color: hsl(var(--shadcn-background));
   transition:
     background-color 0.45s ease,
     color 200ms ease,
@@ -2505,6 +2506,67 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .notif-focus-flash,
 .notif-focus-flash > td {
   animation: notif-focus-flash 4s ease-out;
+}
+
+.dark {
+  color-scheme: dark;
+  --theme-text-primary: #f4f4f5 !important;
+  --theme-text-secondary: #d4d4d8 !important;
+  --theme-text-muted: #a1a1aa !important;
+  --theme-heading-color: #fafafa !important;
+  --theme-card-text: #f4f4f5 !important;
+  --theme-sidebar-text: #e4e4e7 !important;
+  --theme-surface-bg: #18181b;
+  --theme-surface-muted-bg: #27272a;
+  --theme-surface-border: rgb(255 255 255 / 0.12);
+  --theme-glass-bg: rgb(24 24 27 / 0.92);
+  --theme-glass-border: rgb(255 255 255 / 0.14);
+  --theme-backdrop-bg: rgb(0 0 0 / 0.68);
+}
+
+.dark body,
+.dark #app {
+  background-color: hsl(var(--shadcn-background));
+  color: hsl(var(--shadcn-foreground));
+}
+
+.dark .bg-white:not([class*='bg-opacity-']) {
+  background-color: hsl(var(--shadcn-card)) !important;
+}
+
+.dark :where(.border-gray-100, .border-gray-200, .border-slate-200, .border-slate-300) {
+  border-color: var(--theme-surface-border) !important;
+}
+
+.dark :where(input:not([type='color']), select, textarea) {
+  border-color: hsl(var(--shadcn-input));
+  background-color: hsl(var(--shadcn-background));
+  color: hsl(var(--shadcn-foreground));
+}
+
+.dark :where(input, select, textarea)::placeholder {
+  color: hsl(var(--shadcn-muted-foreground));
+}
+
+.dark [class~='text-gray-900'],
+.dark [class~='text-gray-800'],
+.dark [class~='text-slate-900'],
+.dark [class~='text-slate-800'],
+.dark [class~='text-zinc-900'],
+.dark [class~='text-zinc-800'] {
+  color: hsl(var(--shadcn-foreground)) !important;
+}
+
+.dark [class~='text-gray-700'],
+.dark [class~='text-gray-600'],
+.dark [class~='text-gray-500'],
+.dark [class~='text-slate-700'],
+.dark [class~='text-slate-600'],
+.dark [class~='text-slate-500'],
+.dark [class~='text-zinc-700'],
+.dark [class~='text-zinc-600'],
+.dark [class~='text-zinc-500'] {
+  color: hsl(var(--shadcn-muted-foreground)) !important;
 }
 
 /* =========================

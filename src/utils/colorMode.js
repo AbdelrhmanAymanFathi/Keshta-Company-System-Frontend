@@ -1,4 +1,8 @@
+import { ref } from 'vue'
+
 const COLOR_MODE_KEY = 'keshta-color-mode'
+
+export const colorMode = ref(getColorMode())
 
 export function getColorMode() {
   return window.localStorage.getItem(COLOR_MODE_KEY) === 'dark' ? 'dark' : 'light'
@@ -11,6 +15,7 @@ export function setColorMode(mode) {
 
   window.localStorage.setItem(COLOR_MODE_KEY, mode)
   document.documentElement.classList.toggle('dark', mode === 'dark')
+  colorMode.value = mode
   return mode
 }
 

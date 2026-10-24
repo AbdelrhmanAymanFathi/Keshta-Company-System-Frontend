@@ -26,7 +26,7 @@ import AppLoader from './components/shared/AppLoader.vue'
 import GlobalIncomingCallHost from './components/shared/GlobalIncomingCallHost.vue'
 import GlobalSearchModal from './components/shared/GlobalSearchModal.vue'
 import StartupIntroOverlay from './components/shared/StartupIntroOverlay.vue'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from './composables/useAuth'
 import { useRouteLoader } from './composables/useRouteLoader'
@@ -46,7 +46,9 @@ export default {
     const loaderLabel = computed(() => isLoading.value ? t('auth.login.loading') : t('labels.loading'))
 
     const notificationStore = useNotificationStore()
-    notificationStore.fetchUnreadCount()
+    watch(isLoggedIn, (loggedIn) => {
+      if (loggedIn) notificationStore.fetchUnreadCount()
+    }, { immediate: true })
 
     const debouncedFetchUnread = debounce(() => notificationStore.fetchUnreadCount(), 300)
     // A burst (e.g. saving 20 rows at once) shows a single popup
@@ -61,6 +63,7 @@ export default {
       channel: 'notifications',
       events: ['notification_created'],
       handler: (eventName, data) => {
+        if (!isLoggedIn.value) return
         const myId = currentUser.value?.id
         // Only process notifications for the current user or broadcast (userId: null)
         if (data?.userId && data.userId !== myId) {

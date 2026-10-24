@@ -21,6 +21,36 @@
       <div class="responsive-stack">
 
         <div class="settings-card">
+          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
+            <div class="flex items-center gap-3">
+              <div class="rounded-lg bg-white bg-opacity-20 p-2">
+                <svg class="h-5 w-5 theme-text-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.5 15.2A8.5 8.5 0 018.8 3.5 8.5 8.5 0 1020.5 15.2Z" />
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold theme-text-light">{{ $t('profile.appearanceTitle') }}</h2>
+            </div>
+          </div>
+          <div class="settings-card__body space-y-4">
+            <p class="text-sm theme-text-secondary">{{ $t('profile.appearanceDescription') }}</p>
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3">
+              <div class="min-w-0">
+                <p class="text-sm font-semibold theme-text-primary">{{ $t('profile.darkModeLabel') }}</p>
+                <p class="text-xs theme-caption">
+                  {{ colorMode === 'dark' ? $t('profile.darkModeOn') : $t('profile.darkModeOff') }}
+                </p>
+              </div>
+              <Switch
+                :checked="colorMode === 'dark'"
+                :aria-label="$t('profile.darkModeLabel')"
+                class="shrink-0"
+                @update:checked="setColorMode($event ? 'dark' : 'light')"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
 
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
 
@@ -504,6 +534,7 @@ import {
 import { getIconPackOptions, ThemeIcon } from '@acme/icon-packs'
 import { getSidebarOptions } from '@acme/layout-engine'
 import { Switch } from '@/components/ui/switch'
+import { colorMode, setColorMode } from '@/utils/colorMode'
 import { presenceEnabled, savePresenceSettings } from '@/composables/usePresenceSettings'
 import { introEnabled, toggleStartupSound, previewStartupSound } from '@/composables/useStartupIntro'
 
@@ -831,6 +862,10 @@ export default {
       presenceEnabled,
 
       togglePresence,
+
+      colorMode,
+
+      setColorMode,
 
       introEnabled,
 

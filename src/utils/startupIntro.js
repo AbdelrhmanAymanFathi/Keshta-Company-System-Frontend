@@ -105,7 +105,13 @@ export function unlockAudio(timeoutMs = 500) {
   const ctx = getAudioContext()
   if (!ctx) return Promise.resolve(false)
   if (ctx.state === 'running') return Promise.resolve(true)
-  const resumed = Promise.resolve(ctx.resume()).catch(() => false)
+  let resumePromise
+  try {
+    resumePromise = ctx.resume()
+  } catch {
+    return Promise.resolve(false)
+  }
+  const resumed = Promise.resolve(resumePromise).catch(() => false)
   const timedOut = new Promise(resolve => setTimeout(() => resolve(false), timeoutMs))
   return Promise.race([resumed, timedOut]).then(() => ctx.state === 'running')
 }

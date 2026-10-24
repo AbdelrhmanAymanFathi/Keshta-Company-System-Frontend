@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue'
 
 const packagesDir = fileURLToPath(new URL('./packages', import.meta.url))
 
-/** Directory aliases — Vite resolves index.ts via resolve.extensions */
+// Directory aliases — Vite resolves index.ts via resolve.extensions.
 const acmeAliases = {
   '@acme/platform': `${packagesDir}/platform/src`,
   '@acme/theme-engine': `${packagesDir}/theme-engine/src`,
