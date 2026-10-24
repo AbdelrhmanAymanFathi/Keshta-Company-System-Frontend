@@ -99,86 +99,66 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm p-4" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm sm:max-w-lg lg:max-w-3xl p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">
-            {{ editing ? $t('extracts.editContractor') : $t('extracts.addContractor') }}
-          </h3>
-          <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
-            <XMarkIcon class="w-6 h-6" />
-          </button>
+    <Modal
+      :visible="modalOpen"
+      :title="editing ? $t('extracts.editContractor') : $t('extracts.addContractor')"
+      size="lg"
+      @update:visible="modalOpen = $event"
+    >
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="sm:col-span-2 lg:col-span-3">
+          <Label class="text-sm mb-1 block">{{ $t('extracts.name') }}</Label>
+          <Input v-model="form.name" :placeholder="$t('extracts.placeholders.name')" class="w-full" />
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <label class="sm:col-span-2 lg:col-span-3">
-            <div class="text-sm mb-1">{{ $t('extracts.name') }}</div>
-            <input v-model="form.name" :placeholder="$t('extracts.placeholders.name')" class="w-full px-3 py-2 border rounded theme-input-focus" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('extracts.phone') }}</div>
-            <input v-model="form.phone" :placeholder="$t('extracts.placeholders.phone')" class="w-full px-3 py-2 border rounded theme-input-focus" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('extracts.bankName') }}</div>
-            <input v-model="form.bankName" :placeholder="$t('extracts.placeholders.bankName')" class="w-full px-3 py-2 border rounded theme-input-focus" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('extracts.accountNumber') }}</div>
-            <input v-model="form.accountNumber" :placeholder="$t('extracts.placeholders.accountNumber')" class="w-full px-3 py-2 border rounded theme-input-focus" />
-          </label>
-          <label>
-            <div class="text-sm mb-1">{{ $t('extracts.notes') }}</div>
-            <input v-model="form.notes" :placeholder="$t('extracts.placeholders.notes')" class="w-full px-3 py-2 border rounded theme-input-focus" />
-          </label>
-          <div class="sm:col-span-2 lg:col-span-3">
-            <OpeningBalanceSitesField v-model="form.openingBalanceLines" :locations="locations" />
-            <p v-if="editing" class="mt-1 text-xs text-amber-700">
-              <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.sites || openingBalancePending.openingBalance }}<template v-if="!openingBalancePending.sites && openingBalancePending.locationName"> — {{ openingBalancePending.locationName }}</template></template>
-              <template v-else>{{ $i18n.locale === 'ar' ? 'تعديل رصيد أول المدة يحتاج موافقة إدارية' : 'Changing the opening balance needs admin approval' }}</template>
-            </p>
-          </div>
-          
+        <div>
+          <Label class="text-sm mb-1 block">{{ $t('extracts.phone') }}</Label>
+          <Input v-model="form.phone" :placeholder="$t('extracts.placeholders.phone')" class="w-full" />
         </div>
-        <div class="mt-6 flex justify-end gap-3 sm:col-span-2 lg:col-span-3">
-          <button @click="closeModal" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">
-            {{ $t('labels.cancel') }}
-          </button>
-          <button @click="saveContractor" class="px-4 py-2 theme-button rounded">
-            {{ $t('labels.save') }}
-          </button>
+        <div>
+          <Label class="text-sm mb-1 block">{{ $t('extracts.bankName') }}</Label>
+          <Input v-model="form.bankName" :placeholder="$t('extracts.placeholders.bankName')" class="w-full" />
+        </div>
+        <div>
+          <Label class="text-sm mb-1 block">{{ $t('extracts.accountNumber') }}</Label>
+          <Input v-model="form.accountNumber" :placeholder="$t('extracts.placeholders.accountNumber')" class="w-full" />
+        </div>
+        <div>
+          <Label class="text-sm mb-1 block">{{ $t('extracts.notes') }}</Label>
+          <Input v-model="form.notes" :placeholder="$t('extracts.placeholders.notes')" class="w-full" />
+        </div>
+        <div class="sm:col-span-2 lg:col-span-3">
+          <OpeningBalanceSitesField v-model="form.openingBalanceLines" :locations="locations" />
+          <p v-if="editing" class="mt-1 text-xs text-amber-700">
+            <template v-if="openingBalancePending">⏳ {{ $i18n.locale === 'ar' ? 'في انتظار موافقة تعديل رصيد أول المدة إلى' : 'Opening balance change waiting for approval:' }} {{ openingBalancePending.sites || openingBalancePending.openingBalance }}<template v-if="!openingBalancePending.sites && openingBalancePending.locationName"> — {{ openingBalancePending.locationName }}</template></template>
+            <template v-else>{{ $i18n.locale === 'ar' ? 'تعديل رصيد أول المدة يحتاج موافقة إدارية' : 'Changing the opening balance needs admin approval' }}</template>
+          </p>
         </div>
       </div>
-    </div>
+      <template #footer>
+        <Button variant="outline" @click="closeModal">{{ $t('labels.cancel') }}</Button>
+        <Button @click="saveContractor">{{ $t('labels.save') }}</Button>
+      </template>
+    </Modal>
 
     <!-- Contractor Wallet Modal -->
-    <div v-if="walletModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 z-10">
-        <div class="flex items-start justify-between mb-4">
-          <h3 class="text-lg font-semibold" :class="isRTL ? 'text-right' : ''">
-            {{ selectedContractor ? selectedContractor.name : $t('extracts.wallet') }}
-          </h3>
-          <button @click="walletModalOpen = false" class="theme-text-muted hover:theme-text-secondary">✕</button>
-        </div>
-        <WalletPanel v-if="selectedContractor" :contractorId="selectedContractor.id" />
-      </div>
-    </div>
+    <Modal
+      :visible="walletModalOpen"
+      :title="selectedContractor ? selectedContractor.name : $t('extracts.wallet')"
+      size="lg"
+      @update:visible="walletModalOpen = $event"
+    >
+      <WalletPanel v-if="selectedContractor" :contractorId="selectedContractor.id" />
+    </Modal>
 
     <!-- Confirm delete modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-6 z-10">
-        <p class="mb-4 text-center" :class="isRTL ? 'text-right' : 'text-left'">
-          {{ $t('extracts.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
-        </p>
-        <div class="flex justify-center gap-3">
-          <button @click="cancelDelete" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">
-            {{ $t('labels.cancel') }}
-          </button>
-          <button @click="doDelete" class="px-4 py-2 bg-red-600 theme-text-light rounded hover:bg-red-700">
-            {{ $t('labels.delete') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteConfirm.open"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="deleteConfirm.item ? ($t('labels.confirmDelete') + ' ' + deleteConfirm.item.name) : ''"
+      type="danger"
+      @confirm="doDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
@@ -192,6 +172,11 @@ import Pagination from '@/components/shared/Pagination.vue'
 import WalletPanel from '@/components/shared/WalletPanel.vue'
 import OpeningBalanceSitesField, { emptyOpeningBalanceLine, openingBalanceLinesFromApi, openingBalanceLinesPayload, sameOpeningBalanceLines } from '@/components/shared/OpeningBalanceSitesField.vue'
 import RowActions from '@/components/shared/RowActions.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
@@ -199,7 +184,12 @@ export default {
   props: {
     mode: { type: String, default: 'extract' }
   },
-  components: { Pagination, WalletPanel, OpeningBalanceSitesField, RowActions, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
+  components: {
+    Modal,
+    ConfirmDialog,
+    Button,
+    Input,
+    Label, Pagination, WalletPanel, OpeningBalanceSitesField, RowActions, DocumentTextIcon, PencilSquareIcon, PlusIcon, TrashIcon, WalletIcon, XMarkIcon },
   setup(props) {
     const q = ref('')
     const { items: contractorsAll, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(

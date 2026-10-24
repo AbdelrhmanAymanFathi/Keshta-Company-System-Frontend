@@ -1,42 +1,58 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="margin-top: 0;" @click.self="handleBackdrop">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white confirm-dialog-inner" :class="{ 'animate-shake': shaking }" tabindex="-1">
-      <div class="mt-3">
-        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full" :class="iconBgClass">
-          <svg class="h-6 w-6" :class="iconColorClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <AlertDialog :open="show" @update:open="handleOpenChange">
+    <AlertDialogContent
+      ref="dialogContent"
+      class="confirm-dialog-inner shadcn-ui w-[calc(100%-2rem)] max-w-sm"
+      :class="{ 'animate-shake': shaking }"
+      @pointer-down-outside="handleOutsidePointer"
+    >
+      <AlertDialogHeader class="text-center">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full" :class="iconBgClass">
+          <svg class="h-6 w-6" :class="iconColorClass" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path v-if="type === 'danger'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <div class="mt-2 text-center">
-          <h3 class="text-lg font-medium theme-text-primary">{{ title }}</h3>
-          <div class="mt-2 px-7 py-3">
-            <p class="text-sm theme-text-muted">{{ message }}</p>
-          </div>
-        </div>
-        <div class="flex justify-center gap-3 pt-4">
-          <button @click="handleCancel"
-            class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
-            {{ cancelText }}
-          </button>
-          <button @click="handleConfirm" :disabled="loading"
-            :class="[
-              'px-4 py-2 rounded-md theme-text-light transition disabled:opacity-50',
-              type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'theme-button '
-            ]">
-            {{ loading ? loadingText : confirmText }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+        <AlertDialogTitle class="text-lg font-medium theme-text-primary">
+          {{ title }}
+        </AlertDialogTitle>
+        <AlertDialogDescription class="text-sm theme-text-muted">
+          {{ message }}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter class="justify-center sm:justify-center">
+        <AlertDialogCancel>{{ cancelText }}</AlertDialogCancel>
+        <Button
+          :variant="type === 'danger' ? 'destructive' : 'default'"
+          :class="{ 'theme-button': type !== 'danger' }"
+          :disabled="loading"
+          @click="handleConfirm"
+        >
+          {{ loading ? loadingText : confirmText }}
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>
 
 <script>
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+
 export default {
   name: 'ConfirmDialog',
+  components: {
+    AlertDialog,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    Button
+  },
   props: {
     show: {
       type: Boolean,
@@ -70,8 +86,7 @@ export default {
     loading: {
       type: Boolean,
       default: false
-    }
-    ,
+    },
     // If true, clicking the backdrop will NOT cancel/close the dialog.
     // Instead it will trigger a shake animation to indicate the dialog requires an explicit action.
     preventBackdropClose: {
@@ -79,12 +94,12 @@ export default {
       default: false
     }
   },
+  emits: ['confirm', 'cancel'],
   data() {
     return {
       shaking: false
     }
   },
-
   computed: {
     iconBgClass() {
       return this.type === 'danger' ? 'bg-red-100' : 'theme-icon-bg'
@@ -94,18 +109,18 @@ export default {
     }
   },
   methods: {
+    handleOpenChange(open) {
+      if (!open) this.$emit('cancel')
+    },
     handleConfirm() {
       this.$emit('confirm')
     },
-    handleCancel() {
-      this.$emit('cancel')
-    },
-    handleBackdrop() {
+    handleOutsidePointer(event) {
+      event.preventDefault()
       if (this.preventBackdropClose) {
-        // trigger shake animation instead of closing
         this.triggerShake()
       } else {
-        this.handleCancel()
+        this.$emit('cancel')
       }
     },
     triggerShake() {
@@ -113,9 +128,9 @@ export default {
       this.shaking = true
       setTimeout(() => {
         this.shaking = false
-        // restore focus to dialog
         this.$nextTick(() => {
-          const modal = this.$el.querySelector('.confirm-dialog-inner')
+          const content = this.$refs.dialogContent
+          const modal = content?.$el || content
           if (modal && typeof modal.focus === 'function') modal.focus()
         })
       }, 500)
@@ -140,4 +155,3 @@ export default {
 }
 .animate-shake { animation: shake 0.5s ease; will-change: transform; }
 </style>
-

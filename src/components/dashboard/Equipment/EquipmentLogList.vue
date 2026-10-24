@@ -261,12 +261,10 @@
                   <div>{{ rental.contractor?.name || rental.contractorName || rental.equipment?.contractor?.name || rental.equipment?.contractorName || '-' }}</div>
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-                  <span v-if="rental.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
-                    {{ $t('labels.pendingReview') || 'Pending Review' }}
-                  </span>
-                  <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
-                    {{ $t('labels.approved') || 'Approved' }}
-                  </span>
+                  <StatusBadge
+                    :status="rental.hasPendingApproval ? 'pending' : 'approved'"
+                    :label="rental.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
+                  />
                 </td>
                 <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
                   <div>{{ rental.driver?.name || rental.driverName || rental.driverLabel || '-' }}</div>
@@ -418,13 +416,14 @@
         @cancel="showDeleteModal = false" />
 
       <!-- Rental Detail Modal -->
-      <div v-if="showDetailModal && selectedRentalForDetail"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
-        style="margin-top: 0%;" @click.self="closeDetailModal">
-        <div class="relative bg-white rounded-md shadow-lg border w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5">
-          <EquipmentLogDetail :rental-id="selectedRentalForDetail.id" @close="closeDetailModal" />
-        </div>
-      </div>
+      <Modal
+        :visible="showDetailModal && !!selectedRentalForDetail"
+        :title="$t('equipmentLog.detail') || 'Equipment Log Details'"
+        size="lg"
+        @update:visible="val => { if (!val) closeDetailModal() }"
+      >
+        <EquipmentLogDetail v-if="selectedRentalForDetail" :rental-id="selectedRentalForDetail.id" @close="closeDetailModal" />
+      </Modal>
 
       <!-- Context Menu -->
       <div v-if="contextMenu.open" ref="contextMenuElement"
@@ -445,71 +444,53 @@
       </div>
 
       <!-- Payouts Modal -->
-      <div v-if="showPayoutsModal"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
-        style="margin-top: 0%;" @click.self="triggerPayoutsShake">
-        <div
-          class="relative bg-white rounded-md shadow-lg border w-full max-w-2xl max-h-[90vh] overflow-y-auto payouts-modal-inner"
-          :class="{ 'animate-shake': showPayoutsShake }" tabindex="-1">
-          <div class="sticky top-0 bg-white border-b p-5 flex items-center justify-between">
-            <h3 class="text-lg font-medium theme-text-primary">
-              {{ $t('equipmentLog.payouts') }} - {{ selectedRentalForPayouts?.name }}
-            </h3>
-            <button @click="closePayoutsModal" class="theme-caption hover:theme-text-secondary">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+      <Modal
+        :visible="showPayoutsModal"
+        :title="($t('equipmentLog.payouts') || 'Payouts') + (selectedRentalForPayouts?.name ? ' - ' + selectedRentalForPayouts.name : '')"
+        size="lg"
+        @update:visible="val => { if (!val) closePayoutsModal() }"
+      >
+        <div class="space-y-6">
+          <!-- Add Payout Form -->
+          <div class="pb-6 border-b">
+            <h4 class="text-sm font-medium theme-text-secondary mb-3">{{ $t('equipmentLog.addPayout') }}</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Input v-model="payoutForm.amount" type="number" placeholder="Amount" class="w-full" />
+              <DateField v-model="payoutForm.date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
+              <Input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)" class="w-full" />
+            </div>
+            <Button @click="savePayout" :disabled="!payoutForm.amount || equipmentLogsStore.payoutsLoading"
+              class="mt-3">
+              {{ equipmentLogsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
+            </Button>
           </div>
 
-          <div class="p-5 space-y-6">
-            <!-- Add Payout Form -->
-            <div class="pb-6 border-b">
-              <h4 class="text-sm font-medium theme-text-secondary mb-3">{{ $t('equipmentLog.addPayout') }}</h4>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <input v-model="payoutForm.amount" type="number" placeholder="Amount"
-                  class="border border-gray-300 rounded px-3 py-2 text-sm" />
-                <DateField v-model="payoutForm.date" class="border border-gray-300 rounded px-3 py-2 text-sm" />
-                <input v-model="payoutForm.notes" type="text" placeholder="Notes (optional)"
-                  class="border border-gray-300 rounded px-3 py-2 text-sm" />
-              </div>
-              <button @click="savePayout" :disabled="!payoutForm.amount || equipmentLogsStore.payoutsLoading"
-                class="mt-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 theme-text-light px-4 py-2 rounded text-sm">
-                {{ equipmentLogsStore.payoutsLoading ? $t('labels.saving') : $t('labels.add') }}
-              </button>
+          <!-- Payouts List -->
+          <div>
+            <h4 class="text-sm font-medium theme-text-secondary mb-3">{{ $t('equipmentLog.payoutsList') }}</h4>
+            <div v-if="equipmentLogsStore.payouts.length === 0" class="text-center py-4 theme-text-muted">
+              {{ $t('equipmentLog.noPayouts') }}
             </div>
-
-            <!-- Payouts List -->
-            <div>
-              <h4 class="text-sm font-medium theme-text-secondary mb-3">{{ $t('equipmentLog.payoutsList') }}</h4>
-              <div v-if="equipmentLogsStore.payouts.length === 0" class="text-center py-4 theme-text-muted">
-                {{ $t('equipmentLog.noPayouts') }}
-              </div>
-              <div v-else class="space-y-2">
-                <div v-for="payout in equipmentLogsStore.payouts" :key="payout.id"
-                  class="flex items-center justify-between bg-gray-50 p-3 rounded border">
-                  <div>
-                    <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
-                    <div class="text-xs theme-text-muted">{{ formatDate(payout.date) }}</div>
-                    <div v-if="payout.notes" class="text-xs theme-text-secondary">{{ payout.notes }}</div>
-                  </div>
-                  <button @click="deletePayout(payout.id)" :disabled="equipmentLogsStore.payoutsLoading"
-                    class="text-red-600 hover:text-red-900 text-sm">
-                    {{ $t('labels.delete') }}
-                  </button>
+            <div v-else class="space-y-2">
+              <div v-for="payout in equipmentLogsStore.payouts" :key="payout.id"
+                class="flex items-center justify-between bg-gray-50 p-3 rounded border">
+                <div>
+                  <div class="text-sm font-medium">{{ formatCurrency(payout.amount) }}</div>
+                  <div class="text-xs theme-text-muted">{{ formatDate(payout.date) }}</div>
+                  <div v-if="payout.notes" class="text-xs theme-text-secondary">{{ payout.notes }}</div>
                 </div>
+                <Button variant="ghost" size="sm" @click="deletePayout(payout.id)" :disabled="equipmentLogsStore.payoutsLoading"
+                  class="text-red-600 hover:text-red-900 text-sm">
+                  {{ $t('labels.delete') }}
+                </Button>
               </div>
-            </div>
-
-            <div class="flex justify-end gap-2 border-t pt-6">
-              <button @click="closePayoutsModal"
-                class="px-4 py-2 border border-gray-300 rounded theme-text-secondary hover:bg-gray-50">
-                {{ $t('labels.close') }}
-              </button>
             </div>
           </div>
         </div>
-      </div>
+        <template #footer>
+          <Button variant="outline" @click="closePayoutsModal">{{ $t('labels.close') }}</Button>
+        </template>
+      </Modal>
     </div>
   </div>
 </template>
@@ -523,6 +504,10 @@ import { PencilSquareIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import EquipmentLogDetail from './EquipmentLogDetail.vue'
 import Badge from '../../shared/Badge.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
+import Modal from '@/components/shared/Modal.vue'
+import StatusBadge from '@/components/shared/StatusBadge.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { getEquipments, createEquipmentLog, updateEquipmentLog, deleteEquipmentLog, getDrivers, getLocations, getRental } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
@@ -535,7 +520,11 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'EquipmentLogList',
-  components: { EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon, RowActions },
+  components: {
+    Modal,
+    Button,
+    Input,
+    StatusBadge, EquipmentLogDetail, Badge, ConfirmDialog, EquipmentLogCreationModal, SearchDropdown, DateField, SortIcon, RowActions },
   setup() {
     const instance = getCurrentInstance()
     const equipmentLogsStore = useEquipmentLogsStore()

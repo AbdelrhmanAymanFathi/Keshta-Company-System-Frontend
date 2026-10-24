@@ -1,12 +1,12 @@
 <template>
-  <div ref="rootRef" class="relative">
+  <div ref="rootRef" class="shadcn-ui relative w-full">
     <slot name="prefix"></slot>
     <input
       ref="inputRef"
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
-      :class="[inputClass, isRTL ? 'text-right' : 'text-left', clearable && hasValue ? 'pe-9' : '']"
+      :class="[effectiveInputClass, isRTL ? 'text-right' : 'text-left', clearable && hasValue ? 'pe-8' : '']"
       :dir="dir"
       @input="handleInput"
       @focus="handleFocus"
@@ -17,20 +17,22 @@
       v-if="clearable && hasValue && !disabled"
       type="button"
       tabindex="-1"
-      class="absolute end-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-lg leading-none text-gray-400 hover:text-gray-600 focus:outline-none"
+      class="absolute end-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center size-5 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none transition-colors"
       :aria-label="clearAriaLabel"
       @mousedown.prevent
       @click="clearValue"
     >
-      ×
+      <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
     </button>
     <div
       v-if="isOpen && !teleportTarget"
       ref="options"
-      class="absolute top-full left-0 right-0 bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-0"
+      class="shadcn-ui absolute top-full left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-1"
       @mousedown.prevent
     >
-      <div v-if="filteredItems.length">
+      <div v-if="filteredItems.length" class="space-y-0.5">
         <div
           v-for="(item, i) in filteredItems"
           :key="getKey(item, i)"
@@ -38,8 +40,8 @@
           @mousedown.prevent="selectItem(item)"
           @mouseenter="highlightedIndex = i"
           :class="[
-            'px-3 py-2 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
-            i === highlightedIndex ? 'theme-icon-bg theme-text font-semibold' : 'theme-hover-soft theme-text-primary'
+            'cursor-pointer select-none rounded-md px-2.5 py-1.5 text-sm transition-colors',
+            i === highlightedIndex ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-accent/50 text-foreground'
           ]"
         >
           {{ getLabel(item) }}
@@ -50,18 +52,18 @@
     <teleport v-else-if="isOpen && teleportTarget" :to="teleportTarget">
       <div
         ref="optionsRef"
-        class="absolute z-[9999] max-h-48 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-xl"
+        class="shadcn-ui absolute z-[9999] max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-xl p-1"
         :style="dropdownStyle"
         @mousedown.prevent
       >
-        <div v-if="filteredItems.length">
+        <div v-if="filteredItems.length" class="space-y-0.5">
           <div
             v-for="(item, index) in filteredItems"
             :key="getKey(item, index)"
             ref="optionItems"
             :class="[
-              'cursor-pointer border-b border-gray-100 px-3 py-2 text-sm last:border-b-0',
-              index === highlightedIndex ? 'theme-icon-bg theme-text font-semibold' : 'theme-hover-soft theme-text-primary'
+              'cursor-pointer select-none rounded-md px-2.5 py-1.5 text-sm transition-colors',
+              index === highlightedIndex ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-accent/50 text-foreground'
             ]"
             @mousedown.prevent="selectItem(item)"
             @mouseenter="highlightedIndex = index"
@@ -110,8 +112,7 @@ export default {
     },
     inputClass: {
       type: String,
-      default:
-        'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm'
+      default: ''
     },
     dir: {
       type: String,
@@ -149,6 +150,23 @@ export default {
     const highlightedIndex = ref(-1)
     const dropdownStyle = ref({})
 
+    const effectiveInputClass = computed(() => {
+      const base = 'border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive disabled:bg-input/50 h-8 rounded-lg border bg-transparent px-2.5 py-1 text-sm w-full min-w-0 outline-none placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 transition-colors focus-visible:ring-2'
+      const raw = props.inputClass || ''
+      let list = []
+      if (typeof raw === 'string') {
+        list = raw.split(/\s+/).filter(Boolean)
+      } else if (Array.isArray(raw)) {
+        list = raw.flatMap(c => typeof c === 'string' ? c.split(/\s+/) : []).filter(Boolean)
+      }
+
+      const filtered = list.filter(token => {
+        return !/^(border($|-gray-|-slate-)|rounded($|-md|-lg|-xl)|theme-input-focus|focus:(outline|ring)|focus-visible:)/.test(token)
+      })
+
+      return [base, ...filtered].join(' ')
+    })
+
     const sourceItems = computed(() => {
       if (Array.isArray(props.items) && props.items.length) return props.items
       if (Array.isArray(props.allItems) && props.allItems.length) return props.allItems
@@ -158,35 +176,51 @@ export default {
     const normalize = (value) => String(value ?? '').toLowerCase().trim()
 
     const getLabel = (item) => {
-      if (item == null) return ''
-      if (typeof props.itemLabel === 'function') return props.itemLabel(item)
-      if (typeof item === 'object') return item?.[props.itemLabel] ?? item?.label ?? item?.name ?? String(item)
-      return String(item)
+      if (!item) return ''
+      if (typeof props.itemLabel === 'function') {
+        return String(props.itemLabel(item) ?? '')
+      }
+      return String(item[props.itemLabel] ?? '')
+    }
+
+    const getDisplayLabel = (item) => {
+      if (!item) return ''
+      if (typeof props.displayLabel === 'function') {
+        return String(props.displayLabel(item) ?? '')
+      }
+      if (typeof props.displayLabel === 'string' && props.displayLabel) {
+        return String(item[props.displayLabel] ?? '')
+      }
+      return getLabel(item)
     }
 
     const getKey = (item, index) => {
-      if (typeof props.itemKey === 'function') return props.itemKey(item, index)
-      if (item && typeof item === 'object' && item[props.itemKey] != null) return item[props.itemKey]
-      return `${getLabel(item)}-${index}`
+      if (!item) return index
+      if (typeof props.itemKey === 'function') {
+        return props.itemKey(item) ?? index
+      }
+      return item[props.itemKey] ?? index
     }
 
     const filteredItems = computed(() => {
       const query = normalize(props.modelValue)
-      if (!query) return sourceItems.value
+      const list = sourceItems.value
+      if (!query) return list
+
       if (typeof props.filterFn === 'function') {
-        return sourceItems.value.filter((item) => props.filterFn(item, query))
+        return list.filter((item) => props.filterFn(item, query))
       }
-      return sourceItems.value.filter((item) => normalize(getLabel(item)).includes(query))
+
+      return list.filter((item) => {
+        const primary = normalize(getLabel(item))
+        const display = normalize(getDisplayLabel(item))
+        return primary.includes(query) || display.includes(query)
+      })
     })
 
-    const hasValue = computed(() => normalize(props.modelValue).length > 0)
-
-    const clearValue = () => {
-      emit('update:modelValue', '')
-      emit('clear')
-      openDropdown()
-      inputRef.value?.focus()
-    }
+    const hasValue = computed(() => {
+      return props.modelValue !== null && props.modelValue !== undefined && String(props.modelValue).trim() !== ''
+    })
 
     const updateDropdownPosition = async () => {
       if (!props.teleportTarget) return
@@ -251,131 +285,101 @@ export default {
       highlightedIndex.value = -1
     }
 
-    const getDisplayLabel = (item) => {
-      if (!props.displayLabel) return getLabel(item)
-      if (typeof props.displayLabel === 'function') return props.displayLabel(item)
-      if (typeof item === 'object') return item?.[props.displayLabel] ?? getLabel(item)
-      return getLabel(item)
+    const selectItem = (item) => {
+      if (!item) return
+      const displayVal = getDisplayLabel(item) || getLabel(item)
+      emit('update:modelValue', displayVal)
+      emit('select', item)
+      closeDropdown()
     }
 
-    const selectItem = (item) => {
-      emit('select', item)
-      emit('update:modelValue', getDisplayLabel(item))
+    const clearValue = () => {
+      emit('update:modelValue', '')
+      emit('clear')
       closeDropdown()
     }
 
     const handleInput = (event) => {
-      emit('update:modelValue', event.target.value)
+      const val = event.target.value
+      emit('update:modelValue', val)
       if (!isOpen.value) {
         openDropdown()
       } else {
         highlightedIndex.value = filteredItems.value.length ? 0 : -1
-        updateDropdownPosition()
       }
     }
 
-    const handleFocus = () => {
-      emit('focus')
+    const handleFocus = (event) => {
+      emit('focus', event)
       openDropdown()
     }
 
-    const handleBlur = () => {
-      emit('blur')
-      window.setTimeout(() => {
-        closeDropdown()
-      }, 150)
+    const handleBlur = (event) => {
+      emit('blur', event)
     }
 
     const handleKeydown = (event) => {
-      if (props.clearable && event.key === 'Delete' && hasValue.value) {
+      if (props.disabled) return
+
+      if (event.key === 'ArrowDown') {
         event.preventDefault()
-        clearValue()
-        return
-      }
-
-      if (event.key === 'Escape') {
-        if (isOpen.value) {
-          event.preventDefault()
-          event.stopPropagation()
-          closeDropdown()
-        }
-        return
-      }
-
-      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         if (!isOpen.value) {
-          event.preventDefault()
           openDropdown()
           return
         }
         if (!filteredItems.value.length) return
+        highlightedIndex.value = (highlightedIndex.value + 1) % filteredItems.value.length
+        scrollOptionIntoView()
+        return
+      }
+
+      if (event.key === 'ArrowUp') {
         event.preventDefault()
-        event.stopPropagation()
-        if (event.key === 'ArrowDown') {
-          highlightedIndex.value = highlightedIndex.value === -1
-            ? 0
-            : (highlightedIndex.value + 1) % filteredItems.value.length
-        } else {
-          highlightedIndex.value = highlightedIndex.value <= 0
-            ? filteredItems.value.length - 1
-            : highlightedIndex.value - 1
+        if (!isOpen.value) {
+          openDropdown()
+          return
         }
+        if (!filteredItems.value.length) return
+        highlightedIndex.value =
+          (highlightedIndex.value - 1 + filteredItems.value.length) % filteredItems.value.length
         scrollOptionIntoView()
         return
       }
 
       if (event.key === 'Enter') {
-        if (isOpen.value) {
-          event.preventDefault()
-          event.stopPropagation()
-          if (highlightedIndex.value >= 0 && filteredItems.value.length) {
-            const item = filteredItems.value[highlightedIndex.value]
-            if (item) selectItem(item)
-          } else {
-            closeDropdown()
-          }
+        if (!isOpen.value) return
+        event.preventDefault()
+        const selected = filteredItems.value[highlightedIndex.value]
+        if (selected) {
+          selectItem(selected)
         }
         return
       }
 
-      if (event.key === 'Tab' && isOpen.value) {
-        if (highlightedIndex.value >= 0 && filteredItems.value.length) {
-          const item = filteredItems.value[highlightedIndex.value]
-          if (item) selectItem(item)
-        } else {
-          closeDropdown()
-        }
-        return
+      if (event.key === 'Escape') {
+        if (!isOpen.value) return
+        event.preventDefault()
+        closeDropdown()
       }
     }
 
     const handleDocumentPointerDown = (event) => {
-      if (!isOpen.value) return
-      const rootEl = rootRef.value
-      const optionsEl = optionsRef.value
-      if (rootEl && rootEl.contains(event.target)) return
-      if (optionsEl && optionsEl.contains(event.target)) return
-      closeDropdown()
+      const root = rootRef.value
+      const options = optionsRef.value
+      if (!root) return
+
+      const clickedInsideRoot = root.contains(event.target)
+      const clickedInsideOptions = options && options.contains(event.target)
+
+      if (!clickedInsideRoot && !clickedInsideOptions) {
+        closeDropdown()
+      }
     }
 
     watch(
-      () => props.teleportTarget,
-      async () => {
-        if (isOpen.value) await updateDropdownPosition()
-      }
-    )
-
-    watch(
-      () => filteredItems.value.length,
-      async () => {
-        if (isOpen.value) await updateDropdownPosition()
-      }
-    )
-
-    watch(
-      () => props.modelValue,
-      async () => {
-        if (isOpen.value) await updateDropdownPosition()
+      () => props.disabled,
+      (disabled) => {
+        if (disabled) closeDropdown()
       }
     )
 
@@ -391,7 +395,7 @@ export default {
       window.removeEventListener('scroll', updateDropdownPosition, true)
     })
 
-      return {
+    return {
       rootRef,
       inputRef,
       optionsRef,
@@ -401,6 +405,7 @@ export default {
       dropdownStyle,
       filteredItems,
       hasValue,
+      effectiveInputClass,
       getKey,
       getLabel,
       getDisplayLabel,

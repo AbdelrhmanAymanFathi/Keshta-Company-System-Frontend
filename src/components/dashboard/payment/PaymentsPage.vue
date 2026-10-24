@@ -6,9 +6,9 @@
       </div>
 
       <div class="mt-3 sm:mt-0 flex items-center gap-2">
-        <button @click="onPay" class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2">
+        <Button @click="onPay" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2">
           {{ $t('dashboard.pay') || 'Pay' }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -94,12 +94,12 @@
       </div>
 
       <div class="mt-4 flex flex-wrap gap-2">
-        <button @click="applyFilters" class="theme-button px-4 py-2">
+        <Button @click="applyFilters" class="px-4 py-2">
           {{ $t('labels.search') || 'Search' }}
-        </button>
-        <button @click="resetFilters" class="rounded-md border border-gray-200 px-4 py-2 theme-text-secondary hover:theme-hover-soft">
+        </Button>
+        <Button variant="outline" @click="resetFilters" class="px-4 py-2">
           {{ $t('labels.clear') || 'Clear' }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -198,14 +198,16 @@
             <td class="px-4 py-3 theme-text-primary">{{ paymentTreasury(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentNotes(payment) }}</td>
             <td class="px-4 py-3">
-              <button
+              <Button
                 type="button"
-                class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                variant="destructive"
+                size="sm"
+                class="px-3 py-1.5 text-xs font-medium"
                 :disabled="cancellingId === payment.id"
                 @click="confirmCancel(payment)"
               >
                 {{ cancellingId === payment.id ? ($t('labels.loading') || 'Loading...') : ($t('payments.cancelPayment') || 'Cancel') }}
-              </button>
+              </Button>
             </td>
           </tr>
           <tr v-if="!filteredPayments.length">
@@ -218,25 +220,17 @@
     <PaymentCreationModal v-model:visible="paymentModalVisible" @saved="onPaymentCreated" />
 
     <!-- Cancel Confirmation Modal -->
-    <div v-if="showCancelConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="theme-surface rounded-lg p-6 w-96 max-w-md shadow-xl">
-        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirm') || 'Confirm' }}</h3>
-        <p class="theme-text-secondary mb-4">{{ $t('payments.confirmCancelPayment') || 'Are you sure you want to cancel this payment?' }}</p>
-        <div v-if="paymentToCancel" class="mb-6 rounded-lg border border-gray-200 theme-dashboard-bg-soft p-3 text-sm">
-          <p class="theme-text-primary font-medium">{{ paymentContractor(paymentToCancel) }}</p>
-          <p class="theme-text-secondary mt-1">{{ formatDate(paymentDate(paymentToCancel)) }} - {{ formatAmount(paymentToCancel.amount) }}</p>
-          <p v-if="paymentSite(paymentToCancel) && paymentSite(paymentToCancel) !== '-'" class="theme-text-secondary mt-1">{{ paymentSite(paymentToCancel) }}</p>
-        </div>
-        <div class="flex justify-end gap-3">
-          <button @click="closeCancelConfirm" class="rounded-md border border-gray-200 px-4 py-2 theme-text-secondary hover:theme-hover-soft">
-            {{ $t('labels.cancel') || 'Cancel' }}
-          </button>
-          <button @click="confirmCancelAction" :disabled="cancellingId === paymentToCancel?.id" class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:opacity-50">
-            {{ cancellingId === paymentToCancel?.id ? ($t('labels.loading') || 'Loading...') : ($t('labels.confirm') || 'Confirm') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="showCancelConfirm"
+      :title="$t('labels.confirm') || 'Confirm'"
+      :message="$t('payments.confirmCancelPayment') || 'Are you sure you want to cancel this payment?'"
+      :confirm-text="$t('labels.confirm') || 'Confirm'"
+      :cancel-text="$t('labels.cancel') || 'Cancel'"
+      :loading="cancellingId === paymentToCancel?.id"
+      type="danger"
+      @confirm="confirmCancelAction"
+      @cancel="closeCancelConfirm"
+    />
   </div>
 </template>
 
@@ -246,9 +240,11 @@ import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs, deletePayment } from '@/api'
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
+import { Button } from '@/components/ui/button'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
 import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
@@ -265,9 +261,11 @@ export default {
   name: 'PaymentsPage',
   components: {
     PaymentCreationModal,
+    ConfirmDialog,
     DateField,
     SearchDropdown,
-    SortIcon
+    SortIcon,
+    Button
   },
   setup() {
     const { locale, t } = useI18n()

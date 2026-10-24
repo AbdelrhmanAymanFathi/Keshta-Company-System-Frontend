@@ -42,8 +42,12 @@
         </div>
       </div>
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <button @click="page = 1; loadExtracts()" :disabled="loading" class="w-full sm:w-auto px-3 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm ">{{ $t('labels.search') }}</button>
-        <button @click="clearFilters" class="w-full sm:w-auto px-3 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">{{ $t('labels.clear') }}</button>
+        <Button @click="page = 1; loadExtracts()" :disabled="loading" class="w-full sm:w-auto px-3 py-2 text-xs sm:text-sm font-medium shadow-sm">
+          {{ $t('labels.search') }}
+        </Button>
+        <Button variant="outline" @click="clearFilters" class="w-full sm:w-auto px-3 py-2 text-xs sm:text-sm font-medium">
+          {{ $t('labels.clear') }}
+        </Button>
       </div>
     </div>
 
@@ -81,8 +85,10 @@
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ extract.itemDiscount !== null && extract.itemDiscount !== undefined ? formatCurrency(extract.itemDiscount) : '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.contractorName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-              <span v-if="extract.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">{{ $t('labels.pendingReview') || 'Pending Review' }}</span>
-              <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">{{ $t('labels.approved') || 'Approved' }}</span>
+              <StatusBadge
+                :status="extract.hasPendingApproval ? 'pending' : 'approved'"
+                :label="extract.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
+              />
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.locationName || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ extract.areaName || '-' }}</td>
@@ -99,26 +105,28 @@
 
     <Pagination v-if="totalPages > 1" :currentPage="page" :pageSize="pageSize" :total="total" :totalPages="totalPages" :pageSizeOptions="[10,20,50,100]" @update:page="changePage" @update:pageSize="onPageSizeChange" />
 
-    <div v-if="contextMenu.visible" :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }" class="fixed z-50 min-w-[9rem] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10" @click.stop>
-      <button type="button" :disabled="contextMenu.item?.hasPendingApproval" class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed border-b border-slate-100" @click="openEdit(contextMenu.item.id); closeContextMenu()"><PencilIcon class="h-4 w-4 text-slate-500" />{{ $t('labels.edit') || 'Edit' }}</button>
-      <button type="button" :disabled="contextMenu.item?.hasPendingApproval" class="flex w-full items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed" @click="openDeleteConfirm(contextMenu.item); closeContextMenu()"><TrashIcon class="h-4 w-4" />{{ $t('labels.delete') || 'Delete' }}</button>
+    <div v-if="contextMenu.visible" :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }" class="fixed z-50 min-w-[9rem] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 p-1" @click.stop>
+      <Button variant="ghost" size="sm" :disabled="contextMenu.item?.hasPendingApproval" class="w-full justify-start gap-2" @click="openEdit(contextMenu.item.id); closeContextMenu()"><PencilIcon class="h-4 w-4" />{{ $t('labels.edit') || 'Edit' }}</Button>
+      <Button variant="ghost" size="sm" :disabled="contextMenu.item?.hasPendingApproval" class="w-full justify-start gap-2 text-red-600 hover:text-red-700 hover:bg-red-50" @click="openDeleteConfirm(contextMenu.item); closeContextMenu()"><TrashIcon class="h-4 w-4" />{{ $t('labels.delete') || 'Delete' }}</Button>
     </div>
 
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50" style="margin-top:0;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 sm:p-6 w-full max-w-sm">
-        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="theme-text-secondary mb-6">{{ $t('extracts.confirmDelete') || 'Are you sure you want to delete this extract?' }}</p>
-        <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl theme-text-secondary hover:bg-slate-50">{{ $t('labels.cancel') }}</button>
-          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 theme-text-light rounded-xl hover:bg-red-700 disabled:opacity-50">{{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}</button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteConfirmModal.show"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="$t('extracts.confirmDelete') || 'Are you sure you want to delete this extract?'"
+      :loading="deleting"
+      type="danger"
+      @confirm="handleDelete(deleteConfirmModal.id)"
+      @cancel="closeDeleteConfirm"
+    />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
+import { Button } from '@/components/ui/button'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
+import StatusBadge from '@/components/shared/StatusBadge.vue'
 import { usePagination } from '@/composables/usePagination'
 import { deleteExtract, getExtracts } from '@/services/extracts'
 import { getContractors, getLocations, getExportItems } from '../../../api'
@@ -136,7 +144,9 @@ import { debounce } from '@/utils/debounce'
 
 export default {
   name: 'ExtractsList',
-  components: { ExtractsCreationModal, Pagination, RowActions, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon },
+  components: {
+    ConfirmDialog,
+    StatusBadge, ExtractsCreationModal, Pagination, RowActions, SearchDropdown, TrashIcon, PencilIcon, DateField, SortIcon, Button },
   setup() {
     const filters = ref({
       startDate: '', endDate: '', contractorId: '', contractorSearch: '', locationId: '', locationSearch: '', areaId: '', areaSearch: '', itemId: '', itemSearch: ''

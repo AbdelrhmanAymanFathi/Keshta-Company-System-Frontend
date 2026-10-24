@@ -6,20 +6,39 @@ function isISODateString(s) {
   return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}($|T)/.test(s)
 }
 
+function toLocalDateFromYMD(yyyy, mm, dd) {
+  const d = new Date(yyyy, mm - 1, dd)
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
 export function formatDateDMY(date) {
   if (date === null || date === undefined || date === '') return ''
-  let d
+
+  let d = null
   if (date instanceof Date) d = date
   else if (typeof date === 'string') {
-    if (isISODateString(date)) d = new Date(date)
-    else {
+    if (isISODateString(date)) {
+      const match = date.match(/^(\d{4})-(\d{2})-(\d{2})/)
+      if (match) {
+        d = toLocalDateFromYMD(Number(match[1]), Number(match[2]), Number(match[3]))
+      }
+      if (!d) {
+        d = new Date(date)
+      }
+    } else {
       const m = date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
       if (m) {
-        const dd = Number(m[1])
-        const mm = Number(m[2])
-        const yyyy = Number(m[3])
-        d = new Date(yyyy, mm - 1, dd)
-      } else d = new Date(date)
+        d = toLocalDateFromYMD(Number(m[3]), Number(m[2]), Number(m[1]))
+      }
+      if (!d) {
+        const slashMatch = date.match(/^(\d{4})\/(\d{2})\/(\d{2})$/)
+        if (slashMatch) {
+          d = toLocalDateFromYMD(Number(slashMatch[1]), Number(slashMatch[2]), Number(slashMatch[3]))
+        }
+      }
+      if (!d) {
+        d = new Date(date)
+      }
     }
   } else d = new Date(date)
 
@@ -29,13 +48,14 @@ export function formatDateDMY(date) {
 
 export function parseDateDMY(str) {
   if (!str) return null
-  const m = String(str).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  const value = String(str).trim()
+  const m = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
   if (!m) return null
   const dd = Number(m[1])
   const mm = Number(m[2])
   const yyyy = Number(m[3])
-  const d = new Date(yyyy, mm - 1, dd)
-  if (Number.isNaN(d.getTime())) return null
+  const d = toLocalDateFromYMD(yyyy, mm, dd)
+  if (!d) return null
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
@@ -46,6 +66,8 @@ export function formatToISODate(date) {
     if (isISODateString(date)) return date.slice(0, 10)
     const parsed = parseDateDMY(date)
     if (parsed) return parsed
+    const m = date.match(/^(\d{4})\/(\d{2})\/(\d{2})$/)
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`
     const d = new Date(date)
     if (!Number.isNaN(d.getTime())) return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
   }
@@ -54,17 +76,16 @@ export function formatToISODate(date) {
 
 export function parseISODateToDate(iso) {
   if (!iso) return null
-  // Handle plain YYYY-MM-DD as local date (avoid UTC shift)
   if (typeof iso === 'string') {
-    const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-    if (m) {
-      const yyyy = Number(m[1])
-      const mm = Number(m[2])
-      const dd = Number(m[3])
-      const d = new Date(yyyy, mm - 1, dd)
-      if (!Number.isNaN(d.getTime())) return d
+    const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+    if (match) {
+      const d = toLocalDateFromYMD(Number(match[1]), Number(match[2]), Number(match[3]))
+      if (d) return d
       return null
     }
+    const date = new Date(iso)
+    if (!Number.isNaN(date.getTime())) return date
+    return null
   }
 
   const d = new Date(iso)

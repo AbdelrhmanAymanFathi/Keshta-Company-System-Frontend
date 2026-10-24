@@ -7,7 +7,7 @@
     <router-view />
     
     <!-- Toast Notifications -->
-    <Toast />
+    <Toast :host="true" />
     <!-- Global error overlay (e.g. 502 Bad Gateway from backend) -->
     <ErrorOverlay />
     <GlobalIncomingCallHost v-if="isLoggedIn" />
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import './assets/shadcn-theme.css'
 import Toast from './components/shared/Toast.vue'
 import ErrorOverlay from './components/shared/ErrorOverlay.vue'
 import AppLoader from './components/shared/AppLoader.vue'

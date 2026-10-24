@@ -54,11 +54,10 @@
           </h2>
           <p class="text-sm theme-text-secondary">{{ t('queueSubtitle') }}</p>
         </div>
-        <button @click="loadApprovals" :disabled="loading"
-          class="rounded-xl theme-button px-5 py-2 theme-text-light shadow-sm transition-all disabled:opacity-50 flex items-center gap-2">
+        <Button @click="loadApprovals" :disabled="loading" class="gap-2">
           <span v-if="loading" class="animate-spin text-sm">⏳</span>
           <span>{{ t('refresh') }}</span>
-        </button>
+        </Button>
       </div>
 
       <!-- Loading Spinner -->
@@ -357,10 +356,11 @@ import { useRealtime } from '@/composables/useRealtime';
 import { debounce } from '@/utils/debounce';
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord';
 import NotificationChanges from '@/components/shared/NotificationChanges.vue';
+import { Button } from '@/components/ui/button';
 
 export default {
   name: 'ApprovalsInbox',
-  components: { NotificationChanges },
+  components: { NotificationChanges, Button },
   setup() {
     const { locale } = useI18n();
     const instance = getCurrentInstance()

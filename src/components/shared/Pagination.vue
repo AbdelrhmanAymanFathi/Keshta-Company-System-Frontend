@@ -1,144 +1,96 @@
 <template>
   <div
     v-if="total > 0 && totalPages > 1"
-    class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4"
+    class="shadcn-ui mt-4 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
   >
-    <!-- Mobile: simple previous / next + page indicator -->
-    <div class="flex-1 flex justify-between sm:hidden">
-      <button
-        @click="changePage(currentPage - 1)"
-        :disabled="currentPage <= 1"
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Previous
-      </button>
-      <span class="text-sm theme-text-secondary self-center">
-        {{ currentPage }} / {{ totalPages }}
-      </span>
-      <button
-        @click="changePage(currentPage + 1)"
-        :disabled="currentPage >= totalPages"
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Next
-      </button>
-    </div>
-
-    <!-- Desktop: summary + page size + page numbers -->
-    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-      <div class="flex items-center gap-4">
-        <p class="text-sm theme-text-secondary">
-          Showing
-          <span class="font-medium">{{ startItem }}</span>
-          to
-          <span class="font-medium">{{ endItem }}</span>
-          of
-          <span class="font-medium">{{ total }}</span>
-          results
-        </p>
-        <div class="flex items-center gap-2">
-          <label class="text-sm theme-text-secondary">
-            Page size:
-          </label>
-          <select
-            v-model.number="localPageSize"
-            @change="onPageSizeChange"
-            class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none theme-input-focus"
-          >
-            <option v-for="opt in pageSizeOptions" :key="opt" :value="opt">
-              {{ opt }}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Page numbers -->
-      <div>
-        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-          <button
-            @click="changePage(1)"
-            :disabled="currentPage <= 1"
-            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-
-          <button
-            @click="changePage(currentPage - 1)"
-            :disabled="currentPage <= 1"
-            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-
-          <button
-            v-for="p in pageList"
-            :key="p.key"
-            @click="!p.isEllipsis && changePage(p.number)"
-            :disabled="p.isEllipsis"
-            :class="[
-              'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-              p.isEllipsis
-                ? 'bg-white border-gray-300 theme-caption cursor-default'
-                : p.number === currentPage
-                ? 'z-10 theme-dashboard-bg-soft theme-pagination-active'
-                : 'bg-white border-gray-300 theme-text-muted hover:bg-gray-50'
-            ]"
-          >
-            <span v-if="p.isEllipsis">…</span>
-            <span v-else>{{ p.number }}</span>
-          </button>
-
-          <button
-            @click="changePage(currentPage + 1)"
-            :disabled="currentPage >= totalPages"
-            class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-
-          <button
-            @click="changePage(totalPages)"
-            :disabled="currentPage >= totalPages"
-            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10l-4.293-4.293a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </button>
-        </nav>
+    <div class="hidden items-center gap-4 sm:flex">
+      <p class="text-sm theme-text-secondary">
+        Showing
+        <span class="font-medium">{{ startItem }}</span>
+        to
+        <span class="font-medium">{{ endItem }}</span>
+        of
+        <span class="font-medium">{{ total }}</span>
+        results
+      </p>
+      <div class="flex items-center gap-2">
+        <label class="text-sm theme-text-secondary">Page size:</label>
+        <NativeSelect
+          v-model.number="localPageSize"
+          class="h-8 w-20 rounded border border-gray-300 bg-white px-2 text-sm focus:outline-none theme-input-focus"
+          aria-label="Page size"
+          @change="onPageSizeChange"
+        >
+          <NativeSelectOption v-for="option in pageSizeOptions" :key="option" :value="option">
+            {{ option }}
+          </NativeSelectOption>
+        </NativeSelect>
       </div>
     </div>
+
+    <Pagination
+      :page="currentPage"
+      :items-per-page="pageSize"
+      :total="totalPages * pageSize"
+      :sibling-count="3"
+      show-edges
+      class="mx-0 w-auto justify-end"
+      @update:page="changePage"
+    >
+      <PaginationContent class="gap-1">
+        <PaginationFirst class="hidden sm:inline-flex" aria-label="First page" />
+        <PaginationPrevious aria-label="Previous page">
+          Previous
+        </PaginationPrevious>
+        <span class="px-2 text-sm theme-text-secondary sm:hidden">{{ currentPage }} / {{ totalPages }}</span>
+        <template v-for="page in pageList" :key="page.key">
+          <PaginationEllipsis v-if="page.isEllipsis" class="hidden sm:inline-flex" />
+          <PaginationItem
+            v-else
+            :value="page.number"
+            :is-active="page.number === currentPage"
+            class="hidden sm:inline-flex"
+          >
+            {{ page.number }}
+          </PaginationItem>
+        </template>
+        <PaginationNext aria-label="Next page">
+          Next
+        </PaginationNext>
+        <PaginationLast class="hidden sm:inline-flex" aria-label="Last page" />
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>
 
 <script>
 import { computed, ref, watch } from 'vue'
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationItem,
+  PaginationLast,
+  PaginationNext,
+  PaginationPrevious
+} from '@/components/ui/pagination'
 
 export default {
   name: 'AppPagination',
+  components: {
+    NativeSelect,
+    NativeSelectOption,
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationFirst,
+    PaginationItem,
+    PaginationLast,
+    PaginationNext,
+    PaginationPrevious
+  },
   props: {
     currentPage: { type: Number, required: true },
     pageSize: { type: Number, required: true },
@@ -155,8 +107,8 @@ export default {
 
     watch(
       () => props.pageSize,
-      (v) => {
-        localPageSize.value = v
+      (value) => {
+        localPageSize.value = value
       }
     )
 
@@ -165,9 +117,7 @@ export default {
       return (props.currentPage - 1) * props.pageSize + 1
     })
 
-    const endItem = computed(() => {
-      return Math.min(props.currentPage * props.pageSize, props.total)
-    })
+    const endItem = computed(() => Math.min(props.currentPage * props.pageSize, props.total))
 
     const pageList = computed(() => {
       const pages = []
@@ -176,41 +126,32 @@ export default {
       const maxVisible = 7
 
       if (total <= maxVisible) {
-        for (let i = 1; i <= total; i++) {
-          pages.push({ key: `p-${i}`, number: i, isEllipsis: false })
+        for (let page = 1; page <= total; page++) {
+          pages.push({ key: `p-${page}`, number: page, isEllipsis: false })
         }
         return pages
       }
 
-      const addPage = (n) => pages.push({ key: `p-${n}`, number: n, isEllipsis: false })
+      const addPage = (number) => pages.push({ key: `p-${number}`, number, isEllipsis: false })
       const addEllipsis = (key) => pages.push({ key, number: null, isEllipsis: true })
 
       addPage(1)
 
       const windowSize = 3
-      let start = Math.max(2, current - windowSize)
-      let end = Math.min(total - 1, current + windowSize)
+      const start = Math.max(2, current - windowSize)
+      const end = Math.min(total - 1, current + windowSize)
 
-      if (start > 2) {
-        addEllipsis('ellipsis-start')
-      }
-
-      for (let i = start; i <= end; i++) {
-        addPage(i)
-      }
-
-      if (end < total - 1) {
-        addEllipsis('ellipsis-end')
-      }
+      if (start > 2) addEllipsis('ellipsis-start')
+      for (let page = start; page <= end; page++) addPage(page)
+      if (end < total - 1) addEllipsis('ellipsis-end')
 
       addPage(total)
-
       return pages
     })
 
-    function changePage(p) {
-      if (p < 1 || p > props.totalPages || p === props.currentPage) return
-      emit('update:page', p)
+    function changePage(page) {
+      if (page < 1 || page > props.totalPages || page === props.currentPage) return
+      emit('update:page', page)
     }
 
     function onPageSizeChange() {
@@ -228,5 +169,3 @@ export default {
   }
 }
 </script>
-
-

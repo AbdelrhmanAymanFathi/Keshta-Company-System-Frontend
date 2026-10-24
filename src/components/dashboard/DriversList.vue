@@ -2,14 +2,14 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('dashboard.driversList') || 'Drivers' }}</h2>
-      <button @click="openAdd" class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 shadow-sm  text-xs sm:text-sm">
+      <Button class="gap-2" @click="openAdd">
         <PlusIcon class="w-5 h-5" />
         {{ $t('labels.add') || 'Add' }}
-      </button>
+      </Button>
     </div>
 
     <div class="max-w-md">
-      <input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('placeholders.search') || 'Search...'" class="w-full px-3 py-2 border border-gray-300 rounded-lg" />
+      <Input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('placeholders.search') || 'Search...'" class="w-full" />
     </div>
 
     <div v-if="loading" class="flex justify-center py-12">
@@ -47,44 +47,42 @@
     <Pagination v-if="totalPages > 1" :current-page="page" :page-size="pageSize" :total="total" :total-pages="totalPages" @update:page="changePage" @update:pageSize="onPageSizeChange" />
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm p-4" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">{{ editing ? $t('labels.update') : $t('labels.add') }} {{ $t('drivers.singular') || 'Driver' }}</h3>
-          <button @click="closeModal" class="theme-caption hover:theme-text-secondary"><XMarkIcon class="w-5 h-5" /></button>
+    <Modal
+      :visible="modalOpen"
+      :title="(editing ? $t('labels.update') : $t('labels.add')) + ' ' + ($t('drivers.singular') || 'Driver')"
+      size="sm"
+      @update:visible="modalOpen = $event"
+    >
+      <form @submit.prevent="saveDriver" class="space-y-4">
+        <div>
+          <Label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.name') || 'Name' }}</Label>
+          <Input v-model="form.name" type="text" required class="w-full" />
         </div>
-        <form @submit.prevent="saveDriver" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.name') || 'Name' }}</label>
-            <input v-model="form.name" type="text" required class="w-full px-3 py-2 border rounded" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.phone') || 'Phone' }}</label>
-            <input v-model="form.phone" type="tel" class="w-full px-3 py-2 border rounded" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.nationalId') || 'National ID' }}</label>
-            <input v-model="form.nationalId" type="text" class="w-full px-3 py-2 border rounded" />
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="button" @click="closeModal" class="flex-1 px-4 py-2 border rounded theme-text-secondary hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
-            <button type="submit" :disabled="saving" class="flex-1 px-4 py-2 theme-button rounded">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div>
+          <Label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.phone') || 'Phone' }}</Label>
+          <Input v-model="form.phone" type="tel" class="w-full" />
+        </div>
+        <div>
+          <Label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('drivers.nationalId') || 'National ID' }}</Label>
+          <Input v-model="form.nationalId" type="text" class="w-full" />
+        </div>
+      </form>
+      <template #footer>
+        <Button type="button" variant="outline" @click="closeModal">{{ $t('labels.cancel') }}</Button>
+        <Button type="button" :disabled="saving" @click="saveDriver">{{ saving ? $t('labels.saving') : $t('labels.save') }}</Button>
+      </template>
+    </Modal>
 
     <!-- Delete Confirmation -->
-    <div v-if="deleteModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6">
-        <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') }}</h3>
-        <p class="theme-text-secondary mb-6">{{ $t('messages.confirmDeleteItem') || 'Confirm delete?' }}</p>
-        <div class="flex gap-3">
-          <button @click="deleteModalOpen = false" class="flex-1 px-4 py-2 border rounded">{{ $t('labels.cancel') }}</button>
-          <button @click="deleteDriver" :disabled="deleting" class="flex-1 px-4 py-2 bg-red-600 theme-text-light rounded">{{ deleting ? $t('labels.deleting') : $t('labels.delete') }}</button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteModalOpen"
+      :title="$t('labels.confirmDelete')"
+      :message="$t('messages.confirmDeleteItem') || 'Confirm delete?'"
+      :loading="deleting"
+      type="danger"
+      @confirm="deleteDriver"
+      @cancel="deleteModalOpen = false"
+    />
   </div>
 </template>
 
@@ -93,12 +91,20 @@ import { ref, watch } from 'vue'
 import { usePagination } from '@/composables/usePagination'
 import Pagination from '@/components/shared/Pagination.vue'
 import RowActions from '@/components/shared/RowActions.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { getDrivers, createDriver, updateDriver, deleteDriver as apiDeleteDriver } from '@/api'
 import { PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'DriversList',
-  components: { Pagination, RowActions, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: {
+    Modal,
+    ConfirmDialog,
+    Label, Pagination, RowActions, Button, Input, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   setup() {
     const q = ref('')
 

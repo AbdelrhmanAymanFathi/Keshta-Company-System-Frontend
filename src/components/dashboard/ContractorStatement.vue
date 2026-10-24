@@ -6,34 +6,30 @@
         <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('contractors.statementTitle') }}</h2>
       </div>
       <div class="flex flex-wrap items-center justify-end gap-2">
-        <button @click="refresh" :disabled="loading"
-          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs sm:text-sm theme-text-secondary shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50">
+        <Button variant="outline" size="sm" @click="refresh" :disabled="loading">
           {{ $t('labels.refresh') }}
-        </button>
-        <button @click="downloadReport('xlsx')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl theme-button px-3 py-2 text-xs sm:text-sm theme-text-light shadow-sm  transition-colors  disabled:opacity-50">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        </Button>
+        <Button size="sm" @click="downloadReport('xlsx')" :disabled="downloading">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportExcel') }}
-        </button>
-        <button @click="downloadReport('csv')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl theme-button px-3 py-2 text-xs sm:text-sm shadow-sm transition-colors disabled:opacity-50">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        </Button>
+        <Button size="sm" @click="downloadReport('csv')" :disabled="downloading">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportCSV') }}
-        </button>
-        <button @click="downloadReport('pdf')" :disabled="downloading"
-          class="inline-flex items-center gap-1 rounded-xl bg-slate-700 px-3 py-2 text-xs sm:text-sm theme-text-light shadow-sm shadow-slate-200 transition-colors hover:bg-slate-800 disabled:opacity-50">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        </Button>
+        <Button variant="secondary" size="sm" @click="downloadReport('pdf')" :disabled="downloading">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('contractors.exportPDF') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -44,25 +40,22 @@
         <!-- Contractor Selector -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.name') }}</label>
-          <select v-model="selectedContractorId" @change="onContractorChange"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
+          <NativeSelect v-model="selectedContractorId" @change="onContractorChange" class="w-full">
             <option value="">{{ $t('contractors.selectContractor') }}</option>
             <option v-for="c in contractors" :key="c.id" :value="c.id">{{ (isRTL && c.arName) ? c.arName : c.name }}</option>
-          </select>
+          </NativeSelect>
         </div>
 
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
-          <DateField v-model="filters.startDate"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          <DateField v-model="filters.startDate" class="w-full" />
         </div>
 
         <!-- End Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.endDate') }}</label>
-          <DateField v-model="filters.endDate"
-            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+          <DateField v-model="filters.endDate" class="w-full" />
         </div>
 
         <!-- Hide Deleted Transactions Switch -->
@@ -111,18 +104,16 @@
 
         <!-- Load Button -->
         <div class="flex items-end">
-          <button @click="loadReport" :disabled="loading || !selectedContractorId"
-            class="w-full rounded-xl theme-button px-4 py-2 text-sm font-medium theme-text-light shadow-sm  transition-colors  disabled:opacity-50">
+          <Button @click="loadReport" :disabled="loading || !selectedContractorId" class="w-full">
             {{ $t('contractors.loadStatement') }}
-          </button>
+          </Button>
         </div>
       </div>
 
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <button @click="clearFilters"
-          class="w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs sm:text-sm font-medium theme-text-secondary transition-colors hover:bg-slate-200">
+        <Button variant="outline" size="sm" @click="clearFilters">
           {{ $t('labels.clear') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -214,128 +205,50 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ isRTL ? 'الترتيب' : 'Sort' }}</label>
-            <select v-model="sortOrder"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
+            <NativeSelect v-model="sortOrder" class="w-full">
               <option value="desc">{{ isRTL ? 'من الأحدث للأقدم' : 'Newest to oldest' }}</option>
               <option value="asc">{{ isRTL ? 'من الأقدم للأحدث' : 'Oldest to newest' }}</option>
-            </select>
+            </NativeSelect>
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.date') }}</label>
-            <DateField v-model="columnFilters.date"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+            <DateField v-model="columnFilters.date" class="w-full" />
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.type') }}</label>
-            <select v-model="columnFilters.type"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus">
+            <NativeSelect v-model="columnFilters.type" class="w-full">
               <option value="">{{ $t('labels.all') }}</option>
               <option v-for="opt in typeFilterOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-            </select>
+            </NativeSelect>
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.refId') }}</label>
-            <input v-model="columnFilters.refId" type="text" :placeholder="$t('labels.search')"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+            <Input v-model="columnFilters.refId" type="text" :placeholder="$t('labels.search')" class="w-full" />
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.description') }}</label>
-            <input v-model="columnFilters.description" type="text" :placeholder="$t('labels.search')"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+            <Input v-model="columnFilters.description" type="text" :placeholder="$t('labels.search')" class="w-full" />
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ translateWithFallback('contractors.debit', 'contractors.earnings') }}</label>
-            <input v-model="columnFilters.debit" type="text" inputmode="decimal" :placeholder="$t('labels.search')"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+            <Input v-model="columnFilters.debit" type="text" inputmode="decimal" :placeholder="$t('labels.search')" class="w-full" />
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ translateWithFallback('contractors.credit', 'contractors.payments') }}</label>
-            <input v-model="columnFilters.credit" type="text" inputmode="decimal" :placeholder="$t('labels.search')"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+            <Input v-model="columnFilters.credit" type="text" inputmode="decimal" :placeholder="$t('labels.search')" class="w-full" />
           </div>
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}</label>
-            <input v-model="columnFilters.balance" type="text" inputmode="decimal" :placeholder="$t('labels.search')"
-              class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+            <Input v-model="columnFilters.balance" type="text" inputmode="decimal" :placeholder="$t('labels.search')" class="w-full" />
           </div>
         </div>
         <div v-if="hasColumnFilters" class="flex flex-wrap items-center gap-3 text-xs theme-text-muted">
           <span>{{ isRTL ? `${filteredRows.length} من ${statementDataRows.length} حركة` : `${filteredRows.length} of ${statementDataRows.length} records` }}</span>
-          <button @click="clearColumnFilters"
-            class="rounded-xl border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium theme-text-secondary transition-colors hover:bg-slate-200">
+          <Button variant="outline" size="sm" @click="clearColumnFilters">
             {{ isRTL ? 'مسح فلاتر الجدول' : 'Clear table filters' }}
-          </button>
+          </Button>
         </div>
       </div>
-
-      <table v-app-table class="app-table divide-y divide-gray-200">
-        <thead class="theme-table-thead-gradient">
-          <tr>
-            <th data-col="subtitle" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap cursor-pointer select-none hover:opacity-80"
-              :class="isRTL ? 'text-right' : 'text-left'" @click="toggleSortOrder">
-              {{ $t('labels.date') }}
-              <SortIcon :active="true" :dir="sortOrder" />
-            </th>
-            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-              :class="isRTL ? 'text-right' : 'text-left'">
-              {{ $t('labels.type') }}
-            </th>
-            <th class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-              :class="isRTL ? 'text-right' : 'text-left'">
-              {{ $t('contractors.refId') }}
-            </th>
-            <th data-col="title" class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap"
-              :class="isRTL ? 'text-right' : 'text-left'">
-              {{ $t('labels.description') }}
-            </th>
-            <th
-              class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
-              {{ translateWithFallback('contractors.debit', 'contractors.earnings') }}
-            </th>
-            <th
-              class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
-              {{ translateWithFallback('contractors.credit', 'contractors.payments') }}
-            </th>
-            <th
-              class="px-6 py-3 text-xs font-medium theme-text-muted uppercase tracking-wider  whitespace-nowrap text-right">
-              {{ translateWithFallback('contractors.balance', 'contractors.balanceOwed') }}
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-200 bg-white">
-            <tr v-for="(row, index) in paginatedRows" :key="index" :class="[
-            isTotalsRow(row) ? 'bg-amber-50 font-semibold' : 'theme-table-row-hover',
-            row.type === 'DEPOSIT' ? 'bg-emerald-50/70' : '',
-            row.type === 'TRANSPORT' || row.type === 'SUPPLY' ? 'theme-dashboard-bg-soft opacity-70' : '',
-            row.type === 'OPENING' ? 'bg-slate-100' : '',
-            isTotalsRow(row) ? 'border-t-2 border-amber-300' : ''
-          ]">
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ row.date }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <span v-if="isTotalsRow(row)" class="font-bold text-amber-900">
-                  {{ getTypeLabel(row.type) }}
-                </span>
-                <Badge v-else :variant="getTypeVariant(row.type, row)">
-                  {{ row.type === 'SUPPLY' && row.arDescription ? row.arDescription : getTypeLabel(row.type, row) }}
-                </Badge>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm theme-text-primary">{{ isTotalsRow(row) ? '-' : (row.refId || '-') }}</td>
-              <td class="px-6 py-4 text-sm theme-text-primary">{{ row.description || (isTotalsRow(row) ? (getTypeLabel(row.type)) : '-') }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowDebit(row), 'theme-text')">
-                {{ formatCurrency(getRowDebit(row)) }}
-              </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowCredit(row), 'text-green-600')">
-              {{ formatCurrency(getRowCredit(row)) }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-right" :class="getAmountClass(getRowBalance(row), 'theme-text')">
-              {{ row.__filteredTotals ? '-' : formatCurrency(getRowBalance(row)) }}
-            </td>
-          </tr>
-          <tr v-if="!filteredRows.length">
-            <td colspan="7" class="px-6 py-8 text-center text-sm theme-text-muted">{{ $t('labels.noResults') }}</td>
-          </tr>
-        </tbody>
-      </table>
 
       <!-- Pagination -->
       <Pagination v-if="totalPages > 1" :current-page="currentPage" :page-size="pageSize" :total="filteredRows.length"
@@ -358,6 +271,9 @@ import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
 import SortIcon from '../shared/SortIcon.vue'
 import DateField from '@/components/shared/DateField.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { NativeSelect } from '@/components/ui/native-select'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import normalizeItem from '@/utils/normalizeItem'
 import { formatToISODate } from '@/utils/dateUtils'
@@ -367,7 +283,7 @@ import { isContractorStatementTotalsRow, splitFooterRow } from '@/utils/reportDe
 
 export default {
   name: 'ContractorStatement',
-  components: { Badge, Pagination, DateField, SortIcon },
+  components: { Badge, Pagination, DateField, SortIcon, Button, Input, NativeSelect },
   props: {
     mode: {
       type: String,

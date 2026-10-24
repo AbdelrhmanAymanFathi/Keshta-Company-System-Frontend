@@ -1,21 +1,57 @@
 <template>
-  <input
-    ref="inputEl"
-    :placeholder="placeholder"
-    :disabled="disabled"
-    class="date-field"
-    @input="onInput"
-    @blur="onBlur"
-    @focus="onFocus"
-    @keydown="onKeyDown"
-    :value="internalValue"
-  />
+  <div :class="['shadcn-ui relative', parsedClasses.wrapper]" :style="$attrs.style">
+    <Input
+      :id="$attrs.id"
+      :name="$attrs.name"
+      :value="internalValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      type="text"
+      :class="['date-field pe-8', parsedClasses.input]"
+      @input="onInput"
+      @blur="onBlur"
+      @focus="onFocus"
+      @keydown="onKeyDown"
+    />
+
+    <Popover v-model:open="calendarOpen">
+      <PopoverTrigger as-child>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-xs"
+          class="absolute end-1 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-transparent"
+          :disabled="disabled"
+          aria-label="Open calendar"
+        >
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="3.5" y="5" width="17" height="16" rx="2" />
+            <path d="M7.5 3v4M16.5 3v4M3.5 9.5h17" />
+          </svg>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" class="shadcn-ui w-auto p-0" :dir="direction">
+        <Calendar
+          :model-value="selectedDate"
+          :locale="locale"
+          :dir="direction"
+          :week-starts-on="0"
+          :initial-focus="true"
+          @update:model-value="onCalendarSelect"
+        />
+      </PopoverContent>
+    </Popover>
+  </div>
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import flatpickr from 'flatpickr'
-import 'flatpickr/dist/flatpickr.min.css'
+import { CalendarDate } from '@internationalized/date'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Input } from '@/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   formatDateDMY,
   parseDateDMY,
@@ -25,90 +61,94 @@ import {
 
 export default {
   name: 'DateField',
+  inheritAttrs: false,
+  components: { Button, Calendar, Input, Popover, PopoverContent, PopoverTrigger },
   props: {
     modelValue: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     placeholder: { type: String, default: 'dd/MM/yyyy' }
   },
   emits: ['update:modelValue'],
-  setup(props, { emit }) {
-    const inputEl = ref(null)
-    let fp = null
+  setup(props, { emit, attrs }) {
+    const { locale } = useI18n()
     const internalValue = ref('')
+    const calendarOpen = ref(false)
     const isFocused = ref(false)
+    const direction = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr')
+
+    const parsedClasses = computed(() => {
+      const raw = attrs.class
+      if (!raw) return { wrapper: 'w-full', input: '' }
+      let list = []
+      if (typeof raw === 'string') {
+        list = raw.split(/\s+/).filter(Boolean)
+      } else if (Array.isArray(raw)) {
+        list = raw.flatMap(c => typeof c === 'string' ? c.split(/\s+/) : []).filter(Boolean)
+      } else if (typeof raw === 'object' && raw !== null) {
+        list = Object.keys(raw).filter(k => raw[k]).flatMap(c => c.split(/\s+/)).filter(Boolean)
+      }
+
+      const wrapperTokens = []
+      const inputTokens = []
+
+      for (const token of list) {
+        // Discard legacy classes that cause double-borders, padding, or focus outline conflicts
+        if (/^(border($|-)|rounded($|-)|p($|[xytbrse]-)|bg-|theme-input-focus|focus($|:|-)|outline-)/.test(token)) {
+          continue
+        }
+        // Layout and positioning belong to the wrapper
+        if (/^(w-|max-w-|min-w-|col-|row-|flex|grid|m($|[xytbrse]-)|hidden|inline|block)/.test(token)) {
+          wrapperTokens.push(token)
+        } else {
+          // e.g. text-sm, h-9, etc.
+          inputTokens.push(token)
+        }
+      }
+
+      const hasWidth = wrapperTokens.some(t => /^w-/.test(t))
+      if (!hasWidth) {
+        wrapperTokens.unshift('w-full')
+      }
+
+      return {
+        wrapper: wrapperTokens.join(' '),
+        input: inputTokens.join(' ')
+      }
+    })
+
+    const selectedDate = computed(() => {
+      const iso = formatToISODate(props.modelValue)
+      const date = parseISODateToDate(iso)
+      if (!date || formatToISODate(date) !== iso) return undefined
+      return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate())
+    })
 
     function formatDigitsToDisplay(digits) {
-      const d = digits.slice(0, 8)
-      const dd = d.slice(0, 2)
-      const mm = d.slice(2, 4)
-      const yyyy = d.slice(4, 8)
-      if (d.length <= 2) return dd
-      if (d.length <= 4) return `${dd}/${mm}`
-      return `${dd}/${mm}/${yyyy}`
+      const value = digits.slice(0, 8)
+      const day = value.slice(0, 2)
+      const month = value.slice(2, 4)
+      const year = value.slice(4, 8)
+      if (value.length <= 2) return day
+      if (value.length <= 4) return `${day}/${month}`
+      return `${day}/${month}/${year}`
     }
 
-    function setInternalFromModel() {
-      internalValue.value = formatDateDMY(props.modelValue)
-    }
-
-    onMounted(() => {
-      setInternalFromModel()
-      if (!inputEl.value) return
-      fp = flatpickr(inputEl.value, {
-        dateFormat: 'd/m/Y',
-        allowInput: true,
-        defaultDate: props.modelValue ? parseISODateToDate(props.modelValue) : null,
-        onChange(selectedDates) {
-          if (selectedDates && selectedDates.length) {
-            const iso = formatToISODate(selectedDates[0])
-            if (iso) {
-              internalValue.value = formatDateDMY(iso)
-              emit('update:modelValue', iso)
-            }
-          } else {
-            internalValue.value = ''
-            emit('update:modelValue', '')
-          }
-        }
-      })
-    })
-
-    onBeforeUnmount(() => {
-      if (fp) {
-        fp.destroy()
-        fp = null
-      }
-    })
-
-    watch(() => props.modelValue, (val) => {
-      // If input is focused, don't override user's typing
-      if (isFocused.value) return
-      try {
-        if (fp) fp.setDate(val ? parseISODateToDate(val) : null, false)
-      } catch (e) {
-        // ignore
-      }
-      internalValue.value = formatDateDMY(val)
-    })
-
-    function onInput(e) {
-      const v = e.target.value || ''
-      if (v === '') {
+    function onInput(event) {
+      const value = String(event.target.value || '')
+      if (value === '') {
         internalValue.value = ''
         emit('update:modelValue', '')
         return
       }
 
-      // Try dd/MM/yyyy
-      const isoFromDMY = parseDateDMY(v)
+      const isoFromDMY = parseDateDMY(value)
       if (isoFromDMY) {
         internalValue.value = formatDateDMY(isoFromDMY)
         emit('update:modelValue', isoFromDMY)
         return
       }
 
-      // Try ISO yyyy-mm-dd pasted
-      const matchISO = v.match(/^(\d{4})-(\d{2})-(\d{2})/)
+      const matchISO = value.match(/^(\d{4})-(\d{2})-(\d{2})/)
       if (matchISO) {
         const iso = `${matchISO[1]}-${matchISO[2]}-${matchISO[3]}`
         internalValue.value = formatDateDMY(iso)
@@ -116,25 +156,38 @@ export default {
         return
       }
 
-      // Digit-only typing: auto-insert slashes for display but do not emit until complete
-      const digits = v.replace(/\D/g, '').slice(0, 8)
+      const digits = value.replace(/\D/g, '').slice(0, 8)
       internalValue.value = formatDigitsToDisplay(digits)
+      if (digits.length === 8) {
+        const iso = parseDateDMY(formatDigitsToDisplay(digits))
+        if (iso) {
+          emit('update:modelValue', iso)
+        }
+      }
     }
 
     function onFocus() {
       isFocused.value = true
     }
 
-    function addDays(date, n) {
-      const d = new Date(date)
-      d.setDate(d.getDate() + n)
-      return d
+    function onBlur() {
+      isFocused.value = false
+      const value = internalValue.value || ''
+      if (value === '') {
+        emit('update:modelValue', '')
+        return
+      }
+      const iso = parseDateDMY(value)
+      if (iso) {
+        internalValue.value = formatDateDMY(iso)
+        emit('update:modelValue', iso)
+      } else {
+        internalValue.value = formatDateDMY(props.modelValue)
+      }
     }
 
-    function onKeyDown(e) {
-      if (!fp) return
-      const key = e.key
-      const map = {
+    function onKeyDown(event) {
+      const dayOffsets = {
         ArrowLeft: -1,
         ArrowRight: 1,
         ArrowUp: -7,
@@ -142,62 +195,49 @@ export default {
         PageUp: -30,
         PageDown: 30
       }
-      if (!(key in map)) return
-      e.preventDefault()
-      try {
-        // open calendar so user sees changes
-        fp.open()
-        let base = null
-        if (fp.selectedDates && fp.selectedDates.length) base = fp.selectedDates[0]
-        else base = parseISODateToDate(props.modelValue) || new Date()
+      const offset = dayOffsets[event.key]
+      if (!offset) return
 
-        const next = addDays(base, map[key])
-        // setDate with trigger to update picker's selected date and call onChange
-        fp.setDate(next, true)
-        const iso = formatToISODate(next)
-        internalValue.value = formatDateDMY(iso)
-        emit('update:modelValue', iso)
-      } catch (err) {
-        // ignore
-      }
+      event.preventDefault()
+      const baseDate = parseISODateToDate(props.modelValue) || new Date()
+      baseDate.setDate(baseDate.getDate() + offset)
+      const iso = formatToISODate(baseDate)
+      internalValue.value = formatDateDMY(iso)
+      emit('update:modelValue', iso)
+      calendarOpen.value = true
     }
 
-    function onBlur() {
-      isFocused.value = false
-      const v = internalValue.value || ''
-      if (v === '') {
-        emit('update:modelValue', '')
-        return
-      }
-      const iso = parseDateDMY(v)
-      if (iso) {
-        internalValue.value = formatDateDMY(iso)
-        emit('update:modelValue', iso)
-      } else {
-        // Revert to the last valid modelValue
-        internalValue.value = formatDateDMY(props.modelValue)
-      }
+    function onCalendarSelect(value) {
+      if (!value) return
+      const iso = value.toString()
+      internalValue.value = formatDateDMY(iso)
+      emit('update:modelValue', iso)
+      calendarOpen.value = false
     }
+
+    watch(
+      () => props.modelValue,
+      (value) => {
+        if (!isFocused.value) {
+          internalValue.value = formatDateDMY(value)
+        }
+      },
+      { immediate: true }
+    )
 
     return {
-      inputEl,
+      locale,
+      direction,
       internalValue,
+      calendarOpen,
+      selectedDate,
+      parsedClasses,
       onInput,
       onBlur,
       onFocus,
-      onKeyDown
+      onKeyDown,
+      onCalendarSelect
     }
   }
 }
 </script>
-
-<style scoped>
-:where(.date-field) {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-</style>

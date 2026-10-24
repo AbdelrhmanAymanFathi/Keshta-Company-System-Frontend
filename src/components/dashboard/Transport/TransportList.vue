@@ -3,16 +3,18 @@
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('transport.transportList') }}</h2>
 
-      <button @click="showAddModal = true"
-        class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm ">
+      <Button class="gap-2" @click="showAddModal = true">
         {{ $t('transport.addTransport') }} +
-      </button>
+      </Button>
     </div>
 
     <!-- Filters Section -->
-    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 space-y-4 shadow-lg shadow-slate-200/40">
-      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Card class="shadcn-ui border-slate-200/80 bg-white/95 shadow-lg shadow-slate-200/40">
+      <CardHeader class="pb-2">
+        <CardTitle class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</CardTitle>
+      </CardHeader>
+      <CardContent class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
@@ -96,14 +98,12 @@
       </div>
 
       <div class="flex gap-2">
-        <button @click="page = 1; loadTransports()" :disabled="loading"
-          class="px-4 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-sm font-medium shadow-sm ">
+        <Button @click="page = 1; loadTransports()" :disabled="loading" class="px-4 py-2 text-sm font-medium shadow-sm">
           {{ $t('labels.search') }}
-        </button>
-        <button @click="clearFilters"
-          class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-sm font-medium">
+        </Button>
+        <Button variant="outline" @click="clearFilters" class="px-4 py-2 text-sm font-medium">
           {{ $t('labels.clear') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -208,12 +208,10 @@
                <div class="">{{ transport.contractor?.name || '-' }}</div>
              </td>
              <td class="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-               <span v-if="transport.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
-                 {{ $t('labels.pendingReview') || 'Pending Review' }}
-               </span>
-               <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
-                 {{ $t('labels.approved') || 'Approved' }}
-               </span>
+               <StatusBadge
+                :status="transport.hasPendingApproval ? 'pending' : 'approved'"
+                :label="transport.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
+              />
              </td>
              <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
                <div class=""><span class="">{{ transport.location?.name || '-' }}</span></div>
@@ -276,35 +274,28 @@
 
     <!-- Context menu for row actions -->
     <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
-      class="absolute z-50 bg-white border rounded shadow-md" @click.stop>
-      <ul class="p-2">
-        <!-- <li>
-          <button @click="editTransport(contextMenu.item)"
-            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm">{{ $t('common.edit') }}</button>
-        </li> -->
-        <li>
-          <button @click="openDeleteConfirm(contextMenu.item)"
-            :disabled="contextMenu.item?.hasPendingApproval"
-            class="w-full text-left px-3 py-1 hover:bg-gray-100 text-sm text-red-600 disabled:opacity-50 disabled:cursor-not-allowed">{{ $t('labels.delete') }}</button>
-        </li>
-      </ul>
+      class="fixed z-50 rounded-2xl theme-card border theme-border-accent shadow-lg shadow-slate-200/60 min-w-48 overflow-hidden" @click.stop>
+      <div class="p-1">
+        <Button variant="ghost" size="sm"
+          class="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 text-xs"
+          :disabled="contextMenu.item?.hasPendingApproval"
+          @click="openDeleteConfirm(contextMenu.item)">
+          <TrashIcon class="w-4 h-4 mr-2" />
+          {{ $t('labels.delete') }}
+        </Button>
+      </div>
     </div>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50" style="margin-top:0;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 w-full max-w-sm">
-        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="theme-text-secondary mb-6">{{ $t('transport.confirmDelete') || 'Are you sure you want to delete this transport?' }}</p>
-        <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl theme-text-secondary hover:bg-slate-50">
-            {{ $t('labels.cancel') || 'Cancel' }}
-          </button>
-          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 theme-text-light rounded-xl hover:bg-red-700 disabled:opacity-50">
-            {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteConfirmModal.show"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="$t('transport.confirmDelete') || 'Are you sure you want to delete this transport?'"
+      :loading="deleting"
+      type="danger"
+      @confirm="handleDelete(deleteConfirmModal.id)"
+      @cancel="closeDeleteConfirm"
+    />
 
     <!-- Add/Edit Modal -->
     <TransportModal
@@ -326,6 +317,9 @@ import { getTransports, getTransport, deleteTransport, getContractors, getLocati
 import Pagination from '@/components/shared/Pagination.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
+import { Button } from '@/components/ui/button'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
+import StatusBadge from '@/components/shared/StatusBadge.vue'
 import TransportModal from './TransportCreationModal.vue'
 import PaymentModal from '@/components/shared/PaymentModal.vue'
 import { buildQueryParams } from '@/utils/buildQueryParams'
@@ -340,12 +334,15 @@ export default {
   name: 'TransportList',
 
   components: {
+    ConfirmDialog,
+    StatusBadge,
     Pagination,
     TransportModal,
     RowActions,
     SearchDropdown,
     PaymentModal,
     DateField,
+    Button,
     TrashIcon,
     SortIcon
   },

@@ -15,7 +15,7 @@
             :loading="reloading"
             @click="reloadTreasuries"
           />
-          <button class="theme-button rounded-lg px-3 py-2 text-sm font-medium text-white shadow-sm transition" @click="openCreateModal">+ {{ t('treasury.add') }}</button>
+          <Button class="gap-2 rounded-lg px-3 py-2 text-sm font-medium shadow-sm" @click="openCreateModal">+ {{ t('treasury.add') }}</Button>
         </div>
       </div>
 
@@ -27,7 +27,7 @@
       <div class="mt-3 space-y-2.5 border-b border-gray-100 pb-3">
         <div class="relative">
           <MagnifyingGlassIcon class="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-gray-400" aria-hidden="true" />
-          <input
+          <Input
             v-model="treasurySearch"
             type="text"
             class="theme-input-focus w-full rounded-xl border border-gray-200 py-2 pe-3 ps-9 text-sm"
@@ -35,14 +35,14 @@
           />
         </div>
         <div class="flex gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
-          <button
+          <Button
             v-for="opt in viewOptions"
             :key="opt.value"
             type="button"
+            :variant="treasuryView === opt.value ? 'secondary' : 'ghost'"
             class="flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition"
-            :class="treasuryView === opt.value ? 'bg-white text-indigo-700 shadow-sm ring-1 ring-indigo-200/60' : 'text-gray-500 hover:text-gray-700'"
             @click="treasuryView = opt.value"
-          >{{ opt.label }}</button>
+          >{{ opt.label }}</Button>
         </div>
       </div>
 
@@ -124,21 +124,22 @@
             >
               {{ selectedTreasury.deletedAt ? t('treasury.archived') : t('treasury.active') }}
             </span>
-            <button
+            <Button
               v-if="canDeposit"
-              class="w-full rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button sm:w-auto"
+              class="w-full rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm transition sm:w-auto"
               :disabled="!selectedTreasury"
               @click="openDepositModal"
             >
               {{ isCustodySelected ? t('treasury.addMoneyCustody') : t('treasury.addMoney') }}
-            </button>
-            <button
+            </Button>
+            <Button
               v-if="isAdmin && selectedTreasury && !selectedTreasury.deletedAt"
-              class="w-full rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 sm:w-auto"
+              variant="secondary"
+              class="w-full rounded-lg px-4 py-2 text-sm font-medium sm:w-auto"
               @click="openTransferModal"
             >
               💸 {{ t('treasury.transferFunds') }}
-            </button>
+            </Button>
             <button
               v-if="selectedTreasury && !selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto"
@@ -662,6 +663,8 @@ import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
 import ActionButton from '@/components/shared/ActionButton.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { ArrowPathIcon, MagnifyingGlassIcon, PencilSquareIcon } from '@acme/icon-packs/legacy'
 import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
@@ -672,7 +675,7 @@ import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 export default {
   name: 'TreasuryDashboard',
   emits: ['navigateReport', 'navigateStatement'],
-  components: { DateField, Pagination, SortIcon, ActionButton, MagnifyingGlassIcon },
+  components: { DateField, Pagination, SortIcon, ActionButton, Button, Input, MagnifyingGlassIcon },
   setup() {
     const { t, locale } = useI18n()
     const { user } = useAuth()

@@ -15,7 +15,7 @@
       </div>
       <div class="mt-4">
         <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.search') }}</label>
-        <input v-model="treasurySearch" type="text" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm theme-input-focus" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
+        <Input v-model="treasurySearch" type="text" class="w-full" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
       </div>
       <div v-if="!visibleTreasuries.length" class="mt-4 rounded-lg border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500">
         {{ t('labels.noData') }}
@@ -50,9 +50,9 @@
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <div class="text-sm theme-text-secondary">{{ t('treasury.balance') }}: <span class="font-semibold">{{ formatCurrency(store.summary.balance) }}</span></div>
-            <button type="button" class="theme-button px-3 py-2" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('csv')">{{ exportingFormat === 'csv' ? t('labels.loading') : t('reports.downloadCsv') }}</button>
-            <button type="button" class="theme-button px-3 py-2" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('xlsx')">{{ exportingFormat === 'xlsx' ? t('labels.loading') : t('reports.downloadExcel') }}</button>
-            <button type="button" class="theme-button px-3 py-2" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('pdf')">{{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}</button>
+            <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('csv')">{{ exportingFormat === 'csv' ? t('labels.loading') : t('reports.downloadCsv') }}</Button>
+            <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('xlsx')">{{ exportingFormat === 'xlsx' ? t('labels.loading') : t('reports.downloadExcel') }}</Button>
+            <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('pdf')">{{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}</Button>
           </div>
           <p v-if="exportError" class="text-xs text-red-600">{{ exportError }}</p>
         </div>
@@ -87,19 +87,19 @@
             </div>
             <div>
               <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amount') }}</label>
-              <input v-model="filters.amount" type="number" step="0.01" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+              <Input v-model="filters.amount" type="number" step="0.01" class="w-full" />
             </div>
           </div>
           <div class="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-[1fr_auto_auto]">
             <div>
               <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.search') }}</label>
-              <input v-model="filters.search" type="text" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" :placeholder="t('treasury.searchPlaceholder')" />
+              <Input v-model="filters.search" type="text" class="w-full" :placeholder="t('treasury.searchPlaceholder')" />
             </div>
             <div class="flex items-end">
-            <button class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700" @click="applyFilters">{{ t('labels.search') }}</button>
+            <Button @click="applyFilters">{{ t('labels.search') }}</Button>
             </div>
             <div class="flex items-end">
-            <button class="rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50" @click="resetFilters">{{ t('labels.reset') }}</button>
+            <Button variant="outline" @click="resetFilters">{{ t('labels.reset') }}</Button>
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@
                 <td class="px-4 py-3 text-sm font-medium text-gray-800 whitespace-nowrap">{{ formatDate(tx.date || tx.createdAt) }}</td>
                 <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
                 <td class="px-4 py-3 text-sm">
-                  <span class="rounded-full px-2.5 py-1 text-xs font-medium" :class="badgeClass(tx.type)">{{ txTypeLabel(tx.type) }}</span>
+                  <Badge variant="outline" :class="badgeClass(tx.type)">{{ txTypeLabel(tx.type) }}</Badge>
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <span v-if="tx.refId" class="cursor-pointer font-medium text-blue-600 hover:text-blue-800 hover:underline" @click="navigateToSource(tx)">{{ formatSource(tx) }}</span>
@@ -205,10 +205,13 @@ import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
 import DateField from '@/components/shared/DateField.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 
 export default {
   name: 'TreasuryTransactions',
-  components: { DateField, Pagination, SortIcon },
+  components: { DateField, Pagination, SortIcon, Button, Input, Badge },
   setup() {
     const { t, locale } = useI18n()
     const { user } = useAuth()

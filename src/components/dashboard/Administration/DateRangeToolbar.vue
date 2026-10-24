@@ -2,17 +2,17 @@
   <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
     <div class="flex flex-col gap-4">
       <div class="flex flex-wrap items-center gap-2">
-        <button
+        <Button
           v-for="p in presets"
           :key="p.key"
+          type="button"
+          :variant="activePreset === p.key ? 'default' : 'ghost'"
+          size="sm"
           @click="selectPreset(p.key)"
-          class="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
-          :class="activePreset === p.key
-            ? 'theme-button theme-text-light'
-            : 'theme-text-secondary hover:bg-slate-100'"
+          class="rounded-lg px-3"
         >
           {{ $t(p.label) }}
-        </button>
+        </Button>
       </div>
       <div v-if="activePreset === 'custom'" class="flex flex-col sm:flex-row gap-3 items-end">
         <div class="flex-1 w-full">
@@ -33,18 +33,21 @@
             class="w-full rounded-xl border border-slate-200 px-3 py-1.5 text-sm theme-input-focus"
           />
         </div>
-        <button
+        <Button
+          type="button"
+          size="sm"
           @click="applyCustom"
-          class="rounded-lg theme-button px-4 py-1.5 text-sm theme-text-light"
+          class="rounded-lg px-4"
         >
           {{ $t('changes.loadChanges') || 'Apply' }}
-        </button>
+        </Button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { Button } from '@/components/ui/button'
 import DateField from '@/components/shared/DateField.vue'
 
 function formatISO(d) {
@@ -92,7 +95,7 @@ const PRESETS = [
 
 export default {
   name: 'DateRangeToolbar',
-  components: { DateField },
+  components: { Button, DateField },
   props: {
     startDate: { type: String, default: '' },
     endDate: { type: String, default: '' }

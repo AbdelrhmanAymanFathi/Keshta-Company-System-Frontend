@@ -4,23 +4,20 @@
     <!-- Header -->
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t('crushers.title') }}</h2>
-      <button
-        @click="openAdd"
-        class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
-      >
+      <Button class="gap-2" @click="openAdd">
         <PlusIcon class="w-5 h-5" />
         {{ $t('crushers.add') }}
-      </button>
+      </Button>
     </div>
 
     <!-- Search -->
     <div class="max-w-md">
-      <input
+      <Input
         v-model="q"
         @input="onSearchInput"
         type="search"
         :placeholder="$t('crushers.searchPlaceholder')"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus"
+        class="w-full"
       />
     </div>
 
@@ -108,62 +105,38 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0; ">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">
-            {{ editing ? $t('crushers.editCrusher') : $t('crushers.addCrusher') }}
-          </h3>
-          <button @click="closeModal" class="theme-caption hover:theme-text-secondary">
-            <XMarkIcon class="w-6 h-6" />
-          </button>
-        </div>
-        <div>
-          <label class="block text-sm font-medium theme-text-secondary mb-1">
-            {{ $t('crushers.name') }} <span class="text-red-500">*</span>
-          </label>
-          <input
-            v-model="form.name"
-            class="w-full px-3 py-2 border rounded-md theme-input-focus "
-            :placeholder="$t('crushers.namePlaceholder')"
-          />
-        </div>
-        <div class="mt-6 flex justify-end gap-3">
-          <button @click="closeModal" class="px-4 py-2 border rounded-md theme-text-secondary hover:bg-gray-50">
-            {{ $t('labels.cancel') }}
-          </button>
-          <button
-            @click="saveCrusher"
-            :disabled="loading"
-            class="px-4 py-2 theme-button rounded-md disabled:opacity-50"
-          >
-            {{ loading ? $t('labels.saving') : $t('labels.save') }}
-          </button>
-        </div>
+    <Modal
+      :visible="modalOpen"
+      :title="editing ? $t('crushers.editCrusher') : $t('crushers.addCrusher')"
+      size="sm"
+      @update:visible="modalOpen = $event"
+    >
+      <div>
+        <Label class="block text-sm font-medium theme-text-secondary mb-1">
+          {{ $t('crushers.name') }} <span class="text-red-500">*</span>
+        </Label>
+        <Input
+          v-model="form.name"
+          class="w-full"
+          :placeholder="$t('crushers.namePlaceholder')"
+        />
       </div>
-    </div>
+      <template #footer>
+        <Button variant="outline" @click="closeModal">{{ $t('labels.cancel') }}</Button>
+        <Button @click="saveCrusher" :disabled="loading">{{ loading ? $t('labels.saving') : $t('labels.save') }}</Button>
+      </template>
+    </Modal>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm p-4 sm:p-6">
-        <div class="text-center">
-          <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-            <ExclamationTriangleIcon class="w-6 h-6 text-red-600" />
-          </div>
-          <p class="theme-text-primary mb-6">
-            {{ $t('crushers.deleteConfirm') }} "<strong>{{ deleteConfirm.item.name }}</strong>"?
-          </p>
-          <div class="flex justify-center gap-3">
-            <button @click="cancelDelete" class="px-4 py-2 border rounded-md theme-text-secondary hover:bg-gray-50">
-              {{ $t('labels.cancel') }}
-            </button>
-            <button @click="doDelete" :disabled="loading" class="px-4 py-2 bg-red-600 theme-text-light rounded-md hover:bg-red-700 disabled:opacity-50">
-              {{ loading ? $t('labels.deleting') : $t('labels.delete') }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteConfirm.open"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="deleteConfirm.item ? ($t('labels.confirmDelete') + ' ' + deleteConfirm.item.name) : ''"
+      :loading="loading"
+      type="danger"
+      @confirm="doDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
@@ -173,11 +146,19 @@ import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../
 import { usePagination } from '@/composables/usePagination'
 import Pagination from '@/components/shared/Pagination.vue'
 import RowActions from '@/components/shared/RowActions.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'CrushersList',
-  components: { Pagination, RowActions, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+  components: {
+    Modal,
+    ConfirmDialog,
+    Label, Pagination, RowActions, Button, Input, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   setup() {
     const q = ref('')
     const searchTimeout = ref(null)

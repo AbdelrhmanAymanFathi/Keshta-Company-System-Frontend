@@ -10,15 +10,12 @@
   />
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <PageHeader :title="$t('expenses.title')" :subtitle="$t('expenses.searchBy')">
-      <button 
-        @click="openAddModal" 
-        class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
-      >
+      <Button @click="openAddModal" class="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm shadow-sm">
         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
         {{ $t('expenses.addExpense') }}
-      </button>
+      </Button>
     </PageHeader>
 
     <!-- Filters Section -->
@@ -155,14 +152,14 @@
 
       <!-- Filter Action Buttons -->
       <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
-        <button @click="currentPage = 1; resolveSubcategoryFilterFromSearch(); loadExpenses()" :disabled="loading"
-          class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm">
+        <Button @click="currentPage = 1; resolveSubcategoryFilterFromSearch(); loadExpenses()" :disabled="loading"
+          class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm">
           {{ $t('labels.search') }}
-        </button>
-        <button @click="clearFilters"
-          class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">
+        </Button>
+        <Button variant="outline" @click="clearFilters"
+          class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium">
           {{ $t('expenses.clearSearch') }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -233,7 +230,7 @@
             </td>
             <td>
               {{ expense.description }}
-              <span v-if="approvalBadge(expense)" class="approval-badge" :class="approvalBadge(expense).cls" :title="approvalBadge(expense).title">{{ approvalBadge(expense).label }}</span>
+              <Badge v-if="approvalBadge(expense)" variant="outline" :class="approvalBadge(expense).cls" :title="approvalBadge(expense).title">{{ approvalBadge(expense).label }}</Badge>
             </td>
             <td>
               <span v-if="expense.location" class="expense-chip theme-badge">{{ expense.location.name }}</span>
@@ -282,7 +279,7 @@
           <div class="min-w-0">
             <h3 class="font-semibold theme-text-primary break-words">{{ expense.description }}</h3>
             <p class="text-sm theme-text-muted mt-1">{{ formatDate(expense.date) }}</p>
-            <span v-if="approvalBadge(expense)" class="approval-badge" :class="approvalBadge(expense).cls" :title="approvalBadge(expense).title">{{ approvalBadge(expense).label }}</span>
+            <Badge v-if="approvalBadge(expense)" variant="outline" :class="approvalBadge(expense).cls" :title="approvalBadge(expense).title">{{ approvalBadge(expense).label }}</Badge>
           </div>
           <span class="text-base font-bold text-slate-800 shrink-0">{{ formatCurrency(expense.amount) }}</span>
         </div>
@@ -511,7 +508,7 @@
                                 @keydown.enter.prevent="handleFieldNavigation(index, 'description', $event)"
                                 @keydown.tab="handleFieldNavigation(index, 'description', $event)"
                               />
-                              <span v-if="approvalBadge({ approvalStatus: row._approvalStatus })" class="approval-badge" :class="approvalBadge({ approvalStatus: row._approvalStatus }).cls" :title="approvalBadge({ approvalStatus: row._approvalStatus }).title">{{ approvalBadge({ approvalStatus: row._approvalStatus }).label }}</span>
+                              <Badge v-if="approvalBadge({ approvalStatus: row._approvalStatus })" variant="outline" :class="approvalBadge({ approvalStatus: row._approvalStatus }).cls" :title="approvalBadge({ approvalStatus: row._approvalStatus }).title">{{ approvalBadge({ approvalStatus: row._approvalStatus }).label }}</Badge>
                             </td>
                             <td class="px-2 py-2" style="min-width:16rem">
                               <SearchDropdown
@@ -623,154 +620,119 @@
     </teleport>
 
     <!-- Delete Confirmation Modal -->
-    <teleport to="body">
-      <transition name="kc-modal">
-        <div v-if="deleteConfirm.open" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="cancelDelete">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold theme-text-primary">{{ $t('expenses.deleteExpense') || 'حذف المصروف' }}</h3>
-                  <p class="text-xs theme-text-muted mt-0.5">{{ $t('expenses.deleteConfirmation') || 'هل أنت تأكد من تقديم طلب حذف هذا المصروف؟' }}</p>
-                </div>
-              </div>
-              
-              <div class="flex gap-3 pt-2 justify-end">
-                <button 
-                  @click="cancelDelete"
-                  class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm"
-                >
-                  {{ $t('labels.cancel') }}
-                </button>
-                <button 
-                  @click="doDelete"
-                  :disabled="deleting"
-                  class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2"
-                >
-                  <div v-if="deleting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  {{ deleting ? $t('labels.deleting') : $t('labels.delete') }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </transition>
-    </teleport>
+    <ConfirmDialog
+      :show="deleteConfirm.open"
+      :title="$t('expenses.deleteExpense') || 'حذف المصروف'"
+      :message="$t('expenses.deleteConfirmation') || 'هل أنت متأكد من تقديم طلب حذف هذا المصروف؟'"
+      :loading="deleting"
+      type="danger"
+      @confirm="doDelete"
+      @cancel="cancelDelete"
+    />
 
     <!-- Location Dialog Modal -->
-    <div v-if="showLocationDialog" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md animate-in fade-in duration-200" :class="isRTL ? 'direction-rtl' : ''">
-        <!-- Modal Header -->
-        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 flex items-center justify-between rounded-t-lg" :class="isRTL ? 'flex-row-reverse' : ''">
-          <h3 class="text-lg font-semibold theme-text-light">{{ $t('expenses.selectSaveLocation') }}</h3>
-          <button @click="showLocationDialog = false" class="theme-text-light hover:text-green-100 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <Modal
+      :visible="showLocationDialog"
+      :title="$t('expenses.selectSaveLocation')"
+      size="sm"
+      @update:visible="showLocationDialog = $event"
+    >
+      <div class="space-y-4">
+        <p class="text-sm theme-text-secondary" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.chooseLocationHint') }}</p>
+        
+        <!-- Quick Select Options -->
+        <div class="space-y-2">
+          <button 
+            type="button"
+            @click="selectedLocation = 'downloads'"
+            :class="[
+              'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
+              selectedLocation === 'downloads' 
+                ? 'border-green-500 bg-green-50' 
+                : 'border-gray-200 hover:border-gray-300 bg-gray-50',
+              isRTL ? 'flex-row-reverse text-right' : ''
+            ]"
+          >
+            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
+            <div>
+              <div class="font-medium theme-text-primary">{{ $t('expenses.downloads') }}</div>
+              <div class="text-xs theme-text-muted">~/Downloads</div>
+            </div>
+          </button>
+
+          <button 
+            type="button"
+            @click="selectedLocation = 'documents'"
+            :class="[
+              'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
+              selectedLocation === 'documents' 
+                ? 'border-green-500 bg-green-50' 
+                : 'border-gray-200 hover:border-gray-300 bg-gray-50',
+              isRTL ? 'flex-row-reverse text-right' : ''
+            ]"
+          >
+            <svg class="w-5 h-5 theme-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <div>
+              <div class="font-medium theme-text-primary">{{ $t('expenses.documents') }}</div>
+              <div class="text-xs theme-text-muted">~/Documents</div>
+            </div>
+          </button>
+
+          <button 
+            type="button"
+            @click="selectedLocation = 'desktop'"
+            :class="[
+              'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
+              selectedLocation === 'desktop' 
+                ? 'border-green-500 bg-green-50' 
+                : 'border-gray-200 hover:border-gray-300 bg-gray-50',
+              isRTL ? 'flex-row-reverse text-right' : ''
+            ]"
+          >
+            <svg class="w-5 h-5 theme-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <div class="font-medium theme-text-primary">{{ $t('expenses.desktop') }}</div>
+              <div class="text-xs theme-text-muted">~/Desktop</div>
+            </div>
           </button>
         </div>
 
-        <!-- Modal Content -->
-        <div class="px-6 py-6 space-y-4">
-          <p class="text-sm theme-text-secondary" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.chooseLocationHint') }}</p>
-          
-          <!-- Quick Select Options -->
-          <div class="space-y-2">
-            <button 
-              @click="selectedLocation = 'downloads'"
-              :class="[
-                'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
-                selectedLocation === 'downloads' 
-                  ? 'border-green-500 bg-green-50' 
-                  : 'border-gray-200 hover:border-gray-300 bg-gray-50',
-                isRTL ? 'flex-row-reverse text-right' : ''
-              ]"
-            >
-              <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              <div>
-                <div class="font-medium theme-text-primary">{{ $t('expenses.downloads') }}</div>
-                <div class="text-xs theme-text-muted">~/Downloads</div>
-              </div>
-            </button>
-
-            <button 
-              @click="selectedLocation = 'documents'"
-              :class="[
-                'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
-                selectedLocation === 'documents' 
-                  ? 'border-green-500 bg-green-50' 
-                  : 'border-gray-200 hover:border-gray-300 bg-gray-50',
-                isRTL ? 'flex-row-reverse text-right' : ''
-              ]"
-            >
-              <svg class="w-5 h-5 theme-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              <div>
-                <div class="font-medium theme-text-primary">{{ $t('expenses.documents') }}</div>
-                <div class="text-xs theme-text-muted">~/Documents</div>
-              </div>
-            </button>
-
-            <button 
-              @click="selectedLocation = 'desktop'"
-              :class="[
-                'w-full px-4 py-3 rounded-lg border-2 transition-all text-left flex items-center gap-3',
-                selectedLocation === 'desktop' 
-                  ? 'border-green-500 bg-green-50' 
-                  : 'border-gray-200 hover:border-gray-300 bg-gray-50',
-                isRTL ? 'flex-row-reverse text-right' : ''
-              ]"
-            >
-              <svg class="w-5 h-5 theme-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <div>
-                <div class="font-medium theme-text-primary">{{ $t('expenses.desktop') }}</div>
-                <div class="text-xs theme-text-muted">~/Desktop</div>
-              </div>
-            </button>
-          </div>
-
-          <!-- Custom Path -->
-          <div class="border-t pt-4">
-            <label class="text-sm font-medium theme-text-secondary mb-2 block" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.customPath') }}</label>
-            <input 
-              v-model="selectedLocation"
-              type="text"
-              placeholder="e.g., /home/user/reports"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              :class="isRTL ? 'text-right' : 'text-left'"
-            >
-          </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="bg-gray-50 px-6 py-4 flex items-center justify-end gap-3 rounded-b-lg border-t" :class="isRTL ? 'flex-row-reverse' : ''">
-          <button 
-            @click="showLocationDialog = false"
-            class="px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-medium"
-          >
-            {{ $t('labels.cancel') }}
-          </button>
-          <button 
-            @click="downloadReport"
-            :disabled="downloading"
-            class="px-4 py-2 bg-green-600 theme-text-light rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-          >
-            <div v-if="downloading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
-          </button>
+        <!-- Custom Path -->
+        <div class="border-t pt-4">
+          <Label class="text-sm font-medium theme-text-secondary mb-2 block" :class="isRTL ? 'text-right' : 'text-left'">{{ $t('expenses.customPath') }}</Label>
+          <Input 
+            v-model="selectedLocation"
+            type="text"
+            placeholder="e.g., /home/user/reports"
+            class="w-full"
+            :class="isRTL ? 'text-right' : 'text-left'"
+          />
         </div>
       </div>
-    </div>
+
+      <template #footer>
+        <Button 
+          variant="outline"
+          @click="showLocationDialog = false"
+        >
+          {{ $t('labels.cancel') }}
+        </Button>
+        <Button 
+          @click="downloadReport"
+          :disabled="downloading"
+          class="bg-green-600 hover:bg-green-700 text-white gap-2"
+        >
+          <div v-if="downloading" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
+        </Button>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -791,6 +753,12 @@ import {
   createLocation,
   getTreasuries
 } from '../../../api'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SortIcon from '@/components/shared/SortIcon.vue'
@@ -809,7 +777,12 @@ const CUSTODY_FEED_CATEGORY = { id: 'custody_feed', name: 'تغذية عهدة' 
 export default {
   emits: ["navigateReport", "navigateStatement"],
   name: 'ExpensesList',
-  components: { AddFieldModal, DateField, PageHeader, SearchDropdown, SortIcon, RowActions },
+  components: {
+    Modal,
+    ConfirmDialog,
+    Badge,
+    Input,
+    Label, AddFieldModal, Button, DateField, PageHeader, SearchDropdown, SortIcon, RowActions },
   data() {
     return {
       expenses: [],

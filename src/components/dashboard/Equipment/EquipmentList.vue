@@ -3,22 +3,25 @@
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('equipment.title') || 'Equipment' }}</h2>
       <div>
-        <button @click="openCreateModal" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl theme-button inline-flex items-center gap-2 shadow-sm  text-xs sm:text-sm"><PlusIcon class="w-5 h-5" />{{ $t('equipment.add') || 'Add Equipment' }}</button>
+        <Button class="gap-2" @click="openCreateModal">
+          <PlusIcon class="w-5 h-5" />
+          {{ $t('equipment.add') || 'Add Equipment' }}
+        </Button>
       </div>
     </div>
 
     <div class="max-w-md rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg shadow-slate-200/30">
       <div class="flex items-center gap-2">
-        <input
+        <Input
           v-model="q"
           @keyup.enter="search"
           type="search"
           :placeholder="$t('equipment.searchPlaceholder')"
-          class="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm  theme-input-focus"
+          class="w-full"
         />
-        <button @click="clearSearch" class="rounded-xl border theme-border-accent px-3 py-2 text-sm theme-text-secondary hover:theme-dashboard-bg-soft transition-colors duration-300 inline-flex items-center justify-center whitespace-nowrap">
+        <Button variant="outline" @click="clearSearch">
           {{ $t('labels.clear') || 'Clear' }}
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -61,51 +64,44 @@
     <Pagination v-if="totalPages > 1" :current-page="page" :page-size="pageSize" :total="total" :total-pages="totalPages" @update:page="page = $event; loadEquipments()" @update:pageSize="pageSize = $event; page = 1; loadEquipments()" />
 
     <!-- Create/Edit Modal -->
-    <div v-if="showCreateModal || editingEquipment" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold">{{ editingEquipment ? $t('equipment.edit') : $t('equipment.add') }}</h3>
-          <button class="theme-caption hover:theme-text-secondary" @click="closeModals"><XMarkIcon class="w-5 h-5" /></button>
+    <Modal
+      :visible="showCreateModal || !!editingEquipment"
+      :title="editingEquipment ? $t('equipment.edit') : $t('equipment.add')"
+      size="sm"
+      @update:visible="val => { if(!val) closeModals() }"
+    >
+      <form @submit.prevent="onSave" class="space-y-4">
+        <div>
+          <Label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('equipment.name') || 'Name' }}</Label>
+          <Input v-model="form.name" type="text" class="w-full" required />
         </div>
-        <form @submit.prevent="onSave" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('equipment.name') || 'Name' }}</label>
-            <input v-model="form.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
-          </div>
-          <div>
-            <label class="flex items-center gap-2">
-              <input type="checkbox" v-model="form.isCompanyOwned" />
-              <span>{{ $t('rental.isCompanyOwned') }}</span>
-            </label>
-          </div>
-          <div v-if="!form.isCompanyOwned">
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.contractor') || 'Contractor' }}</label>
-            <SearchDropdown
-              v-model="form.contractorLabel"
-              :items="contractors"
-              :item-key="'id'"
-              :item-label="'name'"
-              :placeholder="$t('labels.contractor') || 'Search contractors'"
-                :dir="isRTL ? 'rtl' : 'ltr'"
-                inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              @select="onSelectContractor"
-            />
-          </div>
-          <div class="flex items-center gap-3">
-            
-            <div class="flex-1">
-              <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</label>
-              <input v-model.number="form.hourlyRate" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2">
-            <button type="button" @click="closeModals" class="px-4 py-2 rounded border">{{ $t('labels.cancel') || 'Cancel' }}</button>
-            <button type="submit" :disabled="saving" class="px-4 py-2 rounded theme-button">{{ saving ? $t('labels.saving') : $t('labels.save') }}</button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div class="flex items-center gap-2">
+          <Checkbox id="isCompanyOwned" v-model="form.isCompanyOwned" />
+          <Label for="isCompanyOwned">{{ $t('rental.isCompanyOwned') }}</Label>
+        </div>
+        <div v-if="!form.isCompanyOwned">
+          <Label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.contractor') || 'Contractor' }}</Label>
+          <SearchDropdown
+            v-model="form.contractorLabel"
+            :items="contractors"
+            :item-key="'id'"
+            :item-label="'name'"
+            :placeholder="$t('labels.contractor') || 'Search contractors'"
+            :dir="isRTL ? 'rtl' : 'ltr'"
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+            @select="onSelectContractor"
+          />
+        </div>
+        <div>
+          <Label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('rental.hourlyRate') || 'Hourly Rate' }}</Label>
+          <Input v-model.number="form.hourlyRate" type="number" min="0" step="0.01" class="w-full" />
+        </div>
+      </form>
+      <template #footer>
+        <Button type="button" variant="outline" @click="closeModals">{{ $t('labels.cancel') || 'Cancel' }}</Button>
+        <Button type="button" :disabled="saving" @click="onSave">{{ saving ? $t('labels.saving') : $t('labels.save') }}</Button>
+      </template>
+    </Modal>
 
     <!-- Delete Confirm -->
     <ConfirmDialog :show="showDeleteConfirm" :title="$t('labels.confirmDelete')" :message="deleteMessage" type="danger" @confirm="confirmDelete" @cancel="cancelDelete" />
@@ -149,12 +145,17 @@ import { isPendingApproval, pendingApprovalToast } from '../../../utils/approval
 import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
-import { PencilIcon, PlusIcon, TrashIcon, XMarkIcon } from '@acme/icon-packs/legacy'
+import Modal from '@/components/shared/Modal.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { PencilIcon, PlusIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import RowActions from '@/components/shared/RowActions.vue'
 
 export default {
   name: 'EquipmentList',
-  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, SearchDropdown, TrashIcon, XMarkIcon },
+  components: { ConfirmDialog, Modal, Pagination, Button, Input, Label, Checkbox, PencilIcon, PlusIcon, RowActions, SearchDropdown, TrashIcon },
   setup() {
     const q = ref('')
 

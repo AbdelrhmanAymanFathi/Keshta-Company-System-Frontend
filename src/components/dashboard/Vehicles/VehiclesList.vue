@@ -98,93 +98,86 @@
     </div>
 
     <!-- Create Vehicle Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative w-full max-w-sm sm:max-w-2xl lg:max-w-3xl z-50 mx-auto">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
-          <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b">
-            <h3 class="text-lg font-semibold theme-text-primary">{{ $t('vehicles.createVehicle') }}</h3>
-            <button class="theme-text-muted hover:theme-text-secondary" @click="closeCreateModal"><XMarkIcon class="w-5 h-5" /></button>
-          </div>
-          <div class="p-4 sm:p-6 overflow-y-auto">
-            <CreateVehicle :mode="mode" @created="onCreatedFromModal" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <Modal
+      :visible="showCreateModal"
+      :title="$t('vehicles.createVehicle')"
+      size="lg"
+      @update:visible="showCreateModal = $event"
+    >
+      <CreateVehicle :mode="mode" @created="onCreatedFromModal" />
+    </Modal>
 
     <!-- Edit Vehicle Modal -->
-    <div v-if="editingVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm sm:max-w-md z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold">{{ $t('labels.edit') || 'Edit' }} {{ editingVehicle.name }}</h3>
-          <button class="theme-caption hover:theme-text-secondary" @click="closeEditModal"><XMarkIcon class="w-5 h-5" /></button>
+    <Modal
+      :visible="!!editingVehicle"
+      :title="editingVehicle ? (($t('labels.edit') || 'Edit') + ' ' + editingVehicle.name) : ''"
+      size="md"
+      @update:visible="val => { if (!val) closeEditModal() }"
+    >
+      <form id="vehicleEditForm" @submit.prevent="onSaveEdit" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2">
+          <Label class="text-sm font-medium theme-text-secondary mb-1 block">{{ $t('vehicles.truckName') || 'Truck Name' }}</Label>
+          <Input v-model="editForm.name" type="text" class="w-full" required />
         </div>
-        <form @submit.prevent="onSaveEdit" class="grid grid-cols-1 sm:grid-cols-2 gap-4 space-y-4 sm:space-y-0">
-          <div class="sm:col-span-2">
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.truckName') || 'Truck Name' }}</label>
-            <input v-model="editForm.name" type="text" class="w-full border rounded px-3 py-2 text-sm" required />
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.crusherNumber') }}</label>
-            <div class="relative">
-              <input
-                type="text"
-                class="w-full border rounded px-3 py-2 text-sm"
-                :placeholder="$t('vehicles.selectCrusher')"
-                v-model="crusherSearch"
-                @focus="openCrusherDropdown"
-                @input="openCrusherDropdown"
-                @blur="closeCrusherDropdown"
-                aria-autocomplete="list"
-                aria-haspopup="true"
-                role="combobox"
-              />
+        <div class="sm:col-span-2">
+          <Label class="text-sm font-medium theme-text-secondary mb-1 block">{{ $t('vehicles.crusherNumber') }}</Label>
+          <div class="relative">
+            <Input
+              type="text"
+              class="w-full"
+              :placeholder="$t('vehicles.selectCrusher')"
+              v-model="crusherSearch"
+              @focus="openCrusherDropdown"
+              @input="openCrusherDropdown"
+              @blur="closeCrusherDropdown"
+              aria-autocomplete="list"
+              aria-haspopup="true"
+              role="combobox"
+            />
 
-              <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
-                <button
-                  v-for="c in filteredCrushers"
-                  :key="c.id"
-                  @mousedown.prevent="selectCrusher(c)"
-                  class="w-full text-left px-3 py-2 hover:bg-gray-100"
-                >
-                  {{ c.name }}
-                </button>
-              </div>
+            <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
+              <button
+                v-for="c in filteredCrushers"
+                :key="c.id"
+                @mousedown.prevent="selectCrusher(c)"
+                class="w-full text-left px-3 py-2 hover:bg-gray-100"
+              >
+                {{ c.name }}
+              </button>
             </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('vehicles.companyCapacity') }}</label>
-            <input v-model="editForm.companyCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
-            <p v-if="editForm.companyCapacity && Number(editForm.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
-              {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
-            </p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-1">{{ $t('labels.crusherCapacity') }}</label>
-            <input v-model="editForm.crusherCapacity" type="number" min="0" step="0.01" class="w-full border rounded px-3 py-2 text-sm" />
-            <p v-if="editForm.crusherCapacity && Number(editForm.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
-              {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
-            </p>
-          </div>
-          <div class="flex gap-2 justify-end pt-4 sm:col-span-2">
-            <button type="button" @click="closeEditModal" class="px-4 py-2 rounded border border-gray-300 theme-text-secondary hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-            <button type="submit" :disabled="editLoading" class="theme-button px-4 py-2 rounded disabled:opacity-50">{{ editLoading ? $t('labels.saving') : $t('labels.save') || 'Save' }}</button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div>
+          <Label class="text-sm font-medium theme-text-secondary mb-1 block">{{ $t('vehicles.companyCapacity') }}</Label>
+          <Input v-model="editForm.companyCapacity" type="number" min="0" step="0.01" class="w-full" />
+          <p v-if="editForm.companyCapacity && Number(editForm.companyCapacity) <= 0" class="text-xs text-red-600 mt-1">
+            {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
+          </p>
+        </div>
+        <div>
+          <Label class="text-sm font-medium theme-text-secondary mb-1 block">{{ $t('labels.crusherCapacity') }}</Label>
+          <Input v-model="editForm.crusherCapacity" type="number" min="0" step="0.01" class="w-full" />
+          <p v-if="editForm.crusherCapacity && Number(editForm.crusherCapacity) <= 0" class="text-xs text-red-600 mt-1">
+            {{ $t('vehicles.validationPositiveNumber') || 'Must be greater than 0' }}
+          </p>
+        </div>
+      </form>
+      <template #footer>
+        <Button variant="outline" @click="closeEditModal">{{ $t('labels.cancel') || 'Cancel' }}</Button>
+        <Button type="submit" form="vehicleEditForm" :disabled="editLoading">{{ editLoading ? $t('labels.saving') : ($t('labels.save') || 'Save') }}</Button>
+      </template>
+    </Modal>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="deleteConfirmVehicle" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-sm z-50 p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-lg font-semibold mb-4">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="theme-text-secondary mb-6">{{ $t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete' }} "{{ deleteConfirmVehicle.name }}"?</p>
-        <div class="flex gap-2 justify-end">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 rounded border border-gray-300 theme-text-secondary hover:bg-gray-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-          <button @click="onConfirmDelete" :disabled="deleteLoading" class="px-4 py-2 rounded bg-red-600 theme-text-light hover:bg-red-700 disabled:opacity-50">{{ deleteLoading ? $t('labels.deleting') : $t('labels.delete') || 'Delete' }}</button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="!!deleteConfirmVehicle"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="deleteConfirmVehicle ? (($t('vehicles.deleteConfirmMsg') || 'Are you sure you want to delete') + ' ' + deleteConfirmVehicle.name + '?') : ''"
+      :loading="deleteLoading"
+      type="danger"
+      @confirm="onConfirmDelete"
+      @cancel="closeDeleteConfirm"
+    />
 
     <!-- Pagination Component -->
     <Pagination
@@ -338,6 +331,11 @@ import {
   deleteVehicle
 } from '../../../api'
 import CreateVehicle from './CreateVehicle.vue'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import Pagination from '../../shared/Pagination.vue'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
 import { normalizeVehicleName } from '@/utils/normalizeVehicleName'
@@ -350,7 +348,12 @@ export default {
     mode: { type: String, default: 'transport' }
   },
   emits: ["navigateReport", "navigateStatement"],
-  components: { ArrowsRightLeftIcon, CreateVehicle, DateTimeField, Pagination, PencilSquareIcon, PlusIcon, RowActions, TrashIcon, XMarkIcon },
+  components: {
+    Modal,
+    ConfirmDialog,
+    Button,
+    Input,
+    Label, ArrowsRightLeftIcon, CreateVehicle, DateTimeField, Pagination, PencilSquareIcon, PlusIcon, RowActions, TrashIcon, XMarkIcon },
   setup(props) {
     const q = ref('')
 

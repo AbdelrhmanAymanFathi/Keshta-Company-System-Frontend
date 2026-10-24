@@ -12,9 +12,12 @@
     </div>
 
     <!-- Filters Section -->
-    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
-      <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Card class="shadcn-ui border-slate-200/80 bg-white/95 shadow-lg shadow-slate-200/40">
+      <CardHeader class="pb-2">
+        <CardTitle class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</CardTitle>
+      </CardHeader>
+      <CardContent class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
@@ -112,17 +115,16 @@
         </div>
       </div>
 
-      <div class="flex gap-2">
-        <button @click="page = 1; loadSupplies()" :disabled="loading"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-xs sm:text-sm font-medium shadow-sm ">
-          {{ $t('labels.search') }}
-        </button>
-        <button @click="clearFilters"
-          class="px-3 py-1.5 sm:px-4 sm:py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl transition-colors text-xs sm:text-sm font-medium">
-          {{ $t('labels.clear') }}
-        </button>
-      </div>
-    </div>
+        <div class="flex gap-2">
+          <Button @click="page = 1; loadSupplies()" :disabled="loading" class="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm">
+            {{ $t('labels.search') }}
+          </Button>
+          <Button variant="outline" @click="clearFilters" class="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium">
+            {{ $t('labels.clear') }}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
 
     <!-- table -->
     <div class="app-table-card">
@@ -220,12 +222,10 @@
               {{ supply.contractor?.name || '-' }}
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-              <span v-if="supply.hasPendingApproval" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 block w-max">
-                {{ $t('labels.pendingReview') || 'Pending Review' }}
-              </span>
-              <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-800 border border-green-200 block w-max">
-                {{ $t('labels.approved') || 'Approved' }}
-              </span>
+              <StatusBadge
+                :status="supply.hasPendingApproval ? 'pending' : 'approved'"
+                :label="supply.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
+              />
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
@@ -301,162 +301,157 @@
     </div>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 bg-slate-950/20 backdrop-blur-sm flex items-center justify-center z-50" style="margin-top:0;">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl p-6 w-full max-w-sm">
-        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="theme-text-secondary mb-6">{{ $t('supply.confirmDeleteExport') || 'Are you sure you want to delete this export?' }}</p>
-        <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="px-4 py-2 border border-slate-200 rounded-xl theme-text-secondary hover:bg-slate-50">
-            {{ $t('labels.cancel') || 'Cancel' }}
-          </button>
-          <button @click="handleDelete(deleteConfirmModal.id)" :disabled="deleting" class="px-4 py-2 bg-red-600 theme-text-light rounded-xl hover:bg-red-700 disabled:opacity-50">
-            {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteConfirmModal.show"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="$t('supply.confirmDeleteExport') || 'Are you sure you want to delete this export?'"
+      :loading="deleting"
+      type="danger"
+      @confirm="handleDelete(deleteConfirmModal.id)"
+      @cancel="closeDeleteConfirm"
+    />
 
     <!-- Edit Modal -->
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="fixed inset-0 bg-slate-950/45 backdrop-blur-sm" @click="closeModal"></div>
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl p-6 z-10 max-h-[90vh] overflow-y-auto" style="margin-top:0;">
-        <h3 class="text-lg font-bold mb-4 theme-text-primary">{{ $t('dashboard.suppliesList') }} — {{ $t('labels.edit') }}</h3>
-        
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Date -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.date') }}</label>
-            <DateField v-model="form.date" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
-          </div>
-
-          <!-- Contractor -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.contractor') }}</label>
-            <SearchDropdown
-              v-model="form.contractorSearch"
-              :items="contractors"
-              :allItems="contractors"
-              placeholder=""
-              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              @select="(sel) => { form.contractorId = sel.id; form.contractorSearch = sel.name }"
-            />
-          </div>
-
-          <!-- Location -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.location') }}</label>
-            <SearchDropdown
-              v-model="form.locationSearch"
-              :items="locations"
-              :allItems="locations"
-              placeholder=""
-              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              @select="(sel) => { form.locationId = sel.id; form.locationSearch = sel.name; form.areaId = ''; form.areaSearch = '' }"
-            />
-          </div>
-
-          <!-- Area -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.area') }}</label>
-            <SearchDropdown
-              v-model="form.areaSearch"
-              :items="availableAreasForEdit"
-              :allItems="availableAreasForEdit"
-              placeholder=""
-              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              @select="(sel) => { form.areaId = sel.id; form.areaSearch = sel.name }"
-            />
-          </div>
-
-          <!-- Crusher -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.crusher') }}</label>
-            <SearchDropdown
-              v-model="form.crusherSearch"
-              :items="crushers"
-              :allItems="crushers"
-              placeholder=""
-              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              @select="(sel) => { form.crusherId = sel.id; form.crusherSearch = sel.name }"
-            />
-          </div>
-
-          <!-- Item -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.item') }}</label>
-            <SearchDropdown
-              v-model="form.itemSearch"
-              :items="items"
-              :allItems="items"
-              placeholder=""
-              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              @select="(sel) => { form.itemId = sel.id; form.itemSearch = sel.name }"
-            />
-          </div>
-
-          <!-- Vehicle -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.vehicle') || 'Vehicle' }}</label>
-            <SearchDropdown
-              v-model="form.vehicleSearch"
-              :items="vehicles"
-              :allItems="vehicles"
-              :filterFn="vehicleFilterFn"
-              placeholder=""
-              inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              @select="(sel) => { form.vehicleId = sel.id; form.vehicleSearch = sel.name }"
-            />
-          </div>
-
-          <!-- Crusher Ticket -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.crusherTicket') || 'Crusher Ticket' }}</label>
-            <input v-model="form.crusherTicket" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-
-          <!-- Company Ticket -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.companyTicket') || 'Company Ticket' }}</label>
-            <input v-model="form.companyTicket" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-
-          <!-- Company Capacity -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.companyCapacity') || 'Company Capacity' }}</label>
-            <input v-model.number="form.companyCapacity" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-
-          <!-- Crusher Capacity -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.crusherCapacity') || 'Crusher Capacity' }}</label>
-            <input v-model.number="form.crusherCapacity" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-
-          <!-- Unit Price -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.unitPrice') || 'Unit Price' }}</label>
-            <input v-model.number="form.unitPrice" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-
-          <!-- Discount -->
-          <div>
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.discount') || 'Discount' }}</label>
-            <input v-model.number="form.discount" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-
-          <!-- Notes -->
-          <div class="col-span-2">
-            <label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.notes') }}</label>
-            <textarea v-model="form.notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-          </div>
+    <Modal
+      :visible="modalOpen"
+      :title="$t('dashboard.suppliesList') + ' — ' + $t('labels.edit')"
+      size="lg"
+      @update:visible="modalOpen = $event"
+    >
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Date -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.date') }}</Label>
+          <DateField v-model="form.date" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
         </div>
-        
-        <div class="mt-6 flex gap-2 justify-end">
-          <button @click="closeModal" class="px-4 py-2 rounded-xl border border-gray-300 text-sm hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
-          <button @click="saveEdit" class="px-4 py-2 rounded-xl theme-text-light theme-button text-sm">{{ $t('labels.save') }}</button>
+
+        <!-- Contractor -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.contractor') }}</Label>
+          <SearchDropdown
+            v-model="form.contractorSearch"
+            :items="contractors"
+            :allItems="contractors"
+            placeholder=""
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            @select="(sel) => { form.contractorId = sel.id; form.contractorSearch = sel.name }"
+          />
+        </div>
+
+        <!-- Location -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.location') }}</Label>
+          <SearchDropdown
+            v-model="form.locationSearch"
+            :items="locations"
+            :allItems="locations"
+            placeholder=""
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            @select="(sel) => { form.locationId = sel.id; form.locationSearch = sel.name; form.areaId = ''; form.areaSearch = '' }"
+          />
+        </div>
+
+        <!-- Area -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.area') }}</Label>
+          <SearchDropdown
+            v-model="form.areaSearch"
+            :items="availableAreasForEdit"
+            :allItems="availableAreasForEdit"
+            placeholder=""
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            @select="(sel) => { form.areaId = sel.id; form.areaSearch = sel.name }"
+          />
+        </div>
+
+        <!-- Crusher -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.crusher') }}</Label>
+          <SearchDropdown
+            v-model="form.crusherSearch"
+            :items="crushers"
+            :allItems="crushers"
+            placeholder=""
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            @select="(sel) => { form.crusherId = sel.id; form.crusherSearch = sel.name }"
+          />
+        </div>
+
+        <!-- Item -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.item') }}</Label>
+          <SearchDropdown
+            v-model="form.itemSearch"
+            :items="items"
+            :allItems="items"
+            placeholder=""
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            @select="(sel) => { form.itemId = sel.id; form.itemSearch = sel.name }"
+          />
+        </div>
+
+        <!-- Vehicle -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.vehicle') || 'Vehicle' }}</Label>
+          <SearchDropdown
+            v-model="form.vehicleSearch"
+            :items="vehicles"
+            :allItems="vehicles"
+            :filterFn="vehicleFilterFn"
+            placeholder=""
+            inputClass="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            @select="(sel) => { form.vehicleId = sel.id; form.vehicleSearch = sel.name }"
+          />
+        </div>
+
+        <!-- Crusher Ticket -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.crusherTicket') || 'Crusher Ticket' }}</Label>
+          <Input v-model="form.crusherTicket" class="w-full" />
+        </div>
+
+        <!-- Company Ticket -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.companyTicket') || 'Company Ticket' }}</Label>
+          <Input v-model="form.companyTicket" class="w-full" />
+        </div>
+
+        <!-- Company Capacity -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.companyCapacity') || 'Company Capacity' }}</Label>
+          <Input v-model.number="form.companyCapacity" type="number" class="w-full" />
+        </div>
+
+        <!-- Crusher Capacity -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.crusherCapacity') || 'Crusher Capacity' }}</Label>
+          <Input v-model.number="form.crusherCapacity" type="number" class="w-full" />
+        </div>
+
+        <!-- Unit Price -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('supply.unitPrice') || 'Unit Price' }}</Label>
+          <Input v-model.number="form.unitPrice" type="number" class="w-full" />
+        </div>
+
+        <!-- Discount -->
+        <div>
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.discount') || 'Discount' }}</Label>
+          <Input v-model.number="form.discount" type="number" class="w-full" />
+        </div>
+
+        <!-- Notes -->
+        <div class="col-span-2">
+          <Label class="block text-xs font-semibold theme-text-secondary mb-1">{{ $t('labels.notes') }}</Label>
+          <Textarea v-model="form.notes" rows="3" class="w-full" />
         </div>
       </div>
-    </div>
+
+      <template #footer>
+        <Button variant="outline" @click="closeModal">{{ $t('labels.cancel') }}</Button>
+        <Button @click="saveEdit" class="theme-button">{{ $t('labels.save') }}</Button>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -475,6 +470,14 @@ import { buildQueryParams } from '../../../utils/buildQueryParams'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import { realtimeService } from '@/services/realtimeService'
 import RowActions from '@/components/shared/RowActions.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
+import StatusBadge from '@/components/shared/StatusBadge.vue'
 import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import { debounce } from '@/utils/debounce'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
@@ -483,12 +486,23 @@ export default {
   name: 'SuppliesList',
 
   components: {
+    Modal,
+    ConfirmDialog,
+    StatusBadge,
+    Input,
+    Label,
+    Textarea,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
     TableModal,
     Pagination,
     RowActions,
     SearchDropdown,
     DateField,
-    SortIcon
+    SortIcon,
+    Button
     // PaymentModal,
     // SupplyDetailModal
   },

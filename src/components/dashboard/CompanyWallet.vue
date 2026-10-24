@@ -184,24 +184,24 @@
               <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.amount') }} *
               </label>
-              <input
+              <Input
                 v-model.number="depositForm.amount"
                 type="number"
                 min="0.01"
                 step="0.01"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
-              >
+                class="w-full"
+              />
             </div>
             <div>
               <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.description') }}
               </label>
-              <input
+              <Input
                 v-model="depositForm.description"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
-              >
+                class="w-full"
+              />
             </div>
             <div>
               <label class="block text-sm font-medium theme-text-secondary mb-1">
@@ -214,14 +214,12 @@
               />
             </div>
             <div class="flex justify-end gap-3 pt-4">
-              <button type="button" @click="closeDepositModal"
-                class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
+              <Button type="button" variant="outline" @click="closeDepositModal">
                 {{ $t('labels.cancel') }}
-              </button>
-              <button type="submit" :disabled="processing"
-                class="px-4 py-2 bg-green-600 theme-text-light rounded-md hover:bg-green-700 disabled:opacity-50 transition">
+              </Button>
+              <Button type="submit" :disabled="processing" variant="default">
                 {{ processing ? $t('labels.processing') : $t('company.wallet.deposit') }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -238,24 +236,24 @@
               <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.amount') }} *
               </label>
-              <input
+              <Input
                 v-model.number="withdrawForm.amount"
                 type="number"
                 min="0.01"
                 step="0.01"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
-              >
+                class="w-full"
+              />
             </div>
             <div>
               <label class="block text-sm font-medium theme-text-secondary mb-1">
                 {{ $t('company.wallet.description') }}
               </label>
-              <input
+              <Input
                 v-model="withdrawForm.description"
                 type="text"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus"
-              >
+                class="w-full"
+              />
             </div>
             <div>
               <label class="block text-sm font-medium theme-text-secondary mb-1">
@@ -268,14 +266,12 @@
               />
             </div>
             <div class="flex justify-end gap-3 pt-4">
-              <button type="button" @click="closeWithdrawModal"
-                class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
+              <Button type="button" variant="outline" @click="closeWithdrawModal">
                 {{ $t('labels.cancel') }}
-              </button>
-              <button type="submit" :disabled="processing"
-                class="px-4 py-2 bg-red-600 theme-text-light rounded-md hover:bg-red-700 disabled:opacity-50 transition">
+              </Button>
+              <Button type="submit" variant="destructive" :disabled="processing">
                 {{ processing ? $t('labels.processing') : $t('company.wallet.withdraw') }}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -291,11 +287,13 @@ import { useCompanyStore } from '@/stores/useCompanyStore'
 import { getBranches, getBranchWalletSummary, getBranchWalletTransactions, depositToBranchWallet, withdrawFromBranchWallet } from '../../api'
 import Badge from '../shared/Badge.vue'
 import DateField from '../shared/DateField.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'CompanyWallet',
-  components: { Badge, DateField },
+  components: { Badge, DateField, Button, Input },
   setup() {
     const { locale } = useI18n()
     const companyStore = useCompanyStore()

@@ -4,18 +4,21 @@
     <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-xl sm:text-2xl font-bold theme-text-primary">{{ $t('units.title') || 'Units of Measure' }}</h2>
       <div class="flex items-center gap-3">
-        <button @click="openAddModal()" class="rounded-xl theme-button px-4 py-2 theme-text-light shadow-sm transition">+ {{ $t('units.addUnit') || 'Add Unit' }}</button>
+        <Button class="gap-2" @click="openAddModal()">
+          <PlusIcon class="h-4 w-4" />
+          {{ $t('units.addUnit') || 'Add Unit' }}
+        </Button>
       </div>
     </div>
 
     <!-- Search & Filter -->
     <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/20">
       <div class="relative flex-1 max-w-md">
-        <input
+        <Input
           v-model="searchQuery"
           type="text"
           :placeholder="$t('units.searchPlaceholder') || 'Search units...'"
-          class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 theme-input-focus text-sm"
+          class="w-full pl-10 pr-4 py-2 text-sm"
         />
         <span class="absolute left-3 top-2.5 text-slate-400">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,69 +71,73 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
-      <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl space-y-4">
-        <h3 class="text-lg font-bold">
-          {{ editing ? ($t('units.editUnit') || 'Edit Unit') : ($t('units.addUnit') || 'Add Unit') }}
-        </h3>
-        
-        <div class="space-y-3">
-          <div>
-            <label class="block text-sm theme-text-secondary mb-1">{{ $t('units.symbol') }} *</label>
-            <input v-model="form.symbol" :disabled="editing" class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus" placeholder="e.g. kg, m³" />
-          </div>
-          <div>
-            <label class="block text-sm theme-text-secondary mb-1">{{ $t('units.name') }} *</label>
-            <input v-model="form.name" class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus" placeholder="e.g. Kilogram" />
-          </div>
-          <div>
-            <label class="block text-sm theme-text-secondary mb-1">{{ $t('units.arName') }}</label>
-            <input v-model="form.arName" class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus" placeholder="e.g. كيلوجرام" />
-          </div>
-          <div>
-            <label class="block text-sm theme-text-secondary mb-1">{{ $t('units.description') }}</label>
-            <textarea v-model="form.description" rows="3" class="w-full rounded-xl border border-slate-200 px-3 py-2 theme-input-focus" placeholder="Optional details..."></textarea>
-          </div>
+    <Modal
+      :visible="showModal"
+      :title="editing ? ($t('units.editUnit') || 'Edit Unit') : ($t('units.addUnit') || 'Add Unit')"
+      size="sm"
+      @update:visible="showModal = $event"
+    >
+      <div class="space-y-3">
+        <div>
+          <Label class="block text-sm theme-text-secondary mb-1">{{ $t('units.symbol') }} *</Label>
+          <Input v-model="form.symbol" :disabled="editing" class="w-full" placeholder="e.g. kg, m³" />
         </div>
-
-        <div class="flex justify-end gap-3 pt-2">
-          <button @click="closeModal" class="rounded-xl border border-slate-200 px-4 py-2 theme-text-secondary hover:bg-slate-50">{{ $t('labels.cancel') || 'Cancel' }}</button>
-          <button @click="save" :disabled="saving || !form.symbol.trim() || !form.name.trim()" class="rounded-xl theme-button px-5 py-2 theme-text-light font-medium">
-            {{ saving ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
-          </button>
+        <div>
+          <Label class="block text-sm theme-text-secondary mb-1">{{ $t('units.name') }} *</Label>
+          <Input v-model="form.name" class="w-full" placeholder="e.g. Kilogram" />
         </div>
-        <p v-if="error" class="text-red-600 text-sm mt-3">{{ error }}</p>
+        <div>
+          <Label class="block text-sm theme-text-secondary mb-1">{{ $t('units.arName') }}</Label>
+          <Input v-model="form.arName" class="w-full" placeholder="e.g. كيلوجرام" />
+        </div>
+        <div>
+          <Label class="block text-sm theme-text-secondary mb-1">{{ $t('units.description') }}</Label>
+          <Textarea v-model="form.description" rows="3" class="w-full" placeholder="Optional details..." />
+        </div>
       </div>
-    </div>
+      <p v-if="error" class="text-red-600 text-sm mt-3">{{ error }}</p>
+      <template #footer>
+        <Button variant="outline" @click="closeModal">{{ $t('labels.cancel') || 'Cancel' }}</Button>
+        <Button @click="save" :disabled="saving || !form.symbol.trim() || !form.name.trim()">
+          {{ saving ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
+        </Button>
+      </template>
+    </Modal>
 
     <!-- Delete Confirm Modal -->
-    <div v-if="deleteConfirmModal.show" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm">
-      <div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
-        <h3 class="text-lg font-bold mb-3 theme-text-primary">{{ $t('labels.confirmDelete') || 'Confirm Delete' }}</h3>
-        <p class="theme-text-secondary mb-6">{{ deleteConfirmModal.message }}</p>
-        <div class="flex justify-end gap-3">
-          <button @click="closeDeleteConfirm" class="rounded-xl border border-slate-200 px-4 py-2 theme-text-secondary hover:bg-slate-50">
-            {{ $t('labels.cancel') || 'Cancel' }}
-          </button>
-          <button @click="doDelete(deleteConfirmModal.id)" :disabled="deleting" class="rounded-xl bg-red-600 px-4 py-2 theme-text-light hover:bg-red-700 disabled:opacity-50">
-            {{ deleting ? ($t('labels.deleting') || 'Deleting...') : ($t('labels.delete') || 'Delete') }}
-          </button>
-        </div>
-        <p v-if="deleteError" class="text-red-600 text-sm mt-3">{{ deleteError }}</p>
-      </div>
-    </div>
+    <ConfirmDialog
+      :show="deleteConfirmModal.show"
+      :title="$t('labels.confirmDelete') || 'Confirm Delete'"
+      :message="deleteConfirmModal.message"
+      :loading="deleting"
+      type="danger"
+      @confirm="doDelete(deleteConfirmModal.id)"
+      @cancel="closeDeleteConfirm"
+    />
   </div>
 </template>
 
 <script>
 import { getUnits, createUnit, updateUnit, deleteUnit } from '@/api'
 import RowActions from '@/components/shared/RowActions.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import Modal from '@/components/shared/Modal.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'Units-List',
   components: {
+    Modal,
+    ConfirmDialog,
+    Label,
+    Textarea,
     RowActions,
+    Button,
+    Input,
     PencilIcon,
     TrashIcon
   },

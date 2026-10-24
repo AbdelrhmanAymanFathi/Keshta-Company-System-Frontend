@@ -105,113 +105,81 @@
       @update:pageSize="(size) => { pageSize = size; page = 1; loadItems() }" />
 
     <!-- Create/Edit Modal -->
-    <teleport to="body">
-      <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
-        <div class="fixed inset-0 bg-black opacity-40" @click="closeModal"></div>
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl w-full max-w-md p-4 sm:p-6 z-10">
-          <h3 class="text-lg font-semibold mb-4">
-            {{ editingItem ? ($t('labels.edit') + ' ' + $t('labels.item')) : ($t('labels.new') + ' ' + $t('labels.item'))
-            }}
-          </h3>
-
-          <form @submit.prevent="submitForm" class="space-y-4">
-            <!-- Item Name -->
-            <label class="block">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.itemName') || 'Item Name' }} *</div>
-              <input v-model="form.name" type="text" required
-                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
-                :placeholder="$t('placeholders.enterItemName') || 'Enter item name'" />
-              <div v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</div>
-            </label>
-
-            <!-- Unit -->
-            <label class="block">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.unit') || 'Unit' }}</div>
-              <select v-model="form.unitId"
-                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus">
-                <option :value="null">-- {{ $t('placeholders.selectUnit') || 'Select unit' }} --</option>
-                <option v-for="u in unitOptions" :key="u.id" :value="u.id">{{ u.name }}</option>
-              </select>
-            </label>
-
-            <!-- Supply type: decides which fields the supply wizard asks for -->
-            <label class="block" v-if="form.availableForSupplies">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.supplyType') }}</div>
-              <select v-model="form.supplyType"
-                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus">
-                <option v-if="!editingItem" value="">{{ $t('labels.supplyTypeAuto') }}</option>
-                <option value="AGGREGATE">{{ $t('labels.supplyTypeAggregate') }}</option>
-                <option value="PRECAST">{{ $t('labels.supplyTypePrecast') }}</option>
-                <option value="PETROLEUM">{{ $t('labels.supplyTypePetroleum') }}</option>
-              </select>
-            </label>
-
-            <!-- Prices (mode-specific) -->
-            <label class="block" v-if="mode === 'supply' || mode === 'all'">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</div>
-              <input v-model.number="form.defaultSupplyPrice" :required="mode === 'supply'" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
-                :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-
-              <!-- When in supply mode allow marking also available for transport -->
-              <div v-if="mode === 'supply'" class="mt-2 flex items-center gap-2">
-                <input id="availTransport" type="checkbox" v-model="form.availableForTransports" class="w-4 h-4" />
-                <label for="availTransport" class="text-sm">{{ $t('labels.availableForTransports') || 'Also available for transport' }}</label>
-              </div>
-
-              <!-- If checkbox set, show transport price field -->
-              <label class="block mt-2" v-if="form.availableForTransports">
-                <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }}</div>
-                <input v-model.number="form.defaultTransportPrice" :required="form.availableForTransports" type="number" step="0.01" min="0"
-                  class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
-                  :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-              </label>
-            </label>
-
-            <label class="block" v-if="mode === 'transport' || mode === 'all'">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }} {{ mode === 'transport' ? '*' : '' }}</div>
-              <input v-model.number="form.defaultTransportPrice" :required="mode === 'transport'" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
-                :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-
-              <!-- When in transport mode allow marking also available for supply -->
-              <div v-if="mode === 'transport'" class="mt-2 flex items-center gap-2">
-                <input id="availSupply" type="checkbox" v-model="form.availableForSupplies" class="w-4 h-4" />
-                <label for="availSupply" class="text-sm">{{ $t('labels.availableForSupplies') || 'Also available for supply' }}</label>
-              </div>
-
-              <!-- If checkbox set, show supply price field -->
-              <label class="block mt-2" v-if="form.availableForSupplies">
-                <div class="text-sm font-medium mb-1">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }}</div>
-                <input v-model.number="form.defaultSupplyPrice" :required="form.availableForSupplies" type="number" step="0.01" min="0"
-                  class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
-                  :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-              </label>
-            </label>
-
-            <!-- Export price (for extracts) -->
-            <label class="block" v-if="mode === 'extracts' || form.availableForExtracts">
-              <div class="text-sm font-medium mb-1">{{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }} {{ mode === 'extracts' ? '*' : '' }}</div>
-              <input v-model.number="form.defaultExtractPrice" :required="mode === 'extracts' || form.availableForExtracts" type="number" step="0.01" min="0"
-                class="w-full px-3 py-2 border rounded focus:outline-none theme-input-focus"
-                :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
-            </label>
-
-            <!-- Buttons -->
-            <div class="flex gap-3 pt-4">
-              <button type="submit" :disabled="submitting"
-                class="flex-1 px-4 py-2 theme-button rounded disabled:opacity-50 transition">
-                {{ submitting ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}
-              </button>
-              <button type="button" @click="closeModal"
-                class="flex-1 px-4 py-2 bg-gray-300 theme-text-secondary rounded hover:bg-gray-400 transition">
-                {{ $t('labels.cancel') || 'Cancel' }}
-              </button>
-            </div>
-          </form>
+    <Modal
+      :visible="modalOpen"
+      :title="editingItem ? ($t('labels.edit') + ' ' + $t('labels.item')) : ($t('labels.new') + ' ' + $t('labels.item'))"
+      size="md"
+      @update:visible="val => { if (!val) closeModal() }"
+    >
+      <form id="itemForm" @submit.prevent="submitForm" class="space-y-4">
+        <!-- Item Name -->
+        <div>
+          <Label class="text-sm font-medium mb-1 block">{{ $t('labels.itemName') || 'Item Name' }} *</Label>
+          <Input v-model="form.name" type="text" required class="w-full" :placeholder="$t('placeholders.enterItemName') || 'Enter item name'" />
+          <div v-if="errors.name" class="text-red-600 text-sm mt-1">{{ errors.name }}</div>
         </div>
-      </div>
-    </teleport>
+
+        <!-- Unit -->
+        <div>
+          <Label class="text-sm font-medium mb-1 block">{{ $t('labels.unit') || 'Unit' }}</Label>
+          <select v-model="form.unitId" class="w-full px-3 py-2 border rounded-lg focus:outline-none theme-input-focus text-sm">
+            <option :value="null">-- {{ $t('placeholders.selectUnit') || 'Select unit' }} --</option>
+            <option v-for="u in unitOptions" :key="u.id" :value="u.id">{{ u.name }}</option>
+          </select>
+        </div>
+
+        <!-- Supply type -->
+        <div v-if="form.availableForSupplies">
+          <Label class="text-sm font-medium mb-1 block">{{ $t('labels.supplyType') }}</Label>
+          <select v-model="form.supplyType" class="w-full px-3 py-2 border rounded-lg focus:outline-none theme-input-focus text-sm">
+            <option v-if="!editingItem" value="">{{ $t('labels.supplyTypeAuto') }}</option>
+            <option value="AGGREGATE">{{ $t('labels.supplyTypeAggregate') }}</option>
+            <option value="PRECAST">{{ $t('labels.supplyTypePrecast') }}</option>
+            <option value="PETROLEUM">{{ $t('labels.supplyTypePetroleum') }}</option>
+          </select>
+        </div>
+
+        <!-- Prices (mode-specific) -->
+        <div v-if="mode === 'supply' || mode === 'all'">
+          <Label class="text-sm font-medium mb-1 block">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }} {{ mode === 'supply' ? '*' : '' }}</Label>
+          <Input v-model.number="form.defaultSupplyPrice" :required="mode === 'supply'" type="number" step="0.01" min="0" class="w-full" :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+
+          <div v-if="mode === 'supply'" class="mt-2 flex items-center gap-2">
+            <Checkbox id="availTransport" v-model="form.availableForTransports" />
+            <Label for="availTransport" class="text-sm">{{ $t('labels.availableForTransports') || 'Also available for transport' }}</Label>
+          </div>
+
+          <div class="mt-2" v-if="form.availableForTransports">
+            <Label class="text-sm font-medium mb-1 block">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }}</Label>
+            <Input v-model.number="form.defaultTransportPrice" :required="form.availableForTransports" type="number" step="0.01" min="0" class="w-full" :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+          </div>
+        </div>
+
+        <div v-if="mode === 'transport' || mode === 'all'">
+          <Label class="text-sm font-medium mb-1 block">{{ $t('labels.defaultTransportPrice') || 'Default Transport Price' }} {{ mode === 'transport' ? '*' : '' }}</Label>
+          <Input v-model.number="form.defaultTransportPrice" :required="mode === 'transport'" type="number" step="0.01" min="0" class="w-full" :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+
+          <div v-if="mode === 'transport'" class="mt-2 flex items-center gap-2">
+            <Checkbox id="availSupply" v-model="form.availableForSupplies" />
+            <Label for="availSupply" class="text-sm">{{ $t('labels.availableForSupplies') || 'Also available for supply' }}</Label>
+          </div>
+
+          <div class="mt-2" v-if="form.availableForSupplies">
+            <Label class="text-sm font-medium mb-1 block">{{ $t('labels.defaultSupplyPrice') || 'Default Supply Price' }}</Label>
+            <Input v-model.number="form.defaultSupplyPrice" :required="form.availableForSupplies" type="number" step="0.01" min="0" class="w-full" :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+          </div>
+        </div>
+
+        <div v-if="mode === 'extracts' || form.availableForExtracts">
+          <Label class="text-sm font-medium mb-1 block">{{ $t('labels.defaultExtractPrice') || 'Default Extract Price' }} {{ mode === 'extracts' ? '*' : '' }}</Label>
+          <Input v-model.number="form.defaultExtractPrice" :required="mode === 'extracts' || form.availableForExtracts" type="number" step="0.01" min="0" class="w-full" :placeholder="$t('placeholders.enterPrice') || 'Enter price'" />
+        </div>
+      </form>
+      <template #footer>
+        <Button variant="outline" @click="closeModal">{{ $t('labels.cancel') || 'Cancel' }}</Button>
+        <Button type="submit" form="itemForm" :disabled="submitting">{{ submitting ? ($t('labels.saving') || 'Saving...') : ($t('labels.save') || 'Save') }}</Button>
+      </template>
+    </Modal>
 
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog :show="deleteDialogOpen" type="danger" :title="$t('labels.confirmDelete') || 'Confirm Delete'"
@@ -262,7 +230,12 @@ import RowActions from '@/components/shared/RowActions.vue'
 export default {
   name: 'ItemList',
   emits: ['saved'],
-  components: { ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, Toast, TrashIcon },
+  components: {
+    Modal,
+    Button,
+    Input,
+    Label,
+    Checkbox, ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, Toast, TrashIcon },
   props: {
     mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'extracts' | 'all'
   },

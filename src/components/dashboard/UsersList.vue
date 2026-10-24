@@ -3,25 +3,22 @@
     <!-- Header -->
     <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('users.title') }}</h2>
-      <button
-        @click="openAdd"
-        class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 theme-text-light shadow-sm  transition-colors "
-      >
+      <Button @click="openAdd" class="flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
         </svg>
         {{ $t('users.add') }}
-      </button>
+      </Button>
     </div>
 
     <!-- Search -->
     <div class="max-w-md rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg shadow-slate-200/30">
-      <input
+      <Input
         v-model="q"
         @input="onSearchInput"
         type="search"
         :placeholder="$t('users.searchPlaceholder')"
-        class="w-full rounded-xl border border-slate-200 px-4 py-2  theme-input-focus"
+        class="w-full rounded-xl border border-slate-200 px-4 py-2 theme-input-focus"
       />
     </div>
 
@@ -249,20 +246,12 @@
             </div>
           </div>
           <div class="flex gap-3 pt-4" :class="isRTL ? 'flex-row-reverse' : ''">
-            <button
-              type="button"
-              @click="closeModal"
-              class="flex-1 rounded-xl border border-slate-200 px-4 py-2 theme-text-secondary hover:bg-slate-50"
-            >
+            <Button type="button" variant="outline" @click="closeModal" class="flex-1">
               {{ $t('labels.cancel') }}
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="flex-1 rounded-xl theme-button px-4 py-2 theme-text-light  disabled:opacity-50"
-            >
+            </Button>
+            <Button type="submit" :disabled="saving" class="flex-1">
               {{ saving ? $t('labels.saving') : $t('labels.save') }}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -276,19 +265,12 @@
           {{ $t('users.deleteConfirmMessage', { name: userToDelete?.name || '' }) }}
         </p>
         <div class="flex gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
-          <button
-            @click="deleteModalOpen = false"
-            class="flex-1 rounded-xl border border-slate-200 px-4 py-2 theme-text-secondary hover:bg-slate-50"
-          >
+          <Button variant="outline" @click="deleteModalOpen = false" class="flex-1">
             {{ $t('labels.cancel') }}
-          </button>
-          <button
-            @click="deleteUser"
-            :disabled="deleting"
-            class="flex-1 rounded-xl bg-red-600 px-4 py-2 theme-text-light hover:bg-red-700 disabled:opacity-50"
-          >
+          </Button>
+          <Button variant="destructive" @click="deleteUser" :disabled="deleting" class="flex-1">
             {{ deleting ? $t('labels.deleting') : $t('labels.delete') }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -302,13 +284,17 @@ import { useI18n } from 'vue-i18n'
 import { getUsers, getUserRoles, createUser, updateUser, deleteUser, adminResetUserPassword } from '@/api'
 import Pagination from '@/components/shared/Pagination.vue'
 import RowActions from '@/components/shared/RowActions.vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { PencilIcon, TrashIcon, KeyIcon } from '@acme/icon-packs/legacy'
 
 export default {
   name: 'UsersList',
   components: {
     Pagination,
-    RowActions
+    RowActions,
+    Button,
+    Input
   },
   setup() {
     const { locale } = useI18n()

@@ -1,10 +1,12 @@
 <template>
-  <button
+  <Button
+    variant="ghost"
+    :size="size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon'"
     type="button"
     :disabled="disabled || loading"
     :title="label"
     :aria-label="label"
-    class="action-btn"
+    class="action-btn shadcn-ui"
     :class="[`action-btn--${tone}`, `action-btn--${size}`, { 'action-btn--disabled': disabled || loading }]"
     @click.stop="$emit('click', $event)"
   >
@@ -14,10 +16,12 @@
     </svg>
     <component :is="icon" v-else class="action-btn__icon" aria-hidden="true" />
     <span v-if="label && showLabel" class="action-btn__label">{{ label }}</span>
-  </button>
+  </Button>
 </template>
 
 <script>
+import { Button } from '@/components/ui/button'
+
 /**
  * Unified icon action button used by every table/list row action.
  *
@@ -33,6 +37,7 @@
  */
 export default {
   name: 'ActionButton',
+  components: { Button },
   props: {
     icon: { type: [Object, Function], default: null },
     label: { type: String, default: '' },

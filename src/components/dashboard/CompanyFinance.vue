@@ -15,48 +15,57 @@
       <div :class="['flex items-center justify-between mb-3']">
         <div class="flex items-center gap-2">
           <h3 :class="['text-sm font-semibold theme-accent-strong', isRTL ? 'text-end' : 'text-start']">{{ $t('finance.wallets') }}</h3>
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
             @click="sidebarCollapsed = !sidebarCollapsed"
-            class="sidebar-toggle-glow theme-text-muted hover:theme-text-secondary transition-colors p-1 rounded"
+            class="sidebar-toggle-glow theme-text-muted hover:theme-text-secondary p-1"
             :title="sidebarCollapsed ? ($t('finance.showSidebar') || 'Show wallets') : ($t('finance.hideSidebar') || 'Hide wallets')"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path v-if="!sidebarCollapsed && !isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
               <path v-else-if="sidebarCollapsed && !isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-              <!-- RTL variants (flip directions) -->
               <path v-if="!sidebarCollapsed && isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
               <path v-else-if="sidebarCollapsed && isRTL" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div class="flex items-center gap-2">
-          <button v-if="previousOrders.length" @click="undoOrder" title="Undo"
-            class="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-xs">Undo</button>
+          <Button v-if="previousOrders.length" type="button" variant="secondary" size="sm" @click="undoOrder" title="Undo" class="px-2 py-1 text-xs">
+            Undo
+          </Button>
           <span v-if="savingOrder" class="text-xs theme-caption">Saving...</span>
         </div>
       </div>
 
       <!-- Main Treasury (drop target) -->
       <div class="mb-3">
-        <button @click="selectBranch(null)" @dragover.prevent="onDragOverMain" @dragleave="dragOverMain = false"
+        <Button
+          type="button"
+          @click="selectBranch(null)"
+          @dragover.prevent="onDragOverMain"
+          @dragleave="dragOverMain = false"
           @drop.prevent="onDropOnMain"
-          :class="[selectedBranch === null ? 'theme-button' : 'bg-white theme-accent-strong', 'w-full px-3 py-2 rounded transition border', dragOverMain ? 'border-dashed border-2 theme-border' : '']">
-          <div class="flex items-center justify-between">
-            <span class="font-semibold">{{ $t('finance.companyWallet') }}</span>
-            <svg v-if="dragOverMain" class="w-4 h-4 theme-text-light/60" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-          </div>
-        </button>
+          :variant="selectedBranch === null ? 'default' : 'outline'"
+          class="w-full justify-between px-3 py-2"
+          :class="dragOverMain ? 'border-dashed border-2 theme-border' : ''"
+        >
+          <span class="font-semibold">{{ $t('finance.companyWallet') }}</span>
+          <svg v-if="dragOverMain" class="w-4 h-4 theme-text-light/60" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </Button>
       </div>
 
       <!-- Sub-wallets header -->
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-          <button @click="sublistOpen = !sublistOpen"
-            class="text-xs theme-text-secondary px-2 py-1 rounded hover:bg-gray-50">{{ sublistOpen ? '▼' : '▶' }}</button>
+          <Button type="button" variant="ghost" size="icon-sm" @click="sublistOpen = !sublistOpen" class="text-xs theme-text-secondary px-2 py-1 rounded hover:bg-gray-50">
+            {{ sublistOpen ? '▼' : '▶' }}
+          </Button>
           <span class="text-xs theme-text-secondary">{{ $t('finance.subWallets') || 'Sub-wallets' }}</span>
         </div>
         <div class="text-xs theme-caption">{{ branches.length }}</div>
@@ -87,12 +96,9 @@
             </div>
 
             <div class="flex items-center gap-2 ml-3">
-              <button @click.stop="openEditBranch(branch)" title="Edit"
-                class="px-2 py-1 rounded hover:bg-gray-50 text-xs">✏️</button>
-              <button @click.stop="togglePin(index)" title="Pin"
-                class="px-2 py-1 rounded hover:bg-gray-50 text-xs">📌</button>
-              <button @click.stop="promoteToTop(index)" title="Promote"
-                class="px-2 py-1 rounded hover:bg-gray-50 text-xs">⬆️</button>
+              <Button type="button" variant="ghost" size="icon-xs" @click.stop="openEditBranch(branch)" title="Edit" class="px-2 py-1 rounded hover:bg-gray-50 text-xs">✏️</Button>
+              <Button type="button" variant="ghost" size="icon-xs" @click.stop="togglePin(index)" title="Pin" class="px-2 py-1 rounded hover:bg-gray-50 text-xs">📌</Button>
+              <Button type="button" variant="ghost" size="icon-xs" @click.stop="promoteToTop(index)" title="Promote" class="px-2 py-1 rounded hover:bg-gray-50 text-xs">⬆️</Button>
             </div>
           </li>
         </ul>
@@ -102,15 +108,16 @@
 
     <!-- Floating Show Sidebar button when collapsed -->
     <div v-if="sidebarCollapsed" :class="['fixed top-20 right-6 z-40', isRTL ? 'left-6 right-auto' : '']">
-      <button
+      <Button
+        type="button"
         @click="sidebarCollapsed = false"
-        class="theme-button p-4 rounded-full shadow-xl transition-all duration-200 flex items-center justify-center"
+        class="p-4 rounded-full shadow-xl transition-all duration-200 flex items-center justify-center"
         :title="$t('finance.showSidebar') || 'Show wallets'"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
-      </button>
+      </Button>
     </div>
     <!-- Main Content -->
     <div :class="['w-[72%] flex-1 p-4 sm:p-6 space-y-6 transition-all duration-200', isRTL ? 'text-end' : 'text-start']">
@@ -1046,14 +1053,13 @@ import { ref, onMounted, computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getBranches, getBranchWalletSummary, getBranchExpenses, getExpenses, getExpensesSummary, getLocations, getExpenseCategories, createExpenseCategory, createExpense, createBranch, createLocation, createExpenseSubCategory, saveBranchesOrder, updateBranch, transferFromCompanyToBranch, transferFromBranchToCompany, transferFromBranchToBranch } from '@/api'
 import { useCompanyFinanceStore } from '@/stores/useCompanyFinanceStore'
-
+import { Button } from '@/components/ui/button'
 import AddFieldModal from '@/components/shared/AddFieldModal.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { getTodayISO } from '@/utils/dateUtils'
-
 export default {
   name: 'CompanyFinance',
-  components: { AddFieldModal, DateField },
+  components: { AddFieldModal, Button, DateField },
   setup() {
     const financeStore = useCompanyFinanceStore()
     const showTransferModal = ref(false)

@@ -103,7 +103,37 @@ module.exports = {
           700: 'rgb(var(--theme-primary-700) / <alpha-value>)',
           800: 'rgb(var(--theme-primary-800) / <alpha-value>)',
           900: 'rgb(var(--theme-primary-900) / <alpha-value>)',
-          DEFAULT: 'rgb(var(--theme-primary-500) / <alpha-value>)'
+          DEFAULT: 'rgb(var(--theme-primary-500) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-primary-foreground) / <alpha-value>)'
+        },
+        background: 'hsl(var(--shadcn-background) / <alpha-value>)',
+        foreground: 'hsl(var(--shadcn-foreground) / <alpha-value>)',
+        border: 'hsl(var(--shadcn-border) / <alpha-value>)',
+        input: 'hsl(var(--shadcn-input) / <alpha-value>)',
+        ring: 'hsl(var(--shadcn-ring) / <alpha-value>)',
+        card: {
+          DEFAULT: 'hsl(var(--shadcn-card) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-card-foreground) / <alpha-value>)'
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--shadcn-popover) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-popover-foreground) / <alpha-value>)'
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--shadcn-secondary) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-secondary-foreground) / <alpha-value>)'
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--shadcn-muted) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-muted-foreground) / <alpha-value>)'
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--shadcn-accent) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-accent-foreground) / <alpha-value>)'
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--shadcn-destructive) / <alpha-value>)',
+          foreground: 'hsl(var(--shadcn-destructive-foreground) / <alpha-value>)'
         }
       },
       zIndex: {
@@ -116,5 +146,5 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 }
