@@ -155,20 +155,20 @@
 
       <!-- Summary Stats Bar -->
       <div :class="['flex items-center justify-end gap-3', isRTL ? 'text-end' : 'text-start']">
-        <button @click="openTransferModal"
+        <ShadcnButton variant="outline" size="native" @click="openTransferModal"
           class="px-4 py-2 bg-green-600 theme-text-light rounded-lg hover:bg-green-700 transition flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
           </svg>
           {{ $t('finance.transfer') || 'Transfer' }}
-        </button>
-        <button @click="openExpenseModal"
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="openExpenseModal"
           class="px-4 py-2 theme-button rounded-lg transition flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
           {{ $t('expenses.addExpense') || 'Add Expense' }}
-        </button>
+        </ShadcnButton>
       </div>
       <div :dir="isRTL ? 'rtl' : 'ltr'"
   class="grid gap-4 my-5
@@ -321,7 +321,7 @@
                       </div>
                     </div>
                   </div>
-                  <button type="button" @click="addSubcategoryPrompt(expensesFilters.categoryId)" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                  <ShadcnButton variant="outline" size="native" type="button" @click="addSubcategoryPrompt(expensesFilters.categoryId)" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</ShadcnButton>
                 </div>
               </div>
 
@@ -369,10 +369,10 @@
           />
 
           <div class="flex gap-2 items-center">
-            <button type="button" @click="clearExpensesFilters" :disabled="loading"
+            <ShadcnButton variant="outline" size="native" type="button" @click="clearExpensesFilters" :disabled="loading"
               class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-xs">
               {{ $t('labels.clear') || 'Clear' }}
-            </button>
+            </ShadcnButton>
             <div v-if="loading" class="ml-2">
               <div class="animate-spin rounded-full h-5 w-5 border-b-2 theme-border-accent"></div>
             </div>
@@ -572,18 +572,18 @@
           <div v-if="expenses.totalPages > 1"
             :class="['bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6', isRTL ? 'flex-row-reverse' : '']">
             <div :class="['flex-1 flex justify-between sm:hidden', isRTL ? 'flex-row-reverse' : '']">
-              <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
+              <ShadcnButton variant="outline" size="native" @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-xs font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ $t('labels.previous') }}
-              </button>
+              </ShadcnButton>
               <span :class="['text-xs theme-text-secondary self-center', isRTL ? 'order-2' : '']">
                 {{ expenses.page }} / {{ expenses.totalPages }}
               </span>
-              <button @click="changePage(expenses.page + 1)"
+              <ShadcnButton variant="outline" size="native" @click="changePage(expenses.page + 1)"
                 :disabled="expenses.page >= expenses.totalPages"
                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-xs font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 {{ $t('labels.next') }}
-              </button>
+              </ShadcnButton>
             </div>
             <div
               :class="['hidden sm:flex-1 sm:flex sm:items-center sm:justify-between', isRTL ? 'flex-row-reverse' : '']">
@@ -604,16 +604,16 @@
                   :class="['relative z-0 inline-flex rounded-md shadow-sm -space-x-px', isRTL ? 'flex-row-reverse' : '']">
                   <template v-if="!isRTL">
                     <!-- Previous Button (LTR: left) -->
-                    <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
+                    <ShadcnButton variant="outline" size="native" @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
                           clip-rule="evenodd" />
                       </svg>
-                    </button>
+                    </ShadcnButton>
                     <!-- Next Button (LTR: right) -->
-                    <button @click="changePage(expenses.page + 1)"
+                    <ShadcnButton variant="outline" size="native" @click="changePage(expenses.page + 1)"
                       :disabled="expenses.page >= expenses.totalPages"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -621,11 +621,11 @@
                           d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                           clip-rule="evenodd" />
                       </svg>
-                    </button>
+                    </ShadcnButton>
                   </template>
                   <template v-else>
                     <!-- Next Button (RTL: left, visually first) -->
-                    <button @click="changePage(expenses.page + 1)"
+                    <ShadcnButton variant="outline" size="native" @click="changePage(expenses.page + 1)"
                       :disabled="expenses.page >= expenses.totalPages"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-l-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -633,16 +633,16 @@
                           d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
                           clip-rule="evenodd" />
                       </svg>
-                    </button>
+                    </ShadcnButton>
                     <!-- Previous Button (RTL: right, visually last) -->
-                    <button @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
+                    <ShadcnButton variant="outline" size="native" @click="changePage(expenses.page - 1)" :disabled="expenses.page <= 1"
                       class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-xs font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-r-md">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                           d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                           clip-rule="evenodd" />
                       </svg>
-                    </button>
+                    </ShadcnButton>
                   </template>
                 </nav>
               </div>
@@ -660,11 +660,11 @@
               <h3 :class="['text-sm font-semibold theme-text-primary', isRTL ? 'text-start' : 'text-start']">
                 {{ $t('expenses.addExpense') || 'Add Expense' }}
               </h3>
-              <button @click="closeExpenseModal" class="theme-caption hover:theme-text-secondary">
+              <ShadcnButton variant="outline" size="native" @click="closeExpenseModal" class="theme-caption hover:theme-text-secondary">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
-              </button>
+              </ShadcnButton>
             </div>
 
             <form @submit.prevent="handleCreateExpense" class="grid gap-4 grid-cols-1 md:grid-cols-2">
@@ -694,7 +694,7 @@
                     <option :value="null">{{ $t('expenses.category') || 'Category' }}</option>
                     <option v-for="cat in expenseCategories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                   </select>
-                  <button type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                  <ShadcnButton variant="outline" size="native" type="button" @click="addCategoryPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</ShadcnButton>
                 </div>
               </div>
 
@@ -707,7 +707,7 @@
                   <option :value="null">{{ $t('expenses.subcategory') || 'Subcategory' }}</option>
                   <option v-for="sc in filteredSubcategoriesForForm" :key="sc.id" :value="sc.id">{{ sc.name }}</option>
                 </select>
-                <button type="button" @click="addSubcategoryPrompt()" class="ml-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                <ShadcnButton variant="outline" size="native" type="button" @click="addSubcategoryPrompt()" class="ml-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</ShadcnButton>
               </div>
 
               <!-- Kind (EXPENSE / ADVANCE) - Column 1 -->
@@ -792,7 +792,7 @@
                     <option :value="null">{{ $t('finance.companyWallet') || 'Main Treasury' }}</option>
                     <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{ branch.name }}</option>
                   </select>
-                  <button type="button" @click="addBranchPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                  <ShadcnButton variant="outline" size="native" type="button" @click="addBranchPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</ShadcnButton>
                 </div>
               </div>
 
@@ -810,7 +810,7 @@
                     <option :value="null">{{ $t('expenses.location') || 'Location' }}</option>
                     <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
                   </select>
-                  <button type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</button>
+                  <ShadcnButton variant="outline" size="native" type="button" @click="addLocationPrompt" class="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">+</ShadcnButton>
                 </div>
               </div>
 
@@ -845,21 +845,21 @@
 
               <!-- Buttons - Full Width -->
               <div :class="['col-span-1 md:col-span-2 flex gap-3 pt-4', isRTL ? 'flex-row-reverse' : '']">
-                <button 
+                <ShadcnButton variant="outline" size="native"
                   type="button" 
                   @click="closeExpenseModal"
                   class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   {{ $t('labels.cancel') || 'Cancel' }}
-                </button>
-                <button 
+                </ShadcnButton>
+                <ShadcnButton variant="outline" size="native"
                   type="submit" 
                   :disabled="expenseProcessing"
                   class="flex-1 px-4 py-2 theme-button rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
                   <div v-if="expenseProcessing" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   {{ expenseProcessing ? ($t('labels.processing') || 'Processing...') : ($t('expenses.addExpense') || 'Add Expense') }}
-                </button>
+                </ShadcnButton>
               </div>
             </form>
           </div>
@@ -884,14 +884,14 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus">
             </div>
             <div class="flex justify-end gap-3 pt-4">
-              <button type="button" @click="closeEditBranchModal"
+              <ShadcnButton variant="outline" size="native" type="button" @click="closeEditBranchModal"
                 class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition">
                 {{ $t('labels.cancel') || 'Cancel' }}
-              </button>
-              <button type="submit" :disabled="editBranchProcessing"
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" type="submit" :disabled="editBranchProcessing"
                 class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition">
                 {{ editBranchProcessing ? ($t('labels.processing') || 'Processing...') : ($t('labels.save') || 'Save') }}
-              </button>
+              </ShadcnButton>
             </div>
           </form>
         </div>
@@ -920,7 +920,7 @@
                   {{ $t('finance.transferType') }} *
                 </label>
                 <div class="flex gap-2">
-                  <button 
+                  <ShadcnButton variant="outline" size="native"
                     type="button"
                     @click="transferForm.transferType = 'toCompany'"
                     :class="[
@@ -931,8 +931,8 @@
                     ]"
                   >
                     {{ $t('finance.transferToCompany') }}
-                  </button>
-                  <button 
+                  </ShadcnButton>
+                  <ShadcnButton variant="outline" size="native"
                     type="button"
                     @click="transferForm.transferType = 'toBranch'"
                     :class="[
@@ -943,7 +943,7 @@
                     ]"
                   >
                     {{ $t('finance.transferToBranch') }}
-                  </button>
+                  </ShadcnButton>
                 </div>
               </div>
 
@@ -1023,20 +1023,20 @@
 
               <!-- Buttons - Full Width -->
               <div :class="['col-span-1 md:col-span-2 flex gap-3 pt-4', isRTL ? 'flex-row-reverse' : 'justify-end']">
-                <button 
+                <ShadcnButton variant="outline" size="native"
                   type="button" 
                   @click="closeTransferModal"
                   class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition"
                 >
                   {{ $t('labels.cancel') || 'Cancel' }}
-                </button>
-                <button 
+                </ShadcnButton>
+                <ShadcnButton variant="outline" size="native"
                   type="submit" 
                   :disabled="processing"
                   class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition"
                 >
                   {{ processing ? ($t('labels.processing') || 'Processing...') : ($t('finance.transfer') || 'Transfer') }}
-                </button>
+                </ShadcnButton>
               </div>
             </form>
           </div>

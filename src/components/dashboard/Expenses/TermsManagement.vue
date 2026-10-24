@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6" :class="{ 'direction-rtl': isRTL }">
     <PageHeader :title="$t('expenses.termsManagement')" :subtitle="$t('expenses.termsManagementSubtitle')">
-      <button
+      <ShadcnButton variant="outline" size="native"
         @click="activeTab === 'main' ? openAddCategoryModal() : openAddSubCategoryModal()"
         class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm"
       >
@@ -9,12 +9,12 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
         {{ activeTab === 'main' ? $t('expenses.addMainTerm') : 'إضافة بند فرعي' }}
-      </button>
+      </ShadcnButton>
     </PageHeader>
 
     <!-- Tabs: main terms pick their sub-terms from the one sub-terms list -->
     <div class="flex gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/80 w-full sm:w-fit">
-      <button
+      <ShadcnButton variant="outline" size="native"
         v-for="tab in tabs"
         :key="tab.id"
         type="button"
@@ -27,7 +27,7 @@
           class="text-xs px-2 py-0.5 rounded-full"
           :class="activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'"
         >{{ tab.count }}</span>
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Search & Tree Controls bar -->
@@ -47,7 +47,7 @@
 
       <div class="flex items-center gap-2 shrink-0">
         <template v-if="activeTab === 'main'">
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="expandAll"
             class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
           >
@@ -55,8 +55,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
             توسيع الكل
-          </button>
-          <button
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             @click="collapseAll"
             class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
           >
@@ -64,7 +64,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
             </svg>
             طي الكل
-          </button>
+          </ShadcnButton>
         </template>
         <svg v-if="refreshing" class="w-4 h-4 animate-spin text-emerald-600" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -103,7 +103,7 @@
           >
             <div class="flex items-center gap-3">
               <!-- Expand / Collapse Chevron Icon -->
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-transform duration-200 shadow-2xs"
                 :class="{ 'rotate-90': isExpanded(cat.id) }"
@@ -111,7 +111,7 @@
                 <svg class="w-4 h-4" :class="isRTL ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
-              </button>
+              </ShadcnButton>
 
               <!-- Folder Icon & Category Title -->
               <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-sm shadow-2xs border border-emerald-200/60">
@@ -131,7 +131,7 @@
 
             <!-- Actions (Pick Subs, Edit, Delete) -->
             <div class="flex items-center gap-2" @click.stop>
-              <button
+              <ShadcnButton variant="outline" size="native"
                 @click="openPickerModal(cat)"
                 class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 shadow-2xs"
               >
@@ -139,9 +139,9 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                 </svg>
                 اختيار البنود الفرعية
-              </button>
+              </ShadcnButton>
 
-              <button
+              <ShadcnButton variant="outline" size="native"
                 @click="openEditCategoryModal(cat)"
                 class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 :title="$t('expenses.editMainTerm')"
@@ -149,9 +149,9 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg>
-              </button>
+              </ShadcnButton>
 
-              <button
+              <ShadcnButton variant="outline" size="native"
                 @click="confirmDeleteCategory(cat)"
                 class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 :title="$t('expenses.deleteMainTerm')"
@@ -159,7 +159,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                 </svg>
-              </button>
+              </ShadcnButton>
             </div>
           </div>
 
@@ -194,7 +194,7 @@
                 </div>
 
                 <div class="flex items-center gap-1">
-                  <button
+                  <ShadcnButton variant="outline" size="native"
                     @click="openEditSubCategoryModal(subCat)"
                     class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                     :title="$t('expenses.editSubcategory')"
@@ -202,8 +202,8 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                     </svg>
-                  </button>
-                  <button
+                  </ShadcnButton>
+                  <ShadcnButton variant="outline" size="native"
                     @click="confirmUnlinkSubCategory(cat, subCat)"
                     class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                     title="إزالة من هذا البند الرئيسي"
@@ -211,7 +211,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                  </button>
+                  </ShadcnButton>
                 </div>
               </div>
             </div>
@@ -260,21 +260,21 @@
                 <td>{{ sub.expenseCount }}</td>
                 <td class="actions-col">
                   <div class="flex items-center gap-1">
-                    <button
+                    <ShadcnButton variant="outline" size="native"
                       @click="openEditSubCategoryModal(sub)"
                       class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
                       :title="$t('expenses.editSubcategory')"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                    </button>
-                    <button
+                    </ShadcnButton>
+                    <ShadcnButton variant="outline" size="native"
                       @click="confirmDeleteSubCategory(sub)"
                       :disabled="sub.expenseCount > 0"
                       class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 disabled:cursor-not-allowed"
                       :title="sub.expenseCount > 0 ? 'عليه مصروفات — احذف المصروفات أولاً' : $t('expenses.deleteSubcategory')"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
+                    </ShadcnButton>
                   </div>
                 </td>
               </tr>
@@ -288,12 +288,12 @@
             <div class="flex items-start justify-between gap-3 mb-2">
               <h3 class="font-semibold theme-text-primary break-words">{{ sub.name }}</h3>
               <div class="flex items-center gap-1 shrink-0">
-                <button @click="openEditSubCategoryModal(sub)" class="p-1.5 text-slate-400 hover:text-blue-600 rounded-md" :title="$t('expenses.editSubcategory')">
+                <ShadcnButton variant="outline" size="native" @click="openEditSubCategoryModal(sub)" class="p-1.5 text-slate-400 hover:text-blue-600 rounded-md" :title="$t('expenses.editSubcategory')">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                </button>
-                <button @click="confirmDeleteSubCategory(sub)" :disabled="sub.expenseCount > 0" class="p-1.5 text-slate-400 hover:text-red-600 rounded-md disabled:opacity-30" :title="$t('expenses.deleteSubcategory')">
+                </ShadcnButton>
+                <ShadcnButton variant="outline" size="native" @click="confirmDeleteSubCategory(sub)" :disabled="sub.expenseCount > 0" class="p-1.5 text-slate-400 hover:text-red-600 rounded-md disabled:opacity-30" :title="$t('expenses.deleteSubcategory')">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
+                </ShadcnButton>
               </div>
             </div>
             <div class="text-sm space-y-1">
@@ -316,7 +316,7 @@
             <h3 class="font-bold text-lg">{{ categoryModal.isEdit ? $t('expenses.editMainTerm') : $t('expenses.addMainTerm') }}</h3>
             <p v-if="!categoryModal.isEdit" class="text-emerald-100 text-xs mt-0.5">اضغط Tab لإضافة سطر جديد</p>
           </div>
-          <button @click="categoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
+          <ShadcnButton variant="outline" size="native" @click="categoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</ShadcnButton>
         </div>
 
         <form @submit.prevent="saveCategory" class="p-6 space-y-4">
@@ -359,7 +359,7 @@
                 @keydown.tab.prevent="onCategoryRowTab(idx)"
               />
               <!-- Duplicate btn -->
-              <button
+              <ShadcnButton variant="outline" size="native"
                 v-if="row.trim()"
                 type="button"
                 @click="duplicateCategoryRow(idx)"
@@ -367,9 +367,9 @@
                 title="تكرار"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-              </button>
+              </ShadcnButton>
               <!-- Delete btn -->
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 @click="removeCategoryRow(idx)"
                 :disabled="categoryModal.rows.length === 1"
@@ -377,30 +377,30 @@
                 title="حذف"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
+              </ShadcnButton>
             </div>
 
             <!-- Add row manually -->
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="addCategoryRow"
               class="w-full mt-1 py-2 border-2 border-dashed border-slate-200 hover:border-emerald-400 text-slate-400 hover:text-emerald-600 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
               إضافة سطر
-            </button>
+            </ShadcnButton>
           </div>
 
           <!-- Buttons -->
           <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="categoryModal.open = false"
               class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
             >
               {{ $t('labels.cancel') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="submit"
               :disabled="saving || (!categoryModal.isEdit && categoryModal.rows.every(r => !r.trim()))"
               class="px-5 py-2 text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-2"
@@ -410,7 +410,7 @@
                 حفظ {{ categoryModal.rows.filter(r=>r.trim()).length }} بنود
               </span>
               <span v-else>{{ saving ? $t('labels.saving') : $t('labels.save') }}</span>
-            </button>
+            </ShadcnButton>
           </div>
         </form>
       </div>
@@ -426,7 +426,7 @@
               {{ subCategoryModal.isEdit ? 'الاسم الجديد يظهر في كل البنود الرئيسية المرتبطة وفي مصروفاته' : 'اضغط Tab لإضافة سطر جديد' }}
             </p>
           </div>
-          <button @click="subCategoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
+          <ShadcnButton variant="outline" size="native" @click="subCategoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</ShadcnButton>
         </div>
 
         <form @submit.prevent="saveSubCategory" class="p-6 space-y-4">
@@ -469,7 +469,7 @@
                 @keydown.tab.prevent="onSubCategoryRowTab(idx)"
               />
               <!-- Delete btn -->
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 @click="removeSubCategoryRow(idx)"
                 :disabled="subCategoryModal.rows.length === 1"
@@ -477,30 +477,30 @@
                 title="حذف"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
+              </ShadcnButton>
             </div>
 
             <!-- Add row manually -->
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="addSubCategoryRow"
               class="w-full mt-1 py-2 border-2 border-dashed border-slate-200 hover:border-emerald-400 text-slate-400 hover:text-emerald-600 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
               إضافة سطر
-            </button>
+            </ShadcnButton>
           </div>
 
           <!-- Buttons -->
           <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="subCategoryModal.open = false"
               class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
             >
               {{ $t('labels.cancel') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="submit"
               :disabled="saving || (!subCategoryModal.isEdit && subCategoryModal.rows.every(r => !r.trim()))"
               class="px-4 py-2 text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 flex items-center gap-1.5"
@@ -510,7 +510,7 @@
                 حفظ {{ subCategoryModal.rows.filter(r=>r.trim()).length }} بنود فرعية
               </span>
               <span v-else>{{ saving ? $t('labels.saving') : $t('labels.save') }}</span>
-            </button>
+            </ShadcnButton>
           </div>
         </form>
       </div>
@@ -524,7 +524,7 @@
             <h3 class="font-bold text-lg">اختيار البنود الفرعية</h3>
             <p class="text-emerald-100 text-xs mt-0.5">{{ $t('expenses.mainTerm') }}: <span class="font-semibold text-white">{{ pickerModal.categoryName }}</span></p>
           </div>
-          <button @click="pickerModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
+          <ShadcnButton variant="outline" size="native" @click="pickerModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</ShadcnButton>
         </div>
 
         <div class="p-4 border-b border-slate-100 space-y-2 shrink-0">
@@ -538,13 +538,13 @@
           />
           <div class="flex items-center justify-between text-xs">
             <span class="text-slate-500">تم اختيار {{ pickerModal.selected.length }} من {{ subCategories.length }}</span>
-            <button
+            <ShadcnButton variant="outline" size="native"
               v-if="canAddPickerSearch"
               type="button"
               @click="addPickerSearchAsSub"
               :disabled="saving"
               class="text-emerald-700 font-semibold hover:underline disabled:opacity-50"
-            >+ إضافة "{{ pickerModal.search.trim() }}" للقائمة واختياره</button>
+            >+ إضافة "{{ pickerModal.search.trim() }}" للقائمة واختياره</ShadcnButton>
           </div>
         </div>
 
@@ -569,14 +569,14 @@
         </div>
 
         <div class="flex justify-end gap-2 p-4 border-t border-slate-100 shrink-0">
-          <button
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="pickerModal.open = false"
             class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
           >
             {{ $t('labels.cancel') }}
-          </button>
-          <button
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="savePicker"
             :disabled="saving"
@@ -584,7 +584,7 @@
           >
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
             {{ saving ? $t('labels.saving') : $t('labels.save') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>

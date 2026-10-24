@@ -18,8 +18,8 @@
           <div class="text-2xl font-semibold theme-text">{{ formatCurrency(wallet && wallet.totalDeposits) }}</div>
         </div>
         <div class="ml-auto flex items-center gap-2 px-2">
-          <button @click="openDepositModal" class="px-2 py-1 sm:px-3 sm:py-1 theme-button rounded text-xs sm:text-sm">{{ $t('labels.manualDeposit') }}</button>
-          <button @click="openWithdrawModal" class="px-2 py-1 sm:px-3 sm:py-1 border rounded text-xs sm:text-sm">{{ $t('labels.pay') || 'Pay' }}</button>
+          <ShadcnButton variant="outline" size="native" @click="openDepositModal" class="px-2 py-1 sm:px-3 sm:py-1 theme-button rounded text-xs sm:text-sm">{{ $t('labels.manualDeposit') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="openWithdrawModal" class="px-2 py-1 sm:px-3 sm:py-1 border rounded text-xs sm:text-sm">{{ $t('labels.pay') || 'Pay' }}</ShadcnButton>
         </div>
       </div>
     </div>
@@ -76,7 +76,7 @@
       <div class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.withdraw') || 'Withdraw' }}</h3>
-          <button @click="closeWithdrawModal" class="theme-caption hover:theme-text-secondary">✕</button>
+          <ShadcnButton variant="outline" size="native" @click="closeWithdrawModal" class="theme-caption hover:theme-text-secondary">✕</ShadcnButton>
         </div>
         <div class="grid gap-3">
           <label>
@@ -94,8 +94,8 @@
           <div v-if="withdrawalError" class="text-red-600">{{ withdrawalError }}</div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button @click="closeWithdrawModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
-          <button @click="submitWithdrawal" :disabled="withdrawalSubmitting" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ withdrawalSubmitting ? $t('labels.saving') : ($t('labels.pay') || 'Pay') }}</button>
+          <ShadcnButton variant="outline" size="native" @click="closeWithdrawModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="submitWithdrawal" :disabled="withdrawalSubmitting" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ withdrawalSubmitting ? $t('labels.saving') : ($t('labels.pay') || 'Pay') }}</ShadcnButton>
         </div>
       </div>
     </div>
@@ -105,7 +105,7 @@
       <div class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.manualDeposit') }}</h3>
-          <button @click="closeDepositModal" class="theme-caption hover:theme-text-secondary">✕</button>
+          <ShadcnButton variant="outline" size="native" @click="closeDepositModal" class="theme-caption hover:theme-text-secondary">✕</ShadcnButton>
         </div>
         <div class="grid gap-3">
           <label>
@@ -154,8 +154,8 @@
           </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button @click="closeDepositModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</button>
-          <button @click="confirmDeposit" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ $t('labels.deposit') }}</button>
+          <ShadcnButton variant="outline" size="native" @click="closeDepositModal" class="px-3 py-1 border rounded theme-text-secondary text-xs sm:text-sm">{{ $t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="confirmDeposit" class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded text-xs sm:text-sm">{{ $t('labels.deposit') }}</ShadcnButton>
         </div>
       </div>
     </div>

@@ -327,15 +327,15 @@
       </div>
 
       <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-        <button
+        <ShadcnButton variant="outline" size="native"
           @click="goToPage(currentPage - 1)"
           :disabled="currentPage === 1"
           class="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {{ $t('supply.previous') }}
-        </button>
+        </ShadcnButton>
 
-        <button
+        <ShadcnButton variant="outline" size="native"
           v-for="page in visiblePages"
           :key="page"
           @click="goToPage(page)"
@@ -347,15 +347,15 @@
           ]"
         >
           {{ page }}
-        </button>
+        </ShadcnButton>
         
-        <button 
+        <ShadcnButton variant="outline" size="native"
           @click="goToPage(currentPage + 1)"
           :disabled="currentPage === totalPages"
           class="px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {{ $t('supply.next') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -393,7 +393,7 @@
                 <span class="theme-text-secondary">{{ rows.length }} سطر</span>
                 <span class="font-semibold theme-text-primary">الإجمالي: {{ formatCurrency(step2Total) }}</span>
               </div>
-              <button @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</button>
+              <ShadcnButton variant="outline" size="native" @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</ShadcnButton>
             </div>
 
             <!-- Body -->
@@ -450,9 +450,9 @@
                       <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $t('expenses.modalStepTwoTitle') }}</h4>
                       <p class="mt-1 text-xs theme-text-muted">{{ $t('expenses.modalStepTwoHint') }}</p>
                     </div>
-                    <button type="button" @click="addRow" class="theme-button px-3 py-2 rounded-lg text-sm font-medium shadow-sm">
+                    <ShadcnButton variant="outline" size="native" type="button" @click="addRow" class="theme-button px-3 py-2 rounded-lg text-sm font-medium shadow-sm">
                       + {{ $t('expenses.addRow') }}
-                    </button>
+                    </ShadcnButton>
                   </div>
 
                   <div class="p-4 sm:p-5">
@@ -576,12 +576,12 @@
                             </td>
                             <td class="actions-col px-1 py-2 text-center" style="min-width:5rem;width:5rem">
                               <div class="flex justify-center gap-1">
-                                <button type="button" @click="duplicateRow(index)" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-emerald-700" title="Duplicate">
+                                <ShadcnButton variant="outline" size="native" type="button" @click="duplicateRow(index)" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-emerald-700" title="Duplicate">
                                   ⧉
-                                </button>
-                                <button type="button" @click="removeRow(index)" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-red-600" title="Delete">
+                                </ShadcnButton>
+                                <ShadcnButton variant="outline" size="native" type="button" @click="removeRow(index)" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-red-600" title="Delete">
                                   ×
-                                </button>
+                                </ShadcnButton>
                               </div>
                             </td>
                           </tr>
@@ -596,23 +596,23 @@
 
             <!-- Footer -->
             <div class="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-3" :dir="isRTL ? 'rtl' : 'ltr'">
-              <button 
+              <ShadcnButton variant="outline" size="native"
                 type="button" 
                 @click="closeModal"
                 class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm"
               >
                 {{ $t('labels.cancel') }}
-              </button>
-              <button v-if="modalStep===2" type="button" @click="modalStep=1" class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm">
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" v-if="modalStep===2" type="button" @click="modalStep=1" class="px-5 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-100 font-medium theme-text-secondary transition text-sm">
                 {{ $t('labels.back') }}
-              </button>
-              <button v-if="modalStep===1" type="button" @click="validateStep1() && (modalStep=2)" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md transition text-sm">
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" v-if="modalStep===1" type="button" @click="validateStep1() && (modalStep=2)" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md transition text-sm">
                 {{ $t('labels.next') }}
-              </button>
-              <button v-else type="submit" form="expenseForm" :disabled="saving" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2">
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" v-else type="submit" form="expenseForm" :disabled="saving" class="px-6 py-2.5 theme-button rounded-xl font-semibold shadow-md disabled:opacity-50 transition text-sm flex items-center gap-2">
                 <div v-if="saving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                 {{ saving ? $t('labels.saving') : (editing ? $t('labels.saveChanges') : $t('labels.save')) }}
-              </button>
+              </ShadcnButton>
             </div>
           </div>
         </div>
@@ -642,7 +642,7 @@
         
         <!-- Quick Select Options -->
         <div class="space-y-2">
-          <button 
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="selectedLocation = 'downloads'"
             :class="[
@@ -660,9 +660,9 @@
               <div class="font-medium theme-text-primary">{{ $t('expenses.downloads') }}</div>
               <div class="text-xs theme-text-muted">~/Downloads</div>
             </div>
-          </button>
+          </ShadcnButton>
 
-          <button 
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="selectedLocation = 'documents'"
             :class="[
@@ -680,9 +680,9 @@
               <div class="font-medium theme-text-primary">{{ $t('expenses.documents') }}</div>
               <div class="text-xs theme-text-muted">~/Documents</div>
             </div>
-          </button>
+          </ShadcnButton>
 
-          <button 
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="selectedLocation = 'desktop'"
             :class="[
@@ -700,7 +700,7 @@
               <div class="font-medium theme-text-primary">{{ $t('expenses.desktop') }}</div>
               <div class="text-xs theme-text-muted">~/Desktop</div>
             </div>
-          </button>
+          </ShadcnButton>
         </div>
 
         <!-- Custom Path -->

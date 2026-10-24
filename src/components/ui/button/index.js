@@ -19,6 +19,7 @@ export const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
+        native: "h-10 min-h-10 min-w-10 gap-2 px-4 py-2 text-sm leading-5",
         default:
           'h-8 gap-1.5 px-2.5 has-[[data-icon=inline-end]]:pe-2 has-[[data-icon=inline-start]]:ps-2',
         xs: 'h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs has-[[data-icon=inline-end]]:pe-1.5 has-[[data-icon=inline-start]]:ps-1.5 [&_svg:not([class*=size-])]:size-3',

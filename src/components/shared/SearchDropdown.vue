@@ -1,35 +1,36 @@
 <template>
   <div ref="rootRef" class="shadcn-ui relative w-full">
     <slot name="prefix"></slot>
-    <input
-      ref="inputRef"
-      :value="modelValue"
+    <Input
+      :model-value="modelValue == null ? '' : modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
       :class="[effectiveInputClass, isRTL ? 'text-right' : 'text-left', clearable && hasValue ? 'pe-8' : '']"
       :dir="dir"
-      @input="handleInput"
+      @update:model-value="handleModelUpdate"
       @focus="handleFocus"
       @blur="handleBlur"
       @keydown="handleKeydown"
     />
-    <button
+    <Button
       v-if="clearable && hasValue && !disabled"
       type="button"
+      variant="ghost"
+      size="icon-xs"
       tabindex="-1"
-      class="absolute end-1.5 top-1/2 -translate-y-1/2 flex items-center justify-center size-5 rounded text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:outline-none transition-colors"
+      class="absolute end-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:bg-muted/50 hover:text-foreground"
       :aria-label="clearAriaLabel"
       @mousedown.prevent
       @click="clearValue"
     >
-      <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M18 6L6 18M6 6l12 12" />
       </svg>
-    </button>
+    </Button>
     <div
       v-if="isOpen && !teleportTarget"
       ref="options"
-      class="shadcn-ui absolute top-full left-0 right-0 z-50 mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-1"
+      class="shadcn-ui absolute top-full left-0 right-0 z-[var(--layout-z-popover,220)] mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-1"
       @mousedown.prevent
     >
       <div v-if="filteredItems.length" class="space-y-0.5">
@@ -52,7 +53,7 @@
     <teleport v-else-if="isOpen && teleportTarget" :to="teleportTarget">
       <div
         ref="optionsRef"
-        class="shadcn-ui absolute z-[9999] max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-xl p-1"
+        class="shadcn-ui absolute z-[var(--layout-z-popover,220)] max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-xl p-1"
         :style="dropdownStyle"
         @mousedown.prevent
       >
@@ -78,9 +79,12 @@
 
 <script>
 import { computed, onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export default {
   name: 'SearchDropdown',
+  components: { Button, Input },
   props: {
     modelValue: {
       type: [String, Number, Object, null],
@@ -120,7 +124,7 @@ export default {
     },
     teleportTarget: {
       type: String,
-      default: ''
+      default: 'body'
     },
     clearable: {
       type: Boolean,
@@ -143,7 +147,6 @@ export default {
   setup(props, { emit }) {
     const isRTL = computed(() => (props.dir || '').toLowerCase() === 'rtl')
     const rootRef = ref(null)
-    const inputRef = ref(null)
     const optionsRef = ref(null)
     const optionItems = ref([])
     const isOpen = ref(false)
@@ -151,7 +154,7 @@ export default {
     const dropdownStyle = ref({})
 
     const effectiveInputClass = computed(() => {
-      const base = 'border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive disabled:bg-input/50 h-8 rounded-lg border bg-transparent px-2.5 py-1 text-sm w-full min-w-0 outline-none placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 transition-colors focus-visible:ring-2'
+      const base = ''
       const raw = props.inputClass || ''
       let list = []
       if (typeof raw === 'string') {
@@ -225,7 +228,7 @@ export default {
     const updateDropdownPosition = async () => {
       if (!props.teleportTarget) return
       await nextTick()
-      const inputEl = inputRef.value
+      const inputEl = rootRef.value?.querySelector('[data-slot="input"]')
       const targetElement = document.querySelector(props.teleportTarget)
       if (!inputEl || !targetElement) return
 
@@ -238,17 +241,15 @@ export default {
         const spaceBelow = window.innerHeight - inputRect.bottom - viewportPadding
         const spaceAbove = inputRect.top - viewportPadding
         const openAbove = spaceBelow < Math.min(maxDropdownHeight, spaceAbove) && spaceAbove > spaceBelow
-        const availableHeight = Math.max(
-          0,
-          Math.min(maxDropdownHeight, openAbove ? spaceAbove : spaceBelow)
-        )
+        const availableHeight = Math.min(maxDropdownHeight, Math.max(0, openAbove ? spaceAbove : spaceBelow))
 
         dropdownStyle.value = {
           position: 'fixed',
           top: `${openAbove ? Math.max(viewportPadding, inputRect.top - availableHeight) : inputRect.bottom}px`,
           left: `${inputRect.left}px`,
           width: `${inputRect.width}px`,
-          maxHeight: `${availableHeight}px`
+          maxHeight: `${availableHeight}px`,
+          zIndex: 'var(--layout-z-popover, 220)'
         }
         return
       }
@@ -299,8 +300,7 @@ export default {
       closeDropdown()
     }
 
-    const handleInput = (event) => {
-      const val = event.target.value
+    const handleModelUpdate = (val) => {
       emit('update:modelValue', val)
       if (!isOpen.value) {
         openDropdown()
@@ -397,7 +397,6 @@ export default {
 
     return {
       rootRef,
-      inputRef,
       optionsRef,
       optionItems,
       isOpen,
@@ -409,7 +408,7 @@ export default {
       getKey,
       getLabel,
       getDisplayLabel,
-      handleInput,
+      handleModelUpdate,
       handleFocus,
       handleBlur,
       handleKeydown,

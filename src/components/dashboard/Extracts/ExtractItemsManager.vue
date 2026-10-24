@@ -4,8 +4,8 @@
 
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
-        <button @click="openAddModal" class="bg-green-600 theme-text-light px-4 py-2 rounded">{{ $t('labels.add') }}</button>
-        <button @click="loadItems" class="px-3 py-2 border rounded">{{ $t('refresh') }}</button>
+        <ShadcnButton variant="outline" size="native" @click="openAddModal" class="bg-green-600 theme-text-light px-4 py-2 rounded">{{ $t('labels.add') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="loadItems" class="px-3 py-2 border rounded">{{ $t('refresh') }}</ShadcnButton>
       </div>
       <div v-if="error" class="text-red-600">{{ error }}</div>
     </div>
@@ -38,9 +38,9 @@
             </td>
             <td class="p-2">{{ it.availableForExports ? $t('labels.yes') : $t('labels.no') }}</td>
             <td class="p-2 flex gap-2">
-              <button v-if="editingId !== it.id" @click="startEdit(it)" class="px-2 py-1 border rounded">{{ $t('edit') }}</button>
-              <button v-else @click="saveEdit(it)" class="px-2 py-1 theme-button rounded">{{ $t('save') }}</button>
-              <button @click="removeItem(it)" class="px-2 py-1 border rounded text-red-600">{{ $t('delete') }}</button>
+              <ShadcnButton variant="outline" size="native" v-if="editingId !== it.id" @click="startEdit(it)" class="px-2 py-1 border rounded">{{ $t('edit') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" v-else @click="saveEdit(it)" class="px-2 py-1 theme-button rounded">{{ $t('save') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="removeItem(it)" class="px-2 py-1 border rounded text-red-600">{{ $t('delete') }}</ShadcnButton>
             </td>
           </tr>
           <tr v-if="!items || !items.length"><td class="p-4 text-center" colspan="5">{{ $t('noData') }}</td></tr>

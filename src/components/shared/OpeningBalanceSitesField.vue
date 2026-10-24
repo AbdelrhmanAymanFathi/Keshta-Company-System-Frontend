@@ -25,21 +25,21 @@
           :placeholder="isAr ? 'المبلغ' : 'Amount'"
           class="w-32 sm:w-44 px-3 py-2 border rounded theme-input-focus"
         />
-        <button
+        <ShadcnButton variant="outline" size="native"
           type="button"
           @click="remove(i)"
           class="shrink-0 rounded-lg border border-red-200 bg-red-50 p-2 text-red-700 hover:bg-red-100"
           :title="isAr ? 'حذف' : 'Remove'"
         >
           <XMarkIcon class="h-4 w-4" />
-        </button>
+        </ShadcnButton>
       </div>
     </div>
     <div class="mt-2 flex items-center justify-between gap-3 text-sm">
-      <button type="button" @click="add" class="inline-flex items-center gap-1 theme-text hover:underline">
+      <ShadcnButton variant="outline" size="native" type="button" @click="add" class="inline-flex items-center gap-1 theme-text hover:underline">
         <PlusIcon class="h-4 w-4" />
         {{ isAr ? 'إضافة موقع' : 'Add site' }}
-      </button>
+      </ShadcnButton>
       <span v-if="modelValue.length > 1" class="theme-text-muted">
         {{ isAr ? 'الإجمالي:' : 'Total:' }}
         <span dir="ltr" class="font-medium theme-text-primary">{{ formattedTotal }}</span>

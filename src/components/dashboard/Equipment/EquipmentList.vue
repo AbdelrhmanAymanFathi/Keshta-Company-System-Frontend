@@ -1,29 +1,26 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('equipment.title') || 'Equipment' }}</h2>
-      <div>
-        <Button class="gap-2" @click="openCreateModal">
-          <PlusIcon class="w-5 h-5" />
-          {{ $t('equipment.add') || 'Add Equipment' }}
-        </Button>
-      </div>
-    </div>
+    <PageHeader :title="$t('equipment.title') || 'Equipment'">
+      <Button class="gap-2" @click="openCreateModal">
+        <PlusIcon class="w-5 h-5" />
+        {{ $t('equipment.add') || 'Add Equipment' }}
+      </Button>
+    </PageHeader>
 
-    <div class="max-w-md rounded-2xl border border-slate-200/80 bg-white p-3 shadow-lg shadow-slate-200/30">
-      <div class="flex items-center gap-2">
+    <Card class="shadcn-ui max-w-md border-border/80 bg-card shadow-lg">
+      <CardContent class="flex items-center gap-2 p-3">
         <Input
           v-model="q"
-          @keyup.enter="search"
           type="search"
           :placeholder="$t('equipment.searchPlaceholder')"
           class="w-full"
+          @keyup.enter="search"
         />
         <Button variant="outline" @click="clearSearch">
           {{ $t('labels.clear') || 'Clear' }}
         </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
 
     <div class="app-table-card">
       <table v-app-table :dir="isRTL ? 'rtl' : 'ltr'" class="app-table w-full table-auto text-sm">
@@ -115,7 +112,7 @@
       @click.stop
       @contextmenu.prevent
     >
-      <button
+      <ShadcnButton variant="outline" size="native"
         type="button"
         class="w-full px-4 py-2 text-sm theme-text-primary hover:theme-dashboard-bg-soft flex items-center gap-2 transition-colors duration-200"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
@@ -123,8 +120,8 @@
       >
         <PencilIcon class="w-4 h-4 shrink-0 theme-text-secondary" />
         {{ $t('labels.edit') }}
-      </button>
-      <button
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native"
         type="button"
         class="w-full px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors duration-200"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
@@ -132,7 +129,7 @@
       >
         <TrashIcon class="w-4 h-4 shrink-0 text-rose-500" />
         {{ $t('labels.delete') }}
-      </button>
+      </ShadcnButton>
     </div>
   </div>
 </template>
@@ -146,7 +143,9 @@ import Pagination from '../../shared/Pagination.vue'
 import ConfirmDialog from '../../shared/ConfirmDialog.vue'
 import SearchDropdown from '../../shared/SearchDropdown.vue'
 import Modal from '@/components/shared/Modal.vue'
+import PageHeader from '@/components/shared/PageHeader.vue'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -155,7 +154,7 @@ import RowActions from '@/components/shared/RowActions.vue'
 
 export default {
   name: 'EquipmentList',
-  components: { ConfirmDialog, Modal, Pagination, Button, Input, Label, Checkbox, PencilIcon, PlusIcon, RowActions, SearchDropdown, TrashIcon },
+  components: { Card, CardContent, ConfirmDialog, Modal, PageHeader, Pagination, Button, Input, Label, Checkbox, PencilIcon, PlusIcon, RowActions, SearchDropdown, TrashIcon },
   setup() {
     const q = ref('')
 

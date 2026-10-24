@@ -37,7 +37,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-          <button
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="execute"
             :disabled="executing"
@@ -46,15 +46,15 @@
             <ArrowPathIcon v-if="executing" class="h-4 w-4 animate-spin" />
             <MagnifyingGlassIcon v-else class="h-4 w-4" />
             {{ $t('labels.search') }}
-          </button>
-          <button
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="clear"
             class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-medium theme-text-secondary backdrop-blur-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 theme-input-focus"
           >
             <ArrowUturnLeftIcon class="h-4 w-4" />
             {{ $t('labels.clear') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </header>
@@ -125,7 +125,7 @@
             v-else-if="isEquipmentTypeParam(p)"
             class="flex flex-col gap-2 sm:flex-row"
           >
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="values[p.name] = ''"
               :class="[
@@ -134,8 +134,8 @@
               ]"
             >
               {{ $t('equipmentLog.all') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="values[p.name] = 'false'"
               :class="[
@@ -144,8 +144,8 @@
               ]"
             >
               {{ $t('equipmentLog.companyOwned') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="values[p.name] = 'true'"
               :class="[
@@ -154,7 +154,7 @@
               ]"
             >
               {{ $t('equipmentLog.externalRented') }}
-            </button>
+            </ShadcnButton>
           </div>
 
           <div
@@ -239,18 +239,18 @@
           </span>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <button type="button" @click="downloadCsv" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--csv" :title="$t('reports.downloadCsv') || 'CSV'">
+          <ShadcnButton variant="outline" size="native" type="button" @click="downloadCsv" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--csv" :title="$t('reports.downloadCsv') || 'CSV'">
             <DocumentTextIcon class="h-4 w-4" />
             <span class="hidden sm:inline">{{ exportingFormat === 'csv' ? ($t('labels.loading') || '...') : 'CSV' }}</span>
-          </button>
-          <button type="button" @click="downloadXlsx" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--xlsx" :title="$t('reports.downloadExcel') || 'Excel'">
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" type="button" @click="downloadXlsx" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--xlsx" :title="$t('reports.downloadExcel') || 'Excel'">
             <TableCellsIcon class="h-4 w-4" />
             <span class="hidden sm:inline">{{ exportingFormat === 'xlsx' ? ($t('labels.loading') || '...') : 'Excel' }}</span>
-          </button>
-          <button type="button" @click="downloadPdf" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--pdf" :title="$t('reports.downloadPdf') || 'PDF'">
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" type="button" @click="downloadPdf" :disabled="!report || !hasExportableRows || !!exportingFormat" class="report-export-btn report-export-btn--pdf" :title="$t('reports.downloadPdf') || 'PDF'">
             <DocumentArrowDownIcon class="h-4 w-4" />
             <span class="hidden sm:inline">{{ exportingFormat === 'pdf' ? ($t('labels.loading') || '...') : 'PDF' }}</span>
-          </button>
+          </ShadcnButton>
         </div>
       </div>
       <div class="p-4 sm:p-6">

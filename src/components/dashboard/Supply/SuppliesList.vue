@@ -277,7 +277,7 @@
       @click.stop>
       <div class="divide-y divide-slate-100">
         <!-- Edit Option -->
-        <button @click.stop="openEdit(contextMenu.item); closeContextMenu()"
+        <ShadcnButton variant="outline" size="native" @click.stop="openEdit(contextMenu.item); closeContextMenu()"
           :disabled="contextMenu.item?.hasPendingApproval"
           class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium theme-text-primary hover:theme-dashboard-bg-soft transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left">
           <svg class="w-5 h-5 flex-shrink-0 theme-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -285,10 +285,10 @@
           </svg>
           <span>{{ $t('labels.edit') || 'Edit' }}</span>
           <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
-        </button>
+        </ShadcnButton>
         
         <!-- Delete Option -->
-        <button @click.stop="openDeleteConfirm(contextMenu.item); closeContextMenu()"
+        <ShadcnButton variant="outline" size="native" @click.stop="openDeleteConfirm(contextMenu.item); closeContextMenu()"
           :disabled="contextMenu.item?.hasPendingApproval"
           class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left">
           <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -296,7 +296,7 @@
           </svg>
           <span>{{ $t('labels.delete') || 'Delete' }}</span>
           <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 

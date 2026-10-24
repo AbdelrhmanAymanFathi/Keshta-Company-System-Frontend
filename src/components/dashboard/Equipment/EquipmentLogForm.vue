@@ -110,38 +110,38 @@
       </div>
 
       <div class="flex justify-end gap-3 pt-4 border-t">
-        <button
+        <ShadcnButton variant="outline" size="native"
           type="button"
           @click="$emit('cancel')"
           class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition"
         >
           {{ $t('labels.cancel') }}
-        </button>
+        </ShadcnButton>
 
-        <button
+        <ShadcnButton variant="outline" size="native"
           v-if="currentStep === 1"
           type="submit"
           :disabled="loading"
           class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition"
         >
           {{ $t('labels.next') || 'Next' }}
-        </button>
+        </ShadcnButton>
 
         <div v-else class="flex gap-3">
-          <button
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="currentStep = 1"
             class="px-4 py-2 border border-gray-300 rounded-md theme-text-secondary hover:bg-gray-50 transition"
           >
             {{ $t('labels.back') || 'Back' }}
-          </button>
-          <button
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             type="submit"
             :disabled="loading"
             class="px-4 py-2 theme-button rounded-md disabled:opacity-50 transition"
           >
             {{ loading ? $t('labels.saving') : (isEditing ? $t('labels.update') : $t('labels.save')) }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </form>

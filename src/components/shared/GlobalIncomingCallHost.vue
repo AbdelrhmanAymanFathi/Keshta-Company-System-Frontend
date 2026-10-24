@@ -16,14 +16,14 @@
       <p class="px-6 pt-4 text-sm text-slate-300">{{ t('messaging.answerFromAnywhere') }}</p>
       <p v-if="errorMessage" class="px-6 pt-3 text-sm text-rose-300">{{ errorMessage }}</p>
       <div class="flex items-center justify-center gap-5 px-6 py-6">
-        <button class="flex min-w-28 flex-col items-center gap-2 rounded-2xl px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" :disabled="busy" @click="reject">
+        <ShadcnButton variant="outline" size="native" class="flex min-w-28 flex-col items-center gap-2 rounded-2xl px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" :disabled="busy" @click="reject">
           <span class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-600 text-2xl shadow-lg shadow-rose-950/40" aria-hidden="true">✕</span>
           {{ t('messaging.reject') }}
-        </button>
-        <button class="flex min-w-28 flex-col items-center gap-2 rounded-2xl px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" :disabled="busy" @click="answer">
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" class="flex min-w-28 flex-col items-center gap-2 rounded-2xl px-4 py-2 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" :disabled="busy" @click="answer">
           <span class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-2xl shadow-lg shadow-emerald-950/40" aria-hidden="true">☎</span>
           {{ t('messaging.answer') }}
-        </button>
+        </ShadcnButton>
       </div>
     </section>
   </div>

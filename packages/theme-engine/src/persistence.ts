@@ -8,7 +8,18 @@ export function createPersistence(storageKey: string) {
     try {
       const saved = localStorage.getItem(storageKey)
       if (!saved) return normalizeTheme({ ...DEFAULT_THEME })
-      return normalizeTheme({ ...DEFAULT_THEME, ...JSON.parse(saved) })
+      const savedTheme = JSON.parse(saved) as ThemeDefinition
+      const previousDefaultColors = ['#4f7dcc', '#0f766e', '#1e3a5f', '#18181b']
+      if (savedTheme.primary && previousDefaultColors.includes(savedTheme.primary.toLowerCase())) {
+        savedTheme.primary = DEFAULT_THEME.primary
+      }
+      if (savedTheme.linkColor && previousDefaultColors.includes(savedTheme.linkColor.toLowerCase())) {
+        savedTheme.linkColor = DEFAULT_THEME.primary
+      }
+      if (savedTheme.colors?.primary && previousDefaultColors.includes(savedTheme.colors.primary.toLowerCase())) {
+        savedTheme.colors.primary = DEFAULT_THEME.primary
+      }
+      return normalizeTheme({ ...DEFAULT_THEME, ...savedTheme })
     } catch {
       return normalizeTheme({ ...DEFAULT_THEME })
     }

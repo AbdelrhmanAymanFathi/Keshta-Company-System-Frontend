@@ -25,14 +25,14 @@
             </label>
           </div>
           <div class="flex items-center gap-2">
-            <button @click="store.markAllRead()" :disabled="store.unreadCount === 0"
+            <ShadcnButton variant="outline" size="native" @click="store.markAllRead()" :disabled="store.unreadCount === 0"
               class="rounded-xl px-4 py-2 text-sm font-medium border border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-50">
               تحديد الكل كمقروء
-            </button>
-            <button @click="onReset"
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native" @click="onReset"
               class="rounded-xl px-4 py-2 text-sm font-medium border border-slate-300 hover:bg-slate-50 transition-colors">
               إعادة تعيين
-            </button>
+            </ShadcnButton>
           </div>
         </div>
       </div>
@@ -81,14 +81,14 @@
           </div>
 
           <div class="flex shrink-0 items-center gap-1">
-            <button @click.stop="onMarkRead(item)"
+            <ShadcnButton variant="outline" size="native" @click.stop="onMarkRead(item)"
               v-if="!item.isRead"
               title="تحديد كمقروء"
               class="rounded-lg p-2 hover:bg-blue-100 text-blue-600 transition-colors">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
-            </button>
+            </ShadcnButton>
           </div>
         </div>
       </div>

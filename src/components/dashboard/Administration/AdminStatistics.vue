@@ -2,13 +2,13 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <!-- Header -->
     <PageHeader :title="$t('adminStats.title')" :subtitle="$t('adminStats.description')">
-      <button @click="refresh" :disabled="loading"
-        class="flex items-center gap-1.5 rounded-xl theme-button px-4 py-2 text-sm theme-text-light transition-colors disabled:opacity-50">
+      <Button @click="refresh" :disabled="loading"
+        class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm transition-colors">
         <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
         {{ $t('adminStats.refresh') }}
-      </button>
+      </Button>
     </PageHeader>
 
     <!-- Date Filter -->
@@ -236,11 +236,14 @@ import DashboardSkeleton from './DashboardSkeleton.vue'
 import DashboardEmpty from './DashboardEmpty.vue'
 import LocationTotals from './LocationTotals.vue'
 import VueApexCharts from 'vue3-apexcharts'
+import { getShadcnChartColors, shadcnChartBorderColor, shadcnChartTextColor } from '@/utils/shadcnChartTheme'
+import { Button } from '@/components/ui/button'
 
 export default {
   name: 'AdminStatistics',
   components: {
     PageHeader, DateRangeToolbar, DashboardGrid,
+    Button,
     StatisticsCard, ChartCard, GaugeCard, DirectionGauge,
     DashboardSkeleton, DashboardEmpty, LocationTotals,
     apexchart: VueApexCharts
@@ -398,8 +401,8 @@ export default {
     monthlyOptions() {
       const d = this.monthlyComparison || []
       return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 }, stacked: true },
-        colors: ['#ef4444', '#10b981'],
+        chart: { toolbar: { show: true }, animations: { speed: 500 }, stacked: true, foreColor: shadcnChartTextColor },
+        colors: getShadcnChartColors(2),
         plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
         dataLabels: { enabled: false },
         labels: d.map(m => this.safeLabel(m?.month)),
@@ -432,7 +435,8 @@ export default {
     moduleOptions() {
       const d = this.moduleActivityData
       return {
-        chart: { toolbar: { show: true } },
+        chart: { toolbar: { show: true }, foreColor: shadcnChartTextColor },
+        colors: getShadcnChartColors(this.moduleActivityData.length),
         labels: d.map(m => this.moduleLabel(m.name)),
         dataLabels: {
           enabled: true,
@@ -478,8 +482,8 @@ export default {
     classificationOptions() {
       const labels = this.classificationChart?.labels || []
       return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 }, fontFamily: 'inherit' },
-        colors: ['#6366f1', '#8b5cf6', '#0ea5e9', '#06b6d4', '#14b8a6', '#22c55e', '#eab308', '#f59e0b', '#f97316', '#ef4444', '#94a3b8'],
+        chart: { toolbar: { show: true }, animations: { speed: 500 }, fontFamily: 'inherit', foreColor: shadcnChartTextColor },
+        colors: getShadcnChartColors(labels.length),
         plotOptions: {
           bar: { borderRadius: 4, borderRadiusApplication: 'end', horizontal: true, barHeight: '58%', distributed: true }
         },
@@ -498,7 +502,7 @@ export default {
         yaxis: { labels: { style: { fontSize: '12px' }, maxWidth: 150 } },
         tooltip: { y: { formatter: v => this.formatChartNumber(v) } },
         legend: { show: false },
-        grid: { borderColor: '#e2e8f0', strokeDashArray: 4, padding: { left: 6, right: 28 } },
+        grid: { borderColor: shadcnChartBorderColor, strokeDashArray: 4, padding: { left: 6, right: 28 } },
         responsive: [
           { breakpoint: 640, options: { chart: { height: 360 }, dataLabels: { enabled: false }, yaxis: { labels: { maxWidth: 100 } } } }
         ]
@@ -512,8 +516,8 @@ export default {
     contractorOptions() {
       const d = this.topContractors || []
       return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 } },
-        colors: ['#6366f1'],
+        chart: { toolbar: { show: true }, animations: { speed: 500 }, foreColor: shadcnChartTextColor },
+        colors: getShadcnChartColors(1),
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
         dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
         xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },
@@ -532,8 +536,8 @@ export default {
     treasuryDistOptions() {
       const t = this.treasuryOverview?.treasuries || []
       return {
-        chart: { toolbar: { show: true }, animations: { speed: 500 } },
-        colors: ['#10b981', '#6366f1', '#f59e0b', '#06b6d4', '#ef4444'],
+        chart: { toolbar: { show: true }, animations: { speed: 500 }, foreColor: shadcnChartTextColor },
+        colors: getShadcnChartColors(t.length),
         plotOptions: { bar: { borderRadius: 4, horizontal: true } },
         dataLabels: { enabled: true, formatter: v => this.formatChartNumber(v) },
         xaxis: { labels: { formatter: v => this.formatChartNumber(v) } },

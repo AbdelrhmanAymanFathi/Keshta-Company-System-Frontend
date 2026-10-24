@@ -98,22 +98,22 @@ export const FONT_PRESETS: Record<
 export const TYPOGRAPHY_DEFAULTS = {
   fontPreset: DEFAULT_FONT_PRESET,
   fontFamily: FONT_PRESETS[DEFAULT_FONT_PRESET].family,
-  textPrimary: '#111827',
-  textSecondary: '#4b5563',
-  textMuted: '#6b7280',
+  textPrimary: '#0f172a',
+  textSecondary: '#475569',
+  textMuted: '#64748b',
   textLight: '#ffffff',
   textLightSecondary: '#e5e7eb',
   textLightMuted: '#d1d5db',
   headingColor: '#0f172a',
   linkColor: null as string | null,
   sidebarText: '#334155',
-  cardText: '#111827'
+  cardText: '#0f172a'
 }
 
 export const DEFAULT_THEME = {
   id: 'default',
   name: 'Default',
-  primary: '#4f7dcc',
+  primary: '#7c5ce7',
   animation: DEFAULT_ANIMATION,
   iconPack: DEFAULT_ICON_PACK,
   sidebarType: DEFAULT_SIDEBAR_TYPE,

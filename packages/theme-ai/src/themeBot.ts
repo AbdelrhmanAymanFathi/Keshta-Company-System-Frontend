@@ -82,7 +82,7 @@ function toSuggestion(
     description: (preset as { description?: string }).description || '',
     presetId: preset.id,
     preview: {
-      colors: preset.primary || '#4f7dcc',
+      colors: preset.primary || '#7c5ce7',
       typography: FONT_LABELS[preset.fontPreset || 'inter'] || preset.fontPreset || 'Inter',
       iconPack: ICON_PACK_META[preset.iconPack as keyof typeof ICON_PACK_META]?.label || String(preset.iconPack),
       animation: String(preset.animation),

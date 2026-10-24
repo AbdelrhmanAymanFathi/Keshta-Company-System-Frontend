@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'dir-rtl': isRTL}" class="min-h-screen bg-gray-50">
+  <div :class="{'dir-rtl': isRTL}" class="min-h-screen bg-background">
     <!-- Loading Screen -->
     <AppLoader v-if="isAppLoading" :label="loaderLabel" />
 

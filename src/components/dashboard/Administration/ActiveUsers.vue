@@ -11,12 +11,12 @@
             {{ onlineCount }}
           </span>
         </div>
-        <button @click="refresh" :disabled="loading" class="flex items-center gap-2 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
+        <ShadcnButton variant="outline" size="native" @click="refresh" :disabled="loading" class="flex items-center gap-2 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
           <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           {{ $t('activeUsers.refresh') }}
-        </button>
+        </ShadcnButton>
       </div>
 
       <div v-if="loading && !users.length" class="p-6">
@@ -56,12 +56,12 @@
                   </div>
                   <div class="min-w-0">
                     <span class="text-sm font-medium theme-text-primary">{{ u.name || '?' }}</span>
-                    <button
+                    <ShadcnButton variant="outline" size="native"
                       type="button"
                       class="block text-xs theme-accent-strong hover:underline disabled:opacity-50"
                       :disabled="activityReportLoadingUserId !== null"
                       @click="downloadActivityReportPdf(u)"
-                    >{{ $t(activityReportLoadingUserId === u.userId ? 'activeUsers.downloadingPdf' : 'activeUsers.activityReport') }}</button>
+                    >{{ $t(activityReportLoadingUserId === u.userId ? 'activeUsers.downloadingPdf' : 'activeUsers.activityReport') }}</ShadcnButton>
                     <span
                       v-if="activityReportError && activityReportErrorUserId === u.userId"
                       class="block text-xs text-red-600"

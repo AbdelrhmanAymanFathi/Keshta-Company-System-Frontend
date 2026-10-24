@@ -21,21 +21,21 @@
           </div>
 
           <div class="flex gap-3 justify-end">
-            <button 
+            <ShadcnButton variant="outline" size="native"
               type="button" 
               @click="onCancel"
               class="px-4 py-2 theme-text-secondary border rounded hover:bg-gray-100"
               :disabled="loading"
             >
               {{ $t('labels.cancel') }}
-            </button>
-            <button 
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="submit"
               class="theme-button px-4 py-2 rounded disabled:opacity-50"
               :disabled="loading"
             >
               {{ loading ? $t('labels.saving') : $t('labels.create') }}
-            </button>
+            </ShadcnButton>
           </div>
 
           <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>

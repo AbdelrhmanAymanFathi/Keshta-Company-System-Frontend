@@ -23,7 +23,7 @@
         </p>
       </div>
 
-      <button
+      <ShadcnButton variant="outline" size="native"
         v-if="data.loading"
         type="button"
         disabled
@@ -34,8 +34,8 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
         </svg>
-      </button>
-      <button
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native"
         v-else-if="data.hasChildren"
         type="button"
         class="w-6 h-6 shrink-0 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-transform duration-200"
@@ -46,7 +46,7 @@
         <svg class="w-3.5 h-3.5" :class="$i18n.locale === 'ar' ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
-      </button>
+      </ShadcnButton>
     </div>
 
     <div v-if="data.badge" class="px-3 pb-2">

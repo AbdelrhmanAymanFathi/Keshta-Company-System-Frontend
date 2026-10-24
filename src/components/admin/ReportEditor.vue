@@ -70,9 +70,9 @@
           <router-link to="/dashboard/admin/reports" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
           </router-link>
-          <button @click="save" class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 theme-text-light transition ">
+          <ShadcnButton variant="outline" size="native" @click="save" class="flex items-center gap-2 rounded-xl theme-button px-4 py-2 theme-text-light transition ">
             <span>{{ $t('labels.save') }}</span>
-          </button>
+          </ShadcnButton>
         </div>
     </div>
 </div>
@@ -83,12 +83,12 @@
       <div class="flex justify-between mb-2">
           <div class="text-sm theme-text-secondary">{{ $t('reports.parametersHelp') || '' }}</div>
         <div>
-          <button @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light transition ">
+          <ShadcnButton variant="outline" size="native" @click="startEditParam(null)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light transition ">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
             </svg>
             <span>{{ $t('reports.newParameter') }}</span>
-          </button>
+          </ShadcnButton>
         </div>
       </div>
 
@@ -105,14 +105,14 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <button @click="startEditParam(p, idx)" class="flex items-center gap-1 rounded-lg bg-slate-700 px-2 py-1 theme-text-light transition hover:bg-slate-800">
+            <ShadcnButton variant="outline" size="native" @click="startEditParam(p, idx)" class="flex items-center gap-1 rounded-lg bg-slate-700 px-2 py-1 theme-text-light transition hover:bg-slate-800">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /></svg>
               <span class="text-sm">{{ $t('labels.edit') }}</span>
-            </button>
-            <button @click="removeParam(idx)" class="flex items-center gap-1 rounded-lg bg-red-600 px-2 py-1 theme-text-light transition hover:bg-red-700">
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native" @click="removeParam(idx)" class="flex items-center gap-1 rounded-lg bg-red-600 px-2 py-1 theme-text-light transition hover:bg-red-700">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H3a1 1 0 100 2h14a1 1 0 100-2h-2V3a1 1 0 00-1-1H6zm2 6a1 1 0 011 1v6a1 1 0 11-2 0V9a1 1 0 011-1z" clip-rule="evenodd" /></svg>
               <span class="text-sm">{{ $t('labels.delete') }}</span>
-            </button>
+            </ShadcnButton>
           </div>
         </li>
       </ul>
@@ -153,15 +153,15 @@
           </div>
         </div>
         <div class="flex gap-2 justify-end mt-3">
-          <button @click="cancelEditParam" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
+          <ShadcnButton variant="outline" size="native" @click="cancelEditParam" class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 transition hover:bg-slate-50">
             <span>{{ $t('labels.cancel') }}</span>
-          </button>
-          <button @click="saveParam" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light transition ">
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="saveParam" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 theme-text-light transition ">
             <span>{{ $t('reports.saveParam') }}</span>
-          </button>
-          <button v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 transition">
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" v-if="!isNew && editingParam.name" @click="previewOptions(editingParam.name)" class="flex items-center gap-2 rounded-xl theme-button px-3 py-2 transition">
             <span>{{ $t('admin.previewOptions') }}</span>
-          </button>
+          </ShadcnButton>
         </div>
       </div>
 

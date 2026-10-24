@@ -66,7 +66,7 @@
 
               <div class="settings-option-grid settings-option-grid--compact">
 
-                <button
+                <ShadcnButton variant="outline" size="native"
 
                   v-for="preset in animationPresets"
 
@@ -92,7 +92,7 @@
 
                   {{ animationLabel(preset) }}
 
-                </button>
+                </ShadcnButton>
 
               </div>
 
@@ -150,7 +150,7 @@
 
               <div class="settings-option-grid">
 
-                <button
+                <ShadcnButton variant="outline" size="native"
 
                   v-for="font in fontPresets"
 
@@ -180,7 +180,7 @@
 
                   <span v-if="font.rtl" class="ms-1 text-xs theme-caption">RTL</span>
 
-                </button>
+                </ShadcnButton>
 
               </div>
 
@@ -248,7 +248,7 @@
           <div class="settings-card__body space-y-6">
             <p class="text-sm theme-text-secondary">{{ $t('profile.iconPackDescription') || 'Switch the entire app icon style instantly — sidebar, tables, and actions.' }}</p>
             <div class="settings-option-grid">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 v-for="pack in iconPackOptions"
                 :key="pack.id"
                 type="button"
@@ -269,12 +269,12 @@
                     <span class="block text-xs theme-caption">{{ getIconPackDescription(pack.id) }}</span>
                   </span>
                 </span>
-              </button>
+              </ShadcnButton>
             </div>
             <div>
               <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.themePersonality') || 'UI personalities' }}</label>
               <div class="settings-option-grid">
-                <button
+                <ShadcnButton variant="outline" size="native"
                   v-for="personality in themePersonalities"
                   :key="personality.id"
                   type="button"
@@ -283,7 +283,7 @@
                 >
                   <span class="block font-semibold theme-text-primary">{{ getPersonalityLabel(personality.id) }}</span>
                   <span class="block text-xs theme-caption">{{ personality.description }}</span>
-                </button>
+                </ShadcnButton>
               </div>
             </div>
           </div>
@@ -302,10 +302,10 @@
                 class="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus"
                 :placeholder="$t('profile.themeBotPlaceholder')"
               />
-              <button type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">{{ $t('profile.themeBotApply') }}</button>
+              <ShadcnButton variant="outline" size="native" type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">{{ $t('profile.themeBotApply') }}</ShadcnButton>
             </form>
             <div v-if="botSuggestions.length" class="settings-option-grid">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 v-for="s in botSuggestions"
                 :key="s.presetId"
                 type="button"
@@ -314,7 +314,7 @@
               >
                 <span class="font-semibold theme-text-primary">{{ s.name }}</span>
                 <span class="block text-xs theme-caption">{{ Math.round(s.confidence * 100) }}% — {{ s.preview.iconPack }}</span>
-              </button>
+              </ShadcnButton>
             </div>
             <router-link
               :to="{ name: 'theme-studio' }"
@@ -332,7 +332,7 @@
           <div class="settings-card__body space-y-4">
             <p class="text-sm theme-text-secondary">{{ $t('profile.sidebarLayoutDescription') }}</p>
             <div class="settings-option-grid settings-option-grid--compact">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 v-for="opt in sidebarOptions"
                 :key="opt.id"
                 type="button"
@@ -343,7 +343,7 @@
                 ]"
               >
                 {{ opt.label }}
-              </button>
+              </ShadcnButton>
             </div>
           </div>
         </div>
@@ -396,20 +396,12 @@
                     : ($t('profile.presenceOff') || 'Off — you are hidden from other users') }}
                 </p>
               </div>
-              <button
-                type="button"
-                role="switch"
-                :aria-checked="presenceEnabled"
+              <Switch
+                :checked="presenceEnabled"
                 :aria-label="$t('profile.presenceToggleLabel') || 'Enable live presence'"
-                @click="togglePresence"
-                :class="presenceEnabled ? 'bg-green-500' : 'bg-gray-300'"
-                class="relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200"
-              >
-                <span
-                  class="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all duration-200"
-                  :class="presenceEnabled ? 'start-0.5' : 'end-0.5'"
-                ></span>
-              </button>
+                class="shrink-0"
+                @update:checked="savePresenceSettings"
+              />
             </div>
           </div>
         </div>
@@ -438,39 +430,31 @@
                     : ($t('profile.startupSoundOff') || 'Off — the app opens silently') }}
                 </p>
               </div>
-              <button
-                type="button"
-                role="switch"
-                :aria-checked="introEnabled"
+              <Switch
+                :checked="introEnabled"
                 :aria-label="$t('profile.startupSoundToggleLabel') || 'Enable startup intro sound'"
-                @click="toggleStartupSound(!introEnabled)"
-                :class="introEnabled ? 'bg-green-500' : 'bg-gray-300'"
-                class="relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200"
-              >
-                <span
-                  class="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all duration-200"
-                  :class="introEnabled ? 'start-0.5' : 'end-0.5'"
-                ></span>
-              </button>
+                class="shrink-0"
+                @update:checked="toggleStartupSound"
+              />
             </div>
 
-            <button
+            <ShadcnButton variant="default" size="native"
               type="button"
               @click="previewStartupSound"
-              class="theme-button rounded-xl px-4 py-2 text-sm font-medium transition hover:theme-hover-soft"
+              class="rounded-xl"
             >
               {{ $t('profile.startupSoundPreview') || 'Preview intro sound' }}
-            </button>
+            </ShadcnButton>
           </div>
         </div>
 
         <div class="settings-actions px-1 pb-2">
 
-          <button type="button" @click="resetThemeColor" class="theme-button w-full sm:w-auto px-4 py-3 font-medium rounded-lg transition shadow-sm hover:shadow-md">
+          <ShadcnButton variant="outline" size="native" type="button" @click="resetThemeColor" class="theme-button w-full sm:w-auto px-4 py-3 font-medium rounded-lg transition shadow-sm hover:shadow-md">
 
             {{ $t('profile.resetTheme') || 'Reset Theme' }}
 
-          </button>
+          </ShadcnButton>
 
         </div>
 
@@ -519,6 +503,7 @@ import {
 } from '@acme/platform'
 import { getIconPackOptions, ThemeIcon } from '@acme/icon-packs'
 import { getSidebarOptions } from '@acme/layout-engine'
+import { Switch } from '@/components/ui/switch'
 import { presenceEnabled, savePresenceSettings } from '@/composables/usePresenceSettings'
 import { introEnabled, toggleStartupSound, previewStartupSound } from '@/composables/useStartupIntro'
 
@@ -526,7 +511,7 @@ import { introEnabled, toggleStartupSound, previewStartupSound } from '@/composa
 
 export default {
   name: 'ProfileSettingsView',
-  components: { ThemeIcon },
+  components: { ThemeIcon, Switch },
   setup() {
 
     const { t, locale } = useI18n()

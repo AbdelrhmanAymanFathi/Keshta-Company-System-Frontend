@@ -25,12 +25,12 @@
               @keydown.esc.prevent="close"
             />
             <span v-if="loading" class="shrink-0 text-xs text-slate-400">{{ t('globalSearch.searching') }}</span>
-            <button
+            <ShadcnButton variant="outline" size="native"
               v-else
               type="button"
               class="shrink-0 rounded-md border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-400 hover:bg-slate-50"
               @click="close"
-            >Esc</button>
+            >Esc</ShadcnButton>
           </div>
 
           <!-- Results -->
@@ -53,7 +53,7 @@
                     {{ t('globalSearch.foundCount', { count: group.count }) }}
                   </span>
                 </div>
-                <button
+                <ShadcnButton variant="outline" size="native"
                   v-for="hit in group.items"
                   :key="`${group.type}-${hit.id}`"
                   type="button"
@@ -71,7 +71,7 @@
                     <span v-if="hit.subtitle" class="block truncate text-xs text-slate-400">{{ hit.subtitle }}</span>
                   </span>
                   <ArrowUpRightIcon class="h-4 w-4 shrink-0 text-slate-300" />
-                </button>
+                </ShadcnButton>
               </template>
             </div>
           </div>

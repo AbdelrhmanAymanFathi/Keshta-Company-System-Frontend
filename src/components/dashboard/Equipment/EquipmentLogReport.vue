@@ -3,9 +3,9 @@
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ $t('equipmentLog.report') }}</h3>
       <div>
-        <button @click="exportCsv" class="theme-button px-3 py-2 rounded text-sm">
+        <ShadcnButton variant="outline" size="native" @click="exportCsv" class="theme-button px-3 py-2 rounded text-sm">
           {{ $t('equipmentLog.exportCsv') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -29,7 +29,7 @@
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.equipmentType') }}</label>
           <div class="flex flex-col sm:flex-row gap-2 w-full">
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="filters.isRental = ''"
               :class="[
@@ -38,8 +38,8 @@
               ]"
             >
               {{ $t('equipmentLog.all') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="filters.isRental = 'false'"
               :class="[
@@ -48,8 +48,8 @@
               ]"
             >
               {{ $t('equipmentLog.companyOwned') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="button"
               @click="filters.isRental = 'true'"
               :class="[
@@ -58,7 +58,7 @@
               ]"
             >
               {{ $t('equipmentLog.externalRented') }}
-            </button>
+            </ShadcnButton>
           </div>
         </div>
         <div>
@@ -71,9 +71,9 @@
       </div>
 
       <div class="mt-4 flex gap-2">
-        <button @click="runReport" :disabled="loading"
-          class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded">{{ loading ? $t('labels.running') : $t('labels.run') }}</button>
-        <button @click="clearFilters" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</button>
+        <ShadcnButton variant="outline" size="native" @click="runReport" :disabled="loading"
+          class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded">{{ loading ? $t('labels.running') : $t('labels.run') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="clearFilters" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</ShadcnButton>
       </div>
     </div>
 

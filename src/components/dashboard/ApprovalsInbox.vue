@@ -105,9 +105,9 @@
           <tbody class="divide-y divide-slate-100 bg-white">
             <tr v-for="app in filteredApprovals" :key="app.id" :data-focus-id="app.id" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @dblclick="openDetailModal(app)" @contextmenu.prevent="openRowContextMenu($event, app)">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium theme-text-primary text-start">
-                <button @click.stop="openDetailModal(app)" class="text-indigo-600 hover:text-indigo-900 underline font-semibold transition-colors">
+                <ShadcnButton variant="outline" size="native" @click.stop="openDetailModal(app)" class="text-indigo-600 hover:text-indigo-900 underline font-semibold transition-colors">
                   #{{ app.id }}
-                </button>
+                </ShadcnButton>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-start">
                 <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="getModuleClass(app.module)">
@@ -168,14 +168,14 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-start text-sm font-medium">
                 <div v-if="app.status === 'PENDING'" class="flex justify-center items-center gap-2" :class="isRTL ? 'flex-row-reverse' : ''">
-                  <button @click="handleApprove(app)" :disabled="submitting"
+                  <ShadcnButton variant="outline" size="native" @click="handleApprove(app)" :disabled="submitting"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-3.5 py-1.5 text-xs font-semibold shadow-sm transition-all disabled:opacity-50">
                     {{ t('btnApprove') }}
-                  </button>
-                  <button @click="openRejectModal(app)" :disabled="submitting"
+                  </ShadcnButton>
+                  <ShadcnButton variant="outline" size="native" @click="openRejectModal(app)" :disabled="submitting"
                     class="bg-rose-600 hover:bg-rose-700 text-white rounded-lg px-3.5 py-1.5 text-xs font-semibold shadow-sm transition-all disabled:opacity-50">
                     {{ t('btnReject') }}
-                  </button>
+                  </ShadcnButton>
                 </div>
                 <div v-else class="text-xs font-bold" :class="app.status === 'APPROVED' ? 'text-emerald-600' : 'text-rose-600'">
                   {{ app.status === 'APPROVED' ? t('statusApproved') : t('statusRejected') }}
@@ -194,9 +194,9 @@
           <h3 class="text-lg font-bold text-slate-800">
             {{ t('rejectModalTitle') }}
           </h3>
-          <button @click="closeRejectModal" class="text-slate-400 hover:text-slate-600 text-2xl font-light">
+          <ShadcnButton variant="outline" size="native" @click="closeRejectModal" class="text-slate-400 hover:text-slate-600 text-2xl font-light">
             &times;
-          </button>
+          </ShadcnButton>
         </div>
         <div class="p-6 space-y-4">
           <p class="text-sm text-slate-600" :class="isRTL ? 'text-right' : 'text-left'">
@@ -209,15 +209,15 @@
           </div>
         </div>
         <div class="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end gap-3">
-          <button @click="closeRejectModal" :disabled="submitting"
+          <ShadcnButton variant="outline" size="native" @click="closeRejectModal" :disabled="submitting"
             class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
             {{ t('btnCancel') }}
-          </button>
-          <button @click="handleReject" :disabled="submitting"
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="handleReject" :disabled="submitting"
             class="px-5 py-2 rounded-xl text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
             <span v-if="submitting" class="animate-spin mr-1">⏳</span>
             {{ t('btnRejectConfirm') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>
@@ -229,7 +229,7 @@
           <h3 class="text-lg font-bold text-slate-800">
             🔍 {{ locale === 'ar' ? 'تفاصيل طلب الموافقة الكاملة' : 'Full Approval Request Details' }} (#{{ selectedApprovalForDetail.id }})
           </h3>
-          <button @click="closeDetailModal" class="text-slate-400 hover:text-slate-600 text-2xl font-semibold leading-none">&times;</button>
+          <ShadcnButton variant="outline" size="native" @click="closeDetailModal" class="text-slate-400 hover:text-slate-600 text-2xl font-semibold leading-none">&times;</ShadcnButton>
         </div>
         
         <div class="px-6 py-4 overflow-y-auto space-y-6 flex-grow" :dir="isRTL ? 'rtl' : 'ltr'">
@@ -292,9 +292,9 @@
         </div>
 
         <div class="px-6 py-4 bg-slate-50 border-t border-slate-150 flex justify-end gap-3 font-sans">
-          <button @click="closeDetailModal" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition-all">
+          <ShadcnButton variant="outline" size="native" @click="closeDetailModal" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition-all">
             {{ locale === 'ar' ? 'إغلاق' : 'Close' }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>
@@ -309,7 +309,7 @@
       @click.stop
       @contextmenu.prevent
     >
-      <button
+      <ShadcnButton variant="outline" size="native"
         v-if="contextMenu.approval?.status === 'PENDING'"
         type="button"
         class="w-full px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 transition-colors duration-200"
@@ -320,8 +320,8 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         {{ t('btnApprove') }}
-      </button>
-      <button
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native"
         v-if="contextMenu.approval?.status === 'PENDING'"
         type="button"
         class="w-full px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors duration-200"
@@ -332,8 +332,8 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l6 6M15 9l-6 6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         {{ t('btnReject') }}
-      </button>
-      <button
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native"
         type="button"
         class="w-full px-4 py-2 text-sm theme-text-primary hover:theme-dashboard-bg-soft flex items-center gap-2 transition-colors duration-200 border-t border-slate-100"
         :class="isRTL ? 'flex-row-reverse text-right' : 'text-left'"
@@ -343,7 +343,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         {{ locale === 'ar' ? 'عرض التفاصيل' : 'View Details' }}
-      </button>
+      </ShadcnButton>
     </div>
   </div>
 </template>

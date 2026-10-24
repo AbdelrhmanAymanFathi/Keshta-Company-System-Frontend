@@ -44,9 +44,9 @@
           <h3 class="text-base font-semibold theme-text-primary">{{ $t('reports.description') || 'Report details' }}</h3>
           <p class="text-xs theme-text-muted">{{ isEdit ? ($t('reports.updateSuccess') || 'Update report details and builder fields.') : ($t('reports.createSuccess') || 'Define the report identity before choosing fields.') }}</p>
         </div>
-        <button @click="generate" class="rounded-xl theme-button px-5 py-2.5 text-sm font-semibold theme-text-light shadow-sm disabled:cursor-not-allowed disabled:opacity-60" :disabled="busy">
+        <ShadcnButton variant="outline" size="native" @click="generate" class="rounded-xl theme-button px-5 py-2.5 text-sm font-semibold theme-text-light shadow-sm disabled:cursor-not-allowed disabled:opacity-60" :disabled="busy">
           {{ busy ? ($t('labels.loading') || 'Loading...') : (isEdit ? $t('common.update') : $t('common.generate') || 'Generate') }}
-        </button>
+        </ShadcnButton>
       </div>
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -103,8 +103,8 @@
         </div>
 
         <div class="flex flex-wrap gap-2">
-          <button @click="selectAllOutput" class="report-secondary-button">{{ $t('labels.selectAll') || 'Select Output' }}</button>
-          <button @click="clearAllOutput" class="report-secondary-button">{{ $t('labels.clear') || 'Clear Output' }}</button>
+          <ShadcnButton variant="outline" size="native" @click="selectAllOutput" class="report-secondary-button">{{ $t('labels.selectAll') || 'Select Output' }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="clearAllOutput" class="report-secondary-button">{{ $t('labels.clear') || 'Clear Output' }}</ShadcnButton>
         </div>
       </div>
 
@@ -126,7 +126,7 @@
         >
           <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:gap-5">
             <div class="flex min-w-0 flex-1 items-start gap-3 xl:max-w-[24rem]">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 class="report-drag-handle"
                 draggable="true"
@@ -135,7 +135,7 @@
                 @dragend="onDragEnd"
               >
                 <span>⋮⋮</span>
-              </button>
+              </ShadcnButton>
 
               <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
@@ -211,13 +211,13 @@
       </div>
 
       <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-lg shadow-slate-200/40 backdrop-blur-sm">
-        <button type="button" class="flex w-full items-center justify-between gap-3 text-start" @click="togglePreview">
+        <ShadcnButton variant="outline" size="native" type="button" class="flex w-full items-center justify-between gap-3 text-start" @click="togglePreview">
           <div>
             <h4 class="text-base font-semibold theme-text-primary">{{ $t('reports.preview') || 'Preview' }}</h4>
             <p class="text-xs theme-text-muted">{{ previewOpen ? ($t('labels.hide') || 'Hide preview') : ($t('labels.show') || 'Show preview') }}</p>
           </div>
           <span class="report-preview-toggle" :class="{ 'report-preview-toggle--open': previewOpen }">⌄</span>
-        </button>
+        </ShadcnButton>
 
         <transition name="preview-panel">
           <div v-if="previewOpen" class="mt-4 space-y-4">

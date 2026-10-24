@@ -41,7 +41,7 @@
           />
 
           <div v-if="showContractorDropdown" ref="contractorOptions" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
-            <button
+            <ShadcnButton variant="outline" size="native"
               v-for="(c, i) in filteredContractors"
               :key="c.id"
               ref="contractorOptionItems"
@@ -66,7 +66,7 @@
                   </span>
                 </div>
               </div>
-            </button>
+            </ShadcnButton>
             <!-- 'Add new contractor' removed -->
           </div>
         </div>
@@ -89,16 +89,16 @@
           />
 
           <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
-            <button
+            <ShadcnButton variant="outline" size="native"
               v-for="c in filteredCrushers"
               :key="c.id"
               @click.prevent="selectCrusher(c)"
               class="w-full text-left px-3 py-2 hover:bg-gray-100"
             >
               {{ c.name }}
-            </button>
+            </ShadcnButton>
             <div class="border-t px-3 py-2">
-              <button @click.prevent="chooseAddNewCrusher" class="theme-text hover:underline">{{ $t('vehicles.addNewCrusher') }}</button>
+              <ShadcnButton variant="outline" size="native" @click.prevent="chooseAddNewCrusher" class="theme-text hover:underline">{{ $t('vehicles.addNewCrusher') }}</ShadcnButton>
             </div>
           </div>
         </div>
@@ -123,9 +123,9 @@
       </div>
 
       <div class="flex items-center gap-3 justify-end sm:col-span-2 lg:col-span-3">
-        <button type="submit" class="theme-button px-4 py-2 rounded disabled:opacity-50" :disabled="creating">
+        <ShadcnButton variant="outline" size="native" type="submit" class="theme-button px-4 py-2 rounded disabled:opacity-50" :disabled="creating">
           {{ creating ? $t('labels.saving') : $t('vehicles.createVehicle') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 

@@ -12,13 +12,13 @@
         />
       </div>
       <div>
-        <button
+        <ShadcnButton variant="outline" size="native"
           @click="openCreateModal"
           class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl theme-button flex items-center gap-2 shadow-sm  text-xs sm:text-sm"
         >
           <PlusIcon class="w-5 h-5" />
           {{ $t('vehicles.createVehicle') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -73,26 +73,26 @@
          class="w-56 bg-white border border-slate-200 rounded-xl shadow-lg z-50 text-sm">
       <ul class="py-1">
         <li>
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="onContextMenuSelectManage"
             class="w-full text-left px-4 py-2 theme-hover-soft hover:theme-accent-strong theme-text-secondary">
             {{ $t('vehicles.changeOwner') }}
-          </button>
+          </ShadcnButton>
         </li>
         <li class="border-t border-gray-200 my-1"></li>
         <li>
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="onContextMenuSelectEdit"
             class="w-full text-left px-4 py-2 theme-hover-soft theme-link theme-text-secondary">
             {{ $t('labels.edit') || 'Edit' }}
-          </button>
+          </ShadcnButton>
         </li>
         <li>
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="onContextMenuSelectDelete"
             class="w-full text-left px-4 py-2 hover:bg-red-50 hover:text-red-700 theme-text-secondary">
             {{ $t('labels.delete') || 'Delete' }}
-          </button>
+          </ShadcnButton>
         </li>
       </ul>
     </div>
@@ -136,14 +136,14 @@
             />
 
             <div v-if="showCrusherDropdown" class="absolute z-50 left-0 right-0 mt-1 bg-white border rounded shadow max-h-56 overflow-auto">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 v-for="c in filteredCrushers"
                 :key="c.id"
                 @mousedown.prevent="selectCrusher(c)"
                 class="w-full text-left px-3 py-2 hover:bg-gray-100"
               >
                 {{ c.name }}
-              </button>
+              </ShadcnButton>
             </div>
           </div>
         </div>
@@ -207,9 +207,9 @@
               {{ $t('vehicles.detailsSubtitle') }}
             </p>
           </div>
-          <button class="theme-caption hover:theme-text-secondary" @click="closeVehicleDetails">
+          <ShadcnButton variant="outline" size="native" class="theme-caption hover:theme-text-secondary" @click="closeVehicleDetails">
             <XMarkIcon class="w-5 h-5" />
-          </button>
+          </ShadcnButton>
         </div>
 
         <div class="px-5 pt-4 pb-5 overflow-y-auto space-y-6 max-h-[80vh]">
@@ -248,14 +248,14 @@
                   </option>
                 </select>
                 <DateTimeField v-model="changeOwnerForm.effectiveDate" class="border rounded px-2 py-1 text-sm" />
-                <button
+                <ShadcnButton variant="outline" size="native"
                   type="submit"
                   class="px-3 py-1.5 text-xs md:text-sm rounded theme-button  disabled:opacity-50"
                   :disabled="changeOwnerLoading"
                 >
                   <span v-if="changeOwnerLoading">{{ $t('labels.saving') }}</span>
                   <span v-else>{{ $t('vehicles.changeOwner') }}</span>
-                </button>
+                </ShadcnButton>
               </form>
             </div>
           </section>

@@ -6,7 +6,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold theme-heading">{{ modalHeaderTitle }}</h2>
-          <button @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</button>
+          <ShadcnButton variant="outline" size="native" @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</ShadcnButton>
         </div>
 
         <!-- Body -->
@@ -16,7 +16,7 @@
           <div v-if="currentStep === 0" class="w-full">
             <h3 class="text-lg font-bold mb-6 text-center theme-text-primary">{{ $t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type' }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <button @click="chooseOwnership(false)" type="button"
+              <ShadcnButton variant="outline" size="native" @click="chooseOwnership(false)" type="button"
                 class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
                 <div class="flex items-center justify-between gap-4">
                   <div>
@@ -25,9 +25,9 @@
                   </div>
                   <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">1</span>
                 </div>
-              </button>
+              </ShadcnButton>
 
-              <button @click="chooseOwnership(true)" type="button"
+              <ShadcnButton variant="outline" size="native" @click="chooseOwnership(true)" type="button"
                 class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
                 <div class="flex items-center justify-between gap-4">
                   <div>
@@ -36,10 +36,10 @@
                   </div>
                   <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">2</span>
                 </div>
-              </button>
+              </ShadcnButton>
             </div>
             <div class="mt-10 flex justify-center">
-              <button @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">{{ $t('labels.cancel') }}</button>
+              <ShadcnButton variant="outline" size="native" @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">{{ $t('labels.cancel') }}</ShadcnButton>
             </div>
           </div>
 
@@ -155,8 +155,8 @@
 
             <!-- Back / Next Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="goBackToStep0" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-              <button @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></button>
+              <ShadcnButton variant="outline" size="native" @click="goBackToStep0" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="goToStep2" :disabled="!isStep1Valid()" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ $t('labels.next') }} <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" /></ShadcnButton>
             </div>
           </div>
 
@@ -164,7 +164,7 @@
           <div v-if="currentStep === 2" class="w-full">
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
-              <button @click="goBackToStep1" class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+              <ShadcnButton variant="outline" size="native" @click="goBackToStep1" class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</ShadcnButton>
               <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2DataEquipment') }}</h3>
               <div></div>
             </div>
@@ -254,12 +254,12 @@
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition" title="Duplicate" tabindex="-1">
+                          <ShadcnButton variant="outline" size="native" @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition" title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
-                          </button>
-                          <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition" title="Delete" tabindex="-1">
+                          </ShadcnButton>
+                          <ShadcnButton variant="outline" size="native" @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition" title="Delete" tabindex="-1">
                             <TrashIcon class="w-5 h-5" />
-                          </button>
+                          </ShadcnButton>
                         </div>
                       </td>
                     </tr>
@@ -278,8 +278,8 @@
 
             <!-- Save / Back Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="goBackToStep1" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
-              <button @click="save" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></button>
+              <ShadcnButton variant="outline" size="native" @click="goBackToStep1" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="save" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></ShadcnButton>
             </div>
 
             <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">{{ saveError }}</p>
@@ -296,11 +296,11 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
       <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="addSite" :disabled="!newSiteName || addingLocation"
+        <ShadcnButton variant="outline" size="native" @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addSite" :disabled="!newSiteName || addingLocation"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
@@ -312,11 +312,11 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
       <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="addArea" :disabled="!newAreaName || addingLocation"
+        <ShadcnButton variant="outline" size="native" @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addArea" :disabled="!newAreaName || addingLocation"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>

@@ -17,10 +17,10 @@
         </div>
       </div>
       <div class="mt-4 flex justify-end gap-2">
-        <button @click="$emit('close')" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="submit" :disabled="submitting" class="bg-green-600 theme-text-light px-3 py-1 rounded">
+        <ShadcnButton variant="outline" size="native" @click="$emit('close')" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="submit" :disabled="submitting" class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ submitting ? $t('labels.saving') : $t('payments.savePayment') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="error" class="text-red-600 mt-3">{{ error }}</div>
     </div>

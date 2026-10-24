@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-200/40 h-full">
+  <Card class="shadcn-ui h-full border-border/80 bg-card p-5 shadow-sm">
     <div v-if="loading" class="animate-pulse space-y-4">
       <div class="h-4 w-32 rounded bg-slate-200" />
       <div class="mx-auto h-36 w-36 rounded-full bg-slate-200" />
@@ -42,16 +42,17 @@
         </span>
       </div>
     </template>
-  </div>
+  </Card>
 </template>
 
 <script>
 import VueApexCharts from 'vue3-apexcharts'
 import DashboardEmpty from './DashboardEmpty.vue'
+import { Card } from '@/components/ui/card'
 
 export default {
   name: 'DirectionGauge',
-  components: { apexchart: VueApexCharts, DashboardEmpty },
+  components: { apexchart: VueApexCharts, Card, DashboardEmpty },
   props: {
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
@@ -144,7 +145,7 @@ export default {
             max: this.domainMax,
             shape: 'needle',
             hollow: { margin: 14, size: '52%' },
-            track: { background: '#f1f5f9', strokeWidth: '100%' },
+            track: { background: 'hsl(var(--shadcn-muted))', strokeWidth: '100%' },
             bands: [
               { from: -this.domainMax, to: -this.threshold, color: this.negativeColor },
               { from: -this.threshold, to: this.threshold, color: this.neutralColor },
@@ -153,8 +154,8 @@ export default {
             bandsStyle: { strokeWidth: '92%', linecap: 'round', gap: 1, hideTrackWhenPresent: true },
             ticks: {
               show: true,
-              major: { count: 5, width: 2, color: '#64748b', length: 8, placement: 'inside' },
-              minor: { count: 2, width: 1, color: '#94a3b8', length: 4 }
+              major: { count: 5, width: 2, color: 'hsl(var(--shadcn-muted-foreground))', length: 8, placement: 'inside' },
+              minor: { count: 2, width: 1, color: 'hsl(var(--shadcn-border))', length: 4 }
             },
             needle: {
               color: this.needleColor,

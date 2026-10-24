@@ -1,14 +1,11 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-xl sm:text-2xl font-bold theme-text-primary">{{ $t('locations.title') || 'Locations' }}</h2>
-      <div class="flex items-center gap-3">
-        <Button class="gap-2" @click="openAddSite()">
-          <PlusIcon class="h-4 w-4" />
-          {{ $t('locations.addLocation') || 'Add Location' }}
-        </Button>
-      </div>
-    </div>
+    <PageHeader :title="$t('locations.title') || 'Locations'">
+      <Button class="gap-2" @click="openAddSite()">
+        <PlusIcon class="h-4 w-4" />
+        {{ $t('locations.addLocation') || 'Add Location' }}
+      </Button>
+    </PageHeader>
 
     <div class="app-table-card">
       <table v-app-table class="app-table table-auto">
@@ -78,6 +75,7 @@
 
 <script>
 import { getLocations, createLocation, updateLocation, deleteLocation } from '@/api'
+import PageHeader from '@/components/shared/PageHeader.vue'
 import RowActions from '@/components/shared/RowActions.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -92,6 +90,7 @@ export default {
     Modal,
     ConfirmDialog,
     Label,
+    PageHeader,
     RowActions,
     Button,
     Input,

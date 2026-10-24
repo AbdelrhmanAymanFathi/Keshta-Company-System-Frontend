@@ -35,14 +35,14 @@ function handleUpdate(value) {
     :default-checked="defaultChecked"
     data-slot="switch"
     :class="cn(
-      'peer focus-visible:border-ring focus-visible:ring-ring/50 dark:focus-visible:ring-ring/50 inline-flex h-5 w-9 shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input/80',
+      'peer focus-visible:border-ring focus-visible:ring-ring/50 dark:focus-visible:ring-ring/50 inline-flex h-7 w-12 shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input/80',
       props.class
     )"
     @update:checked="handleUpdate"
   >
     <SwitchThumb
       :class="cn(
-        'pointer-events-none block size-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0'
+        'pointer-events-none block size-6 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 rtl:data-[state=checked]:translate-x-0 rtl:data-[state=unchecked]:-translate-x-5'
       )"
     />
   </SwitchRoot>

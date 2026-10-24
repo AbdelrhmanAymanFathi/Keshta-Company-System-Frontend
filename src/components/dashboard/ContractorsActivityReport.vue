@@ -7,14 +7,14 @@
         <p class="text-sm theme-text-secondary mt-1">{{ t('description') }}</p>
       </div>
       <div class="flex items-center gap-2">
-        <button 
+        <ShadcnButton variant="outline" size="native"
           @click="refresh" 
           :disabled="loading"
           class="bg-gray-100 hover:bg-gray-200 theme-text-primary px-3 py-2 rounded-xl transition-colors disabled:opacity-50 text-sm font-medium"
         >
           {{ $t('labels.refresh') || 'Refresh' }}
-        </button>
-        <button 
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           @click="downloadReport('xlsx')" 
           :disabled="downloading || loading"
           class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 text-sm font-medium theme-text-light shadow-sm"
@@ -23,8 +23,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
           </svg>
           {{ t('exportExcel') }}
-        </button>
-        <button 
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           @click="downloadReport('pdf')" 
           :disabled="downloading || loading"
           class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 text-sm font-medium shadow-sm"
@@ -33,7 +33,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
           </svg>
           {{ t('exportPdf') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -213,19 +213,19 @@
         </div>
 
         <div class="flex gap-2">
-          <button 
+          <ShadcnButton variant="outline" size="native"
             @click="loadReport"
             :disabled="loading"
             class="px-4 py-2 theme-button rounded-xl transition-colors disabled:opacity-50 text-sm font-semibold theme-text-light shadow-sm"
           >
             {{ t('generate') }}
-          </button>
-          <button 
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             @click="clearFilters"
             class="px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 theme-text-secondary rounded-xl transition-colors text-sm font-semibold"
           >
             {{ t('clear') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>
@@ -308,7 +308,7 @@
               <td class="px-4 py-4 text-sm font-medium theme-text-primary">{{ row.contractorName }}</td>
               <td class="px-4 py-4 text-sm theme-text-secondary">
                 <template v-if="row.locationName">{{ row.locationName }}</template>
-                <button
+                <ShadcnButton variant="outline" size="native"
                   v-else-if="isAdmin && row.contractorId"
                   type="button"
                   @click="openPlacement(row)"
@@ -319,7 +319,7 @@
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 16.5 9 17l.5-3.5z"/>
                   </svg>
-                </button>
+                </ShadcnButton>
                 <template v-else>{{ t('unassignedLocation') }}</template>
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-sm theme-text-primary">
@@ -443,21 +443,21 @@
         </div>
 
         <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-          <button
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="closePlacement"
             class="px-4 py-2 border border-slate-200 bg-slate-100 hover:bg-slate-200 theme-text-secondary rounded-xl text-sm font-semibold"
           >
             {{ t('cancel') }}
-          </button>
-          <button
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             type="button"
             @click="savePlacement"
             :disabled="placement.saving || placement.loading || !placement.entries.length"
             class="px-4 py-2 theme-button rounded-xl text-sm font-semibold theme-text-light disabled:opacity-50"
           >
             {{ placement.saving ? t('saving') : t('save') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>

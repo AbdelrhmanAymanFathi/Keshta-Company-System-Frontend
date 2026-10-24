@@ -1,53 +1,44 @@
 <template>
-  <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
-    <div class="flex flex-col gap-4">
+  <Card class="shadcn-ui border-border/80 bg-card shadow-lg shadow-slate-200/40">
+    <CardContent class="flex flex-col gap-4 p-4">
       <div class="flex flex-wrap items-center gap-2">
         <Button
           v-for="p in presets"
           :key="p.key"
           type="button"
-          :variant="activePreset === p.key ? 'default' : 'ghost'"
+          :variant="activePreset === p.key ? 'default' : 'outline'"
           size="sm"
-          @click="selectPreset(p.key)"
           class="rounded-lg px-3"
+          @click="selectPreset(p.key)"
         >
           {{ $t(p.label) }}
         </Button>
       </div>
-      <div v-if="activePreset === 'custom'" class="flex flex-col sm:flex-row gap-3 items-end">
-        <div class="flex-1 w-full">
-          <label class="mb-1 block text-xs font-medium theme-text-secondary">
+      <div v-if="activePreset === 'custom'" class="flex flex-col items-end gap-3 sm:flex-row">
+        <div class="w-full flex-1 space-y-1">
+          <Label class="text-xs font-medium text-muted-foreground">
             {{ $t('labels.fromDate') || 'From' }}
-          </label>
-          <DateField
-            v-model="customFrom"
-            class="w-full rounded-xl border border-slate-200 px-3 py-1.5 text-sm theme-input-focus"
-          />
+          </Label>
+          <DateField v-model="customFrom" class="w-full" />
         </div>
-        <div class="flex-1 w-full">
-          <label class="mb-1 block text-xs font-medium theme-text-secondary">
+        <div class="w-full flex-1 space-y-1">
+          <Label class="text-xs font-medium text-muted-foreground">
             {{ $t('labels.toDate') || 'To' }}
-          </label>
-          <DateField
-            v-model="customTo"
-            class="w-full rounded-xl border border-slate-200 px-3 py-1.5 text-sm theme-input-focus"
-          />
+          </Label>
+          <DateField v-model="customTo" class="w-full" />
         </div>
-        <Button
-          type="button"
-          size="sm"
-          @click="applyCustom"
-          class="rounded-lg px-4"
-        >
+        <Button type="button" size="sm" class="rounded-lg px-4" @click="applyCustom">
           {{ $t('changes.loadChanges') || 'Apply' }}
         </Button>
       </div>
-    </div>
-  </div>
+    </CardContent>
+  </Card>
 </template>
 
 <script>
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 import DateField from '@/components/shared/DateField.vue'
 
 function formatISO(d) {
@@ -95,7 +86,7 @@ const PRESETS = [
 
 export default {
   name: 'DateRangeToolbar',
-  components: { Button, DateField },
+  components: { Button, Card, CardContent, DateField, Label },
   props: {
     startDate: { type: String, default: '' },
     endDate: { type: String, default: '' }

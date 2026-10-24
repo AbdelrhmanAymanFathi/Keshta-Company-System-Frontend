@@ -1,23 +1,23 @@
 <template>
   <div
     v-if="total > 0 && totalPages > 1"
-    class="shadcn-ui mt-4 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+    class="shadcn-ui mt-4 flex items-center justify-between border-t border-border bg-card px-4 py-3 sm:px-6"
   >
     <div class="hidden items-center gap-4 sm:flex">
-      <p class="text-sm theme-text-secondary">
-        Showing
-        <span class="font-medium">{{ startItem }}</span>
-        to
-        <span class="font-medium">{{ endItem }}</span>
-        of
-        <span class="font-medium">{{ total }}</span>
-        results
+      <p class="text-sm text-muted-foreground">
+        {{ $t('labels.showing') }}
+        <span class="font-medium text-foreground">{{ startItem }}</span>
+        {{ $t('labels.to') }}
+        <span class="font-medium text-foreground">{{ endItem }}</span>
+        {{ $t('labels.of') }}
+        <span class="font-medium text-foreground">{{ total }}</span>
+        {{ $t('labels.results') }}
       </p>
       <div class="flex items-center gap-2">
-        <label class="text-sm theme-text-secondary">Page size:</label>
+        <Label class="text-sm text-muted-foreground">{{ $t('labels.pageSize') || 'Page size' }}:</Label>
         <NativeSelect
           v-model.number="localPageSize"
-          class="h-8 w-20 rounded border border-gray-300 bg-white px-2 text-sm focus:outline-none theme-input-focus"
+          class="h-8 w-20"
           aria-label="Page size"
           @change="onPageSizeChange"
         >
@@ -39,10 +39,10 @@
     >
       <PaginationContent class="gap-1">
         <PaginationFirst class="hidden sm:inline-flex" aria-label="First page" />
-        <PaginationPrevious aria-label="Previous page">
-          Previous
+        <PaginationPrevious :aria-label="$t('labels.previous')">
+          {{ $t('labels.previous') }}
         </PaginationPrevious>
-        <span class="px-2 text-sm theme-text-secondary sm:hidden">{{ currentPage }} / {{ totalPages }}</span>
+        <span class="px-2 text-sm text-muted-foreground sm:hidden">{{ currentPage }} / {{ totalPages }}</span>
         <template v-for="page in pageList" :key="page.key">
           <PaginationEllipsis v-if="page.isEllipsis" class="hidden sm:inline-flex" />
           <PaginationItem
@@ -54,8 +54,8 @@
             {{ page.number }}
           </PaginationItem>
         </template>
-        <PaginationNext aria-label="Next page">
-          Next
+        <PaginationNext :aria-label="$t('labels.next')">
+          {{ $t('labels.next') }}
         </PaginationNext>
         <PaginationLast class="hidden sm:inline-flex" aria-label="Last page" />
       </PaginationContent>
@@ -65,6 +65,7 @@
 
 <script>
 import { computed, ref, watch } from 'vue'
+import { Label } from '@/components/ui/label'
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import {
   Pagination,
@@ -80,6 +81,7 @@ import {
 export default {
   name: 'AppPagination',
   components: {
+    Label,
     NativeSelect,
     NativeSelectOption,
     Pagination,

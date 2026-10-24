@@ -5,9 +5,9 @@
       <div class="text-xl theme-text-secondary mb-6">{{ message || $t('common.error') }}</div>
 
       <div class="flex justify-center gap-3">
-        <button @click="retry" class="px-4 py-2 theme-button rounded">{{ $t('labels.retry') || 'Retry' }}</button>
+        <ShadcnButton variant="outline" size="native" @click="retry" class="px-4 py-2 theme-button rounded">{{ $t('labels.retry') || 'Retry' }}</ShadcnButton>
         <a :href="staticPageHref" target="_blank" rel="noopener" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-100">Open static page</a>
-        <button @click="dismiss" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-100">Close</button>
+        <ShadcnButton variant="outline" size="native" @click="dismiss" class="px-4 py-2 border rounded theme-text-secondary hover:bg-gray-100">Close</ShadcnButton>
       </div>
     </div>
   </div>

@@ -14,7 +14,7 @@
     </div>
 
     <!-- Autoplay fallback: discreet button shown only when the browser blocked us -->
-    <button
+    <ShadcnButton variant="outline" size="native"
       v-if="introBlocked && introEnabled"
       type="button"
       class="startup-intro__play"
@@ -24,7 +24,7 @@
         <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z" />
       </svg>
       <span>{{ $t('intro.playButton') }}</span>
-    </button>
+    </ShadcnButton>
   </div>
 </template>
 

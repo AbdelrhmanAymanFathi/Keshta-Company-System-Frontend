@@ -13,14 +13,14 @@
               <h2 class="text-2xl font-bold theme-heading theme-text-primary">
                 {{ currentStep === 1 ? modalTitleComputed : enterPaymentTitle }}
               </h2>
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 class="theme-caption hover:theme-text-secondary focus:outline-none"
                 aria-label="Close"
                 @click="closeModal"
               >
                 &times;
-              </button>
+              </ShadcnButton>
             </div>
 
             <div class="modal-body-container relative flex-1 overflow-y-auto p-6">
@@ -61,7 +61,7 @@
                           :dir="isRTL ? 'rtl' : 'ltr'"
                           @keydown="handleStep1FieldKeydown($event, 'date')"
                         />
-                        <button
+                        <ShadcnButton variant="outline" size="native"
                           v-if="selectedDate"
                           type="button"
                           tabindex="-1"
@@ -71,7 +71,7 @@
                           @click="clearDate"
                         >
                           ×
-                        </button>
+                        </ShadcnButton>
                       </div>
                     </div>
 
@@ -91,7 +91,7 @@
                             {{ option.label }}
                           </option>
                         </select>
-                        <button
+                        <ShadcnButton variant="outline" size="native"
                           v-if="selectedModule"
                           type="button"
                           tabindex="-1"
@@ -101,7 +101,7 @@
                           @click="clearModule"
                         >
                           ×
-                        </button>
+                        </ShadcnButton>
                       </div>
                     </div>
 
@@ -145,7 +145,7 @@
                 </div>
 
                 <div class="mt-10 flex justify-end">
-                  <button
+                  <ShadcnButton variant="outline" size="native"
                     type="button"
                     class="theme-button inline-flex items-center gap-2 px-6 py-3"
                     :disabled="!isStep1Valid"
@@ -153,7 +153,7 @@
                   >
                     <span>{{ nextLabel }}</span>
                     <component :is="isRTL ? ArrowLeftIcon : ArrowRightIcon" class="h-5 w-5" />
-                  </button>
+                  </ShadcnButton>
                 </div>
               </div>
 
@@ -222,7 +222,7 @@
 
                         <td class="px-4 py-3 text-center">
                           <div class="flex justify-center gap-3">
-                            <button
+                            <ShadcnButton variant="outline" size="native"
                               type="button"
                               class="theme-caption hover:theme-text-primary"
                               title="Duplicate"
@@ -230,8 +230,8 @@
                               @click="duplicateRow(index)"
                             >
                               <DocumentDuplicateIcon class="h-5 w-5" />
-                            </button>
-                            <button
+                            </ShadcnButton>
+                            <ShadcnButton variant="outline" size="native"
                               type="button"
                               class="theme-caption text-red-600 transition hover:text-red-800"
                               title="Delete"
@@ -239,7 +239,7 @@
                               @click="removeRow(index)"
                             >
                               <TrashIcon class="h-5 w-5" />
-                            </button>
+                            </ShadcnButton>
                           </div>
                         </td>
                       </tr>
@@ -252,20 +252,20 @@
                 </p>
 
                 <div class="mt-8 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
-                  <button
+                  <ShadcnButton variant="outline" size="native"
                     type="button"
                     class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-6 py-3 font-medium theme-text-secondary hover:theme-hover-soft"
                     @click="prevStep"
                   >
                     <component :is="isRTL ? ArrowRightIcon : ArrowLeftIcon" class="h-5 w-5" />
                     <span>{{ backLabel }}</span>
-                  </button>
+                  </ShadcnButton>
 
                   <div class="flex flex-col gap-3 sm:items-end">
                     <div class="text-sm font-medium theme-text-secondary">
                       {{ totalLabel }}: <span class="font-semibold theme-text-primary">{{ totalAmountDisplay }}</span>
                     </div>
-                    <button
+                    <ShadcnButton variant="outline" size="native"
                       type="button"
                       class="theme-button inline-flex items-center justify-center gap-2 px-10 py-3"
                       :disabled="isSubmitDisabled || isSaving"
@@ -273,7 +273,7 @@
                     >
                       <span>{{ isSaving ? savingLabel : saveLabel }}</span>
                       <CheckIcon class="h-5 w-5" />
-                    </button>
+                    </ShadcnButton>
                   </div>
                 </div>
               </div>

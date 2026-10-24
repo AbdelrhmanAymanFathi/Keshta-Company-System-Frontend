@@ -17,11 +17,11 @@
           {{ $t('suppliers.importExcel') }}
         </label> -->
         <!-- Add Button -->
-        <button @click="openAdd"
+        <ShadcnButton variant="outline" size="native" @click="openAdd"
           class="theme-button px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm text-xs sm:text-sm">
           <PlusIcon class="w-5 h-5" />
           {{ $t('suppliers.add') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -55,9 +55,9 @@
           >
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-accent-muted" :class="textAlign">{{ idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">
-              <button @click.stop="goToDetail(c)" class="theme-text hover:underline">
+              <ShadcnButton variant="outline" size="native" @click.stop="goToDetail(c)" class="theme-text hover:underline">
                 {{ c.name }}
-              </button>
+              </ShadcnButton>
             </td>
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">{{ c.phone || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-4 text-sm theme-text-primary" :class="textAlign">{{ c.bankName || '-' }}</td>
@@ -95,24 +95,24 @@
       @click.stop
       @contextmenu.prevent
     >
-      <button @click="contextAction('edit')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      <ShadcnButton variant="outline" size="native" @click="contextAction('edit')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <PencilSquareIcon class="h-4 w-4" />
         {{ $t('labels.edit') }}
-      </button>
-      <button @click="contextAction('delete')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native" @click="contextAction('delete')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <TrashIcon class="h-4 w-4" />
         {{ $t('labels.delete') }}
-      </button>
+      </ShadcnButton>
       <!-- <button @click="contextAction('wallet')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-6 4h12a2 2 0 002-2v-4a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z" />
         </svg>
         {{ $t('suppliers.wallet') }}
       </button> -->
-      <button @click="contextAction('statement')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      <ShadcnButton variant="outline" size="native" @click="contextAction('statement')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <DocumentTextIcon class="h-4 w-4" />
         {{ $t('suppliers.statement') }}
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Add/Edit Modal -->

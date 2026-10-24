@@ -31,8 +31,8 @@
             <input v-model="localBranchCategory" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg theme-input-focus" />
           </div>
           <div class="flex gap-2 mt-6">
-            <button type="button" @click="handleClose" class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</button>
-            <button type="submit" class="flex-1 px-4 py-2 theme-button rounded-lg">{{ $t('labels.save') }}</button>
+            <ShadcnButton variant="outline" size="native" type="button" @click="handleClose" class="flex-1 px-4 py-2 theme-text-secondary border border-gray-300 rounded-lg hover:bg-gray-50">{{ $t('labels.cancel') }}</ShadcnButton>
+            <ShadcnButton variant="outline" size="native" type="submit" class="flex-1 px-4 py-2 theme-button rounded-lg">{{ $t('labels.save') }}</ShadcnButton>
           </div>
         </form>
       </div>

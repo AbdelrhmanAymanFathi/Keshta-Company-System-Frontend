@@ -20,8 +20,11 @@ export const LAYOUT_TOKENS = {
   zIndex: {
     backdrop: 35,
     sidebar: 40,
-    header: 50,
-    dropdown: 60
+    header: 120,
+    dropdown: 130,
+    modal: 200,
+    popover: 220,
+    toast: 300
   },
   motion: {
     duration: '280ms',
@@ -74,6 +77,11 @@ export function applyLayoutTokens() {
   root.setProperty('--mobile-toolbar-height', t.responsive.mobileToolbarHeight)
   root.setProperty('--layout-z-backdrop', String(t.zIndex.backdrop))
   root.setProperty('--layout-z-sidebar', String(t.zIndex.sidebar))
+  root.setProperty('--layout-z-header', String(t.zIndex.header))
+  root.setProperty('--layout-z-dropdown', String(t.zIndex.dropdown))
+  root.setProperty('--layout-z-modal', String(t.zIndex.modal))
+  root.setProperty('--layout-z-popover', String(t.zIndex.popover))
+  root.setProperty('--layout-z-toast', String(t.zIndex.toast))
   root.setProperty('--layout-motion-duration', t.motion.duration)
   root.setProperty('--layout-motion-duration-fast', t.motion.durationFast)
   root.setProperty('--layout-motion-ease', t.motion.ease)

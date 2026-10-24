@@ -2,7 +2,7 @@
   <div class="space-y-4" :class="{ 'direction-rtl': isRTL }">
     <PageHeader :title="title" :subtitle="subtitle">
       <div class="flex items-center gap-2">
-        <button
+        <ShadcnButton variant="outline" size="native"
           v-for="(action, i) in headerActions"
           :key="'hdr-' + i"
           type="button"
@@ -11,8 +11,8 @@
           @click="$emit('header-action', action)"
         >
           {{ action.label }}
-        </button>
-        <button
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           type="button"
           class="px-3 py-1.5 text-xs sm:text-sm font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center gap-1.5"
           :disabled="exporting"
@@ -22,8 +22,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           {{ $t('orgCharts.downloadImage') }}
-        </button>
-        <button
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           type="button"
           class="px-3 py-1.5 text-xs sm:text-sm font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center gap-1.5"
           :disabled="exporting"
@@ -33,8 +33,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           {{ $t('orgCharts.exportPdf') }}
-        </button>
-        <button
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           type="button"
           class="px-3 py-1.5 text-xs sm:text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors flex items-center gap-1.5"
           :disabled="loading"
@@ -45,7 +45,7 @@
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
           </svg>
           {{ $t('orgCharts.refresh') }}
-        </button>
+        </ShadcnButton>
       </div>
     </PageHeader>
 
@@ -65,7 +65,7 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <button
+        <ShadcnButton variant="outline" size="native"
           type="button"
           class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
           @click="expandAll"
@@ -74,8 +74,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
           {{ $t('orgCharts.expandAll') }}
-        </button>
-        <button
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           type="button"
           class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
           @click="collapseAll"
@@ -84,7 +84,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
           </svg>
           {{ $t('orgCharts.collapseAll') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -158,7 +158,7 @@
               {{ selectedDetails.subtitle }}
             </p>
           </div>
-          <button
+          <ShadcnButton variant="outline" size="native"
             type="button"
             class="w-8 h-8 shrink-0 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors"
             :title="$t('orgCharts.closePanel')"
@@ -167,7 +167,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </ShadcnButton>
         </div>
 
         <div v-if="selectedDetails.badge" class="flex flex-wrap gap-2">
@@ -188,7 +188,7 @@
         </div>
 
         <div v-if="selectedDetails.link" class="pt-1">
-          <button
+          <ShadcnButton variant="outline" size="native"
             type="button"
             class="w-full px-4 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors flex items-center justify-center gap-2"
             @click="$emit('open-link', selectedDetails.link)"
@@ -197,11 +197,11 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
             {{ selectedDetails.linkLabel || $t('orgCharts.openDetails') }}
-          </button>
+          </ShadcnButton>
         </div>
 
         <div v-if="selectedDetails.actions && selectedDetails.actions.length" class="pt-1 space-y-2">
-          <button
+          <ShadcnButton variant="outline" size="native"
             v-for="(action, i) in selectedDetails.actions"
             :key="'action-' + i"
             type="button"
@@ -216,7 +216,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             {{ action.label }}
-          </button>
+          </ShadcnButton>
         </div>
       </aside>
     </div>

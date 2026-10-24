@@ -9,13 +9,13 @@
         </div>
 
         <div class="flex gap-2">
-          <button @click="openAddModal"
+          <ShadcnButton variant="outline" size="native" @click="openAddModal"
             class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition whitespace-nowrap shadow-sm ">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             {{ $t('equipmentLog.addEntry') }}
-          </button>
+          </ShadcnButton>
 
           <!-- <button @click="$emit('navigate-report')"
             class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded-lg flex items-center gap-2 transition whitespace-nowrap">
@@ -64,15 +64,15 @@
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('equipmentLog.equipmentType') }}</label>
             <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <button @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'theme-button shadow-sm ' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.all') }}</button>
-              <button @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.companyOwned') }}</button>
-              <button @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.external') }}</button>
+              <ShadcnButton variant="outline" size="native" @click="setCompanyOwnedFilter(null)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === null ? 'theme-button shadow-sm ' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.all') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="setCompanyOwnedFilter(true)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === true ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.companyOwned') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="setCompanyOwnedFilter(false)" :class="['px-3 py-2 rounded-xl text-sm font-medium transition whitespace-nowrap flex-1 sm:flex-none', localIsCompanyOwned === false ? 'bg-slate-600 theme-text-light shadow-sm shadow-slate-200' : 'bg-white theme-text-secondary hover:bg-slate-50 border border-slate-200']">{{ $t('equipmentLog.external') }}</ShadcnButton>
             </div>
           </div>
 
           <div class="col-span-full flex gap-2">
-            <button @click="applyFilters" class="px-4 py-2 theme-button rounded-xl text-sm shadow-sm ">{{ $t('labels.search') }}</button>
-            <button @click="clearFilters" class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl text-sm">{{ $t('labels.clear') }}</button>
+            <ShadcnButton variant="outline" size="native" @click="applyFilters" class="px-4 py-2 theme-button rounded-xl text-sm shadow-sm ">{{ $t('labels.search') }}</ShadcnButton>
+            <ShadcnButton variant="outline" size="native" @click="clearFilters" class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl text-sm">{{ $t('labels.clear') }}</ShadcnButton>
           </div>
         </div>
       </div>
@@ -313,17 +313,17 @@
         class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
         <!-- Mobile Pagination -->
         <div class="flex-1 flex justify-between sm:hidden">
-          <button @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
+          <ShadcnButton variant="outline" size="native" @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.previous') }}
-          </button>
+          </ShadcnButton>
           <span class="text-sm theme-text-secondary self-center">
             {{ equipmentLogsStore.page }} / {{ equipmentLogsStore.totalPages }}
           </span>
-          <button @click="changePage(equipmentLogsStore.page + 1)" :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
+          <ShadcnButton variant="outline" size="native" @click="changePage(equipmentLogsStore.page + 1)" :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md theme-text-secondary bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
             {{ $t('labels.next') }}
-          </button>
+          </ShadcnButton>
         </div>
 
         <!-- Desktop Pagination -->
@@ -344,36 +344,36 @@
           <!-- Page Numbers -->
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              <button @click="changePage(1)" :disabled="equipmentLogsStore.page <= 1"
+              <ShadcnButton variant="outline" size="native" @click="changePage(1)" :disabled="equipmentLogsStore.page <= 1"
                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z"
                     clip-rule="evenodd" />
                 </svg>
-              </button>
+              </ShadcnButton>
 
-              <button @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
+              <ShadcnButton variant="outline" size="native" @click="changePage(equipmentLogsStore.page - 1)" :disabled="equipmentLogsStore.page <= 1"
                 class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd"
                     d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
                 </svg>
-              </button>
+              </ShadcnButton>
 
               <template v-for="page in visiblePages" :key="page">
-                <button @click="changePage(page)" :class="[
+                <ShadcnButton variant="outline" size="native" @click="changePage(page)" :class="[
                   'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
                   page === equipmentLogsStore.page
                     ? 'z-10 theme-dashboard-bg-soft theme-pagination-active'
                     : 'bg-white border-gray-300 theme-text-muted hover:bg-gray-50'
                 ]">
                   {{ page }}
-                </button>
+                </ShadcnButton>
               </template>
 
-              <button @click="changePage(equipmentLogsStore.page + 1)"
+              <ShadcnButton variant="outline" size="native" @click="changePage(equipmentLogsStore.page + 1)"
                 :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
                 class="relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -381,9 +381,9 @@
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                     clip-rule="evenodd" />
                 </svg>
-              </button>
+              </ShadcnButton>
 
-              <button @click="changePage(equipmentLogsStore.totalPages)"
+              <ShadcnButton variant="outline" size="native" @click="changePage(equipmentLogsStore.totalPages)"
                 :disabled="equipmentLogsStore.page >= equipmentLogsStore.totalPages"
                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium theme-text-muted hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -391,7 +391,7 @@
                     d="M4.293 4.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414zm6 0a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L14.586 10l-4.293-4.293a1 1 0 010-1.414z"
                     clip-rule="evenodd" />
                 </svg>
-              </button>
+              </ShadcnButton>
             </nav>
           </div>
         </div>
@@ -430,7 +430,7 @@
         class="fixed bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]"
         :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }" @click.stop
         @contextmenu.prevent>
-        <button @click="handleContextMenuAction('delete')"
+        <ShadcnButton variant="outline" size="native" @click="handleContextMenuAction('delete')"
           :disabled="contextMenu.rental?.hasPendingApproval"
           class="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
@@ -440,7 +440,7 @@
             </path>
           </svg>
           {{ $t('labels.delete') }}
-        </button>
+        </ShadcnButton>
       </div>
 
       <!-- Payouts Modal -->

@@ -14,12 +14,12 @@
           <h2 class="text-2xl font-bold theme-heading">
             {{ currentStep === 1 ? modalTitleComputed : ($t('transport.enterTransports') || 'إدخال النقل') }}
           </h2>
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="closeModal"
             class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none"
           >
             ×
-          </button>
+          </ShadcnButton>
         </div>
 
         <!-- Body -->
@@ -243,20 +243,20 @@
 
             <!-- Next / Cancel Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 @click="closeModal"
                 class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition"
               >
                 {{ $t('common.cancel') || 'إلغاء' }}
-              </button>
-              <button
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native"
                 @click="goToStep2"
                 :disabled="!isStep1Valid()"
                 class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3"
               >
                 {{ $t('common.next') || 'التالي' }}
                 <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
-              </button>
+              </ShadcnButton>
             </div>
           </div>
 
@@ -264,13 +264,13 @@
           <div v-else class="w-full">
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 @click="goBackToStep1"
                 class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"
               >
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('common.back') || 'عودة' }}
-              </button>
+              </ShadcnButton>
               <h3 class="text-lg font-bold theme-text-primary">{{ $t('transport.step2Data') || 'الخطوة 2: بيانات الرحلات' }}</h3>
               <div></div> <!-- Placeholder -->
             </div>
@@ -374,14 +374,14 @@
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition"
+                          <ShadcnButton variant="outline" size="native" @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition"
                             title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
-                          </button>
-                          <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
+                          </ShadcnButton>
+                          <ShadcnButton variant="outline" size="native" @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
                             title="Delete" tabindex="-1">
                             <TrashIcon class="w-5 h-5" />
-                          </button>
+                          </ShadcnButton>
                         </div>
                       </td>
                     </tr>
@@ -408,16 +408,16 @@
             </div>
             <!-- Save / Back Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="goBackToStep1"
+              <ShadcnButton variant="outline" size="native" @click="goBackToStep1"
                 class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('common.back') }}
-              </button>
-              <button @click="saveData" :disabled="isSaving"
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="saveData" :disabled="isSaving"
                 class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">
                 {{ isSaving ? $t('common.saving') : $t('common.save') }}
                 <CheckIcon class="w-6 h-6" />
-              </button>
+              </ShadcnButton>
             </div>
             <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">
               {{ saveError }}
@@ -441,11 +441,11 @@
         <option v-for="loc in locations" :key="loc.id" :value="loc.id">{{ loc.name }}</option>
       </select>
       <div class="flex gap-2 justify-end">
-        <button @click="showAddLocation = false; pendingField = null" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
-        <button @click="addLocation" :disabled="!newLocationName || addingLocation"
+        <ShadcnButton variant="outline" size="native" @click="showAddLocation = false; pendingField = null" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addLocation" :disabled="!newLocationName || addingLocation"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
@@ -460,11 +460,11 @@
       <input v-model="newContractorPhone" class="w-full border rounded px-2 py-1 mb-3"
         :placeholder="$t('contractors.phone')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
-        <button @click="addContractor" :disabled="!newContractorName || creatingContractor"
+        <ShadcnButton variant="outline" size="native" @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addContractor" :disabled="!newContractorName || creatingContractor"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div>
     </div>
@@ -485,12 +485,12 @@
       <input v-model.number="newVehicleForm.companyCapacity" type="number" step="0.01"
         :placeholder="$t('vehicles.companyCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
-        <button @click="addVehicle"
+        <ShadcnButton variant="outline" size="native" @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addVehicle"
           :disabled="!newVehicleForm.name || !newVehicleForm.companyCapacity || creatingVehicle"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
     </div>
@@ -503,11 +503,11 @@
       <input v-model="newItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddItemDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</button>
-        <button @click="addItem" :disabled="!newItemForm.name || creatingItem"
+        <ShadcnButton variant="outline" size="native" @click="showAddItemDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addItem" :disabled="!newItemForm.name || creatingItem"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingItem ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="itemDialogError" class="text-red-600 text-sm mt-2">{{ itemDialogError }}</div>
     </div>

@@ -212,7 +212,9 @@ function relativeLuminance({ r, g, b }: { r: number; g: number; b: number }) {
 }
 
 export function getContrastColor(hex: string) {
-  return relativeLuminance(hexToRgb(hex)) > 0.5 ? '#111827' : '#ffffff'
+  const lightText = '#ffffff'
+  const darkText = '#111827'
+  return contrastRatio(hex, lightText) >= contrastRatio(hex, darkText) ? lightText : darkText
 }
 
 export function contrastRatio(hexA: string, hexB: string) {
@@ -296,8 +298,24 @@ export function applyCoreColors(theme: NormalizedTheme) {
   const primaryDark = adjustLightness(primary, -18)
   const primaryRgb = hexToRgb(primary)
   const primaryDarkRgb = hexToRgb(primaryDark)
+  const primaryHsl = rgbToHsl(primaryRgb)
+  const darkPrimary = adjustLightness(primary, 88 - primaryHsl.l)
   const shadeVars = setThemeShadeVars(primary)
   const root = document.documentElement.style
+  const toHslToken = (hex: string) => {
+    const { h, s, l } = rgbToHsl(hexToRgb(hex))
+    return `${Math.round(h)} ${Math.round(s)}% ${Math.round(l)}%`
+  }
+  const chartColor = (hueOffset: number, saturation: number, lightness: number) =>
+    toHslToken(
+      rgbToHex(
+        hslToRgb({
+          h: (primaryHsl.h + hueOffset) % 360,
+          s: saturation,
+          l: lightness
+        })
+      )
+    )
   root.setProperty('--theme-primary', primary)
   root.setProperty('--theme-primary-dark', primaryDark)
   root.setProperty('--theme-primary-rgb', `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`)
@@ -306,6 +324,15 @@ export function applyCoreColors(theme: NormalizedTheme) {
   root.setProperty('--theme-on-primary', getContrastColor(primary))
   root.setProperty('--theme-primary-soft', `rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.14)`)
   root.setProperty('--theme-primary-border', `rgba(${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}, 0.18)`)
+  root.setProperty('--theme-primary-hsl', toHslToken(primary))
+  root.setProperty('--theme-primary-foreground-hsl', toHslToken(getContrastColor(primary)))
+  root.setProperty('--theme-primary-dark-hsl', toHslToken(darkPrimary))
+  root.setProperty('--theme-primary-dark-foreground-hsl', toHslToken(getContrastColor(darkPrimary)))
+  root.setProperty('--shadcn-chart-1', toHslToken(primary))
+  root.setProperty('--shadcn-chart-2', chartColor(230, 78, 48))
+  root.setProperty('--shadcn-chart-3', chartColor(60, 65, 55))
+  root.setProperty('--shadcn-chart-4', chartColor(290, 55, 43))
+  root.setProperty('--shadcn-chart-5', chartColor(150, 58, 57))
   if (shadeVars[700]) {
     const s700 = hexToRgb(shadeVars[700])
     root.setProperty('--theme-primary-dark', `rgb(${s700.r}, ${s700.g}, ${s700.b})`)

@@ -117,7 +117,7 @@
       <!-- Step 2: Lines -->
       <div v-else class="w-full">
         <div class="flex items-center justify-between mb-8">
-          <button @click="currentStep = 1" class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</button>
+          <ShadcnButton variant="outline" size="native" @click="currentStep = 1" class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition"><ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />{{ $t('labels.back') }}</ShadcnButton>
           <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2Data') }}</h3>
           <div></div>
         </div>
@@ -135,7 +135,7 @@
           </dl>
         </div>
 
-        <div class="mb-6"><button @click="addRow" class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">+ {{ $t('labels.addRow') }}</button></div>
+        <div class="mb-6"><ShadcnButton variant="outline" size="native" @click="addRow" class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">+ {{ $t('labels.addRow') }}</ShadcnButton></div>
 
         <div class="mb-8 relative border border-gray-200 rounded-lg overflow-visible p-2">
           <div class="overflow-x-auto w-full">
@@ -154,7 +154,7 @@
 
         <div class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
           <div class="flex items-center justify-end gap-3"><span class="theme-text-secondary">{{ $t('labels.subtotal') }}:</span><span class="theme-text-primary min-w-32 text-end">{{ formatCurrency(subtotal) }}</span></div>
-          <div class="mt-4 sm:mt-0"><button @click="saveData" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></button></div>
+          <div class="mt-4 sm:mt-0"><ShadcnButton variant="outline" size="native" @click="saveData" :disabled="isSaving" class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">{{ isSaving ? $t('labels.saving') : $t('labels.save') }} <CheckIcon class="w-6 h-6" /></ShadcnButton></div>
         </div>
 
         <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">{{ saveError }}</p>

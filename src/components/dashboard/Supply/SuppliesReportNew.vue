@@ -4,18 +4,18 @@
     <div class="flex justify-between items-center gap-4 flex-wrap">
       <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t('supply.exportTableTitle') }}</h2>
       <div class="flex items-center gap-2">
-        <button @click="refresh" :disabled="loading"
+        <ShadcnButton variant="outline" size="native" @click="refresh" :disabled="loading"
           class="bg-gray-100 hover:bg-gray-200 theme-text-primary px-3 py-2 rounded-lg transition-colors disabled:opacity-50">
           {{ $t('labels.refresh') }}
-        </button>
-        <button @click="downloadReport" :disabled="downloading"
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="downloadReport" :disabled="downloading"
           class="theme-button px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14" />
           </svg>
           {{ downloading ? $t('labels.downloading') : $t('labels.download') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -114,14 +114,14 @@
       </div>
 
       <div class="flex gap-2">
-        <button @click="loadReport" :disabled="loading"
+        <ShadcnButton variant="outline" size="native" @click="loadReport" :disabled="loading"
           class="px-4 py-2 theme-button rounded-lg transition-colors disabled:opacity-50 text-sm font-medium">
           {{ $t('labels.search') }}
-        </button>
-        <button @click="clearFilters"
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="clearFilters"
           class="px-4 py-2 bg-gray-200 hover:bg-gray-300 theme-text-primary rounded-lg transition-colors text-sm font-medium">
           {{ $t('labels.clear') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}"
@@ -103,7 +104,7 @@ module.exports = {
           700: 'rgb(var(--theme-primary-700) / <alpha-value>)',
           800: 'rgb(var(--theme-primary-800) / <alpha-value>)',
           900: 'rgb(var(--theme-primary-900) / <alpha-value>)',
-          DEFAULT: 'rgb(var(--theme-primary-500) / <alpha-value>)',
+          DEFAULT: 'hsl(var(--shadcn-primary) / <alpha-value>)',
           foreground: 'hsl(var(--shadcn-primary-foreground) / <alpha-value>)'
         },
         background: 'hsl(var(--shadcn-background) / <alpha-value>)',

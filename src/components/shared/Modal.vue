@@ -7,7 +7,7 @@
       @escape-key-down="onEscapeKeyDown"
       @pointer-down-outside="onPointerDownOutside"
     >
-      <DialogHeader class="flex shrink-0 flex-row items-center justify-between border-b border-gray-200 bg-gray-50 p-4">
+      <DialogHeader class="flex shrink-0 flex-row items-center justify-between border-b border-border bg-muted/40 p-4">
         <DialogTitle class="text-lg font-semibold theme-text-primary">
           {{ title }}
         </DialogTitle>
@@ -24,7 +24,7 @@
         <slot />
       </section>
 
-      <DialogFooter v-if="$slots.footer" class="shrink-0 border-t border-gray-200 bg-gray-50 p-4 sm:justify-start">
+      <DialogFooter v-if="$slots.footer" class="shrink-0 border-t border-border bg-muted/40 p-4 sm:justify-start">
         <slot name="footer" />
       </DialogFooter>
     </DialogContent>

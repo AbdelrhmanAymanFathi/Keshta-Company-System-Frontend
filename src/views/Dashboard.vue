@@ -4,8 +4,10 @@
     <header :class="headerClasses">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile and overlay/drawer/reveal desktop layouts -->
-        <button
+        <Button
+          variant="ghost"
           @click="toggleSidebar"
+          :aria-label="$t('dashboard.toggleSidebar') || 'Toggle sidebar'"
           :class="[
             'p-2 theme-rounded hover:bg-white/12 transition-all',
             showDesktopMenuToggle ? '' : 'sm:hidden'
@@ -14,7 +16,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
-        </button>
+        </Button>
         <!-- Brand -->
         <div class="flex shrink-0 items-center gap-2 sm:gap-3">
           <img
@@ -34,21 +36,22 @@
           :class="editLayout ? 'hidden md:flex ml-2 min-w-0 max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'hidden md:flex ml-2 min-w-0 max-w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden whitespace-nowrap lg:ml-4 lg:gap-2'"
           @end="onLayoutEnd"
         >
-          <button v-for="key in menuOrder" :key="key" @click="selectTop(key)"
+          <Button variant="ghost" v-for="key in menuOrder" :key="key" @click="selectTop(key)"
             class="top-nav-item flex items-center gap-1 rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm"
             :class="selectedTop === key ? 'bg-white theme-text-primary shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200'">
             {{ $t('navbar.' + key) }}
             <span v-if="editLayout" @click.stop.prevent class="menu-drag-handle inline-flex cursor-grab opacity-70 hover:opacity-100" title="">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
             </span>
-          </button>
+          </Button>
         </VueDraggable>
       </div>
 
       <!-- Right side: Language + User Avatar -->
       <div class="flex shrink-0 items-center gap-2 sm:gap-3">
         <!-- Edit menu layout -->
-        <button
+        <Button
+          variant="ghost"
           @click="toggleEditLayout"
           :title="$t('dashboard.editLayout')"
           :class="[
@@ -65,8 +68,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
           </svg>
           <span v-if="layoutSaving" class="absolute -top-0.5 -end-0.5 h-3 w-3 rounded-full border-2 border-white bg-amber-400 animate-pulse"></span>
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
           v-if="editLayout"
           @click="resetLayout"
           :title="$t('dashboard.resetLayout')"
@@ -75,7 +79,7 @@
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
           </svg>
-        </button>
+        </Button>
 
         <!-- Language Switcher -->
         <div
@@ -83,27 +87,30 @@
           role="group"
           aria-label="Language switcher"
         >
-          <button
+          <Button
+            variant="ghost"
             @click="switchLang('en')"
             :class="langBtnClass('en')"
             class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:theme-input-focus focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
             aria-label="Switch to English"
           >
             <img src="/flags/us.png" alt="English" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
             @click="switchLang('ar')"
             :class="langBtnClass('ar')"
             class="rounded-lg p-1 transition-all duration-200 hover:scale-110 focus:outline-none focus-visible:theme-input-focus focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900"
             aria-label="التبديل إلى العربية"
           >
             <img src="/flags/eg.png" alt="العربية" class="h-5 w-5 rounded sm:h-6 sm:w-6" />
-          </button>
+          </Button>
         </div>
 
         <!-- Notification Bell -->
         <div class="relative shrink-0">
-          <button @click="toggleNotificationMenu"
+          <Button variant="ghost" @click="toggleNotificationMenu"
+            :aria-label="$t('notifications.title') || 'Notifications'"
             class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm transition-all duration-200 hover:bg-white/16 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10">
             <svg class="w-5 h-5 theme-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -112,20 +119,20 @@
               class="absolute -top-1 -end-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none shadow-md shadow-red-500/40">
               {{ notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount }}
             </span>
-          </button>
+          </Button>
           <!-- Notification Dropdown -->
           <div v-if="notificationMenuOpen"
             class="fixed inset-x-3 top-16 transition-all duration-300 ease-out transform opacity-100 scale-100 sm:absolute sm:top-12"
-            :class="isRTL ? 'sm:left-0 sm:right-auto' : 'sm:right-0 sm:left-auto'" style="z-index: 60;">
+            :class="['layout-dropdown', isRTL ? 'sm:left-0 sm:right-auto' : 'sm:right-0 sm:left-auto']">
             <div class="mx-auto w-full max-w-md sm:w-96 animate-fade-in rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden">
               <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                 <span class="text-sm font-semibold theme-text-primary">{{ $t('notifications.title') || 'Notifications' }}</span>
                 <div class="flex items-center gap-2">
-                  <button @click="notificationMenuOpen = false" class="text-slate-400 hover:text-slate-600 transition-colors">
+                  <Button variant="ghost" size="icon-sm" @click="notificationMenuOpen = false" :aria-label="$t('labels.close') || 'Close'" class="text-slate-400 hover:text-slate-600 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div v-if="notifLoading && notifItems.length === 0" class="flex items-center justify-center py-8">
@@ -165,21 +172,23 @@
                 </div>
               </div>
               <div class="border-t border-slate-100 p-2 flex items-center gap-2">
-                <button @click="markAllRead" :disabled="notificationStore.unreadCount === 0 || markingAllRead"
+                <Button variant="outline" @click="markAllRead" :disabled="notificationStore.unreadCount === 0 || markingAllRead"
                   style="color: var(--theme-primary); border-color: var(--theme-primary);"
                   class="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border bg-white px-3 py-2 text-sm font-medium transition-all hover:bg-slate-50 hover:shadow-md active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2 12.5l4.5 4.5L15 8.5M9.5 16.5l1 1L22 6" />
                   </svg>
                   {{ $t('notifications.markAllRead') || 'Mark all read' }}
-                </button>
-                <router-link :to="{ name: 'notifications' }" @click="notificationMenuOpen = false"
-                  class="theme-btn-primary flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all hover:shadow-md active:scale-[0.97]">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  {{ $t('notifications.viewAll') || 'View all notifications' }}
-                </router-link>
+                </Button>
+                <Button as-child>
+                  <router-link :to="{ name: 'notifications' }" @click="notificationMenuOpen = false"
+                    class="flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all hover:shadow-md active:scale-[0.97]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    {{ $t('notifications.viewAll') || 'View all notifications' }}
+                  </router-link>
+                </Button>
               </div>
             </div>
           </div>
@@ -187,25 +196,25 @@
 
         <!-- User Avatar with Dropdown -->
         <div class="relative shrink-0">
-          <button @click="toggleUserMenu"
+          <Button variant="ghost" @click="toggleUserMenu" :aria-label="$t('dashboard.userMenu') || 'User menu'"
             class="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-sm font-semibold theme-text-light transition-all duration-200 hover:bg-white/16 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10 sm:text-lg">
             {{ userInitials }}
-          </button>
+          </Button>
           <!-- User Dropdown Menu -->
-          <div v-if="userMenuOpen" class="absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100" :class="isRTL ? 'left-0' : 'right-0'" style="z-index: 60;">
+          <div v-if="userMenuOpen" class="layout-dropdown absolute top-12 transition-all duration-300 ease-out transform opacity-100 scale-100" :class="isRTL ? 'left-0' : 'right-0'">
             <div class="min-w-[160px] animate-fade-in rounded-xl border border-slate-200 bg-white py-2 shadow-xl shadow-slate-200/60">
-              <button @click="goToProfile(); userMenuOpen = false"
+              <Button variant="ghost" @click="goToProfile(); userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.824.645 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 {{ $t('profile.title') || 'Profile' }}
-              </button>
-              <button @click="goToSettings(); userMenuOpen = false"
+              </Button>
+              <Button variant="ghost" @click="goToSettings(); userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <WrenchScrewdriverIcon class="w-4 h-4" />
                 {{ $t('settings') || 'Settings' }}
-              </button>
+              </Button>
               <div
                 @click="togglePresence()"
                 role="menuitemcheckbox"
@@ -227,7 +236,7 @@
                   ></span>
                 </span>
               </div>
-              <button @click="showLogoutDialog = true; userMenuOpen = false"
+              <Button variant="ghost" @click="showLogoutDialog = true; userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -235,7 +244,7 @@
                   </path>
                 </svg>
                 {{ $t('labels.logout') }}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -253,8 +262,8 @@
         @end="onLayoutEnd"
       >
         <span v-for="item in filteredVerticalMenu" :key="item.routeName" class="horiz-nav-item inline-flex items-center gap-1">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             @click="selectVertical(item.routeName)"
             :class="[
               'rounded-xl border px-3 py-2 text-sm font-medium transition-all duration-200 hover:shadow-md hover:scale-[1.02]',
@@ -262,7 +271,7 @@
             ]"
           >
             {{ $t(item.label) }}
-          </button>
+          </Button>
           <span v-if="editLayout" class="menu-drag-handle cursor-grab text-slate-500 opacity-70 hover:opacity-100">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
           </span>
@@ -293,7 +302,7 @@
               </div>
             </transition>
           </div>
-          <button v-if="showCollapseControl" @click="toggleCollapsed" class="theme-sidebar-collapse-btn theme-rounded p-2 sm:p-3 hover:scale-105 transition-all duration-200">
+          <Button v-if="showCollapseControl" variant="ghost" size="icon" @click="toggleCollapsed" :aria-label="$t('dashboard.toggleSidebar') || 'Toggle sidebar'" class="theme-sidebar-collapse-btn theme-rounded p-2 sm:p-3 hover:scale-105 transition-all duration-200">
             <!-- English: collapse left, expand right | Arabic: collapse right, expand left -->
             <svg v-if="!effectiveCollapsed" class="w-5 h-5 theme-accent-strong" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
@@ -302,7 +311,7 @@
             <svg v-else class="w-5 h-5 theme-accent-strong" viewBox="0 0 24 24" fill="none" stroke="currentColor" :style="{ transform: isRTL ? 'scaleX(-1)' : 'scaleX(1)' }">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <!-- Mobile Header -->
@@ -313,11 +322,11 @@
             </div>
             <div class="truncate font-semibold text-base">{{ $t('appName') }}</div>
           </div>
-          <button @click="toggleSidebar" class="theme-sidebar-collapse-btn p-2 rounded-lg hover:scale-105 transition-all duration-200">
+          <Button variant="ghost" size="icon" @click="toggleSidebar" :aria-label="$t('dashboard.closeSidebar') || 'Close sidebar'" class="theme-sidebar-collapse-btn p-2 rounded-lg hover:scale-105 transition-all duration-200">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         <!-- Mobile Top Menu -->
@@ -333,10 +342,10 @@
             @end="onLayoutEnd"
           >
             <div v-for="key in menuOrder" :key="key" class="mobile-top-item flex items-center gap-2">
-              <button @click="selectTop(key)"
+              <Button variant="ghost" @click="selectTop(key)"
                 :class="['w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition-all duration-200 hover:scale-105', selectedTop === key ? 'theme-sidebar-item-active' : 'theme-sidebar-item']">
                 {{ $t('navbar.' + key) }}
-              </button>
+              </Button>
               <span v-if="editLayout" class="menu-drag-handle cursor-grab opacity-70 hover:opacity-100">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
               </span>
@@ -356,7 +365,8 @@
           @end="onLayoutEnd"
         >
           <li v-for="item in filteredVerticalMenu" :key="item.name" class="vertical-item">
-            <button
+            <Button
+              variant="ghost"
               @click="selectVertical(item.routeName)"
               :title="effectiveCollapsed ? $t(item.label) : undefined"
               :class="['sidebar-link group flex w-full items-center gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item') : (currentRouteName === item.routeName ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
@@ -372,7 +382,7 @@
               <span v-if="editLayout" @click.stop.prevent class="menu-drag-handle cursor-grab opacity-70 hover:opacity-100 ml-auto">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
               </span>
-            </button>
+            </Button>
           </li>
         </VueDraggable>
           <!-- Transport module: show dynamic reports inline under the transport menu -->
@@ -380,7 +390,8 @@
             <h4 v-if="showSidebarLabels" class="sidebar-label-text px-4 text-xs uppercase theme-text-muted tracking-wide mt-4 m:px-5 sm:py-3">{{ $t('reports.moduleReports') || 'Reports' }}</h4>
             <ul class=" space-y-2 ">
               <li v-for="r in reportsForModule" :key="r.id">
-                <button
+                <Button
+                  variant="ghost"
                   @click="openReport(r.id)"
                   :title="effectiveCollapsed ? ($i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle)) : undefined"
                   :class="['sidebar-link group flex w-full items-center gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
@@ -391,7 +402,7 @@
                     <DocumentTextIcon class="h-5 w-6" />
                   </div>
                   <span v-if="showSidebarLabels" class="sidebar-label-text truncate text-sm font-medium">{{ $i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle) }}</span>
-                </button>
+                </Button>
               </li>
             </ul>
           </li>
@@ -449,6 +460,7 @@ import { useNotificationStore } from '@/stores/useNotificationStore'
 import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import { VueDraggable } from 'vue-draggable-plus'
 import NotificationChanges from '@/components/shared/NotificationChanges.vue'
+import { Button } from '@/components/ui/button'
 import {
   getSidebarAsideClasses,
   shouldShowBackdrop,
@@ -500,7 +512,7 @@ function presenceRecordForRoute(route) {
 
 export default {
   name: 'DashboardLayout',
-  components: { AuthLogout, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges, PresenceCursors },
+  components: { AuthLogout, Button, DocumentTextIcon, WrenchScrewdriverIcon, ThemeIcon, VueDraggable, NotificationChanges, PresenceCursors },
   setup() {
     const { logout: authLogout, user } = useAuth()
     const router = useRouter()
@@ -1161,9 +1173,13 @@ export default {
 }
 
 .dashboard-shell > header {
-  min-height: 4rem;
-  border-radius: 0 0 0.875rem 0.875rem;
-  backdrop-filter: blur(14px);
+  min-height: 4.25rem;
+  border-radius: 0 0 1rem 1rem;
+  border-color: rgba(255, 255, 255, 0.12);
+  background-image:
+    linear-gradient(110deg, rgba(var(--theme-primary-rgb), 0.98), rgba(var(--theme-primary-rgb), 0.84));
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(16px);
 }
 
 .dashboard-shell > header :deep(button:focus-visible),
@@ -1173,20 +1189,53 @@ export default {
 }
 
 .dashboard-shell .layout-sidebar {
-  border-inline-end: 1px solid rgba(var(--theme-primary-rgb), 0.14);
-  box-shadow: 8px 0 28px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(var(--theme-primary-rgb), 0.12);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.96);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(14px);
 }
 
 .dashboard-shell .layout-sidebar :deep(.sidebar-link) {
+  border-radius: 0.75rem;
+  min-height: 2.875rem;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.dashboard-shell .layout-sidebar :deep(.sidebar-link:not(.sidebar-link-active):hover) {
+  background: rgba(var(--theme-primary-rgb), 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--theme-primary-rgb), 0.12);
+}
+
+.dashboard-shell .layout-sidebar :deep(.sidebar-link-active) {
+  box-shadow: 0 8px 20px rgba(var(--theme-primary-rgb), 0.22);
+}
+
+.dashboard-shell .layout-sidebar :deep(.sidebar-link-icon) {
   border-radius: 0.75rem;
 }
 
 .dashboard-shell .top-nav-item {
   border: 1px solid transparent;
+  min-height: 2.5rem;
+  border-radius: 0.75rem;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .dashboard-shell .top-nav-item:hover {
   border-color: rgba(255, 255, 255, 0.16);
+}
+
+.dashboard-shell .top-nav-item:focus-visible {
+  outline-color: rgba(255, 255, 255, 0.8);
 }
 
 .sidebar-link {

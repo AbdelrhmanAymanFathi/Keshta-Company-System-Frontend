@@ -1,14 +1,12 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
 
-    <!-- Header -->
-    <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
-      <h2 class="text-2xl font-semibold mb-6 theme-text-primary">{{ $t('crushers.title') }}</h2>
+    <PageHeader :title="$t('crushers.title')">
       <Button class="gap-2" @click="openAdd">
         <PlusIcon class="w-5 h-5" />
         {{ $t('crushers.add') }}
       </Button>
-    </div>
+    </PageHeader>
 
     <!-- Search -->
     <div class="max-w-md">
@@ -86,22 +84,22 @@
       @click.stop
       @contextmenu.prevent
     >
-      <button
+      <ShadcnButton variant="outline" size="native"
         @click="contextAction('edit')"
         class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
         :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
       >
         <PencilSquareIcon class="h-4 w-4" />
         {{ $t('labels.edit') }}
-      </button>
-      <button
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native"
         @click="contextAction('delete')"
         class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"
         :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'"
       >
         <TrashIcon class="h-4 w-4" />
         {{ $t('labels.delete') }}
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -144,6 +142,7 @@
 import { ref } from 'vue'
 import { getCrushers, createCrusher, deleteCrusher, updateCrusher } from '../../api'
 import { usePagination } from '@/composables/usePagination'
+import PageHeader from '@/components/shared/PageHeader.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import RowActions from '@/components/shared/RowActions.vue'
 import { Button } from '@/components/ui/button'
@@ -158,7 +157,7 @@ export default {
   components: {
     Modal,
     ConfirmDialog,
-    Label, Pagination, RowActions, Button, Input, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+    PageHeader, Label, Pagination, RowActions, Button, Input, ExclamationTriangleIcon, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   setup() {
     const q = ref('')
     const searchTimeout = ref(null)

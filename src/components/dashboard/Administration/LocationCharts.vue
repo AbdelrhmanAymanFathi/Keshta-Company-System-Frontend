@@ -75,13 +75,14 @@
 import VueApexCharts from 'vue3-apexcharts'
 import ChartCard from './ChartCard.vue'
 import DashboardGrid from './DashboardGrid.vue'
+import { getShadcnChartColors, shadcnChartBorderColor, shadcnChartTextColor } from '@/utils/shadcnChartTheme'
 
 const CATEGORIES = [
-  { key: 'supplies', color: '#3b82f6' },
-  { key: 'transports', color: '#f59e0b' },
-  { key: 'expenses', color: '#ef4444' },
-  { key: 'extracts', color: '#06b6d4' },
-  { key: 'payments', color: '#8b5cf6' }
+  { key: 'supplies' },
+  { key: 'transports' },
+  { key: 'expenses' },
+  { key: 'extracts' },
+  { key: 'payments' }
 ]
 
 const TOP_LIMIT = 10
@@ -97,7 +98,11 @@ export default {
   computed: {
     isRTL() { return this.$i18n?.locale === 'ar' },
     categoryMeta() {
-      return CATEGORIES.map((c) => ({ ...c, label: this.catLabel(c.key) }))
+      return CATEGORIES.map((c, index) => ({
+        ...c,
+        color: getShadcnChartColors(CATEGORIES.length)[index],
+        label: this.catLabel(c.key)
+      }))
     },
     colors() {
       return this.categoryMeta.map((c) => c.color)
@@ -139,7 +144,8 @@ export default {
       return {
         toolbar: { show: true },
         animations: { enabled: true, speed: 600, dynamicAnimation: { enabled: true, speed: 350 } },
-        fontFamily: 'inherit'
+        fontFamily: 'inherit',
+        foreColor: shadcnChartTextColor
       }
     },
     sharedXaxis() {
@@ -189,7 +195,7 @@ export default {
           type: 'gradient',
           gradient: { shadeIntensity: 1, opacityFrom: 0.95, opacityTo: 0.8, stops: [0, 100] }
         },
-        grid: { borderColor: '#e2e8f0', strokeDashArray: 4, padding: { left: 6, right: 6 } },
+        grid: { borderColor: shadcnChartBorderColor, strokeDashArray: 4, padding: { left: 6, right: 6 } },
         responsive: [
           {
             breakpoint: 640,
@@ -215,7 +221,7 @@ export default {
         xaxis: this.sharedXaxis,
         yaxis: this.sharedYaxis,
         tooltip: this.tooltipBase,
-        grid: { borderColor: '#e2e8f0', strokeDashArray: 4, padding: { left: 6, right: 6 } },
+        grid: { borderColor: shadcnChartBorderColor, strokeDashArray: 4, padding: { left: 6, right: 6 } },
         responsive: [
           {
             breakpoint: 640,

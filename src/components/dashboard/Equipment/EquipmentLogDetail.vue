@@ -3,11 +3,11 @@
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">{{ $t('equipmentLog.detail') }}</h3>
       <div class="flex items-center gap-2">
-        <button @click="$emit('close')" class="theme-text-muted hover:theme-text-secondary">
+        <ShadcnButton variant="outline" size="native" @click="$emit('close')" class="theme-text-muted hover:theme-text-secondary">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -69,8 +69,8 @@
             </div>
             <div class="flex items-center gap-3">
               <div class="text-sm font-semibold">{{ formatCurrency(job.total ?? Math.max(0, (Number(job.hours || 0) * Number(job.hourlyRate || rental.hourlyRate || 0)) - Number(job.discount || 0))) }}</div>
-              <button @click="editJob(job)" class="theme-text hover:theme-accent-muted text-sm">{{ $t('labels.edit') }}</button>
-              <button @click="deleteJob(job)" class="text-red-600 hover:text-red-900 text-sm">{{ $t('labels.delete') }}</button>
+              <ShadcnButton variant="outline" size="native" @click="editJob(job)" class="theme-text hover:theme-accent-muted text-sm">{{ $t('labels.edit') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="deleteJob(job)" class="text-red-600 hover:text-red-900 text-sm">{{ $t('labels.delete') }}</ShadcnButton>
             </div>
           </div>
         </div>
@@ -90,9 +90,9 @@
             class="border rounded px-3 py-2 text-sm col-span-1 sm:col-span-4" />
         </div>
         <div class="mt-3 flex gap-2">
-          <button @click="saveJob" :disabled="savingJob"
-            class="theme-button px-4 py-2 rounded">{{ savingJob ? $t('labels.saving') : $t('labels.save') }}</button>
-          <button @click="resetJobForm" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</button>
+          <ShadcnButton variant="outline" size="native" @click="saveJob" :disabled="savingJob"
+            class="theme-button px-4 py-2 rounded">{{ savingJob ? $t('labels.saving') : $t('labels.save') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="resetJobForm" class="px-4 py-2 border rounded">{{ $t('labels.reset') }}</ShadcnButton>
         </div>
       </div>
 
@@ -100,7 +100,7 @@
         <h4 class="text-sm font-medium mb-3">{{ $t('equipmentLog.notes') }}</h4>
         <textarea v-model="rental.notes" rows="4" class="w-full border rounded px-3 py-2 text-sm"></textarea>
         <div class="mt-3 flex justify-end">
-          <button @click="saveNotes" class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded">{{ $t('labels.save') }}</button>
+          <ShadcnButton variant="outline" size="native" @click="saveNotes" class="bg-green-600 hover:bg-green-700 theme-text-light px-4 py-2 rounded">{{ $t('labels.save') }}</ShadcnButton>
         </div>
       </div>
     </div>

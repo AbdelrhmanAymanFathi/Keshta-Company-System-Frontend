@@ -3,6 +3,7 @@ import { createApp, watch } from 'vue'
 import { createPinia } from 'pinia'
 import { VueQueryPlugin, QueryClient, QueryCache } from '@tanstack/vue-query'
 import App from './App.vue'
+import { Button } from './components/ui/button'
 import router from './router'
 import './assets/main.css'
 import { initThemePlatform } from '@acme/platform'
@@ -18,14 +19,17 @@ import { tokenManager } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
 import appTable from './directives/appTable'
 import { playChatSound } from './utils/notificationSound'
+import { initializeColorMode } from './utils/colorMode'
 
 // Initialize auth store immediately on app load
 initializeAuthStore()
+initializeColorMode()
 initThemePlatform()
 
 const app = createApp(App)
 const pinia = createPinia()
 
+app.component('ShadcnButton', Button)
 app.component('ThemeIcon', ThemeIcon)
 app.directive('app-table', appTable)
 app.provide(ICON_REVISION_KEY, iconRevision)

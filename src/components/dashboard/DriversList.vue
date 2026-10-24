@@ -1,12 +1,11 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('dashboard.driversList') || 'Drivers' }}</h2>
+    <PageHeader :title="$t('dashboard.driversList') || 'Drivers'">
       <Button class="gap-2" @click="openAdd">
         <PlusIcon class="w-5 h-5" />
         {{ $t('labels.add') || 'Add' }}
       </Button>
-    </div>
+    </PageHeader>
 
     <div class="max-w-md">
       <Input v-model="q" @input="onSearchInput" type="search" :placeholder="$t('placeholders.search') || 'Search...'" class="w-full" />
@@ -89,6 +88,7 @@
 <script>
 import { ref, watch } from 'vue'
 import { usePagination } from '@/composables/usePagination'
+import PageHeader from '@/components/shared/PageHeader.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import RowActions from '@/components/shared/RowActions.vue'
 import { Button } from '@/components/ui/button'
@@ -104,7 +104,7 @@ export default {
   components: {
     Modal,
     ConfirmDialog,
-    Label, Pagination, RowActions, Button, Input, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
+    PageHeader, Label, Pagination, RowActions, Button, Input, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   setup() {
     const q = ref('')
 

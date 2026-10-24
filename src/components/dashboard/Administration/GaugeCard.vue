@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-lg shadow-slate-200/40">
+  <Card class="shadcn-ui border-border/80 bg-card p-5 shadow-sm">
     <div v-if="loading || !mounted" class="animate-pulse space-y-4">
       <div class="h-4 w-32 rounded bg-slate-200" />
       <div class="mx-auto h-40 w-40 rounded-full bg-slate-200" />
@@ -31,23 +31,24 @@
 
       <p v-if="footerLabel" class="text-center text-xs theme-text-muted mt-2">{{ footerLabel }}</p>
     </template>
-  </div>
+  </Card>
 </template>
 
 <script>
 import VueApexCharts from 'vue3-apexcharts'
 import DashboardError from './DashboardError.vue'
+import { Card } from '@/components/ui/card'
 
 export default {
   name: 'GaugeCard',
-  components: { apexchart: VueApexCharts, DashboardError },
+  components: { apexchart: VueApexCharts, Card, DashboardError },
   props: {
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
     value: { type: Number, default: 0 },
     min: { type: Number, default: 0 },
     max: { type: Number, default: 100 },
-    color: { type: String, default: '#6366f1' },
+    color: { type: String, default: 'hsl(var(--shadcn-chart-1))' },
     type: { type: String, default: 'radial' },
     loading: { type: Boolean, default: false },
     error: { type: String, default: '' },
@@ -90,15 +91,15 @@ export default {
             startAngle: isSemi ? -90 : 0,
             endAngle: isSemi ? 90 : 360,
             hollow: { margin: 15, size: '60%' },
-            track: { background: '#e2e8f0', strokeWidth: '97%' },
+            track: { background: 'hsl(var(--shadcn-muted))', strokeWidth: '97%' },
             dataLabels: {
               show: true,
-              name: { show: true, fontSize: '13px', color: '#64748b', offsetY: isSemi ? 30 : -10 },
+              name: { show: true, fontSize: '13px', color: 'hsl(var(--shadcn-muted-foreground))', offsetY: isSemi ? 30 : -10 },
               value: {
                 show: true,
                 fontSize: '24px',
                 fontWeight: 600,
-                color: '#1e293b',
+                color: 'hsl(var(--shadcn-foreground))',
                 offsetY: isSemi ? 0 : 6,
                 formatter: this.formatter || (v => v.toFixed(1) + '%')
               }

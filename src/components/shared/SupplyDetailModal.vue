@@ -4,9 +4,9 @@
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold">{{ $t('supply.exportDetails') || 'Export Details' }}</h3>
         <div class="flex gap-2">
-          <button @click="$emit('close')" class="px-3 py-1 border rounded">{{ $t('labels.close') || 'Close' }}</button>
-          <button v-if="exportId" @click="togglePayments" class="px-3 py-1 border rounded bg-gray-100">{{ showPayments ? ($t('payments.hidePayments') || 'Hide payments') : ($t('payments.showPayments') || 'Show payments') }}</button>
-          <button v-if="exportId" @click="openPaymentModal" class="px-3 py-1 border rounded bg-green-100 text-green-700">{{ $t('labels.addPayment') || 'Add Payment' }}</button>
+          <ShadcnButton variant="outline" size="native" @click="$emit('close')" class="px-3 py-1 border rounded">{{ $t('labels.close') || 'Close' }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" v-if="exportId" @click="togglePayments" class="px-3 py-1 border rounded bg-gray-100">{{ showPayments ? ($t('payments.hidePayments') || 'Hide payments') : ($t('payments.showPayments') || 'Show payments') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" v-if="exportId" @click="openPaymentModal" class="px-3 py-1 border rounded bg-green-100 text-green-700">{{ $t('labels.addPayment') || 'Add Payment' }}</ShadcnButton>
         </div>
       </div>
 

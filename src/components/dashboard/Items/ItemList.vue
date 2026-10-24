@@ -2,11 +2,11 @@
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
     <div class="app-page-header flex items-center justify-between rounded-2xl theme-page-header-bar p-3 sm:p-5 shadow-lg shadow-slate-200/50">
       <h2 class="text-2xl font-semibold">{{ $t('dashboard.items') || 'Items' }}</h2>
-      <button @click="openCreateModal"
+      <ShadcnButton variant="outline" size="native" @click="openCreateModal"
         class="px-3 py-1.5 sm:px-4 sm:py-2 theme-button rounded-xl  transition inline-flex items-center gap-2 shadow-sm  text-xs sm:text-sm">
         <PlusIcon class="w-5 h-5" />
         {{ $t('dashboard.newItem') || 'Add Item' }} 
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Table -->
@@ -192,7 +192,7 @@
     <div v-if="contextMenu.visible" class="fixed inset-0 z-40" @click="contextMenu.visible = false"></div>
     <div v-if="contextMenu.visible" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
       class="fixed bg-white border border-slate-200 rounded-xl shadow-lg z-50 py-1 min-w-[150px]" @click.stop>
-      <button @click="() => { editItem(contextMenu.item); contextMenu.visible = false }"
+      <ShadcnButton variant="outline" size="native" @click="() => { editItem(contextMenu.item); contextMenu.visible = false }"
         class="w-full px-4 py-2 text-left text-sm theme-hover-soft theme-accent-strong flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -200,8 +200,8 @@
           </path>
         </svg>
         {{ $t('labels.edit') }}
-      </button>
-      <button @click="() => { confirmDelete(contextMenu.item); contextMenu.visible = false }"
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native" @click="() => { confirmDelete(contextMenu.item); contextMenu.visible = false }"
         class="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -209,7 +209,7 @@
           </path>
         </svg>
         {{ $t('labels.delete') }}
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Toast notifications -->

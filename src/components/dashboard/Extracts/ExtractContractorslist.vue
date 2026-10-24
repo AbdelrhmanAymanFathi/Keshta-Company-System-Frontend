@@ -4,11 +4,11 @@
     <div class="app-page-header flex items-center rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50" :class="isRTL ? 'justify-between' : 'justify-between'">
       <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('extracts.title') }}</h2>
       <div class="flex items-center gap-3">
-        <button @click="openAdd"
+        <ShadcnButton variant="outline" size="native" @click="openAdd"
           class="theme-button px-4 py-2 rounded-xl flex items-center gap-2 transition-colors shadow-sm ">
           <PlusIcon class="w-5 h-5" />
           {{ $t('extracts.add') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 
@@ -42,7 +42,7 @@
           >
             <td class="px-6 py-4 text-sm theme-accent-muted" :class="textAlign">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-6 py-4 text-sm theme-text-primary" :class="textAlign">
-              <button @click.stop="goToDetail(c)" class="theme-accent-muted hover:underline">{{ c.name }}</button>
+              <ShadcnButton variant="outline" size="native" @click.stop="goToDetail(c)" class="theme-accent-muted hover:underline">{{ c.name }}</ShadcnButton>
             </td>
             <td class="px-6 py-4 text-sm theme-text-primary" :class="textAlign">{{ c.phone || '-' }}</td>
             <td class="px-6 py-4 text-sm theme-text-primary" :class="textAlign">{{ c.bankName || '-' }}</td>
@@ -80,22 +80,22 @@
       @click.stop
       @contextmenu.prevent
     >
-      <button @click="contextAction('edit')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      <ShadcnButton variant="outline" size="native" @click="contextAction('edit')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <PencilSquareIcon class="h-4 w-4" />
         {{ $t('labels.edit') }}
-      </button>
-      <button @click="contextAction('delete')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native" @click="contextAction('delete')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 text-red-600 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <TrashIcon class="h-4 w-4" />
         {{ $t('labels.delete') }}
-      </button>
-      <button @click="contextAction('wallet')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native" @click="contextAction('wallet')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <WalletIcon class="h-4 w-4" />
         {{ $t('extracts.wallet') }}
-      </button>
-      <button @click="contextAction('statement')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native" @click="contextAction('statement')" class="w-full px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-3" :class="isRTL ? 'text-right flex-row-reverse' : 'text-left'">
         <DocumentTextIcon class="h-4 w-4" />
         {{ $t('extracts.statement') }}
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Add/Edit Modal -->

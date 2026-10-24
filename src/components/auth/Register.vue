@@ -3,16 +3,16 @@
     class="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
     <!-- Language switcher -->
     <div class="absolute top-4 right-4 flex gap-2">
-      <button @click="switchLang('en')" :class="btnClass('en')"
+      <ShadcnButton variant="outline" size="native" @click="switchLang('en')" :class="btnClass('en')"
         class="p-2 rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-200"
         :title="$t('auth.register.title')">
         <img src="/flags/us.png" alt="EN" class="w-6 h-6" />
-      </button>
-      <button @click="switchLang('ar')" :class="btnClass('ar')"
+      </ShadcnButton>
+      <ShadcnButton variant="outline" size="native" @click="switchLang('ar')" :class="btnClass('ar')"
         class="p-2 rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-200"
         :title="$t('auth.register.title')">
         <img src="/flags/eg.png" alt="AR" class="w-6 h-6" />
-      </button>
+      </ShadcnButton>
     </div>
 
     <!-- Register Card -->
@@ -131,7 +131,7 @@
                 :placeholder="$t('auth.register.password')"
                 class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
                 :class="{ 'border-red-500': passwordError }" required />
-              <button type="button" @click="showPassword = !showPassword"
+              <ShadcnButton variant="outline" size="native" type="button" @click="showPassword = !showPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <svg v-if="showPassword" class="h-5 w-5 theme-caption" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -146,7 +146,7 @@
                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                   </path>
                 </svg>
-              </button>
+              </ShadcnButton>
             </div>
             <p v-if="passwordError" class="mt-1 text-sm text-red-600">{{ passwordError }}</p>
           </div>
@@ -168,7 +168,7 @@
                 autocomplete="new-password" :placeholder="$t('auth.register.confirmPassword')"
                 class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
                 :class="{ 'border-red-500': confirmPasswordError }" required />
-              <button type="button" @click="showConfirmPassword = !showConfirmPassword"
+              <ShadcnButton variant="outline" size="native" type="button" @click="showConfirmPassword = !showConfirmPassword"
                 class="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <svg v-if="showConfirmPassword" class="h-5 w-5 theme-caption" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -183,7 +183,7 @@
                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                   </path>
                 </svg>
-              </button>
+              </ShadcnButton>
             </div>
             <p v-if="confirmPasswordError" class="mt-1 text-sm text-red-600">{{ confirmPasswordError }}</p>
           </div>
@@ -198,7 +198,7 @@
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" :disabled="loading"
+          <ShadcnButton variant="outline" size="native" type="submit" :disabled="loading"
             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium theme-text-light bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 theme-text-light" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -207,7 +207,7 @@
               </path>
             </svg>
             {{ loading ? $t('auth.register.loading') : $t('auth.register.button') }}
-          </button>
+          </ShadcnButton>
 
           <!-- Error Message -->
           <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">

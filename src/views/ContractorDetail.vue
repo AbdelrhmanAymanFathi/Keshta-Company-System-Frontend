@@ -6,7 +6,7 @@
         <div class="text-sm theme-text-muted">{{ contractor?.phone || '' }}</div>
       </div>
       <div>
-        <button @click="$router.back()" class="px-3 py-1 border rounded">{{ $t('labels.back') }}</button>
+        <ShadcnButton variant="outline" size="native" @click="$router.back()" class="px-3 py-1 border rounded">{{ $t('labels.back') }}</ShadcnButton>
       </div>
     </div>
 

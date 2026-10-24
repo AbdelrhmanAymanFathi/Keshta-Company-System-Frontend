@@ -6,12 +6,12 @@
       <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
           <h3 class="text-base font-semibold theme-text-primary">{{ $t('systemLogs.filesTitle') }}</h3>
-          <button @click="loadFiles" :disabled="filesLoading" class="flex items-center gap-2 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
+          <ShadcnButton variant="outline" size="native" @click="loadFiles" :disabled="filesLoading" class="flex items-center gap-2 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
             <svg class="w-4 h-4" :class="{ 'animate-spin': filesLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             {{ $t('systemLogs.refresh') }}
-          </button>
+          </ShadcnButton>
         </div>
 
         <div v-if="filesLoading" class="p-6">
@@ -56,7 +56,7 @@
               <option :value="500">500</option>
               <option :value="1000">1000</option>
             </select>
-            <button v-if="selectedFile" @click="onDownloadFile" :disabled="downloading" class="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors">
+            <ShadcnButton variant="outline" size="native" v-if="selectedFile" @click="onDownloadFile" :disabled="downloading" class="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50 transition-colors">
               <svg v-if="downloading" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -64,7 +64,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
               </svg>
               {{ $t('systemLogs.download') }}
-            </button>
+            </ShadcnButton>
           </div>
         </div>
 

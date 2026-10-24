@@ -1,9 +1,9 @@
 <template>
   <!-- Button to open the Modal (you can remove or change it depending on the page) -->
-  <button v-if="showTriggerButton" @click="openModal"
+  <ShadcnButton variant="outline" size="native" v-if="showTriggerButton" @click="openModal"
     :class="triggerButtonClass">
     {{ triggerText }}
-  </button>
+  </ShadcnButton>
 
   <!-- Modal -->
   <teleport to="body">
@@ -16,10 +16,10 @@
           <h2 class="text-2xl font-bold theme-heading">
             {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
           </h2>
-          <button @click="closeModal"
+          <ShadcnButton variant="outline" size="native" @click="closeModal"
             class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">
             ×
-          </button>
+          </ShadcnButton>
         </div>
 
         <!-- Body -->
@@ -219,26 +219,26 @@
 
             <!-- Next / Cancel Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="closeModal"
+              <ShadcnButton variant="outline" size="native" @click="closeModal"
                 class="px-10 py-3 sm:px-2 md:px-3 lg:px-8  border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">
                 {{ $t('labels.cancel') }}
-              </button>
-              <button @click="goToStep2" :disabled="!isStep1Valid()"
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="goToStep2" :disabled="!isStep1Valid()"
                 class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">
                 {{ $t('labels.next') }}
                 <ArrowRightIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
-              </button>
+              </ShadcnButton>
             </div>
           </div>
           <!-- ============================================ STEP 2 ============================================ -->
           <div v-else class="w-full">
             <!-- Back Button and Title -->
             <div class="flex items-center justify-between mb-8">
-              <button @click="goBackToStep1"
+              <ShadcnButton variant="outline" size="native" @click="goBackToStep1"
                 class="flex items-center gap-3 theme-text hover:theme-accent-muted font-medium transition">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('labels.back') }}
-              </button>
+              </ShadcnButton>
               <h3 class="text-lg font-bold theme-text-primary">{{ $t('labels.step2Data') }}</h3>
               <div></div> <!-- Placeholder to balance flex -->
             </div>
@@ -505,14 +505,14 @@
                       <!-- Actions -->
                       <td class="px-4 py-3 text-center">
                         <div class="flex justify-center gap-3">
-                          <button @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition"
+                          <ShadcnButton variant="outline" size="native" @click="duplicateRow(index)" class="theme-text hover:theme-accent-muted transition"
                             title="Duplicate" tabindex="-1">
                             <DocumentDuplicateIcon class="w-5 h-5" />
-                          </button>
-                          <button @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
+                          </ShadcnButton>
+                          <ShadcnButton variant="outline" size="native" @click="removeRow(index)" class="text-red-600 hover:text-red-800 transition"
                             title="Delete" tabindex="-1">
                             <TrashIcon class="w-5 h-5" />
-                          </button>
+                          </ShadcnButton>
                         </div>
                       </td>
                     </tr>
@@ -554,16 +554,16 @@
 
             <!-- Save / Back Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <button @click="goBackToStep1"
+              <ShadcnButton variant="outline" size="native" @click="goBackToStep1"
                 class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition flex items-center gap-3">
                 <ArrowLeftIcon class="w-6 h-6 transition-transform rtl:rotate-180" />
                 {{ $t('labels.back') }}
-              </button>
-              <button @click="saveData" :disabled="isSaving"
+              </ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="saveData" :disabled="isSaving"
                 class="px-10 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed theme-text-light rounded-lg font-medium transition flex items-center gap-3">
                 {{ isSaving ? $t('labels.saving') : $t('labels.save') }}
                 <CheckIcon class="w-6 h-6" />
-              </button>
+              </ShadcnButton>
             </div>
 
             <p v-if="saveError" class="mt-6 text-center text-red-600 font-medium text-lg">
@@ -582,11 +582,11 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
       <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="addSite" :disabled="!newSiteName || addingLocation"
+        <ShadcnButton variant="outline" size="native" @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addSite" :disabled="!newSiteName || addingLocation"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
@@ -598,11 +598,11 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
       <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</button>
-        <button @click="addArea" :disabled="!newAreaName || addingLocation"
+        <ShadcnButton variant="outline" size="native" @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="addArea" :disabled="!newAreaName || addingLocation"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
@@ -615,12 +615,12 @@
       <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
         :placeholder="$t('contractors.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
+        <ShadcnButton variant="outline" size="native" @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+        }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div>
     </div>
@@ -632,12 +632,12 @@
       <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
       <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
+        <ShadcnButton variant="outline" size="native" @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+        }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div>
     </div>
@@ -650,7 +650,7 @@
       <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
         <div class="flex items-center justify-between px-4 py-3 border-b">
           <h3 class="text-lg font-semibold theme-text-primary">{{ $t('vehicles.createVehicle') }}</h3>
-          <button class="theme-text-muted hover:theme-text-secondary" @click="showAddVehicleDialog = false">✕</button>
+          <ShadcnButton variant="outline" size="native" class="theme-text-muted hover:theme-text-secondary" @click="showAddVehicleDialog = false">✕</ShadcnButton>
         </div>
         <div class="p-4 overflow-y-auto">
           <CreateVehicle :mode="'supply'" @created="onCreatedFromVehicleModal" :prefilledContractorId="commonData.contractor?.id"
@@ -669,13 +669,13 @@
       <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')"
         class="w-full border rounded px-2 py-1 mb-3" />
       <div class="flex gap-2 justify-end">
-        <button @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</button>
-        <button @click="createNewExportItem"
+        <ShadcnButton variant="outline" size="native" @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
+        }}</ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="createNewExportItem"
           :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
           class="bg-green-600 theme-text-light px-3 py-1 rounded">
           {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
-        </button>
+        </ShadcnButton>
       </div>
       <div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div>
     </div>

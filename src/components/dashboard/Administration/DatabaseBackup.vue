@@ -21,7 +21,7 @@
         </div>
 
         <div class="mt-6 flex flex-1 items-end">
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="onDownload"
             :disabled="downloading"
             class="flex items-center gap-2 rounded-xl theme-button px-5 py-2.5 text-sm theme-text-light shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center"
@@ -35,7 +35,7 @@
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             {{ downloading ? $t('databaseBackup.downloading') : $t('databaseBackup.download') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
 
@@ -72,11 +72,11 @@
           <div v-if="selectedFile" class="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-1.5 text-sm">
             <div class="flex items-center justify-between">
               <span class="font-medium theme-text-primary">{{ $t('databaseBackup.fileInfo') }}</span>
-              <button @click="clearFile" class="theme-text-muted hover:text-red-500 transition-colors" :disabled="restoring" aria-label="Clear file">
+              <ShadcnButton variant="outline" size="native" @click="clearFile" class="theme-text-muted hover:text-red-500 transition-colors" :disabled="restoring" aria-label="Clear file">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              </button>
+              </ShadcnButton>
             </div>
             <p class="theme-text-secondary flex justify-between">
               <span>{{ $t('databaseBackup.fileName') }}</span>
@@ -111,7 +111,7 @@
             {{ $t('databaseBackup.restoring') }}
           </div>
 
-          <button
+          <ShadcnButton variant="outline" size="native"
             @click="showConfirm = true"
             :disabled="!selectedFile || restoring"
             class="flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed w-full"
@@ -121,7 +121,7 @@
                 d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 3v12m0 0l-4-4m4 4l4-4" />
             </svg>
             {{ $t('databaseBackup.restoreNow') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>
@@ -130,11 +130,11 @@
     <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
         <h3 class="text-base font-semibold theme-text-primary">{{ $t('databaseBackup.backupsTitle') }}</h3>
-        <button @click="loadBackups" :disabled="filesLoading" class="flex items-center gap-1.5 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
+        <ShadcnButton variant="outline" size="native" @click="loadBackups" :disabled="filesLoading" class="flex items-center gap-1.5 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
           <svg class="w-4 h-4" :class="{ 'animate-spin': filesLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-        </button>
+        </ShadcnButton>
       </div>
 
       <div v-if="filesLoading" class="p-6">
@@ -164,7 +164,7 @@
                 </span>
               </td>
               <td class="px-5 py-3 whitespace-nowrap text-right">
-                <button
+                <ShadcnButton variant="outline" size="native"
                   @click="onDownloadFile(f)"
                   :disabled="downloadingFile === f.name"
                   class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm theme-text-secondary hover:theme-hover-soft transition-colors disabled:opacity-40"
@@ -176,7 +176,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   {{ $t('databaseBackup.actionBackupDownload') }}
-                </button>
+                </ShadcnButton>
               </td>
             </tr>
           </tbody>
@@ -188,11 +188,11 @@
     <div class="rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
       <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
         <h3 class="text-base font-semibold theme-text-primary">{{ $t('databaseBackup.logsTitle') }}</h3>
-        <button @click="loadLogs" :disabled="logsLoading" class="flex items-center gap-1.5 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
+        <ShadcnButton variant="outline" size="native" @click="loadLogs" :disabled="logsLoading" class="flex items-center gap-1.5 text-sm theme-text-secondary hover:theme-text-primary transition-colors disabled:opacity-50">
           <svg class="w-4 h-4" :class="{ 'animate-spin': logsLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-        </button>
+        </ShadcnButton>
       </div>
 
       <div v-if="logsLoading" class="p-6">
@@ -237,12 +237,12 @@
         <div class="flex items-center justify-between px-5 py-3 border-t border-slate-100">
           <span class="text-xs theme-text-muted">{{ page }} / {{ totalPages }}</span>
           <div class="flex gap-2">
-            <button @click="changePage(page - 1)" :disabled="page <= 1" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm theme-text-secondary hover:theme-hover-soft transition-colors disabled:opacity-40">
+            <ShadcnButton variant="outline" size="native" @click="changePage(page - 1)" :disabled="page <= 1" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm theme-text-secondary hover:theme-hover-soft transition-colors disabled:opacity-40">
               {{ isRTL ? '→' : '←' }}
-            </button>
-            <button @click="changePage(page + 1)" :disabled="page >= totalPages" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm theme-text-secondary hover:theme-hover-soft transition-colors disabled:opacity-40">
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native" @click="changePage(page + 1)" :disabled="page >= totalPages" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm theme-text-secondary hover:theme-hover-soft transition-colors disabled:opacity-40">
               {{ isRTL ? '←' : '→' }}
-            </button>
+            </ShadcnButton>
           </div>
         </div>
       </div>

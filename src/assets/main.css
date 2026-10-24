@@ -62,22 +62,22 @@ body,
    Color Theme System
    ========================= */
 :root {
-  --theme-primary: #4f7dcc;
-  --theme-primary-rgb: 79, 70, 229;
-  --theme-primary-50: 238, 242, 255;
-  --theme-primary-100: 224, 231, 255;
-  --theme-primary-200: 199, 210, 254;
-  --theme-primary-300: 165, 180, 252;
-  --theme-primary-400: 129, 140, 248;
-  --theme-primary-500: 79, 70, 229;
-  --theme-primary-600: 67, 56, 202;
-  --theme-primary-700: 55, 48, 163;
-  --theme-primary-800: 49, 46, 129;
-  --theme-primary-900: 30, 23, 100;
-  --theme-primary-dark: #3730a3;
-  --theme-primary-dark-rgb: 55, 48, 163;
-  --theme-primary-soft: rgba(79, 70, 229, 0.14);
-  --theme-primary-border: rgba(79, 70, 229, 0.18);
+  --theme-primary: #7c5ce7;
+  --theme-primary-rgb: 124, 92, 231;
+  --theme-primary-50: 248, 246, 255;
+  --theme-primary-100: 238, 232, 255;
+  --theme-primary-200: 218, 205, 255;
+  --theme-primary-300: 190, 168, 250;
+  --theme-primary-400: 155, 125, 233;
+  --theme-primary-500: 124, 92, 231;
+  --theme-primary-600: 107, 79, 212;
+  --theme-primary-700: 91, 67, 187;
+  --theme-primary-800: 75, 56, 155;
+  --theme-primary-900: 59, 45, 123;
+  --theme-primary-dark: #6b4fd4;
+  --theme-primary-dark-rgb: 107, 79, 212;
+  --theme-primary-soft: rgba(124, 92, 231, 0.12);
+  --theme-primary-border: rgba(124, 92, 231, 0.2);
   --theme-scrollbar-size: 9px;
   --theme-scrollbar-track-bg: transparent;
   --theme-scrollbar-thumb-color: rgba(var(--theme-primary-rgb), 0.55);
@@ -96,19 +96,19 @@ body,
   --theme-icon-stroke: 1.5;
   --theme-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  --theme-text-primary: #111827;
-  --theme-text-secondary: #4b5563;
-  --theme-text-muted: #6b7280;
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #475569;
+  --theme-text-muted: #64748b;
 
   --theme-text-light: #ffffff;
   --theme-text-light-secondary: #e5e7eb;
   --theme-text-light-muted: #d1d5db;
 
   --theme-heading-color: #0f172a;
-  --theme-link-color: #4f7dcc;
+  --theme-link-color: #6b4fd4;
 
   --theme-sidebar-text: #334155;
-  --theme-card-text: #111827;
+  --theme-card-text: #0f172a;
 }
 
 @layer components {
@@ -159,8 +159,8 @@ body,
 
 .message-bubble--sent {
   color: #ffffff !important;
-  background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%) !important;
-  border: 1px solid #4338ca;
+  background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-primary-dark) 100%) !important;
+  border: 1px solid rgba(var(--theme-primary-dark-rgb), 0.8);
 }
 
 .message-bubble--received {
@@ -210,7 +210,7 @@ body,
 
 /* Color picker — square, border matches selected color (--picker-color) */
 .theme-color-input {
-  --picker-color: #4f7dcc;
+  --picker-color: #7c5ce7;
   box-sizing: border-box;
   width: 2.5rem;
   height: 2.5rem;
@@ -394,6 +394,100 @@ body,
 .theme-sidebar-icon {
   background: rgba(var(--theme-primary-rgb), 0.08);
   color: rgb(var(--theme-primary-600));
+}
+
+/* Consistent sidebar / menu icon sizing across icon packs (shell layout unchanged) */
+.dashboard-shell .sidebar-link-icon :is(svg, img) {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.dashboard-shell .sidebar-link-icon > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.dashboard-shell .layout-dropdown {
+  z-index: var(--layout-z-dropdown, 130);
+}
+
+.dashboard-shell > header {
+  z-index: var(--layout-z-header, 120);
+  isolation: isolate;
+}
+
+.dashboard-shell > header.fixed {
+  z-index: var(--layout-z-header, 120);
+}
+
+.dashboard-module-content :is(.apexcharts-canvas, .apexcharts-svg) {
+  position: relative;
+  z-index: 0;
+}
+
+.dashboard-module-content button:not([data-slot='button']),
+.dashboard-shell button[data-slot='button'] {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.dashboard-module-content button:not([data-slot='button']):focus-visible,
+.dashboard-shell button[data-slot='button']:focus-visible {
+  outline: 2px solid rgba(var(--theme-primary-rgb), 0.65);
+  outline-offset: 2px;
+}
+
+.shadcn-ui .apexcharts-toolbar button {
+  border-radius: 0.375rem;
+  color: hsl(var(--shadcn-muted-foreground));
+}
+
+.shadcn-ui .apexcharts-toolbar button:hover {
+  background: hsl(var(--shadcn-accent));
+  color: hsl(var(--shadcn-accent-foreground));
+}
+
+.shadcn-ui .apexcharts-tooltip.apexcharts-theme-light,
+.shadcn-ui .apexcharts-menu {
+  border: 1px solid hsl(var(--shadcn-border));
+  border-radius: 0.625rem;
+  background: hsl(var(--shadcn-popover));
+  color: hsl(var(--shadcn-popover-foreground));
+  box-shadow: 0 12px 32px rgb(15 23 42 / 0.12);
+}
+
+.shadcn-ui .apexcharts-tooltip-title {
+  border-bottom-color: hsl(var(--shadcn-border));
+  background: hsl(var(--shadcn-muted));
+  color: hsl(var(--shadcn-foreground));
+}
+
+.shadcn-ui .apexcharts-legend-text,
+.shadcn-ui .apexcharts-xaxis-label,
+.shadcn-ui .apexcharts-yaxis-label,
+.shadcn-ui .apexcharts-datalabel {
+  fill: hsl(var(--shadcn-muted-foreground));
+  color: hsl(var(--shadcn-muted-foreground));
+}
+
+.shadcn-ui .apexcharts-gridline {
+  stroke: hsl(var(--shadcn-border) / 0.75);
+}
+
+.chart-card-fullscreen {
+  z-index: var(--layout-z-modal);
+  border-radius: 1rem;
+  background: hsl(var(--shadcn-background));
+  box-shadow: 0 24px 80px rgb(15 23 42 / 0.24);
 }
 
 .theme-sidebar-item:hover .theme-sidebar-icon {
@@ -1540,6 +1634,11 @@ body,
   --layout-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --layout-z-backdrop: 35;
   --layout-z-sidebar: 40;
+  --layout-z-header: 120;
+  --layout-z-dropdown: 130;
+  --layout-z-modal: 200;
+  --layout-z-popover: 220;
+  --layout-z-toast: 300;
   --theme-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
   --theme-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
   --theme-shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.1);
@@ -2415,45 +2514,45 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 /* CSS Variables for Spartan-style theming */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --background: hsl(var(--shadcn-background));
+  --foreground: hsl(var(--shadcn-foreground));
+  --card: hsl(var(--shadcn-card));
+  --card-foreground: hsl(var(--shadcn-card-foreground));
+  --popover: hsl(var(--shadcn-popover));
+  --popover-foreground: hsl(var(--shadcn-popover-foreground));
+  --primary: hsl(var(--shadcn-primary));
+  --primary-foreground: hsl(var(--shadcn-primary-foreground));
+  --secondary: hsl(var(--shadcn-secondary));
+  --secondary-foreground: hsl(var(--shadcn-secondary-foreground));
+  --muted: hsl(var(--shadcn-muted));
+  --muted-foreground: hsl(var(--shadcn-muted-foreground));
+  --accent: hsl(var(--shadcn-accent));
+  --accent-foreground: hsl(var(--shadcn-accent-foreground));
+  --destructive: hsl(var(--shadcn-destructive));
+  --border: hsl(var(--shadcn-border));
+  --input: hsl(var(--shadcn-input));
+  --ring: hsl(var(--shadcn-ring));
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: hsl(var(--shadcn-background));
+  --foreground: hsl(var(--shadcn-foreground));
+  --card: hsl(var(--shadcn-card));
+  --card-foreground: hsl(var(--shadcn-card-foreground));
+  --popover: hsl(var(--shadcn-popover));
+  --popover-foreground: hsl(var(--shadcn-popover-foreground));
+  --primary: hsl(var(--shadcn-primary));
+  --primary-foreground: hsl(var(--shadcn-primary-foreground));
+  --secondary: hsl(var(--shadcn-secondary));
+  --secondary-foreground: hsl(var(--shadcn-secondary-foreground));
+  --muted: hsl(var(--shadcn-muted));
+  --muted-foreground: hsl(var(--shadcn-muted-foreground));
+  --accent: hsl(var(--shadcn-accent));
+  --accent-foreground: hsl(var(--shadcn-accent-foreground));
+  --destructive: hsl(var(--shadcn-destructive));
+  --border: hsl(var(--shadcn-border));
+  --input: hsl(var(--shadcn-input));
+  --ring: hsl(var(--shadcn-ring));
 }
 
 /* Spartan Button Styles */
@@ -2473,7 +2572,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 .spartan-button:focus-visible {
-  outline: 2px solid rgb(var(--ring) / 0.5);
+  outline: 2px solid hsl(var(--shadcn-ring) / 0.5);
   outline-offset: 2px;
 }
 
@@ -2616,7 +2715,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 .spartan-input:focus-visible {
-  outline: 2px solid rgb(var(--ring) / 0.5);
+  outline: 2px solid hsl(var(--shadcn-ring) / 0.5);
   outline-offset: 2px;
   border-color: var(--ring);
 }

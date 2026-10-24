@@ -21,7 +21,7 @@
         {{ t('labels.noData') }}
       </div>
       <div v-else class="mt-4 space-y-2">
-        <button v-for="(treasury, index) in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
+        <ShadcnButton variant="outline" size="native" v-for="(treasury, index) in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
           :class="['w-full rounded-lg px-3 py-2 transition flex items-center justify-between', store.selectedTreasuryId === treasury.id ? 'ring-1 ring-offset-0 ring-indigo-300 bg-indigo-50' : 'border border-gray-200 hover:bg-gray-50']">
           <div class="min-w-0 flex-1">
             <div class="flex items-center justify-between gap-2">
@@ -34,7 +34,7 @@
               <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
             </div>
           </div>
-        </button>
+        </ShadcnButton>
       </div>
     </aside>
 

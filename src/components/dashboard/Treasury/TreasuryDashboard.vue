@@ -140,38 +140,38 @@
             >
               💸 {{ t('treasury.transferFunds') }}
             </Button>
-            <button
+            <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && !selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto"
               :disabled="!selectedTreasury"
               @click="openEditModal(selectedTreasury)"
             >
               {{ t('treasury.edit') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && !selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-amber-200 px-4 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50 sm:w-auto"
               :disabled="!selectedTreasury"
               @click="archiveSelectedTreasury"
             >
               {{ t('treasury.archive') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && selectedTreasury.deletedAt"
               class="w-full rounded-lg border border-emerald-200 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 sm:w-auto"
               :disabled="!selectedTreasury"
               @click="restoreSelectedTreasury"
             >
               {{ t('treasury.unarchive') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && selectedTreasury.type === 'CUSTODY'"
               class="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 sm:w-auto"
               :disabled="purging"
               @click="purgeSelectedTreasury"
             >
               🗑 {{ purging ? t('treasury.purging') : t('treasury.purge') }}
-            </button>
+            </ShadcnButton>
           </div>
         </div>
       </div>
@@ -242,12 +242,12 @@
                 />
               </div>
               <div class="flex flex-col gap-2 sm:flex-row md:shrink-0">
-                <button class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto" @click="applyFilters">
+                <ShadcnButton variant="outline" size="native" class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto" @click="applyFilters">
                   {{ t('labels.search') }}
-                </button>
-                <button class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto" @click="resetFilters">
+                </ShadcnButton>
+                <ShadcnButton variant="outline" size="native" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto" @click="resetFilters">
                   {{ t('labels.reset') }}
-                </button>
+                </ShadcnButton>
               </div>
             </div>
           </div>
@@ -348,16 +348,16 @@
                 </td>
                 <td class="px-4 py-3 text-center" @click.stop>
                   <div v-if="rowEditKind(tx)" class="flex items-center justify-center gap-1.5">
-                    <button type="button" class="theme-text" :title="t('labels.edit')" @click="editRow(tx)">
+                    <ShadcnButton variant="outline" size="native" type="button" class="theme-text" :title="t('labels.edit')" @click="editRow(tx)">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                       </svg>
-                    </button>
-                    <button type="button" class="text-red-600" :title="t('labels.delete')" @click="deleteRow(tx)">
+                    </ShadcnButton>
+                    <ShadcnButton variant="outline" size="native" type="button" class="text-red-600" :title="t('labels.delete')" @click="deleteRow(tx)">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
-                    </button>
+                    </ShadcnButton>
                   </div>
                   <span v-else class="text-xs text-slate-300" :title="isRTL ? 'بتتعدل من صفحة المدفوعات' : 'Managed from the payments page'">—</span>
                 </td>
@@ -463,7 +463,7 @@
     <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
         <h3 class="text-lg font-semibold theme-text-primary">{{ modalMode === 'create' ? t('treasury.create') : t('treasury.edit') }}</h3>
-        <button class="theme-caption transition hover:theme-text-secondary" @click="closeModal">×</button>
+        <ShadcnButton variant="outline" size="native" class="theme-caption transition hover:theme-text-secondary" @click="closeModal">×</ShadcnButton>
       </div>
       <form class="mt-4 space-y-4" @submit.prevent="saveTreasury">
         <div>
@@ -478,8 +478,8 @@
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeModal">{{ t('labels.cancel') }}</button>
-          <button type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('labels.save') }}</button>
+          <ShadcnButton variant="outline" size="native" type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeModal">{{ t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('labels.save') }}</ShadcnButton>
         </div>
       </form>
     </div>
@@ -562,8 +562,8 @@
           {{ depositError }}
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeDepositModal">{{ t('labels.cancel') }}</button>
-          <button type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('treasury.add') }}</button>
+          <ShadcnButton variant="outline" size="native" type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeDepositModal">{{ t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" type="submit" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('treasury.add') }}</ShadcnButton>
         </div>
       </form>
     </div>
@@ -573,7 +573,7 @@
     <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
         <h3 class="text-lg font-semibold theme-text-primary">{{ t('treasury.transferTitle') }}</h3>
-        <button class="theme-caption transition hover:theme-text-secondary" @click="closeTransferModal">×</button>
+        <ShadcnButton variant="outline" size="native" class="theme-caption transition hover:theme-text-secondary" @click="closeTransferModal">×</ShadcnButton>
       </div>
       <form class="mt-4 space-y-4" @submit.prevent="executeTransfer">
         <div>
@@ -608,8 +608,8 @@
           {{ transferError }}
         </div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeTransferModal">{{ t('labels.cancel') }}</button>
-          <button type="submit" :disabled="transferSubmitting" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('treasury.transferSubmit') }}</button>
+          <ShadcnButton variant="outline" size="native" type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeTransferModal">{{ t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" type="submit" :disabled="transferSubmitting" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button">{{ t('treasury.transferSubmit') }}</ShadcnButton>
         </div>
       </form>
     </div>
@@ -623,7 +623,7 @@
           <h3 class="text-lg font-semibold theme-text-primary">{{ isRTL ? 'تعديل' : 'Edit' }} {{ refTypeLabel(movementForm.refType) }}</h3>
           <p v-if="movementForm.refType === 'TRANSFER'" class="mt-1 text-xs theme-text-secondary">{{ isRTL ? 'التعديل بيتطبق على الخزينتين (المحوِّل والمحوَّل له).' : 'Applies to both treasuries of the transfer.' }}</p>
         </div>
-        <button class="theme-caption transition hover:theme-text-secondary" @click="closeMovementModal">×</button>
+        <ShadcnButton variant="outline" size="native" class="theme-caption transition hover:theme-text-secondary" @click="closeMovementModal">×</ShadcnButton>
       </div>
       <form class="mt-4 space-y-4" @submit.prevent="saveMovement">
         <div>
@@ -644,8 +644,8 @@
         </div>
         <div v-if="movementForm.error" class="rounded-lg bg-red-50 p-3 text-xs font-medium text-red-600">{{ movementForm.error }}</div>
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeMovementModal">{{ t('labels.cancel') }}</button>
-          <button type="submit" :disabled="movementForm.saving" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button disabled:opacity-60">{{ t('labels.save') }}</button>
+          <ShadcnButton variant="outline" size="native" type="button" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft" @click="closeMovementModal">{{ t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" type="submit" :disabled="movementForm.saving" class="rounded-xl px-4 py-2 text-sm font-medium text-white shadow-sm transition theme-button disabled:opacity-60">{{ t('labels.save') }}</ShadcnButton>
         </div>
       </form>
     </div>

@@ -1,11 +1,22 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="settings-shell theme-typography-transition">
     <div class="settings-panel responsive-stack">
-      <div class="app-page-header theme-header theme-animated-surface theme-glow rounded-2xl border border-gray-100 p-5 shadow-lg">
+      <div class="app-page-header theme-header theme-animated-surface theme-glow flex items-center justify-between gap-4 rounded-2xl border border-gray-100 p-5 shadow-lg">
         <div>
           <h1 class="text-2xl font-semibold theme-heading mb-2">{{ $t('themeStudio.title') }}</h1>
           <p class="text-sm theme-text-secondary">{{ $t('themeStudio.subtitle') }}</p>
         </div>
+        <ShadcnButton
+          variant="outline"
+          size="native"
+          type="button"
+          class="shrink-0"
+          :aria-label="isDarkMode ? $t('themeStudio.lightMode') : $t('themeStudio.darkMode')"
+          :aria-pressed="isDarkMode"
+          @click="toggleColorMode"
+        >
+          {{ isDarkMode ? $t('themeStudio.lightMode') : $t('themeStudio.darkMode') }}
+        </ShadcnButton>
       </div>
 
       <div class="responsive-grid">
@@ -40,9 +51,9 @@
                 class="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus"
                 :placeholder="$t('themeStudio.placeholder')"
               />
-              <button type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">
+              <ShadcnButton variant="outline" size="native" type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">
                 {{ $t('themeStudio.send') }}
-              </button>
+              </ShadcnButton>
             </form>
           </div>
         </div>
@@ -76,20 +87,20 @@
               <ul class="mt-2 text-xs theme-caption list-disc ps-4 space-y-0.5">
                 <li v-for="(r, i) in s.reasons" :key="i">{{ r }}</li>
               </ul>
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 class="theme-button mt-3 w-full rounded-lg px-3 py-2 text-sm font-medium"
                 @click="applySuggestion(s)"
               >
                 {{ $t('themeStudio.apply') }}
-              </button>
+              </ShadcnButton>
             </article>
           </div>
 
           <div class="settings-card settings-card__body">
             <h3 class="text-sm font-semibold theme-label mb-3">{{ $t('themeStudio.compare') }}</h3>
             <div class="settings-option-grid">
-              <button
+              <ShadcnButton variant="outline" size="native"
                 v-for="preset in presetThemes"
                 :key="preset.id"
                 type="button"
@@ -99,14 +110,14 @@
               >
                 <span class="font-semibold theme-text-primary block">{{ preset.name }}</span>
                 <span class="text-xs theme-caption">{{ preset.description }}</span>
-              </button>
+              </ShadcnButton>
             </div>
           </div>
 
           <div class="settings-actions">
-            <button type="button" class="theme-button rounded-lg px-4 py-2 text-sm" @click="exportPreset">
+            <ShadcnButton variant="outline" size="native" type="button" class="theme-button rounded-lg px-4 py-2 text-sm" @click="exportPreset">
               {{ $t('themeStudio.export') }}
-            </button>
+            </ShadcnButton>
             <label class="rounded-lg border border-gray-200 px-4 py-2 text-sm cursor-pointer hover:theme-hover-soft theme-text-secondary">
               {{ $t('themeStudio.import') }}
               <input type="file" accept="application/json" class="hidden" @change="importPreset" />
@@ -129,6 +140,7 @@ import {
   importThemePreset,
   loadTheme
 } from '@acme/platform'
+import { getColorMode, setColorMode } from '@/utils/colorMode'
 
 export default {
   name: 'ThemeStudioView',
@@ -144,6 +156,11 @@ export default {
     const presetThemes = getPresetThemeList()
 
     const isRTL = computed(() => locale.value === 'ar')
+    const isDarkMode = ref(getColorMode() === 'dark')
+
+    function toggleColorMode() {
+      isDarkMode.value = setColorMode(isDarkMode.value ? 'light' : 'dark') === 'dark'
+    }
 
     async function scrollChat() {
       await nextTick()
@@ -215,6 +232,8 @@ export default {
       activePresetId,
       chatScroll,
       isRTL,
+      isDarkMode,
+      toggleColorMode,
       sendPrompt,
       applySuggestion,
       previewPreset,

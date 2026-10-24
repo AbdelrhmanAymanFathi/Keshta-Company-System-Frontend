@@ -23,10 +23,10 @@
           <DateField v-model="selectedDateTo"
             class="w-full rounded-xl border border-slate-200 px-4 py-2 theme-input-focus" />
         </div>
-        <button @click="loadChanges" :disabled="loading || !selectedDateFrom"
+        <ShadcnButton variant="outline" size="native" @click="loadChanges" :disabled="loading || !selectedDateFrom"
           class="rounded-xl theme-button px-6 py-2 theme-text-light shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50">
           {{ $t('changes.loadChanges') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 

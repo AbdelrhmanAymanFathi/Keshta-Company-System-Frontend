@@ -24,17 +24,17 @@
             <option value="">{{ t('messaging.startDirect') }}</option>
             <option v-for="person in filteredUsers" :key="person.id" :value="person.id">{{ person.name }}</option>
           </select>
-          <button
+          <ShadcnButton variant="outline" size="native"
             v-if="newUserId"
             class="w-full rounded-xl bg-indigo-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
             @click="startDirectConversation"
-          >{{ t('messaging.startDirect') }}</button>
+          >{{ t('messaging.startDirect') }}</ShadcnButton>
         </div>
 
         <div v-if="loadingConversations" class="p-4 text-sm text-indigo-100/70">{{ t('messaging.conversations') }}...</div>
         <div v-else-if="!filteredConversations.length" class="p-4 text-sm text-indigo-100/70">{{ t('messaging.emptyConversations') }}</div>
         <div v-else class="max-h-[70vh] overflow-y-auto">
-          <button
+          <ShadcnButton variant="outline" size="native"
             v-for="conversation in filteredConversations"
             :key="conversation.id"
             class="flex w-full items-center gap-3 border-b border-white/5 px-4 py-3 text-start transition hover:bg-white/10"
@@ -53,7 +53,7 @@
               </span>
               <span class="block truncate text-xs text-indigo-100/65">{{ previewText(conversation.lastMessage) }}</span>
             </span>
-          </button>
+          </ShadcnButton>
         </div>
       </aside>
 
@@ -61,7 +61,7 @@
         <template v-if="selectedConversation">
           <header class="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3.5 shadow-sm">
             <div class="flex min-w-0 items-center gap-3">
-              <button class="rounded-lg px-2 py-1 text-sm text-blue-700 lg:hidden" @click="mobileChatOpen = false">‹</button>
+              <ShadcnButton variant="outline" size="native" class="rounded-lg px-2 py-1 text-sm text-blue-700 lg:hidden" @click="mobileChatOpen = false">‹</ShadcnButton>
               <div class="min-w-0">
                 <h2 class="truncate font-semibold text-slate-900">{{ selectedConversation.name }}</h2>
                 <p class="text-xs text-slate-500">
@@ -70,18 +70,18 @@
               </div>
             </div>
             <div v-if="selectedConversation.type === 'DIRECT'" class="flex items-center gap-1">
-              <button class="rounded-xl border border-slate-200 p-2.5 text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50" :aria-label="t('messaging.callAudio')" :title="t('messaging.callAudio')" @click="startCall('AUDIO')"><PhoneIcon class="h-5 w-5" /></button>
-              <button class="rounded-xl border border-slate-200 p-2.5 text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50" :aria-label="t('messaging.callVideo')" :title="t('messaging.callVideo')" @click="startCall('VIDEO')"><VideoCameraIcon class="h-5 w-5" /></button>
+              <ShadcnButton variant="outline" size="native" class="rounded-xl border border-slate-200 p-2.5 text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50" :aria-label="t('messaging.callAudio')" :title="t('messaging.callAudio')" @click="startCall('AUDIO')"><PhoneIcon class="h-5 w-5" /></ShadcnButton>
+              <ShadcnButton variant="outline" size="native" class="rounded-xl border border-slate-200 p-2.5 text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50" :aria-label="t('messaging.callVideo')" :title="t('messaging.callVideo')" @click="startCall('VIDEO')"><VideoCameraIcon class="h-5 w-5" /></ShadcnButton>
             </div>
           </header>
 
           <div ref="messageScroller" class="relative flex-1 space-y-3 overflow-y-auto bg-[#f4f5fa] p-4" @scroll="onMessageScroll">
-            <button v-if="newMessagesAvailable" class="sticky top-1 z-10 mx-auto block rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-200" @click="jumpToLatest">
+            <ShadcnButton variant="outline" size="native" v-if="newMessagesAvailable" class="sticky top-1 z-10 mx-auto block rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-200" @click="jumpToLatest">
               {{ t('messaging.newMessages') }}
-            </button>
-            <button v-if="hasMoreMessages" class="mx-auto block rounded-lg px-3 py-1 text-xs text-blue-700 hover:bg-blue-50" @click="loadOlderMessages">
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native" v-if="hasMoreMessages" class="mx-auto block rounded-lg px-3 py-1 text-xs text-blue-700 hover:bg-blue-50" @click="loadOlderMessages">
               {{ t('messaging.retry') }}
-            </button>
+            </ShadcnButton>
             <p v-if="loadingMessages" class="text-center text-sm theme-text-muted">{{ t('messaging.loadingMessages') }}</p>
             <p v-else-if="!messages.length" class="py-8 text-center text-sm theme-text-muted">{{ t('messaging.noMessages') }}</p>
             <article
@@ -94,9 +94,9 @@
               <div class="message-bubble max-w-[88%] rounded-2xl px-4 py-3 shadow-sm sm:max-w-[75%]"
                 :class="message.senderId === currentUserId ? 'message-bubble--sent rounded-ee-md' : 'message-bubble--received rounded-es-md'">
                 <p v-if="selectedConversation.type === 'GROUP' && message.senderId !== currentUserId" class="mb-1 text-xs font-semibold text-indigo-700">{{ message.sender?.name }}</p>
-                <button v-if="message.replyTo" class="mb-1 block max-w-full truncate border-s-2 border-current ps-2 text-start text-xs opacity-75" @click="scrollToMessage(message.replyTo.id)">
+                <ShadcnButton variant="outline" size="native" v-if="message.replyTo" class="mb-1 block max-w-full truncate border-s-2 border-current ps-2 text-start text-xs opacity-75" @click="scrollToMessage(message.replyTo.id)">
                   {{ message.replyTo.text || t('messaging.file') }}
-                </button>
+                </ShadcnButton>
                 <p v-if="message.deletedAt" class="text-sm italic opacity-75">{{ t('messaging.deleted') }}</p>
                 <template v-else>
                   <p v-if="message.text" class="whitespace-pre-wrap break-words text-sm">{{ message.text }}</p>
@@ -104,17 +104,17 @@
                     <img v-if="message.type === 'IMAGE' && mediaUrls[message.media.id]" :src="mediaUrls[message.media.id]" class="max-h-72 max-w-full rounded-lg object-contain" :alt="message.media.originalName">
                     <audio v-else-if="message.type === 'VOICE' && mediaUrls[message.media.id]" controls :src="mediaUrls[message.media.id]" class="max-w-full"></audio>
                     <video v-else-if="message.type === 'VIDEO_NOTE' && mediaUrls[message.media.id]" controls playsinline :src="mediaUrls[message.media.id]" class="max-h-72 max-w-full rounded-lg"></video>
-                    <button v-else class="rounded-lg bg-black/5 px-2 py-1 text-sm underline" @click="downloadMedia(message.media)">
+                    <ShadcnButton variant="outline" size="native" v-else class="rounded-lg bg-black/5 px-2 py-1 text-sm underline" @click="downloadMedia(message.media)">
                       {{ message.media.originalName || t('messaging.file') }} · {{ formatBytes(message.media.sizeBytes) }}
-                    </button>
+                    </ShadcnButton>
                   </div>
                 </template>
                 <footer class="message-bubble__footer mt-1 flex items-center justify-end gap-2 text-[10px]">
                   <span>{{ formatTime(message.createdAt) }} <span v-if="message.editedAt">· {{ t('messaging.edited') }}</span></span>
                   <span v-if="message.senderId === currentUserId && message.readBy?.length">✓✓</span>
-                  <button v-if="!message.deletedAt" class="underline" @click="replyTo(message)">{{ t('messaging.reply') }}</button>
-                  <button v-if="message.senderId === currentUserId && !message.deletedAt && message.text" class="underline" @click="editMessage(message)">{{ t('messaging.edit') }}</button>
-                  <button v-if="message.senderId === currentUserId || isConversationAdmin" class="underline" @click="removeMessage(message)">{{ t('messaging.delete') }}</button>
+                  <ShadcnButton variant="outline" size="native" v-if="!message.deletedAt" class="underline" @click="replyTo(message)">{{ t('messaging.reply') }}</ShadcnButton>
+                  <ShadcnButton variant="outline" size="native" v-if="message.senderId === currentUserId && !message.deletedAt && message.text" class="underline" @click="editMessage(message)">{{ t('messaging.edit') }}</ShadcnButton>
+                  <ShadcnButton variant="outline" size="native" v-if="message.senderId === currentUserId || isConversationAdmin" class="underline" @click="removeMessage(message)">{{ t('messaging.delete') }}</ShadcnButton>
                 </footer>
               </div>
             </article>
@@ -123,21 +123,21 @@
 
           <div v-if="replyTarget" class="flex items-center justify-between border-t border-slate-200 bg-blue-50 px-4 py-2 text-xs">
             <span class="truncate">{{ t('messaging.reply') }}: {{ replyTarget.text || t('messaging.file') }}</span>
-            <button class="rounded-lg p-1 text-slate-500 transition hover:bg-blue-100 hover:text-slate-800" :aria-label="t('messaging.cancelReply')" :title="t('messaging.cancelReply')" @click="replyTarget = null"><XMarkIcon class="h-4 w-4" /></button>
+            <ShadcnButton variant="outline" size="native" class="rounded-lg p-1 text-slate-500 transition hover:bg-blue-100 hover:text-slate-800" :aria-label="t('messaging.cancelReply')" :title="t('messaging.cancelReply')" @click="replyTarget = null"><XMarkIcon class="h-4 w-4" /></ShadcnButton>
           </div>
           <div class="border-t border-slate-200 bg-white p-3">
             <div v-if="recordingKind" class="mb-2 flex items-center justify-between rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
               <span>{{ recordingKind === 'video' ? t('messaging.callVideo') : t('messaging.recording') }} · {{ recordingSeconds }}s</span>
               <div class="flex gap-2">
-                <button class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-red-100" @click="cancelRecording"><XMarkIcon class="h-4 w-4" />{{ t('messaging.cancelRecording') }}</button>
-                <button class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 font-semibold transition hover:bg-red-100" @click="stopRecording"><StopIcon class="h-4 w-4" />{{ t('messaging.sendRecording') }}</button>
+                <ShadcnButton variant="outline" size="native" class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-red-100" @click="cancelRecording"><XMarkIcon class="h-4 w-4" />{{ t('messaging.cancelRecording') }}</ShadcnButton>
+                <ShadcnButton variant="outline" size="native" class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 font-semibold transition hover:bg-red-100" @click="stopRecording"><StopIcon class="h-4 w-4" />{{ t('messaging.sendRecording') }}</ShadcnButton>
               </div>
             </div>
             <div class="flex items-end gap-2">
               <input ref="fileInput" type="file" class="hidden" accept="image/*,application/pdf,text/plain,text/csv,audio/*,video/*,.docx,.xlsx" @change="onFileSelected">
-              <button class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-700" :aria-label="t('messaging.attach')" :title="t('messaging.attach')" @click="$refs.fileInput.click()"><PaperClipIcon class="h-5 w-5" /></button>
-              <button v-if="!recordingKind" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-rose-600" :aria-label="t('messaging.startRecording')" :title="t('messaging.startRecording')" @click="startRecording('audio')"><MicrophoneIcon class="h-5 w-5" /></button>
-              <button v-if="!recordingKind && selectedConversation.type === 'DIRECT'" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-700" :aria-label="t('messaging.videoNote')" :title="t('messaging.videoNote')" @click="startRecording('video')"><VideoCameraIcon class="h-5 w-5" /></button>
+              <ShadcnButton variant="outline" size="native" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-700" :aria-label="t('messaging.attach')" :title="t('messaging.attach')" @click="$refs.fileInput.click()"><PaperClipIcon class="h-5 w-5" /></ShadcnButton>
+              <ShadcnButton variant="outline" size="native" v-if="!recordingKind" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-rose-600" :aria-label="t('messaging.startRecording')" :title="t('messaging.startRecording')" @click="startRecording('audio')"><MicrophoneIcon class="h-5 w-5" /></ShadcnButton>
+              <ShadcnButton variant="outline" size="native" v-if="!recordingKind && selectedConversation.type === 'DIRECT'" class="rounded-xl p-2.5 text-slate-600 transition hover:bg-slate-100 hover:text-indigo-700" :aria-label="t('messaging.videoNote')" :title="t('messaging.videoNote')" @click="startRecording('video')"><VideoCameraIcon class="h-5 w-5" /></ShadcnButton>
               <textarea
                 v-model="draft"
                 rows="1"
@@ -146,10 +146,10 @@
                 @input="onDraftInput"
                 @keydown.enter.exact.prevent="sendMessage"
               ></textarea>
-              <button :disabled="!draft.trim() || sending" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 disabled:opacity-50" @click="sendMessage">
+              <ShadcnButton variant="outline" size="native" :disabled="!draft.trim() || sending" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-indigo-200 transition hover:bg-indigo-700 disabled:opacity-50" @click="sendMessage">
                 <PaperAirplaneIcon class="h-4 w-4" />
                 {{ t('messaging.send') }}
-              </button>
+              </ShadcnButton>
             </div>
             <p v-if="errorMessage" class="mt-2 text-xs text-red-600">{{ errorMessage }}</p>
           </div>
@@ -165,12 +165,12 @@
         <h2 class="my-2 text-2xl font-bold">{{ callerName(incomingCall) }}</h2>
         <p class="mb-6 text-sm text-slate-300">{{ incomingCall.type === 'VIDEO' ? t('messaging.callVideo') : t('messaging.callAudio') }}</p>
         <div class="flex justify-center gap-5">
-          <button class="flex flex-col items-center gap-2 text-sm text-slate-300" @click="answerCall">
+          <ShadcnButton variant="outline" size="native" class="flex flex-col items-center gap-2 text-sm text-slate-300" @click="answerCall">
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-xl">☎</span>{{ t('messaging.answer') }}
-          </button>
-          <button class="flex flex-col items-center gap-2 text-sm text-slate-300" @click="rejectCall">
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" class="flex flex-col items-center gap-2 text-sm text-slate-300" @click="rejectCall">
             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-rose-600 text-xl">✕</span>{{ t('messaging.reject') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>
@@ -201,7 +201,7 @@
           <p class="mt-2 text-sm text-slate-300">{{ callStatusText }}</p>
         </div>
         <div class="mt-5 flex items-center justify-center gap-3">
-          <button
+          <ShadcnButton variant="outline" size="native"
             class="inline-flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition"
             :class="localStream?.getAudioTracks()[0]?.enabled ? 'border-white/10 bg-white/10 text-white hover:bg-white/20' : 'border-rose-400/40 bg-rose-500/20 text-rose-100 hover:bg-rose-500/30'"
             :aria-label="localStream?.getAudioTracks()[0]?.enabled ? t('messaging.mute') : t('messaging.unmute')"
@@ -213,8 +213,8 @@
               <NoSymbolIcon v-if="!localStream?.getAudioTracks()[0]?.enabled" class="absolute -end-1 -top-1 h-3 w-3 text-rose-300" />
             </span>
             {{ localStream?.getAudioTracks()[0]?.enabled ? t('messaging.microphoneActive') : t('messaging.microphoneMuted') }}
-          </button>
-          <button
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native"
             v-if="activeCall.type === 'VIDEO'"
             class="inline-flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition"
             :class="localStream?.getVideoTracks()[0]?.enabled ? 'border-white/10 bg-white/10 text-white hover:bg-white/20' : 'border-rose-400/40 bg-rose-500/20 text-rose-100 hover:bg-rose-500/30'"
@@ -225,8 +225,8 @@
             <VideoCameraIcon v-if="localStream?.getVideoTracks()[0]?.enabled" class="h-5 w-5" />
             <VideoCameraSlashIcon v-else class="h-5 w-5" />
             {{ localStream?.getVideoTracks()[0]?.enabled ? t('messaging.cameraActive') : t('messaging.cameraDisabled') }}
-          </button>
-          <button class="rounded-2xl bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-950/30 transition hover:bg-rose-500" @click="endCall">{{ t('messaging.endCall') }}</button>
+          </ShadcnButton>
+          <ShadcnButton variant="outline" size="native" class="rounded-2xl bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-950/30 transition hover:bg-rose-500" @click="endCall">{{ t('messaging.endCall') }}</ShadcnButton>
         </div>
       </div>
     </div>

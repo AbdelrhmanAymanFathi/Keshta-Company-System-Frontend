@@ -21,7 +21,7 @@
         {{ t('labels.noData') }}
       </div>
       <div v-else class="mt-3 space-y-2">
-        <button
+        <ShadcnButton variant="outline" size="native"
           v-for="(treasury, index) in visibleTreasuries"
           :key="treasury.id"
           @click="selectTreasury(treasury.id)"
@@ -40,7 +40,7 @@
               <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
             </div>
           </div>
-        </button>
+        </ShadcnButton>
       </div>
     </aside>
 
@@ -54,22 +54,22 @@
             <p class="mt-0.5 text-sm theme-text-secondary">{{ t('treasury.ledgerTitle') }}</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button
+            <ShadcnButton variant="outline" size="native"
               type="button"
               class="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium theme-text-secondary transition hover:bg-gray-50 disabled:opacity-50"
               :disabled="!selectedTreasury || !!exportingFormat || loading"
               @click="downloadReport('xlsx')"
             >
               {{ exportingFormat === 'xlsx' ? t('labels.loading') : t('reports.downloadExcel') }}
-            </button>
-            <button
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="button"
               class="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium theme-text-secondary transition hover:bg-gray-50 disabled:opacity-50"
               :disabled="!selectedTreasury || !!exportingFormat || loading"
               @click="downloadReport('pdf')"
             >
               {{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}
-            </button>
+            </ShadcnButton>
           </div>
         </div>
 
@@ -83,7 +83,7 @@
             <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateTo') }}</label>
             <DateField v-model="filters.endDate" @update:modelValue="applyFilters" class="rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
           </div>
-          <button class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:bg-gray-50" @click="resetFilters">{{ t('labels.reset') }}</button>
+          <ShadcnButton variant="outline" size="native" class="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:bg-gray-50" @click="resetFilters">{{ t('labels.reset') }}</ShadcnButton>
         </div>
         <p v-if="exportError" class="mt-2 text-xs text-red-600">{{ exportError }}</p>
       </div>
@@ -250,7 +250,7 @@
               </span>
               <h3 class="text-base font-bold text-white">تفاصيل العملية</h3>
             </div>
-            <button @click="closeDetail" class="text-indigo-200 hover:text-white text-2xl leading-none">×</button>
+            <ShadcnButton variant="outline" size="native" @click="closeDetail" class="text-indigo-200 hover:text-white text-2xl leading-none">×</ShadcnButton>
           </div>
 
           <!-- Body -->
@@ -354,10 +354,10 @@
 
           <!-- Footer -->
           <div class="border-t border-gray-100 px-5 py-3 flex justify-end">
-            <button
+            <ShadcnButton variant="outline" size="native"
               @click="closeDetail"
               class="rounded-xl bg-gray-100 px-5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 transition"
-            >إغلاق</button>
+            >إغلاق</ShadcnButton>
           </div>
         </div>
       </div>

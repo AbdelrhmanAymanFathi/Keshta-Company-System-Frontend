@@ -75,7 +75,7 @@
                     : ($t('profile.presenceOff') || 'Off — you are hidden from other users') }}
                 </p>
               </div>
-              <button
+              <ShadcnButton variant="outline" size="native"
                 type="button"
                 role="switch"
                 :aria-checked="presenceEnabled"
@@ -88,7 +88,7 @@
                   class="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all duration-200"
                   :class="presenceEnabled ? 'start-0.5' : 'end-0.5'"
                 ></span>
-              </button>
+              </ShadcnButton>
             </div>
           </div>
         </div>
@@ -101,9 +101,9 @@
       <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 sm:p-8 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold theme-text-primary">{{ $t('profile.changePassword') }}</h3>
-          <button @click="closeChangeModal" class="theme-caption hover:theme-text-secondary transition">
+          <ShadcnButton variant="outline" size="native" @click="closeChangeModal" class="theme-caption hover:theme-text-secondary transition">
             <XMarkIcon class="w-6 h-6" />
-          </button>
+          </ShadcnButton>
         </div>
         
         <form @submit.prevent="handleChangePassword" class="space-y-4">
@@ -135,20 +135,20 @@
             />
           </div>
           <div class="pt-4 flex gap-3" :class="isRTL ? 'flex-row-reverse' : ''">
-            <button 
+            <ShadcnButton variant="outline" size="native"
               type="button" 
               @click="closeChangeModal" 
               class="flex-1 px-4 py-2 border border-gray-300 theme-text-secondary font-medium rounded-lg hover:bg-gray-50 transition"
             >
               {{ $t('labels.cancel') }}
-            </button>
-            <button 
+            </ShadcnButton>
+            <ShadcnButton variant="outline" size="native"
               type="submit" 
               :disabled="changing" 
               class="flex-1 px-4 py-2 theme-button font-medium rounded-lg disabled:opacity-50 transition whitespace-nowrap"
             >
               {{ changing ? $t('labels.saving') : $t('profile.changePassword') }}
-            </button>
+            </ShadcnButton>
           </div>
         </form>
       </div>
@@ -159,18 +159,18 @@
       <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold theme-text-primary">{{ $t('profile.totpTitle') }}</h3>
-          <button @click="showTotpModal = false" class="theme-caption hover:theme-text-secondary transition">
+          <ShadcnButton variant="outline" size="native" @click="showTotpModal = false" class="theme-caption hover:theme-text-secondary transition">
             <XMarkIcon class="w-6 h-6" />
-          </button>
+          </ShadcnButton>
         </div>
         <TotpManager />
         <div class="mt-6 flex justify-end">
-          <button 
+          <ShadcnButton variant="outline" size="native"
             @click="showTotpModal = false" 
             class="px-6 py-2 bg-gray-200 theme-text-primary font-medium rounded-lg hover:bg-gray-300 transition"
           >
             {{ $t('labels.close') }}
-          </button>
+          </ShadcnButton>
         </div>
       </div>
     </div>

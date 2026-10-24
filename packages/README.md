@@ -30,7 +30,7 @@ import { layoutPlugin } from '@acme/layout-engine'
 import { motionPlugin } from '@acme/motion-engine'
 
 themeEngine.use(iconPlugin).use(layoutPlugin).use(motionPlugin)
-await themeEngine.applyTheme({ primary: '#2563eb', iconPack: 'lucide' })
+await themeEngine.applyTheme({ primary: '#7c5ce7', iconPack: 'lucide' })
 ```
 
 Or use the bootstrap:

@@ -2,31 +2,31 @@
   <div class="space-y-6">
     <PageHeader :title="$t('expenses.reportTitle')" :subtitle="$t('expenses.reportDescription')">
       <div class="flex flex-wrap items-center gap-2">
-        <button @click="refresh" :disabled="loading"
+        <ShadcnButton variant="outline" size="native" @click="refresh" :disabled="loading"
                 class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium theme-text-primary transition-colors hover:bg-slate-50 disabled:opacity-50 sm:px-4 sm:py-2 shadow-2xs">
           {{ $t('labels.refresh') }}
-        </button>
-        <button @click="downloadReport('xlsx')" :disabled="downloading"
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="downloadReport('xlsx')" :disabled="downloading"
                 class="inline-flex items-center gap-1.5 rounded-xl theme-button px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-2xs transition-colors disabled:opacity-50">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
           </svg>
           Excel
-        </button>
-        <button @click="downloadReport('csv')" :disabled="downloading"
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="downloadReport('csv')" :disabled="downloading"
                 class="inline-flex items-center gap-1.5 rounded-xl theme-button px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-2xs transition-colors disabled:opacity-50">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
           </svg>
           CSV
-        </button>
-        <button @click="downloadReport('pdf')" :disabled="downloading"
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native" @click="downloadReport('pdf')" :disabled="downloading"
                 class="inline-flex items-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-2xs transition-colors disabled:opacity-50">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-3-3m3 3l3-3M5 20h14"/>
           </svg>
           PDF
-        </button>
+        </ShadcnButton>
       </div>
     </PageHeader>
 
@@ -166,19 +166,19 @@
       </div>
 
       <div class="flex gap-2">
-        <button 
+        <ShadcnButton variant="outline" size="native"
           @click="loadReport"
           :disabled="loading"
           class="px-4 py-2 theme-button rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
         >
           {{ $t('labels.search') }}
-        </button>
-        <button 
+        </ShadcnButton>
+        <ShadcnButton variant="outline" size="native"
           @click="clearFilters"
           class="px-4 py-2 bg-gray-200 hover:bg-gray-300 theme-text-primary rounded-lg transition-colors text-sm font-medium"
         >
           {{ $t('labels.clear') }}
-        </button>
+        </ShadcnButton>
       </div>
     </div>
 

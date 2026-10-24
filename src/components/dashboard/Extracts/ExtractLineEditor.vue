@@ -30,7 +30,7 @@
     <input type="number" v-model.number="internal.quantity" placeholder="Qty" class="p-2 border rounded" />
     <input type="number" min="0" step="0.01" v-model.number="internal.discount" placeholder="Discount" class="p-2 border rounded" />
     <div class="p-2">{{ formattedTotal }}</div>
-    <button type="button" @click="onRemove" class="text-red-600">Remove</button>
+    <ShadcnButton variant="outline" size="native" type="button" @click="onRemove" class="text-red-600">Remove</ShadcnButton>
   </div>
 </template>
 

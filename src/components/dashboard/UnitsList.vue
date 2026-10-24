@@ -1,32 +1,29 @@
 <template>
   <div class="p-0 sm:p-0.5 md:p-1 lg:p-0 space-y-6">
-    <!-- Header -->
-    <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50">
-      <h2 class="text-xl sm:text-2xl font-bold theme-text-primary">{{ $t('units.title') || 'Units of Measure' }}</h2>
-      <div class="flex items-center gap-3">
-        <Button class="gap-2" @click="openAddModal()">
-          <PlusIcon class="h-4 w-4" />
-          {{ $t('units.addUnit') || 'Add Unit' }}
-        </Button>
-      </div>
-    </div>
+    <PageHeader :title="$t('units.title') || 'Units of Measure'">
+      <Button class="gap-2" @click="openAddModal()">
+        <PlusIcon class="h-4 w-4" />
+        {{ $t('units.addUnit') || 'Add Unit' }}
+      </Button>
+    </PageHeader>
 
-    <!-- Search & Filter -->
-    <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-md shadow-slate-200/20">
-      <div class="relative flex-1 max-w-md">
-        <Input
-          v-model="searchQuery"
-          type="text"
-          :placeholder="$t('units.searchPlaceholder') || 'Search units...'"
-          class="w-full pl-10 pr-4 py-2 text-sm"
-        />
-        <span class="absolute left-3 top-2.5 text-slate-400">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </span>
-      </div>
-    </div>
+    <Card class="shadcn-ui border-border/80 bg-card shadow-md">
+      <CardContent class="flex items-center gap-4 p-4">
+        <div class="relative max-w-md flex-1">
+          <Input
+            v-model="searchQuery"
+            type="text"
+            :placeholder="$t('units.searchPlaceholder') || 'Search units...'"
+            :class="['w-full', isRTL ? 'pe-10 ps-4' : 'ps-10 pe-4']"
+          />
+          <span class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground" :class="isRTL ? 'end-3' : 'start-3'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+        </div>
+      </CardContent>
+    </Card>
 
     <!-- Table -->
     <div class="app-table-card">
@@ -119,8 +116,10 @@
 
 <script>
 import { getUnits, createUnit, updateUnit, deleteUnit } from '@/api'
+import PageHeader from '@/components/shared/PageHeader.vue'
 import RowActions from '@/components/shared/RowActions.vue'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -133,6 +132,9 @@ export default {
   components: {
     Modal,
     ConfirmDialog,
+    Card,
+    CardContent,
+    PageHeader,
     Label,
     Textarea,
     RowActions,
