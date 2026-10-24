@@ -135,6 +135,8 @@
     "retry": "Retry"
   },
   "dashboard": {
+    "toggleSidebar": "Toggle sidebar",
+    "userMenu": "User menu",
     "newItem": "New Item",
     "payments": "Payments",
     "pay": "Pay",
@@ -524,6 +526,8 @@
   "themeStudio": {
     "title": "Theme Studio",
     "subtitle": "Chat with the theme bot, compare presets, and export your UI personality.",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
     "botTitle": "Theme Bot",
     "placeholder": "e.g. minimal clean UI for a SaaS startup",
     "send": "Suggest",

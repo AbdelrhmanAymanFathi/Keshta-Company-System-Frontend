@@ -320,7 +320,7 @@ function isAudioAsset(url) {
 function resolvePrerecordedUrl() {
   if (prerecorded.checked) return Promise.resolve(prerecorded.url)
   prerecorded.checked = true
-  const base = process.env.BASE_URL || '/'
+  const base = import.meta.env.BASE_URL || '/'
   const prefix = base.endsWith('/') ? base : `${base}/`
   const chain = PRERECORDED_FILES.reduce((promise, file) => promise.then((found) => {
     if (found) return found
