@@ -202,10 +202,10 @@
         <tbody>
           <tr v-for="(transport, idx) in transports" :key="`transport-${transport.id}-${idx}`" :data-focus-id="transport.id" :class="['theme-table-row-hover', { 'row-pending-review': transport.hasPendingApproval }]"
               @contextmenu.prevent="onRowContextMenu($event, transport)">
-            <td class="px-6 py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-secondary uppercase tracking-wider whitespace-nowrap">
               {{ formatDate(transport.date) }}
             </td>
-             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+             <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
                <div class="">{{ transport.contractor?.name || '-' }}</div>
              </td>
              <td class="px-6 py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
@@ -214,31 +214,31 @@
                 :label="transport.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
               />
              </td>
-             <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+             <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
                <div class=""><span class="">{{ transport.location?.name || '-' }}</span></div>
              </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               <div class=""><span class="">{{ transport.area?.name || '-' }}</span></div>
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               <div class="">{{ getVehicleDisplay(transport) }}</div>
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ transport.item?.name || '-' }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ transport.numTrips }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ transport.distanceKm }} km
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ transport.vehicleCompanyCapacity != null ? transport.vehicleCompanyCapacity : '-' }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(getTransportFirstKmPrice(transport)) }}
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(getTransportPerKmPrice(transport)) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">
@@ -246,7 +246,7 @@
                 {{ transport.discount }}
               </span>
             </td>
-            <td class="px-6 py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ formatCurrency(transport.total) }}
             </td>
             <td class="px-6 py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
