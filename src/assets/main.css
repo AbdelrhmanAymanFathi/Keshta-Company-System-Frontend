@@ -2516,10 +2516,10 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   --theme-heading-color: #fafafa !important;
   --theme-card-text: #f4f4f5 !important;
   --theme-sidebar-text: #e4e4e7 !important;
-  --theme-surface-bg: #20252e !important;
-  --theme-surface-muted-bg: #292f3a !important;
+  --theme-surface-bg: #080808 !important;
+  --theme-surface-muted-bg: #141414 !important;
   --theme-surface-border: rgb(203 213 225 / 0.14) !important;
-  --theme-glass-bg: rgb(32 37 46 / 0.94) !important;
+  --theme-glass-bg: rgb(8 8 8 / 0.96) !important;
   --theme-glass-border: rgb(203 213 225 / 0.16) !important;
   --theme-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.2) !important;
   --theme-shadow-md: 0 4px 12px rgb(0 0 0 / 0.24) !important;
@@ -2887,7 +2887,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .dashboard-module-content table > thead,
 .dark .dashboard-module-content table > thead tr,
 .dark .dashboard-module-content table > thead th {
-  background-color: #303846 !important;
+  background-color: #191919 !important;
   background-image: none !important;
 }
 
@@ -2898,16 +2898,16 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 
 .dark .dashboard-module-content table,
 .dark .dashboard-module-content table tbody {
-  background-color: #20252e;
+  background-color: #080808;
   color: hsl(var(--shadcn-foreground));
 }
 
 .dark .dashboard-module-content table tr:hover {
-  background-color: #292f3a;
+  background-color: #141414;
 }
 
 .dark .dashboard-module-content table tr:hover td:not([class*='bg-']) {
-  background-color: #292f3a;
+  background-color: #141414;
 }
 
 .dark .dashboard-module-content table tbody tr + tr td {
@@ -2952,12 +2952,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 .dark :where(
-  [class~='bg-white/50'],
-  [class~='bg-white/60'],
-  [class~='bg-white/70'],
-  [class~='bg-white/80'],
-  [class~='bg-white/90'],
-  [class~='bg-white/95'],
+  [class*='bg-white'],
   [class~='bg-gray-50'],
   [class~='bg-gray-100'],
   [class~='bg-slate-50'],
@@ -2967,6 +2962,57 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 ) {
   background-color: var(--theme-surface-bg) !important;
   background-image: none;
+}
+
+.dark :where(
+  .theme-card,
+  .theme-surface,
+  .app-table-card,
+  .context-menu,
+  .report-field-card,
+  .report-drag-handle,
+  .report-secondary-button,
+  .report-input,
+  .message-bubble--received
+) {
+  background-color: var(--theme-surface-bg) !important;
+  background-image: none !important;
+  border-color: var(--theme-surface-border) !important;
+}
+
+.dark :where(.report-input, .report-secondary-button, .context-menu) {
+  color: var(--theme-text-primary) !important;
+}
+
+.dark .dashboard-module-content :is(.overflow-auto, .overflow-x-auto):has(> table),
+.dark .dashboard-module-content table > thead,
+.dark .dashboard-module-content table > thead tr,
+.dark .dashboard-module-content table > thead th {
+  background-color: #191919 !important;
+  background-image: none !important;
+}
+
+.dark .message-bubble--received {
+  color: var(--theme-text-primary) !important;
+}
+
+.dark .message-bubble--received .message-bubble__footer,
+.dark .context-menu-item {
+  color: var(--theme-text-secondary) !important;
+}
+
+.dark .report-field-card,
+.dark .report-drag-handle,
+.dark .report-secondary-button,
+.dark .report-input,
+.dark .report-info-chip:not(.report-info-chip--accent) {
+  background: var(--theme-surface-bg) !important;
+  color: var(--theme-text-primary) !important;
+  border-color: var(--theme-surface-border) !important;
+}
+
+.dark .report-field-card {
+  background-image: none !important;
 }
 
 .dark :where(

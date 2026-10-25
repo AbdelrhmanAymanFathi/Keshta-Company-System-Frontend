@@ -26,24 +26,24 @@
 }
 
 .dark {
-  --shadcn-background: 222 18% 11%;
+  --shadcn-background: 0 0% 4%;
   --shadcn-foreground: 220 15% 94%;
-  --shadcn-card: 222 17% 15%;
+  --shadcn-card: 0 0% 7%;
   --shadcn-card-foreground: 220 15% 94%;
-  --shadcn-popover: 222 17% 15%;
+  --shadcn-popover: 0 0% 7%;
   --shadcn-popover-foreground: 220 15% 94%;
   --shadcn-primary: var(--theme-primary-dark-hsl, 0 0% 98%);
   --shadcn-primary-foreground: var(--theme-primary-dark-foreground-hsl, 240 5.9% 10%);
-  --shadcn-secondary: 222 14% 22%;
+  --shadcn-secondary: 0 0% 14%;
   --shadcn-secondary-foreground: 220 15% 94%;
-  --shadcn-muted: 222 14% 22%;
+  --shadcn-muted: 0 0% 14%;
   --shadcn-muted-foreground: 220 10% 70%;
-  --shadcn-accent: 222 14% 22%;
+  --shadcn-accent: 0 0% 14%;
   --shadcn-accent-foreground: 220 15% 94%;
   --shadcn-destructive: 0 62.8% 30.6%;
   --shadcn-destructive-foreground: 0 0% 98%;
-  --shadcn-border: 222 12% 28%;
-  --shadcn-input: 222 12% 28%;
+  --shadcn-border: 0 0% 23%;
+  --shadcn-input: 0 0% 23%;
   --shadcn-ring: var(--theme-primary-dark-hsl, 0 0% 98%);
   --shadcn-chart-1: 220 70% 50%;
   --shadcn-chart-2: 160 60% 45%;
