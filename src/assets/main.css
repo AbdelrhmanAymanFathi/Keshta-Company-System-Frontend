@@ -2914,6 +2914,10 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   border-color: var(--theme-surface-border);
 }
 
+.dark .dashboard-module-content table td[class~='text-black'] {
+  color: hsl(var(--shadcn-foreground)) !important;
+}
+
 .dark .dashboard-module-content :where(.bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100, .bg-zinc-50, .bg-zinc-100):not([class*='bg-opacity-']) {
   background-color: var(--theme-surface-bg) !important;
 }
