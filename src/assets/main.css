@@ -2914,6 +2914,23 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   border-color: var(--theme-surface-border);
 }
 
+.dark .dashboard-module-content table.app-table tbody,
+.dark .dashboard-module-content table.app-table tbody tr,
+.dark .dashboard-module-content table.app-table tbody td {
+  background-color: var(--theme-surface-bg) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.dark .dashboard-module-content table.app-table tbody tr.location-area-row,
+.dark .dashboard-module-content table.app-table tbody tr.location-area-row td {
+  background-color: var(--theme-surface-muted-bg) !important;
+}
+
+.dark .dashboard-module-content table.app-table tbody tr:hover,
+.dark .dashboard-module-content table.app-table tbody tr:hover td {
+  background-color: var(--theme-surface-muted-bg) !important;
+}
+
 .dark table td[class~='theme-text-primary'] {
   color: var(--theme-text-primary) !important;
 }

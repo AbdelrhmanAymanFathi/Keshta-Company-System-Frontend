@@ -24,16 +24,16 @@
               <td :class="['px-4 py-3 font-medium', isRTL ? 'text-right' : 'text-left']">{{ loc.name }}</td>
               <td class="px-4 py-3">{{ $t('locations.site') || 'Site' }}</td>
               <td :class="['px-4 py-3', isRTL ? 'text-right' : 'text-left']">
-                <RowActions :actions="rowActions(loc)" />
+                <RowActions :actions="rowActions(loc)" size="sm" />
               </td>
             </tr>
 
-            <tr v-for="(child) in loc.children" :key="child.id" class="border-b border-slate-200 bg-slate-50/70 theme-table-row-hover">
+            <tr v-for="child in loc.children" :key="child.id" class="location-area-row border-b border-slate-200 theme-table-row-hover">
               <td class="px-4 py-2">&nbsp;</td>
               <td :class="['px-4 py-2 ps-8', isRTL ? 'text-right' : 'text-left']">— {{ child.name }}</td>
               <td class="px-4 py-2">{{ $t('locations.area') || 'Area' }}</td>
               <td :class="['px-4 py-2', isRTL ? 'text-right' : 'text-left']">
-                <RowActions :actions="rowActions(child, loc)" />
+                <RowActions :actions="rowActions(child, loc)" size="sm" />
               </td>
             </tr>
           </template>
@@ -94,8 +94,6 @@ export default {
     RowActions,
     Button,
     Input,
-    PencilIcon,
-    TrashIcon,
     PlusIcon
   },
   computed: {
@@ -150,7 +148,7 @@ export default {
     rowActions(loc, parent = null) {
       const actions = []
       if (!parent) {
-        actions.push({ key: 'addArea', icon: PlusIcon, label: this.$t('locations.addArea') || 'Add Area', tone: 'default', showLabel: true, onClick: () => this.openAddArea(loc) })
+        actions.push({ key: 'addArea', icon: PlusIcon, label: this.$t('locations.addArea') || 'Add Area', tone: 'default', onClick: () => this.openAddArea(loc) })
       }
       actions.push({ key: 'edit', icon: PencilIcon, label: this.$t('labels.edit'), tone: 'edit', onClick: () => (parent ? this.openEdit(loc, parent) : this.openEdit(loc)) })
       actions.push({ key: 'delete', icon: TrashIcon, label: this.$t('labels.delete'), tone: 'delete', onClick: () => this.confirmDelete(loc) })
