@@ -291,12 +291,12 @@ import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { createPayment, getContractors, getLocations, getTreasuries } from '@/api'
 import {
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  CheckIcon,
-  DocumentDuplicateIcon,
-  TrashIcon
-} from '@heroicons/vue/24/outline'
+  ArrowRight as ArrowRightIcon,
+  ArrowLeft as ArrowLeftIcon,
+  Check as CheckIcon,
+  Copy as DocumentDuplicateIcon,
+  Trash2 as TrashIcon
+} from '@lucide/vue'
 import { useI18n } from 'vue-i18n'
 
 const normalizeList = (payload) => {

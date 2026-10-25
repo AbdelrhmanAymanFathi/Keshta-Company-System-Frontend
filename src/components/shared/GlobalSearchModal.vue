@@ -95,23 +95,23 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import {
-  MagnifyingGlassIcon,
-  ArrowUpRightIcon,
-  BuildingOffice2Icon,
-  TruckIcon,
-  UserCircleIcon,
-  CubeIcon,
-  Cog6ToothIcon,
-  MapPinIcon,
-  UsersIcon,
-  ArchiveBoxArrowDownIcon,
-  ArrowsRightLeftIcon,
-  DocumentTextIcon,
-  BanknotesIcon,
-  WrenchScrewdriverIcon,
-  ClipboardDocumentListIcon,
-  CreditCardIcon
-} from '@heroicons/vue/24/outline'
+  Search as MagnifyingGlassIcon,
+  ArrowUpRight as ArrowUpRightIcon,
+  Building2 as BuildingOffice2Icon,
+  Truck as TruckIcon,
+  CircleUserRound as UserCircleIcon,
+  Box as CubeIcon,
+  Settings as Cog6ToothIcon,
+  MapPin as MapPinIcon,
+  Users as UsersIcon,
+  ArchiveRestore as ArchiveBoxArrowDownIcon,
+  ArrowLeftRight as ArrowsRightLeftIcon,
+  FileText as DocumentTextIcon,
+  Banknote as BanknotesIcon,
+  Wrench as WrenchScrewdriverIcon,
+  ClipboardList as ClipboardDocumentListIcon,
+  CreditCard as CreditCardIcon
+} from '@lucide/vue'
 import { globalSearch } from '@/api'
 import { isAuthenticated } from '@/composables/authStore'
 

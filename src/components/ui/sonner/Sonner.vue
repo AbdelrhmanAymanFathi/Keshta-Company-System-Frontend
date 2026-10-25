@@ -1,12 +1,12 @@
 <script setup>
 import {
-  PhCheckCircle,
-  PhInfo,
-  PhCircleNotch,
-  PhXCircle,
-  PhWarning,
-  PhX,
-} from '@phosphor-icons/vue';
+  CircleCheck as PhCheckCircle,
+  Info as PhInfo,
+  LoaderCircle as PhCircleNotch,
+  CircleX as PhXCircle,
+  TriangleAlert as PhWarning,
+  X as PhX,
+} from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import { Toaster as Sonner } from "vue-sonner";

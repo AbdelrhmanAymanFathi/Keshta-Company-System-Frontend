@@ -238,9 +238,16 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  MicrophoneIcon, NoSymbolIcon, PaperAirplaneIcon, PaperClipIcon, PhoneIcon,
-  StopIcon, VideoCameraIcon, VideoCameraSlashIcon, XMarkIcon
-} from '@heroicons/vue/24/outline'
+  Mic as MicrophoneIcon,
+  Ban as NoSymbolIcon,
+  Send as PaperAirplaneIcon,
+  Paperclip as PaperClipIcon,
+  Phone as PhoneIcon,
+  Square as StopIcon,
+  Video as VideoCameraIcon,
+  VideoOff as VideoCameraSlashIcon,
+  X as XMarkIcon
+} from '@lucide/vue'
 import {
   createChatCall, createDirectConversation, deleteChatMessage, downloadChatMedia,
   editChatMessage, ensureOrganizationConversation, getActiveChatCalls,

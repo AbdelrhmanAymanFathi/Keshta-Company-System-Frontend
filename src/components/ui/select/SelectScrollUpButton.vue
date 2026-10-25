@@ -1,5 +1,5 @@
 <script setup>
-import { PhCaretUp } from '@phosphor-icons/vue';
+import { ChevronUp as PhCaretUp } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import { SelectScrollUpButton, useForwardProps } from "reka-ui";

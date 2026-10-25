@@ -268,53 +268,20 @@
 
         <div class="settings-card">
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
-            <div class="flex items-center gap-3">
-              <div class="bg-white bg-opacity-20 rounded-lg p-2">
-                <ThemeIcon name="grid" class="w-5 h-5 theme-text-light" />
-              </div>
-              <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.iconPackTitle') || 'Icon Pack' }}</h2>
-            </div>
+            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.themePersonality') || 'UI personalities' }}</h2>
           </div>
-          <div class="settings-card__body space-y-6">
-            <p class="text-sm theme-text-secondary">{{ $t('profile.iconPackDescription') || 'Switch the entire app icon style instantly — sidebar, tables, and actions.' }}</p>
+          <div class="settings-card__body">
             <div class="settings-option-grid">
               <ShadcnButton variant="outline" size="native"
-                v-for="pack in iconPackOptions"
-                :key="pack.id"
+                v-for="personality in themePersonalities"
+                :key="personality.id"
                 type="button"
-                @click="themeIconPack = pack.id"
-                :class="[
-                  'rounded-xl border px-3 py-3 text-start transition theme-motion-soft',
-                  themeIconPack === pack.id
-                    ? 'theme-selected border-transparent shadow-sm'
-                    : 'border-gray-200 bg-white hover:theme-hover-soft'
-                ]"
+                @click="applyPersonality(personality.id)"
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium theme-text-secondary hover:theme-hover-soft transition theme-motion-soft text-start"
               >
-                <span class="flex items-center gap-3">
-                  <span class="theme-icon-container theme-dashboard-bg-soft h-10 w-10">
-                    <ThemeIcon name="vehicle" class="h-5 w-5 theme-accent-strong" />
-                  </span>
-                  <span>
-                    <span class="block text-sm font-semibold theme-text-primary">{{ getIconPackLabel(pack.id) }}</span>
-                    <span class="block text-xs theme-caption">{{ getIconPackDescription(pack.id) }}</span>
-                  </span>
-                </span>
+                <span class="block font-semibold theme-text-primary">{{ getPersonalityLabel(personality.id) }}</span>
+                <span class="block text-xs theme-caption">{{ personality.description }}</span>
               </ShadcnButton>
-            </div>
-            <div>
-              <label class="block text-sm font-semibold theme-label mb-2">{{ $t('profile.themePersonality') || 'UI personalities' }}</label>
-              <div class="settings-option-grid">
-                <ShadcnButton variant="outline" size="native"
-                  v-for="personality in themePersonalities"
-                  :key="personality.id"
-                  type="button"
-                  @click="applyPersonality(personality.id)"
-                  class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium theme-text-secondary hover:theme-hover-soft transition theme-motion-soft text-start"
-                >
-                  <span class="block font-semibold theme-text-primary">{{ getPersonalityLabel(personality.id) }}</span>
-                  <span class="block text-xs theme-caption">{{ personality.description }}</span>
-                </ShadcnButton>
-              </div>
             </div>
           </div>
         </div>
@@ -531,7 +498,6 @@ import {
   DENSITY_PRESETS,
   SHADOW_PRESETS
 } from '@acme/platform'
-import { getIconPackOptions, ThemeIcon } from '@acme/icon-packs'
 import { getSidebarOptions } from '@acme/layout-engine'
 import { Switch } from '@/components/ui/switch'
 import { colorMode, setColorMode } from '@/utils/colorMode'
@@ -542,7 +508,7 @@ import { introEnabled, toggleStartupSound, previewStartupSound } from '@/composa
 
 export default {
   name: 'ProfileSettingsView',
-  components: { ThemeIcon, Switch },
+  components: { Switch },
   setup() {
 
     const { t, locale } = useI18n()
@@ -554,7 +520,6 @@ export default {
     const themeAnimation = ref(savedTheme.animation || DEFAULT_THEME.animation)
 
     const themeFontPreset = ref(savedTheme.fontPreset || DEFAULT_THEME.fontPreset)
-    const themeIconPack = ref(savedTheme.iconPack || DEFAULT_THEME.iconPack)
     const themeSidebarType = ref(savedTheme.sidebarType || DEFAULT_THEME.sidebarType)
     const themeRadius = ref(savedTheme.radius || DEFAULT_THEME.radius)
     const themeDensity = ref(savedTheme.density || DEFAULT_THEME.density)
@@ -564,7 +529,6 @@ export default {
 
     const animationPresets = ANIMATION_PRESETS
     const fontPresets = getFontPresets()
-    const iconPackOptions = getIconPackOptions()
     const sidebarOptions = getSidebarOptions()
     const themePersonalities = getThemePersonalities()
     const radiusPresets = RADIUS_PRESETS
@@ -671,7 +635,7 @@ export default {
 
         animation: themeAnimation.value || DEFAULT_THEME.animation,
 
-        iconPack: themeIconPack.value || DEFAULT_THEME.iconPack,
+        iconPack: 'lucide',
         sidebarType: themeSidebarType.value || DEFAULT_THEME.sidebarType,
         radius: themeRadius.value || DEFAULT_THEME.radius,
         density: themeDensity.value || DEFAULT_THEME.density,
@@ -721,7 +685,6 @@ export default {
       themeColor.value = next.primary
       themeAnimation.value = next.animation
       themeFontPreset.value = next.fontPreset
-      themeIconPack.value = next.iconPack
       themeSidebarType.value = next.sidebarType
       themeRadius.value = next.radius
       themeDensity.value = next.density
@@ -752,7 +715,7 @@ export default {
     }
 
     watch(
-      [themeColor, themeAnimation, themeFontPreset, themeIconPack, themeSidebarType, themeRadius, themeDensity, themeShadows],
+      [themeColor, themeAnimation, themeFontPreset, themeSidebarType, themeRadius, themeDensity, themeShadows],
       persistTheme,
       { immediate: true }
     )
@@ -771,7 +734,6 @@ export default {
 
       themeFontPreset.value = reset.fontPreset
 
-      themeIconPack.value = reset.iconPack
       themeSidebarType.value = reset.sidebarType
       themeRadius.value = reset.radius
       themeDensity.value = reset.density
@@ -793,14 +755,6 @@ export default {
 
     }
 
-    function getIconPackLabel(packId) {
-      return t(`profile.iconPack_${packId}`) || packId
-    }
-
-    function getIconPackDescription(packId) {
-      return t(`profile.iconPackDesc_${packId}`) || ''
-    }
-
     function getPersonalityLabel(personalityId) {
       return t(`profile.preset_${personalityId}`) || t(`profile.personality_${personalityId}`) || personalityId
     }
@@ -817,7 +771,6 @@ export default {
 
       themeFontPreset,
 
-      themeIconPack,
       themeSidebarType,
       themeRadius,
       themeDensity,
@@ -825,7 +778,6 @@ export default {
       themeBotQuery,
       botSuggestions,
 
-      iconPackOptions,
       sidebarOptions,
       radiusPresets,
       densityPresets,
@@ -872,10 +824,6 @@ export default {
       toggleStartupSound,
 
       previewStartupSound,
-
-      getIconPackLabel,
-
-      getIconPackDescription,
 
       getPersonalityLabel
 

@@ -75,20 +75,12 @@
                     : ($t('profile.presenceOff') || 'Off — you are hidden from other users') }}
                 </p>
               </div>
-              <ShadcnButton variant="outline" size="native"
-                type="button"
-                role="switch"
-                :aria-checked="presenceEnabled"
+              <Switch
+                :checked="presenceEnabled"
                 :aria-label="$t('profile.presenceToggleLabel') || 'Enable live presence'"
-                @click="togglePresence"
-                :class="presenceEnabled ? 'bg-green-500' : 'bg-gray-300'"
-                class="relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200"
-              >
-                <span
-                  class="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all duration-200"
-                  :class="presenceEnabled ? 'start-0.5' : 'end-0.5'"
-                ></span>
-              </ShadcnButton>
+                class="shrink-0"
+                @update:checked="togglePresence"
+              />
             </div>
           </div>
         </div>
@@ -181,6 +173,7 @@
 import TotpManager from '@/components/auth/TotpManager.vue'
 import { useAuth } from '@/composables/useAuth'
 import { presenceEnabled, savePresenceSettings } from '@/composables/usePresenceSettings'
+import { Switch } from '@/components/ui/switch'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { changePassword } from '@/api'
@@ -188,8 +181,9 @@ import { InformationCircleIcon, EnvelopeIcon, UserIcon, XMarkIcon } from '@acme/
 
 export default {
   name: 'ProfileView',
-  components: { 
+  components: {
     TotpManager,
+    Switch,
     InformationCircleIcon,
     EnvelopeIcon,
     UserIcon,
@@ -218,8 +212,8 @@ export default {
       clearPasswordForm()
     }
 
-    function togglePresence() {
-      savePresenceSettings(!presenceEnabled.value)
+    function togglePresence(enabled) {
+      savePresenceSettings(enabled)
     }
 
     /* theme moved to Settings view */

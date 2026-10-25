@@ -2516,11 +2516,15 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   --theme-heading-color: #fafafa !important;
   --theme-card-text: #f4f4f5 !important;
   --theme-sidebar-text: #e4e4e7 !important;
-  --theme-surface-bg: #18181b;
-  --theme-surface-muted-bg: #27272a;
-  --theme-surface-border: rgb(255 255 255 / 0.12);
-  --theme-glass-bg: rgb(24 24 27 / 0.92);
-  --theme-glass-border: rgb(255 255 255 / 0.14);
+  --theme-surface-bg: #20252e !important;
+  --theme-surface-muted-bg: #292f3a !important;
+  --theme-surface-border: rgb(203 213 225 / 0.14) !important;
+  --theme-glass-bg: rgb(32 37 46 / 0.94) !important;
+  --theme-glass-border: rgb(203 213 225 / 0.16) !important;
+  --theme-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.2) !important;
+  --theme-shadow-md: 0 4px 12px rgb(0 0 0 / 0.24) !important;
+  --theme-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.3) !important;
+  --theme-shadow-card: 0 4px 14px rgb(0 0 0 / 0.24) !important;
   --theme-backdrop-bg: rgb(0 0 0 / 0.68);
 }
 
@@ -2532,6 +2536,15 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 
 .dark .bg-white:not([class*='bg-opacity-']) {
   background-color: hsl(var(--shadcn-card)) !important;
+}
+
+.dark [class~='bg-gray-50'],
+.dark [class~='bg-gray-100'],
+.dark [class~='bg-slate-50'],
+.dark [class~='bg-slate-100'],
+.dark [class~='bg-zinc-50'],
+.dark [class~='bg-zinc-100'] {
+  background-color: var(--theme-surface-muted-bg) !important;
 }
 
 .dark :where(.border-gray-100, .border-gray-200, .border-slate-200, .border-slate-300) {
@@ -2845,4 +2858,83 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   padding: 0.5rem;
   vertical-align: middle;
   white-space: nowrap;
+}
+.dark .layout-sidebar {
+  background-color: var(--theme-surface-bg) !important;
+  color: hsl(var(--shadcn-foreground));
+}
+
+.dark .theme-glow {
+  box-shadow:
+    0 0 0 1px rgba(var(--theme-primary-rgb), 0.1),
+    0 12px 26px rgb(0 0 0 / 0.24);
+}
+
+.dark .theme-header,
+.dark .theme-page-header-bar {
+  background: linear-gradient(135deg, #20252e 0%, #252a35 48%, #2b2b3b 100%) !important;
+  border-color: var(--theme-surface-border);
+}
+
+.dark .theme-main-gradient {
+  background: linear-gradient(135deg, #171b22 0%, #1c202a 55%, #222333 100%);
+}
+
+.dark .theme-page-header-bar {
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.18);
+}
+
+.dark .dashboard-module-content table > thead,
+.dark .dashboard-module-content table > thead tr,
+.dark .dashboard-module-content table > thead th {
+  background-color: #303846 !important;
+  background-image: none !important;
+}
+
+.dark .dashboard-module-content table > thead th {
+  color: hsl(var(--shadcn-foreground));
+  box-shadow: 0 1px 0 hsl(var(--shadcn-border));
+}
+
+.dark .dashboard-module-content table,
+.dark .dashboard-module-content table tbody {
+  background-color: #20252e;
+  color: hsl(var(--shadcn-foreground));
+}
+
+.dark .dashboard-module-content table tr:hover {
+  background-color: #292f3a;
+}
+
+.dark .dashboard-module-content table tr:hover td:not([class*='bg-']) {
+  background-color: #292f3a;
+}
+
+.dark .dashboard-module-content table tbody tr + tr td {
+  border-color: var(--theme-surface-border);
+}
+
+.dark .dashboard-module-content :where(.bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100, .bg-zinc-50, .bg-zinc-100):not([class*='bg-opacity-']) {
+  background-color: var(--theme-surface-bg) !important;
+}
+
+.dark .dashboard-module-content :where(.bg-white\/50, .bg-white\/60, .bg-white\/70, .bg-white\/80, .bg-white\/90) {
+  background-color: var(--theme-glass-bg) !important;
+}
+
+.dark :where(.apexcharts-text, .apexcharts-legend-text, .apexcharts-title-text, .apexcharts-subtitle-text) {
+  fill: hsl(var(--shadcn-foreground));
+  color: hsl(var(--shadcn-foreground));
+}
+
+.dark :where(.apexcharts-gridline, .apexcharts-xaxis-tick, .apexcharts-yaxis-tick) {
+  stroke: hsl(var(--shadcn-border));
+}
+
+.dark .apexcharts-tooltip,
+.dark .apexcharts-xaxistooltip,
+.dark .apexcharts-yaxistooltip {
+  border-color: hsl(var(--shadcn-border));
+  background: hsl(var(--shadcn-popover));
+  color: hsl(var(--shadcn-popover-foreground));
 }

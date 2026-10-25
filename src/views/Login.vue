@@ -1,76 +1,84 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'"
-    class="min-h-screen bg-gradient-to-br theme-main-gradient flex items-center justify-center p-4">
+    class="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 p-4">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
+      <div class="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-violet-200/40 blur-3xl"></div>
+      <div class="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-indigo-200/40 blur-3xl"></div>
+    </div>
     <!-- Language switcher -->
-    <div class="absolute top-4 right-4 flex gap-2">
-      <ShadcnButton variant="outline" size="native" @click="switchLang('en')" :class="btnClass('en')"
-        class="p-2 rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-200"
+    <div class="absolute right-4 top-4 z-10 flex gap-2 sm:right-6 sm:top-6">
+      <Button variant="outline" size="icon" @click="switchLang('en')" :class="btnClass('en')"
+        class="rounded-lg bg-white shadow-sm hover:shadow-md"
         :title="$t('auth.login.title')">
         <img src="/flags/us.png" alt="EN" class="w-6 h-6" />
-      </ShadcnButton>
-      <ShadcnButton variant="outline" size="native" @click="switchLang('ar')" :class="btnClass('ar')"
-        class="p-2 rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-200"
+      </Button>
+      <Button variant="outline" size="icon" @click="switchLang('ar')" :class="btnClass('ar')"
+        class="rounded-lg bg-white shadow-sm hover:shadow-md"
         :title="$t('auth.login.title')">
         <img src="/flags/eg.png" alt="AR" class="w-6 h-6" />
-      </ShadcnButton>
+      </Button>
     </div>
 
     <!-- Login Card -->
-    <div class="w-full max-w-md">
-      <div class="bg-white rounded-2xl shadow-2xl p-8">
+    <Card class="relative z-0 w-full max-w-md overflow-visible rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-300/50">
+      <CardContent class="p-6 sm:p-8">
         <!-- Header -->
-        <div class="text-center mb-8">
-          <div class="mx-auto w-16 h-16 theme-icon-bg rounded-full flex items-center justify-center mb-4">
+        <div class="mb-8 text-center">
+          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-100 text-violet-600 shadow-sm">
             <svg class="w-8 h-8 theme-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
           </div>
-          <h1 class="text-2xl font-bold theme-text-primary mb-2">{{ $t('auth.login.title') }}</h1>
-          <p class="theme-text-secondary">{{ $t('auth.login.subtitle') }}</p>
+          <h1 class="mb-2 text-2xl font-bold tracking-tight text-slate-900">{{ $t('auth.login.title') }}</h1>
+          <p class="text-sm leading-6 text-slate-500">{{ $t('auth.login.subtitle') }}</p>
         </div>
 
         <!-- Form -->
-        <form @submit.prevent="submit" class="space-y-6">
+        <form @submit.prevent="submit" class="space-y-5">
           <!-- Email Field -->
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-2">
+          <div class="space-y-2">
+            <Label class="text-sm font-semibold text-slate-700">
               {{ $t('auth.login.email') }}
-            </label>
+            </Label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div :class="isRTL ? 'right-0 pr-3' : 'left-0 pl-3'"
+                class="pointer-events-none absolute inset-y-0 flex items-center">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207">
                   </path>
                 </svg>
               </div>
-              <input v-model="email" type="email" autocomplete="username" :placeholder="$t('auth.login.email')"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg theme-input-focus transition-colors"
-                :class="{ 'border-red-500': emailError }" required />
+              <Input v-model="email" type="email" autocomplete="username" :placeholder="$t('auth.login.email')"
+                :class="[isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4', 'h-12 rounded-xl border-slate-200 bg-slate-50/70 text-sm shadow-none transition focus-visible:bg-white focus-visible:ring-violet-500/20', { 'border-red-500': emailError }]"
+                required />
             </div>
             <p v-if="emailError" class="mt-1 text-sm text-red-600">{{ emailError }}</p>
           </div>
 
           <!-- Password Field -->
-          <div>
-            <label class="block text-sm font-medium theme-text-secondary mb-2">
+          <div class="space-y-2">
+            <Label class="text-sm font-semibold text-slate-700">
               {{ $t('auth.login.password') }}
-            </label>
+            </Label>
             <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 theme-caption" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div :class="isRTL ? 'right-0 pr-3' : 'left-0 pl-3'"
+                class="pointer-events-none absolute inset-y-0 flex items-center">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                   </path>
                 </svg>
               </div>
-              <input v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password"
+              <Input v-model="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password"
                 :placeholder="$t('auth.login.password')"
-                class="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg theme-input-focus transition-colors"
-                :class="{ 'border-red-500': passwordError }" required />
-              <ShadcnButton variant="outline" size="native" type="button" @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                :class="[isRTL ? 'pl-12 pr-10' : 'pl-10 pr-12', 'h-12 rounded-xl border-slate-200 bg-slate-50/70 text-sm shadow-none transition focus-visible:bg-white focus-visible:ring-violet-500/20', { 'border-red-500': passwordError }]"
+                required />
+              <Button variant="ghost" size="icon" type="button" @click="showPassword = !showPassword"
+                :class="isRTL ? 'left-1.5' : 'right-1.5'"
+                class="absolute inset-y-0 my-auto h-9 w-9 rounded-lg text-slate-500 hover:bg-violet-50 hover:text-violet-600"
+                :aria-label="showPassword ? (isRTL ? 'إخفاء كلمة المرور' : 'Hide password') : (isRTL ? 'إظهار كلمة المرور' : 'Show password')">
                 <svg v-if="showPassword" class="h-5 w-5 theme-caption" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,26 +92,25 @@
                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                   </path>
                 </svg>
-              </ShadcnButton>
+              </Button>
             </div>
             <p v-if="passwordError" class="mt-1 text-sm text-red-600">{{ passwordError }}</p>
           </div>
 
           <!-- Remember Me & Forgot Password -->
-          <div class="flex items-center justify-between">
-            <label class="flex items-center">
-              <input v-model="rememberMe" type="checkbox"
-                class="h-4 w-4 theme-text theme-input-focus border-gray-300 rounded" />
-              <span class="ml-2 text-sm theme-text-secondary">{{ $t('auth.login.rememberMe') }}</span>
-            </label>
-            <a href="#" class="text-sm theme-link">
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <Label class="cursor-pointer gap-2 text-sm font-normal text-slate-600">
+              <Checkbox v-model="rememberMe" />
+              {{ $t('auth.login.rememberMe') }}
+            </Label>
+            <a href="#" class="text-sm font-medium text-violet-600 transition hover:text-violet-700 hover:underline">
               {{ $t('auth.login.forgotPassword') }}
             </a>
           </div>
 
           <!-- Submit Button -->
-          <ShadcnButton variant="outline" size="native" v-if="step === 'credentials'" type="submit" :disabled="loading"
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium theme-text-light theme-button  focus:outline-none focus:ring-2 focus:ring-offset-2 theme-input-focus disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          <Button v-if="step === 'credentials'" type="submit" :disabled="loading"
+            class="h-12 w-full rounded-xl bg-violet-600 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 hover:shadow-lg hover:shadow-violet-600/25">
             <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 theme-text-light" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor"
@@ -111,17 +118,18 @@
               </path>
             </svg>
             {{ loading ? $t('auth.login.loading') : $t('auth.login.button') }}
-          </ShadcnButton>
+          </Button>
 
           <!-- TOTP submit (shown when server asks for 2FA) -->
           <div v-if="step === 'totp'" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium theme-text-secondary mb-2">{{ $t('auth.login.totpLabel') || 'Authenticator code' }}</label>
-              <input v-model="totpCode" type="text" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="w-full px-4 py-3 border border-gray-300 rounded-lg" />
+                <Label class="mb-2 text-sm font-medium text-slate-700">{{ $t('auth.login.totpLabel') || 'Authenticator code' }}</Label>
+                <Input v-model="totpCode" type="text" maxlength="6" inputmode="numeric" pattern="[0-9]*"
+                  class="h-12 rounded-xl border-slate-200 bg-slate-50/70 px-4 shadow-none focus-visible:bg-white" />
             </div>
             <div class="flex gap-3">
-              <ShadcnButton variant="outline" size="native" @click.prevent="restartLogin" class="flex-1 px-3 py-2 border rounded-md">{{ $t('labels.cancel') }}</ShadcnButton>
-              <ShadcnButton variant="outline" size="native" @click.prevent="submitTotp" :disabled="loading" class="flex-1 px-3 py-2 theme-button rounded-md">{{ $t('auth.login.button') }}</ShadcnButton>
+              <Button variant="outline" @click.prevent="restartLogin" class="h-11 flex-1 rounded-xl">{{ $t('labels.cancel') }}</Button>
+              <Button @click.prevent="submitTotp" :disabled="loading" class="h-11 flex-1 rounded-xl bg-violet-600 text-white hover:bg-violet-700">{{ $t('auth.login.button') }}</Button>
             </div>
           </div>
 
@@ -165,12 +173,17 @@
             </a>
           </p>
         </div> -->
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   </div>
 </template>
 
 <script>
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useAuth } from '@/composables/useAuth'
 import { useI18n } from 'vue-i18n'
 import { isAuthenticated, user } from '@/composables/authStore';
@@ -180,6 +193,7 @@ import authManager from '@/auth'
 
 export default {
   name: 'AuthLogin',
+  components: { Card, CardContent, Input, Button, Label, Checkbox },
   emits: ['auth-success', 'switch-auth'],
   setup() {
     const { loading } = useAuth()

@@ -1,5 +1,5 @@
 <script setup>
-import { PhCaretDoubleRight } from '@phosphor-icons/vue';
+import { ChevronsRight as PhCaretDoubleRight } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import { PaginationLast, useForwardProps } from "reka-ui";

@@ -1,5 +1,5 @@
 <script setup>
-import { PhDotsThree } from '@phosphor-icons/vue';
+import { Ellipsis as PhDotsThree } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import { PaginationEllipsis } from "reka-ui";

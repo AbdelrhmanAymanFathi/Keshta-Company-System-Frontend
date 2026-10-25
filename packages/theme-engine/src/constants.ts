@@ -26,7 +26,7 @@ export const DENSITY_PRESETS = ['compact', 'comfortable', 'spacious'] as const
 export const SHADOW_PRESETS = ['flat', 'soft', 'elevated', 'glow'] as const
 
 export const DEFAULT_ANIMATION = 'bubbles'
-export const DEFAULT_ICON_PACK = 'heroicons'
+export const DEFAULT_ICON_PACK = 'lucide'
 export const DEFAULT_SIDEBAR_TYPE = 'static'
 export const DEFAULT_RADIUS = 'md'
 export const DEFAULT_DENSITY = 'comfortable'

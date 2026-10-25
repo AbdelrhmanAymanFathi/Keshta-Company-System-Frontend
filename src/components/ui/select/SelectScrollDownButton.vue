@@ -1,5 +1,5 @@
 <script setup>
-import { PhCaretDown } from '@phosphor-icons/vue';
+import { ChevronDown as PhCaretDown } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import { SelectScrollDownButton, useForwardProps } from "reka-ui";

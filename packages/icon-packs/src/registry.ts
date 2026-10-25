@@ -22,7 +22,7 @@ export const ICON_PACK_LOADERS: Record<
   futuristic: () => import('./packs/futuristic.js')
 }
 
-export const DEFAULT_ICON_PACK: IconPackId = 'heroicons'
+export const DEFAULT_ICON_PACK: IconPackId = 'lucide'
 
 export function normalizeIconPack(pack?: string): IconPackId {
   const value = (pack || DEFAULT_ICON_PACK).toString().trim().toLowerCase()

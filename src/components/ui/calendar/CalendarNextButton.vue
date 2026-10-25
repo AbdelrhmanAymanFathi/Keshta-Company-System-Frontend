@@ -1,5 +1,5 @@
 <script setup>
-import { PhCaretRight } from '@phosphor-icons/vue';
+import { ChevronRight as PhCaretRight } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import { CalendarNext, useForwardProps } from "reka-ui";

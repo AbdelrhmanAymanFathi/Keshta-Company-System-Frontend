@@ -3,7 +3,7 @@ import { SwitchRoot, SwitchThumb } from 'reka-ui'
 import { cn } from 'cn'
 
 const props = defineProps({
-  modelValue: { type: Boolean, default: false },
+  modelValue: { type: Boolean, default: undefined },
   checked: { type: Boolean, default: undefined },
   defaultChecked: { type: Boolean, default: undefined },
   disabled: { type: Boolean, default: false },
@@ -32,14 +32,14 @@ function handleUpdate(value) {
   <SwitchRoot
     v-bind="{ id, name, disabled, required }"
     dir="ltr"
-    :checked="checkedValue"
-    :default-checked="defaultChecked"
+    :model-value="checkedValue"
+    :default-value="defaultChecked"
     data-slot="switch"
     :class="cn(
       'peer focus-visible:border-ring focus-visible:ring-ring/50 dark:focus-visible:ring-ring/50 inline-flex h-7 w-12 shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input/80',
       props.class
     )"
-    @update:checked="handleUpdate"
+    @update:model-value="handleUpdate"
   >
     <SwitchThumb
       :class="cn(

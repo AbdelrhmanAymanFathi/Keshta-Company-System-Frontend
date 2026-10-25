@@ -63,8 +63,8 @@ export const iconPlugin: ThemePlugin = {
   install() {
     void initThemeIcons(DEFAULT_ICON_PACK)
   },
-  async apply(theme: NormalizedTheme) {
-    await setIconPack(theme.iconPack)
+  async apply() {
+    await setIconPack('lucide')
   }
 }
 

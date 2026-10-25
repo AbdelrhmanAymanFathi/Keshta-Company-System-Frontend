@@ -73,15 +73,15 @@
 <script>
 import { Handle, Position } from '@vue-flow/core'
 import {
-  BuildingOffice2Icon,
-  TruckIcon,
-  DocumentTextIcon,
-  CubeIcon,
-  UserGroupIcon,
-  BanknotesIcon,
-  WalletIcon,
-  Square3Stack3DIcon
-} from '@heroicons/vue/24/outline'
+  Building2 as BuildingOffice2Icon,
+  Truck as TruckIcon,
+  FileText as DocumentTextIcon,
+  Box as CubeIcon,
+  UsersRound as UserGroupIcon,
+  Banknote as BanknotesIcon,
+  Wallet as WalletIcon,
+  Layers3 as Square3Stack3DIcon
+} from '@lucide/vue'
 
 const TONE_ICONS = {
   root: BuildingOffice2Icon,

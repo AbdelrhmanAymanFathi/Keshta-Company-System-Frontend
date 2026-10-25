@@ -6,9 +6,8 @@ import App from './App.vue'
 import { Button } from './components/ui/button'
 import router from './router'
 import './assets/main.css'
-import { initThemePlatform } from '@acme/platform'
-import { ThemeIcon } from '@acme/icon-packs'
-import { iconRevision, ICON_REVISION_KEY } from '@acme/icon-packs'
+import { initThemePlatform, loadTheme, saveTheme } from '@acme/platform'
+import { ThemeIcon, iconRevision, ICON_REVISION_KEY, setIconPack } from '@acme/icon-packs'
 import { themeRevision, THEME_REVISION_KEY } from '@acme/theme-engine'
 import i18n from './i18n'
 import authManager from './auth'
@@ -24,7 +23,12 @@ import { initializeColorMode } from './utils/colorMode'
 // Initialize auth store immediately on app load
 initializeAuthStore()
 initializeColorMode()
+const savedTheme = loadTheme()
+if (savedTheme.iconPack !== 'lucide') {
+  saveTheme({ ...savedTheme, iconPack: 'lucide' })
+}
 initThemePlatform()
+void setIconPack('lucide')
 
 const app = createApp(App)
 const pinia = createPinia()

@@ -1,5 +1,5 @@
 <script setup>
-import { PhX } from '@phosphor-icons/vue';
+import { X as PhX } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import {

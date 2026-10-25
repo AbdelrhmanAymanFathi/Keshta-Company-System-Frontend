@@ -1,5 +1,5 @@
 <script setup>
-import { PhCheck } from '@phosphor-icons/vue';
+import { Check as PhCheck } from '@lucide/vue'
 import { reactiveOmit } from "@vueuse/core";
 import { cn } from "cn";
 import {
