@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-shell flex min-h-screen h-dvh flex-col" :class="{ 'direction-rtl': isRTL }" :dir="isRTL ? 'rtl' : 'ltr'">
     <!-- Top horizontal navbar -->
-    <header :class="headerClasses">
+    <header ref="dashboardHeader" :class="headerClasses">
       <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
         <!-- Hamburger for mobile and overlay/drawer/reveal desktop layouts -->
         <Button
@@ -22,23 +22,43 @@
           <img
             src="../assets/logo.png"
             alt="Keshta Logo"
-            class="h-11 w-auto shrink-0 sm:h-12 transition-transform duration-300 hover:scale-105"
+            class="dashboard-brand-logo h-11 w-auto shrink-0 sm:h-12 transition-transform duration-300"
           />
         </div>
+        <Button
+          variant="ghost"
+          type="button"
+          @click="toggleCompactNav"
+          :aria-label="compactNavOpen ? $t('dashboard.closeTopNavigation') : $t('dashboard.openTopNavigation')"
+          aria-controls="dashboard-primary-navigation"
+          :aria-expanded="compactNavOpen"
+          class="top-nav-toggle h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 p-2 theme-text-light transition-colors hover:bg-white/16 focus-visible:ring-2 focus-visible:ring-white/70"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </Button>
         <!-- Top menus (desktop) -->
         <VueDraggable
           v-model="menuOrder"
+          id="dashboard-primary-navigation"
           tag="nav"
+          :aria-label="$t('dashboard.primaryNavigation')"
           handle=".menu-drag-handle"
           draggable=".top-nav-item"
           :animation="150"
           :disabled="!editLayout"
-          :class="editLayout ? 'top-nav-scroll hidden md:flex ml-2 min-w-0 max-w-full flex-1 flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain scroll-smooth whitespace-nowrap [&>.top-nav-item]:shrink-0 lg:ml-4 lg:gap-2 rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : 'top-nav-scroll hidden md:flex ml-2 min-w-0 max-w-full flex-1 flex-nowrap items-center gap-1 overflow-x-auto overscroll-x-contain scroll-smooth whitespace-nowrap [&>.top-nav-item]:shrink-0 lg:ml-4 lg:gap-2'"
+          :class="[
+            'top-nav-desktop ml-2 min-w-0 max-w-full flex-1 items-center gap-1 [&>.top-nav-item]:shrink-0',
+            editLayout ? 'rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : '',
+            compactNavOpen ? 'top-nav-compact-open' : ''
+          ]"
           @end="onLayoutEnd"
         >
           <Button variant="ghost" v-for="key in menuOrder" :key="key" @click="selectTop(key)"
-            class="top-nav-item flex items-center gap-1 rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md lg:px-4 lg:py-2 lg:text-sm"
-            :class="selectedTop === key ? 'bg-white theme-text-primary shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200'">
+            class="top-nav-item flex items-center gap-1 rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md"
+            :class="selectedTop === key ? 'top-nav-item-active shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200'"
+            :aria-current="selectedTop === key ? 'page' : undefined">
             {{ $t('navbar.' + key) }}
             <span v-if="editLayout" @click.stop.prevent class="menu-drag-handle inline-flex cursor-grab opacity-70 hover:opacity-100" title="">
               <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>
@@ -48,14 +68,14 @@
       </div>
 
       <!-- Right side: Language + User Avatar -->
-      <div class="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div class="header-controls flex shrink-0 items-center gap-2 sm:gap-3">
         <!-- Edit menu layout -->
         <Button
           variant="ghost"
           @click="toggleEditLayout"
           :title="$t('dashboard.editLayout')"
+          class="dashboard-layout-edit-toggle relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10"
           :class="[
-            'relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10',
             editLayout
               ? 'border-amber-300/60 bg-amber-400/20 text-amber-200'
               : 'border-white/15 bg-white/10 hover:bg-white/16 theme-text-light'
@@ -74,7 +94,7 @@
           v-if="editLayout"
           @click="resetLayout"
           :title="$t('dashboard.resetLayout')"
-          class="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition-all duration-200 hover:scale-105 hover:bg-white/16 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10"
+          class="dashboard-layout-edit-toggle dashboard-layout-reset-toggle relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-slate-200 transition-all duration-200 hover:scale-105 hover:bg-white/16 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10"
         >
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -351,6 +371,17 @@
               </span>
             </div>
           </VueDraggable>
+          <Button
+            v-if="editLayout"
+            variant="ghost"
+            @click="resetLayout"
+            class="w-full justify-start gap-2 rounded-xl px-3 py-2 text-sm theme-sidebar-item"
+          >
+            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            {{ $t('dashboard.resetLayout') }}
+          </Button>
         </div>
 
         <!-- Vertical Menu -->
@@ -622,6 +653,7 @@ export default {
       markingAllRead: false,
       notifItems: [],
       isMobile: window.innerWidth < 768,
+      compactNavOpen: false,
       reports: [],
       menuOrder: [],
       moduleOrders: {},
@@ -674,8 +706,9 @@ export default {
     },
     headerClasses() {
       return [
-        'flex items-center justify-between gap-2 px-3 py-2.5 theme-text-light shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border-b border-slate-800/70 theme-dashboard-header',
-        this.isMobile ? 'fixed inset-x-0 top-0 z-50 w-full' : 'relative'
+        'flex items-center justify-between gap-2 px-3 py-2.5 theme-text-light shadow-lg shadow-slate-950/20 sm:gap-4 sm:px-4 sm:py-3 lg:px-6 transition-all duration-300 ease-in-out border border-slate-800/70 theme-dashboard-header',
+        this.isMobile ? 'fixed inset-x-2 top-2 z-50 w-auto' : 'relative mx-2 mt-2',
+        this.compactNavOpen ? 'z-[45]' : ''
       ]
     },
     mainClasses() {
@@ -729,12 +762,11 @@ export default {
       if (this.$route?.meta?.module === 'notifications') return []
 
       // When viewing profile-related pages, show a small profile menu
-      const profileRoutes = ['profile', 'settings', 'theme-studio']
+      const profileRoutes = ['profile', 'settings']
       if (profileRoutes.includes(this.currentRouteName) || ['profile', 'settings'].includes(this.$route?.meta?.module)) {
         return [
           { name: 'profile', label: 'profile.title', routeName: 'profile' },
           { name: 'settings', label: 'profile.settings', routeName: 'settings' },
-          { name: 'themeStudio', label: 'themeStudio.title', routeName: 'theme-studio' },
           { name: 'signout', label: 'labels.signOut', routeName: 'signout' }
         ]
       }
@@ -905,6 +937,7 @@ export default {
         this.router.push({ name: first.routeName })
       }
       this.sidebarOpen = false
+      this.compactNavOpen = false
     },
     selectVertical(routeName) {
       if (routeName === 'contractor-supply-statement') {
@@ -942,8 +975,11 @@ export default {
       }
     },
     onSidebarEscape(e) {
-      if (e.key === 'Escape' && this.sidebarOpen) this.sidebarOpen = false
+      if (e.key !== 'Escape') return
+      this.sidebarOpen = false
+      this.compactNavOpen = false
     },
+    toggleCompactNav() { this.compactNavOpen = !this.compactNavOpen },
     resetSidebarHover() { this.sidebarHovered = false },
     toggleUserMenu() { this.userMenuOpen = !this.userMenuOpen },
     navigateToReport() { 
@@ -1052,7 +1088,15 @@ export default {
       return getMenuIcon(name)
     },
     onResize() {
+      const wasMobile = this.isMobile
       this.isMobile = window.innerWidth < 768
+      if (wasMobile !== this.isMobile) {
+        this.sidebarOpen = false
+        this.syncSidebarOpenState()
+      }
+      if (window.innerWidth < 768 || window.innerWidth > 959) {
+        this.compactNavOpen = false
+      }
     }
     ,
     mergeByOrder(stored, defaults) {
@@ -1151,6 +1195,9 @@ export default {
     this.loadReports()
     this.loadMenuLayout()
     document.addEventListener('click', (e) => {
+      if (this.compactNavOpen && !this.$refs.dashboardHeader?.contains(e.target)) {
+        this.compactNavOpen = false
+      }
       const relatives = this.$el.querySelectorAll('.relative')
       const inside = Array.from(relatives).some(el => el.contains(e.target))
       if (!inside) {
@@ -1174,12 +1221,216 @@ export default {
 
 .dashboard-shell > header {
   min-height: 4.25rem;
-  border-radius: 0 0 1rem 1rem;
+  flex-shrink: 0;
+  border-radius: 1rem;
   border-color: rgba(255, 255, 255, 0.12);
   background-image:
     linear-gradient(110deg, rgba(var(--theme-primary-rgb), 0.98), rgba(var(--theme-primary-rgb), 0.84));
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
   backdrop-filter: blur(16px);
+}
+
+.top-nav-toggle {
+  display: none;
+}
+
+.top-nav-desktop {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .top-nav-desktop {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .top-nav-item {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding-inline: 0.5rem;
+    padding-block: 0.375rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 960px) and (max-width: 1285px) {
+  .dashboard-shell > header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+  }
+
+  .dashboard-shell > header > div:first-child {
+    display: contents;
+  }
+
+  .dashboard-shell > header > div:first-child > button:first-child {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .dashboard-shell > header > div:first-child > div:first-of-type {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .dashboard-shell > header > div:first-child > nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+    width: 100%;
+    margin-inline: 0 !important;
+  }
+
+  .dashboard-shell > header > div:last-child {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 959px) {
+  .top-nav-toggle {
+    display: inline-flex;
+  }
+
+  .top-nav-compact-open {
+    position: absolute;
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline-start: calc(var(--layout-sidebar-expanded) + 0.5rem);
+    inset-inline-end: 0.5rem;
+    z-index: var(--layout-z-popover);
+    display: grid;
+    max-height: calc(100dvh - 7rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.375rem;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(var(--theme-primary-rgb), 0.99), rgba(var(--theme-primary-rgb), 0.92));
+    padding: 0.5rem;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.24);
+  }
+
+  .top-nav-compact-open .top-nav-item {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    white-space: nowrap;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .top-nav-desktop {
+    gap: 0.5rem;
+  }
+
+  .top-nav-item {
+    padding-inline: 1rem;
+    padding-block: 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-shell > header {
+    gap: 0.375rem;
+  }
+
+  .dashboard-shell > header > div:first-child {
+    gap: 0.25rem;
+  }
+
+  .dashboard-shell > header > div:first-child > button:first-child {
+    width: 2rem;
+    height: 2rem;
+    padding: 0.375rem;
+  }
+
+  .dashboard-shell > header > div:first-child > button:first-child svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .dashboard-brand-logo {
+    height: 2.25rem;
+  }
+
+  .header-controls {
+    gap: 0.375rem;
+  }
+
+  .dashboard-layout-reset-toggle {
+    display: none;
+  }
+
+  .dashboard-layout-edit-toggle {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .dashboard-layout-edit-toggle svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .header-controls > [role='group'] {
+    gap: 0;
+    padding: 0.125rem;
+  }
+
+  .header-controls > [role='group'] button {
+    padding: 0.125rem;
+  }
+
+  .header-controls > [role='group'] img {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .header-controls > .relative > button {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .header-controls > .relative > button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .dashboard-shell > header {
+    gap: 0.25rem;
+    padding-inline: 0.5rem;
+    padding-block: 0.375rem;
+  }
+
+  .dashboard-shell > header > div:first-child {
+    gap: 0.25rem;
+  }
+
+  .dashboard-shell > header > div:first-child > button:first-child {
+    width: 2rem;
+    height: 2rem;
+    padding: 0.375rem;
+  }
+
+  .dashboard-shell > header > div:first-child > button:first-child svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .dashboard-brand-logo {
+    height: 2rem;
+  }
+
+  .header-controls {
+    gap: 0.25rem;
+  }
 }
 
 .dashboard-shell > header :deep(button:focus-visible),
@@ -1230,30 +1481,22 @@ export default {
     box-shadow 150ms ease;
 }
 
+.dashboard-shell .top-nav-item-active {
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-primary-dark));
+  color: #f8fafc !important;
+}
+
+.dashboard-shell .theme-sidebar-item-active,
+.dashboard-shell .sidebar-link-active {
+  color: #f8fafc !important;
+}
+
 .dashboard-shell .top-nav-item:hover {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
 .dashboard-shell .top-nav-item:focus-visible {
   outline-color: rgba(255, 255, 255, 0.8);
-}
-
-.dashboard-shell .top-nav-scroll {
-  scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
-  scrollbar-width: thin;
-}
-
-.dashboard-shell .top-nav-scroll::-webkit-scrollbar {
-  height: 4px;
-}
-
-.dashboard-shell .top-nav-scroll::-webkit-scrollbar-thumb {
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.32);
-}
-
-.dashboard-shell .top-nav-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.56);
 }
 
 .sidebar-link {

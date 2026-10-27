@@ -36,14 +36,14 @@
     <!-- Filters Section -->
     <div class="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Contractor Selector -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.name') }}</label>
-          <NativeSelect v-model="selectedContractorId" @change="onContractorChange" class="w-full">
+          <select v-model="selectedContractorId" @change="onContractorChange" class="w-full px-3 py-2 border rounded-lg focus:outline-none theme-input-focus text-sm">
             <option value="">{{ $t('contractors.selectContractor') }}</option>
             <option v-for="c in contractors" :key="c.id" :value="c.id">{{ (isRTL && c.arName) ? c.arName : c.name }}</option>
-          </NativeSelect>
+          </select>
         </div>
 
         <!-- Start Date -->
@@ -267,9 +267,7 @@
 <script>
 import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue'
 import { getContractorReportData, getContractors, normalizeContractorAccountType } from '@/api'
-import Badge from '../shared/Badge.vue'
 import Pagination from '../shared/Pagination.vue'
-import SortIcon from '../shared/SortIcon.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -283,7 +281,7 @@ import { isContractorStatementTotalsRow, splitFooterRow } from '@/utils/reportDe
 
 export default {
   name: 'ContractorStatement',
-  components: { Badge, Pagination, DateField, SortIcon, Button, Input, NativeSelect },
+  components: { Pagination, DateField, Button, Input, NativeSelect },
   props: {
     mode: {
       type: String,

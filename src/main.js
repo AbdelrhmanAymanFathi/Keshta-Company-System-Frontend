@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import { VueQueryPlugin, QueryClient, QueryCache } from '@tanstack/vue-query'
 import App from './App.vue'
 import { Button } from './components/ui/button'
+import Modal from './components/shared/Modal.vue'
 import router from './router'
 import './assets/main.css'
 import { initThemePlatform, loadTheme, saveTheme } from '@acme/platform'
@@ -34,6 +35,8 @@ const app = createApp(App)
 const pinia = createPinia()
 
 app.component('ShadcnButton', Button)
+app.component('Modal', Modal)
+app.component('AppModal', Modal)
 app.component('ThemeIcon', ThemeIcon)
 app.directive('app-table', appTable)
 app.provide(ICON_REVISION_KEY, iconRevision)

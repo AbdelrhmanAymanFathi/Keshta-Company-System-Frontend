@@ -44,7 +44,7 @@
           <div
             v-for="tile in tiles"
             :key="tile.key"
-            class="rounded-xl border border-slate-200/70 bg-slate-50/60 p-4"
+            class="rounded-xl border border-[var(--theme-surface-border)] bg-[var(--theme-surface-muted-bg)] p-4"
           >
             <div class="flex items-center justify-between">
               <p class="text-xs font-medium theme-text-secondary">{{ tile.label }}</p>
@@ -107,15 +107,15 @@
                 <td colspan="7" class="px-4 py-6 text-center text-sm theme-text-muted">{{ $t('adminStats.noData') }}</td>
               </tr>
             </tbody>
-            <tfoot v-if="rows.length" class="bg-slate-50">
+            <tfoot v-if="rows.length" class="bg-[var(--theme-surface-muted-bg)]">
               <tr class="font-semibold theme-text-primary">
-                <td class="px-4 py-3 text-sm">{{ $t('adminStats.total') }}</td>
-                <td class="px-4 py-3 text-sm">{{ formatAmount(totals.supplies.total) }}</td>
-                <td class="px-4 py-3 text-sm">{{ formatAmount(totals.transports.total) }}</td>
-                <td class="px-4 py-3 text-sm">{{ formatAmount(totals.expenses.total) }}</td>
-                <td class="px-4 py-3 text-sm">{{ formatAmount(totals.extracts.total) }}</td>
-                <td class="px-4 py-3 text-sm">{{ formatAmount(totals.payments.total) }}</td>
-                <td class="px-4 py-3 text-sm text-right">{{ formatAmount(totals.total) }}</td>
+                <td class="px-4 py-3 text-sm theme-text-primary">{{ $t('adminStats.total') }}</td>
+                <td class="px-4 py-3 text-sm theme-text-primary">{{ formatAmount(totals.supplies.total) }}</td>
+                <td class="px-4 py-3 text-sm theme-text-primary">{{ formatAmount(totals.transports.total) }}</td>
+                <td class="px-4 py-3 text-sm theme-text-primary">{{ formatAmount(totals.expenses.total) }}</td>
+                <td class="px-4 py-3 text-sm theme-text-primary">{{ formatAmount(totals.extracts.total) }}</td>
+                <td class="px-4 py-3 text-sm theme-text-primary">{{ formatAmount(totals.payments.total) }}</td>
+                <td class="px-4 py-3 text-sm text-right theme-text-primary">{{ formatAmount(totals.total) }}</td>
               </tr>
             </tfoot>
           </table>

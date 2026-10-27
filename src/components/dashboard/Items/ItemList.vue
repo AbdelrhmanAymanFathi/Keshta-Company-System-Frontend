@@ -221,9 +221,14 @@
 import { usePagination } from '@/composables/usePagination'
 import { getItems, createItem, updateItem, deleteItem, getUnits } from '@/api'
 import normalizeItem from '@/utils/normalizeItem'
+import Modal from '@/components/shared/Modal.vue'
 import Pagination from '@/components/shared/Pagination.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import Toast from '@/components/shared/Toast.vue'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { PencilIcon, PlusIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import RowActions from '@/components/shared/RowActions.vue'
 
@@ -235,7 +240,7 @@ export default {
     Button,
     Input,
     Label,
-    Checkbox, ConfirmDialog, Pagination, PencilIcon, PlusIcon, RowActions, Toast, TrashIcon },
+    Checkbox, ConfirmDialog, Pagination, PlusIcon, RowActions, Toast },
   props: {
     mode: { type: String, default: 'supply' } // 'supply' | 'transport' | 'extracts' | 'all'
   },

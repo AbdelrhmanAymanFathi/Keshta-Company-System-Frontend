@@ -20,9 +20,10 @@ export const LAYOUT_TOKENS = {
   zIndex: {
     backdrop: 35,
     sidebar: 40,
-    header: 120,
+    header: 30,
     dropdown: 130,
     modal: 200,
+    nestedModal: 210,
     popover: 220,
     toast: 300
   },
@@ -80,6 +81,7 @@ export function applyLayoutTokens() {
   root.setProperty('--layout-z-header', String(t.zIndex.header))
   root.setProperty('--layout-z-dropdown', String(t.zIndex.dropdown))
   root.setProperty('--layout-z-modal', String(t.zIndex.modal))
+  root.setProperty('--layout-z-nested-modal', String(t.zIndex.nestedModal))
   root.setProperty('--layout-z-popover', String(t.zIndex.popover))
   root.setProperty('--layout-z-toast', String(t.zIndex.toast))
   root.setProperty('--layout-motion-duration', t.motion.duration)

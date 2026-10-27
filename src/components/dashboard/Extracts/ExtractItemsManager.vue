@@ -59,10 +59,12 @@ import { useI18n } from 'vue-i18n'
 import { getExportItems, createExportItem, updateExportItem, deleteExportItem } from '@/api'
 import ItemList from '@/components/dashboard/Items/ItemList.vue'
 import normalizeItem from '@/utils/normalizeItem'
+import Modal from '@/components/shared/Modal.vue'
+if (typeof window !== 'undefined' && !window.Modal) window.Modal = Modal
 
 export default {
   name: 'ExtractItemsManager',
-  components: { ItemList },
+  components: { ItemList, Modal },
   setup() {
     const { locale } = useI18n()
     const items = ref([])

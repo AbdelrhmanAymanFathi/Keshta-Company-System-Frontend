@@ -104,6 +104,8 @@
 
                   type="button"
 
+                  :aria-pressed="themeAnimation === preset"
+
                   @click="themeAnimation = preset"
 
                   :class="[
@@ -112,7 +114,7 @@
 
                     themeAnimation === preset
 
-                      ? 'theme-selected border-transparent shadow-sm'
+                      ? 'theme-selected !text-white border-transparent shadow-sm'
 
                       : 'border-gray-200 bg-white theme-text-secondary hover:theme-hover-soft'
 
@@ -188,6 +190,8 @@
 
                   type="button"
 
+                  :aria-pressed="themeFontPreset === font.id"
+
                   @click="selectFont(font.id)"
 
                   :class="[
@@ -196,7 +200,7 @@
 
                     themeFontPreset === font.id
 
-                      ? 'theme-selected border-transparent shadow-sm'
+                      ? 'theme-selected !text-white border-transparent shadow-sm'
 
                       : 'border-gray-200 bg-white theme-text-secondary hover:theme-hover-soft'
 
@@ -268,62 +272,6 @@
 
         <div class="settings-card">
           <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
-            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.themePersonality') || 'UI personalities' }}</h2>
-          </div>
-          <div class="settings-card__body">
-            <div class="settings-option-grid">
-              <ShadcnButton variant="outline" size="native"
-                v-for="personality in themePersonalities"
-                :key="personality.id"
-                type="button"
-                @click="applyPersonality(personality.id)"
-                class="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-medium theme-text-secondary hover:theme-hover-soft transition theme-motion-soft text-start"
-              >
-                <span class="block font-semibold theme-text-primary">{{ getPersonalityLabel(personality.id) }}</span>
-                <span class="block text-xs theme-caption">{{ personality.description }}</span>
-              </ShadcnButton>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-card">
-          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
-            <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.themeBotTitle') }}</h2>
-          </div>
-          <div class="settings-card__body space-y-4">
-            <p class="text-sm theme-text-secondary">{{ $t('profile.themeBotDescription') }}</p>
-            <form class="settings-control-row" @submit.prevent="runThemeBot">
-              <input
-                v-model="themeBotQuery"
-                type="text"
-                class="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm theme-input-focus"
-                :placeholder="$t('profile.themeBotPlaceholder')"
-              />
-              <ShadcnButton variant="outline" size="native" type="submit" class="theme-button rounded-xl px-4 py-2 text-sm font-medium">{{ $t('profile.themeBotApply') }}</ShadcnButton>
-            </form>
-            <div v-if="botSuggestions.length" class="settings-option-grid">
-              <ShadcnButton variant="outline" size="native"
-                v-for="s in botSuggestions"
-                :key="s.presetId"
-                type="button"
-                @click="applyBotSuggestion(s)"
-                class="rounded-xl border border-gray-200 px-3 py-2 text-start hover:theme-hover-soft transition text-sm"
-              >
-                <span class="font-semibold theme-text-primary">{{ s.name }}</span>
-                <span class="block text-xs theme-caption">{{ Math.round(s.confidence * 100) }}% — {{ s.preview.iconPack }}</span>
-              </ShadcnButton>
-            </div>
-            <router-link
-              :to="{ name: 'theme-studio' }"
-              class="inline-flex theme-link text-sm font-medium"
-            >
-              {{ $t('profile.openThemeStudio') }} →
-            </router-link>
-          </div>
-        </div>
-
-        <div class="settings-card">
-          <div class="theme-card-header px-6 py-4 sm:px-8 sm:py-6">
             <h2 class="text-lg sm:text-xl font-bold theme-text-light">{{ $t('profile.sidebarLayoutTitle') }}</h2>
           </div>
           <div class="settings-card__body space-y-4">
@@ -333,10 +281,11 @@
                 v-for="opt in sidebarOptions"
                 :key="opt.id"
                 type="button"
+                :aria-pressed="themeSidebarType === opt.id"
                 @click="themeSidebarType = opt.id"
                 :class="[
                   'rounded-xl border px-3 py-2 text-sm font-medium transition theme-motion-soft text-start',
-                  themeSidebarType === opt.id ? 'theme-selected border-transparent' : 'border-gray-200 bg-white theme-text-secondary hover:theme-hover-soft'
+                  themeSidebarType === opt.id ? 'theme-selected !text-white border-transparent' : 'border-gray-200 bg-white theme-text-secondary hover:theme-hover-soft'
                 ]"
               >
                 {{ opt.label }}
@@ -490,10 +439,6 @@ import {
   getFontPresets,
 
   colorPickerStyle,
-  applyThemePersonality,
-  applyThemePreset,
-  getThemePersonalities,
-  recommendThemes,
   RADIUS_PRESETS,
   DENSITY_PRESETS,
   SHADOW_PRESETS
@@ -524,13 +469,9 @@ export default {
     const themeRadius = ref(savedTheme.radius || DEFAULT_THEME.radius)
     const themeDensity = ref(savedTheme.density || DEFAULT_THEME.density)
     const themeShadows = ref(savedTheme.shadows || DEFAULT_THEME.shadows)
-    const themeBotQuery = ref('')
-    const botSuggestions = ref([])
-
     const animationPresets = ANIMATION_PRESETS
     const fontPresets = getFontPresets()
     const sidebarOptions = getSidebarOptions()
-    const themePersonalities = getThemePersonalities()
     const radiusPresets = RADIUS_PRESETS
     const densityPresets = DENSITY_PRESETS
     const shadowPresets = SHADOW_PRESETS
@@ -681,39 +622,6 @@ export default {
 
 
 
-    function syncFromTheme(next) {
-      themeColor.value = next.primary
-      themeAnimation.value = next.animation
-      themeFontPreset.value = next.fontPreset
-      themeSidebarType.value = next.sidebarType
-      themeRadius.value = next.radius
-      themeDensity.value = next.density
-      themeShadows.value = next.shadows
-      typographyColors.textPrimary = next.textPrimary
-      typographyColors.textSecondary = next.textSecondary
-      typographyColors.textMuted = next.textMuted
-      typographyColors.headingColor = next.headingColor
-      typographyColors.textLight = next.textLight
-      typographyColors.sidebarText = next.sidebarText
-      typographyColors.cardText = next.cardText
-    }
-
-    function applyPersonality(personalityId) {
-      const next = applyThemePreset(personalityId) || applyThemePersonality(personalityId)
-      syncFromTheme(next)
-    }
-
-    function runThemeBot() {
-      const q = themeBotQuery.value.trim()
-      if (!q) return
-      botSuggestions.value = recommendThemes(q)
-    }
-
-    function applyBotSuggestion(s) {
-      if (s.presetId) applyThemePreset(s.presetId)
-      syncFromTheme(loadTheme())
-    }
-
     watch(
       [themeColor, themeAnimation, themeFontPreset, themeSidebarType, themeRadius, themeDensity, themeShadows],
       persistTheme,
@@ -755,10 +663,6 @@ export default {
 
     }
 
-    function getPersonalityLabel(personalityId) {
-      return t(`profile.preset_${personalityId}`) || t(`profile.personality_${personalityId}`) || personalityId
-    }
-
     function togglePresence(enabled) {
       savePresenceSettings(enabled)
     }
@@ -775,19 +679,12 @@ export default {
       themeRadius,
       themeDensity,
       themeShadows,
-      themeBotQuery,
-      botSuggestions,
 
       sidebarOptions,
       radiusPresets,
       densityPresets,
       shadowPresets,
 
-      themePersonalities,
-
-      applyPersonality,
-      runThemeBot,
-      applyBotSuggestion,
 
       typographyColors,
 
@@ -824,8 +721,6 @@ export default {
       toggleStartupSound,
 
       previewStartupSound,
-
-      getPersonalityLabel
 
     }
 

@@ -9,7 +9,7 @@ export function createPersistence(storageKey: string) {
       const saved = localStorage.getItem(storageKey)
       if (!saved) return normalizeTheme({ ...DEFAULT_THEME })
       const savedTheme = JSON.parse(saved) as ThemeDefinition
-      const previousDefaultColors = ['#4f7dcc', '#0f766e', '#1e3a5f', '#18181b']
+      const previousDefaultColors = ['#7c5ce7', '#4f7dcc', '#0f766e', '#1e3a5f', '#18181b']
       if (savedTheme.primary && previousDefaultColors.includes(savedTheme.primary.toLowerCase())) {
         savedTheme.primary = DEFAULT_THEME.primary
       }

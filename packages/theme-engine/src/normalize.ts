@@ -214,6 +214,7 @@ function relativeLuminance({ r, g, b }: { r: number; g: number; b: number }) {
 export function getContrastColor(hex: string) {
   const lightText = '#ffffff'
   const darkText = '#111827'
+  if (normalizeHex(hex) === DEFAULT_THEME.primary) return lightText
   return contrastRatio(hex, lightText) >= contrastRatio(hex, darkText) ? lightText : darkText
 }
 

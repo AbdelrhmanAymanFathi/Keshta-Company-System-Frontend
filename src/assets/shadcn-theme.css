@@ -5,7 +5,7 @@
   --shadcn-card-foreground: 240 10% 3.9%;
   --shadcn-popover: 0 0% 100%;
   --shadcn-popover-foreground: 240 10% 3.9%;
-  --shadcn-primary: var(--theme-primary-hsl, 254 74% 63%);
+  --shadcn-primary: var(--theme-primary-hsl, 218 55% 55%);
   --shadcn-primary-foreground: var(--theme-primary-foreground-hsl, 0 0% 100%);
   --shadcn-secondary: 240 4.8% 95.9%;
   --shadcn-secondary-foreground: 240 5.9% 10%;
@@ -17,8 +17,8 @@
   --shadcn-destructive-foreground: 0 0% 98%;
   --shadcn-border: 240 5.9% 90%;
   --shadcn-input: 240 5.9% 90%;
-  --shadcn-ring: var(--theme-primary-hsl, 254 74% 63%);
-  --shadcn-chart-1: 254 74% 63%;
+  --shadcn-ring: var(--theme-primary-hsl, 218 55% 55%);
+  --shadcn-chart-1: 218 55% 55%;
   --shadcn-chart-2: 270 68% 75%;
   --shadcn-chart-3: 24 85% 70%;
   --shadcn-chart-4: 215 70% 70%;
@@ -32,8 +32,8 @@
   --shadcn-card-foreground: 220 15% 94%;
   --shadcn-popover: 0 0% 7%;
   --shadcn-popover-foreground: 220 15% 94%;
-  --shadcn-primary: var(--theme-primary-dark-hsl, 0 0% 98%);
-  --shadcn-primary-foreground: var(--theme-primary-dark-foreground-hsl, 240 5.9% 10%);
+  --shadcn-primary: var(--theme-primary-hsl, 218 55% 55%);
+  --shadcn-primary-foreground: var(--theme-primary-foreground-hsl, 0 0% 100%);
   --shadcn-secondary: 0 0% 14%;
   --shadcn-secondary-foreground: 220 15% 94%;
   --shadcn-muted: 0 0% 14%;
@@ -44,7 +44,7 @@
   --shadcn-destructive-foreground: 0 0% 98%;
   --shadcn-border: 0 0% 23%;
   --shadcn-input: 0 0% 23%;
-  --shadcn-ring: var(--theme-primary-dark-hsl, 0 0% 98%);
+  --shadcn-ring: var(--theme-primary-hsl, 218 55% 55%);
   --shadcn-chart-1: 220 70% 50%;
   --shadcn-chart-2: 160 60% 45%;
   --shadcn-chart-3: 30 80% 55%;

@@ -1,7 +1,7 @@
 <template>
   <teleport to="body">
     <transition name="kc-modal">
-      <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
+      <div v-if="isOpen" class="fixed inset-0 z-[var(--layout-z-modal,200)] flex items-center justify-center bg-black/60 p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
@@ -17,24 +17,24 @@
             <h3 class="text-lg font-bold mb-6 text-center theme-text-primary">{{ $t('equipmentLog.selectOwnershipType') || 'Choose Equipment Type' }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
               <ShadcnButton variant="outline" size="native" @click="chooseOwnership(false)" type="button"
-                class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
-                <div class="flex items-center justify-between gap-4">
-                  <div>
+                class="!h-auto min-h-32 !w-full !min-w-0 !shrink !justify-start !whitespace-normal rounded-2xl border theme-border bg-white p-4 text-start shadow-sm transition hover:theme-hover-soft focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)] sm:p-5">
+                <div class="flex w-full min-w-0 items-center justify-start gap-4">
+                  <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">1</span>
+                  <div class="min-w-0 flex-1">
                     <p class="text-lg font-semibold theme-text-primary">{{ $t('equipmentLog.companyOwned') || 'Company-owned Equipment' }}</p>
                     <p class="mt-2 text-sm theme-text-secondary">{{ $t('equipmentLog.addCompanyOwnedEntry') || 'Add a log for equipment owned by the company.' }}</p>
                   </div>
-                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">1</span>
                 </div>
               </ShadcnButton>
 
               <ShadcnButton variant="outline" size="native" @click="chooseOwnership(true)" type="button"
-                class="w-full rounded-2xl border theme-border bg-white p-6 text-left shadow-sm hover:theme-border theme-hover-soft transition">
-                <div class="flex items-center justify-between gap-4">
-                  <div>
+                class="!h-auto min-h-32 !w-full !min-w-0 !shrink !justify-start !whitespace-normal rounded-2xl border theme-border bg-white p-4 text-start shadow-sm transition hover:theme-hover-soft focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)] sm:p-5">
+                <div class="flex w-full min-w-0 items-center justify-start gap-4">
+                  <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">2</span>
+                  <div class="min-w-0 flex-1">
                     <p class="text-lg font-semibold theme-text-primary">{{ $t('equipmentLog.external') || 'Rented Equipment' }}</p>
                     <p class="mt-2 text-sm theme-text-secondary">{{ $t('equipmentLog.addRentalEntry') || 'Add a log for rented equipment.' }}</p>
                   </div>
-                  <span class="inline-flex h-10 w-10 items-center justify-center rounded-full theme-icon-bg theme-accent-strong">2</span>
                 </div>
               </ShadcnButton>
             </div>
@@ -54,7 +54,7 @@
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('equipmentLog.equipment') }} <span class="text-red-600">*</span></label>
                   <div class="relative flex items-center gap-2">
                     <div class="flex-1 relative">
-                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :itemLabel="equipmentOptionLabel" displayLabel="name" :filterFn="equipmentMatches" :placeholder="$t('equipmentLog.equipment')" :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" clearable :clearAriaLabel="$t('labels.clear')" @clear="() => selectEquipment(null)" />
+                      <SearchDropdown v-model="form.equipmentLabel" :items="equipmentOptions" :allItems="equipmentOptions" :itemLabel="equipmentOptionLabel" displayLabel="name" :filterFn="equipmentMatches" :placeholder="$t('equipmentLog.equipment')" :dir="isRTL ? 'rtl' : 'ltr'" :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'" @select="selectEquipment" clearable :clearAriaLabel="$t('labels.clear')" @clear="() => selectEquipment(null)" />
                     </div>
                   </div>
                 </div>
@@ -63,7 +63,7 @@
                 <div v-if="!isCompanyOwnedEquipment">
                   <label class="block text-sm font-medium theme-text-secondary mb-1.5">{{ $t('labels.price') }} <span class="text-red-600">*</span></label>
                   <div class="relative">
-                    <input type="number" v-model.number="form.hourlyRate" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 ps-11 pe-4 text-sm theme-input-focus transition" />
+                    <input type="number" v-model.number="form.hourlyRate" step="0.01" :dir="isRTL ? 'rtl' : 'ltr'" class="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm leading-5 text-foreground shadow-sm placeholder:text-muted-foreground transition focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-60" />
                   </div>
                 </div>
 
@@ -75,7 +75,8 @@
                     :items="drivers"
                     :allItems="drivers"
                     :placeholder="$t('labels.driver')"
-                    :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
+                    :dir="isRTL ? 'rtl' : 'ltr'"
+                    :inputClass="'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                     @select="selectDriver"
                     clearable
                     :clearAriaLabel="$t('labels.clear')"
@@ -101,6 +102,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonSiteSearch" :items="sites" :allItems="sites"
                         :placeholder="$t('labels.site')"
+                        :dir="isRTL ? 'rtl' : 'ltr'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm'"
                         @select="(sel) => { form.site = sel; filters.commonSiteSearch = sel.name; onCommonSiteChange() }"
                         clearable
@@ -130,6 +132,7 @@
                     <div class="flex-1 relative">
                       <SearchDropdown v-model="filters.commonAreaSearch" :items="commonAvailableAreas"
                         :allItems="commonAvailableAreas" :placeholder="$t('labels.area')" :disabled="!form.site"
+                        :dir="isRTL ? 'rtl' : 'ltr'"
                         :inputClass="'w-full px-3 py-2.5 ps-11 border border-gray-300 rounded-lg focus:outline-none theme-input-focus text-sm disabled:bg-gray-100 disabled:cursor-not-allowed'"
                         @select="(sel) => { form.area = sel; filters.commonAreaSearch = sel.name }"
                         clearable
@@ -290,37 +293,37 @@
     </transition>
   </teleport>
 
-  <!-- Dialog: Add Site -->
-  <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
-      <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addSite" :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
+  <teleport to="body">
+    <!-- Dialog: Add Site -->
+    <div v-if="showAddSite" :dir="isRTL ? 'rtl' : 'ltr'" class="fixed inset-0 z-[var(--layout-z-nested-modal,210)] flex items-center justify-center bg-black/30 p-4">
+      <div class="w-full max-w-sm rounded-xl bg-background p-6 shadow-xl">
+        <h3 class="mb-2 text-lg font-bold theme-heading">{{ $t('supply.addSite') }}</h3>
+        <input v-model="newSiteName" class="mb-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm leading-5 text-foreground placeholder:text-muted-foreground shadow-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" :placeholder="$t('supply.siteName')" />
+        <div class="flex flex-wrap justify-end gap-2">
+          <ShadcnButton variant="outline" size="native" @click="showAddSite = false" class="rounded-xl border px-3">{{ $t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="default" size="native" @click="addSite" :disabled="!newSiteName || addingLocation" class="rounded-xl px-3">
+            {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
+          </ShadcnButton>
+        </div>
+        <div v-if="locationError" class="mt-2 text-sm text-red-600">{{ locationError }}</div>
       </div>
-      <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
-  </div>
 
-  <!-- Dialog: Add Area -->
-  <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
-      <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addArea" :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
+    <!-- Dialog: Add Area -->
+    <div v-if="showAddArea" :dir="isRTL ? 'rtl' : 'ltr'" class="fixed inset-0 z-[var(--layout-z-nested-modal,210)] flex items-center justify-center bg-black/30 p-4">
+      <div class="w-full max-w-sm rounded-xl bg-background p-6 shadow-xl">
+        <h3 class="mb-2 text-lg font-bold theme-heading">{{ $t('supply.addArea') }}</h3>
+        <input v-model="newAreaName" class="mb-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm leading-5 text-foreground placeholder:text-muted-foreground shadow-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" :placeholder="$t('supply.areaName')" />
+        <div class="flex flex-wrap justify-end gap-2">
+          <ShadcnButton variant="outline" size="native" @click="showAddArea = false" class="rounded-xl border px-3">{{ $t('labels.cancel') }}</ShadcnButton>
+          <ShadcnButton variant="default" size="native" @click="addArea" :disabled="!newAreaName || addingLocation" class="rounded-xl px-3">
+            {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
+          </ShadcnButton>
+        </div>
+        <div v-if="locationError" class="mt-2 text-sm text-red-600">{{ locationError }}</div>
       </div>
-      <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script>

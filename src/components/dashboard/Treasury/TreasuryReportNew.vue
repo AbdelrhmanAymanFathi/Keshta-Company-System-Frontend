@@ -1,7 +1,7 @@
 ﻿<template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex flex-col gap-6 lg:flex-row">
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
     <!-- Sidebar -->
-    <aside class="h-fit w-full rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm lg:sticky lg:top-4 lg:w-72">
+    <aside class="h-fit w-full min-w-0 rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm xl:sticky xl:top-4">
       <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-3">
         <h2 class="text-base font-semibold theme-text-primary">{{ t('dashboard.treasury') }}</h2>
         <span class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
@@ -20,19 +20,19 @@
       <div v-if="!visibleTreasuries.length" class="mt-4 rounded-xl border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-400">
         {{ t('labels.noData') }}
       </div>
-      <div v-else class="mt-3 space-y-2">
+      <div v-else class="mt-3 grid min-w-0 grid-cols-1 gap-2">
         <ShadcnButton variant="outline" size="native"
           v-for="(treasury, index) in visibleTreasuries"
           :key="treasury.id"
           @click="selectTreasury(treasury.id)"
-          :class="['flex w-full items-center justify-between rounded-xl border px-3 py-2.5 transition text-left', selectedId === treasury.id ? 'border-transparent bg-indigo-50/80 ring-1 ring-indigo-200/70' : 'border-gray-200 bg-white/70 hover:bg-gray-50']"
+          :aria-pressed="selectedId === treasury.id"
+          :title="treasury.name"
+          :class="['!h-auto !min-h-[4.75rem] !w-full !min-w-0 !shrink !justify-start !whitespace-normal rounded-xl border px-3 py-3 text-start transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-primary)] focus-visible:ring-offset-2', selectedId === treasury.id ? 'theme-selected-soft theme-border-accent' : 'border-gray-200 bg-white/70 hover:theme-hover-soft']"
         >
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <p class="truncate text-sm font-medium theme-text-primary">{{ treasury.name }}</p>
-              <span class="text-xs font-semibold" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
-            </div>
-            <div class="mt-1 flex items-center gap-2 text-[11px] theme-text-secondary">
+          <div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
+            <p class="min-w-0 break-words text-start text-sm font-semibold leading-5 theme-text-primary">{{ treasury.name }}</p>
+            <span dir="ltr" class="max-w-full text-end text-xs font-semibold tabular-nums" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
+            <div class="col-span-2 flex min-w-0 flex-wrap items-center gap-1.5 text-[11px] theme-text-secondary">
               <span>#{{ index + 1 }}</span>
               <span v-if="treasury.type === 'CUSTODY'" class="rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">{{ t('treasury.typeCustody') }}</span>
               <span v-else class="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">{{ t('treasury.typeMain') }}</span>

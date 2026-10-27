@@ -63,22 +63,22 @@ body,
    Color Theme System
    ========================= */
 :root {
-  --theme-primary: #7c5ce7;
-  --theme-primary-rgb: 124, 92, 231;
-  --theme-primary-50: 248, 246, 255;
-  --theme-primary-100: 238, 232, 255;
-  --theme-primary-200: 218, 205, 255;
-  --theme-primary-300: 190, 168, 250;
-  --theme-primary-400: 155, 125, 233;
-  --theme-primary-500: 124, 92, 231;
-  --theme-primary-600: 107, 79, 212;
-  --theme-primary-700: 91, 67, 187;
-  --theme-primary-800: 75, 56, 155;
-  --theme-primary-900: 59, 45, 123;
-  --theme-primary-dark: #6b4fd4;
-  --theme-primary-dark-rgb: 107, 79, 212;
-  --theme-primary-soft: rgba(124, 92, 231, 0.12);
-  --theme-primary-border: rgba(124, 92, 231, 0.2);
+  --theme-primary: #4f7dcc;
+  --theme-primary-rgb: 79, 125, 204;
+  --theme-primary-50: 255, 255, 255;
+  --theme-primary-100: 255, 255, 255;
+  --theme-primary-200: 237, 242, 250;
+  --theme-primary-300: 198, 213, 238;
+  --theme-primary-400: 150, 178, 225;
+  --theme-primary-500: 79, 125, 204;
+  --theme-primary-600: 52, 99, 180;
+  --theme-primary-700: 43, 82, 148;
+  --theme-primary-800: 34, 64, 117;
+  --theme-primary-900: 25, 47, 85;
+  --theme-primary-dark: #3463b4;
+  --theme-primary-dark-rgb: 52, 99, 180;
+  --theme-primary-soft: rgba(79, 125, 204, 0.12);
+  --theme-primary-border: rgba(79, 125, 204, 0.2);
   --theme-scrollbar-size: 9px;
   --theme-scrollbar-track-bg: transparent;
   --theme-scrollbar-thumb-color: rgba(var(--theme-primary-rgb), 0.55);
@@ -106,7 +106,7 @@ body,
   --theme-text-light-muted: #d1d5db;
 
   --theme-heading-color: #0f172a;
-  --theme-link-color: #6b4fd4;
+  --theme-link-color: #3463b4;
 
   --theme-sidebar-text: #334155;
   --theme-card-text: #0f172a;
@@ -211,7 +211,7 @@ body,
 
 /* Color picker — square, border matches selected color (--picker-color) */
 .theme-color-input {
-  --picker-color: #7c5ce7;
+  --picker-color: #4f7dcc;
   box-sizing: border-box;
   width: 2.5rem;
   height: 2.5rem;
@@ -418,12 +418,12 @@ body,
 }
 
 .dashboard-shell > header {
-  z-index: var(--layout-z-header, 120);
+  z-index: var(--layout-z-header, 50);
   isolation: isolate;
 }
 
 .dashboard-shell > header.fixed {
-  z-index: var(--layout-z-header, 120);
+  z-index: var(--layout-z-header, 50);
 }
 
 .dashboard-module-content :is(.apexcharts-canvas, .apexcharts-svg) {
@@ -578,8 +578,10 @@ body,
   background: linear-gradient(to bottom right, rgb(248 250 252), rgba(var(--theme-primary-rgb), 0.04), rgb(248 250 252));
 }
 
-.theme-selected {
-  background-color: var(--theme-primary);
+.theme-selected,
+.theme-selected:hover,
+.theme-selected:focus-visible {
+  background-color: var(--theme-primary) !important;
   color: var(--theme-on-primary);
 }
 
@@ -1635,9 +1637,10 @@ body,
   --layout-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --layout-z-backdrop: 35;
   --layout-z-sidebar: 40;
-  --layout-z-header: 120;
+  --layout-z-header: 30;
   --layout-z-dropdown: 130;
   --layout-z-modal: 200;
+  --layout-z-nested-modal: 210;
   --layout-z-popover: 220;
   --layout-z-toast: 300;
   --theme-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
@@ -1746,13 +1749,39 @@ body,
 }
 
 .settings-option-grid > :where(button, a, label) {
+  width: 100%;
   min-height: var(--theme-control-min-height);
 }
 
+.settings-option-grid > button {
+  justify-content: flex-start;
+  overflow-wrap: anywhere;
+  text-align: start;
+  white-space: normal;
+}
+
+.settings-option-grid > button:not(.theme-selected):not(:disabled):hover {
+  border-color: rgba(var(--theme-primary-rgb), 0.3);
+  color: var(--theme-primary);
+}
+
+.settings-option-grid > button:focus-visible {
+  outline: 2px solid rgba(var(--theme-primary-rgb), 0.65);
+  outline-offset: 2px;
+}
+
+.settings-option-grid > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.theme-selected,
+.theme-selected:hover,
+.theme-selected:focus-visible,
 .theme-selected :where(.theme-text-primary, .theme-text-secondary, .theme-caption),
 .theme-selected.theme-text-primary,
 .theme-selected.theme-text-secondary {
-  color: var(--theme-on-primary);
+  color: var(--theme-on-primary) !important;
 }
 
 .text-no-collapse {
@@ -1908,6 +1937,13 @@ body,
   min-height: 0;
   min-width: 0;
   overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .layout-shell {
+    width: auto;
+    margin-inline: 0.5rem;
+  }
 }
 
 .layout-backdrop {

@@ -5,8 +5,14 @@
       :model-value="modelValue == null ? '' : modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
-      :class="[effectiveInputClass, isRTL ? 'text-right' : 'text-left', clearable && hasValue ? 'pe-8' : '']"
-      :dir="dir"
+      :class="['min-w-0 bg-background text-foreground placeholder:text-muted-foreground', effectiveInputClass, isRTL ? 'text-right' : 'text-left', clearable && hasValue ? 'pe-8' : '']"
+      :style="inputStyle"
+      :dir="effectiveDir"
+      role="combobox"
+      aria-autocomplete="list"
+      :aria-expanded="isOpen"
+      :aria-controls="listboxId"
+      :aria-activedescendant="activeDescendantId"
       @update:model-value="handleModelUpdate"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -30,7 +36,10 @@
     <div
       v-if="isOpen && !teleportTarget"
       ref="options"
-      class="shadcn-ui absolute top-full left-0 right-0 z-[var(--layout-z-popover,220)] mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-md p-1"
+      :id="listboxId"
+      role="listbox"
+      :dir="effectiveDir"
+      class="shadcn-ui absolute top-full inset-x-0 z-[var(--layout-z-popover,220)] mt-1 max-h-56 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-md"
       @mousedown.prevent
     >
       <div v-if="filteredItems.length" class="space-y-0.5">
@@ -38,7 +47,11 @@
           v-for="(item, i) in filteredItems"
           :key="getKey(item, i)"
           ref="optionItems"
+          :id="getOptionId(i)"
+          role="option"
+          :aria-selected="i === highlightedIndex"
           @mousedown.prevent="selectItem(item)"
+          @pointerdown.prevent="selectItem(item)"
           @mouseenter="highlightedIndex = i"
           :class="[
             'cursor-pointer select-none rounded-md px-2.5 py-1.5 text-sm transition-colors',
@@ -48,12 +61,16 @@
           {{ getLabel(item) }}
         </div>
       </div>
+      <slot name="afterOptions"></slot>
     </div>
 
     <teleport v-else-if="isOpen && teleportTarget" :to="teleportTarget">
       <div
         ref="optionsRef"
-        class="shadcn-ui absolute z-[var(--layout-z-popover,220)] max-h-56 overflow-y-auto rounded-lg border border-border bg-popover text-popover-foreground shadow-xl p-1"
+        :id="listboxId"
+        role="listbox"
+        :dir="effectiveDir"
+        class="shadcn-ui absolute z-[var(--layout-z-popover,220)] max-h-56 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl"
         :style="dropdownStyle"
         @mousedown.prevent
       >
@@ -62,23 +79,29 @@
             v-for="(item, index) in filteredItems"
             :key="getKey(item, index)"
             ref="optionItems"
+            :id="getOptionId(index)"
+            role="option"
+            :aria-selected="index === highlightedIndex"
             :class="[
               'cursor-pointer select-none rounded-md px-2.5 py-1.5 text-sm transition-colors',
               index === highlightedIndex ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-accent/50 text-foreground'
             ]"
             @mousedown.prevent="selectItem(item)"
+            @pointerdown.prevent="selectItem(item)"
             @mouseenter="highlightedIndex = index"
           >
             {{ getLabel(item) }}
           </div>
         </div>
+        <slot name="afterOptions"></slot>
       </div>
     </teleport>
   </div>
 </template>
 
 <script>
-import { computed, onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
+import { computed, getCurrentInstance, onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -120,7 +143,7 @@ export default {
     },
     dir: {
       type: String,
-      default: 'ltr'
+      default: ''
     },
     teleportTarget: {
       type: String,
@@ -145,13 +168,34 @@ export default {
   },
   emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear'],
   setup(props, { emit }) {
-    const isRTL = computed(() => (props.dir || '').toLowerCase() === 'rtl')
+    const { locale } = useI18n()
+    const instance = getCurrentInstance()
+    const effectiveDir = computed(() => {
+      if (props.dir) return props.dir
+      return String(locale.value || '').toLowerCase().startsWith('ar') ? 'rtl' : 'ltr'
+    })
+    const isRTL = computed(() => effectiveDir.value.toLowerCase() === 'rtl')
     const rootRef = ref(null)
     const optionsRef = ref(null)
     const optionItems = ref([])
     const isOpen = ref(false)
     const highlightedIndex = ref(-1)
     const dropdownStyle = ref({})
+    const listboxId = `search-dropdown-${instance?.uid ?? 'options'}`
+    const activeDescendantId = computed(() => (
+      isOpen.value && highlightedIndex.value >= 0
+        ? getOptionId(highlightedIndex.value)
+        : undefined
+    ))
+    const inputStyle = {
+      height: 'var(--theme-control-min-height, 2.5rem)',
+      minHeight: 'var(--theme-control-min-height, 2.5rem)',
+      lineHeight: '1.25rem'
+    }
+
+    function getOptionId(index) {
+      return `${listboxId}-option-${index}`
+    }
 
     const effectiveInputClass = computed(() => {
       const base = ''
@@ -233,11 +277,18 @@ export default {
       if (!inputEl || !targetElement) return
 
       const inputRect = inputEl.getBoundingClientRect()
-      const useFixed = props.teleportTarget === 'body'
+      const useFixed = targetElement === document.body
 
       if (useFixed) {
         const viewportPadding = 8
-        const maxDropdownHeight = 192
+        const maxDropdownHeight = 224
+        const viewportWidth = document.documentElement.clientWidth
+        const viewportHeight = window.innerHeight
+        const width = Math.min(inputRect.width, Math.max(0, viewportWidth - viewportPadding * 2))
+        const left = Math.min(
+          Math.max(viewportPadding, inputRect.left),
+          Math.max(viewportPadding, viewportWidth - width - viewportPadding)
+        )
         const spaceBelow = window.innerHeight - inputRect.bottom - viewportPadding
         const spaceAbove = inputRect.top - viewportPadding
         const openAbove = spaceBelow < Math.min(maxDropdownHeight, spaceAbove) && spaceAbove > spaceBelow
@@ -245,10 +296,12 @@ export default {
 
         dropdownStyle.value = {
           position: 'fixed',
-          top: `${openAbove ? Math.max(viewportPadding, inputRect.top - availableHeight) : inputRect.bottom}px`,
-          left: `${inputRect.left}px`,
-          width: `${inputRect.width}px`,
+          top: openAbove ? 'auto' : `${inputRect.bottom + 4}px`,
+          bottom: openAbove ? `${Math.max(viewportPadding, viewportHeight - inputRect.top + 4)}px` : 'auto',
+          left: `${left}px`,
+          width: `${width}px`,
           maxHeight: `${availableHeight}px`,
+          visibility: availableHeight > 0 && inputRect.bottom > 0 && inputRect.top < viewportHeight ? 'visible' : 'hidden',
           zIndex: 'var(--layout-z-popover, 220)'
         }
         return
@@ -383,31 +436,53 @@ export default {
       }
     )
 
+    watch(
+      () => [isOpen.value, filteredItems.value.length, props.teleportTarget],
+      ([open]) => {
+        if (open) updateDropdownPosition()
+      },
+      { flush: 'post' }
+    )
+
+    let resizeObserver
+
     onMounted(() => {
-      document.addEventListener('mousedown', handleDocumentPointerDown, true)
+      document.addEventListener('pointerdown', handleDocumentPointerDown, true)
       window.addEventListener('resize', updateDropdownPosition)
       window.addEventListener('scroll', updateDropdownPosition, true)
+      if (typeof ResizeObserver !== 'undefined' && rootRef.value) {
+        resizeObserver = new ResizeObserver(() => {
+          if (isOpen.value) updateDropdownPosition()
+        })
+        resizeObserver.observe(rootRef.value)
+      }
     })
 
     onBeforeUnmount(() => {
-      document.removeEventListener('mousedown', handleDocumentPointerDown, true)
+      document.removeEventListener('pointerdown', handleDocumentPointerDown, true)
       window.removeEventListener('resize', updateDropdownPosition)
       window.removeEventListener('scroll', updateDropdownPosition, true)
+      resizeObserver?.disconnect()
     })
 
     return {
       rootRef,
       optionsRef,
       optionItems,
+      effectiveDir,
       isOpen,
       highlightedIndex,
       dropdownStyle,
+      inputStyle,
+      listboxId,
+      activeDescendantId,
       filteredItems,
       hasValue,
       effectiveInputClass,
       getKey,
       getLabel,
       getDisplayLabel,
+      getOptionId,
       handleModelUpdate,
       handleFocus,
       handleBlur,

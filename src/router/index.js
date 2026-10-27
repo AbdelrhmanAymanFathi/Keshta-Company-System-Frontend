@@ -50,13 +50,12 @@ const UsersList = () => import('@/components/dashboard/UsersList.vue')
 const Locations = () => import('@/components/dashboard/Locations.vue')
 const Profile = () => import('@/views/Profile.vue')
 const Settings = () => import('@/views/Settings.vue')
-const ThemeStudio = () => import('@/views/ThemeStudio.vue')
 const ExtractsPage = () => import('@/views/extracts/ExtractsPage.vue')
 const NotificationCenter = () => import('@/components/dashboard/NotificationCenter.vue')
 const MessagingPage = () => import('@/components/dashboard/MessagingPage.vue')
 const CreateExtract = () => import('@/views/extracts/CreateExtract.vue')
 const ExtractDetail = () => import('@/views/extracts/ExtractDetail.vue')
-// const ExtractItemsManager = () => import('@/components/dashboard/Extracts/ExtractItemsManager.vue')
+const ExtractItemsManager = () => import('@/components/dashboard/Extracts/ExtractItemsManager.vue')
 
 const routes = [
   // ==================== Auth Routes ====================
@@ -428,13 +427,6 @@ const routes = [
         component: Settings,
         meta: { title: 'settings', module: 'settings' }
       },
-      {
-        path: 'theme-studio',
-        name: 'theme-studio',
-        component: ThemeStudio,
-        meta: { title: 'themeStudio.title', module: 'settings' }
-      },
-
       // ==================== Extracts Module ====================
       {
         path: 'extracts',
