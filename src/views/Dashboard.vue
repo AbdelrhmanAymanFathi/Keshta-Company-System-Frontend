@@ -256,6 +256,33 @@
                   ></span>
                 </span>
               </div>
+              <div
+                @click="toggleColorMode()"
+                role="menuitemcheckbox"
+                :aria-checked="isDarkMode"
+                :aria-label="$t('profile.darkModeLabel') || 'Dark mode'"
+                class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200 cursor-pointer"
+              >
+                <svg v-if="!isDarkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                    d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                </svg>
+                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="4" stroke-width="1.8" />
+                  <path stroke-linecap="round" stroke-width="1.8"
+                    d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.07-7.07l-1.41 1.41M8.34 15.66l-1.41 1.41m0-10.48l1.41 1.41m7.32 7.32l1.41 1.41" />
+                </svg>
+                <span class="flex-1">{{ $t('profile.darkModeLabel') || 'Dark mode' }}</span>
+                <span
+                  class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200"
+                  :class="isDarkMode ? 'bg-green-500' : 'bg-gray-300'"
+                >
+                  <span
+                    class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all duration-200"
+                    :class="isDarkMode ? 'start-0.5' : 'end-0.5'"
+                  ></span>
+                </span>
+              </div>
               <Button variant="ghost" @click="showLogoutDialog = true; userMenuOpen = false"
                 class="w-full px-4 py-2 text-sm text-left hover:bg-gray-100 flex items-center gap-3 theme-text-primary transition-colors duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -487,6 +514,7 @@ import { getReportDefs, getNotifications, markNotificationRead, markAllNotificat
 import { DocumentTextIcon, WrenchScrewdriverIcon } from '@acme/icon-packs/legacy'
 import { iconRevision, getMenuIcon } from '@acme/icon-packs'
 import { themeRevision, loadTheme } from '@acme/theme-engine'
+import { colorMode, setColorMode } from '@/utils/colorMode'
 import { useNotificationStore } from '@/stores/useNotificationStore'
 import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import { VueDraggable } from 'vue-draggable-plus'
@@ -557,7 +585,13 @@ export default {
       savePresenceSettings(!presenceEnabled.value)
     }
 
-    return { authLogout, user, router, notificationStore, presenceMembers, presenceEnabled, togglePresence }
+    // Dark mode (menu bindings — state lives in @/utils/colorMode)
+    const isDarkMode = computed(() => colorMode.value === 'dark')
+    const toggleColorMode = () => {
+      setColorMode(isDarkMode.value ? 'light' : 'dark')
+    }
+
+    return { authLogout, user, router, notificationStore, presenceMembers, presenceEnabled, togglePresence, isDarkMode, toggleColorMode }
   },
   data() {
     return {
