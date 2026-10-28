@@ -112,12 +112,6 @@
                           <MapPinIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('supply.addNewSite') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -141,13 +135,6 @@
                         <template #prefix>
                           <MapIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                        </template>
-                        <template #afterOptions>
-                          <div v-if="form.site" @click="showAddArea = true; pendingRow = null"
-                            style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('supply.addNewArea') }}
-                          </div>
                         </template>
                       </SearchDropdown>
                     </div>
@@ -292,38 +279,6 @@
       </div>
     </transition>
   </teleport>
-
-  <teleport to="body">
-    <!-- Dialog: Add Site -->
-    <div v-if="showAddSite" :dir="isRTL ? 'rtl' : 'ltr'" class="fixed inset-0 z-[var(--layout-z-nested-modal,210)] flex items-center justify-center bg-black/30 p-4">
-      <div class="w-full max-w-sm rounded-xl bg-background p-6 shadow-xl">
-        <h3 class="mb-2 text-lg font-bold theme-heading">{{ $t('supply.addSite') }}</h3>
-        <input v-model="newSiteName" class="mb-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm leading-5 text-foreground placeholder:text-muted-foreground shadow-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" :placeholder="$t('supply.siteName')" />
-        <div class="flex flex-wrap justify-end gap-2">
-          <ShadcnButton variant="outline" size="native" @click="showAddSite = false" class="rounded-xl border px-3">{{ $t('labels.cancel') }}</ShadcnButton>
-          <ShadcnButton variant="default" size="native" @click="addSite" :disabled="!newSiteName || addingLocation" class="rounded-xl px-3">
-            {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-          </ShadcnButton>
-        </div>
-        <div v-if="locationError" class="mt-2 text-sm text-red-600">{{ locationError }}</div>
-      </div>
-    </div>
-
-    <!-- Dialog: Add Area -->
-    <div v-if="showAddArea" :dir="isRTL ? 'rtl' : 'ltr'" class="fixed inset-0 z-[var(--layout-z-nested-modal,210)] flex items-center justify-center bg-black/30 p-4">
-      <div class="w-full max-w-sm rounded-xl bg-background p-6 shadow-xl">
-        <h3 class="mb-2 text-lg font-bold theme-heading">{{ $t('supply.addArea') }}</h3>
-        <input v-model="newAreaName" class="mb-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm leading-5 text-foreground placeholder:text-muted-foreground shadow-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" :placeholder="$t('supply.areaName')" />
-        <div class="flex flex-wrap justify-end gap-2">
-          <ShadcnButton variant="outline" size="native" @click="showAddArea = false" class="rounded-xl border px-3">{{ $t('labels.cancel') }}</ShadcnButton>
-          <ShadcnButton variant="default" size="native" @click="addArea" :disabled="!newAreaName || addingLocation" class="rounded-xl px-3">
-            {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-          </ShadcnButton>
-        </div>
-        <div v-if="locationError" class="mt-2 text-sm text-red-600">{{ locationError }}</div>
-      </div>
-    </div>
-  </teleport>
 </template>
 
 <script>
@@ -331,7 +286,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@acme/icon-packs/legacy'
-import { getLocations, createLocation } from '@/api'
+import { getLocations } from '@/api'
 
 export default {
   name: 'EquipmentLogCreationModal',
@@ -375,14 +330,7 @@ export default {
       filters: {
         commonSiteSearch: '',
         commonAreaSearch: ''
-      },
-      showAddSite: false,
-      newSiteName: '',
-      showAddArea: false,
-      newAreaName: '',
-      addingLocation: false,
-      pendingRow: null,
-      locationError: ''
+      }
     }
   },
   computed: {
@@ -441,7 +389,6 @@ export default {
   watch: {
     isOpen(val) {
       if (val) {
-        this.locationError = ''
         this.$nextTick(() => {
           this.onModalOpen()
         })
@@ -594,74 +541,9 @@ export default {
       }
     },
     onCommonSiteChange() {
-      if (this.form.site === '__new__') {
-        this.showAddSite = true
-        this.form.site = null
-        this.form.area = null
-        this.filters.commonSiteSearch = ''
-        this.filters.commonAreaSearch = ''
-        return
-      }
       if (this.form.site && this.form.site.id) {
         this.form.area = null
         this.filters.commonAreaSearch = ''
-      }
-    },
-    async addSite() {
-      if (!this.newSiteName?.trim()) return
-      this.addingLocation = true
-      this.locationError = ''
-      try {
-        const res = await createLocation({ name: this.newSiteName.trim(), parentId: null })
-        await this.refreshLocations()
-        const created = res?.data
-        if (created?.id) {
-          const newSite = this.allLocations.find(l => l.id === created.id)
-          if (newSite && this.currentStep === 1 && !this.pendingRow) {
-            this.form.site = newSite
-            this.filters.commonSiteSearch = newSite.name || ''
-            this.form.area = null
-            this.filters.commonAreaSearch = ''
-          }
-        }
-        this.showAddSite = false
-        this.newSiteName = ''
-        this.pendingRow = null
-      } catch (err) {
-        this.locationError = err?.response?.data?.message || 'Failed to add site'
-        console.error('addSite error:', err)
-      } finally {
-        this.addingLocation = false
-      }
-    },
-    async addArea() {
-      if (!this.newAreaName?.trim()) return
-      const siteId = this.currentStep === 1 ? this.form.site?.id : this.pendingRow?.site?.id
-      if (!siteId) return
-      this.addingLocation = true
-      this.locationError = ''
-      try {
-        const res = await createLocation({
-          name: this.newAreaName.trim(),
-          parentId: siteId
-        })
-        await this.refreshLocations()
-        const created = res?.data
-        if (created?.id) {
-          const newArea = this.allLocations.find(l => l.id === created.id)
-          if (newArea && this.currentStep === 1 && !this.pendingRow) {
-            this.form.area = newArea
-            this.filters.commonAreaSearch = newArea.name || ''
-          }
-        }
-        this.showAddArea = false
-        this.newAreaName = ''
-        this.pendingRow = null
-      } catch (err) {
-        this.locationError = err?.response?.data?.message || 'Failed to add area'
-        console.error('addArea error:', err)
-      } finally {
-        this.addingLocation = false
       }
     },
     closeModal() {

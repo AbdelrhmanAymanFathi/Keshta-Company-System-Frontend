@@ -8,17 +8,7 @@
         :placeholder="$t ? $t('labels.item') : 'Item'"
         :inputClass="'w-full p-2 border rounded text-sm focus:outline-none theme-input-focus'"
         @select="selectItem"
-      >
-        <template #afterOptions>
-          <div
-            @click="emitAddItem"
-            style="color: #10b981;"
-            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100"
-          >
-            + {{ $t ? $t('labels.addNew') : 'Add New' }}
-          </div>
-        </template>
-      </SearchDropdown>
+      />
       <div v-if="displayUnitName" class="mt-1 text-xs theme-text-muted">
         {{ displayUnitName }}
       </div>
@@ -46,7 +36,7 @@ const props = defineProps({
   },
   items: { type: Array, default: () => [] }
 })
-const emit = defineEmits(['update:modelValue', 'remove', 'add-item'])
+const emit = defineEmits(['update:modelValue', 'remove'])
 
 const internal = reactive({ ...props.modelValue })
 
@@ -86,10 +76,6 @@ watch(internal, (val) => {
 
 function onRemove() {
   emit('remove')
-}
-
-function emitAddItem() {
-  emit('add-item')
 }
 
 function selectItem(item) {

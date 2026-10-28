@@ -51,12 +51,6 @@
                         <template #prefix>
                           <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @mousedown.prevent="showAddItemDialog = true"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
-                            + {{ $t('labels.addNew') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -123,12 +117,6 @@
                         <template #prefix>
                           <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @mousedown.prevent="showAddContractorDialog = true"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
-                            + {{ $t('labels.addNew') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -150,12 +138,6 @@
                         @clear="() => { commonData.vehicle = null; filters.commonVehicleSearch = ''; vehicleCompanyCapacity = 0; rows.forEach(r => { r.vehicle = null }) }">
                         <template #prefix>
                           <ArchiveBoxIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                        </template>
-                        <template #afterOptions>
-                          <div @mousedown.prevent="showAddVehicleDialog = true"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
-                            + {{ $t('labels.addNew') }}
-                          </div>
                         </template>
                       </SearchDropdown>
                     </div>
@@ -438,68 +420,6 @@
       <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
     </div>
   </div>
-
-  <!-- Dialog: Add Contractor -->
-  <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
-      <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
-        :placeholder="$t('contractors.name')" />
-      <input v-model="newContractorPhone" class="w-full border rounded px-2 py-1 mb-3"
-        :placeholder="$t('contractors.phone')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addContractor" :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Vehicle -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
-    <div class="bg-white p-6 rounded shadow w-full max-w-md">
-      <h3 class="text-lg font-bold mb-3">{{ $t('vehicles.addVehicle') }}</h3>
-      <input v-model="newVehicleForm.name" :placeholder="$t('vehicles.name')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <select v-model="newVehicleForm.contractorId" class="w-full border rounded px-2 py-1 mb-3">
-        <option value="">{{ $t('labels.contractor') }} —</option>
-        <option v-for="c in contractors" :key="c.id" :value="c.id">{{ c.name }}</option>
-      </select>
-      <input v-model="newVehicleForm.crusherNumber" :placeholder="$t('vehicles.crusherNumber')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newVehicleForm.companyCapacity" type="number" step="0.01"
-        :placeholder="$t('vehicles.companyCapacity')" class="w-full border rounded px-2 py-1 mb-3" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddVehicleDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addVehicle"
-          :disabled="!newVehicleForm.name || !newVehicleForm.companyCapacity || creatingVehicle"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ creatingVehicle ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="vehicleDialogError" class="text-red-600 text-sm mt-2">{{ vehicleDialogError }}</div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Item -->
-  <div v-if="showAddItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-3">{{ $t('transport.addItem') || 'Add Item' }}</h3>
-      <input v-model="newItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddItemDialog = false" class="px-3 py-1 border rounded">{{ $t('common.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addItem" :disabled="!newItemForm.name || creatingItem"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ creatingItem ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="itemDialogError" class="text-red-600 text-sm mt-2">{{ itemDialogError }}</div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -508,8 +428,6 @@ import {
   updateTransport,
   getContractors,
   getContractorsWithVehicles,
-  createContractor,
-  createVehicle,
   getVehicles,
   getLocations,
   createLocation,
@@ -584,30 +502,11 @@ export default {
       saveError: '',
       locationError: '',
         vehicleCompanyCapacity: 0,
-      vehicleDialogError: '',
-      itemDialogError: '',
       showAddLocation: false,
       newLocationName: '',
       newLocationParentId: null,
       addingLocation: false,
       pendingField: null,
-      showAddContractorDialog: false,
-      newContractorName: '',
-      newContractorPhone: '',
-      creatingContractor: false,
-      showAddVehicleDialog: false,
-      newVehicleForm: {
-        name: '',
-        contractorId: '',
-        crusherNumber: '',
-        companyCapacity: ''
-      },
-      creatingVehicle: false,
-      showAddItemDialog: false,
-      newItemForm: {
-        name: ''
-      },
-      creatingItem: false,
       rows: [],
       // highlighted indexes for common dropdowns
       highlightedCommonItemIndex: -1,
@@ -1178,76 +1077,6 @@ export default {
         this.items = Array.isArray(res.data.items) ? res.data.items : (Array.isArray(res.data) ? res.data : [])
       } catch (err) {
         console.error('loadItems failed:', err)
-      }
-    },
-    async addContractor() {
-      if (!this.newContractorName?.trim()) return
-      this.creatingContractor = true
-      try {
-        const payload = { name: this.newContractorName.trim(), phone: this.newContractorPhone?.trim() || '' }
-        const res = await createContractor(payload)
-        await this.loadLookups()
-        // backend may return single or multiple contractors; pick the one appropriate for transport
-        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
-        let chosen = createdList.find(c => c.availableForTransports) || createdList[0]
-        if (chosen && chosen.id) {
-          const newContractor = this.contractors.find(c => c.id === chosen.id)
-          if (newContractor) {
-            this.commonData.contractor = newContractor
-            this.filters.commonContractorSearch = newContractor.name
-          }
-        }
-        this.showAddContractorDialog = false
-        this.newContractorName = ''
-        this.newContractorPhone = ''
-      } catch (err) {
-        this.contractorDialogError = err?.response?.data?.message || 'Failed to add contractor'
-      } finally {
-        this.creatingContractor = false
-      }
-    },
-    async addVehicle() {
-      const { name, contractorId, crusherNumber, companyCapacity } = this.newVehicleForm
-      if (!name?.trim() || companyCapacity <= 0) return
-      this.creatingVehicle = true
-      try {
-        const payload = {
-          name: name.trim(),
-          contractorId: contractorId ? Number(contractorId) : null,
-          crusherNumber: crusherNumber?.trim() || '',
-          companyCapacity: Number(companyCapacity)
-        }
-        const res = await createVehicle(payload)
-        if (res?.data?.id) {
-        }
-        await this.loadLookups()
-        this.showAddVehicleDialog = false
-        this.newVehicleForm = { name: '', contractorId: '', crusherNumber: '', companyCapacity: '' }
-      } catch (err) {
-        this.vehicleDialogError = err?.response?.data?.message || 'Failed to add vehicle'
-      } finally {
-        this.creatingVehicle = false
-      }
-    },
-    async addItem() {
-      const { name } = this.newItemForm
-      if (!name?.trim()) return
-      this.creatingItem = true
-      try {
-        // Assuming createItem API exists; adjust as needed
-        // const res = await createItem({ name: name.trim(), mode: 'transport' })
-        // For demo, mock
-        const mockId = Date.now()
-        const newItem = { id: mockId, name: name.trim() }
-        this.items.push(newItem)
-        this.commonData.item = newItem
-        this.filters.commonItemSearch = newItem.name
-        this.showAddItemDialog = false
-        this.newItemForm = { name: '' }
-      } catch (err) {
-        this.itemDialogError = err?.response?.data?.message || 'Failed to add item'
-      } finally {
-        this.creatingItem = false
       }
     },
     buildRowPayload(row) {

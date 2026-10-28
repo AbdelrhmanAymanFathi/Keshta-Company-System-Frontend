@@ -63,12 +63,6 @@
                           <ArchiveBoxIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @click="showAddExportItemDialog = true" style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('labels.addNew') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -105,12 +99,6 @@
                           <MapPinIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('supply.addNewSite') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -133,13 +121,6 @@
                         <template #prefix>
                           <MapIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                        </template>
-                        <template #afterOptions>
-                          <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null"
-                            style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('supply.addNewArea') }}
-                          </div>
                         </template>
                       </SearchDropdown>
                     </div>
@@ -164,12 +145,6 @@
                           <UserGroupIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @click="showAddContractorDialog = true" style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('labels.addNew') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -192,12 +167,6 @@
                         <template #prefix>
                           <WrenchScrewdriverIcon
                             class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                        </template>
-                        <template #afterOptions>
-                          <div @click="showAddCrusherDialog = true" style="color: #10b981;"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">
-                            + {{ $t('labels.addNew') }}
-                          </div>
                         </template>
                       </SearchDropdown>
                     </div>
@@ -281,14 +250,6 @@
                 </div>
               </dl>
             </div>
-
-            <!-- Add New Vehicle Button -->
-            <!-- <div class="mb-6" >
-              <button @click="showAddVehicleDialog = true"style="z-index: 900;"
-                class="bg-green-600 theme-text-light px-4 py-2 rounded-lg hover:bg-green-700 font-medium shadow-md transition">
-                + {{ $t('vehicles.addVehicle') || 'Add New Vehicle' }}
-              </button>
-            </div> -->
 
             <!-- Table for Variable Data -->
             <div class="    mb-8
@@ -387,12 +348,6 @@
                               :class="['px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start', vi === row.highlightedVehicleIndex ? 'theme-icon-bg' : 'theme-hover-soft']">
                               {{ v.name }}
                             </div>
-
-                            <!-- Add new -->
-                            <!-- <div @click.stop="onAddVehicleClicked(row)"
-                            class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start">
-                            + {{ $t('labels.addNew') }}
-                          </div> -->
                           </div>
                           </teleport>
                         </div>
@@ -576,110 +531,6 @@
     </transition>
   </teleport>
 
-  <!-- Dialog: Add Site -->
-  <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
-      <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddSite = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addSite" :disabled="!newSiteName || addingLocation"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Area -->
-  <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
-      <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddArea = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel') }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="addArea" :disabled="!newAreaName || addingLocation"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ addingLocation ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Contractor -->
-  <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
-      <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
-        :placeholder="$t('contractors.name')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddContractorDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="createNewContractor" :disabled="!newContractorName || creatingContractor"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Crusher -->
-  <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
-      <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddCrusherDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Vehicle (use shared CreateVehicle modal) -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 z-100 flex items-center justify-center px-4">
-    <div class="fixed inset-0 bg-black bg-opacity-40" @click="showAddVehicleDialog = false"></div>
-    <div class="relative w-full max-w-3xl z-[1002] mx-auto">
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden max-h-[90vh] flex flex-col">
-        <div class="flex items-center justify-between px-4 py-3 border-b">
-          <h3 class="text-lg font-semibold theme-text-primary">{{ $t('vehicles.createVehicle') }}</h3>
-          <ShadcnButton variant="outline" size="native" class="theme-text-muted hover:theme-text-secondary" @click="showAddVehicleDialog = false">✕</ShadcnButton>
-        </div>
-        <div class="p-4 overflow-y-auto">
-          <CreateVehicle :mode="'supply'" @created="onCreatedFromVehicleModal" :prefilledContractorId="commonData.contractor?.id"
-            :prefilledCrusherName="commonData.crusher?.name" />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dialog: Add Export Item -->
-  <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
-    <div class="bg-white p-6 rounded shadow w-96">
-      <h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3>
-      <input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')"
-        class="w-full border rounded px-2 py-1 mb-3" />
-      <div class="flex gap-2 justify-end">
-        <ShadcnButton variant="outline" size="native" @click="showAddExportItemDialog = false" class="px-3 py-1 border rounded">{{ $t('labels.cancel')
-        }}</ShadcnButton>
-        <ShadcnButton variant="outline" size="native" @click="createNewExportItem"
-          :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem"
-          class="bg-green-600 theme-text-light px-3 py-1 rounded">
-          {{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}
-        </ShadcnButton>
-      </div>
-      <div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div>
-    </div>
-  </div>
   <!-- Transport Modal (open after successful supply save when item supports transport) -->
   <TransportCreationModal :isOpen="showTransportModal"
     :modalTitle="$t('transport.addTransportFromSupply') || 'Create Transport'" :transport="transportModalPayload"
@@ -688,18 +539,13 @@
 
 <script>
 import {
-  createLocation,
   getLocations,
   getContractors,
   getCrushers,
   getVehicles,
   getContractorsWithVehicles,
   createExport,
-  createContractor,
-  createCrusher,
-  createVehicle,
-  getExportItems,
-  createExportItem
+  getExportItems
 } from '@/api'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
 import {
@@ -717,7 +563,6 @@ import {
   ArrowRightIcon
 } from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
-import CreateVehicle from '@/components/dashboard/Vehicles/CreateVehicle.vue'
 import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import DateField from '@/components/shared/DateField.vue'
@@ -738,10 +583,9 @@ export default {
     TrashIcon,
     CheckIcon,
     ArrowRightIcon,
-    SearchDropdown
-    , CreateVehicle
-    , TransportCreationModal
-    , DateField
+    SearchDropdown,
+    TransportCreationModal,
+    DateField
   },
   props: {
     showTriggerButton: {
@@ -795,42 +639,10 @@ export default {
 
       // Errors
       saveError: '',
-      locationError: '',
-      contractorDialogError: '',
-      crusherDialogError: '',
-      vehicleDialogError: '',
-      exportItemDialogError: '',
 
-      // Dialog states
-      showAddSite: false,
-      newSiteName: '',
-      showAddArea: false,
-      newAreaName: '',
-      addingLocation: false,
-      pendingRow: null,
-      showAddContractorDialog: false,
-      newContractorName: '',
-      creatingContractor: false,
-      showAddCrusherDialog: false,
-      newCrusherName: '',
-      creatingCrusher: false,
-      showAddVehicleDialog: false,
-      newVehicleForm: {
-        name: '',
-        contractorId: '',
-        companyCapacity: '',
-        crusherCapacity: ''
-      },
       // Transport modal trigger/state (open after successful supply save)
       showTransportModal: false,
       transportModalPayload: null,
-      creatingVehicle: false,
-      showAddExportItemDialog: false,
-      newExportItemForm: {
-        name: '',
-        currentPrice: ''
-      },
-      creatingExportItem: false,
 
       // Search filters for Step 1
       filters: {
@@ -934,26 +746,6 @@ export default {
   },
 
   methods: {
-    async onCreatedFromVehicleModal() {
-      try {
-        await this.loadLookups()
-      } catch (e) {
-        console.error('Failed to reload lookups after vehicle creation', e)
-      } finally {
-        this.showAddVehicleDialog = false
-      }
-    },
-
-    onAddVehicleClicked(row) {
-      try {
-        // Open the vehicle creation modal directly (same as the button above table)
-        this.showAddVehicleDialog = true
-        if (row) row.open = false
-      } catch (e) {
-        console.error('Error handling add vehicle click', e)
-      }
-    },
-
     handleGlobalClick(e) {
       // Close vehicle dropdowns when clicking outside the table area
       const isClickInTable = e.target.closest('table') || e.target.closest('thead') || e.target.closest('tbody')
@@ -1265,12 +1057,6 @@ export default {
 
     // ============ Field Interactions (Step 1) ============
     onCommonSiteChange() {
-      if (this.commonData.site === '__new__') {
-        this.showAddSite = true
-        this.commonData.site = null
-        this.commonData.area = null
-        return
-      }
       // Only clear area if we actually selected a different real site
       if (this.commonData.site && this.commonData.site.id) {
         this.commonData.area = null
@@ -1278,10 +1064,6 @@ export default {
     },
 
     onCommonContractorChange() {
-      if (this.commonData.contractor === '__new__') {
-        this.showAddContractorDialog = true
-        return
-      }
       const availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
       this.rows.forEach(row => {
         row.availableVehicles = availableVehicles
@@ -1293,18 +1075,10 @@ export default {
     },
 
     onCommonCrusherChange() {
-      if (this.commonData.crusher === '__new__') {
-        this.showAddCrusherDialog = true
-        return
-      }
+      // no-op: crusher changes don't cascade anything today
     },
 
     onCommonItemSelect() {
-      if (this.commonData.item === '__new__') {
-        // Keep it as __new__ so the dialog stays open
-        return
-      }
-
       if (!this.commonData.item) return
 
       // Support multiple possible field names returned by the API
@@ -1486,73 +1260,6 @@ export default {
       }
     },
 
-    async addSite() {
-      if (!this.newSiteName?.trim()) return
-      this.addingLocation = true
-      try {
-        const res = await createLocation({ name: this.newSiteName.trim(), parentId: null })
-        await this.refreshLocations()
-        const created = res?.data
-        if (created?.id) {
-          const newSite = this.allLocations.find(l => l.id === created.id)
-          if (newSite) {
-            // If called from Step 1
-            if (this.currentStep === 1 && !this.pendingRow) {
-              this.commonData.site = newSite
-            }
-            // If called from Step 2 row (via pendingRow)
-            if (this.pendingRow) {
-              this.pendingRow.site = newSite
-            }
-          }
-        }
-        this.showAddSite = false
-        this.newSiteName = ''
-        this.pendingRow = null
-      } catch (err) {
-        this.locationError = err?.response?.data?.message || 'فشل إضافة الموقع'
-        console.error('❌ addSite error:', err)
-      } finally {
-        this.addingLocation = false
-      }
-    },
-
-    async addArea() {
-      if (!this.newAreaName?.trim()) return
-
-      const siteId = this.currentStep === 1 ? this.commonData.site?.id : this.pendingRow?.site?.id
-      if (!siteId) return
-
-      this.addingLocation = true
-      try {
-        const res = await createLocation({
-          name: this.newAreaName.trim(),
-          parentId: siteId
-        })
-        await this.refreshLocations()
-        const created = res?.data
-        if (created?.id) {
-          const newArea = this.allLocations.find(l => l.id === created.id)
-          if (newArea) {
-            if (this.currentStep === 1 && !this.pendingRow) {
-              this.commonData.area = newArea
-            }
-            if (this.pendingRow) {
-              this.pendingRow.area = newArea
-            }
-          }
-        }
-        this.showAddArea = false
-        this.newAreaName = ''
-        this.pendingRow = null
-      } catch (err) {
-        this.locationError = err?.response?.data?.message || 'فشل إضافة المنطقة'
-        console.error('❌ addArea error:', err)
-      } finally {
-        this.addingLocation = false
-      }
-    },
-
     // ============ Lookups Management ============
     async loadExportItems() {
       try {
@@ -1607,137 +1314,6 @@ export default {
         })
       } catch (err) {
         console.error('loadLookups failed:', err)
-      }
-    },
-
-    // ============ Create New Items ============
-    async createNewContractor() {
-      const name = this.newContractorName.trim()
-      if (!name) return
-      this.creatingContractor = true
-      this.contractorDialogError = ''
-      try {
-        const res = await createContractor({ name })
-        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
-        if (!createdList || createdList.length === 0) throw new Error('Invalid response')
-
-        // Reload all lookups to get fresh data
-        await this.loadLookups()
-
-        // Choose exporter-capable contractor when available
-        const chosen = createdList.find(c => c.availableForSupplies) || createdList.find(c => c.availableForExports) || createdList[0]
-        const updatedContractor = this.contractors.find(c => c.id === chosen.id)
-        if (updatedContractor && this.currentStep === 1) {
-          this.commonData.contractor = updatedContractor
-        }
-
-        this.newContractorName = ''
-        this.showAddContractorDialog = false
-      } catch (e) {
-        this.contractorDialogError = e?.response?.data?.message || e.message || 'Error'
-        console.error('❌ createNewContractor error:', e)
-      } finally {
-        this.creatingContractor = false
-      }
-    },
-
-    async createNewCrusher() {
-      const name = this.newCrusherName.trim()
-      if (!name) return
-      this.creatingCrusher = true
-      this.crusherDialogError = ''
-      try {
-        const res = await createCrusher({ name })
-        const nc = res?.data
-        if (!nc || !nc.id) throw new Error('Invalid response')
-
-        // Reload all lookups to get fresh data
-        await this.loadLookups()
-
-        // After reload, find and set the new crusher
-        const updatedCrusher = this.crushers.find(c => c.id === nc.id)
-        if (updatedCrusher && this.currentStep === 1) {
-          this.commonData.crusher = updatedCrusher
-        }
-
-        this.newCrusherName = ''
-        this.showAddCrusherDialog = false
-      } catch (e) {
-        this.crusherDialogError = e?.response?.data?.message || e.message || 'Error'
-        console.error('❌ createNewCrusher error:', e)
-      } finally {
-        this.creatingCrusher = false
-      }
-    },
-
-    async createNewVehicle() {
-      const { name, contractorId, companyCapacity, crusherCapacity } = this.newVehicleForm
-      if (!name.trim() || !companyCapacity || !crusherCapacity) {
-        this.vehicleDialogError = 'All fields required'
-        return
-      }
-      this.creatingVehicle = true
-      this.vehicleDialogError = ''
-      try {
-        const res = await createVehicle({
-          name: name.trim(),
-          contractorId: contractorId ? Number(contractorId) : null,
-          companyCapacity: Number(companyCapacity),
-          crusherCapacity: Number(crusherCapacity)
-        })
-        const nv = res?.data
-        if (!nv || !nv.id) throw new Error('Invalid response')
-
-        // Reload all lookups to get fresh data
-        await this.loadLookups()
-
-        this.newVehicleForm = { name: '', contractorId: '', companyCapacity: '', crusherCapacity: '' }
-        this.showAddVehicleDialog = false
-      } catch (e) {
-        this.vehicleDialogError = e?.response?.data?.message || e.message || 'Error'
-        console.error('❌ createNewVehicle error:', e)
-      } finally {
-        this.creatingVehicle = false
-      }
-    },
-
-    async createNewExportItem() {
-      const { name, currentPrice } = this.newExportItemForm
-      if (!name.trim() || !currentPrice) {
-        this.exportItemDialogError = 'All fields required'
-        return
-      }
-      this.creatingExportItem = true
-      this.exportItemDialogError = ''
-      try {
-        // Without availableForSupplies the new item is filtered out of the supply item list
-        const res = await createExportItem({
-          name: name.trim(),
-          defaultSupplyPrice: Number(currentPrice),
-          availableForSupplies: true
-        })
-        const newItem = res?.data
-        if (!newItem || !newItem.id) throw new Error('Invalid response')
-
-        // Reload export items to get fresh data
-        await this.loadExportItems()
-
-        // After reload, find and set the new item if in Step 1
-        if (this.currentStep === 1) {
-          const updatedItem = this.exportItems.find(i => i.id === newItem.id)
-          if (updatedItem) {
-            this.commonData.item = updatedItem
-            this.onCommonItemSelect()
-          }
-        }
-
-        this.newExportItemForm = { name: '', currentPrice: '' }
-        this.showAddExportItemDialog = false
-      } catch (e) {
-        this.exportItemDialogError = e?.response?.data?.message || e.message || 'Error'
-        console.error('❌ createNewExportItem error:', e)
-      } finally {
-        this.creatingExportItem = false
       }
     },
 

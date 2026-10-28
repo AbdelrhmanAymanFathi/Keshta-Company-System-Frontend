@@ -34,9 +34,6 @@
                       <template #prefix>
                         <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                       </template>
-                      <template #afterOptions>
-                        <div @click="showAddSite = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewSite') }}</div>
-                      </template>
                     </SearchDropdown>
                   </div>
                 </div>
@@ -51,9 +48,6 @@
                       @select="(sel) => { commonData.area = sel; filters.commonAreaSearch = sel.name }">
                       <template #prefix>
                         <MapIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                      </template>
-                      <template #afterOptions>
-                        <div v-if="commonData.site" @click="showAddArea = true; pendingRow = null" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('supply.addNewArea') }}</div>
                       </template>
                     </SearchDropdown>
                   </div>
@@ -70,9 +64,6 @@
                       <template #prefix>
                         <UserGroupIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                       </template>
-                      <template #afterOptions>
-                        <div @click="showAddContractorDialog = true" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
-                      </template>
                     </SearchDropdown>
                   </div>
                 </div>
@@ -87,9 +78,6 @@
                       @select="(sel) => { commonData.crusher = sel; filters.commonCrusherSearch = sel.name; onCommonCrusherChange() }">
                       <template #prefix>
                         <WrenchScrewdriverIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                      </template>
-                      <template #afterOptions>
-                        <div @click="showAddCrusherDialog = true" style="color: #10b981;" class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100">+ {{ $t('labels.addNew') }}</div>
                       </template>
                     </SearchDropdown>
                   </div>
@@ -145,7 +133,6 @@
                 :key="r.id"
                 v-model="rows[i]"
                 :items="exportItems"
-                @add-item="pendingRow = r; showAddExportItemDialog = true"
                 @remove="() => removeRow(i)"
               />
             </div>
@@ -161,16 +148,6 @@
       </div>
     </div>
 
-    <!-- Dialogs: Add Site / Area / Contractor / Crusher / Export Item -->
-    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3><Input v-model="newSiteName" class="w-full mb-3" :placeholder="$t('supply.siteName')" /><div class="flex gap-2 justify-end"><Button variant="outline" @click="showAddSite = false">{{ $t('labels.cancel') }}</Button><Button @click="addSite" :disabled="!newSiteName || addingLocation">{{ addingLocation ? $t('supply.adding') : $t('labels.add') }}</Button></div><div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div></div></div>
-
-    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3><Input v-model="newAreaName" class="w-full mb-3" :placeholder="$t('supply.areaName')" /><div class="flex gap-2 justify-end"><Button variant="outline" @click="showAddArea = false">{{ $t('labels.cancel') }}</Button><Button @click="addArea" :disabled="!newAreaName || addingLocation">{{ addingLocation ? $t('supply.adding') : $t('labels.add') }}</Button></div><div v-if="locationError" class="text-red-600 text-sm mt-2">{{ locationError }}</div></div></div>
-
-    <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3><Input v-model="newContractorName" class="w-full mb-3" :placeholder="$t('contractors.name')" /><div class="flex gap-2 justify-end"><Button variant="outline" @click="showAddContractorDialog = false">{{ $t('labels.cancel') }}</Button><Button @click="createNewContractor" :disabled="!newContractorName || creatingContractor">{{ creatingContractor ? $t('supply.adding') : $t('labels.add') }}</Button></div><div v-if="contractorDialogError" class="text-red-600 text-sm mt-2">{{ contractorDialogError }}</div></div></div>
-
-    <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3><Input v-model="newCrusherName" class="w-full mb-3" :placeholder="$t('crushers.name')" /><div class="flex gap-2 justify-end"><Button variant="outline" @click="showAddCrusherDialog = false">{{ $t('labels.cancel') }}</Button><Button @click="createNewCrusher" :disabled="!newCrusherName || creatingCrusher">{{ creatingCrusher ? $t('supply.adding') : $t('labels.add') }}</Button></div><div v-if="crusherDialogError" class="text-red-600 text-sm mt-2">{{ crusherDialogError }}</div></div></div>
-
-    <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]"><div class="bg-white p-6 rounded shadow w-96"><h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3><Input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'" class="w-full mb-3" /><Input v-model.number="newExportItemForm.currentPrice" type="number" step="0.01" :placeholder="$t('labels.price')" class="w-full mb-3" /><div class="flex gap-2 justify-end"><Button variant="outline" @click="showAddExportItemDialog = false">{{ $t('labels.cancel') }}</Button><Button @click="createNewExportItem" :disabled="!newExportItemForm.name || !newExportItemForm.currentPrice || creatingExportItem">{{ creatingExportItem ? $t('supply.adding') : $t('labels.add') }}</Button></div><div v-if="exportItemDialogError" class="text-red-600 text-sm mt-2">{{ exportItemDialogError }}</div></div></div>
   </div>
 </template>
 
@@ -184,7 +161,7 @@ import DateField from '@/components/shared/DateField.vue'
 import { parseCreateExtract } from '@/validators/extracts'
 import { useCreateExtract } from '@/composables/useCreateExtract'
 import { getExtract, updateExtract } from '@/services/extracts'
-import { getContractors, getLocations, getCrushers, getExportItems, getVehicles, createLocation, createContractor, createCrusher, createExportItem, getContractorsWithVehicles } from '@/api'
+import { getContractors, getLocations, getCrushers, getExportItems, getVehicles, getContractorsWithVehicles } from '@/api'
 import normalizeItem from '@/utils/normalizeItem'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -246,31 +223,6 @@ export default {
 
     // search filters group (used by SearchDropdown v-model)
     const filters = reactive({ commonSiteSearch: '', commonAreaSearch: '', commonContractorSearch: '', commonCrusherSearch: '' })
-
-    // small dialog state + errors
-    const showAddSite = ref(false)
-    const newSiteName = ref('')
-    const showAddArea = ref(false)
-    const newAreaName = ref('')
-    const addingLocation = ref(false)
-    const pendingRow = ref(null)
-
-    const showAddContractorDialog = ref(false)
-    const newContractorName = ref('')
-    const creatingContractor = ref(false)
-    const contractorDialogError = ref('')
-
-    const showAddCrusherDialog = ref(false)
-    const newCrusherName = ref('')
-    const creatingCrusher = ref(false)
-    const crusherDialogError = ref('')
-
-    const showAddExportItemDialog = ref(false)
-    const newExportItemForm = reactive({ name: '', currentPrice: '' })
-    const creatingExportItem = ref(false)
-    const exportItemDialogError = ref('')
-
-    const locationError = ref('')
 
     const { mutateAsync } = useCreateExtract()
 
@@ -525,154 +477,6 @@ export default {
       }finally{ isSaving.value = false }
     }
 
-    // === Site/Area creation helpers ===
-    async function addSite() {
-      if (!newSiteName.value?.trim()) return
-      addingLocation.value = true
-      try {
-        const res = await createLocation({ name: newSiteName.value.trim(), parentId: null })
-        await refreshLocations()
-        const created = res?.data
-        if (created?.id) {
-          const newSite = allLocations.value.find(l => l.id === created.id)
-          if (newSite) {
-            if (currentStep.value === 1 && !pendingRow.value) {
-              commonData.site = newSite
-              filters.commonSiteSearch = newSite.name
-            }
-            if (pendingRow.value) {
-              pendingRow.value.site = newSite
-            }
-          }
-        }
-        showAddSite.value = false
-        newSiteName.value = ''
-        pendingRow.value = null
-      } catch (err) {
-        locationError.value = err?.response?.data?.message || 'Failed to add site'
-        console.error('addSite error:', err)
-      } finally {
-        addingLocation.value = false
-      }
-    }
-
-    async function addArea() {
-      if (!newAreaName.value?.trim()) return
-      const siteId = currentStep.value === 1 ? commonData.site?.id : pendingRow.value?.site?.id
-      if (!siteId) return
-      addingLocation.value = true
-      try {
-        const res = await createLocation({ name: newAreaName.value.trim(), parentId: siteId })
-        await refreshLocations()
-        const created = res?.data
-        if (created?.id) {
-          const newArea = allLocations.value.find(l => l.id === created.id)
-          if (newArea) {
-            if (currentStep.value === 1 && !pendingRow.value) {
-              commonData.area = newArea
-              filters.commonAreaSearch = newArea.name
-            }
-            if (pendingRow.value) pendingRow.value.area = newArea
-          }
-        }
-        showAddArea.value = false
-        newAreaName.value = ''
-        pendingRow.value = null
-      } catch (err) {
-        locationError.value = err?.response?.data?.message || 'Failed to add area'
-        console.error('addArea error:', err)
-      } finally {
-        addingLocation.value = false
-      }
-    }
-
-    // === Create new lookup items ===
-    async function createNewContractor() {
-      const name = newContractorName.value.trim()
-      if (!name) return
-      creatingContractor.value = true
-      contractorDialogError.value = ''
-      try {
-        const res = await createContractor({ name })
-        const createdList = res.normalized || (Array.isArray(res.data) ? res.data : [res.data])
-        await loadLookups()
-        const chosen = createdList.find(c => c.availableForSupplies) || createdList.find(c => c.availableForExports) || createdList[0]
-        const updatedContractor = contractors.value.find(c => c.id === chosen.id)
-        if (updatedContractor && currentStep.value === 1) {
-          commonData.contractor = updatedContractor
-          filters.commonContractorSearch = updatedContractor.name
-        }
-        newContractorName.value = ''
-        showAddContractorDialog.value = false
-      } catch (e) {
-        contractorDialogError.value = e?.response?.data?.message || e?.message || 'Error'
-        console.error('createNewContractor error:', e)
-      } finally {
-        creatingContractor.value = false
-      }
-    }
-
-    async function createNewCrusher() {
-      const name = newCrusherName.value.trim()
-      if (!name) return
-      creatingCrusher.value = true
-      crusherDialogError.value = ''
-      try {
-        const res = await createCrusher({ name })
-        const nc = res?.data
-        await loadLookups()
-        const updatedCrusher = crushers.value.find(c => c.id === nc?.id)
-        if (updatedCrusher && currentStep.value === 1) {
-          commonData.crusher = updatedCrusher
-          filters.commonCrusherSearch = updatedCrusher.name
-        }
-        newCrusherName.value = ''
-        showAddCrusherDialog.value = false
-      } catch (e) {
-        crusherDialogError.value = e?.response?.data?.message || e?.message || 'Error'
-        console.error('createNewCrusher error:', e)
-      } finally {
-        creatingCrusher.value = false
-      }
-    }
-
-    async function createNewExportItem() {
-      const name = newExportItemForm.name?.trim()
-      const currentPrice = newExportItemForm.currentPrice
-      if (!name || !currentPrice) {
-        exportItemDialogError.value = 'All fields required'
-        return
-      }
-      creatingExportItem.value = true
-      exportItemDialogError.value = ''
-      try {
-        const payload = { name, currentPrice: Number(currentPrice), defaultExtractPrice: Number(currentPrice), availableForExports: true, availableForExtracts: true }
-        const res = await createExportItem(payload)
-        const newItem = res?.data
-        if (!newItem || !newItem.id) throw new Error('Invalid response')
-        await loadExportItems()
-        const updatedItem = exportItems.value.find(i => i.id === newItem.id)
-        if (updatedItem && pendingRow.value && currentStep.value === 2) {
-          pendingRow.value.itemId = updatedItem.id
-          pendingRow.value.itemSearch = updatedItem.name || ''
-          const parsed = Number(updatedItem.defaultExtractPrice ?? updatedItem.currentPrice ?? updatedItem.price ?? updatedItem.current_price)
-          if (!Number.isNaN(parsed)) {
-            pendingRow.value.price = parsed
-            pendingRow.value.total = Number((parsed * Number(pendingRow.value.quantity || 0)).toFixed(2))
-          }
-        }
-        newExportItemForm.name = ''
-        newExportItemForm.currentPrice = ''
-        pendingRow.value = null
-        showAddExportItemDialog.value = false
-      } catch (e) {
-        exportItemDialogError.value = e?.response?.data?.message || e?.message || 'Error'
-        console.error('createNewExportItem error:', e)
-      } finally {
-        creatingExportItem.value = false
-      }
-    }
-
     function onCancel() {
       if (props.modalMode) {
         emit('cancelled')
@@ -707,25 +511,6 @@ export default {
       allLocations,
       contractorsWithVehicles,
       filters,
-      showAddSite,
-      newSiteName,
-      showAddArea,
-      newAreaName,
-      addingLocation,
-      pendingRow,
-      showAddContractorDialog,
-      newContractorName,
-      creatingContractor,
-      contractorDialogError,
-      showAddCrusherDialog,
-      newCrusherName,
-      creatingCrusher,
-      crusherDialogError,
-      showAddExportItemDialog,
-      newExportItemForm,
-      creatingExportItem,
-      exportItemDialogError,
-      locationError,
       subtotal,
       formatCurrency,
       isStep1Valid,
@@ -739,11 +524,6 @@ export default {
       duplicateLastRow,
       commonAvailableAreas,
       saveData,
-      addSite,
-      addArea,
-      createNewContractor,
-      createNewCrusher,
-      createNewExportItem,
       onCancel
     }
   }

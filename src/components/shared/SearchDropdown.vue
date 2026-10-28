@@ -61,6 +61,9 @@
           {{ getLabel(item) }}
         </div>
       </div>
+      <div v-else class="px-2.5 py-2 text-sm text-muted-foreground select-none">
+        {{ noResultsText }}
+      </div>
       <slot name="afterOptions"></slot>
     </div>
 
@@ -92,6 +95,9 @@
           >
             {{ getLabel(item) }}
           </div>
+        </div>
+        <div v-else class="px-2.5 py-2 text-sm text-muted-foreground select-none">
+          {{ noResultsText }}
         </div>
         <slot name="afterOptions"></slot>
       </div>
@@ -168,7 +174,7 @@ export default {
   },
   emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear'],
   setup(props, { emit }) {
-    const { locale } = useI18n()
+    const { locale, t } = useI18n()
     const instance = getCurrentInstance()
     const effectiveDir = computed(() => {
       if (props.dir) return props.dir
@@ -248,6 +254,9 @@ export default {
       }
       return item[props.itemKey] ?? index
     }
+
+    /* Empty state: shown when the search/list has no matching items */
+    const noResultsText = computed(() => String(t('labels.noResults') || 'No results found'))
 
     const filteredItems = computed(() => {
       const query = normalize(props.modelValue)
@@ -477,6 +486,7 @@ export default {
       listboxId,
       activeDescendantId,
       filteredItems,
+      noResultsText,
       hasValue,
       effectiveInputClass,
       getKey,
