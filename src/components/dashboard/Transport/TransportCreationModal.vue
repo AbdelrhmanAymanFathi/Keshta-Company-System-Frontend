@@ -5,7 +5,7 @@
       <div
         v-if="isOpen"
         :dir="isRTL ? 'rtl' : 'ltr'"
-        class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+        class="fixed inset-0 bg-black/60 flex items-center justify-center z-[var(--layout-z-modal,200)] p-4 overflow-hidden"
         @click.self="handleBackdropClick"
       >
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
@@ -79,12 +79,6 @@
                         <template #prefix>
                           <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
                         </template>
-                        <template #afterOptions>
-                          <div @mousedown.prevent="(function(){ pendingField = 'location'; showAddLocation = true })()"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
-                            + {{ $t('supply.addSite') }}
-                          </div>
-                        </template>
                       </SearchDropdown>
                     </div>
                   </div>
@@ -106,12 +100,6 @@
                         @clear="() => { commonData.area = null; filters.commonToLocSearch = '' }">
                         <template #prefix>
                           <MapPinIcon class="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5 theme-caption pointer-events-none" />
-                        </template>
-                        <template #afterOptions>
-                          <div @mousedown.prevent="(function(){ pendingField = 'area'; showAddLocation = true })()"
-                            class="px-3 py-2 theme-hover-soft cursor-pointer text-sm font-medium border-t border-gray-100 text-green-600">
-                            + {{ $t('supply.addSite') }}
-                          </div>
                         </template>
                       </SearchDropdown>
                     </div>
@@ -430,7 +418,7 @@
   </teleport>
 
   <!-- Dialog: Add Location -->
-  <div v-if="showAddLocation" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+  <div v-if="showAddLocation" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
       <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
@@ -452,7 +440,7 @@
   </div>
 
   <!-- Dialog: Add Contractor -->
-  <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+  <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
       <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3"
@@ -471,7 +459,7 @@
   </div>
 
   <!-- Dialog: Add Vehicle -->
-  <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+  <div v-if="showAddVehicleDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
     <div class="bg-white p-6 rounded shadow w-full max-w-md">
       <h3 class="text-lg font-bold mb-3">{{ $t('vehicles.addVehicle') }}</h3>
       <input v-model="newVehicleForm.name" :placeholder="$t('vehicles.name')"
@@ -497,7 +485,7 @@
   </div>
 
   <!-- Dialog: Add Item -->
-  <div v-if="showAddItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+  <div v-if="showAddItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
     <div class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-3">{{ $t('transport.addItem') || 'Add Item' }}</h3>
       <input v-model="newItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'"

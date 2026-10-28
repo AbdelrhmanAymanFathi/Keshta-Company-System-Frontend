@@ -74,7 +74,7 @@
           variant="ghost"
           @click="toggleEditLayout"
           :title="$t('dashboard.editLayout')"
-          class="dashboard-layout-edit-toggle relative flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 shadow-sm shadow-slate-950/10 sm:h-10 sm:w-10"
+          class="dashboard-layout-edit-toggle hidden h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 shadow-sm shadow-slate-950/10 sm:flex sm:h-10 sm:w-10"
           :class="[
             editLayout
               ? 'border-amber-300/60 bg-amber-400/20 text-amber-200'

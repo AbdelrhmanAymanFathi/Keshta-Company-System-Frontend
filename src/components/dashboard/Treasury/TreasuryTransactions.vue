@@ -1,35 +1,37 @@
 <template>
-  <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex flex-col gap-6 lg:flex-row">
-    <aside class="w-full lg:w-80 rounded-lg theme-surface p-4 shadow-sm lg:sticky lg:top-4 h-fit">
-      <div class="flex items-center justify-between gap-2">
-        <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
-        <span class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
+  <div :dir="isRTL ? 'rtl' : 'ltr'" class="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(18rem,20rem)_minmax(0,1fr)]">
+    <aside class="h-fit w-full min-w-0 rounded-2xl theme-surface p-4 shadow-sm sm:p-5 xl:sticky xl:top-4">
+      <div class="flex items-center justify-between gap-3 border-b border-gray-200/70 pb-3">
+        <h2 class="text-base font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
+        <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
       </div>
-      <div class="mt-4">
-        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.view') }}</label>
-        <select v-model="treasuryView" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm theme-input-focus">
-          <option value="active">{{ t('treasury.viewActive') }}</option>
-          <option value="archived">{{ t('treasury.viewArchived') }}</option>
-          <option value="all">{{ t('treasury.viewAll') }}</option>
-        </select>
-      </div>
-      <div class="mt-4">
-        <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.search') }}</label>
-        <Input v-model="treasurySearch" type="text" class="w-full" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
+      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1">
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.view') }}</label>
+          <select v-model="treasuryView" class="h-10 w-full rounded-xl border border-gray-300 px-3 text-sm theme-input-focus">
+            <option value="active">{{ t('treasury.viewActive') }}</option>
+            <option value="archived">{{ t('treasury.viewArchived') }}</option>
+            <option value="all">{{ t('treasury.viewAll') }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.search') }}</label>
+          <Input v-model="treasurySearch" type="text" class="h-10 w-full rounded-xl" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
+        </div>
       </div>
       <div v-if="!visibleTreasuries.length" class="mt-4 rounded-lg border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500">
         {{ t('labels.noData') }}
       </div>
-      <div v-else class="mt-4 space-y-2">
+      <div v-else class="mt-4 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1">
         <ShadcnButton variant="outline" size="native" v-for="(treasury, index) in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
-          :class="['w-full rounded-lg px-3 py-2 transition flex items-center justify-between', store.selectedTreasuryId === treasury.id ? 'ring-1 ring-offset-0 ring-indigo-300 bg-indigo-50' : 'border border-gray-200 hover:bg-gray-50']">
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center justify-between gap-2">
-              <span class="truncate text-sm font-medium theme-text-primary">{{ treasury.name }}</span>
-              <span class="text-xs font-semibold" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
-            </div>
-            <div class="mt-1 flex items-center gap-2 text-[11px] theme-text-secondary">
-              <span>#{{ index + 1 }}</span>
+          :aria-pressed="store.selectedTreasuryId === treasury.id"
+          :title="treasury.name"
+          :class="['!h-auto !min-h-[4.5rem] !w-full !min-w-0 !shrink !justify-start !whitespace-normal rounded-xl border px-3 py-3 text-start transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2', store.selectedTreasuryId === treasury.id ? 'theme-selected-soft theme-border-accent' : 'border-gray-200 theme-hover-soft']">
+          <div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
+            <span class="line-clamp-2 min-w-0 text-start text-sm font-semibold leading-5 theme-text-primary">{{ treasury.name }}</span>
+            <span dir="ltr" class="whitespace-nowrap text-end text-xs font-semibold tabular-nums" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
+            <div class="col-span-2 flex min-w-0 flex-wrap items-center gap-1.5 text-[11px] theme-text-secondary">
+              <span class="shrink-0">#{{ index + 1 }}</span>
               <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
               <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
             </div>
@@ -38,46 +40,46 @@
       </div>
     </aside>
 
-    <div class="min-w-0 flex-1 space-y-6">
-      <div class="rounded-lg theme-surface p-4 shadow-sm">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+    <div class="min-w-0 space-y-5">
+      <div class="rounded-2xl theme-surface p-4 shadow-sm sm:p-5">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div class="min-w-0">
             <h1 class="text-2xl font-semibold theme-heading theme-text-primary">{{ selectedTreasury?.name || t('dashboard.treasury') }}</h1>
             <div class="mt-1 flex flex-wrap items-center gap-2">
               <p class="text-sm theme-text-secondary">{{ t('treasury.ledgerTitle') }}</p>
               <span v-if="selectedTreasury" class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="selectedTreasuryIsArchived ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'">{{ selectedTreasuryIsArchived ? t('treasury.archived') : t('treasury.active') }}</span>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <div class="text-sm theme-text-secondary">{{ t('treasury.balance') }}: <span class="font-semibold">{{ formatCurrency(store.summary.balance) }}</span></div>
+          <div class="flex flex-wrap items-center gap-2 xl:justify-end">
+            <div class="me-1 text-sm theme-text-secondary">{{ t('treasury.balance') }}: <span dir="ltr" class="font-semibold tabular-nums">{{ formatCurrency(store.summary.balance) }}</span></div>
             <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('csv')">{{ exportingFormat === 'csv' ? t('labels.loading') : t('reports.downloadCsv') }}</Button>
             <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('xlsx')">{{ exportingFormat === 'xlsx' ? t('labels.loading') : t('reports.downloadExcel') }}</Button>
             <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('pdf')">{{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}</Button>
           </div>
-          <p v-if="exportError" class="text-xs text-red-600">{{ exportError }}</p>
         </div>
+        <p v-if="exportError" class="mt-3 text-xs text-red-600">{{ exportError }}</p>
       </div>
 
-      <div class="rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div class="border-b border-gray-200 px-4 py-4">
-          <div class="mb-3 flex items-center justify-between gap-3">
+      <div class="min-w-0 overflow-hidden rounded-2xl border border-gray-200 theme-surface shadow-sm">
+        <div class="border-b border-gray-200 px-4 py-5 sm:px-5">
+          <div class="mb-4 flex items-center justify-between gap-3">
             <div>
-              <h2 class="text-sm font-semibold text-gray-900">{{ t('treasury.filtersTitle') }}</h2>
-              <p class="text-xs text-gray-500">{{ t('treasury.filtersHint') }}</p>
+              <h2 class="text-base font-semibold theme-text-primary">{{ t('treasury.filtersTitle') }}</h2>
+              <p class="mt-1 text-xs theme-text-secondary">{{ t('treasury.filtersHint') }}</p>
             </div>
           </div>
-          <div class="grid gap-4 grid-cols-1 lg:grid-cols-4">
+          <div class="grid min-w-0 grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 2xl:grid-cols-4">
             <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateFrom') }}</label>
-              <DateField v-model="filters.startDate" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateFrom') }}</label>
+              <DateField v-model="filters.startDate" :dir="isRTL ? 'rtl' : 'ltr'" class="h-10 w-full min-w-0 rounded-xl border border-gray-300 px-3 text-sm focus:outline-none theme-input-focus" />
             </div>
             <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.dateTo') }}</label>
-              <DateField v-model="filters.endDate" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateTo') }}</label>
+              <DateField v-model="filters.endDate" :dir="isRTL ? 'rtl' : 'ltr'" class="h-10 w-full min-w-0 rounded-xl border border-gray-300 px-3 text-sm focus:outline-none theme-input-focus" />
             </div>
             <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.type') }}</label>
-              <select v-model="filters.type" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none theme-input-focus">
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.type') }}</label>
+              <select v-model="filters.type" class="h-10 w-full rounded-xl border border-gray-300 px-3 text-sm focus:outline-none theme-input-focus">
                 <option value="">{{ t('labels.all') }}</option>
                 <option value="DEPOSIT">{{ t('treasury.types.deposit') }}</option>
                 <option value="PAYMENT">{{ t('treasury.types.payment') }}</option>
@@ -86,20 +88,20 @@
               </select>
             </div>
             <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.amount') }}</label>
-              <Input v-model="filters.amount" type="number" step="0.01" class="w-full" />
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amount') }}</label>
+              <Input v-model="filters.amount" type="number" step="0.01" class="h-10 w-full rounded-xl" />
             </div>
           </div>
-          <div class="mt-4 grid gap-4 grid-cols-1 lg:grid-cols-[1fr_auto_auto]">
+          <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-end">
             <div>
-              <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">{{ t('treasury.search') }}</label>
-              <Input v-model="filters.search" type="text" class="w-full" :placeholder="t('treasury.searchPlaceholder')" />
+              <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.search') }}</label>
+              <Input v-model="filters.search" type="text" class="h-10 w-full rounded-xl" :placeholder="t('treasury.searchPlaceholder')" />
             </div>
-            <div class="flex items-end">
-            <Button @click="applyFilters">{{ t('labels.search') }}</Button>
+            <div class="flex">
+              <Button class="h-10 w-full sm:w-auto" @click="applyFilters">{{ t('labels.search') }}</Button>
             </div>
-            <div class="flex items-end">
-            <Button variant="outline" @click="resetFilters">{{ t('labels.reset') }}</Button>
+            <div class="flex">
+              <Button variant="outline" class="h-10 w-full sm:w-auto" @click="resetFilters">{{ t('labels.reset') }}</Button>
             </div>
           </div>
         </div>
@@ -107,69 +109,69 @@
         <div v-if="loading" class="px-6 py-12 text-center text-sm text-gray-500">{{ t('labels.loading') }}</div>
         <div v-else-if="error" class="px-6 py-12 text-center text-sm text-red-600">{{ error }}</div>
         <div v-else-if="!transactions.length" class="px-6 py-12 text-center text-sm text-gray-500">{{ t('treasury.noTransactions') }}</div>
-        <div v-else>
-          <table v-app-table class="app-table divide-y divide-gray-200">
+        <div v-else class="treasury-transactions-scroll min-w-0">
+          <table v-app-table class="treasury-transactions-table w-full min-w-[1225px] table-fixed divide-y divide-gray-200">
             <colgroup>
-              <col style="width: 9%" />
-              <col style="width: 11%" />
-              <col style="width: 8%" />
-              <col style="width: 11%" />
-              <col style="width: 15%" />
-              <col style="width: 16%" />
-              <col style="width: 9%" />
-              <col style="width: 9%" />
-              <col style="width: 12%" />
+              <col style="width: 110px" />
+              <col style="width: 135px" />
+              <col style="width: 100px" />
+              <col style="width: 130px" />
+              <col style="width: 195px" />
+              <col style="width: 205px" />
+              <col style="width: 110px" />
+              <col style="width: 110px" />
+              <col style="width: 130px" />
             </colgroup>
             <thead class="bg-gray-50">
               <tr>
                 <!-- The list is ordered by the operation date, so the sort toggle lives on it -->
-                <th data-col="subtitle" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']"
+                <th data-col="subtitle" :class="['px-3 py-3 text-xs font-semibold theme-text-secondary cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']"
                   @click="toggleSortOrder">
                   {{ isRTL ? 'تاريخ العملية' : 'Operation date' }}
                   <SortIcon :active="true" :dir="sortOrder" />
                 </th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'تاريخ التسجيل' : 'Entered at' }}</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
-                <th data-col="title" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">تفاصيل العملية</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-gray-500', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.updatedBy') }}</th>
-                <th data-col="amount" class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ t('treasury.amount') }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'تاريخ التسجيل' : 'Entered at' }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'تفاصيل العملية' : 'Operation details' }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.createdBy') }}</th>
+                <th :class="['px-3 py-3 text-xs font-semibold theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.updatedBy') }}</th>
+                <th data-col="amount" class="px-3 py-3 text-end text-xs font-semibold theme-text-secondary">{{ t('treasury.amount') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
+            <tbody class="divide-y divide-gray-200 theme-surface">
               <tr v-for="tx in transactions" :key="tx.id" class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm font-medium text-gray-800 whitespace-nowrap">{{ formatDate(tx.date || tx.createdAt) }}</td>
-                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
-                <td class="px-4 py-3 text-sm">
+                <td dir="ltr" class="whitespace-nowrap px-3 py-3 text-start text-sm font-medium theme-text-primary">{{ formatDate(tx.date || tx.createdAt) }}</td>
+                <td dir="ltr" class="whitespace-nowrap px-3 py-3 text-start text-sm theme-text-secondary">{{ formatDateTime(tx.createdAt || tx.date) }}</td>
+                <td class="whitespace-nowrap px-3 py-3 text-sm">
                   <Badge variant="outline" :class="badgeClass(tx.type)">{{ txTypeLabel(tx.type) }}</Badge>
                 </td>
-                <td class="px-4 py-3 text-sm">
+                <td class="px-3 py-3 text-sm leading-5">
                   <span v-if="tx.refId" class="cursor-pointer font-medium text-blue-600 hover:text-blue-800 hover:underline" @click="navigateToSource(tx)">{{ formatSource(tx) }}</span>
-                  <span v-else class="text-gray-700">{{ formatSource(tx) }}</span>
+                  <span v-else class="theme-text-primary">{{ formatSource(tx) }}</span>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-700">{{ displayDescription(tx) }}</td>
+                <td class="break-words px-3 py-3 text-sm leading-5 theme-text-primary">{{ displayDescription(tx) }}</td>
                 <!-- عمود تفاصيل العملية -->
-                <td class="px-4 py-3 text-sm" style="min-width:160px">
-                  <div class="space-y-1">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-xs font-semibold text-gray-400">النوع:</span>
-                      <span class="text-xs font-bold text-gray-700">{{ refTypeLabel(tx.refType) }}</span>
+                <td class="px-3 py-3 text-sm">
+                  <div class="min-w-0 space-y-1.5 leading-5">
+                    <div class="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
+                      <span class="text-xs font-semibold theme-text-muted">{{ t('treasury.type') }}:</span>
+                      <span class="break-words text-xs font-bold theme-text-primary">{{ refTypeLabel(tx.refType) }}</span>
                     </div>
-                    <div v-if="tx.refId" class="flex items-center gap-1.5">
-                      <span class="text-xs font-semibold text-gray-400">المرجع:</span>
-                      <span class="text-xs font-bold text-indigo-600">#{{ tx.refId }}</span>
+                    <div v-if="tx.refId" class="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
+                      <span class="text-xs font-semibold theme-text-muted">{{ t('company.wallet.reference') }}:</span>
+                      <span dir="ltr" class="whitespace-nowrap text-xs font-bold text-indigo-600">#{{ tx.refId }}</span>
                     </div>
-                    <div v-if="tx.source" class="flex items-center gap-1.5">
-                      <span class="text-xs font-semibold text-gray-400">المصدر:</span>
-                      <span class="text-xs text-gray-700">{{ tx.source }}</span>
+                    <div v-if="tx.source" class="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
+                      <span class="text-xs font-semibold theme-text-muted">{{ t('treasury.source') }}:</span>
+                      <span class="break-words text-xs theme-text-primary">{{ tx.source }}</span>
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-600">{{ tx.createdBy?.name || tx.createdByName || '-' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-600">{{ tx.updatedBy?.name || tx.updatedByName || '-' }}</td>
-                <td class="px-4 py-3 text-right text-sm font-semibold" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
+                <td class="break-words px-3 py-3 text-sm leading-5 theme-text-secondary">{{ tx.createdBy?.name || tx.createdByName || '-' }}</td>
+                <td class="break-words px-3 py-3 text-sm leading-5 theme-text-secondary">{{ tx.updatedBy?.name || tx.updatedByName || '-' }}</td>
+                <td dir="ltr" class="whitespace-nowrap px-3 py-3 text-end text-sm font-semibold tabular-nums" :class="Number(tx.amount) >= 0 ? 'text-emerald-600' : 'text-red-600'">
                   {{ formatCurrency(tx.amount) }}
                 </td>
               </tr>
@@ -264,7 +266,12 @@ export default {
     }
 
     const refTypeLabel = (refType) => {
-      const map = { EXPENSE: 'مصروف', TRANSFER: 'تحويل', TOPUP: 'إيداع مباشر', PAYMENT: 'سداد' }
+      const map = {
+        EXPENSE: t('expenses.expense'),
+        TRANSFER: t('transfer'),
+        TOPUP: t('treasury.types.deposit'),
+        PAYMENT: t('treasury.types.payment'),
+      }
       return map[refType] || refType || '—'
     }
 
@@ -538,6 +545,13 @@ export default {
 </script>
 
 <style scoped>
+.treasury-transactions-scroll {
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: clip;
+  overscroll-behavior-x: contain;
+}
+
 .tx-fade-enter-active,
 .tx-fade-leave-active {
   transition: opacity 0.18s ease;

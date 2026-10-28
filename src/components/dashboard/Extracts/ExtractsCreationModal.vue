@@ -12,7 +12,7 @@
       <transition name="kc-modal">
         <div
           v-if="isOpen"
-          class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4 overflow-hidden"
+          class="fixed inset-0 bg-black/60 flex items-center justify-center z-[var(--layout-z-modal,200)] p-4 overflow-hidden"
           :dir="isRTL ? 'rtl' : 'ltr'"
           @click.self="closeModal"
         >
@@ -296,73 +296,22 @@
                     <tbody class="divide-y divide-gray-200 bg-white">
                       <tr v-for="(row, index) in rows" :key="row.id">
                         <td class="px-4 py-3 text-center text-sm theme-text-secondary">{{ index + 1 }}</td>
-                        <td class="px-3 py-2" :ref="el => row.itemCell = el">
-                          <div class="relative">
-                            <div
-                              class="border border-gray-300 rounded px-2 py-1 flex items-center justify-between cursor-pointer focus-within:theme-input-focus"
-                              @mousedown.prevent="toggleItemDropdown(row)"
-                            >
-                              <input
-                                v-model="row.itemSearch"
-                                type="text"
-                                :placeholder="row.item?.name || $t('labels.item')"
-                                :class="['outline-none flex-1 text-sm bg-transparent', (row.itemSearch || row.item) ? 'pe-8' : '']"
-                                @keydown.enter.prevent
-                                @keydown.escape="row.itemOpen = false"
-                                @keydown="onItemDropdownKeydown($event, row)"
-                                @mousedown.prevent=""
-                                @focus="row.itemOpen = true"
-                                @blur="row.itemOpen = false"
-                              />
-                              <span class="theme-caption">▾</span>
-                              <ShadcnButton variant="outline" size="native"
-                                v-if="row.itemSearch || row.item"
-                                type="button"
-                                tabindex="-1"
-                                class="absolute end-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-lg leading-none text-gray-400 hover:text-gray-600 focus:outline-none"
-                                :aria-label="$t('labels.clear')"
-                                @mousedown.prevent
-                                @click="() => { row.item = null; row.itemId = ''; row.itemSearch = '' }"
-                              >
-                                ×
-                              </ShadcnButton>
-                            </div>
-
-                            <teleport to=".modal-body-container" v-if="row.itemOpen">
-                              <div
-                                class="extract-item-dropdown absolute border border-gray-200 bg-white rounded-md max-h-40 overflow-y-auto shadow-2xl z-[9999]"
-                                :style="getItemDropdownStyle(row)"
-                                @click.stop
-                              >
-                                <div
-                                  v-if="filteredExtractItems(row).length === 0"
-                                  class="px-3 py-2 text-sm theme-text-muted text-start"
-                                >
-                                  {{ $t('labels.noResults') || 'No items found' }}
-                                </div>
-
-                                <div
-                                  v-for="(item, itemIndex) in filteredExtractItems(row)"
-                                  :key="item.id"
-                                  @mousedown.prevent="selectRowItem(row, item)"
-                                  @mousemove="row.highlightedItemIndex = itemIndex"
-                                  :class="[
-                                    'px-3 py-2 cursor-pointer text-sm border-b border-gray-50 last:border-b-0 text-start',
-                                    itemIndex === row.highlightedItemIndex ? 'theme-icon-bg' : 'theme-hover-soft'
-                                  ]"
-                                >
-                                  {{ item.name }}
-                                </div>
-
-                                <!-- <div
-                                  @mousedown.prevent="pendingItemRow = row; row.itemOpen = false; showAddExportItemDialog = true"
-                                  class="px-3 py-2 text-green-600 hover:bg-green-50 cursor-pointer text-sm font-medium text-start"
-                                >
-                                  + {{ $t('labels.addNew') }}
-                                </div> -->
-                              </div>
-                            </teleport>
-                          </div>
+                        <td class="px-3 py-2">
+                          <SearchDropdown
+                            v-model="row.itemSearch"
+                            :items="extractItems"
+                            :allItems="extractItems"
+                            itemLabel="name"
+                            :placeholder="$t('labels.item')"
+                            :inputClass="'w-full px-2 py-1 text-sm theme-input-focus'"
+                            :dir="isRTL ? 'rtl' : 'ltr'"
+                            teleportTarget="body"
+                            clearable
+                            :clearAriaLabel="$t('labels.clear')"
+                            @select="(item) => selectRowItem(row, item)"
+                            @clear="() => clearRowItem(row)"
+                            @keydown.delete="(event) => clearRowItem(row, event)"
+                          />
                         </td>
                         <td class="px-3 py-2">
                           <input
@@ -453,7 +402,7 @@
       </transition>
     </teleport>
 
-    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div v-if="showAddSite" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
         <input v-model="newSiteName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.siteName')" />
@@ -467,7 +416,7 @@
       </div>
     </div>
 
-    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div v-if="showAddArea" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('supply.addArea') }}</h3>
         <input v-model="newAreaName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('supply.areaName')" />
@@ -481,7 +430,7 @@
       </div>
     </div>
 
-    <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div v-if="showAddContractorDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('contractors.addContractor') }}</h3>
         <input v-model="newContractorName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('contractors.name')" />
@@ -495,7 +444,7 @@
       </div>
     </div>
 
-    <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div v-if="showAddCrusherDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-2">{{ $t('crushers.addCrusher') }}</h3>
         <input v-model="newCrusherName" class="w-full border rounded px-2 py-1 mb-3" :placeholder="$t('crushers.name')" />
@@ -509,7 +458,7 @@
       </div>
     </div>
 
-    <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[2000]">
+    <div v-if="showAddExportItemDialog" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
       <div class="bg-white p-6 rounded shadow w-96">
         <h3 class="text-lg font-bold mb-3">{{ $t('labels.addExportItem') || 'Add Export Item' }}</h3>
         <input v-model="newExportItemForm.name" :placeholder="$t('labels.itemName') || 'Item Name'" class="w-full border rounded px-2 py-1 mb-3" />
@@ -658,107 +607,7 @@ export default {
       if (this.isOpen || this.items.length) this.loadExportItems()
     }
   },
-  mounted() {
-    document.addEventListener('click', this.handleGlobalClick)
-  },
-
-  beforeUnmount() {
-    document.removeEventListener('click', this.handleGlobalClick)
-  },
   methods: {
-    handleGlobalClick(e) {
-      const isClickInDropdown = e.target.closest('.extract-item-dropdown')
-      const isClickInTable = e.target.closest('table')
-
-      if (!isClickInDropdown && !isClickInTable) {
-        this.rows.forEach(row => {
-          row.itemOpen = false
-        })
-      }
-    },
-
-    toggleItemDropdown(row) {
-      this.rows.forEach(r => {
-        if (r !== row) r.itemOpen = false
-      })
-
-      row.itemOpen = !row.itemOpen
-
-      if (row.itemOpen) {
-        this.$nextTick(() => {
-          const input = row.itemCell?.querySelector('input')
-          if (input) input.focus()
-        })
-      }
-    },
-
-    filteredExtractItems(row) {
-      const q = (row.itemSearch || '').toLowerCase().trim()
-
-      if (!q) return this.extractItems
-
-      return this.extractItems.filter(item =>
-        (item.name || '').toLowerCase().includes(q)
-      )
-    },
-
-    getItemDropdownStyle(row) {
-      if (!row.itemCell) return {}
-
-      const rect = row.itemCell.getBoundingClientRect()
-      const container = document.querySelector('.modal-body-container')
-      const containerRect = container?.getBoundingClientRect()
-
-      if (!container || !containerRect) return {}
-
-      const top = rect.bottom - containerRect.top + container.scrollTop + 4
-      const left = rect.left - containerRect.left + container.scrollLeft
-
-      return {
-        top: `${top}px`,
-        left: `${left}px`,
-        width: `${rect.width}px`,
-        zIndex: '9999'
-      }
-    },
-
-    onItemDropdownKeydown(event, row) {
-      // Allow Delete to clear the item when focused
-      if (event.key === 'Delete' && (row.itemSearch || row.item)) {
-        event.preventDefault()
-        row.item = null
-        row.itemId = ''
-        row.itemSearch = ''
-        row.itemOpen = false
-        return
-      }
-
-      const items = this.filteredExtractItems(row)
-
-      if (!items.length) return
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault()
-        row.highlightedItemIndex = Math.min(
-          (row.highlightedItemIndex || 0) + 1,
-          items.length - 1
-        )
-      }
-
-      if (event.key === 'ArrowUp') {
-        event.preventDefault()
-        row.highlightedItemIndex = Math.max(
-          (row.highlightedItemIndex || 0) - 1,
-          0
-        )
-      }
-
-      if (event.key === 'Enter') {
-        event.preventDefault()
-        const selected = items[row.highlightedItemIndex || 0]
-        if (selected) this.selectRowItem(row, selected)
-      }
-    },
     getDefaultCommonData() {
       return {
         dateFrom: '',
@@ -777,9 +626,6 @@ export default {
         itemId: '',
         item: null,
         itemSearch: '',
-        itemOpen: false,
-        highlightedItemIndex: 0,
-        itemCell: null,
         quantity: '',
         price: '',
         discount: 0,
@@ -934,8 +780,6 @@ export default {
       row.item = item
       row.itemId = item.id
       row.itemSearch = item.name
-      row.itemOpen = false
-      row.highlightedItemIndex = 0
 
       const maybePrice =
         item.currentPrice ??
@@ -955,6 +799,13 @@ export default {
       this.$nextTick(() => {
         row.quantityInput?.focus?.()
       })
+    },
+    clearRowItem(row, event) {
+      if (!row.itemSearch && !row.item) return
+      event?.preventDefault()
+      row.item = null
+      row.itemId = ''
+      row.itemSearch = ''
     },
     selectSite(site) {
       this.commonData.site = site

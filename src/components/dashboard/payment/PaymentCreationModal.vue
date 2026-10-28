@@ -4,7 +4,7 @@
       <transition name="kc-modal">
         <div
           v-if="isVisible"
-          class="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden bg-black/60 p-4"
+          class="fixed inset-0 z-[var(--layout-z-modal,200)] flex items-center justify-center overflow-hidden bg-black/60 p-4"
           :dir="isRTL ? 'rtl' : 'ltr'"
           @click.self="closeModal"
         >
