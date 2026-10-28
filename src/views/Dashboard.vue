@@ -400,7 +400,7 @@
               variant="ghost"
               @click="selectVertical(item.routeName)"
               :title="effectiveCollapsed ? $t(item.label) : undefined"
-              :class="['sidebar-link group flex w-full items-center gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item') : (currentRouteName === item.routeName ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+              :class="['sidebar-link group flex w-full items-center justify-start gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-1.5', item.routeName === 'admin-reports-list' ? (isReportsListActive ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item') : (currentRouteName === item.routeName ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item'), effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
               <div
                 class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 flex-shrink-0 items-center justify-center theme-rounded transition-all duration-200"
                 :class="(item.routeName === 'admin-reports-list' ? isReportsListActive : currentRouteName === item.routeName) ? 'scale-110' : ''"
@@ -425,7 +425,7 @@
                   variant="ghost"
                   @click="openReport(r.id)"
                   :title="effectiveCollapsed ? ($i18n.locale === 'ar' ? (r.arTitle || r.title) : (r.title || r.arTitle)) : undefined"
-                  :class="['sidebar-link group flex w-full items-center gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
+                  :class="['sidebar-link group flex w-full items-center justify-start gap-3 theme-rounded px-3 py-2.5 transition-all duration-200 hover:scale-[1.02] hover:shadow-md sm:px-4 sm:py-3', isDynamicReportActive(r) ? 'sidebar-link-active theme-sidebar-item-active' : 'theme-sidebar-item', effectiveCollapsed ? 'sidebar-link-collapsed justify-center px-2.5 py-2.5' : '']">
                   <div
                     class="sidebar-link-icon theme-sidebar-icon flex h-9 w-9 items-center justify-center theme-rounded transition-all duration-200"
                     :class="isDynamicReportActive(r) ? 'scale-110' : ''"

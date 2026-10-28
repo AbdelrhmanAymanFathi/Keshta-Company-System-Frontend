@@ -1,7 +1,7 @@
 <template>
   <Button
     variant="ghost"
-    :size="size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon'"
+    :size="buttonSize"
     type="button"
     :disabled="disabled || loading"
     :title="label"
@@ -52,6 +52,20 @@ export default {
     loading: { type: Boolean, default: false },
   },
   emits: ['click'],
+  computed: {
+    /**
+     * Labeled buttons must not be forced into the square "icon-*" sizes,
+     * otherwise the text gets clipped (e.g. "Change owner" row action).
+     */
+    buttonSize() {
+      if (this.label && this.showLabel) {
+        if (this.size === 'sm') return 'sm'
+        if (this.size === 'lg') return 'lg'
+        return 'default'
+      }
+      return this.size === 'sm' ? 'icon-sm' : this.size === 'lg' ? 'icon-lg' : 'icon'
+    },
+  },
 }
 </script>
 
