@@ -1628,8 +1628,8 @@ body,
   --theme-navbar-py: 0.625rem;
   --layout-sidebar-slim: 4.5rem;
   --layout-sidebar-slim-plus: 5rem;
-  --layout-sidebar-expanded: 17rem;
-  --layout-sidebar-expanded-lg: 18rem;
+  --layout-sidebar-expanded: 16rem;
+  --layout-sidebar-expanded-lg: 17rem;
   --layout-sidebar-drawer: 18rem;
   --layout-sidebar-mobile: clamp(260px, 82vw, 340px);
   --layout-motion-duration: 280ms;
@@ -2044,8 +2044,16 @@ body,
   height: 100dvh;
 }
 
+/* Floating desktop panel (overlay/drawer): small top/bottom gaps
+   so the panel floats like the top navbar instead of touching the edges */
+.layout-sidebar--floating.layout-sidebar--desktop {
+  inset-block: 0.5rem;
+  height: auto;
+}
+
 .layout-sidebar--inline {
   position: relative;
+  margin-block: 0.5rem;
 }
 
 /* Closed off-canvas (floating + mobile) */

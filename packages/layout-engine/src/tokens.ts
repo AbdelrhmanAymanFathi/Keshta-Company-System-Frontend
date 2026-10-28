@@ -5,8 +5,8 @@ export const LAYOUT_TOKENS = {
   sidebar: {
     slimWidth: '4.5rem',
     slimPlusWidth: '5rem',
-    expandedWidth: '17rem',
-    expandedWidthLg: '18rem',
+    expandedWidth: '16rem',
+    expandedWidthLg: '17rem',
     drawerWidth: '18rem',
     mobileWidth: 'clamp(260px, 82vw, 340px)'
   },
