@@ -116,6 +116,34 @@
             class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus"
           />
         </div>
+
+        <!-- Due From (minimum outstanding) -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('dueFrom') }}</label>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            v-model="filters.dueFrom"
+            @blur="clampDueField('dueFrom')"
+            :placeholder="isRTL ? 'من' : 'Min'"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus"
+          />
+        </div>
+
+        <!-- Due To (maximum outstanding) -->
+        <div>
+          <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('dueTo') }}</label>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            v-model="filters.dueTo"
+            @blur="clampDueField('dueTo')"
+            :placeholder="isRTL ? 'إلى' : 'Max'"
+            class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none theme-input-focus"
+          />
+        </div>
       </div>
 
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2 border-t border-slate-100 flex-wrap">
@@ -505,6 +533,8 @@ export default {
       areaId: '',
       startDate: '',
       endDate: '',
+      dueFrom: '',
+      dueTo: '',
       onlyAddedAndReversals: false,
       reportVariant: 'simple'
     })
@@ -565,6 +595,8 @@ export default {
           clear: 'Reset',
           dateFrom: 'Date From',
           dateTo: 'Date To',
+          dueFrom: 'Due From',
+          dueTo: 'Due To',
           noData: 'No transactions found. Choose a different range or filter.',
           loading: 'Loading activities...',
           totals: 'Totals',
@@ -618,6 +650,8 @@ export default {
           clear: 'إعادة ضبط',
           dateFrom: 'من تاريخ',
           dateTo: 'إلى تاريخ',
+          dueFrom: 'المستحق من',
+          dueTo: 'المستحق إلى',
           noData: 'لا توجد حركات للفترة أو الفلاتر المحددة.',
           loading: 'جاري تحميل الحركات...',
           totals: 'الإجماليات',
@@ -682,7 +716,7 @@ export default {
 
     const loadReport = async () => {
       error.value = null
-      
+
       // Basic range validation
       if (filters.value.startDate && filters.value.endDate) {
         const s = new Date(filters.value.startDate)
@@ -694,6 +728,14 @@ export default {
             : 'End date must be greater than or equal to Start date'
           return
         }
+      }
+
+      // Due range (المستحق من / إلى): swap values automatically if "from" > "to"
+      const from = parseFloat(filters.value.dueFrom)
+      const to = parseFloat(filters.value.dueTo)
+      if (!Number.isNaN(from) && !Number.isNaN(to) && from > to) {
+        filters.value.dueFrom = String(to)
+        filters.value.dueTo = String(from)
       }
 
       loading.value = true
@@ -712,6 +754,14 @@ export default {
       }
     }
 
+    // Keep the due range fields non-negative, matching the backend's min 0 rule
+    const clampDueField = (key) => {
+      const val = parseFloat(filters.value[key])
+      if (!Number.isNaN(val) && val < 0) {
+        filters.value[key] = ''
+      }
+    }
+
     const clearFilters = () => {
       filters.value = {
         contractorId: '',
@@ -720,6 +770,8 @@ export default {
         areaId: '',
         startDate: '',
         endDate: '',
+        dueFrom: '',
+        dueTo: '',
         onlyAddedAndReversals: false,
         reportVariant: 'simple'
       }
@@ -873,6 +925,7 @@ export default {
       t,
       loadReport,
       clearFilters,
+      clampDueField,
       refresh,
       downloadReport,
       getModuleClass,
