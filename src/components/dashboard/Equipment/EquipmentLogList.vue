@@ -975,6 +975,13 @@ export default {
           }
         }
 
+        if (!isEditing.value) {
+          try {
+            localStorage.removeItem('equipmentLogCreationModalDraft')
+          } catch (storageError) {
+            console.warn('Failed to clear equipment log draft after save:', storageError)
+          }
+        }
         closeModal()
         // Refresh store listing if available
         if (typeof equipmentLogsStore.fetchRentals === 'function') equipmentLogsStore.fetchRentals()

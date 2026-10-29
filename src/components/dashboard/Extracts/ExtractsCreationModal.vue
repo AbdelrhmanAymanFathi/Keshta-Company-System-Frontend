@@ -419,6 +419,7 @@ export default {
       isOpen: false,
       currentStep: 1,
       isSaving: false,
+      isRestoringDraft: false,
       saveError: '',
       tableRef: null,
       commonData: this.getDefaultCommonData(),
@@ -467,6 +468,18 @@ export default {
   watch: {
     '$i18n.locale'() {
       if (this.isOpen || this.items.length) this.loadExportItems()
+    },
+    commonData: {
+      deep: true,
+      handler() {
+        this.persistExtractDraft()
+      }
+    },
+    rows: {
+      deep: true,
+      handler() {
+        this.persistExtractDraft()
+      }
     }
   },
   methods: {
@@ -509,6 +522,7 @@ export default {
       }
     },
     async openModal() {
+      this.isRestoringDraft = true
       this.resetState()
       this.isOpen = true
       await this.loadInitialData()
@@ -564,10 +578,111 @@ export default {
         }
       } else {
         this.loadCommonDataFromStorage()
+        this.restoreExtractDraftIfPresent()
+      }
+      this.isRestoringDraft = false
+    },
+    extractDraftEntity(value) {
+      return value ? { id: value.id, name: value.name } : null
+    },
+    persistExtractDraft() {
+      if (!this.isOpen || this.isRestoringDraft || this.isSaving || this.isEditing) return
+      try {
+        if (!this.hasUnsavedData()) {
+          localStorage.removeItem('extractsCreationModalDraft')
+          return
+        }
+        localStorage.setItem('extractsCreationModalDraft', JSON.stringify({
+          currentStep: this.currentStep,
+          commonData: {
+            dateFrom: this.commonData.dateFrom,
+            dateTo: this.commonData.dateTo,
+            site: this.extractDraftEntity(this.commonData.site),
+            area: this.extractDraftEntity(this.commonData.area),
+            contractor: this.extractDraftEntity(this.commonData.contractor),
+            crusher: this.extractDraftEntity(this.commonData.crusher),
+            notes: this.commonData.notes
+          },
+          rows: this.rows.map(row => ({
+            itemId: row.itemId,
+            item: this.extractDraftEntity(row.item),
+            itemSearch: row.itemSearch,
+            quantity: row.quantity,
+            price: row.price,
+            discount: row.discount,
+            total: row.total
+          }))
+        }))
+      } catch (err) {
+        console.warn('Failed to save extracts draft:', err)
+      }
+    },
+    restoreExtractDraftIfPresent() {
+      let savedDraft
+      try {
+        savedDraft = localStorage.getItem('extractsCreationModalDraft')
+      } catch (err) {
+        console.warn('Failed to read extracts draft:', err)
+        return
+      }
+      if (!savedDraft) return
+
+      try {
+        const draft = JSON.parse(savedDraft)
+        const message = this.isRTL
+          ? 'توجد مسودة مستخلصات محفوظة. هل تريد استرجاعها؟'
+          : 'A saved extracts draft was found. Would you like to restore it?'
+        if (!window.confirm(message)) {
+          localStorage.removeItem('extractsCreationModalDraft')
+          return
+        }
+        const common = draft.commonData || {}
+        const findById = (list, id) => (list || []).find(item => String(item.id) === String(id)) || null
+        const findLocation = id => {
+          const visit = locations => {
+            for (const location of locations || []) {
+              if (String(location.id) === String(id)) return location
+              const child = visit(location.children)
+              if (child) return child
+            }
+            return null
+          }
+          return visit(this.allLocations)
+        }
+        this.commonData.dateFrom = common.dateFrom || ''
+        this.commonData.dateTo = common.dateTo || ''
+        this.commonData.site = findLocation(common.site?.id)
+        this.commonData.area = findLocation(common.area?.id)
+        this.commonData.contractor = findById(this.contractors, common.contractor?.id)
+        this.commonData.crusher = findById(this.crushers, common.crusher?.id)
+        this.commonData.notes = common.notes || ''
+        this.filters.commonSiteSearch = this.commonData.site?.name || ''
+        this.filters.commonAreaSearch = this.commonData.area?.name || ''
+        this.filters.commonContractorSearch = this.commonData.contractor?.name || ''
+        this.filters.commonCrusherSearch = this.commonData.crusher?.name || ''
+        this.rows = (Array.isArray(draft.rows) ? draft.rows : []).map(saved => {
+          const item = findById(this.items, saved.itemId || saved.item?.id)
+          return {
+            ...this.getDefaultRow(),
+            itemId: saved.itemId || item?.id || '',
+            item,
+            itemSearch: item?.name || saved.itemSearch || saved.item?.name || '',
+            quantity: saved.quantity ?? '',
+            price: saved.price ?? '',
+            discount: saved.discount ?? 0,
+            total: saved.total ?? 0
+          }
+        })
+        if (!this.rows.length && draft.currentStep === 2) this.rows = [this.getDefaultRow()]
+        this.currentStep = draft.currentStep === 2 ? 2 : 1
+      } catch (err) {
+        console.warn('Failed to restore extracts draft:', err)
+        localStorage.removeItem('extractsCreationModalDraft')
       }
     },
     closeModal() {
       if (!this.isEditing) {
+        this.persistExtractDraft()
         this.saveCommonDataToStorage()
       }
       this.isOpen = false
@@ -806,7 +921,8 @@ export default {
       }
     },
     handleBeforeUnload(event) {
-      if (!this.isOpen || !this.hasUnsavedData()) return
+      if (!this.isOpen || this.isSaving || !this.hasUnsavedData()) return
+      this.persistExtractDraft()
       event.preventDefault()
       event.returnValue = ''
     },
@@ -891,6 +1007,13 @@ export default {
           res = await createExtract(payload)
         }
 
+        if (!this.isEditing) {
+          try {
+            localStorage.removeItem('extractsCreationModalDraft')
+          } catch (storageError) {
+            console.warn('Failed to clear extracts draft after save:', storageError)
+          }
+        }
         this.$emit('saved', res)
         this.closeModal()
       } catch (error) {

@@ -496,6 +496,7 @@ export default {
         notes: ''
       },
       isSaving: false,
+      isRestoringDraft: false,
       locations: [],
       contractors: [],
       contractorsWithVehicles: [],
@@ -622,9 +623,26 @@ export default {
       }
     }
     ,
+    commonData: {
+      deep: true,
+      handler() {
+        this.persistTransportDraft()
+      }
+    },
+    rows: {
+      deep: true,
+      handler() {
+        this.persistTransportDraft()
+      }
+    },
     'commonData.area'() {
       // auto-save selected area to localStorage whenever it changes
       try {
+        try {
+          localStorage.removeItem('transportCreationModalDraft')
+        } catch (storageError) {
+          console.warn('Failed to clear transport draft after save:', storageError)
+        }
         this.saveCommonDataToStorage()
       } catch (err) {
         console.warn('Failed to auto-save area to storage', err)
@@ -698,14 +716,131 @@ export default {
       this.currentStep = 1
     },
     async openModal() {
+      this.isRestoringDraft = true
       this.currentStep = 1
       this.rows = []
       this.saveError = ''
-      await this.loadInitialData()
-      this.loadCommonDataFromStorage()
-      if (this.transport) {
-        this.populateForm()
+      try {
+        await this.loadInitialData()
+        if (this.transport) {
+          this.loadCommonDataFromStorage()
+          this.populateForm()
+          return
+        }
+
+        const savedDraft = localStorage.getItem('transportCreationModalDraft')
+        if (savedDraft) {
+          try {
+            const draft = JSON.parse(savedDraft)
+            const message = this.isRTL
+              ? 'توجد مسودة نقل محفوظة. هل تريد استرجاعها؟'
+              : 'A saved transport draft was found. Would you like to restore it?'
+            if (window.confirm(message)) {
+              this.restoreTransportDraft(draft)
+            } else {
+              localStorage.removeItem('transportCreationModalDraft')
+              this.loadCommonDataFromStorage()
+            }
+          } catch (err) {
+            console.warn('Failed to restore transport draft:', err)
+            localStorage.removeItem('transportCreationModalDraft')
+            this.loadCommonDataFromStorage()
+          }
+        } else {
+          this.loadCommonDataFromStorage()
+        }
+      } finally {
+        this.isRestoringDraft = false
       }
+    },
+    transportDraftEntity(value) {
+      return value ? { id: value.id, name: value.name } : null
+    },
+    persistTransportDraft() {
+      if (!this.isOpen || this.isRestoringDraft || this.isSaving || this.transport) return
+      try {
+        if (!this.hasUnsavedData()) {
+          localStorage.removeItem('transportCreationModalDraft')
+          return
+        }
+        localStorage.setItem('transportCreationModalDraft', JSON.stringify({
+          currentStep: this.currentStep,
+          commonData: {
+            date: this.commonData.date,
+            item: this.transportDraftEntity(this.commonData.item),
+            location: this.transportDraftEntity(this.commonData.location),
+            area: this.transportDraftEntity(this.commonData.area),
+            vehicle: this.transportDraftEntity(this.commonData.vehicle),
+            contractor: this.transportDraftEntity(this.commonData.contractor),
+            distanceKm: this.commonData.distanceKm,
+            firstKmPrice: this.commonData.firstKmPrice,
+            perKmPrice: this.commonData.perKmPrice,
+            notes: this.commonData.notes,
+            vehicleCompanyCapacity: this.vehicleCompanyCapacity
+          },
+          rows: this.rows.map(row => ({
+            date: row.date,
+            discount: row.discount,
+            companyCapacity: row.companyCapacity,
+            count: row.count,
+            distanceKm: row.distanceKm,
+            vehicle: this.transportDraftEntity(row.vehicle),
+            search: row.search
+          }))
+        }))
+      } catch (err) {
+        console.warn('Failed to save transport draft:', err)
+      }
+    },
+    restoreTransportDraft(draft) {
+      const common = draft?.commonData || {}
+      const findById = (list, id) => (list || []).find(item => String(item.id) === String(id)) || null
+      const findLocation = id => {
+        const visit = locations => {
+          for (const location of locations || []) {
+            if (String(location.id) === String(id)) return location
+            const child = visit(location.children)
+            if (child) return child
+          }
+          return null
+        }
+        return visit(this.locations)
+      }
+
+      this.commonData.date = common.date || ''
+      this.commonData.item = findById(this.items, common.item?.id)
+      this.commonData.location = findLocation(common.location?.id)
+      this.commonData.area = findLocation(common.area?.id)
+      this.commonData.contractor = findById(this.contractors, common.contractor?.id)
+      this.commonData.vehicle = findById(this.vehicles, common.vehicle?.id)
+      this.commonData.distanceKm = common.distanceKm || 0
+      this.commonData.firstKmPrice = common.firstKmPrice || 0
+      this.commonData.perKmPrice = common.perKmPrice || 0
+      this.commonData.notes = common.notes || ''
+      this.vehicleCompanyCapacity = Number(common.vehicleCompanyCapacity || this.commonData.vehicle?.companyCapacity || 0)
+      this.filters.commonItemSearch = this.commonData.item?.name || ''
+      this.filters.commonFromLocSearch = this.commonData.location ? this.locLabel(this.commonData.location) : ''
+      this.filters.commonToLocSearch = this.commonData.area?.name || ''
+      this.filters.commonContractorSearch = this.commonData.contractor?.name || ''
+      this.filters.commonVehicleSearch = this.commonData.vehicle?.name || ''
+      this.rows = (Array.isArray(draft?.rows) ? draft.rows : []).map(saved => ({
+        ...this.createEmptyRow(),
+        date: saved.date || '',
+        discount: saved.discount ?? 0,
+        companyCapacity: saved.companyCapacity ?? this.vehicleCompanyCapacity,
+        count: saved.count ?? 1,
+        distanceKm: saved.distanceKm ?? 0,
+        vehicle: findById(this.vehicles, saved.vehicle?.id) || this.commonData.vehicle,
+        search: saved.search || saved.vehicle?.name || ''
+      }))
+      if (!this.rows.length && draft?.currentStep === 2) this.rows = [this.createEmptyRow()]
+      this.rows.forEach(row => {
+        row.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id)
+      })
+      this.currentStep = draft?.currentStep === 2 ? 2 : 1
+      this.$nextTick(() => {
+        if (this.currentStep === 2 && this.rows.length) this.focusNewRow(this.rows.length - 1)
+      })
     },
     hasUnsavedData() {
       const common = this.commonData || {}
@@ -743,11 +878,13 @@ export default {
       }
     },
     handleBeforeUnload(event) {
-      if (!this.isOpen || !this.hasUnsavedData()) return
+      if (!this.isOpen || this.isSaving || !this.hasUnsavedData()) return
+      this.persistTransportDraft()
       event.preventDefault()
       event.returnValue = ''
     },
     closeModal() {
+      this.persistTransportDraft()
       this.$emit('close')
     },
     async loadInitialData() {

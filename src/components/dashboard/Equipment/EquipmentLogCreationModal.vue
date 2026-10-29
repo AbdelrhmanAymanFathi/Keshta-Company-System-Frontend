@@ -323,6 +323,7 @@ export default {
       },
       rows: [],
       isSaving: false,
+      isRestoringDraft: false,
       saveError: '',
       sites: [],
       allLocations: [],
@@ -395,10 +396,23 @@ export default {
         this.currentStep = 0
         this.saveCommonDataToStorage()
       }
+    },
+    form: {
+      deep: true,
+      handler() {
+        this.persistEquipmentDraft()
+      }
+    },
+    rows: {
+      deep: true,
+      handler() {
+        this.persistEquipmentDraft()
+      }
     }
   },
   methods: {
     async onModalOpen() {
+      this.isRestoringDraft = true
       this.currentStep = this.isEditing ? 1 : 0
       this.rows = []
       await this.refreshLocations()
@@ -424,6 +438,117 @@ export default {
       } else {
         this.syncFormLocationsFromModel()
         this.loadCommonDataFromStorage()
+        this.restoreEquipmentDraftIfPresent()
+      }
+      this.isRestoringDraft = false
+    },
+    equipmentDraftEntity(value) {
+      return value ? { id: value.id, name: value.name } : null
+    },
+    persistEquipmentDraft() {
+      if (!this.isOpen || this.isRestoringDraft || this.isSaving || this.isEditing) return
+      try {
+        if (!this.hasUnsavedData()) {
+          localStorage.removeItem('equipmentLogCreationModalDraft')
+          return
+        }
+        localStorage.setItem('equipmentLogCreationModalDraft', JSON.stringify({
+          currentStep: this.currentStep,
+          form: {
+            date: this.form.date,
+            equipmentId: this.form.equipmentId,
+            equipmentLabel: this.form.equipmentLabel,
+            contractorId: this.form.contractorId,
+            contractorLabel: this.form.contractorLabel,
+            hourlyRate: this.form.hourlyRate,
+            discount: this.form.discount,
+            hours: this.form.hours,
+            driverId: this.form.driverId,
+            driverLabel: this.form.driverLabel,
+            site: this.equipmentDraftEntity(this.form.site),
+            area: this.equipmentDraftEntity(this.form.area),
+            notes: this.form.notes,
+            isRental: this.form.isRental
+          },
+          rows: this.rows.map(row => ({
+            date: row.date,
+            hours: row.hours,
+            discount: row.discount,
+            driver: this.equipmentDraftEntity(row.driver),
+            driverLabel: row.driverLabel,
+            search: row.search,
+            notes: row.notes,
+            hourlyRate: row.hourlyRate
+          }))
+        }))
+      } catch (err) {
+        console.warn('Failed to save equipment log draft:', err)
+      }
+    },
+    restoreEquipmentDraftIfPresent() {
+      let savedDraft
+      try {
+        savedDraft = localStorage.getItem('equipmentLogCreationModalDraft')
+      } catch (err) {
+        console.warn('Failed to read equipment log draft:', err)
+        return
+      }
+      if (!savedDraft) return
+
+      try {
+        const draft = JSON.parse(savedDraft)
+        const message = this.isRTL
+          ? 'توجد مسودة سجل معدات محفوظة. هل تريد استرجاعها؟'
+          : 'A saved equipment log draft was found. Would you like to restore it?'
+        if (!window.confirm(message)) {
+          localStorage.removeItem('equipmentLogCreationModalDraft')
+          return
+        }
+
+        const savedForm = draft.form || {}
+        Object.assign(this.form, {
+          date: savedForm.date || this.form.date,
+          equipmentId: savedForm.equipmentId || '',
+          equipmentLabel: savedForm.equipmentLabel || '',
+          contractorId: savedForm.contractorId || '',
+          contractorLabel: savedForm.contractorLabel || '',
+          hourlyRate: savedForm.hourlyRate ?? 0,
+          discount: savedForm.discount ?? 0,
+          hours: savedForm.hours ?? 1,
+          driverId: savedForm.driverId || '',
+          driverLabel: savedForm.driverLabel || '',
+          notes: savedForm.notes || '',
+          isRental: Boolean(savedForm.isRental)
+        })
+        this.form.site = this.allLocations.find(location =>
+          String(location.id) === String(savedForm.site?.id)
+        ) || null
+        this.form.area = this.commonAvailableAreas.find(area =>
+          String(area.id) === String(savedForm.area?.id)
+        ) || this.allLocations.find(location =>
+          String(location.id) === String(savedForm.area?.id)
+        ) || null
+        this.filters.commonSiteSearch = this.form.site?.name || ''
+        this.filters.commonAreaSearch = this.form.area?.name || ''
+        this.restoreEquipmentFromSavedData()
+        const drivers = this.drivers || []
+        this.rows = (Array.isArray(draft.rows) ? draft.rows : []).map(saved => ({
+          ...this.createEmptyRow(saved.date || ''),
+          hours: saved.hours ?? 1,
+          discount: saved.discount ?? 0,
+          driver: drivers.find(driver => String(driver.id) === String(saved.driver?.id)) || null,
+          driverLabel: saved.driverLabel || saved.driver?.name || '',
+          search: saved.search || saved.driverLabel || saved.driver?.name || '',
+          notes: saved.notes || '',
+          hourlyRate: saved.hourlyRate ?? this.form.hourlyRate ?? 0
+        }))
+        if (!this.rows.length && draft.currentStep === 2) {
+          this.rows = [this.createEmptyRow('')]
+        }
+        this.currentStep = [0, 1, 2].includes(draft.currentStep) ? draft.currentStep : 1
+      } catch (err) {
+        console.warn('Failed to restore equipment log draft:', err)
+        localStorage.removeItem('equipmentLogCreationModalDraft')
       }
     },
     chooseOwnership(isRental) {
@@ -554,7 +679,7 @@ export default {
       )
       const hasRowData = this.rows.some(row =>
         Boolean(row.date || Number(row.hours) !== 1 || Number(row.discount) ||
-          row.driver || row.driverLabel || row.notes || Number(row.hourlyRate) > 0)
+          row.driver || row.driverLabel || row.search || row.notes || Number(row.hourlyRate) > 0)
       )
       return hasFormData || hasRowData
     },
@@ -581,11 +706,13 @@ export default {
       }
     },
     handleBeforeUnload(event) {
-      if (!this.isOpen || !this.hasUnsavedData()) return
+      if (!this.isOpen || this.isSaving || !this.hasUnsavedData()) return
+      this.persistEquipmentDraft()
       event.preventDefault()
       event.returnValue = ''
     },
     closeModal() {
+      this.persistEquipmentDraft()
       this.currentStep = 0
       this.$emit('close')
     },
