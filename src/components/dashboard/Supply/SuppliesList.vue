@@ -16,8 +16,8 @@
       <CardHeader class="pb-2">
         <CardTitle class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</CardTitle>
       </CardHeader>
-      <CardContent class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <CardContent class="app-filter-panel space-y-4">
+        <div class="app-filter-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
@@ -115,7 +115,7 @@
         </div>
       </div>
 
-        <div class="flex gap-2">
+        <div class="app-filter-actions flex gap-2">
           <Button @click="page = 1; loadSupplies()" :disabled="loading" class="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm">
             {{ $t('labels.search') }}
           </Button>

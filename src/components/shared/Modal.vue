@@ -20,11 +20,17 @@
         </DialogClose>
       </DialogHeader>
 
-      <section class="min-h-0 flex-1 overflow-y-auto p-4 md:p-6">
+      <section class="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-6">
         <slot />
       </section>
 
-      <DialogFooter v-if="$slots.footer" class="shrink-0 border-t border-border bg-muted/40 p-4 sm:justify-start">
+      <DialogFooter
+        v-if="$slots.footer"
+        :class="[
+          'sticky bottom-0 z-10 mx-0 mb-0 shrink-0 gap-2 rounded-none border-t border-border bg-muted/95 px-6 py-4 backdrop-blur',
+          isRTL ? 'flex-row-reverse justify-end sm:flex-row-reverse sm:justify-end' : 'flex-row justify-end sm:flex-row sm:justify-end'
+        ]"
+      >
         <slot name="footer" />
       </DialogFooter>
     </DialogContent>
@@ -60,9 +66,9 @@ export default {
         sm: 'sm:max-w-sm',
         md: 'sm:max-w-2xl',
         lg: 'sm:max-w-4xl',
-        fullscreen: 'h-dvh max-w-none rounded-none sm:max-w-none'
+        fullscreen: 'h-dvh max-h-dvh w-full max-w-none rounded-none sm:max-w-none'
       }
-      return `flex h-dvh max-h-dvh w-full max-w-none flex-col gap-0 overflow-hidden rounded-none bg-white p-0 sm:h-auto sm:max-h-[90vh] sm:rounded-lg ${sizes[props.size]}`
+      return `flex h-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-none flex-col gap-0 overflow-hidden rounded-lg bg-white p-0 sm:max-h-[90vh] ${sizes[props.size]}`
     })
 
     return { isRTL, sizeClass }

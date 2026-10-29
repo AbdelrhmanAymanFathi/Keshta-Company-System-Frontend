@@ -29,9 +29,9 @@
       </div>
 
       <!-- Filter Bar -->
-      <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-lg shadow-slate-200/40">
+      <div class="app-filter-panel rounded-2xl border border-slate-200/80 bg-white/95 p-5 shadow-lg shadow-slate-200/40">
         <h4 class="text-sm font-semibold theme-text-secondary mb-3">{{ $t('equipmentLog.filters') || 'Filters' }}</h4>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+        <div class="app-filter-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
           <div>
             <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
             <DateField v-model="filters.startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
@@ -70,7 +70,7 @@
             </div>
           </div>
 
-          <div class="col-span-full flex gap-2">
+          <div class="app-filter-actions col-span-full flex gap-2">
             <ShadcnButton variant="outline" size="native" @click="applyFilters" class="px-4 py-2 theme-button rounded-xl text-sm shadow-sm ">{{ $t('labels.search') }}</ShadcnButton>
             <ShadcnButton variant="outline" size="native" @click="clearFilters" class="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 theme-text-secondary rounded-xl text-sm">{{ $t('labels.clear') }}</ShadcnButton>
           </div>

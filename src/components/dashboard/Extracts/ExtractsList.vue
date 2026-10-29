@@ -13,9 +13,9 @@
       />
     </div>
 
-    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
+    <div class="app-filter-panel rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div class="app-filter-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div>
           <label class="block text-[11px] font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
           <DateField v-model="filters.startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none theme-input-focus text-sm" />
@@ -41,7 +41,7 @@
           <SearchDropdown v-model="filters.itemSearch" :items="items" :allItems="items" :placeholder="$t('placeholders.searchItem')" inputClass="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" @select="(sel) => { filters.itemId = sel.id; filters.itemSearch = sel.name }" />
         </div>
       </div>
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div class="app-filter-actions flex flex-row gap-2 sm:items-center">
         <Button @click="page = 1; loadExtracts()" :disabled="loading" class="w-full sm:w-auto px-3 py-2 text-xs sm:text-sm font-medium shadow-sm">
           {{ $t('labels.search') }}
         </Button>

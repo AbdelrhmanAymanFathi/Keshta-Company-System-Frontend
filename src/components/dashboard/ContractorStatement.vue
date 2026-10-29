@@ -34,9 +34,9 @@
     </div>
 
     <!-- Filters Section -->
-    <div class="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
+    <div class="app-filter-panel space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="app-filter-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Contractor Selector -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('contractors.name') }}</label>
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div class="app-filter-actions flex flex-col gap-2 sm:flex-row sm:items-center">
         <Button variant="outline" size="sm" @click="clearFilters">
           {{ $t('labels.clear') }}
         </Button>

@@ -19,9 +19,9 @@
     </PageHeader>
 
     <!-- Filters Section -->
-    <div class="rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
+    <div class="app-filter-panel rounded-2xl border border-slate-200/80 bg-white/95 p-3 sm:p-5 space-y-4 shadow-lg shadow-slate-200/40">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') }}</h4>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="app-filter-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Start Date -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ $t('labels.startDate') }}</label>
@@ -151,7 +151,7 @@
       </div>
 
       <!-- Filter Action Buttons -->
-      <div class="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
+      <div class="app-filter-actions flex flex-row gap-2 pt-2 sm:items-center">
         <Button @click="currentPage = 1; resolveSubcategoryFilterFromSearch(); loadExpenses()" :disabled="loading"
           class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium shadow-sm">
           {{ $t('labels.search') }}

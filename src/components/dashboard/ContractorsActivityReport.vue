@@ -38,10 +38,10 @@
     </div>
 
     <!-- Filters Section -->
-    <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
+    <div class="app-filter-panel bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
       <h4 class="text-sm font-semibold theme-text-secondary">{{ $t('labels.filters') || 'Filters' }}</h4>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="app-filter-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <!-- Location Selection -->
         <div>
           <label class="block text-xs font-medium theme-text-secondary mb-1">{{ t('location') }}</label>
@@ -212,7 +212,7 @@
 
         </div>
 
-        <div class="flex gap-2">
+        <div class="app-filter-actions flex gap-2">
           <ShadcnButton variant="outline" size="native"
             @click="loadReport"
             :disabled="loading"

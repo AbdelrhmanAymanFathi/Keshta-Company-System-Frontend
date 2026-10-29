@@ -12,10 +12,10 @@
       </div>
     </div>
 
-    <div class="theme-surface rounded-lg shadow-sm p-4">
+    <div class="app-filter-panel theme-surface rounded-lg shadow-sm p-4">
       <h4 class="text-sm font-semibold theme-text-primary">{{ $t('labels.filters') || 'Filters' }}</h4>
 
-      <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div class="app-filter-grid mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div>
           <label class="mb-2 block text-xs font-semibold theme-text-secondary">{{ $t('labels.dateFrom') || 'Date from' }}</label>
           <DateField v-model="filters.dateFrom" :class="fieldClass" />
@@ -93,7 +93,7 @@
         </div>
       </div>
 
-      <div class="mt-4 flex flex-wrap gap-2">
+      <div class="app-filter-actions mt-4 flex flex-wrap gap-2">
         <Button @click="applyFilters" class="px-4 py-2">
           {{ $t('labels.search') || 'Search' }}
         </Button>
