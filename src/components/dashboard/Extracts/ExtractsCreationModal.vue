@@ -14,7 +14,7 @@
           v-if="isOpen"
           class="fixed inset-0 bg-black/60 flex items-center justify-center z-[var(--layout-z-modal,200)] p-4 overflow-hidden"
           :dir="isRTL ? 'rtl' : 'ltr'"
-          @click.self="closeModal"
+          @click.self="requestClose"
         >
           <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
@@ -22,7 +22,7 @@
               {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterDetails') || 'Enter Details') }}
             </h2>
             <ShadcnButton variant="outline" size="native"
-              @click="closeModal"
+              @click="requestClose"
               class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none"
             >
               ×
@@ -170,7 +170,7 @@
 
               <div class="mt-10 flex justify-end gap-6">
                 <ShadcnButton variant="outline" size="native"
-                  @click="closeModal"
+                  @click="requestClose"
                   class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition"
                 >
                   {{ $t('labels.cancel') }}
@@ -242,8 +242,8 @@
                 </ShadcnButton>
               </div>
 
-              <div class="mb-8 relative border border-gray-200 rounded-lg overflow-visible p-2">
-                <div class="overflow-x-auto overflow-y-visible w-full">
+              <div class="extract-rows-container mb-8 relative border border-gray-200 rounded-lg p-2">
+                <div class="overflow-x-auto w-full">
                   <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                     <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                       <tr>
@@ -283,7 +283,7 @@
                             type="number"
                             step="1"
                             @input="syncRowTotal(row)"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter.prevent="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner"
                           />
                         </td>
@@ -295,7 +295,7 @@
                             min="0"
                             step="0.01"
                             @input="syncRowTotal(row)"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter.prevent="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner"
                           />
                         </td>
@@ -307,7 +307,7 @@
                             step="0.01"
                             @input="syncRowTotal(row)"
                             @keydown.tab="onLastFieldTab(index, $event)"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter.prevent="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner"
                           />
                         </td>
@@ -734,15 +734,32 @@ export default {
       this.rows.splice(index, 1)
       if (!this.rows.length) this.addRow()
     },
-    handleEnterKey() {
+    handleEnterKey(index, event) {
+      const rowElement = event.target.closest('tr')
+      if (!rowElement) return
+      const fields = Array.from(rowElement.querySelectorAll(
+        'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled)'
+      )).filter(field => field.getClientRects().length)
+      const fieldIndex = fields.indexOf(event.target)
+      if (fieldIndex < 0) return
+      if (fieldIndex < fields.length - 1) {
+        fields[fieldIndex + 1].focus()
+        return
+      }
+      if (index < this.rows.length - 1) {
+        this.focusNewRow(index + 1)
+        return
+      }
       const newRowIndex = this.rows.length
       this.addRow()
+      this.focusNewRow(newRowIndex)
+    },
+    focusNewRow(index) {
       this.$nextTick(() => {
-        if (!this.tableRef) return
-        const allRows = this.tableRef.querySelectorAll('tbody tr')
-        const newRow = allRows[newRowIndex]
-        const firstInput = newRow?.querySelector('input[type="number"]')
-        firstInput?.focus()
+        const row = this.tableRef?.querySelectorAll('tbody tr')[index]
+        if (!row) return
+        row.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        row.querySelector('input, select, textarea')?.focus()
       })
     },
     onLastFieldTab(index, event) {
@@ -751,14 +768,47 @@ export default {
         event.preventDefault()
         const newRowIndex = this.rows.length
         this.addRow()
-        this.$nextTick(() => {
-          if (!this.tableRef) return
-          const allRows = this.tableRef.querySelectorAll('tbody tr')
-          const newRow = allRows[newRowIndex]
-          const firstInput = newRow?.querySelector('input[type="number"]')
-          firstInput?.focus()
-        })
+        this.focusNewRow(newRowIndex)
       }
+    },
+    hasUnsavedData() {
+      const common = this.commonData || {}
+      const hasCommonData = Boolean(
+        common.dateFrom || common.dateTo || common.site || common.area ||
+        common.contractor || common.crusher || common.notes
+      )
+      const hasRowData = this.rows.some(row =>
+        Boolean(row.itemId || row.item || row.itemSearch || row.quantity !== '' ||
+          row.price !== '' || Number(row.discount) > 0)
+      )
+      return hasCommonData || hasRowData
+    },
+    requestClose() {
+      if (this.hasUnsavedData() &&
+        !window.confirm(this.isRTL
+          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+          : 'You have unsaved data. Are you sure you want to leave?')) return
+      this.closeModal()
+    },
+    handleModalKeydown(event) {
+      if (!this.isOpen) return
+      const target = event.target
+      const isEditable = target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input, textarea, select'))
+
+      if (event.key === 'Backspace' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+      } else if (event.key === 'Escape' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.requestClose()
+      }
+    },
+    handleBeforeUnload(event) {
+      if (!this.isOpen || !this.hasUnsavedData()) return
+      event.preventDefault()
+      event.returnValue = ''
     },
     formatCurrency(value) {
       if (value === undefined || value === null || value === '') return '-'
@@ -907,6 +957,14 @@ export default {
       } catch (err) {
         console.warn('Failed to load extracts data:', err)
       }
+    },
+    mounted() {
+      window.addEventListener('keydown', this.handleModalKeydown, true)
+      window.addEventListener('beforeunload', this.handleBeforeUnload)
+    },
+    beforeUnmount() {
+      window.removeEventListener('keydown', this.handleModalKeydown, true)
+      window.removeEventListener('beforeunload', this.handleBeforeUnload)
     }
   }
 }
@@ -926,6 +984,12 @@ export default {
 
 .modal-body-container {
   max-height: 70vh;
+}
+
+.extract-rows-container {
+  max-height: 50vh;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 </style>

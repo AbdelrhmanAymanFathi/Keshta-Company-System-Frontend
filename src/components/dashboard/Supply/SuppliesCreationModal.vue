@@ -9,14 +9,14 @@
   <teleport to="body">
     <transition name="kc-modal">
       <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-80 p-4 overflow-hidden"
-        :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
+        :dir="isRTL ? 'rtl' : 'ltr'" @click.self="requestClose">
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold theme-heading">
             {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterSupplies') || 'إدخال التوريدات') }}
           </h2>
-          <ShadcnButton variant="outline" size="native" @click="closeModal"
+          <ShadcnButton variant="outline" size="native" @click="requestClose"
             class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">
             ×
           </ShadcnButton>
@@ -188,7 +188,7 @@
 
             <!-- Next / Cancel Buttons -->
             <div class="mt-10 flex justify-end gap-6">
-              <ShadcnButton variant="outline" size="native" @click="closeModal"
+              <ShadcnButton variant="outline" size="native" @click="requestClose"
                 class="px-10 py-3 sm:px-2 md:px-3 lg:px-8  border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">
                 {{ $t('labels.cancel') }}
               </ShadcnButton>
@@ -252,13 +252,8 @@
             </div>
 
             <!-- Table for Variable Data -->
-            <div class="    mb-8
-              relative
-              border border-gray-200 rounded-lg
-              overflow-visible
-              p-2">
-              <div class="overflow-x-auto overflow-y-visible w-full">
-                <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
+            <div ref="rowsContainer" class="supply-rows-container mb-8 relative border border-gray-200 rounded-lg p-2">
+                <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
                       <th class="px-4 py-3 text-center text-xs font-medium theme-text-secondary w-12">{{ $t('#') }}</th>
@@ -355,34 +350,34 @@
 
                       <!-- Crusher Ticket -->
                       <td class="px-3 py-2">
-                        <input type="text" v-model="row.crusherTicket" @keydown.enter.prevent="handleEnterKey(index)"
+                        <input type="text" v-model="row.crusherTicket" @keydown.enter="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                       </td>
 
                       <!-- Company Ticket -->
                       <td class="px-3 py-2">
-                        <input type="text" v-model="row.companyTicket" @keydown.enter.prevent="handleEnterKey(index)"
+                        <input type="text" v-model="row.companyTicket" @keydown.enter="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                       </td>
 
                       <!-- Discount -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.discount" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)"
+                          @keydown.enter="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Company Cubic -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.companyCapacity" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)"
+                          @keydown.enter="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Crusher Cubic -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.crusherCapacity" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)"
+                          @keydown.enter="handleEnterKey(index, $event)"
                           @keydown.tab="onLastFieldTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
@@ -396,21 +391,21 @@
                       <!-- Precast (انترلوك / بردورة) -->
                       <template v-else-if="isPrecast">
                         <td class="px-3 py-2">
-                          <input type="text" v-model="row.supplyPermitNo" @keydown.enter.prevent="handleEnterKey(index)"
+                          <input type="text" v-model="row.supplyPermitNo" @keydown.enter="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                         </td>
                         <td class="px-3 py-2">
-                          <input type="text" v-model="row.receiptNo" @keydown.enter.prevent="handleEnterKey(index)"
+                          <input type="text" v-model="row.receiptNo" @keydown.enter="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                         </td>
                         <td class="px-3 py-2">
                           <input type="number" v-model.number="row.companyCapacity" step="0.01"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                         </td>
                         <td class="px-3 py-2">
                           <input type="number" v-model.number="row.discount" step="0.01"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter="handleEnterKey(index, $event)"
                             @keydown.tab="onLastFieldTab(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                         </td>
@@ -422,16 +417,16 @@
                       <!-- Petroleum (بتومين / MC / RC) -->
                       <template v-else>
                         <td class="px-3 py-2">
-                          <input type="text" v-model="row.supplyPermitNo" @keydown.enter.prevent="handleEnterKey(index)"
+                          <input type="text" v-model="row.supplyPermitNo" @keydown.enter="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                         </td>
                         <td class="px-3 py-2">
-                          <input type="text" v-model="row.vehicleNumber" @keydown.enter.prevent="handleEnterKey(index)"
+                          <input type="text" v-model="row.vehicleNumber" @keydown.enter="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                         </td>
                         <td class="px-3 py-2">
                           <input type="number" v-model.number="row.companyCapacity" step="0.01"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter="handleEnterKey(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                         </td>
                         <!-- Transport is optional: the supplier may deliver the load itself -->
@@ -445,7 +440,7 @@
                         <td class="px-3 py-2">
                           <input type="number" v-model.number="row.transportPrice" step="0.01" min="0"
                             :disabled="!row.transportContractorId"
-                            @keydown.enter.prevent="handleEnterKey(index)"
+                            @keydown.enter="handleEnterKey(index, $event)"
                             @keydown.tab="onLastFieldTab(index, $event)"
                             class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner disabled:bg-gray-100 disabled:cursor-not-allowed" />
                         </td>
@@ -473,12 +468,11 @@
                     </tr>
                   </tbody>
                 </table>
-              </div>
             </div>
 
             <!-- Totals -->
             <div
-              class="bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
+              class="sticky bottom-0 z-10 bg-gray-50 rounded-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-6 text-sm font-semibold">
               <template v-if="isPetroleum">
                 <div class="flex items-center justify-end gap-3">
                   <span class="theme-text-secondary">{{ $t('labels.transportTotal') }}:</span>
@@ -625,6 +619,7 @@ export default {
       // Modal state
       isOpen: false,
       isSaving: false,
+      isRestoringDraft: false,
 
       // Lookups
       sites: [],
@@ -655,6 +650,7 @@ export default {
 
       // References
       tableRef: null,
+      rowsContainer: null,
 
       // Last entered data for localStorage
       lastEnteredData: {
@@ -736,16 +732,181 @@ export default {
     }
   },
 
+  watch: {
+    commonData: {
+      deep: true,
+      handler() {
+        this.persistSupplyDraft()
+      }
+    },
+    rows: {
+      deep: true,
+      handler() {
+        this.persistSupplyDraft()
+      }
+    }
+  },
+
   async mounted() {
     this.loadLastEnteredDataFromStorage()
     document.addEventListener('click', this.handleGlobalClick)
+    window.addEventListener('keydown', this.handleModalKeydown, true)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
   },
 
   beforeUnmount() {
     document.removeEventListener('click', this.handleGlobalClick)
+    window.removeEventListener('keydown', this.handleModalKeydown, true)
+    window.removeEventListener('beforeunload', this.handleBeforeUnload)
   },
 
   methods: {
+    handleModalKeydown(event) {
+      if (!this.isOpen) return
+      const target = event.target
+      const isEditable = target instanceof HTMLElement &&
+        (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+
+      if (event.key === 'Backspace' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+        return
+      }
+
+      if (event.key === 'Escape' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.requestClose()
+      }
+    },
+
+    handleBeforeUnload(event) {
+      if (!this.isOpen || !this.hasUnsavedData()) return
+      this.persistSupplyDraft()
+      event.preventDefault()
+      event.returnValue = ''
+    },
+
+    hasUnsavedData() {
+      const common = this.commonData
+      const hasCommonData = Boolean(
+        common.date || common.item?.id || Number(common.price) || common.site?.id ||
+        common.area?.id || common.contractor?.id || common.crusher?.id || common.notes?.trim()
+      )
+      const rowFields = [
+        'search', 'crusherTicket', 'companyTicket', 'supplyPermitNo', 'receiptNo',
+        'vehicleNumber', 'companyCapacity', 'crusherCapacity', 'discount',
+        'transportContractorId', 'transportPrice'
+      ]
+      return hasCommonData || this.rows.length > 1 || this.rows.some(row =>
+        rowFields.some(field => {
+          const value = row[field]
+          return value !== null && value !== undefined && value !== '' && value !== 0
+        }) || row.vehicle?.id
+      )
+    },
+
+    requestClose() {
+      if (this.hasUnsavedData()) {
+        const message = this.isRTL
+          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+          : 'You have unsaved data. Are you sure you want to leave?'
+        if (!window.confirm(message)) return
+      }
+      this.closeModal()
+    },
+
+    getDraftCommonData() {
+      const common = this.commonData
+      const pick = value => value ? { id: value.id, name: value.name } : null
+      return {
+        date: common.date,
+        item: pick(common.item),
+        price: common.price,
+        site: pick(common.site),
+        area: pick(common.area),
+        contractor: pick(common.contractor),
+        crusher: pick(common.crusher),
+        notes: common.notes
+      }
+    },
+
+    persistSupplyDraft() {
+      if (!this.isOpen || this.isRestoringDraft || this.isSaving) return
+      try {
+        if (!this.hasUnsavedData()) {
+          localStorage.removeItem('suppliesCreationModalDraft')
+          return
+        }
+        const rowFields = [
+          'search', 'crusherTicket', 'companyTicket', 'supplyPermitNo', 'receiptNo',
+          'vehicleNumber', 'companyCapacity', 'crusherCapacity', 'discount',
+          'transportContractorId', 'transportPrice', 'unitPrice'
+        ]
+        const rows = this.rows.map(row => {
+          const saved = {}
+          rowFields.forEach(field => { saved[field] = row[field] })
+          saved.vehicle = row.vehicle ? { id: row.vehicle.id, name: row.vehicle.name } : null
+          return saved
+        })
+        localStorage.setItem('suppliesCreationModalDraft', JSON.stringify({
+          currentStep: this.currentStep,
+          commonData: this.getDraftCommonData(),
+          rows
+        }))
+      } catch (err) {
+        console.warn('Failed to save supplies draft:', err)
+      }
+    },
+
+    async restoreSupplyDraft(draft) {
+      const common = draft?.commonData || {}
+      const findById = (list, id) => list.find(item => String(item.id) === String(id)) || null
+      this.commonData.date = common.date || ''
+      this.commonData.item = findById(this.exportItems, common.item?.id)
+      this.commonData.price = common.price || 0
+      this.commonData.site = findById(this.allLocations, common.site?.id)
+      this.commonData.area = findById(this.commonData.site?.children || this.allLocations, common.area?.id)
+      this.commonData.contractor = findById(this.contractors, common.contractor?.id)
+      this.commonData.crusher = findById(this.crushers, common.crusher?.id)
+      this.commonData.notes = common.notes || ''
+      this.filters.commonItemSearch = this.commonData.item?.name || ''
+      this.filters.commonSiteSearch = this.commonData.site?.name || ''
+      this.filters.commonAreaSearch = this.commonData.area?.name || ''
+      this.filters.commonContractorSearch = this.commonData.contractor?.name || ''
+      this.filters.commonCrusherSearch = this.commonData.crusher?.name || ''
+
+      const rowFields = [
+        'search', 'crusherTicket', 'companyTicket', 'supplyPermitNo', 'receiptNo',
+        'vehicleNumber', 'companyCapacity', 'crusherCapacity', 'discount',
+        'transportContractorId', 'transportPrice', 'unitPrice'
+      ]
+      this.rows = (Array.isArray(draft.rows) ? draft.rows : []).map(saved => {
+        const row = this.createEmptyRow()
+        rowFields.forEach(field => {
+          if (saved[field] !== undefined) row[field] = saved[field]
+        })
+        row.vehicle = findById(this.vehicles, saved.vehicle?.id)
+        row.search = row.vehicle?.name || row.search || ''
+        return row
+      })
+      if (!this.rows.length && draft.currentStep === 2) this.rows = [this.createEmptyRow()]
+      this.currentStep = draft.currentStep === 2 ? 2 : 1
+      this.rows.forEach(row => row.availableVehicles = this.getAvailableVehiclesForContractor(this.commonData.contractor?.id))
+      await this.$nextTick()
+      if (this.currentStep === 2) this.focusAndRevealRow(Math.max(0, this.rows.length - 1))
+    },
+
+    focusAndRevealRow(index) {
+      this.$nextTick(() => {
+        const row = this.rowsContainer?.querySelectorAll('tbody tr')[index]
+        if (!row) return
+        row.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        const firstInput = row.querySelector('input:not([type="hidden"]):not(:disabled)')
+        firstInput?.focus({ preventScroll: true })
+      })
+    },
+
     handleGlobalClick(e) {
       // Close vehicle dropdowns when clicking outside the table area
       const isClickInTable = e.target.closest('table') || e.target.closest('thead') || e.target.closest('tbody')
@@ -780,20 +941,7 @@ export default {
         const newRowIndex = this.rows.length;
         this.addRow();
 
-        // Focus on the first input in the new row with a small timeout
-        setTimeout(() => {
-          this.$nextTick(() => {
-            if (!this.tableRef) return;
-            const allRows = this.tableRef.querySelectorAll('tbody tr');
-            const newRow = allRows[newRowIndex];
-            if (newRow) {
-              const vehicleInput = newRow.querySelector('input[type="text"]');
-              if (vehicleInput) {
-                vehicleInput.focus();
-              }
-            }
-          });
-        }, 10);
+        this.focusAndRevealRow(newRowIndex)
       }
     },
     // ============ Step Control ============
@@ -821,15 +969,42 @@ export default {
 
     // ============ Modal Management ============
     async openModal() {
+      this.isRestoringDraft = true
       this.isOpen = true
       this.currentStep = 1
+      this.commonData = { date: '', item: null, price: 0, site: null, area: null, contractor: null, crusher: null, notes: '' }
       this.rows = []
       this.saveError = ''
-      await this.loadInitialData()
-      this.loadCommonDataFromStorage()
+      try {
+        await this.loadInitialData()
+        const savedDraft = localStorage.getItem('suppliesCreationModalDraft')
+        if (savedDraft) {
+          try {
+            const draft = JSON.parse(savedDraft)
+            const message = this.isRTL
+              ? 'توجد مسودة توريدات محفوظة. هل تريد استرجاعها؟'
+              : 'A saved supplies draft was found. Would you like to restore it?'
+            if (window.confirm(message)) {
+              await this.restoreSupplyDraft(draft)
+            } else {
+              localStorage.removeItem('suppliesCreationModalDraft')
+              this.loadCommonDataFromStorage()
+            }
+          } catch (err) {
+            console.warn('Failed to restore supplies draft:', err)
+            localStorage.removeItem('suppliesCreationModalDraft')
+            this.loadCommonDataFromStorage()
+          }
+        } else {
+          this.loadCommonDataFromStorage()
+        }
+      } finally {
+        this.isRestoringDraft = false
+      }
     },
 
     closeModal() {
+      this.persistSupplyDraft()
       this.isOpen = false
       this.saveError = ''
       this.currentStep = 1
@@ -1009,22 +1184,28 @@ export default {
       return missing
     },
 
-    handleEnterKey(rowIndex) {
-      const currentRow = this.rows[rowIndex]
-      if (!currentRow) return
+    handleEnterKey(rowIndex, event) {
+      const row = event.target.closest('tr')
+      if (!row) return
+      const fields = Array.from(row.querySelectorAll(
+        'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled)'
+      )).filter(field => field.getClientRects().length)
+      const fieldIndex = fields.indexOf(event.target)
+      if (fieldIndex < 0) return
 
-      const newRow = this.createEmptyRow()
-      this.rows.push(newRow)
+      event.preventDefault()
+      if (fieldIndex < fields.length - 1) {
+        fields[fieldIndex + 1].focus()
+        return
+      }
 
-      this.$nextTick(() => {
-        if (!this.tableRef) return
-        const allRows = this.tableRef.querySelectorAll('tbody tr')
-        const newRowEl = allRows[rowIndex + 1]
-        if (newRowEl) {
-          const firstInput = newRowEl.querySelector('input[type="text"]')
-          firstInput?.focus()
-        }
-      })
+      if (rowIndex < this.rows.length - 1) {
+        this.focusAndRevealRow(rowIndex + 1)
+        return
+      }
+
+      this.addRow()
+      this.focusAndRevealRow(rowIndex + 1)
     },
 
     addRow() {
@@ -1377,6 +1558,7 @@ export default {
           }
         }
 
+        localStorage.removeItem('suppliesCreationModalDraft')
         this.saveCommonDataToStorage()
 
         // capture the step-1 data so we can pass it to transport modal if needed
@@ -1445,6 +1627,17 @@ export default {
 .no-spinner {
   appearance: textfield;
   -moz-appearance: textfield;
+}
+
+.supply-rows-container {
+  max-height: 55vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+.supply-rows-container table {
+  min-width: max-content;
 }
 
 input:focus,

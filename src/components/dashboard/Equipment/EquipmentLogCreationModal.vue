@@ -1,12 +1,12 @@
 <template>
   <teleport to="body">
     <transition name="kc-modal">
-      <div v-if="isOpen" class="fixed inset-0 z-[var(--layout-z-modal,200)] flex items-center justify-center bg-black/60 p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
+      <div v-if="isOpen" class="fixed inset-0 z-[var(--layout-z-modal,200)] flex items-center justify-center bg-black/60 p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="requestClose">
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold theme-heading">{{ modalHeaderTitle }}</h2>
-          <ShadcnButton variant="outline" size="native" @click="closeModal" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</ShadcnButton>
+          <ShadcnButton variant="outline" size="native" @click="requestClose" class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none">×</ShadcnButton>
         </div>
 
         <!-- Body -->
@@ -39,7 +39,7 @@
               </ShadcnButton>
             </div>
             <div class="mt-10 flex justify-center">
-              <ShadcnButton variant="outline" size="native" @click="closeModal" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">{{ $t('labels.cancel') }}</ShadcnButton>
+              <ShadcnButton variant="outline" size="native" @click="requestClose" class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition">{{ $t('labels.cancel') }}</ShadcnButton>
             </div>
           </div>
 
@@ -191,10 +191,9 @@
             </div>
 
             <!-- Fields table simplified for EquipmentLog: hours, driver, notes -->
-            <div class="    mb-8
+            <div class="equipment-rows-container mb-8
     relative
     border border-gray-200 rounded-lg
-    overflow-visible
     p-2">
               <div class="overflow-x-auto w-full">
                 <table ref="tableRef" class="w-full  divide-y divide-gray-200 border rounded-lg">
@@ -215,24 +214,24 @@
 
                       <!-- Date -->
                       <td class="px-3 py-2">
-                        <DateField v-model="row.date" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" />
+                        <DateField v-model="row.date" @keydown.enter.prevent="handleEnterKey(index, $event)" class="w-full border border-gray-300 rounded px-2 py-1 text-sm" />
                       </td>
 
                       <!-- Hours -->
                       <td class="px-3 py-2">
-                        <input :ref="el => row.hoursInput = el" type="number" v-model.number="row.hours" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
+                        <input :ref="el => row.hoursInput = el" type="number" v-model.number="row.hours" step="0.01" @keydown.enter.prevent="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Discount -->
                       <td v-if="!isCompanyOwnedEquipment" class="px-3 py-2">
-                        <input type="number" v-model.number="row.discount" min="0" step="0.01" @keydown.enter.prevent="handleEnterKey(index)"
+                        <input type="number" v-model.number="row.discount" min="0" step="0.01" @keydown.enter.prevent="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
 
                       <!-- Notes -->
                       <td class="px-3 py-2">
-                        <input type="text" v-model="row.notes" @keydown.enter.prevent="handleEnterKey(index)" @keydown.tab="onLastFieldTab(index, $event)"
+                        <input type="text" v-model="row.notes" @keydown.enter.prevent="handleEnterKey(index, $event)" @keydown.tab="onLastFieldTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus" />
                       </td>
 
@@ -546,6 +545,46 @@ export default {
         this.filters.commonAreaSearch = ''
       }
     },
+    hasUnsavedData() {
+      const form = this.form || {}
+      const hasFormData = Boolean(
+        form.equipmentId || form.equipmentLabel || form.contractorId || form.contractorLabel ||
+        Number(form.hourlyRate) > 0 || Number(form.discount) > 0 || Number(form.hours) !== 1 ||
+        form.driverId || form.driverLabel || form.site || form.area || form.notes || form.isRental
+      )
+      const hasRowData = this.rows.some(row =>
+        Boolean(row.date || Number(row.hours) !== 1 || Number(row.discount) ||
+          row.driver || row.driverLabel || row.notes || Number(row.hourlyRate) > 0)
+      )
+      return hasFormData || hasRowData
+    },
+    requestClose() {
+      if (this.hasUnsavedData() &&
+        !window.confirm(this.isRTL
+          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+          : 'You have unsaved data. Are you sure you want to leave?')) return
+      this.closeModal()
+    },
+    handleModalKeydown(event) {
+      if (!this.isOpen) return
+      const target = event.target
+      const isEditable = target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input, textarea, select'))
+
+      if (event.key === 'Backspace' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+      } else if (event.key === 'Escape' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.requestClose()
+      }
+    },
+    handleBeforeUnload(event) {
+      if (!this.isOpen || !this.hasUnsavedData()) return
+      event.preventDefault()
+      event.returnValue = ''
+    },
     closeModal() {
       this.currentStep = 0
       this.$emit('close')
@@ -775,18 +814,26 @@ export default {
       return `${d.getFullYear()}-${mm}-${dd}`
     },
 
-    handleEnterKey(index) {
-      if (index !== this.rows.length - 1) return
+    handleEnterKey(index, event) {
+      const rowElement = event.target.closest('tr')
+      if (!rowElement) return
+      const fields = Array.from(rowElement.querySelectorAll(
+        'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled)'
+      )).filter(field => field.getClientRects().length)
+      const fieldIndex = fields.indexOf(event.target)
+      if (fieldIndex < 0) return
+      if (fieldIndex < fields.length - 1) {
+        fields[fieldIndex + 1].focus()
+        return
+      }
+      if (index < this.rows.length - 1) {
+        this.focusNewRow(index + 1)
+        return
+      }
       const prevDate = this.rows[index]?.date || ''
       const newRow = this.createEmptyRow(this.addOneDayISO(prevDate))
       this.rows.push(newRow)
-      this.$nextTick(() => {
-        const input = newRow.hoursInput
-        if (input && typeof input.focus === 'function') {
-          input.focus()
-          if (typeof input.select === 'function') input.select()
-        }
-      })
+      this.focusNewRow(newRow)
     },
     onLastFieldTab(index, event) {
       if (event.shiftKey) return
@@ -795,13 +842,17 @@ export default {
         const prevDate = this.rows[index]?.date || ''
         const newRow = this.createEmptyRow(this.addOneDayISO(prevDate))
         this.rows.push(newRow)
-        this.$nextTick(() => {
-          if (newRow.hoursInput && typeof newRow.hoursInput.focus === 'function') {
-            newRow.hoursInput.focus()
-            if (typeof newRow.hoursInput.select === 'function') newRow.hoursInput.select()
-          }
-        })
+        this.focusNewRow(newRow)
       }
+    },
+    focusNewRow(row) {
+      this.$nextTick(() => {
+        const rowIndex = this.rows.indexOf(row)
+        const rowElement = this.tableRef?.querySelector(`tbody tr:nth-child(${rowIndex + 1})`)
+        rowElement?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        const input = rowElement?.querySelector('input, select, textarea') || row.hoursInput
+        input?.focus()
+      })
     },
     async save() {
       this.saveError = ''
@@ -944,6 +995,14 @@ export default {
       } catch (err) {
         console.warn('Failed to load equipment log data:', err)
       }
+    },
+    mounted() {
+      window.addEventListener('keydown', this.handleModalKeydown, true)
+      window.addEventListener('beforeunload', this.handleBeforeUnload)
+    },
+    beforeUnmount() {
+      window.removeEventListener('keydown', this.handleModalKeydown, true)
+      window.removeEventListener('beforeunload', this.handleBeforeUnload)
     }
   }
 }
@@ -951,4 +1010,5 @@ export default {
 
 <style scoped>
 .modal-body-container { max-height: 80vh; overflow: auto; }
+.equipment-rows-container { max-height: 50vh; overflow: auto; overscroll-behavior: contain; }
 </style>

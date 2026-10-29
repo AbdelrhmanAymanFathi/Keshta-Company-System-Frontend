@@ -6,7 +6,7 @@
         v-if="isOpen"
         :dir="isRTL ? 'rtl' : 'ltr'"
         class="fixed inset-0 bg-black/60 flex items-center justify-center z-[var(--layout-z-modal,200)] p-4 overflow-hidden"
-        @click.self="handleBackdropClick"
+        @click.self="requestClose"
       >
         <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
@@ -15,7 +15,7 @@
             {{ currentStep === 1 ? modalTitleComputed : ($t('transport.enterTransports') || 'إدخال النقل') }}
           </h2>
           <ShadcnButton variant="outline" size="native"
-            @click="closeModal"
+            @click="requestClose"
             class="theme-text-muted hover:theme-text-primary text-3xl leading-none focus:outline-none"
           >
             ×
@@ -214,7 +214,7 @@
             <!-- Next / Cancel Buttons -->
             <div class="mt-10 flex justify-end gap-6">
               <ShadcnButton variant="outline" size="native"
-                @click="closeModal"
+                @click="requestClose"
                 class="px-10 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium theme-text-secondary transition"
               >
                 {{ $t('common.cancel') || 'إلغاء' }}
@@ -291,7 +291,7 @@
             </div>
 
             <!-- Table for Variable Data (Trips) -->
-            <div class="relative border border-gray-200 rounded-lg overflow-visible p-2">
+            <div class="transport-rows-container relative border border-gray-200 rounded-lg p-2">
               <div class="overflow-x-auto w-full">
                 <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
@@ -317,23 +317,25 @@
                       <!-- Row Date -->
                       <td class="px-3 py-2">
                         <DateField v-model="row.date"
-                          @keydown.enter.prevent="handleEnterKey(index)"
+                          @keydown.enter.prevent="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus text-sm" />
                       </td>
                       <!-- Discount -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.discount" step="0.01"
-                          @keydown.enter.prevent="handleEnterKey(index)"
+                          @keydown.enter.prevent="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
                       <!-- Count -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.count" min="1" step="1"
+                          @keydown.enter.prevent="handleEnterKey(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
                       <!-- Distance per Row -->
                       <td class="px-3 py-2">
                         <input type="number" v-model.number="row.distanceKm" step="0.1" min="0"
+                          @keydown.enter.prevent="handleEnterKey(index, $event)"
                           @keydown.tab="onLastFieldTab(index, $event)"
                           class="w-full border border-gray-300 rounded px-2 py-1  theme-input-focus no-spinner" />
                       </td>
@@ -667,18 +669,16 @@ export default {
         const newRow = this.createEmptyRow()
         newRow.date = this.addOneDayISO(prevDate)
         this.rows.push(newRow)
-        setTimeout(() => {
-          this.$nextTick(() => {
-            if (!this.tableRef) return
-            const allRows = this.tableRef.querySelectorAll('tbody tr')
-            const newRow = allRows[newRowIndex]
-            if (newRow) {
-              const vehicleInput = newRow.querySelector('input[type="text"]')
-              if (vehicleInput) vehicleInput.focus()
-            }
-          })
-        }, 10)
+        this.focusNewRow(newRowIndex)
       }
+    },
+    focusNewRow(index) {
+      this.$nextTick(() => {
+        const row = this.tableRef?.querySelectorAll('tbody tr')[index]
+        if (!row) return
+        row.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+        row.querySelector('input, select, textarea')?.focus()
+      })
     },
     isStep1Valid() {
       return this.commonData.item &&
@@ -707,11 +707,48 @@ export default {
         this.populateForm()
       }
     },
+    hasUnsavedData() {
+      const common = this.commonData || {}
+      const hasCommonData = Boolean(
+        common.item || common.location || common.area || common.vehicle ||
+        common.contractor || common.date || common.distanceKm || common.firstKmPrice ||
+        common.perKmPrice || common.notes
+      )
+      const hasRowData = this.rows.some(row =>
+        Boolean(row.date || row.discount || row.count !== 1 || row.distanceKm || row.vehicle ||
+          row.companyCapacity || row.search)
+      )
+      return hasCommonData || hasRowData
+    },
+    requestClose() {
+      if (this.hasUnsavedData() &&
+        !window.confirm(this.isRTL
+          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+          : 'You have unsaved data. Are you sure you want to leave?')) return
+      this.closeModal()
+    },
+    handleModalKeydown(event) {
+      if (!this.isOpen) return
+      const target = event.target
+      const isEditable = target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input, textarea, select'))
+
+      if (event.key === 'Backspace' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+      } else if (event.key === 'Escape' && !isEditable) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.requestClose()
+      }
+    },
+    handleBeforeUnload(event) {
+      if (!this.isOpen || !this.hasUnsavedData()) return
+      event.preventDefault()
+      event.returnValue = ''
+    },
     closeModal() {
       this.$emit('close')
-    },
-    handleBackdropClick() {
-      this.closeModal()
     },
     async loadInitialData() {
       await Promise.all([
@@ -840,21 +877,27 @@ export default {
       return `${d.getFullYear()}-${mm}-${dd}`
     },
 
-    handleEnterKey(index) {
-      if (index !== this.rows.length - 1) return
+    handleEnterKey(index, event) {
+      const row = event.target.closest('tr')
+      if (!row) return
+      const fields = Array.from(row.querySelectorAll(
+        'input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled)'
+      )).filter(field => field.getClientRects().length)
+      const fieldIndex = fields.indexOf(event.target)
+      if (fieldIndex < 0) return
+      if (fieldIndex < fields.length - 1) {
+        fields[fieldIndex + 1].focus()
+        return
+      }
+      if (index < this.rows.length - 1) {
+        this.focusNewRow(index + 1)
+        return
+      }
       const prevDate = this.rows[index]?.date || ''
       const newRow = this.createEmptyRow()
       newRow.date = this.addOneDayISO(prevDate)
       this.rows.push(newRow)
-      this.$nextTick(() => {
-        if (!this.tableRef) return
-        const allRows = this.tableRef.querySelectorAll('tbody tr')
-        const newRowEl = allRows[index + 1]
-        if (newRowEl) {
-          const firstInput = newRowEl.querySelector('input[type="text"]')
-          firstInput?.focus()
-        }
-      })
+      this.focusNewRow(index + 1)
     },
     filteredVehicles(row) {
       const q = row.search?.toLowerCase() || ''
@@ -1264,9 +1307,13 @@ export default {
   },
   mounted() {
     document.addEventListener('click', this.handleGlobalClick)
+    window.addEventListener('keydown', this.handleModalKeydown, true)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
   },
   beforeUnmount() {
     document.removeEventListener('click', this.handleGlobalClick)
+    window.removeEventListener('keydown', this.handleModalKeydown, true)
+    window.removeEventListener('beforeunload', this.handleBeforeUnload)
   }
 }
 </script>
@@ -1281,6 +1328,12 @@ export default {
 .no-spinner {
   appearance: textfield;
   -moz-appearance: textfield;
+}
+
+.transport-rows-container {
+  max-height: 55vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 input:focus,
