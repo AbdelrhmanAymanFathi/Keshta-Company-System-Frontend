@@ -190,6 +190,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getTransportReportData, downloadTransportReport } from '@/api'
 import { buildQueryParams } from '@/utils/buildQueryParams'
+import { formatToISODate } from '@/utils/dateUtils'
 import DateField from '@/components/shared/DateField.vue'
 import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
 import { useDateSort } from '@/composables/useDateSort'
@@ -411,8 +412,8 @@ export default {
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-      filters.value.endDate = endDate.toISOString().split('T')[0]
-      filters.value.startDate = startDate.toISOString().split('T')[0]
+      filters.value.endDate = formatToISODate(endDate)
+      filters.value.startDate = formatToISODate(startDate)
       // Do not auto-load: user must click Search
     })
 

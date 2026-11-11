@@ -2,7 +2,7 @@
   <teleport to="body">
     <transition name="kc-modal">
       <div v-if="isOpen" class="fixed inset-0 z-[var(--layout-z-modal,200)] flex items-center justify-center bg-black/60 p-4" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="requestClose">
-        <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+        <div v-modal-focus class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold theme-heading">{{ modalHeaderTitle }}</h2>

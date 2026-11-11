@@ -373,6 +373,9 @@ export default {
 
     const handleFocus = (event) => {
       emit('focus', event)
+      // Programmatic focus (e.g. modal autofocus) must not open the options.
+      const target = event && event.target
+      if (target && target.dataset && target.dataset.suppressFocusOpen !== undefined) return
       openDropdown()
     }
 

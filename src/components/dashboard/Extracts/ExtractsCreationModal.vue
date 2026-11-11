@@ -16,7 +16,7 @@
           :dir="isRTL ? 'rtl' : 'ltr'"
           @click.self="requestClose"
         >
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+          <div v-modal-focus class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
             <h2 class="text-2xl font-bold theme-heading">
               {{ currentStep === 1 ? modalTitleComputed : ($t('labels.enterDetails') || 'Enter Details') }}

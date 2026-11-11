@@ -18,6 +18,7 @@ import { buildVersionService } from './services/buildVersionService'
 import { tokenManager } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
 import appTable from './directives/appTable'
+import modalFocus from './directives/modalFocus'
 import { playChatSound } from './utils/notificationSound'
 import { initializeColorMode } from './utils/colorMode'
 
@@ -39,6 +40,7 @@ app.component('Modal', Modal)
 app.component('AppModal', Modal)
 app.component('ThemeIcon', ThemeIcon)
 app.directive('app-table', appTable)
+app.directive('modal-focus', modalFocus)
 app.provide(ICON_REVISION_KEY, iconRevision)
 app.provide(THEME_REVISION_KEY, themeRevision)
 

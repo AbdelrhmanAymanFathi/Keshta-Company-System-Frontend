@@ -138,7 +138,7 @@
 
     <!-- Reset Password Modal -->
     <div v-if="resetModalOpen" class="fixed inset-0 z-50 mt-0 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0 !important;">
-      <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl" :class="isRTL ? 'text-right' : 'text-left'">
+      <div v-modal-focus="{ onEscape: closeResetModal }" class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl" :class="isRTL ? 'text-right' : 'text-left'">
         <h3 class="text-lg font-semibold mb-4">{{ $t('users.resetModalTitle') }}</h3>
         <p class="theme-text-secondary mb-4">{{ $t('users.resetConfirmMessage', { name: resetUser?.name || '' }) }}</p>
         <div class="space-y-4">
@@ -161,7 +161,7 @@
 
     <!-- Add/Edit Modal -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 mt-0 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0 !important;">
-      <div class="max-h-[100vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl" :class="isRTL ? 'text-right' : 'text-left'">
+      <div v-modal-focus="{ onEscape: closeModal }" class="max-h-[100vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">
             {{ editing ? $t('users.editUser') : $t('users.addUser') }}
@@ -259,7 +259,7 @@
 
     <!-- Delete Confirmation Modal -->
     <div v-if="deleteModalOpen" class="fixed inset-0 z-50 mt-0 flex items-center justify-center bg-slate-950/20 backdrop-blur-sm" style="margin-top: 0 !important;">
-      <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+      <div v-modal-focus="{ onEscape: () => { deleteModalOpen = false } }" class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
         <h3 class="text-lg font-semibold mb-4">{{ $t('users.deleteConfirm') }}</h3>
         <p class="theme-text-secondary mb-6">
           {{ $t('users.deleteConfirmMessage', { name: userToDelete?.name || '' }) }}
@@ -278,7 +278,7 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import { usePagination } from '@/composables/usePagination'
 import { useI18n } from 'vue-i18n'
 import { getUsers, getUserRoles, createUser, updateUser, deleteUser, adminResetUserPassword } from '@/api'
@@ -299,6 +299,7 @@ export default {
   setup() {
     const { locale } = useI18n()
     const q = ref('')
+    let searchTimer = null
 
     const { items: users, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
       (p, ps, extra) => getUsers({ page: p, pageSize: ps, q: extra.q ?? q.value }),
@@ -309,7 +310,14 @@ export default {
       try { await load({ q: q.value }) } catch (e) { console.error('Error loading users:', e) }
     }
 
-    watch(q, () => { setPage(1); loadUsers() })
+    watch(q, () => {
+      clearTimeout(searchTimer)
+      searchTimer = setTimeout(() => {
+        setPage(1)
+        loadUsers()
+      }, 350)
+    })
+    onBeforeUnmount(() => clearTimeout(searchTimer))
 
     return { locale, q, users, page, pageSize, total, totalPages, loading, loadUsers, setPage, setPageSize }
   },

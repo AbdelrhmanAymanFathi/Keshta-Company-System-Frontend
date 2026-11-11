@@ -8,7 +8,7 @@
         class="fixed inset-0 bg-black/60 flex items-center justify-center z-[var(--layout-z-modal,200)] p-4 overflow-hidden"
         @click.self="requestClose"
       >
-        <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+        <div v-modal-focus class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold theme-heading">
@@ -403,7 +403,7 @@
 
   <!-- Dialog: Add Location -->
   <div v-if="showAddLocation" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
-    <div class="bg-white p-6 rounded shadow w-96">
+    <div v-modal-focus="{ onEscape: () => { showAddLocation = false; pendingField = null } }" class="bg-white p-6 rounded shadow w-96">
       <h3 class="text-lg font-bold mb-2">{{ $t('supply.addSite') }}</h3>
       <label class="block text-sm mb-1">{{ $t('supply.name') }}</label>
       <input v-model="newLocationName" :placeholder="$t('supply.siteName')" class="w-full border rounded px-2 py-1 mb-3" />
@@ -449,6 +449,7 @@ import {
 } from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
+import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 
 export default {
   name: 'TransportModal',
@@ -1398,7 +1399,7 @@ export default {
         row.companyCapacity = Number(t.vehicleCompanyCapacity ?? vehicle?.companyCapacity ?? 0)
         row.count = Number(t.numTrips) || 1
         row.distanceKm = parseFloat(t.distanceKm) || this.commonData.distanceKm || 0
-        row.date = t.date?.split('T')[0] || this.commonData.date || new Date().toISOString().split('T')[0]
+        row.date = formatToISODate(t.date) || this.commonData.date || getTodayISO()
         this.rows = [row]
       } else {
         // Draft: ensure the modal stays on Step 1 so user can confirm header data first

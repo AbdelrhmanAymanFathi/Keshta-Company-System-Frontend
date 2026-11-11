@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="fixed inset-0 z-[2200] flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-lg p-6 w-full max-w-3xl overflow-y-auto max-h-[80vh]">
+    <div v-modal-focus="{ onEscape: () => $emit('close') }" class="bg-white rounded-lg p-6 w-full max-w-3xl overflow-y-auto max-h-[80vh]">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold">{{ $t('supply.exportDetails') || 'Export Details' }}</h3>
         <div class="flex gap-2">

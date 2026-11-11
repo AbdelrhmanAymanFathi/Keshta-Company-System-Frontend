@@ -310,7 +310,7 @@
 
     <!-- Category Modal (Add / Edit Main Term) -->
     <div v-if="categoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="categoryModal.open = false">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
+      <div v-modal-focus="{ onEscape: () => { categoryModal.open = false } }" class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
           <div>
             <h3 class="font-bold text-lg">{{ categoryModal.isEdit ? $t('expenses.editMainTerm') : $t('expenses.addMainTerm') }}</h3>
@@ -418,7 +418,7 @@
 
     <!-- SubCategory Modal (Add to the master list / Rename everywhere) -->
     <div v-if="subCategoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="subCategoryModal.open = false">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
+      <div v-modal-focus="{ onEscape: () => { subCategoryModal.open = false } }" class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
           <div>
             <h3 class="font-bold text-lg">{{ subCategoryModal.isEdit ? $t('expenses.editSubcategory') : 'إضافة بنود فرعية للقائمة' }}</h3>
@@ -518,7 +518,7 @@
 
     <!-- Picker Modal: choose a main term's sub-terms from the master list -->
     <div v-if="pickerModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="pickerModal.open = false">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
+      <div v-modal-focus="{ onEscape: () => { pickerModal.open = false } }" class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center shrink-0">
           <div>
             <h3 class="font-bold text-lg">اختيار البنود الفرعية</h3>

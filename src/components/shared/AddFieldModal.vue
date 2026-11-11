@@ -2,7 +2,7 @@
   <!-- Modal for add category/branch/location -->
   <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="z-index:1050;">
     <div class="fixed inset-0 bg-black bg-opacity-50 z-40" @click="handleClose"></div>
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
+    <div v-modal-focus="{ onEscape: handleClose }" class="bg-white rounded-lg shadow-xl w-full max-w-sm relative z-50" style="z-index:1060;">
       <div class="p-6">
         <div class="mb-4">
           <h3 class="text-lg font-semibold theme-text-primary">

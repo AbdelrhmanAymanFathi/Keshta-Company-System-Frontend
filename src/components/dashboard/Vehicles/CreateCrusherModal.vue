@@ -1,7 +1,7 @@
 <template>
   <teleport to="body">
     <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 z-100 flex items-center justify-center" style="z-index: 150;">
-      <div class="bg-white rounded-lg shadow-lg p-6 w-96 max-w-full">
+      <div v-modal-focus="{ onEscape: onCancel }" class="bg-white rounded-lg shadow-lg p-6 w-96 max-w-full">
         <h2 class="text-lg font-bold mb-4">{{ $t('vehicles.addNewCrusher') }}</h2>
         
         <form @submit.prevent="onSubmit" class="space-y-4">

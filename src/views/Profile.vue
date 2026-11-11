@@ -90,7 +90,7 @@
 
     <!-- Change Password Modal -->
     <div v-if="showChangeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 sm:p-8 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
+      <div v-modal-focus="{ onEscape: closeChangeModal }" class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 sm:p-8 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold theme-text-primary">{{ $t('profile.changePassword') }}</h3>
           <ShadcnButton variant="outline" size="native" @click="closeChangeModal" class="theme-caption hover:theme-text-secondary transition">
@@ -148,7 +148,7 @@
 
     <!-- TOTP Modal -->
     <div v-if="showTotpModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4" style="margin-top: 0 !important;">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
+      <div v-modal-focus="{ onEscape: () => { showTotpModal = false } }" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto" :class="isRTL ? 'text-right' : 'text-left'">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-bold theme-text-primary">{{ $t('profile.totpTitle') }}</h3>
           <ShadcnButton variant="outline" size="native" @click="showTotpModal = false" class="theme-caption hover:theme-text-secondary transition">

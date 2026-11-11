@@ -486,7 +486,7 @@
   </div>
 
   <div v-if="showDeposit" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeDepositModal">
-    <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
+    <div v-modal-focus="{ onEscape: closeDepositModal }" class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
       <div class="border-b border-gray-100 pb-3">
         <h3 class="text-lg font-semibold theme-text-primary">{{ isCustodySelected ? t('treasury.addMoneyCustody') : t('treasury.addMoney') }}</h3>
         <p class="mt-1 text-xs theme-text-secondary">{{ isCustodySelected ? t('treasury.custodyDepositHint') : t('treasury.mainDepositHint') }}</p>
@@ -570,7 +570,7 @@
   </div>
 
   <div v-if="showTransfer" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeTransferModal">
-    <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
+    <div v-modal-focus="{ onEscape: closeTransferModal }" class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
         <h3 class="text-lg font-semibold theme-text-primary">{{ t('treasury.transferTitle') }}</h3>
         <ShadcnButton variant="outline" size="native" class="theme-caption transition hover:theme-text-secondary" @click="closeTransferModal">×</ShadcnButton>
@@ -617,7 +617,7 @@
 
   <!-- Edit a direct deposit / transfer from the ledger -->
   <div v-if="movementForm.open" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" @click.self="closeMovementModal">
-    <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm" :dir="isRTL ? 'rtl' : 'ltr'">
+    <div v-modal-focus="{ onEscape: closeMovementModal }" class="w-full max-w-md rounded-2xl border border-gray-100 bg-white/90 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-sm" :dir="isRTL ? 'rtl' : 'ltr'">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
         <div>
           <h3 class="text-lg font-semibold theme-text-primary">{{ isRTL ? 'تعديل' : 'Edit' }} {{ refTypeLabel(movementForm.refType) }}</h3>
@@ -670,6 +670,7 @@ import { useRealtime } from '@/composables/useRealtime'
 import { debounce } from '@/utils/debounce'
 import { transferBetweenTreasuries, getExpense, getTreasuryPurgePreview, updateTreasuryMovement, deleteTreasuryMovement, deleteExpense } from '@/api'
 import { playNotificationSound } from '@/utils/notificationSound'
+import { getTodayISO, formatToISODate } from '@/utils/dateUtils'
 import { isPendingApproval, pendingApprovalToast } from '@/utils/approval'
 
 export default {
@@ -856,7 +857,7 @@ export default {
     const toDateInput = (value) => {
       if (!value) return ''
       const d = new Date(value)
-      return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10)
+      return isNaN(d.getTime()) ? '' : formatToISODate(d)
     }
     const movementForm = reactive({ open: false, id: null, refType: '', amount: 0, description: '', originalDescription: '', date: '', settlementDate: '', saving: false, error: '' })
     const toast = (message, type = 'error') => { if (window.$toast) window.$toast(message, type, 5000) }
@@ -1125,7 +1126,7 @@ export default {
       if (!canDeposit.value) return
       depositForm.amount = 0
       depositForm.description = ''
-      depositForm.date = new Date().toISOString().slice(0, 10)
+      depositForm.date = getTodayISO()
       depositForm.settlementDate = ''
       // Default: prefer a MAIN treasury as source, fall back to first available
       const defaultSource = mainTreasuries.value.find(t => t.type === 'MAIN') ?? mainTreasuries.value[0]
@@ -1231,7 +1232,7 @@ export default {
         transferForm.description = ''
       }
       transferForm.amount = 0
-      transferForm.date = new Date().toISOString().slice(0, 10)
+      transferForm.date = getTodayISO()
       transferError.value = ''
       showTransfer.value = true
     }

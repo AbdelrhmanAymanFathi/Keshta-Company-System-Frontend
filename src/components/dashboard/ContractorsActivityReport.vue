@@ -502,6 +502,7 @@ import SortableDateHeader from '@/components/shared/SortableDateHeader.vue'
 import { useDateSort } from '@/composables/useDateSort'
 import { buildQueryParams } from '@/utils/buildQueryParams'
 import { downloadBlobData, getFilenameFromHeaders } from '@/utils/downloadFile'
+import { formatToISODate } from '@/utils/dateUtils'
 
 export default {
   name: 'ContractorsActivityReport',
@@ -891,8 +892,8 @@ export default {
     const setDefaultDates = () => {
       const endDate = new Date()
       const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-      filters.value.endDate = endDate.toISOString().split('T')[0]
-      filters.value.startDate = startDate.toISOString().split('T')[0]
+      filters.value.endDate = formatToISODate(endDate)
+      filters.value.startDate = formatToISODate(startDate)
     }
 
     onMounted(async () => {

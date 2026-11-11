@@ -189,7 +189,7 @@
 
     <!-- Rejection Dialog Modal -->
     <div v-if="showRejectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all border border-slate-100" :dir="isRTL ? 'rtl' : 'ltr'">
+      <div v-modal-focus="{ onEscape: closeRejectModal }" class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all border border-slate-100" :dir="isRTL ? 'rtl' : 'ltr'">
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-150 flex justify-between items-center">
           <h3 class="text-lg font-bold text-slate-800">
             {{ t('rejectModalTitle') }}
@@ -224,7 +224,7 @@
 
     <!-- Full Details Modal -->
     <div v-if="selectedApprovalForDetail" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto" style="margin-top:0;">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all border border-slate-100 max-h-[90vh] flex flex-col" :dir="isRTL ? 'rtl' : 'ltr'">
+      <div v-modal-focus="{ onEscape: closeDetailModal }" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all border border-slate-100 max-h-[90vh] flex flex-col" :dir="isRTL ? 'rtl' : 'ltr'">
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-150 flex justify-between items-center">
           <h3 class="text-lg font-bold text-slate-800">
             🔍 {{ locale === 'ar' ? 'تفاصيل طلب الموافقة الكاملة' : 'Full Approval Request Details' }} (#{{ selectedApprovalForDetail.id }})

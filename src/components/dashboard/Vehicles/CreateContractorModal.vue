@@ -1,7 +1,7 @@
 <template>
   <teleport to="body">
     <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex z-100 items-center justify-center" style="z-index: 150;">
-      <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+      <div v-modal-focus="{ onEscape: onCancel }" class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
         <h2 class="text-lg font-bold mb-4">{{ $t('vehicles.addNewContractor') }}</h2>
         
         <form @submit.prevent="onSubmit" class="space-y-4">

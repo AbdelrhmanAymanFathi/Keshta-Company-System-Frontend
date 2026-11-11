@@ -24,6 +24,16 @@ export const getPayments = (params = {}) => {
   const q = query.toString();
   return axios.get(`${BASE_URL}/api/payments${q ? `?${q}` : ''}`);
 };
+// Edit a payment. Backend reconciles the treasury, company wallet and contractor wallet.
+export const updatePayment = (id, data = {}) => {
+  const payload = { ...data };
+  if (payload.exportId && !payload.supplyId) {
+    payload.supplyId = payload.exportId;
+    delete payload.exportId;
+  }
+  return axios.patch(withLangQuery(`${BASE_URL}/api/payments/${id}`), payload);
+};
+
 // Cancel (delete) a payment. Backend reverses the treasury, company wallet and contractor wallet.
 export const deletePayment = (id) =>
   axios.delete(withLangQuery(`${BASE_URL}/api/payments/${id}`));

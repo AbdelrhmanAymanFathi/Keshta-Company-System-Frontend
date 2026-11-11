@@ -180,27 +180,7 @@
             @mousedown="activeDropdown = p.name"
           >
             <div
-              v-if="paramLoading[p.name]"
-              class="flex items-center gap-2 py-2 text-xs theme-text-muted"
-            >
-              <ArrowPathIcon class="h-3.5 w-3.5 animate-spin theme-text" />
-              {{ $t('reports.loadingOptions') || $t('labels.loading') }}
-            </div>
-            <SearchDropdown
-              v-else-if="!paramDependencies[p.name] || (paramDependencies[p.name] && paramDependencies[p.name].every(dep => values[dep]))"
-              :modelValue="selectedLabels[p.name] || ''"
-              :items="paramOptions[p.name] || []"
-              :allItems="paramOptions[p.name] || []"
-              :placeholder="$t('placeholders.search')"
-              itemKey="id"
-              itemLabel="label"
-              :inputClass="inputClass"
-              @update:modelValue="q => onOptionSearch(p.name, q)"
-              @select="item => onSelectOptionGeneric(p, item)"
-            />
-
-            <div
-              v-else
+              v-if="paramDependencies[p.name] && !paramDependencies[p.name].every(dep => values[dep])"
               :class="[inputClass, 'flex items-center gap-2 bg-slate-100/80 theme-text-muted']"
             >
               <InformationCircleIcon class="h-4 w-4 shrink-0 theme-text" />
@@ -219,6 +199,33 @@
                     .join(', ')
                 }}
                 {{ locale === 'ar' ? ' أولاً' : ' first' }}
+              </span>
+            </div>
+
+            <!--
+              Keep the search input mounted while options load. Swapping it for a
+              loading placeholder destroys the focused <input>, so the user loses
+              focus after every keystroke. The spinner is rendered as an overlay
+              instead, and the dropdown stays open with its current results.
+            -->
+            <div v-else class="relative">
+              <SearchDropdown
+                :modelValue="selectedLabels[p.name] || ''"
+                :items="paramOptions[p.name] || []"
+                :allItems="paramOptions[p.name] || []"
+                :placeholder="$t('placeholders.search')"
+                itemKey="id"
+                itemLabel="label"
+                :inputClass="inputClass"
+                @update:modelValue="q => onOptionSearch(p.name, q)"
+                @select="item => onSelectOptionGeneric(p, item)"
+              />
+              <span
+                v-if="paramLoading[p.name]"
+                class="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 theme-text-muted"
+                :aria-label="$t('reports.loadingOptions') || $t('labels.loading')"
+              >
+                <ArrowPathIcon class="h-4 w-4 animate-spin" />
               </span>
             </div>
           </div>
@@ -369,7 +376,7 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getReportDef, executeReport, getReportParamOptions } from '@/api'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
@@ -904,7 +911,21 @@ export default {
       }
     }
 
-    async function loadOptions(paramName, q = '') {
+    // One debounce timer + one "latest request" token per filter, so typing
+    // cannot fire a request for every character or let a slow, stale response
+    // overwrite the results of the newest query.
+    const optionSearchTimers = new Map()
+    const optionRequestSeq = new Map()
+
+    function nextOptionRequest(paramName) {
+      const seq = (optionRequestSeq.get(paramName) || 0) + 1
+      optionRequestSeq.set(paramName, seq)
+      return seq
+    }
+
+    async function loadOptions(paramName, q = '', requestSeq = null) {
+      const seq = requestSeq ?? nextOptionRequest(paramName)
+
       paramLoading.value[paramName] = true
 
       try {
@@ -927,6 +948,8 @@ export default {
 
         const res = await getReportParamOptions(props.reportId, paramName, queryObj)
 
+        if (optionRequestSeq.get(paramName) !== seq) return
+
         const items = Array.isArray(res.data || res)
           ? (res.data || res).map((it, idx) => ({
               id: it.id ?? it.value ?? it.key ?? idx,
@@ -936,10 +959,13 @@ export default {
 
         paramOptions.value[paramName] = items
       } catch (err) {
+        if (optionRequestSeq.get(paramName) !== seq) return
         console.error('Failed to load options for', paramName, err)
         paramOptions.value[paramName] = []
       } finally {
-        paramLoading.value[paramName] = false
+        if (optionRequestSeq.get(paramName) === seq) {
+          paramLoading.value[paramName] = false
+        }
       }
     }
 
@@ -954,8 +980,21 @@ export default {
         }
       }
 
-      loadOptions(paramName, q)
+      // Invalidate any in-flight request immediately, then wait for the user to
+      // pause before asking the API for the filtered options.
+      const seq = nextOptionRequest(paramName)
+
+      clearTimeout(optionSearchTimers.get(paramName))
+      optionSearchTimers.set(paramName, setTimeout(() => {
+        optionSearchTimers.delete(paramName)
+        loadOptions(paramName, q, seq)
+      }, 350))
     }
+
+    onBeforeUnmount(() => {
+      optionSearchTimers.forEach((timer) => clearTimeout(timer))
+      optionSearchTimers.clear()
+    })
 
     function onSelectOptionGeneric(p, item) {
       if (!p) return

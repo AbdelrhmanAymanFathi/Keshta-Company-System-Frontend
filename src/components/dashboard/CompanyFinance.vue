@@ -654,7 +654,7 @@
       <!-- Add Expense Modal -->
       <div v-if="showExpenseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeExpenseModal"></div>
-        <div :class="['bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto', isRTL ? 'direction-rtl' : '']">
+        <div v-modal-focus="{ onEscape: closeExpenseModal }" :class="['bg-white rounded-lg shadow-xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto', isRTL ? 'direction-rtl' : '']">
           <div class="p-6">
             <div class="flex items-center justify-between mb-4">
               <h3 :class="['text-sm font-semibold theme-text-primary', isRTL ? 'text-start' : 'text-start']">
@@ -870,6 +870,7 @@
     <div v-if="showEditBranchModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="margin-top: 0;"
       @click.self="closeEditBranchModal">
       <div
+        v-modal-focus="{ onEscape: closeEditBranchModal }"
         :class="['relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white', isRTL ? 'text-end' : 'text-start']">
         <div class="mt-3">
           <h3 :class="['text-sm font-medium theme-text-primary mb-4', isRTL ? 'text-end' : 'text-start']">
@@ -903,6 +904,7 @@
   class="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50 px-4"
   @click.self="closeTransferModal" style="margin-top: 0px;">
         <div
+          v-modal-focus="{ onEscape: closeTransferModal }"
           :class="[
     'relative w-full max-w-2xl bg-white rounded-md shadow-lg p-5 max-h-[90vh] overflow-y-auto',
     isRTL ? 'text-end' : 'text-start'

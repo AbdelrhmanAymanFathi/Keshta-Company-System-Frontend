@@ -382,7 +382,7 @@
     <teleport to="body">
       <transition name="kc-modal">
         <div v-if="modalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[var(--layout-z-modal,200)] p-4 overflow-hidden" :dir="isRTL ? 'rtl' : 'ltr'" @click.self="closeModal">
-          <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-[calc(100vw-16px)] max-w-[calc(100vw-16px)] md:w-[96vw] md:max-w-[96vw] max-h-[95vh] flex flex-col" :class="isRTL ? 'rtl-modal' : ''">
+          <div v-modal-focus="{ onEscape: closeModal }" class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-[calc(100vw-16px)] max-w-[calc(100vw-16px)] md:w-[96vw] md:max-w-[96vw] max-h-[95vh] flex flex-col" :class="isRTL ? 'rtl-modal' : ''">
             <!-- Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
               <h2 class="text-xl sm:text-2xl font-bold theme-heading">
@@ -1671,7 +1671,7 @@ rows: [],
       }
 
       this.editing = true
-      const formattedDate = this.toDateOnly(expense.date) || new Date().toISOString().split('T')[0]
+      const formattedDate = this.toDateOnly(expense.date) || getTodayISO()
       const formattedSettlementDate = this.toDateOnly(expense.settlementDate) || formattedDate
       const terms = this.resolveExpenseTerms(expense)
 

@@ -198,16 +198,27 @@
             <td class="px-4 py-3 theme-text-primary">{{ paymentTreasury(payment) }}</td>
             <td class="px-4 py-3 theme-text-primary">{{ paymentNotes(payment) }}</td>
             <td class="px-4 py-3">
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                class="px-3 py-1.5 text-xs font-medium"
-                :disabled="cancellingId === payment.id"
-                @click="confirmCancel(payment)"
-              >
-                {{ cancellingId === payment.id ? ($t('labels.loading') || 'Loading...') : ($t('payments.cancelPayment') || 'Cancel') }}
-              </Button>
+              <div class="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  class="px-3 py-1.5 text-xs font-medium"
+                  @click="openEdit(payment)"
+                >
+                  {{ $t('labels.edit') || 'Edit' }}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  class="px-3 py-1.5 text-xs font-medium"
+                  :disabled="cancellingId === payment.id"
+                  @click="confirmCancel(payment)"
+                >
+                  {{ cancellingId === payment.id ? ($t('labels.loading') || 'Loading...') : ($t('payments.cancelPayment') || 'Cancel') }}
+                </Button>
+              </div>
             </td>
           </tr>
           <tr v-if="!filteredPayments.length">
@@ -218,6 +229,11 @@
     </div>
 
     <PaymentCreationModal v-model:visible="paymentModalVisible" @saved="onPaymentCreated" />
+    <PaymentEditModal
+      v-model:visible="editModalVisible"
+      :payment="paymentToEdit"
+      @saved="onPaymentUpdated"
+    />
 
     <!-- Cancel Confirmation Modal -->
     <ConfirmDialog
@@ -240,6 +256,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { getPayments, getLocations, getContractors, getTreasuries, getReportDefs, deletePayment } from '@/api'
 import PaymentCreationModal from '@/components/dashboard/payment/PaymentCreationModal.vue'
+import PaymentEditModal from '@/components/dashboard/payment/PaymentEditModal.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
@@ -261,6 +278,7 @@ export default {
   name: 'PaymentsPage',
   components: {
     PaymentCreationModal,
+    PaymentEditModal,
     ConfirmDialog,
     DateField,
     SearchDropdown,
@@ -272,6 +290,8 @@ export default {
     const router = useRouter()
     const isRTL = computed(() => locale.value?.toString().startsWith('ar'))
     const paymentModalVisible = ref(false)
+    const editModalVisible = ref(false)
+    const paymentToEdit = ref(null)
     const cancellingId = ref(null)
     const showCancelConfirm = ref(false)
     const paymentToCancel = ref(null)
@@ -559,6 +579,25 @@ export default {
       await loadPayments()
     }
 
+    const openEdit = (payment) => {
+      if (!payment?.id) return
+      paymentToEdit.value = payment
+      editModalVisible.value = true
+    }
+
+    const onPaymentUpdated = async (res) => {
+      const pending = isPendingApproval(res)
+      if (typeof window !== 'undefined' && window.$toast) {
+        window.$toast(
+          pending
+            ? pendingApprovalToast(isRTL.value)
+            : (t('payments.updateSuccess') || 'Payment updated'),
+          pending ? 'info' : 'success'
+        )
+      }
+      if (!pending) await loadPayments()
+    }
+
     const confirmCancel = (payment) => {
       if (!payment?.id) return
       paymentToCancel.value = payment
@@ -644,6 +683,8 @@ export default {
     return {
       isRTL,
       paymentModalVisible,
+      editModalVisible,
+      paymentToEdit,
       cancellingId,
       showCancelConfirm,
       paymentToCancel,
@@ -674,6 +715,8 @@ export default {
       resetFilters,
       onPay,
       onPaymentCreated,
+      openEdit,
+      onPaymentUpdated,
       paymentDate,
       paymentSite,
       paymentModule,

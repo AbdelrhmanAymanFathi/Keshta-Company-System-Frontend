@@ -3,15 +3,17 @@
     <Input
       :id="$attrs.id"
       :name="$attrs.name"
-      :value="internalValue"
+      :model-value="internalValue"
       :placeholder="placeholder"
       :disabled="disabled"
       type="text"
+      inputmode="numeric"
       :class="['date-field pe-8', parsedClasses.input]"
-      @input="onInput"
+      v-bind="forwardedAttrs"
+      @update:model-value="onModelUpdate"
       @blur="onBlur"
       @focus="onFocus"
-      @keydown="onKeyDown"
+      @keydown="onKeyDownCombined"
     />
 
     <Popover v-model:open="calendarOpen">
@@ -116,6 +118,20 @@ export default {
       }
     })
 
+    // Forward the remaining attrs (required, aria-*, data-*, autocomplete, …) to
+    // the native input. `class`, `id`, `name` and `style` are handled explicitly,
+    // and `onKeydown` is merged into onKeyDownCombined below so callers can still
+    // react to Enter/Tab while arrow-key date stepping keeps working.
+    const forwardedAttrs = computed(() => {
+      const rest = { ...attrs }
+      delete rest.class
+      delete rest.id
+      delete rest.name
+      delete rest.style
+      delete rest.onKeydown
+      return rest
+    })
+
     const selectedDate = computed(() => {
       const iso = formatToISODate(props.modelValue)
       const date = parseISODateToDate(iso)
@@ -133,22 +149,22 @@ export default {
       return `${day}/${month}/${year}`
     }
 
-    function onInput(event) {
-      const value = String(event.target.value || '')
-      if (value === '') {
+    function onModelUpdate(value) {
+      const raw = String(value ?? '')
+      if (raw === '') {
         internalValue.value = ''
         emit('update:modelValue', '')
         return
       }
 
-      const isoFromDMY = parseDateDMY(value)
+      const isoFromDMY = parseDateDMY(raw)
       if (isoFromDMY) {
         internalValue.value = formatDateDMY(isoFromDMY)
         emit('update:modelValue', isoFromDMY)
         return
       }
 
-      const matchISO = value.match(/^(\d{4})-(\d{2})-(\d{2})/)
+      const matchISO = raw.match(/^(\d{4})-(\d{2})-(\d{2})/)
       if (matchISO) {
         const iso = `${matchISO[1]}-${matchISO[2]}-${matchISO[3]}`
         internalValue.value = formatDateDMY(iso)
@@ -156,7 +172,7 @@ export default {
         return
       }
 
-      const digits = value.replace(/\D/g, '').slice(0, 8)
+      const digits = raw.replace(/\D/g, '').slice(0, 8)
       internalValue.value = formatDigitsToDisplay(digits)
       if (digits.length === 8) {
         const iso = parseDateDMY(formatDigitsToDisplay(digits))
@@ -166,8 +182,14 @@ export default {
       }
     }
 
-    function onFocus() {
+    function onFocus(event) {
       isFocused.value = true
+      // When the field already holds a complete date, select it so typing
+      // replaces the value instead of appending to it.
+      const el = event && event.target
+      if (el && typeof el.select === 'function' && parseDateDMY(internalValue.value)) {
+        el.select()
+      }
     }
 
     function onBlur() {
@@ -207,6 +229,11 @@ export default {
       calendarOpen.value = true
     }
 
+    function onKeyDownCombined(event) {
+      onKeyDown(event)
+      if (typeof attrs.onKeydown === 'function') attrs.onKeydown(event)
+    }
+
     function onCalendarSelect(value) {
       if (!value) return
       const iso = value.toString()
@@ -232,10 +259,12 @@ export default {
       calendarOpen,
       selectedDate,
       parsedClasses,
-      onInput,
+      forwardedAttrs,
+      onModelUpdate,
       onBlur,
       onFocus,
       onKeyDown,
+      onKeyDownCombined,
       onCalendarSelect
     }
   }

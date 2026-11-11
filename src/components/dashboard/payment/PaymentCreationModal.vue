@@ -8,7 +8,7 @@
           :dir="isRTL ? 'rtl' : 'ltr'"
           @click.self="closeModal"
         >
-          <div class="kc-modal-panel flex max-h-[95vh] w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+          <div v-modal-focus="{ onEscape: closeModal }" class="kc-modal-panel flex max-h-[95vh] w-full max-w-[95vw] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div class="flex items-center justify-between border-b theme-dashboard-bg-soft px-6 py-4">
               <h2 class="text-2xl font-bold theme-heading theme-text-primary">
                 {{ currentStep === 1 ? modalTitleComputed : enterPaymentTitle }}
@@ -163,7 +163,7 @@
                 </h3>
 
                 <div class="overflow-x-auto rounded-xl border border-gray-200">
-                  <table class="min-w-full divide-y divide-gray-200">
+                  <table ref="tableRef" class="min-w-full divide-y divide-gray-200">
                     <thead class="sticky top-0 z-10 bg-gray-50">
                       <tr>
                         <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">#</th>
@@ -286,7 +286,7 @@
 </template>
 
 <script>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import DateField from '@/components/shared/DateField.vue'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import { createPayment, getContractors, getLocations, getTreasuries } from '@/api'
@@ -656,11 +656,29 @@ export default {
         !row.notes
     }
 
+    const tableRef = ref(null)
+
+    function focusRowInput(rowIndex) {
+      const table = tableRef.value
+      if (!table) return
+      const rowEl = table.querySelectorAll('tbody tr')[rowIndex]
+      if (!rowEl) return
+      rowEl.scrollIntoView({ block: 'nearest' })
+      const input = rowEl.querySelector('input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
+      if (input) input.focus({ preventScroll: true })
+    }
+
+    async function appendRowAndFocus() {
+      rows.value.push(createRow())
+      const newRow = rows.value[rows.value.length - 1]
+      await loadContractorsForRow(newRow)
+      await nextTick()
+      focusRowInput(rows.value.length - 1)
+    }
+
     async function handleEnterKey(index) {
       if (index === rows.value.length - 1) {
-        rows.value.push(createRow())
-        const newRow = rows.value[rows.value.length - 1]
-        await loadContractorsForRow(newRow)
+        await appendRowAndFocus()
       }
     }
 
@@ -668,9 +686,7 @@ export default {
       if (event.shiftKey) return
       if (event.key === 'Tab' && index === rows.value.length - 1) {
         event.preventDefault()
-        rows.value.push(createRow())
-        const newRow = rows.value[rows.value.length - 1]
-        await loadContractorsForRow(newRow)
+        await appendRowAndFocus()
       }
     }
 
@@ -690,6 +706,8 @@ export default {
       })
       await Promise.all(rows.value.map(row => loadContractorsForRow(row)))
       saveToStorage()
+      await nextTick()
+      focusRowInput(0)
     }
 
     const prevStep = () => {
@@ -787,6 +805,7 @@ export default {
 
     return {
       isVisible: internalVisible,
+      tableRef,
       isRTL,
       currentStep,
       filters,

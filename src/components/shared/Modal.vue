@@ -1,9 +1,11 @@
 <template>
   <Dialog :open="visible" @update:open="onOpenChange">
     <DialogContent
+      ref="contentRef"
       :dir="isRTL ? 'rtl' : 'ltr'"
       :class="['shadcn-ui', sizeClass]"
       :show-close-button="false"
+      @open-auto-focus="onOpenAutoFocus"
       @escape-key-down="onEscapeKeyDown"
       @pointer-down-outside="onPointerDownOutside"
     >
@@ -76,6 +78,27 @@ export default {
   methods: {
     onOpenChange(open) {
       if (!open) this.$emit('update:visible', false)
+    },
+    // Radix/reka focuses the first tabbable element, which is the header close
+    // button. For data-entry screens we want the first field instead, so the
+    // user can start typing immediately (and Tab flows in DOM order).
+    onOpenAutoFocus(event) {
+      const fromEvent = event?.target && typeof event.target.querySelector === 'function' ? event.target : null
+      const root = fromEvent || this.$refs.contentRef?.$el || this.$refs.contentRef
+      if (!root || typeof root.querySelector !== 'function') return
+      const field = root.querySelector(
+        'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+      )
+      if (!field) return
+      event.preventDefault()
+      requestAnimationFrame(() => {
+        // SearchDropdown opens its options on focus; autofocus must not pop the
+        // list open, so flag the focus event as programmatic for that component.
+        const suppress = field.tagName === 'INPUT'
+        if (suppress) field.setAttribute('data-suppress-focus-open', '')
+        field.focus()
+        if (suppress) field.removeAttribute('data-suppress-focus-open')
+      })
     },
     onEscapeKeyDown(event) {
       if (!this.closeOnEsc) event.preventDefault()

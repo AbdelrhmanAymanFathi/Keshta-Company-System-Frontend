@@ -10,7 +10,7 @@
     <transition name="kc-modal">
       <div v-if="isOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center z-80 p-4 overflow-hidden"
         :dir="isRTL ? 'rtl' : 'ltr'" @click.self="requestClose">
-        <div class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
+        <div v-modal-focus class="kc-modal-panel bg-white rounded-2xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
           <h2 class="text-2xl font-bold theme-heading">
@@ -252,7 +252,8 @@
             </div>
 
             <!-- Table for Variable Data -->
-            <div ref="rowsContainer" class="supply-rows-container mb-8 relative border border-gray-200 rounded-lg p-2">
+            <div ref="rowsContainer" class="supply-rows-container mb-8 relative border border-gray-200 rounded-lg p-2"
+              @focusin="onRowFocusIn">
                 <table ref="tableRef" class="w-full divide-y divide-gray-200 border rounded-lg">
                   <thead class="theme-dashboard-bg-soft sticky top-0 z-10">
                     <tr>
@@ -904,6 +905,18 @@ export default {
         row.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
         const firstInput = row.querySelector('input:not([type="hidden"]):not(:disabled)')
         firstInput?.focus({ preventScroll: true })
+      })
+    },
+
+    // Every time a field inside the rows table receives focus (mouse or Tab),
+    // scroll it into view with `block: 'nearest'` so newly added rows are never
+    // left below the visible area.
+    onRowFocusIn(event) {
+      const el = event.target
+      if (!(el instanceof HTMLElement)) return
+      if (!/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) return
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
       })
     },
 
@@ -1630,10 +1643,19 @@ export default {
 }
 
 .supply-rows-container {
-  max-height: 55vh;
+  /* No fixed height: let the modal body be the single scroll region so rows
+     are never clipped by a nested scroll box. `overflow: auto` stays for the
+     horizontal scrollbar the wide table needs. */
   overflow: auto;
   overscroll-behavior: contain;
   scroll-behavior: smooth;
+}
+
+/* Keep the focused field clear of the sticky totals bar when it is scrolled
+   into view on Tab. */
+.supply-rows-container input,
+.supply-rows-container select {
+  scroll-margin-bottom: 7rem;
 }
 
 .supply-rows-container table {

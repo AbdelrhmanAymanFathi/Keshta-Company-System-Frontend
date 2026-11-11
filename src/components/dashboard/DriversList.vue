@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import { usePagination } from '@/composables/usePagination'
 import PageHeader from '@/components/shared/PageHeader.vue'
 import Pagination from '@/components/shared/Pagination.vue'
@@ -107,6 +107,7 @@ export default {
     PageHeader, Label, Pagination, RowActions, Button, Input, PencilSquareIcon, PlusIcon, TrashIcon, XMarkIcon },
   setup() {
     const q = ref('')
+    let searchTimer = null
 
     const { items: drivers, page, pageSize, total, totalPages, loading, load, setPage, setPageSize } = usePagination(
       (p, ps, extra) => getDrivers({ page: p, pageSize: ps, q: extra.q ?? q.value }),
@@ -115,7 +116,14 @@ export default {
 
     const loadDrivers = () => load({ q: q.value })
 
-    watch(q, () => { setPage(1); loadDrivers() })
+    watch(q, () => {
+      clearTimeout(searchTimer)
+      searchTimer = setTimeout(() => {
+        setPage(1)
+        loadDrivers()
+      }, 350)
+    })
+    onBeforeUnmount(() => clearTimeout(searchTimer))
 
     return { q, drivers, page, pageSize, total, totalPages, loading, loadDrivers, setPage, setPageSize }
   },

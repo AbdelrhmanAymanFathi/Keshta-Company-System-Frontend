@@ -73,7 +73,7 @@
 
     <!-- Withdraw Modal -->
     <div v-if="withdrawModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
+      <div v-modal-focus="{ onEscape: closeWithdrawModal }" class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.withdraw') || 'Withdraw' }}</h3>
           <ShadcnButton variant="outline" size="native" @click="closeWithdrawModal" class="theme-caption hover:theme-text-secondary">✕</ShadcnButton>
@@ -102,7 +102,7 @@
 
     <!-- Manual Deposit Modal -->
     <div v-if="depositModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
+      <div v-modal-focus="{ onEscape: closeDepositModal }" class="bg-white rounded-lg shadow-lg w-full max-w-full sm:max-w-md p-4 sm:p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">{{ $t('labels.manualDeposit') }}</h3>
           <ShadcnButton variant="outline" size="native" @click="closeDepositModal" class="theme-caption hover:theme-text-secondary">✕</ShadcnButton>

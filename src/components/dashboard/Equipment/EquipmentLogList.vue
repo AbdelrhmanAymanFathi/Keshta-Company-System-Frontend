@@ -670,7 +670,7 @@ export default {
     const selectedRentalForPayouts = ref(null)
     const payoutForm = ref({
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayISO(),
       notes: ''
     })
     const contextMenu = ref({
@@ -868,7 +868,7 @@ export default {
       isEditing.value = false
       form.value = {
         id: null,
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayISO(),
         equipmentLog: '',
         name: '',
         hourlyRate: 0,
@@ -1118,7 +1118,7 @@ export default {
       selectedRentalForPayouts.value = null
       payoutForm.value = {
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayISO(),
         notes: ''
       }
     }
@@ -1145,7 +1145,7 @@ export default {
         }
         payoutForm.value = {
           amount: '',
-          date: new Date().toISOString().split('T')[0],
+          date: getTodayISO(),
           notes: ''
         }
       } catch (error) {

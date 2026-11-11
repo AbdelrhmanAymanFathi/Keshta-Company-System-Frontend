@@ -1,6 +1,6 @@
 <template>
   <div v-if="visible" class="fixed inset-0 z-[2000] flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <div v-modal-focus="{ onEscape: () => $emit('close') }" class="bg-white rounded-lg p-6 w-full max-w-md">
       <h3 class="text-lg font-semibold mb-4">{{ title }}</h3>
       <div class="space-y-3">
         <div>
@@ -30,6 +30,13 @@
 <script>
 import { createPayment } from '@/api'
 import DateTimeField from '@/components/shared/DateTimeField.vue'
+
+function localDateTimeInput(d) {
+  const copy = new Date(d)
+  copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset())
+  return copy.toISOString().slice(0, 16)
+}
+
 export default {
   name: 'PaymentModal',
   components: { DateTimeField },
@@ -42,7 +49,8 @@ export default {
     return {
       form: {
         amount: '',
-        date: new Date().toISOString().slice(0,16),
+        // Local `datetime-local` value (avoids the UTC shift of toISOString()).
+        date: localDateTimeInput(new Date()),
         notes: ''
       },
       submitting: false,
