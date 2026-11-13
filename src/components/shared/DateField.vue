@@ -1,5 +1,10 @@
 <template>
-  <div :class="['shadcn-ui relative', parsedClasses.wrapper]" :style="$attrs.style">
+  <div
+    ref="rootRef"
+    :class="['shadcn-ui relative', parsedClasses.wrapper]"
+    :style="$attrs.style"
+    @click="handleInputClick"
+  >
     <Input
       :id="$attrs.id"
       :name="$attrs.name"
@@ -13,15 +18,16 @@
       @update:model-value="onModelUpdate"
       @blur="onBlur"
       @focus="onFocus"
-      @keydown="onKeyDownCombined"
+      @keydown="onKeyDown"
     />
 
     <Popover v-model:open="calendarOpen">
-      <PopoverTrigger as-child>
+      <PopoverTrigger as-child tabindex="-1">
         <Button
           type="button"
           variant="ghost"
           size="icon-xs"
+          tabindex="-1"
           class="absolute end-1 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-transparent"
           :disabled="disabled"
           aria-label="Open calendar"
@@ -32,13 +38,20 @@
           </svg>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" class="shadcn-ui w-auto p-0" :dir="direction">
+      <PopoverContent
+        align="end"
+        class="shadcn-ui w-auto p-0"
+        :dir="direction"
+        @open-auto-focus.prevent
+        @focus-outside.prevent
+        @close-auto-focus="onCloseAutoFocus"
+      >
         <Calendar
           :model-value="selectedDate"
           :locale="locale"
           :dir="direction"
           :week-starts-on="0"
-          :initial-focus="true"
+          :initial-focus="false"
           @update:model-value="onCalendarSelect"
         />
       </PopoverContent>
@@ -70,12 +83,14 @@ export default {
     disabled: { type: Boolean, default: false },
     placeholder: { type: String, default: 'dd/MM/yyyy' }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'keydown'],
   setup(props, { emit, attrs }) {
     const { locale } = useI18n()
     const internalValue = ref('')
     const calendarOpen = ref(false)
     const isFocused = ref(false)
+    const suppressCloseAutoFocus = ref(false)
+    const rootRef = ref(null)
     const direction = computed(() => locale.value === 'ar' ? 'rtl' : 'ltr')
 
     const parsedClasses = computed(() => {
@@ -118,17 +133,13 @@ export default {
       }
     })
 
-    // Forward the remaining attrs (required, aria-*, data-*, autocomplete, …) to
-    // the native input. `class`, `id`, `name` and `style` are handled explicitly,
-    // and `onKeydown` is merged into onKeyDownCombined below so callers can still
-    // react to Enter/Tab while arrow-key date stepping keeps working.
+    // Forward non-keyboard attributes to the native input.
     const forwardedAttrs = computed(() => {
       const rest = { ...attrs }
       delete rest.class
       delete rest.id
       delete rest.name
       delete rest.style
-      delete rest.onKeydown
       return rest
     })
 
@@ -182,6 +193,20 @@ export default {
       }
     }
 
+    function openCalendar() {
+      if (!props.disabled) calendarOpen.value = true
+    }
+
+    function handleInputClick(event) {
+      const el = event.target?.closest?.('[data-slot="input"]')
+      if (!el || !rootRef.value?.contains(el)) return
+      openCalendar()
+      window.requestAnimationFrame(() => {
+        if (isFocused.value && document.activeElement === el) openCalendar()
+      })
+      if (typeof el.select === 'function' && parseDateDMY(internalValue.value)) el.select()
+    }
+
     function onFocus(event) {
       isFocused.value = true
       // When the field already holds a complete date, select it so typing
@@ -190,25 +215,43 @@ export default {
       if (el && typeof el.select === 'function' && parseDateDMY(internalValue.value)) {
         el.select()
       }
+      openCalendar()
     }
 
-    function onBlur() {
+    function onBlur(event) {
       isFocused.value = false
       const value = internalValue.value || ''
       if (value === '') {
         emit('update:modelValue', '')
-        return
-      }
-      const iso = parseDateDMY(value)
-      if (iso) {
-        internalValue.value = formatDateDMY(iso)
-        emit('update:modelValue', iso)
       } else {
-        internalValue.value = formatDateDMY(props.modelValue)
+        const iso = parseDateDMY(value)
+        if (iso) {
+          internalValue.value = formatDateDMY(iso)
+          emit('update:modelValue', iso)
+        } else {
+          internalValue.value = formatDateDMY(props.modelValue)
+        }
+      }
+
+      const nextTarget = event?.relatedTarget
+      const focusInsideCalendar = nextTarget?.closest?.('[data-slot="popover-content"]')
+      if (calendarOpen.value && !rootRef.value?.contains(nextTarget) && !focusInsideCalendar) {
+        suppressCloseAutoFocus.value = true
+        calendarOpen.value = false
       }
     }
 
+    function onCloseAutoFocus(event) {
+      if (!suppressCloseAutoFocus.value) return
+      event.preventDefault()
+      suppressCloseAutoFocus.value = false
+    }
+
     function onKeyDown(event) {
+      if (/^\d$/.test(event.key) && parseDateDMY(internalValue.value)) {
+        event.target?.select?.()
+      }
+
       const dayOffsets = {
         ArrowLeft: -1,
         ArrowRight: 1,
@@ -218,20 +261,16 @@ export default {
         PageDown: 30
       }
       const offset = dayOffsets[event.key]
-      if (!offset) return
-
-      event.preventDefault()
-      const baseDate = parseISODateToDate(props.modelValue) || new Date()
-      baseDate.setDate(baseDate.getDate() + offset)
-      const iso = formatToISODate(baseDate)
-      internalValue.value = formatDateDMY(iso)
-      emit('update:modelValue', iso)
-      calendarOpen.value = true
-    }
-
-    function onKeyDownCombined(event) {
-      onKeyDown(event)
-      if (typeof attrs.onKeydown === 'function') attrs.onKeydown(event)
+      if (offset) {
+        event.preventDefault()
+        const baseDate = parseISODateToDate(props.modelValue) || new Date()
+        baseDate.setDate(baseDate.getDate() + offset)
+        const iso = formatToISODate(baseDate)
+        internalValue.value = formatDateDMY(iso)
+        emit('update:modelValue', iso)
+        calendarOpen.value = true
+      }
+      emit('keydown', event)
     }
 
     function onCalendarSelect(value) {
@@ -255,6 +294,7 @@ export default {
     return {
       locale,
       direction,
+      rootRef,
       internalValue,
       calendarOpen,
       selectedDate,
@@ -263,8 +303,10 @@ export default {
       onModelUpdate,
       onBlur,
       onFocus,
+      onCloseAutoFocus,
+      openCalendar,
+      handleInputClick,
       onKeyDown,
-      onKeyDownCombined,
       onCalendarSelect
     }
   }

@@ -172,7 +172,7 @@ export default {
       default: null
     }
   },
-  emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear'],
+  emits: ['update:modelValue', 'select', 'focus', 'blur', 'clear', 'keydown'],
   setup(props, { emit }) {
     const { locale, t } = useI18n()
     const instance = getCurrentInstance()
@@ -380,52 +380,51 @@ export default {
     }
 
     const handleBlur = (event) => {
+      closeDropdown()
       emit('blur', event)
     }
 
     const handleKeydown = (event) => {
-      if (props.disabled) return
-
-      if (event.key === 'ArrowDown') {
+      if (event.key === 'Tab') {
+        if (isOpen.value) {
+          const selected = filteredItems.value[highlightedIndex.value]
+          if (selected) {
+            selectItem(selected)
+          } else {
+            closeDropdown()
+          }
+        }
+      } else if (!props.disabled && event.key === 'ArrowDown') {
         event.preventDefault()
         if (!isOpen.value) {
           openDropdown()
-          return
+        } else if (filteredItems.value.length) {
+          highlightedIndex.value = (highlightedIndex.value + 1) % filteredItems.value.length
+          scrollOptionIntoView()
         }
-        if (!filteredItems.value.length) return
-        highlightedIndex.value = (highlightedIndex.value + 1) % filteredItems.value.length
-        scrollOptionIntoView()
-        return
-      }
-
-      if (event.key === 'ArrowUp') {
+      } else if (!props.disabled && event.key === 'ArrowUp') {
         event.preventDefault()
         if (!isOpen.value) {
           openDropdown()
-          return
+        } else if (filteredItems.value.length) {
+          highlightedIndex.value =
+            (highlightedIndex.value - 1 + filteredItems.value.length) % filteredItems.value.length
+          scrollOptionIntoView()
         }
-        if (!filteredItems.value.length) return
-        highlightedIndex.value =
-          (highlightedIndex.value - 1 + filteredItems.value.length) % filteredItems.value.length
-        scrollOptionIntoView()
-        return
-      }
-
-      if (event.key === 'Enter') {
-        if (!isOpen.value) return
-        event.preventDefault()
-        const selected = filteredItems.value[highlightedIndex.value]
-        if (selected) {
-          selectItem(selected)
+      } else if (!props.disabled && event.key === 'Enter') {
+        if (isOpen.value) {
+          event.preventDefault()
+          const selected = filteredItems.value[highlightedIndex.value]
+          if (selected) {
+            selectItem(selected)
+          }
         }
-        return
-      }
-
-      if (event.key === 'Escape') {
-        if (!isOpen.value) return
+      } else if (!props.disabled && event.key === 'Escape' && isOpen.value) {
         event.preventDefault()
         closeDropdown()
       }
+
+      emit('keydown', event)
     }
 
     const handleDocumentPointerDown = (event) => {
