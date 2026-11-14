@@ -19,6 +19,9 @@ export function usePresence(page, recordId = null) {
   let lastCursor = null
   let lastCursorAt = 0
   let cursorAttached = false
+  let lastResyncAt = 0
+
+  const RESYNC_COOLDOWN_MS = 5000
 
   function getPage() {
     return toValue(page)
@@ -36,8 +39,9 @@ export function usePresence(page, recordId = null) {
   async function request(method, payload) {
     const token = tokenManager.getToken()
     if (!token) return
+    const sentClientId = payload.clientId
     try {
-      await fetch(`${realtimeService.apiBaseUrl}/api/realtime/presence`, {
+      const res = await fetch(`${realtimeService.apiBaseUrl}/api/realtime/presence`, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -45,6 +49,22 @@ export function usePresence(page, recordId = null) {
         },
         body: JSON.stringify(payload),
       })
+      if (!res.ok) return
+      const data = await res.json().catch(() => null)
+      // The server no longer knows this clientId (restart / silent drop). Only
+      // resync if we haven't already moved on to a newer SSE client, otherwise a
+      // request that lost a reconnect race would needlessly drop a healthy
+      // stream. Throttled so a persistently unknown client can't loop.
+      if (data && data.ok === false && data.reason === 'client_not_found') {
+        const now = Date.now()
+        if (
+          realtimeService.clientId.value === sentClientId &&
+          now - lastResyncAt >= RESYNC_COOLDOWN_MS
+        ) {
+          lastResyncAt = now
+          realtimeService.resync()
+        }
+      }
     } catch (e) {
       // Presence is best-effort; ignore network errors.
     }

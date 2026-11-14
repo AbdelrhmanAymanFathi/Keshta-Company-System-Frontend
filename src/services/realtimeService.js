@@ -428,6 +428,20 @@ class RealtimeService {
     this.connect()
   }
 
+  /**
+   * Force a fresh SSE connection (and therefore a new `clientId`). Used when the
+   * server reports our current clientId is unknown — e.g. after a server restart
+   * or a stream that dropped silently — so room/presence state can be rebuilt.
+   */
+  resync() {
+    if (this._destroyed) return
+    if (this._pageClosing) return
+    if (this._offline) return
+    this.resetReconnectCounters()
+    this.close()
+    this.connect()
+  }
+
   _teardownLifecycleHooks() {
     for (const fn of this._cleanupFns) {
       try { fn() } catch (e) { /* ignore cleanup errors */ }
