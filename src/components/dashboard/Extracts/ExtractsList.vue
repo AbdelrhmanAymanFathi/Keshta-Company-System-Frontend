@@ -189,8 +189,7 @@ export default {
     }
   },
   async mounted() {
-    await this.loadFilterData()
-    await this.loadExtracts()
+    await Promise.all([this.loadFilterData(), this.loadExtracts()])
     document.addEventListener('click', this.closeContextMenu)
     this.__realtimeUnsub = realtimeService.subscribe('extracts', ['extract_created', 'extract_updated', 'extract_deleted'], debounce(() => { this.loadExtracts() }, 300))
   },
@@ -237,14 +236,16 @@ export default {
     },
     async loadFilterData() {
       try {
-        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'extract' })
+        const [contractorsRes, locationsRes, itemsRes] = await Promise.all([
+          getContractors({ pageSize: 1000, mode: 'extract' }),
+          getLocations(),
+          getExportItems({ mode: 'extracts' })
+        ])
         const payload = contractorsRes.data || {}
         const contractorsData = Array.isArray(payload.items) ? payload.items : Array.isArray(payload.data) ? payload.data : Array.isArray(payload) ? payload : []
         this.contractors = contractorsData
-        const locationsRes = await getLocations()
         const locationsData = locationsRes.data?.data || locationsRes.data || []
         this.locations = Array.isArray(locationsData) ? locationsData : []
-        const itemsRes = await getExportItems({ mode: 'extracts' })
         const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
         this.items = Array.isArray(itemsData) ? itemsData.map(normalizeItem) : []
       } catch (err) {

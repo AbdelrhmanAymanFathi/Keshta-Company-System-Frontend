@@ -650,8 +650,9 @@ export default {
   },
 
   async mounted() {
-    await this.loadFilterData()
-    await this.loadSupplies()
+    // Filter lookups and the first page are independent — load them together
+    // instead of chaining 6 sequential round trips.
+    await Promise.all([this.loadFilterData(), this.loadSupplies()])
     this.openFocusedSupply()
     // ensure payments modal data is reactive
     /* paymentTarget watcher commented out
@@ -682,23 +683,25 @@ export default {
      */
     async loadFilterData() {
       try {
-        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'supply' })
+        const [contractorsRes, locationsRes, crushersRes, itemsRes, vehiclesRes] = await Promise.all([
+          getContractors({ pageSize: 1000, mode: 'supply' }),
+          getLocations(),
+          getCrushers({ pageSize: 1000 }),
+          getExportItems({ mode: 'supply' }),
+          getVehicles({ pageSize: 1000 })
+        ])
         const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
         this.contractors = Array.isArray(contractorsData) ? contractorsData : []
 
-        const locationsRes = await getLocations()
         const locationsData = locationsRes.data?.data || locationsRes.data || []
         this.locations = Array.isArray(locationsData) ? locationsData : []
 
-        const crushersRes = await getCrushers({ pageSize: 1000 })
         const crushersData = crushersRes.data?.data || crushersRes.data || []
         this.crushers = Array.isArray(crushersData) ? crushersData : []
 
-        const itemsRes = await getExportItems({ mode: 'supply' })
         const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
         this.items = Array.isArray(itemsData) ? itemsData.map(normalizeItem) : []
 
-        const vehiclesRes = await getVehicles({ pageSize: 1000 })
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         this.vehicles = Array.isArray(vehiclesData) ? vehiclesData : []
 

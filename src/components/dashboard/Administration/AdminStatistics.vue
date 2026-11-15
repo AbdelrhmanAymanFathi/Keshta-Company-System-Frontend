@@ -611,11 +611,16 @@ export default {
       return map[(mod || '').toLowerCase()] || 'bg-slate-100 text-slate-600'
     }
   },
-  mounted() {
+  created() {
+    // Initialise the range BEFORE the toolbar's mounted hook emits its
+    // default "last 30 days" change event. Otherwise that event fires with an
+    // empty parent range and triggers a second full dashboard fetch.
     const now = new Date()
     const d30 = new Date(Date.now() - 29 * 86400000)
     this.fromDate = `${d30.getFullYear()}-${String(d30.getMonth() + 1).padStart(2, '0')}-${String(d30.getDate()).padStart(2, '0')}`
     this.toDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  },
+  mounted() {
     this.fetchAll(this.fromDate, this.toDate)
   }
 }

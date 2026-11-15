@@ -1195,18 +1195,20 @@ rows: [],
   },
   
   async mounted() {
-    // Load hierarchical expense categories
-    try {
-      const r = await getExpenseCategories()
-      this.expenseCategories = r.data || []
-    } catch (e) {
-      this.expenseCategories = []
-    }
-    await this.loadExpenses()
-    await this.fetchBranches()
-    await this.fetchLocations()
-    await this.fetchTreasuries()
-    await this.fetchContractors()
+    // Every lookup below is independent; run them together instead of
+    // serialising 6 network round trips before the list can render.
+    const categoriesPromise = getExpenseCategories()
+      .then(r => { this.expenseCategories = r.data || [] })
+      .catch(() => { this.expenseCategories = [] })
+
+    await Promise.all([
+      categoriesPromise,
+      this.loadExpenses(),
+      this.fetchBranches(),
+      this.fetchLocations(),
+      this.fetchTreasuries(),
+      this.fetchContractors()
+    ])
     this.openFocusedExpense()
     this.__realtimeUnsub = realtimeService.subscribe('expenses', ['expense_created', 'expense_updated', 'expense_deleted'], debounce(() => { this.loadExpenses() }, 300))
     this.__approvalsUnsub = realtimeService.subscribe('approvals', ['approval_created', 'approval_completed', 'approval_rejected'], debounce((event, data) => {

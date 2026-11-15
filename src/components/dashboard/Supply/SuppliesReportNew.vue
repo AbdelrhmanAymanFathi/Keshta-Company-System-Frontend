@@ -317,23 +317,21 @@ export default {
      */
     const loadFilterData = async () => {
       try {
-        // Load contractors
-        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'supply' })
+        const [contractorsRes, locationsRes, itemsRes, vehiclesRes] = await Promise.all([
+          getContractors({ pageSize: 1000, mode: 'supply' }),
+          getLocations(),
+          getExportItems({ mode: 'supply' }),
+          getVehicles({ pageSize: 1000 })
+        ])
         const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
         contractors.value = Array.isArray(contractorsData) ? contractorsData : []
 
-        // Load locations
-        const locationsRes = await getLocations()
         const locationsData = locationsRes.data?.data || locationsRes.data || []
         locations.value = Array.isArray(locationsData) ? locationsData : []
 
-        // Load items
-        const itemsRes = await getExportItems({ mode: 'supply' })
         const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
         items.value = Array.isArray(itemsData) ? itemsData.map(normalizeItem) : []
 
-        // Load vehicles
-        const vehiclesRes = await getVehicles({ pageSize: 1000 })
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         vehicles.value = Array.isArray(vehiclesData) ? vehiclesData : []
 

@@ -455,8 +455,7 @@ export default {
   },
 
   async mounted() {
-    await this.loadFilterData()
-    await this.loadTransports()
+    await Promise.all([this.loadFilterData(), this.loadTransports()])
     this.openFocusedTransport()
     document.addEventListener('click', this.closeContextMenu)
     this.__realtimeUnsub = realtimeService.subscribe('transport', ['transport_created', 'transport_updated', 'transport_deleted'], debounce(() => { this.loadTransports() }, 300))
@@ -476,19 +475,21 @@ export default {
      */
     async loadFilterData() {
       try {
-        const contractorsRes = await getContractors({ pageSize: 1000, mode: 'transport' })
+        const [contractorsRes, locationsRes, itemsRes, vehiclesRes] = await Promise.all([
+          getContractors({ pageSize: 1000, mode: 'transport' }),
+          getLocations(),
+          getItems({ mode: 'transport' }),
+          getVehicles({ pageSize: 1000 })
+        ])
         const contractorsData = contractorsRes.data?.data || contractorsRes.data || []
         this.contractors = Array.isArray(contractorsData) ? contractorsData : []
 
-        const locationsRes = await getLocations()
         const locationsData = locationsRes.data?.data || locationsRes.data || []
         this.locations = Array.isArray(locationsData) ? locationsData : []
 
-        const itemsRes = await getItems({ mode: 'transport' })
         const itemsData = itemsRes.data?.items || itemsRes.data?.data || itemsRes.data || []
         this.items = Array.isArray(itemsData) ? itemsData : []
 
-        const vehiclesRes = await getVehicles({ pageSize: 1000 })
         const vehiclesData = vehiclesRes.data?.data || vehiclesRes.data || []
         this.vehicles = Array.isArray(vehiclesData) ? vehiclesData : []
 
