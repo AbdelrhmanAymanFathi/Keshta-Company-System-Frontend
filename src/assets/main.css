@@ -824,6 +824,71 @@ body,
   opacity: 1;
 }
 
+/* =========================
+   Modal inputs — slim sizing
+   ========================= */
+.kc-modal-panel,
+.modal-body-container {
+  --theme-control-min-height: 2rem;
+}
+
+.kc-modal-panel :where(
+  input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='hidden']):not([type='file']),
+  select,
+  textarea:not([rows])
+),
+.modal-body-container :where(
+  input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='hidden']):not([type='file']),
+  select,
+  textarea:not([rows])
+) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.4 !important;
+}
+
+/* Keep textarea height natural when rows are set */
+.kc-modal-panel textarea[rows],
+.modal-body-container textarea[rows] {
+  height: auto !important;
+  min-height: unset !important;
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.375rem !important;
+  font-size: 0.8125rem !important;
+}
+
+/* Labels */
+.kc-modal-panel label,
+.modal-body-container label {
+  font-size: 0.8125rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* shadcn Dialog-based modals (Modal.vue shared component) */
+[data-slot='dialog-content'] {
+  --theme-control-min-height: 2rem;
+}
+
+[data-slot='dialog-content'] :where(
+  input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='hidden']):not([type='file']),
+  select
+) {
+  height: 2rem !important;
+  min-height: 2rem !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.4 !important;
+}
+
+[data-slot='dialog-content'] label {
+  font-size: 0.8125rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
 .dashboard-module-content table tbody tr {
   transition: background-color 0.15s ease;
 }
