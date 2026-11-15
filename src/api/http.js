@@ -3,8 +3,10 @@ import axios from 'axios'
 
 // import * as XLSX from 'xlsx';
 
-// Base URL for API requests - loaded from .env file
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+// Base URL for API requests - loaded from .env file.
+// Empty string means same-origin: requests go to "/api/..." and are proxied by
+// Vite (dev) or nginx (production). Never default to localhost in a build.
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Token management utilities
 export class TokenManager {

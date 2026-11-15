@@ -39,7 +39,9 @@ export default defineConfig({
     ],
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3000',
+        // Point this at wherever the backend is reachable from the dev machine.
+        // With docker compose the backend is published only through nginx (8080).
+        target: process.env.VITE_DEV_API_PROXY || 'http://127.0.0.1:3000',
         changeOrigin: true,
         ws: true
       }
@@ -49,19 +51,9 @@ export default defineConfig({
   build: {
     // Never ship source maps to production (they leaked full source in dist/).
     sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('apexcharts') || id.includes('vue3-apexcharts')) return 'charts'
-            if (id.includes('jspdf')) return 'jspdf'
-            if (id.includes('xlsx')) return 'xlsx'
-            if (id.includes('@tanstack')) return 'query'
-            if (id.includes('vue-router') || id.includes('pinia') || id.includes('vue-i18n')) return 'vue-core'
-            return 'vendor'
-          }
-        }
-      }
-    }
+    // Let Vite/Rolldown split on dynamic import boundaries. The previous
+    // manualChunks config merged Vue's runtime into the "charts" chunk, so the
+    // login screen had to download ApexCharts (1.4 MB) before it could render.
+    chunkSizeWarningLimit: 1200
   }
 })
