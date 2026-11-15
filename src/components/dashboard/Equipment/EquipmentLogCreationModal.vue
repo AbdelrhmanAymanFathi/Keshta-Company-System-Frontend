@@ -278,18 +278,32 @@
       </div>
     </transition>
   </teleport>
+
+  <!-- Draft restore / unsaved-data confirm dialog -->
+  <ConfirmDialog
+    :show="confirmDialog.show"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    :confirm-text="confirmDialog.confirmText"
+    :cancel-text="confirmDialog.cancelText"
+    :type="confirmDialog.type"
+    :prevent-backdrop-close="false"
+    @confirm="confirmDialog.onConfirm"
+    @cancel="confirmDialog.onCancel"
+  />
 </template>
 
 <script>
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@acme/icon-packs/legacy'
 import { getLocations } from '@/api'
 
 export default {
   name: 'EquipmentLogCreationModal',
-  components: { SearchDropdown, DateField, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon },
+  components: { SearchDropdown, DateField, ConfirmDialog, ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon },
   props: {
     isOpen: { type: Boolean, default: false },
     modalTitle: { type: String, default: '' },
@@ -325,6 +339,16 @@ export default {
       isSaving: false,
       isRestoringDraft: false,
       saveError: '',
+      confirmDialog: {
+        show: false,
+        title: '',
+        message: '',
+        confirmText: '',
+        cancelText: '',
+        type: 'default',
+        onConfirm: () => {},
+        onCancel: () => {}
+      },
       sites: [],
       allLocations: [],
       filters: {
@@ -438,7 +462,7 @@ export default {
       } else {
         this.syncFormLocationsFromModel()
         this.loadCommonDataFromStorage()
-        this.restoreEquipmentDraftIfPresent()
+        await this.restoreEquipmentDraftIfPresent()
       }
       this.isRestoringDraft = false
     },
@@ -485,7 +509,21 @@ export default {
         console.warn('Failed to save equipment log draft:', err)
       }
     },
-    restoreEquipmentDraftIfPresent() {
+    showConfirm({ title, message, confirmText, cancelText, type = 'default' }) {
+      return new Promise((resolve) => {
+        this.confirmDialog = {
+          show: true,
+          title,
+          message,
+          confirmText: confirmText || (this.isRTL ? 'نعم' : 'Yes'),
+          cancelText: cancelText || (this.isRTL ? 'إلغاء' : 'Cancel'),
+          type,
+          onConfirm: () => { this.confirmDialog.show = false; resolve(true) },
+          onCancel: () => { this.confirmDialog.show = false; resolve(false) }
+        }
+      })
+    },
+    async restoreEquipmentDraftIfPresent() {
       let savedDraft
       try {
         savedDraft = localStorage.getItem('equipmentLogCreationModalDraft')
@@ -497,10 +535,18 @@ export default {
 
       try {
         const draft = JSON.parse(savedDraft)
+        const title = this.isRTL ? 'استرجاع المسودة' : 'Restore Draft'
         const message = this.isRTL
           ? 'توجد مسودة سجل معدات محفوظة. هل تريد استرجاعها؟'
           : 'A saved equipment log draft was found. Would you like to restore it?'
-        if (!window.confirm(message)) {
+        const confirmed = await this.showConfirm({
+          title,
+          message,
+          confirmText: this.isRTL ? 'استرجاع' : 'Restore',
+          cancelText: this.isRTL ? 'تجاهل وحذف' : 'Discard',
+          type: 'default'
+        })
+        if (!confirmed) {
           localStorage.removeItem('equipmentLogCreationModalDraft')
           return
         }
@@ -683,11 +729,19 @@ export default {
       )
       return hasFormData || hasRowData
     },
-    requestClose() {
-      if (this.hasUnsavedData() &&
-        !window.confirm(this.isRTL
-          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
-          : 'You have unsaved data. Are you sure you want to leave?')) return
+    async requestClose() {
+      if (this.hasUnsavedData()) {
+        const confirmed = await this.showConfirm({
+          title: this.isRTL ? 'تنبيه' : 'Warning',
+          message: this.isRTL
+            ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+            : 'You have unsaved data. Are you sure you want to leave?',
+          confirmText: this.isRTL ? 'خروج' : 'Leave',
+          cancelText: this.isRTL ? 'البقاء' : 'Stay',
+          type: 'danger'
+        })
+        if (!confirmed) return
+      }
       this.closeModal()
     },
     handleModalKeydown(event) {

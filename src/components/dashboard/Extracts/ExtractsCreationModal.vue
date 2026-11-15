@@ -381,6 +381,7 @@ import {
 } from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import { parseCreateExtract } from '@/validators/extracts'
 import { createExtract, getExtract, updateExtract } from '@/services/extracts'
@@ -421,6 +422,16 @@ export default {
       isSaving: false,
       isRestoringDraft: false,
       saveError: '',
+      confirmDialog: {
+        show: false,
+        title: '',
+        message: '',
+        confirmText: '',
+        cancelText: '',
+        type: 'default',
+        onConfirm: () => {},
+        onCancel: () => {}
+      },
       tableRef: null,
       commonData: this.getDefaultCommonData(),
       rows: [],
@@ -578,7 +589,7 @@ export default {
         }
       } else {
         this.loadCommonDataFromStorage()
-        this.restoreExtractDraftIfPresent()
+        await this.restoreExtractDraftIfPresent()
       }
       this.isRestoringDraft = false
     },
@@ -617,7 +628,21 @@ export default {
         console.warn('Failed to save extracts draft:', err)
       }
     },
-    restoreExtractDraftIfPresent() {
+    showConfirm({ title, message, confirmText, cancelText, type = 'default' }) {
+      return new Promise((resolve) => {
+        this.confirmDialog = {
+          show: true,
+          title,
+          message,
+          confirmText: confirmText || (this.isRTL ? 'نعم' : 'Yes'),
+          cancelText: cancelText || (this.isRTL ? 'إلغاء' : 'Cancel'),
+          type,
+          onConfirm: () => { this.confirmDialog.show = false; resolve(true) },
+          onCancel: () => { this.confirmDialog.show = false; resolve(false) }
+        }
+      })
+    },
+    async restoreExtractDraftIfPresent() {
       let savedDraft
       try {
         savedDraft = localStorage.getItem('extractsCreationModalDraft')
@@ -629,10 +654,18 @@ export default {
 
       try {
         const draft = JSON.parse(savedDraft)
+        const title = this.isRTL ? 'استرجاع المسودة' : 'Restore Draft'
         const message = this.isRTL
           ? 'توجد مسودة مستخلصات محفوظة. هل تريد استرجاعها؟'
           : 'A saved extracts draft was found. Would you like to restore it?'
-        if (!window.confirm(message)) {
+        const confirmed = await this.showConfirm({
+          title,
+          message,
+          confirmText: this.isRTL ? 'استرجاع' : 'Restore',
+          cancelText: this.isRTL ? 'تجاهل وحذف' : 'Discard',
+          type: 'default'
+        })
+        if (!confirmed) {
           localStorage.removeItem('extractsCreationModalDraft')
           return
         }
@@ -898,11 +931,19 @@ export default {
       )
       return hasCommonData || hasRowData
     },
-    requestClose() {
-      if (this.hasUnsavedData() &&
-        !window.confirm(this.isRTL
-          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
-          : 'You have unsaved data. Are you sure you want to leave?')) return
+    async requestClose() {
+      if (this.hasUnsavedData()) {
+        const confirmed = await this.showConfirm({
+          title: this.isRTL ? 'تنبيه' : 'Warning',
+          message: this.isRTL
+            ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+            : 'You have unsaved data. Are you sure you want to leave?',
+          confirmText: this.isRTL ? 'خروج' : 'Leave',
+          cancelText: this.isRTL ? 'البقاء' : 'Stay',
+          type: 'danger'
+        })
+        if (!confirmed) return
+      }
       this.closeModal()
     },
     handleModalKeydown(event) {

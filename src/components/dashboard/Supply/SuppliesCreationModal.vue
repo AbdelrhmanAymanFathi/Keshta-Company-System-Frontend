@@ -561,6 +561,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import TransportCreationModal from '@/components/dashboard/Transport/TransportCreationModal.vue'
 import normalizeItem from '@/utils/normalizeItem'
 import DateField from '@/components/shared/DateField.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 
 export default {
   emits: ['saved'],
@@ -980,6 +981,20 @@ export default {
       this.currentStep = 1
     },
 
+    showConfirm({ title, message, confirmText, cancelText, type = 'default' }) {
+      return new Promise((resolve) => {
+        this.confirmDialog = {
+          show: true,
+          title,
+          message,
+          confirmText: confirmText || (this.isRTL ? 'نعم' : 'Yes'),
+          cancelText: cancelText || (this.isRTL ? 'إلغاء' : 'Cancel'),
+          type,
+          onConfirm: () => { this.confirmDialog.show = false; resolve(true) },
+          onCancel: () => { this.confirmDialog.show = false; resolve(false) }
+        }
+      })
+    },
     // ============ Modal Management ============
     async openModal() {
       this.isRestoringDraft = true
@@ -994,10 +1009,18 @@ export default {
         if (savedDraft) {
           try {
             const draft = JSON.parse(savedDraft)
+            const title = this.isRTL ? 'استرجاع المسودة' : 'Restore Draft'
             const message = this.isRTL
               ? 'توجد مسودة توريدات محفوظة. هل تريد استرجاعها؟'
               : 'A saved supplies draft was found. Would you like to restore it?'
-            if (window.confirm(message)) {
+            const confirmed = await this.showConfirm({
+              title,
+              message,
+              confirmText: this.isRTL ? 'استرجاع' : 'Restore',
+              cancelText: this.isRTL ? 'تجاهل وحذف' : 'Discard',
+              type: 'default'
+            })
+            if (confirmed) {
               await this.restoreSupplyDraft(draft)
             } else {
               localStorage.removeItem('suppliesCreationModalDraft')

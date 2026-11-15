@@ -449,6 +449,7 @@ import {
 } from '@acme/icon-packs/legacy'
 import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
+import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
 
 export default {
@@ -733,10 +734,18 @@ export default {
         if (savedDraft) {
           try {
             const draft = JSON.parse(savedDraft)
+            const title = this.isRTL ? 'استرجاع المسودة' : 'Restore Draft'
             const message = this.isRTL
               ? 'توجد مسودة نقل محفوظة. هل تريد استرجاعها؟'
               : 'A saved transport draft was found. Would you like to restore it?'
-            if (window.confirm(message)) {
+            const confirmed = await this.showConfirm({
+              title,
+              message,
+              confirmText: this.isRTL ? 'استرجاع' : 'Restore',
+              cancelText: this.isRTL ? 'تجاهل وحذف' : 'Discard',
+              type: 'default'
+            })
+            if (confirmed) {
               this.restoreTransportDraft(draft)
             } else {
               localStorage.removeItem('transportCreationModalDraft')
@@ -856,11 +865,19 @@ export default {
       )
       return hasCommonData || hasRowData
     },
-    requestClose() {
-      if (this.hasUnsavedData() &&
-        !window.confirm(this.isRTL
-          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
-          : 'You have unsaved data. Are you sure you want to leave?')) return
+    async requestClose() {
+      if (this.hasUnsavedData()) {
+        const confirmed = await this.showConfirm({
+          title: this.isRTL ? 'تنبيه' : 'Warning',
+          message: this.isRTL
+            ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+            : 'You have unsaved data. Are you sure you want to leave?',
+          confirmText: this.isRTL ? 'خروج' : 'Leave',
+          cancelText: this.isRTL ? 'البقاء' : 'Stay',
+          type: 'danger'
+        })
+        if (!confirmed) return
+      }
       this.closeModal()
     },
     handleModalKeydown(event) {
