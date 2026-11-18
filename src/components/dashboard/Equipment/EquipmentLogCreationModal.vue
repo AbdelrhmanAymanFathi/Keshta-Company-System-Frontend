@@ -298,6 +298,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
+import { hasOpenFloatingLayer } from '@/utils/floatingLayer'
 import { ArrowRightIcon, ArrowLeftIcon, CheckIcon, DocumentDuplicateIcon, TrashIcon, MapPinIcon, MapIcon } from '@acme/icon-packs/legacy'
 import { getLocations } from '@/api'
 
@@ -745,7 +746,7 @@ export default {
       this.closeModal()
     },
     handleModalKeydown(event) {
-      if (!this.isOpen) return
+      if (!this.isOpen || this.confirmDialog.show) return
       const target = event.target
       const isEditable = target instanceof HTMLElement &&
         (target.isContentEditable || target.matches('input, textarea, select'))
@@ -753,7 +754,9 @@ export default {
       if (event.key === 'Backspace' && !isEditable) {
         event.preventDefault()
         event.stopPropagation()
-      } else if (event.key === 'Escape' && !isEditable) {
+      } else if (event.key === 'Escape') {
+        // Let an open calendar/dropdown consume the first Escape press.
+        if (hasOpenFloatingLayer()) return
         event.preventDefault()
         event.stopPropagation()
         this.requestClose()
@@ -1176,15 +1179,15 @@ export default {
       } catch (err) {
         console.warn('Failed to load equipment log data:', err)
       }
-    },
-    mounted() {
-      window.addEventListener('keydown', this.handleModalKeydown, true)
-      window.addEventListener('beforeunload', this.handleBeforeUnload)
-    },
-    beforeUnmount() {
-      window.removeEventListener('keydown', this.handleModalKeydown, true)
-      window.removeEventListener('beforeunload', this.handleBeforeUnload)
     }
+  },
+  mounted() {
+    window.addEventListener('keydown', this.handleModalKeydown, true)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.handleModalKeydown, true)
+    window.removeEventListener('beforeunload', this.handleBeforeUnload)
   }
 }
 </script>

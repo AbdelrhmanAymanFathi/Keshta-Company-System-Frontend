@@ -394,6 +394,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import normalizeItem from '@/utils/normalizeItem'
+import { hasOpenFloatingLayer } from '@/utils/floatingLayer'
 import { parseCreateExtract } from '@/validators/extracts'
 import { createExtract, getExtract, updateExtract } from '@/services/extracts'
 import {
@@ -419,7 +420,7 @@ export default {
     TrashIcon,
     ConfirmDialog
   },
-  emits: ['saved'],
+  emits: ['saved', 'close'],
   props: {
     showTriggerButton: { type: Boolean, default: true },
     triggerButtonText: { type: String, default: '' },
@@ -967,7 +968,9 @@ export default {
       if (event.key === 'Backspace' && !isEditable) {
         event.preventDefault()
         event.stopPropagation()
-      } else if (event.key === 'Escape' && !isEditable) {
+      } else if (event.key === 'Escape') {
+        // Let an open calendar/dropdown consume the first Escape press.
+        if (hasOpenFloatingLayer()) return
         event.preventDefault()
         event.stopPropagation()
         this.requestClose()
@@ -1133,15 +1136,15 @@ export default {
       } catch (err) {
         console.warn('Failed to load extracts data:', err)
       }
-    },
-    mounted() {
-      window.addEventListener('keydown', this.handleModalKeydown, true)
-      window.addEventListener('beforeunload', this.handleBeforeUnload)
-    },
-    beforeUnmount() {
-      window.removeEventListener('keydown', this.handleModalKeydown, true)
-      window.removeEventListener('beforeunload', this.handleBeforeUnload)
     }
+  },
+  mounted() {
+    window.addEventListener('keydown', this.handleModalKeydown, true)
+    window.addEventListener('beforeunload', this.handleBeforeUnload)
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.handleModalKeydown, true)
+    window.removeEventListener('beforeunload', this.handleBeforeUnload)
   }
 }
 </script>

@@ -462,6 +462,7 @@ import SearchDropdown from '@/components/shared/SearchDropdown.vue'
 import DateField from '@/components/shared/DateField.vue'
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue'
 import { formatToISODate, getTodayISO } from '@/utils/dateUtils'
+import { hasOpenFloatingLayer } from '@/utils/floatingLayer'
 
 export default {
   name: 'TransportModal',
@@ -925,7 +926,9 @@ export default {
       if (event.key === 'Backspace' && !isEditable) {
         event.preventDefault()
         event.stopPropagation()
-      } else if (event.key === 'Escape' && !isEditable) {
+      } else if (event.key === 'Escape') {
+        // Let an open calendar/dropdown consume the first Escape press.
+        if (hasOpenFloatingLayer()) return
         event.preventDefault()
         event.stopPropagation()
         this.requestClose()

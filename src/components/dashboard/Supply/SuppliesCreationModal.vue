@@ -554,6 +554,7 @@ import {
   getExportItems
 } from '@/api'
 import { matchesVehicleName } from '@/utils/normalizeVehicleName'
+import { hasOpenFloatingLayer } from '@/utils/floatingLayer'
 import {
   CalendarDaysIcon,
   ArchiveBoxIcon,
@@ -797,7 +798,9 @@ export default {
         return
       }
 
-      if (event.key === 'Escape' && !isEditable) {
+      if (event.key === 'Escape') {
+        // Let an open calendar/dropdown consume the first Escape press.
+        if (hasOpenFloatingLayer()) return
         event.preventDefault()
         event.stopPropagation()
         this.requestClose()
