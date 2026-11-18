@@ -252,9 +252,10 @@ export default {
         event.target?.select?.()
       }
 
+      const horizontalDirection = direction.value === 'rtl' ? -1 : 1
       const dayOffsets = {
-        ArrowLeft: -1,
-        ArrowRight: 1,
+        ArrowLeft: -horizontalDirection,
+        ArrowRight: horizontalDirection,
         ArrowUp: -7,
         ArrowDown: 7,
         PageUp: -30,

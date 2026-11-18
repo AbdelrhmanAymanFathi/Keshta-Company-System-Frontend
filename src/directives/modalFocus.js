@@ -45,7 +45,7 @@ function firstField(root) {
 // Focus that lives in a teleported layer (calendar popover, dropdown listbox)
 // is managed by that layer — never yank it back into the modal.
 function isFloatingLayer(el) {
-  return !!(el && el.closest && el.closest('[data-slot="popover-content"], [role="listbox"]'))
+  return !!(el && el.closest && el.closest('[data-slot="popover-content"], [data-slot="alert-dialog-content"], [role="listbox"]'))
 }
 
 function isInOtherModal(el, root) {

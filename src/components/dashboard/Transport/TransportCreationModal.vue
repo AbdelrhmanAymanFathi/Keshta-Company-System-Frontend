@@ -401,6 +401,17 @@
     </transition>
   </teleport>
 
+  <ConfirmDialog
+    :show="confirmDialog.show"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    :confirm-text="confirmDialog.confirmText"
+    :cancel-text="confirmDialog.cancelText"
+    :type="confirmDialog.type"
+    @confirm="confirmDialog.onConfirm()"
+    @cancel="confirmDialog.onCancel()"
+  />
+
   <!-- Dialog: Add Location -->
   <div v-if="showAddLocation" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[var(--layout-z-nested-modal,210)]">
     <div v-modal-focus="{ onEscape: () => { showAddLocation = false; pendingField = null } }" class="bg-white p-6 rounded shadow w-96">
@@ -465,7 +476,8 @@ export default {
     CheckIcon,
     ArrowRightIcon
     ,SearchDropdown,
-    DateField
+    DateField,
+    ConfirmDialog
   },
   props: {
     isOpen: {
@@ -505,6 +517,16 @@ export default {
       items: [],
       vehicles: [],
       saveError: '',
+      confirmDialog: {
+        show: false,
+        title: '',
+        message: '',
+        confirmText: '',
+        cancelText: '',
+        type: 'default',
+        onConfirm: () => {},
+        onCancel: () => {}
+      },
       locationError: '',
         vehicleCompanyCapacity: 0,
       showAddLocation: false,
@@ -865,6 +887,20 @@ export default {
       )
       return hasCommonData || hasRowData
     },
+    showConfirm({ title, message, confirmText, cancelText, type = 'default' }) {
+      return new Promise((resolve) => {
+        this.confirmDialog = {
+          show: true,
+          title,
+          message,
+          confirmText: confirmText || (this.isRTL ? 'نعم' : 'Yes'),
+          cancelText: cancelText || (this.isRTL ? 'إلغاء' : 'Cancel'),
+          type,
+          onConfirm: () => { this.confirmDialog.show = false; resolve(true) },
+          onCancel: () => { this.confirmDialog.show = false; resolve(false) }
+        }
+      })
+    },
     async requestClose() {
       if (this.hasUnsavedData()) {
         const confirmed = await this.showConfirm({
@@ -881,7 +917,7 @@ export default {
       this.closeModal()
     },
     handleModalKeydown(event) {
-      if (!this.isOpen) return
+      if (!this.isOpen || this.confirmDialog.show) return
       const target = event.target
       const isEditable = target instanceof HTMLElement &&
         (target.isContentEditable || target.matches('input, textarea, select'))

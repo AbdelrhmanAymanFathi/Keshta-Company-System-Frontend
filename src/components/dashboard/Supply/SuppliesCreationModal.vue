@@ -526,6 +526,17 @@
     </transition>
   </teleport>
 
+  <ConfirmDialog
+    :show="confirmDialog.show"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    :confirm-text="confirmDialog.confirmText"
+    :cancel-text="confirmDialog.cancelText"
+    :type="confirmDialog.type"
+    @confirm="confirmDialog.onConfirm()"
+    @cancel="confirmDialog.onCancel()"
+  />
+
   <!-- Transport Modal (open after successful supply save when item supports transport) -->
   <TransportCreationModal :isOpen="showTransportModal"
     :modalTitle="$t('transport.addTransportFromSupply') || 'Create Transport'" :transport="transportModalPayload"
@@ -581,7 +592,8 @@ export default {
     ArrowRightIcon,
     SearchDropdown,
     TransportCreationModal,
-    DateField
+    DateField,
+    ConfirmDialog
   },
   props: {
     showTriggerButton: {
@@ -622,6 +634,16 @@ export default {
       isOpen: false,
       isSaving: false,
       isRestoringDraft: false,
+      confirmDialog: {
+        show: false,
+        title: '',
+        message: '',
+        confirmText: '',
+        cancelText: '',
+        type: 'default',
+        onConfirm: () => {},
+        onCancel: () => {}
+      },
 
       // Lookups
       sites: [],
@@ -764,7 +786,7 @@ export default {
 
   methods: {
     handleModalKeydown(event) {
-      if (!this.isOpen) return
+      if (!this.isOpen || this.confirmDialog.show) return
       const target = event.target
       const isEditable = target instanceof HTMLElement &&
         (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
@@ -808,12 +830,18 @@ export default {
       )
     },
 
-    requestClose() {
+    async requestClose() {
       if (this.hasUnsavedData()) {
-        const message = this.isRTL
-          ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
-          : 'You have unsaved data. Are you sure you want to leave?'
-        if (!window.confirm(message)) return
+        const confirmed = await this.showConfirm({
+          title: this.isRTL ? 'تنبيه' : 'Warning',
+          message: this.isRTL
+            ? 'لديك بيانات غير محفوظة. هل أنت متأكد أنك تريد الخروج؟'
+            : 'You have unsaved data. Are you sure you want to leave?',
+          confirmText: this.isRTL ? 'خروج' : 'Leave',
+          cancelText: this.isRTL ? 'البقاء' : 'Stay',
+          type: 'danger'
+        })
+        if (!confirmed) return
       }
       this.closeModal()
     },

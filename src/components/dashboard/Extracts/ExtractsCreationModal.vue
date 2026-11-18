@@ -364,6 +364,17 @@
         </div>
       </transition>
     </teleport>
+
+    <ConfirmDialog
+      :show="confirmDialog.show"
+      :title="confirmDialog.title"
+      :message="confirmDialog.message"
+      :confirm-text="confirmDialog.confirmText"
+      :cancel-text="confirmDialog.cancelText"
+      :type="confirmDialog.type"
+      @confirm="confirmDialog.onConfirm()"
+      @cancel="confirmDialog.onCancel()"
+    />
   </div>
 </template>
 
@@ -405,7 +416,8 @@ export default {
     ArrowRightIcon,
     CheckIcon,
     DocumentDuplicateIcon,
-    TrashIcon
+    TrashIcon,
+    ConfirmDialog
   },
   emits: ['saved'],
   props: {
@@ -947,7 +959,7 @@ export default {
       this.closeModal()
     },
     handleModalKeydown(event) {
-      if (!this.isOpen) return
+      if (!this.isOpen || this.confirmDialog.show) return
       const target = event.target
       const isEditable = target instanceof HTMLElement &&
         (target.isContentEditable || target.matches('input, textarea, select'))
