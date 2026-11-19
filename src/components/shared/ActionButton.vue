@@ -121,29 +121,61 @@ export default {
 
 /* edit */
 .action-btn--edit {
-  border-color: #fde68a;
-  background-color: #fffbeb;
-  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.35);
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #d97706;
 }
-.action-btn--edit:hover { background-color: #fef3c7; }
+.dark .action-btn--edit {
+  border-color: rgba(245, 158, 11, 0.35);
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+.action-btn--edit:hover {
+  background-color: rgba(245, 158, 11, 0.18);
+}
+.dark .action-btn--edit:hover {
+  background-color: rgba(245, 158, 11, 0.25);
+}
 
 /* delete / danger */
 .action-btn--delete,
 .action-btn--danger {
-  border-color: #fecaca;
-  background-color: #fef2f2;
-  color: #b91c1c;
+  border-color: rgba(248, 113, 113, 0.35);
+  background-color: rgba(248, 113, 113, 0.1);
+  color: #dc2626;
+}
+.dark .action-btn--delete,
+.dark .action-btn--danger {
+  border-color: rgba(248, 113, 113, 0.35);
+  background-color: rgba(248, 113, 113, 0.15);
+  color: #f87171;
 }
 .action-btn--delete:hover,
-.action-btn--danger:hover { background-color: #fee2e2; }
+.action-btn--danger:hover {
+  background-color: rgba(248, 113, 113, 0.18);
+}
+.dark .action-btn--delete:hover,
+.dark .action-btn--danger:hover {
+  background-color: rgba(248, 113, 113, 0.25);
+}
 
 /* success */
 .action-btn--success {
-  border-color: #a7f3d0;
-  background-color: #ecfdf5;
-  color: #047857;
+  border-color: rgba(16, 185, 129, 0.35);
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
 }
-.action-btn--success:hover { background-color: #d1fae5; }
+.dark .action-btn--success {
+  border-color: rgba(16, 185, 129, 0.35);
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+.action-btn--success:hover {
+  background-color: rgba(16, 185, 129, 0.18);
+}
+.dark .action-btn--success:hover {
+  background-color: rgba(16, 185, 129, 0.25);
+}
 
 .action-btn--disabled {
   opacity: 0.5;

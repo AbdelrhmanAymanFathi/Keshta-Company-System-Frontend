@@ -212,12 +212,12 @@
               {{ $t('labels.actions') }}</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
           <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" :data-focus-id="supply.id" :class="['theme-table-row-hover', { 'row-pending-review': supply.hasPendingApproval }]" @contextmenu.prevent="onRowContextMenu($event, supply)">
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
               {{ supply.contractor?.name || '-' }}
             </td>
@@ -227,16 +227,15 @@
                 :label="supply.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
               />
             </td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ getAreaName(supply) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.vehicle?.name || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.vehicle?.name || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.crusherTicket || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.companyTicket || '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.companyTicket || '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.companyCapacity ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black uppercase tracking-wider whitespace-nowrap">{{ supply.crusherCapacity ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-sm font-semibold theme-accent-muted whitespace-nowrap">{{ formatCurrency(computeUnitPrice(supply)) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black dark:text-slate-100 uppercase tracking-wider whitespace-nowrap">{{ supply.crusherCapacity ?? '-' }}</td>
+            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
             <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
               <div>{{ supply.notes || '-' }}</div>
@@ -284,18 +283,18 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
           <span>{{ $t('labels.edit') || 'Edit' }}</span>
-          <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
+          <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 dark:bg-amber-50/20 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
         </ShadcnButton>
         
         <!-- Delete Option -->
         <ShadcnButton variant="outline" size="native" @click.stop="openDeleteConfirm(contextMenu.item); closeContextMenu()"
           :disabled="contextMenu.item?.hasPendingApproval"
-          class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left">
-          <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-50/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-left">
+          <svg class="w-5 h-5 flex-shrink-0 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
           <span>{{ $t('labels.delete') || 'Delete' }}</span>
-          <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
+          <span v-if="contextMenu.item?.hasPendingApproval" class="text-[11px] font-bold bg-amber-50 dark:bg-amber-50/20 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full ml-auto">{{ isRTL ? 'قيد المراجعة' : 'Pending' }}</span>
         </ShadcnButton>
       </div>
     </div>

@@ -9,7 +9,7 @@
           @click="toggleSidebar"
           :aria-label="$t('dashboard.toggleSidebar') || 'Toggle sidebar'"
           :class="[
-            'p-2 theme-rounded hover:bg-white/12 transition-all',
+            'p-2 theme-rounded hover:bg-white/12 dark:hover:bg-white/5 transition-all',
             showDesktopMenuToggle ? '' : 'sm:hidden'
           ]"
         >
@@ -32,7 +32,7 @@
           :aria-label="compactNavOpen ? $t('dashboard.closeTopNavigation') : $t('dashboard.openTopNavigation')"
           aria-controls="dashboard-primary-navigation"
           :aria-expanded="compactNavOpen"
-          class="top-nav-toggle h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/10 p-2 theme-text-light transition-colors hover:bg-white/16 focus-visible:ring-2 focus-visible:ring-white/70"
+          class="top-nav-toggle h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/15 dark:border-white/20 bg-white/10 dark:bg-white/5 p-2 theme-text-light transition-colors hover:bg-white/16 dark:hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/70"
         >
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -50,14 +50,14 @@
           :disabled="!editLayout"
           :class="[
             'top-nav-desktop ml-2 min-w-0 max-w-full flex-1 items-center gap-1 [&>.top-nav-item]:shrink-0',
-            editLayout ? 'rounded-xl ring-2 ring-amber-400/60 bg-white/5 px-2 py-1' : '',
+            editLayout ? 'rounded-xl ring-2 ring-amber-400/60 dark:ring-amber-500/60 bg-white/5 dark:bg-white/10 px-2 py-1' : '',
             compactNavOpen ? 'top-nav-compact-open' : ''
           ]"
           @end="onLayoutEnd"
         >
           <Button variant="ghost" v-for="key in menuOrder" :key="key" @click="selectTop(key)"
             class="top-nav-item flex items-center gap-1 rounded-xl px-2 py-1.5 text-xs font-medium transition-all duration-200 hover:shadow-md"
-            :class="selectedTop === key ? 'top-nav-item-active shadow-md shadow-slate-950/10' : 'hover:bg-white/10 text-slate-200'"
+            :class="selectedTop === key ? 'top-nav-item-active shadow-md dark:shadow-slate-950/20' : 'hover:bg-white/10 dark:hover:bg-white/5 text-slate-200 dark:text-slate-300'"
             :aria-current="selectedTop === key ? 'page' : undefined">
             {{ $t('navbar.' + key) }}
             <span v-if="editLayout" @click.stop.prevent class="menu-drag-handle inline-flex cursor-grab opacity-70 hover:opacity-100" title="">
@@ -1269,6 +1269,13 @@ export default {
     linear-gradient(110deg, rgba(var(--theme-primary-rgb), 0.98), rgba(var(--theme-primary-rgb), 0.84));
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
   backdrop-filter: blur(16px);
+}
+
+.dark .dashboard-shell > header {
+  background-image:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(var(--theme-primary-rgb), 0.12) 100%);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 .top-nav-toggle {

@@ -113,19 +113,24 @@ body,
 }
 
 .dark {
-  --theme-text-primary: #ffffff;
-  --theme-text-secondary: #e5e7eb;
-  --theme-text-muted: #d1d5db;
+  /* Layered dark palette: page < card < table header < hover row */
+  --theme-text-primary: #f8fafc;
+  --theme-text-secondary: #cbd5e1;
+  --theme-text-muted: #94a3b8;
   --theme-heading-color: #ffffff;
-  --theme-card-text: #ffffff;
-  --theme-sidebar-text: #e5e7eb;
-  --theme-link-color: var(--theme-primary);
+  --theme-card-text: #f8fafc;
+  --theme-sidebar-text: #cbd5e1;
+  --theme-link-color: var(--theme-primary-400);
   --theme-surface-bg: #0f172a;
   --theme-surface-muted-bg: #1e293b;
-  --theme-surface-border: rgba(255, 255, 255, 0.08);
+  --theme-surface-border: rgba(255, 255, 255, 0.1);
   --theme-glass-bg: rgba(15, 23, 42, 0.6);
   --theme-glass-border: rgba(255, 255, 255, 0.1);
   --theme-backdrop-bg: rgba(15, 23, 42, 0.7);
+  /* Table row layers */
+  --theme-table-bg: #0f172a;
+  --theme-table-hover-bg: rgba(255, 255, 255, 0.03);
+  --theme-table-zebra-bg: rgba(255, 255, 255, 0.02);
 }
 
 @layer components {
@@ -2633,25 +2638,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   animation: notif-focus-flash 4s ease-out;
 }
 
-.dark {
-  color-scheme: dark;
-  --theme-text-primary: #f4f4f5 !important;
-  --theme-text-secondary: #d4d4d8 !important;
-  --theme-text-muted: #a1a1aa !important;
-  --theme-heading-color: #fafafa !important;
-  --theme-card-text: #f4f4f5 !important;
-  --theme-sidebar-text: #e4e4e7 !important;
-  --theme-surface-bg: #080808 !important;
-  --theme-surface-muted-bg: #141414 !important;
-  --theme-surface-border: rgb(203 213 225 / 0.14) !important;
-  --theme-glass-bg: rgb(8 8 8 / 0.96) !important;
-  --theme-glass-border: rgb(203 213 225 / 0.16) !important;
-  --theme-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.2) !important;
-  --theme-shadow-md: 0 4px 12px rgb(0 0 0 / 0.24) !important;
-  --theme-shadow-lg: 0 12px 28px rgb(0 0 0 / 0.3) !important;
-  --theme-shadow-card: 0 4px 14px rgb(0 0 0 / 0.24) !important;
-  --theme-backdrop-bg: rgb(0 0 0 / 0.68);
-}
+/* Removed: pitch-black .dark block that overrode the layered palette with !important */
 
 .dark body,
 .dark #app {
@@ -3502,7 +3489,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 /* =========================
-   Dark mode — icons
+   Dark mode — icons (outline/stroke-based, use currentColor)
    ========================= */
 .dark svg,
 .dark .theme-icon,
@@ -3512,101 +3499,207 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .top-nav-toggle svg,
 .dark .theme-sidebar-collapse-btn svg {
   color: var(--theme-text-light);
-  fill: var(--theme-text-light);
-  stroke: var(--theme-text-light);
+  fill: none;
+  stroke: currentColor;
 }
 
+/* Sidebar / nav icons slightly muted so active ones stand out */
 .dark .theme-sidebar-icon svg,
 .dark .sidebar-link-icon svg,
 .dark .theme-sidebar-item svg {
   color: var(--theme-text-light-secondary);
-  fill: var(--theme-text-light-secondary);
-  stroke: var(--theme-text-light-secondary);
+  fill: none;
+  stroke: currentColor;
 }
 
 .dark .theme-sidebar-item-active svg,
 .dark .theme-sidebar-item-active .theme-sidebar-icon {
   color: #ffffff;
-  fill: #ffffff;
-  stroke: #ffffff;
+  fill: none;
+  stroke: currentColor;
 }
 
+/* Active / emphasis icons keep primary color */
 .dark .theme-accent-strong svg,
 .dark .theme-text-strong svg {
   color: var(--theme-primary-300);
-  fill: var(--theme-primary-300);
-  stroke: var(--theme-primary-300);
+  fill: none;
+  stroke: currentColor;
 }
+
+/* Ensure all outline icons stay stroke-based everywhere */
+.dark [fill="none"] { fill: none !important; }
+.dark [stroke="currentColor"] { stroke: currentColor !important; }
 
 /* =========================
-   Dark mode — buttons (mirror PaymentsPage)
+   Dark mode — action buttons (edit/delete) + navbar + surfaces
    ========================= */
-.dark .bg-primary,
-.dark .theme-btn-primary,
-.dark button[class*='bg-primary'] {
-  background-color: rgb(var(--theme-primary-500));
-  color: #ffffff;
+
+/* Action buttons — dark tinted backgrounds, visible borders, bright icons */
+.dark .action-btn--edit {
+  border-color: rgba(245, 158, 11, 0.35);
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+.dark .action-btn--edit:hover {
+  background-color: rgba(245, 158, 11, 0.25);
+  color: #fcd34d;
 }
 
-.dark .bg-primary:hover,
-.dark .theme-btn-primary:hover,
-.dark button[class*='bg-primary']:hover {
-  background-color: rgb(var(--theme-primary-600));
+.dark .action-btn--delete,
+.dark .action-btn--danger {
+  border-color: rgba(248, 113, 113, 0.35);
+  background-color: rgba(248, 113, 113, 0.15);
+  color: #f87171;
 }
-
-/* Outline / ghost buttons */
-.dark .border-border,
-.dark .bg-background,
-.dark .bg-muted,
-.dark .hover\:bg-muted:hover,
-.dark .hover\:bg-muted\/50:hover {
-  background-color: rgba(15, 23, 42, 0.55);
-  border-color: rgba(255, 255, 255, 0.18);
-  color: #e5e7eb;
-}
-
-.dark .hover\:bg-muted:hover,
-.dark .hover\:bg-muted\/50:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-/* Destructive / cancel buttons */
-.dark .bg-destructive\/10,
-.dark .bg-destructive\/20,
-.dark .text-destructive {
-  background-color: rgba(239, 68, 68, 0.15);
+.dark .action-btn--delete:hover,
+.dark .action-btn--danger:hover {
+  background-color: rgba(248, 113, 113, 0.25);
   color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.3);
 }
 
-.dark .bg-destructive\/10:hover,
-.dark .bg-destructive\/20:hover {
-  background-color: rgba(239, 68, 68, 0.25);
+/* Success tone in dark */
+.dark .action-btn--success {
+  border-color: rgba(52, 211, 153, 0.35);
+  background-color: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+.dark .action-btn--success:hover {
+  background-color: rgba(52, 211, 153, 0.25);
+  color: #6ee7b7;
 }
 
-/* Text on buttons / action links */
-.dark .text-white,
-.dark .text-white\/70,
-.dark .text-white\/80 {
-  color: #ffffff;
-}
-
-.dark .theme-text-secondary,
-.dark .theme-text-muted {
+/* Neutral / wallet / default already use theme vars; just ensure contrast in dark */
+.dark .action-btn--default,
+.dark .action-btn--view,
+.dark .action-btn--statement,
+.dark .action-btn--wallet {
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.05);
   color: #e5e7eb;
 }
+.dark .action-btn--default:hover,
+.dark .action-btn--view:hover,
+.dark .action-btn--statement:hover,
+.dark .action-btn--wallet:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
 
-/* Status badges / pills */
-.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.2); color: #e5e7eb; }
-.dark .bg-indigo-600 { background-color: rgba(99, 102, 241, 0.2); color: #e5e7eb; }
-.dark .bg-green-600 { background-color: rgba(34, 197, 94, 0.2); color: #e5e7eb; }
-.dark .bg-red-600 { background-color: rgba(239, 68, 68, 0.2); color: #e5e7eb; }
-.dark .text-emerald-700,
-.dark .text-indigo-700,
-.dark .text-green-700,
-.dark .text-red-700 { color: #e5e7eb; }
+/* Top navbar items — match light mode: transparent items, subtle hover, clear active */
+.dark .top-nav-item {
+  background: transparent;
+  color: #cbd5e1;
+  border-color: transparent;
+}
+.dark .top-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark .top-nav-item-active {
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-primary-dark));
+  color: #ffffff !important;
+  border-color: transparent;
+}
+
+/* Top navbar header — enough contrast for icons (notifications, flags, cloud, avatar) */
+.dark .theme-dashboard-header,
+.dark .dashboard-shell > header {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(var(--theme-primary-rgb), 0.15) 100%);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Nav toggle buttons — not heavy black pills */
+.dark .theme-top-nav-toggle,
+.dark .top-nav-toggle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+}
+.dark .theme-top-nav-toggle:hover,
+.dark .top-nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.dark .theme-top-nav-toggle:focus-visible,
+.dark .top-nav-toggle:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Hamburger / compact nav toggle */
+.dark .p-2.theme-rounded:hover\:bg-white\/12:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Table body / filter card / sidebar layered palette */
+.dark .app-table-card,
+.dark .theme-card,
+.dark .settings-card,
+.dark .kc-modal-panel,
+.dark .modal-body-container {
+  background-color: var(--theme-surface-bg);
+  border-color: var(--theme-surface-border);
+  color: var(--theme-card-text);
+}
+
+.dark .dashboard-module-content table tbody {
+  background-color: var(--theme-table-bg);
+}
+
+.dark .dashboard-module-content table tbody tr + tr td {
+  border-top-color: var(--theme-surface-border);
+}
+
+.dark .dashboard-module-content table tbody tr:hover {
+  background-color: var(--theme-table-hover-bg);
+}
+
+.dark .dashboard-module-content table thead {
+  background-color: var(--theme-surface-muted-bg);
+}
+
+.dark .dashboard-module-content table th {
+  color: var(--theme-text-muted);
+}
+
+/* Filter card / app-filter-panel */
+.dark .app-filter-panel {
+  background-color: var(--theme-surface-bg);
+  border-color: var(--theme-surface-border);
+  color: var(--theme-card-text);
+}
+
+/* Context menus / dropdowns */
+.dark .fixed.z-50.rounded-2xl.theme-card,
+.dark .fixed.z-50.rounded-xl.shadow-lg {
+  background-color: var(--theme-surface-bg);
+  border-color: var(--theme-surface-border);
+  color: var(--theme-card-text);
+}
+
+.dark .divide-y.divide-slate-100 > * + * {
+  border-color: var(--theme-surface-border);
+}
+
+/* Status badges / pills — dark tinted, readable text */
+.dark .bg-amber-50 { background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+.dark .text-amber-700 { color: #fbbf24 !important; }
+.dark .bg-red-50 { background-color: rgba(248, 113, 113, 0.15) !important; }
+.dark .text-red-600 { color: #f87171 !important; }
+.dark .text-red-500 { color: #f87171 !important; }
+.dark .hover\:bg-red-50:hover { background-color: rgba(248, 113, 113, 0.25) !important; }
+
+/* Inputs, selects, placeholders — readable in dark */
+.dark .border-gray-300 { border-color: rgba(255, 255, 255, 0.2); }
+.dark .focus\:ring-indigo-500:focus { ring-color: var(--theme-primary); }
 
 /* Reinforce text tokens */
 .dark .theme-text-light { color: #ffffff; }
 .dark .theme-text-light-secondary { color: #e5e7eb; }
 .dark .theme-text-light-muted { color: #d1d5db; }
+
+/* Focus rings clearly visible in dark */
+.dark :where(button, input, select, textarea, [role='tab']):focus-visible {
+  outline: 2px solid rgba(var(--theme-primary-rgb), 0.7);
+  outline-offset: 2px;
+}
