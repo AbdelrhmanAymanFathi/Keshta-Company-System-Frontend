@@ -30,3 +30,9 @@ export const adminResetUserPassword = (userId, data = {}) =>
 // User: change own password
 export const changePassword = (data = {}) =>
   axios.post(`${BASE_URL}/api/auth/password/change`, data);
+
+// Admin: user permissions
+export const getUserPermissions = (id) =>
+  axios.get(`${BASE_URL}/api/users/${id}/permissions`);
+export const updateUserPermissions = (id, permissions) =>
+  axios.put(`${BASE_URL}/api/users/${id}/permissions`, { permissions });
