@@ -1,5 +1,6 @@
 // Auto-split from src/api.js — domain module: http.js
 import axios from 'axios'
+import { user } from '@/composables/authStore'
 
 // import * as XLSX from 'xlsx';
 
@@ -261,6 +262,28 @@ export const logout = () => {
   return axios.post(`${BASE_URL}/api/auth/logout`);
 };
 
+// Fetch current user (includes permissions) from /auth/me and sync the store.
+export const getMe = () =>
+  axios.get(`${BASE_URL}/api/auth/me`);
+
+export async function refreshPermissions() {
+  try {
+    const res = await getMe()
+    if (res.data?.user?.permissions && Array.isArray(res.data.user.permissions)) {
+      user.value = { ...user.value, permissions: res.data.user.permissions }
+      try {
+        const stored = localStorage.getItem('user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          localStorage.setItem('user', JSON.stringify({ ...parsed, permissions: res.data.user.permissions }))
+        }
+      } catch { /* ignore */ }
+    }
+  } catch (e) {
+    console.warn('[permissions] refreshPermissions failed', e)
+  }
+}
+
 // --- Global search (Ctrl+H command palette) ---
 export const globalSearch = (query, params = {}) => {
   const { limit = 5 } = params;
@@ -307,6 +330,18 @@ axios.interceptors.response.use(
     if (response.data?.accessToken) {
       tokenManager.setToken(response.data.accessToken);
       tokenManager.scheduleTokenRefresh(response.data.accessToken);
+    }
+    // Keep the client-side user permissions in sync with the server response
+    // (login / refresh / /auth/me all return user.permissions).
+    if (response.data?.user?.permissions && Array.isArray(response.data.user.permissions)) {
+      user.value = { ...user.value, permissions: response.data.user.permissions }
+      try {
+        const stored = localStorage.getItem('user')
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          localStorage.setItem('user', JSON.stringify({ ...parsed, permissions: response.data.user.permissions }))
+        }
+      } catch { /* ignore */ }
     }
     return response;
   },
@@ -379,6 +414,19 @@ axios.interceptors.response.use(
         // ignore if running server-side
       }
       // suppress additional error logging for 502
+    }
+
+    // 403 Forbidden — the user lacks the required permission. Notify gracefully
+    // without crashing so the router / UI can redirect or show a message.
+    if (error.response && error.response.status === 403) {
+      try {
+        window.dispatchEvent(new CustomEvent('app:no-access', {
+          detail: { permission: error.response.data?.permission, message: error.response.data?.message },
+        }))
+      } catch (e) { /* ignore */ }
+      if (window.$toast) {
+        window.$toast(error.response.data?.message || 'You do not have access to this page', 'error')
+      }
     }
     
     return Promise.reject(error);
