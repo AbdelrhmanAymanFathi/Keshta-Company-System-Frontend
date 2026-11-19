@@ -2125,6 +2125,7 @@
   },
   "users": {
     "title": "إدارة المستخدمين",
+    "permissions": "صلاحية المستخدمين",
     "add": "إضافة مستخدم",
     "addUser": "إضافة مستخدم",
     "editUser": "تعديل مستخدم",
@@ -2240,7 +2241,7 @@
     },
     "viewAll": "عرض كل الإشعارات",
     "users": {
-      "permissions": "إصلاحيات المستخدمين"
+      "permissions": "صلاحية المستخدمين"
     },
     "permissions": {
       "selectUser": "اختر مستخدمًا",
@@ -2262,7 +2263,7 @@
       "unsaved": "تغييرات غير محفوظة",
       "adminLocked": "مسؤول — غير مقيد دائمًا",
       "adminLockedDesc": "للمسؤولين حق الوصول الكامل لجميع الصفحات ولا يمكن تقييدهم.",
-      "summary": "{name} يمكنه الوصول إلى {pages} صفحة من {total} عبر {modules} وحدات",
+      "summary": "{name} يمكنه الوصول إلى {pages} صفحة عبر {modules} وحدات",
       "searchUsers": "ابحث عن مستخدم…",
       "searchModules": "ابحث عن الوحدات والصفحات…",
       "expandAll": "توسيع الكل",
@@ -2279,7 +2280,8 @@
       "modulePages": "{checked} صفحة من {total}",
       "confirmLeave": "لديك تغييرات غير محفوظة. هل تريد تجاهلها وتغيير المستخدم؟",
       "confirmDiscard": "تجاهل",
-      "errorRetry": "إعادة المحاولة"
+      "errorRetry": "إعادة المحاولة",
+      "usersCount": "{count} مستخدم"
     }
   }
 }

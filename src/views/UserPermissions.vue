@@ -1,5 +1,8 @@
 <template>
-  <div :dir="dir" class="permissions-admin app-page-header-space p-4 sm:p-0.5 lg:p-1 min-h-[calc(100vh-var(--header-height,0))]">
+  <div
+    :dir="dir"
+    class="permissions-admin min-h-screen bg-background p-4 sm:p-0 lg:p-2 rtl:pl-0 rtl:pr-0"
+  >
     <!-- Page header -->
     <div class="app-page-header rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div>
@@ -8,8 +11,8 @@
       </div>
     </div>
 
-    <!-- Sticky action bar -->
-    <div class="sticky top-0 z-20 mt-4 border-b border-border bg-background/80 backdrop-blur-sm p-3 sm:p-4 shadow-sm">
+    <!-- Sticky action bar (hidden when no user is selected) -->
+    <div v-if="selectedUser" class="sticky top-0 z-20 border-b border-border bg-background p-3 sm:p-4 shadow-sm">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
           <span
@@ -22,13 +25,13 @@
           <Button
             variant="outline"
             size="xs"
-            :disabled="saving || !selectedUser"
+            :disabled="saving"
             @click="selectAll"
           >{{ $t('notifications.permissions.selectAll') }}</Button>
           <Button
             variant="outline"
             size="xs"
-            :disabled="saving || !selectedUser"
+            :disabled="saving"
             @click="clearAll"
           >{{ $t('notifications.permissions.clearAll') }}</Button>
           <Button
@@ -38,7 +41,7 @@
             @click="handleDiscard"
           >{{ $t('notifications.permissions.discard') }}</Button>
           <Button
-            :disabled="saving || !selectedUser || !dirty"
+            :disabled="saving || !dirty"
             @click="save"
             class="px-4"
           >
@@ -50,22 +53,19 @@
     </div>
 
     <!-- Body: user selector panel + permissions panel -->
-    <div class="flex flex-col lg:flex-row rtl:flex-row-reverse gap-4">
+    <div class="flex flex-col lg:flex-row gap-4 min-h-[300px]">
       <!-- User selector panel -->
-      <div class="lg:w-[360px] flex-shrink-0 min-w-0">
-        <Card>
-          <CardHeader>
-            <CardTitle class="text-sm font-semibold theme-text-primary flex items-center gap-2">
-              <div class="h-5 w-5 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center text-[10px] font-medium">
-                U
-              </div>
+      <div class="lg:w-[360px] flex-shrink-0 min-w-0 lg:sticky lg:top-4">
+        <Card class="max-h-[calc(100vh-150px)] overflow-y-auto flex flex-col">
+          <CardHeader class="p-4">
+            <CardTitle class="text-sm font-semibold theme-text-primary">
               {{ $t('notifications.permissions.selectUser') }}
             </CardTitle>
-            <CardDescription class="text-xs theme-text-muted">
+            <CardDescription class="text-xs theme-text-muted mt-1">
               {{ $t('notifications.permissions.noUserSelectedDesc') }}
             </CardDescription>
           </CardHeader>
-          <CardContent class="p-0">
+          <CardContent class="p-0 flex-1 min-h-0 overflow-y-auto">
             <div class="p-3">
               <div class="relative mb-3">
                 <MagnifyingGlassIcon class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:right-2 rtl:left-auto" />
@@ -74,6 +74,15 @@
                   :placeholder="$t('notifications.permissions.searchUsers')"
                   class="pl-8 rtl:pl-2 rtl:pr-8"
                 />
+                <button
+                  v-if="searchUsers"
+                  type="button"
+                  @click="searchUsers = ''"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 rtl:left-2 rtl:right-auto p-1 hover:bg-muted rounded"
+                  :aria-label="$t('labels.clear')"
+                >
+                  <span class="text-[10px] text-muted-foreground">×</span>
+                </button>
               </div>
 
               <div v-if="loadingUsers" class="space-y-2">
@@ -87,33 +96,49 @@
               </div>
 
               <div v-else class="space-y-1">
+                <p class="px-2 text-xs font-medium theme-text-muted uppercase tracking-wider">
+                  {{ userResults.length }} {{ $t('notifications.permissions.usersCount', { count: userResults.length }) }}
+                </p>
                 <button
                   v-for="u in userResults"
                   :key="u.id"
                   type="button"
                   @click="onUserSelect(u)"
-                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring"
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-colors focus-visible:ring-2 focus-visible:ring-ring"
                   :class="{
-                    'bg-muted border-primary': selectedUser?.id === u.id,
-                    'border-border': selectedUser?.id !== u.id
+                    'bg-primary/50 border-primary': selectedUser?.id === u.id,
+                    'border-border hover:bg-muted/50': selectedUser?.id !== u.id
                   }"
+                  :aria-selected="selectedUser?.id === u.id"
+                  role="option"
                 >
                   <div class="h-9 w-9 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center text-sm font-medium shrink-0">
                     {{ initials(u.name) }}
                   </div>
                   <div class="min-w-0 flex-1">
-                    <div class="text-sm theme-text-primary truncate">{{ u.name }}</div>
-                    <div class="text-xs theme-text-muted truncate">{{ u.email || '-' }}</div>
+                    <div class="text-start truncate" :title="u.name">
+                      <span dir="ltr" class="text-sm theme-text-primary">{{ u.name }}</span>
+                    </div>
+                    <div class="text-start truncate" :title="u.email">
+                      <span dir="ltr" class="text-xs theme-text-muted">{{ u.email || '-' }}</span>
+                    </div>
                   </div>
-                  <Badge
-                    :variant="isAdminUser(u) ? 'destructive' : 'secondary'"
-                    class="mt-0.5 shrink-0"
-                  >{{ isAdminUser(u) ? $t('notifications.permissions.roleAdmin') : $t('notifications.permissions.roleUser') }}</Badge>
+                  <span
+                    class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium shrink-0"
+                    :class="{
+                      'border-blue-200 bg-blue-50 text-blue-700': isAdminUser(u),
+                      'border-border bg-muted text-muted-foreground': !isAdminUser(u)
+                    }"
+                  >
+                    {{ isAdminUser(u) ? $t('notifications.permissions.roleAdmin') : $t('notifications.permissions.roleUser') }}
+                  </span>
                   <span
                     v-if="selectedUser?.id === u.id"
                     class="h-3.5 w-3.5 rounded-full bg-primary flex items-center justify-center shrink-0"
                   >
-                    <CheckIcon class="h-2.5 w-2.5 text-primary-foreground" />
+                    <svg class="h-2.5 w-2.5 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
                   </span>
                 </button>
               </div>
@@ -125,12 +150,12 @@
       <!-- Permissions panel -->
       <div class="flex-1 min-w-0 flex flex-col">
         <!-- Empty state -->
-        <div v-if="!selectedUser" class="flex-1 flex flex-col items-center justify-center text-center p-8">
-          <div class="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-3 text-muted-foreground shrink-0">
+        <div v-if="!selectedUser" class="flex-1 flex flex-col items-center justify-center text-center p-10">
+          <div class="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4 text-muted-foreground shrink-0">
             <UserGroupIcon class="h-8 w-8" />
           </div>
           <h3 class="text-base font-semibold theme-text-primary">{{ $t('notifications.permissions.noUserSelected') }}</h3>
-          <p class="text-sm theme-text-muted max-w-xs mt-1">{{ $t('notifications.permissions.noUserSelectedDesc') }}</p>
+          <p class="text-sm theme-text-muted max-w-xs mt-2">{{ $t('notifications.permissions.noUserSelectedDesc') }}</p>
         </div>
 
         <!-- Permissions content -->
@@ -173,14 +198,14 @@
                 :key="p.key"
                 type="button"
                 @click="applyPreset(p)"
-                :disabled="saving || !selectedUser || isAdminUser(selectedUser)"
+                :disabled="saving.value || isAdminUser(selectedUser)"
                 class="px-2.5 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-theme-primary hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >{{ $t(p.label) }}</button>
               <button
                 v-if="dirty"
                 type="button"
                 @click="handleDiscard"
-                :disabled="saving"
+                :disabled="saving.value"
                 class="px-2.5 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-xs font-medium text-amber-800 hover:bg-amber-100 transition-colors disabled:opacity-50"
               >{{ $t('notifications.permissions.discard') }}</button>
             </div>
@@ -198,7 +223,7 @@
                 class="module-card rounded-xl border border-border bg-card"
               >
                 <div
-                  class="module-header flex items-center gap-2 px-3 py-2.5 cursor-pointer"
+                  class="module-header flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none"
                   @click="toggleExpansion(module.key)"
                   role="button"
                   :aria-expanded="isExpanded(module.key)"
@@ -254,23 +279,22 @@
                       @keydown.space.prevent="togglePage(page.key)"
                       @keydown.enter.prevent="togglePage(page.key)"
                     >
-                    <input
-                      type="checkbox"
-                      role="checkbox"
-                      :aria-checked="isSelected(page.key)"
-                      :aria-label="pageLabel(page)"
-                      class="peer sr-only focus-visible:outline-none"
-                      :checked="isSelected(page.key)"
-                      @change="togglePage(page.key)"
-                      @click.stop
-                    />
-                    <div class="w-5 h-5 rounded border border-input theme-text-primary flex items-center justify-center shrink-0" :class="{
-                      'bg-primary': isSelected(page.key),
-                      'border-primary': false
-                    }">
-                      <span v-if="isSelected(page.key)" class="text-[10px] text-primary-foreground">✓</span>
-                    </div>
-                    <div class="flex items-center gap-2 min-w-0">
+                      <input
+                        type="checkbox"
+                        role="checkbox"
+                        :aria-checked="isSelected(page.key)"
+                        :aria-label="pageLabel(page)"
+                        class="peer sr-only focus-visible:outline-none"
+                        :checked="isSelected(page.key)"
+                        @change="togglePage(page.key)"
+                        @click.stop
+                      />
+                      <div class="w-5 h-5 rounded border border-input theme-text-primary flex items-center justify-center shrink-0" :class="{
+                        'bg-primary': isSelected(page.key)
+                      }">
+                        <span v-if="isSelected(page.key)" class="text-[10px] text-primary-foreground">✓</span>
+                      </div>
+                      <div class="flex items-center gap-2 min-w-0">
                         <div class="h-6 w-6 rounded bg-muted flex items-center justify-center shrink-0">
                           <component :is="moduleIcon(module.key)" class="h-3 w-3 theme-text-muted" />
                         </div>
@@ -307,7 +331,7 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getThemeIcon } from '@acme/icon-packs'
-import { ArrowRightIcon, CheckIcon, ShieldCheckIcon, UserGroupIcon, MagnifyingGlassIcon, UserIcon } from '@acme/icon-packs/legacy'
+import { ArrowRightIcon, ShieldCheckIcon, UserGroupIcon, MagnifyingGlassIcon } from '@acme/icon-packs/legacy'
 import { PERMISSION_REGISTRY } from '@/permissions/registry'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -570,6 +594,14 @@ export default {
       }
     }
 
+    const setDocumentTitle = () => {
+      document.title = `Keshta Company - ${t('notifications.users.permissions')}`
+    }
+
+    const restoreDocumentTitle = () => {
+      document.title = 'Keshta Company'
+    }
+
     const onBeforeUnload = (e) => {
       if (dirty.value) {
         e.preventDefault()
@@ -578,22 +610,26 @@ export default {
     }
 
     onMounted(() => {
+      setDocumentTitle()
       watch(dirty, (d) => {
         if (d) window.addEventListener('beforeunload', onBeforeUnload)
         else window.removeEventListener('beforeunload', onBeforeUnload)
       })
+      watch(locale, setDocumentTitle)
       if (dirty.value) window.addEventListener('beforeunload', onBeforeUnload)
     })
 
     onBeforeUnmount(() => {
+      watch(locale, setDocumentTitle) // noop, but remove listeners
       window.removeEventListener('beforeunload', onBeforeUnload)
+      restoreDocumentTitle()
     })
 
     loadUsers()
 
     return {
-      dir, modules, moduleIcon, ArrowRightIcon, CheckIcon, ShieldCheckIcon, UserGroupIcon,
-      MagnifyingGlassIcon, UserIcon, users, selectedUser, selectedKeys, initialKeys,
+      dir, modules, moduleIcon, ArrowRightIcon, ShieldCheckIcon, UserGroupIcon, MagnifyingGlassIcon,
+      users, selectedUser, selectedKeys, initialKeys,
       loadingUsers, loadingPermissions, saving, serverError, serverSuccess, pickerError,
       searchUsers, searchModules, expandedModules, showConfirm, pendingUser,
       isAdminUser, initials, moduleLabel, pageLabel, modulePageKeys, isSelected,

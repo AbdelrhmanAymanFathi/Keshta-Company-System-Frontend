@@ -2125,6 +2125,7 @@
   },
   "users": {
     "title": "Users Management",
+    "permissions": "User Permissions",
     "add": "Add User",
     "addUser": "Add User",
     "editUser": "Edit User",
@@ -2267,7 +2268,8 @@
       "modulePages": "{checked} of {total} pages",
       "confirmLeave": "You have unsaved changes. Discard them and switch user?",
       "confirmDiscard": "Discard",
-      "errorRetry": "Retry"
+      "errorRetry": "Retry",
+      "usersCount": "{count} users"
     }
   }
 }
