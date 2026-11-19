@@ -7,7 +7,7 @@ export const getUsers = (params = {}) => {
   const { page = 1, pageSize = 20, q = '' } = params;
   const queryParams = new URLSearchParams({
     page: page.toString(),
-    pageSize: pageSize.toString()
+    pageSize: Math.min(pageSize, 100).toString()
   });
   if (q) {
     queryParams.append('q', q);

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { tokenManager } from '@/api/http'
 
 class RealtimeService {
   constructor() {
@@ -62,6 +63,19 @@ class RealtimeService {
     const jwt = this.authToken
     if (!jwt) return
 
+    if (tokenManager.isTokenExpired(jwt)) {
+      try {
+        await tokenManager.refreshToken()
+      } catch (e) {
+        this.isConnected.value = false
+        this.isConnecting = false
+        this.es = null
+        this.sessionToken = null
+        this.scheduleReconnect()
+        return
+      }
+    }
+
     this.isConnecting = true
     this.connectionError.value = null
     this.controller = new AbortController()
@@ -69,7 +83,9 @@ class RealtimeService {
     let handshakeOk = false
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        this.sessionToken = await this.performHandshake(jwt)
+        const currentToken = this.authToken
+        if (!currentToken) return
+        this.sessionToken = await this.performHandshake(currentToken)
         handshakeOk = true
         break
       } catch (err) {
