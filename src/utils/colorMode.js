@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { applyTypography, loadTheme } from '@acme/theme-engine'
 
 const COLOR_MODE_KEY = 'keshta-color-mode'
 
@@ -16,6 +17,15 @@ export function setColorMode(mode) {
   window.localStorage.setItem(COLOR_MODE_KEY, mode)
   document.documentElement.classList.toggle('dark', mode === 'dark')
   colorMode.value = mode
+
+  // Refresh theme typography tokens so inline CSS variables (--theme-text-*)
+  // reflect the active color mode instead of staying locked to light-mode values.
+  if (typeof document !== 'undefined') {
+    try {
+      void applyTypography(loadTheme())
+    } catch { /* theme engine not ready yet */ }
+  }
+
   return mode
 }
 

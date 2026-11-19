@@ -112,6 +112,22 @@ body,
   --theme-card-text: #0f172a;
 }
 
+.dark {
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #e5e7eb;
+  --theme-text-muted: #d1d5db;
+  --theme-heading-color: #ffffff;
+  --theme-card-text: #ffffff;
+  --theme-sidebar-text: #e5e7eb;
+  --theme-link-color: var(--theme-primary);
+  --theme-surface-bg: #0f172a;
+  --theme-surface-muted-bg: #1e293b;
+  --theme-surface-border: rgba(255, 255, 255, 0.08);
+  --theme-glass-bg: rgba(15, 23, 42, 0.6);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-backdrop-bg: rgba(15, 23, 42, 0.7);
+}
+
 @layer components {
 /* =========================
    Text Semantic Classes
@@ -3233,4 +3249,131 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   .app-filter-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+}
+
+/* =========================
+   Dark mode surface overrides
+   ========================= */
+.dark .theme-card {
+  background-color: var(--theme-surface-bg);
+  border-color: var(--theme-surface-border);
+  color: var(--theme-card-text);
+}
+
+.dark .theme-card-header {
+  background: linear-gradient(90deg, var(--theme-primary-dark), var(--theme-primary));
+}
+
+.dark .theme-sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15, 23, 42, 0.95),
+      rgba(var(--theme-primary-rgb), 0.15)
+    );
+  border-color: rgba(var(--theme-primary-rgb), 0.25);
+}
+
+.dark .theme-sidebar-item {
+  color: var(--theme-sidebar-text);
+}
+
+.dark .theme-sidebar-item:hover {
+  background: rgba(var(--theme-primary-rgb), 0.15);
+  color: var(--theme-primary-300);
+}
+
+.dark .theme-sidebar-item-active {
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-primary-dark));
+  color: var(--theme-on-primary);
+}
+
+.dark .theme-sidebar-icon {
+  background: rgba(var(--theme-primary-rgb), 0.15);
+  color: var(--theme-primary-400);
+}
+
+.dark .theme-main-gradient {
+  background: linear-gradient(to bottom right, rgb(15 23 42), rgba(var(--theme-primary-rgb), 0.12), rgb(15 23 42));
+}
+
+.dark .theme-header {
+  background: linear-gradient(135deg, rgb(15 23 42) 0%, rgba(var(--theme-primary-rgb), 0.18) 24%, rgba(var(--theme-primary-rgb), 0.14) 42%, rgba(var(--theme-primary-rgb), 0.1) 100%);
+}
+
+.dark .theme-page-header-bar {
+  background: linear-gradient(to bottom right, rgb(15 23 42), rgba(var(--theme-primary-rgb), 0.12), rgb(15 23 42));
+  border-color: rgba(var(--theme-primary-rgb), 0.18);
+  box-shadow: 0 10px 15px -3px rgba(var(--theme-primary-rgb), 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .theme-table-thead {
+  background-color: rgba(var(--theme-primary-rgb), 0.12);
+}
+
+.dark .theme-table-thead-gradient {
+  background: linear-gradient(to right, rgba(var(--theme-primary-rgb), 0.12), rgba(var(--theme-primary-rgb), 0.06));
+}
+
+.dark .theme-table-row-hover:hover {
+  background-color: rgba(var(--theme-primary-rgb), 0.1);
+}
+
+.dark .theme-top-nav-toggle,
+.dark .top-nav-toggle {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--theme-text-light);
+}
+
+.dark .theme-btn-primary {
+  background: rgb(var(--theme-primary-500));
+}
+.dark .theme-btn-primary:hover {
+  background: rgb(var(--theme-primary-600));
+}
+
+.dark .theme-info-panel {
+  border-color: rgba(var(--theme-primary-rgb), 0.25);
+  background-color: rgba(var(--theme-primary-rgb), 0.12);
+  color: var(--theme-text-light);
+}
+
+.dark .theme-badge {
+  background-color: rgba(var(--theme-primary-rgb), 0.18);
+  color: var(--theme-primary-300);
+}
+
+.dark .dashboard-module-content table thead {
+  background-color: rgba(var(--theme-primary-rgb), 0.12);
+}
+
+.dark .dashboard-module-content table th {
+  color: #9ca3af;
+}
+
+.dark .dashboard-module-content table tbody {
+  background-color: #0f172a;
+}
+
+.dark .dashboard-module-content table tbody tr + tr td {
+  border-top-color: #334155;
+}
+
+.dark .dashboard-module-content table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.dark .dashboard-module-content table td {
+  color: #e5e7eb;
+}
+
+.dark .message-bubble--received {
+  color: #e2e8f0 !important;
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark .message-bubble--received .message-bubble__footer {
+  color: #94a3b8 !important;
 }

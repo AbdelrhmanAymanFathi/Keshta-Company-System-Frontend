@@ -345,11 +345,25 @@ export function applyTypography(theme: NormalizedTheme) {
   ensureGoogleFontLink(theme.fontPreset)
   const withLink = { ...theme, linkColor: theme.linkColor || theme.primary }
   const root = document.documentElement.style
+  const isDark = document.documentElement.classList.contains('dark')
+  const darkOverrides: Partial<NormalizedTheme> = isDark
+    ? {
+        textPrimary: theme.textLight,
+        textSecondary: theme.textLightSecondary,
+        textMuted: theme.textLightMuted,
+        headingColor: theme.textLight,
+        cardText: theme.textLight,
+        sidebarText: theme.textLightSecondary,
+        linkColor: theme.linkColor || theme.primary
+      }
+    : {}
+  const effective = { ...withLink, ...darkOverrides } as NormalizedTheme
   TYPOGRAPHY_CSS_MAP.forEach(([cssVar, key]) => {
-    const val = withLink[key]
+    const val = effective[key]
     if (val) root.setProperty(cssVar, String(val))
   })
   document.documentElement.dataset.themeFont = theme.fontPreset
+  document.documentElement.dataset.colorScheme = isDark ? 'dark' : 'light'
   return withLink
 }
 
