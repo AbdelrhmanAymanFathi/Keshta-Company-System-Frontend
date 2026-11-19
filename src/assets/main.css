@@ -3375,18 +3375,19 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 .dark .message-bubble--received .message-bubble__footer {
-  color: #94a3b8 !important;
+  color: #94a3b8;
 }
 
 /* =========================
-   Dark mode — fix light buttons/containers (bg-white, bg-gray-100, hover states)
+   Dark mode — light backgrounds & borders
+   Specificity (.dark X) beats plain utility classes, no !important needed.
    ========================= */
 .dark .bg-white,
 .dark .bg-white\/90,
 .dark .bg-white\/95,
 .dark .bg-slate-50\/70,
 .dark .bg-gray-50 {
-  background-color: #0f172a !important;
+  background-color: #0f172a;
 }
 
 .dark .bg-white\/10,
@@ -3397,18 +3398,18 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .bg-gray-100,
 .dark .bg-slate-100,
 .dark .bg-gray-200 {
-  background-color: rgba(15, 23, 42, 0.55) !important;
+  background-color: rgba(15, 23, 42, 0.55);
 }
 
 .dark .border-gray-100,
 .dark .border-gray-200,
 .dark .border-slate-200,
 .dark .border-slate-200\/80 {
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .dark .border-white\/15 {
-  border-color: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 .dark .hover\:bg-white\/10:hover,
@@ -3417,7 +3418,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .hover\:bg-white\/16:hover,
 .dark .hover\:bg-gray-100:hover,
 .dark .hover\:bg-gray-200:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .dark .hover\:bg-white\/10,
@@ -3426,12 +3427,12 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .hover\:bg-white\/16,
 .dark .hover\:bg-gray-100,
 .dark .hover\:bg-gray-200 {
-  background-color: rgba(15, 23, 42, 0.45) !important;
+  background-color: rgba(15, 23, 42, 0.45);
 }
 
 .dark .text-gray-100,
 .dark .text-slate-200 {
-  color: #e5e7eb !important;
+  color: #e5e7eb;
 }
 
 .dark .text-slate-950,
@@ -3439,7 +3440,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .text-gray-800,
 .dark .text-gray-700,
 .dark .text-gray-600 {
-  color: #e5e7eb !important;
+  color: #e5e7eb;
 }
 
 .dark .shadow-slate-200\/40,
@@ -3447,20 +3448,20 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .shadow-slate-300\/50,
 .dark .shadow-slate-950\/10,
 .dark .shadow-slate-950\/20 {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 /* Form inputs / selects stay readable in dark mode */
 .dark .bg-slate-50\/70,
 .dark .disabled\:bg-gray-100:disabled,
 .dark .disabled:bg-gray-100:disabled {
-  background-color: #1e293b !important;
-  color: #e5e7eb !important;
+  background-color: #1e293b;
+  color: #e5e7eb;
 }
 
 .dark .focus-visible\:bg-white:focus-visible,
 .dark .focus-visible\:bg-white\/70:focus-visible {
-  background-color: #1e293b !important;
+  background-color: #1e293b;
 }
 
 /* Modal / panel backgrounds */
@@ -3471,37 +3472,37 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .bg-white.shadow-lg,
 .dark .bg-white.shadow-2xl,
 .dark .bg-white\/95.shadow {
-  background-color: #0f172a !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: #e5e7eb !important;
+  background-color: #0f172a;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
 }
 
-/* Table rows / tbody in dark mode already handled; ensure cards inside tables */
+/* Table rows / tbody in dark mode */
 .dark .bg-white.divide-y,
 .dark .bg-white.divide-gray-200,
 .dark .bg-white.shadow-sm.rounded-lg {
-  background-color: #0f172a !important;
-  color: #e5e7eb !important;
+  background-color: #0f172a;
+  color: #e5e7eb;
 }
 
 /* Dropdown / context menus */
 .dark .bg-white.rounded-md.max-h-40,
 .dark .bg-white.rounded-xl.shadow-lg.py-2,
 .dark .bg-white.rounded-xl.shadow-lg.py-2.z-50 {
-  background-color: #0f172a !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: #e5e7eb !important;
+  background-color: #0f172a;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
 }
 
 /* Logout / auth cards */
 .dark .rounded-lg.bg-white.shadow-sm,
 .dark .rounded-lg.bg-white.shadow-sm.hover\:shadow-md:hover {
-  background-color: #0f172a !important;
-  color: #e5e7eb !important;
+  background-color: #0f172a;
+  color: #e5e7eb;
 }
 
 /* =========================
-   Dark mode — icons (match PaymentsPage button look)
+   Dark mode — icons
    ========================= */
 .dark svg,
 .dark .theme-icon,
@@ -3509,108 +3510,103 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .sidebar-link-icon svg,
 .dark .theme-sidebar-item svg,
 .dark .top-nav-toggle svg,
-.dark .theme-sidebar-collapse-btn svg,
-.dark .theme-accent-strong svg,
-.dark .theme-text-strong svg {
-  color: var(--theme-text-light) !important;
-  fill: var(--theme-text-light) !important;
-  stroke: var(--theme-text-light) !important;
+.dark .theme-sidebar-collapse-btn svg {
+  color: var(--theme-text-light);
+  fill: var(--theme-text-light);
+  stroke: var(--theme-text-light);
 }
 
-/* Sidebar / nav icons slightly muted so active ones stand out */
 .dark .theme-sidebar-icon svg,
 .dark .sidebar-link-icon svg,
 .dark .theme-sidebar-item svg {
-  color: var(--theme-text-light-secondary) !important;
-  fill: var(--theme-text-light-secondary) !important;
-  stroke: var(--theme-text-light-secondary) !important;
+  color: var(--theme-text-light-secondary);
+  fill: var(--theme-text-light-secondary);
+  stroke: var(--theme-text-light-secondary);
 }
 
 .dark .theme-sidebar-item-active svg,
 .dark .theme-sidebar-item-active .theme-sidebar-icon {
-  color: #ffffff !important;
-  fill: #ffffff !important;
-  stroke: #ffffff !important;
+  color: #ffffff;
+  fill: #ffffff;
+  stroke: #ffffff;
 }
 
-/* Active / emphasis icons keep primary color */
 .dark .theme-accent-strong svg,
 .dark .theme-text-strong svg {
-  color: var(--theme-primary-300) !important;
-  fill: var(--theme-primary-300) !important;
-  stroke: var(--theme-primary-300) !important;
+  color: var(--theme-primary-300);
+  fill: var(--theme-primary-300);
+  stroke: var(--theme-primary-300);
 }
 
-/* Buttons (all variants) — mirror PaymentsPage dark look */
+/* =========================
+   Dark mode — buttons (mirror PaymentsPage)
+   ========================= */
 .dark .bg-primary,
-.dark .text-primary-foreground,
 .dark .theme-btn-primary,
 .dark button[class*='bg-primary'] {
-  background-color: rgb(var(--theme-primary-500)) !important;
-  color: #ffffff !important;
+  background-color: rgb(var(--theme-primary-500));
+  color: #ffffff;
 }
+
 .dark .bg-primary:hover,
 .dark .theme-btn-primary:hover,
 .dark button[class*='bg-primary']:hover {
-  background-color: rgb(var(--theme-primary-600)) !important;
+  background-color: rgb(var(--theme-primary-600));
 }
 
-/* Outline / ghost buttons stay readable on dark bg */
+/* Outline / ghost buttons */
 .dark .border-border,
 .dark .bg-background,
 .dark .bg-muted,
 .dark .hover\:bg-muted:hover,
 .dark .hover\:bg-muted\/50:hover {
-  background-color: rgba(15, 23, 42, 0.55) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  color: #e5e7eb !important;
+  background-color: rgba(15, 23, 42, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #e5e7eb;
 }
+
 .dark .hover\:bg-muted:hover,
 .dark .hover\:bg-muted\/50:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Destructive / cancel buttons */
 .dark .bg-destructive\/10,
 .dark .bg-destructive\/20,
 .dark .text-destructive {
-  background-color: rgba(239, 68, 68, 0.15) !important;
-  color: #fca5a5 !important;
-  border-color: rgba(239, 68, 68, 0.3) !important;
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
 }
+
 .dark .bg-destructive\/10:hover,
 .dark .bg-destructive\/20:hover {
-  background-color: rgba(239, 68, 68, 0.25) !important;
+  background-color: rgba(239, 68, 68, 0.25);
 }
 
 /* Text on buttons / action links */
 .dark .text-white,
 .dark .text-white\/70,
 .dark .text-white\/80 {
-  color: #ffffff !important;
+  color: #ffffff;
 }
+
 .dark .theme-text-secondary,
 .dark .theme-text-muted {
-  color: #e5e7eb !important;
+  color: #e5e7eb;
 }
 
 /* Status badges / pills */
-.dark .bg-emerald-100,
-.dark .bg-indigo-600,
-.dark .bg-green-600,
-.dark .bg-red-600,
+.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.2); color: #e5e7eb; }
+.dark .bg-indigo-600 { background-color: rgba(99, 102, 241, 0.2); color: #e5e7eb; }
+.dark .bg-green-600 { background-color: rgba(34, 197, 94, 0.2); color: #e5e7eb; }
+.dark .bg-red-600 { background-color: rgba(239, 68, 68, 0.2); color: #e5e7eb; }
 .dark .text-emerald-700,
 .dark .text-indigo-700,
 .dark .text-green-700,
-.dark .text-red-700 {
-  color: #e5e7eb !important;
-}
-.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.2) !important; }
-.dark .bg-indigo-600 { background-color: rgba(99, 102, 241, 0.2) !important; }
-.dark .bg-green-600 { background-color: rgba(34, 197, 94, 0.2) !important; }
-.dark .bg-red-600 { background-color: rgba(239, 68, 68, 0.2) !important; }
+.dark .text-red-700 { color: #e5e7eb; }
 
-/* Ensure text color tokens also apply to icon/button labels */
-.dark .theme-text-light { color: #ffffff !important; }
-.dark .theme-text-light-secondary { color: #e5e7eb !important; }
-.dark .theme-text-light-muted { color: #d1d5db !important; }
+/* Reinforce text tokens */
+.dark .theme-text-light { color: #ffffff; }
+.dark .theme-text-light-secondary { color: #e5e7eb; }
+.dark .theme-text-light-muted { color: #d1d5db; }
