@@ -612,7 +612,7 @@ export default {
           { name:'suppliesItemList', label: 'dashboard.itemsList', routeName: 'supplies-items-list' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', routeName: 'vehicles-list' },
           { name: 'contractorSupplyStatement', label: 'dashboard.contractorSupplyStatement', routeName: 'contractor-supply-statement' },
-          // { name: 'suppliesReport', label: 'dashboard.suppliesReport', routeName: 'supplies-report' }
+          { name: 'suppliesReport', label: 'dashboard.suppliesReport', routeName: 'supplies-report' }
         ],
         transport: [
           { name: 'transportList', label: 'dashboard.transportList', routeName: 'transport-list' },
@@ -621,14 +621,13 @@ export default {
           { name:'transportItemsList', label: 'dashboard.itemsList', routeName: 'transport-items-list' },
           { name: 'vehiclesList', label: 'dashboard.vehiclesList', routeName: 'transport-vehicles' },
           { name: 'contractorTransportStatement', label: 'dashboard.contractorTransportStatement', routeName: 'contractor-transport-statement' },
-          // { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' },
-
+          { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' }
         ],
         equipmentLog: [
           { name: 'equipmentLogList', label: 'dashboard.equipmentLog', routeName: 'equipment-log-list' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'equipment-contractors-list' },
           { name: 'equipmentList', label: 'equipment.title', routeName: 'equipment-list' },
-          // { name: 'equipmentReport', label: 'equipment.reportMenu', routeName: 'equipment-report' },
+          { name: 'equipmentReport', label: 'equipment.reportMenu', routeName: 'equipment-report' },
           { name: 'driversList', label: 'dashboard.driversList', routeName: 'equipment-drivers-list' },
           { name: 'contractorRentals', label: 'dashboard.contractorStatement', routeName: 'equipment-contractor-statement' }
         ],
@@ -652,12 +651,7 @@ export default {
         ],
         reports: [
           { name: 'reportsLanding', label: 'navbar.reports', routeName: 'reports-landing' },
-          { name: 'contractorsActivityReport', label: 'dashboard.contractorsActivityReport', routeName: 'contractors-activity-report' },
-          // { name: 'suppliesReport', label: 'dashboard.suppliesReport', routeName: 'supplies-report' },
-          // { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' },
-          // { name: 'equipmentReport', label: 'equipment.reportMenu', routeName: 'equipment-report' },
-          { name: 'expensesReport', label: 'expenses.report', routeName: 'report-expenses-report' },
-          { name: 'companyTransactions', label: 'treasury.report', routeName: 'report-company-transactions' },
+          { name: 'contractorsActivityReport', label: 'dashboard.contractorsActivityReport', routeName: 'contractors-activity-report' }
         ],
         orgCharts: [
           { name: 'modulesChart', label: 'orgCharts.modulesTitle', routeName: 'admin-org-chart-modules' },
