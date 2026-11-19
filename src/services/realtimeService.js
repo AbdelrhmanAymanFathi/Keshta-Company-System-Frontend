@@ -21,6 +21,7 @@ class RealtimeService {
     this._offline = false
     this._errorFired = false
     this._cleanupFns = []
+    this.consecutiveAuthFailures = 0
   }
 
   isConnected = ref(false)
@@ -98,14 +99,41 @@ class RealtimeService {
     }
 
     if (!handshakeOk) {
+      this.consecutiveAuthFailures++
       this.isConnected.value = false
       this.isConnecting = false
       this.es = null
       this.sessionToken = null
+
+      // Repeated 401: attempt a single token refresh, then stop if still failing
+      if (this.consecutiveAuthFailures >= 2 && !this._exhausted) {
+        try {
+          await tokenManager.refreshToken()
+          const retryToken = this.authToken
+          if (retryToken) {
+            try {
+              this.sessionToken = await this.performHandshake(retryToken)
+              this.consecutiveAuthFailures = 0
+              await this.connectWithSessionToken()
+              return
+            } catch (err) {
+              if (err?.name === 'AbortError') return
+            }
+          }
+        } catch (e) {
+          /* refresh failed */
+        }
+        this._exhausted = true
+        this.connectionError.value = 'auth_failed'
+        this._fireErrorOnce()
+        return
+      }
+
       this.scheduleReconnect()
       return
     }
 
+    this.consecutiveAuthFailures = 0
     await this.connectWithSessionToken()
   }
 

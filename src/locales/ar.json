@@ -2239,20 +2239,25 @@
       "payment": "دفعة"
     },
     "viewAll": "عرض كل الإشعارات",
-    "users.permissions": "إصلاحيات المستخدمين",
-    "permissions.selectUser": "اختر مستخدمًا",
-    "permissions.configureFor": "تكوين الصلاحيات لـ {name}",
-    "permissions.module": "القسم",
-    "permissions.page": "الصفحة / الصفحة الفرعية",
-    "permissions.selectAll": "تحديد الكل",
-    "permissions.clearAll": "مسح الكل",
-    "permissions.save": "حفظ الصلاحيات",
-    "permissions.saving": "جاري الحفظ...",
-    "permissions.saveSuccess": "تم تحديث الصلاحيات بنجاح",
-    "permissions.saveError": "فشل تحديث الصلاحيات",
-    "permissions.noUsers": "لا يوجد مستخدمون",
-    "permissions.inheritNote": "تحديد القسم يحدد جميع صفحاته",
-    "permissions.adminAlways": "غير مقيد دائمًا",
-    "permissions.saveHint": "اختر الصفحات التي يمكن للمستخدم رؤيتها، ثم اضغط حفظ."
+    "users": {
+      "permissions": "إصلاحيات المستخدمين"
+    },
+    "permissions": {
+      "selectUser": "اختر مستخدمًا",
+      "configureFor": "تكوين الصلاحيات لـ {name}",
+      "module": "القسم",
+      "page": "الصفحة / الصفحة الفرعية",
+      "selectAll": "تحديد الكل",
+      "clearAll": "مسح الكل",
+      "save": "حفظ الصلاحيات",
+      "saving": "جاري الحفظ...",
+      "saveSuccess": "تم تحديث الصلاحيات بنجاح",
+      "saveError": "فشل تحديث الصلاحيات",
+      "noUsers": "لا يوجد مستخدمون",
+      "inheritNote": "تحديد القسم يحدد جميع صفحاته",
+      "adminAlways": "غير مقيد دائمًا",
+      "saveHint": "اختر الصفحات التي يمكن للمستخدم رؤيتها، ثم اضغط حفظ.",
+      "loadError": "خطأ في تحميل الصلاحيات"
+    }
   }
 }

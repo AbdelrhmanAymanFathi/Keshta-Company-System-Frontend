@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="app-page-header flex flex-wrap items-center justify-between gap-4 rounded-2xl theme-page-header-bar p-5 shadow-lg shadow-slate-200/50 mb-4">
       <div>
-        <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('users.permissions') }}</h2>
-        <p class="text-sm theme-text-muted">{{ $t('permissions.inheritNote') }}</p>
+        <h2 class="text-2xl font-semibold theme-text-primary">{{ $t('notifications.users.permissions') }}</h2>
+        <p class="text-sm theme-text-muted">{{ $t('notifications.permissions.inheritNote') }}</p>
       </div>
       <div class="flex items-center gap-2">
         <Button
@@ -12,32 +12,32 @@
           variant="outline"
           @click="selectAll"
           class="text-xs px-3 py-1.5"
-        >{{ $t('permissions.selectAll') }}</Button>
+        >{{ $t('notifications.permissions.selectAll') }}</Button>
         <Button
           v-if="!saving"
           variant="outline"
           @click="clearAll"
           class="text-xs px-3 py-1.5"
-        >{{ $t('permissions.clearAll') }}</Button>
+        >{{ $t('notifications.permissions.clearAll') }}</Button>
         <Button
           :disabled="saving || !selectedUser || isAdminUser(selectedUser)"
           @click="save"
           class="px-4 py-2"
         >
-          <span v-if="saving">{{ $t('permissions.saving') }}</span>
-          <span v-else>{{ $t('permissions.save') }}</span>
+          <span v-if="saving">{{ $t('notifications.permissions.saving') }}</span>
+          <span v-else>{{ $t('notifications.permissions.save') }}</span>
         </Button>
       </div>
     </div>
 
     <!-- User picker -->
     <div v-if="!loadingUsers" class="max-w-xl mb-6">
-      <div class="mb-3 text-sm font-medium theme-text-primary">{{ $t('permissions.selectUser') }}</div>
+      <div class="mb-3 text-sm font-medium theme-text-primary">{{ $t('notifications.permissions.selectUser') }}</div>
       <SearchDropdown
         :items="users"
         item-key="id"
         item-label="name"
-        :placeholder="$t('permissions.selectUser')"
+        :placeholder="$t('notifications.permissions.selectUser')"
         :model-value="selectedUser ? selectedUser.name : ''"
         @select="onUserSelect"
         clearable
@@ -54,9 +54,9 @@
         class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-lg shadow-slate-200/30"
       >
         <div class="flex items-center justify-between mb-2">
-          <span class="font-semibold theme-text-primary">{{ $t('permissions.configureFor', { name: selectedUser.name }) }}</span>
+          <span class="font-semibold theme-text-primary">{{ $t('notifications.permissions.configureFor', { name: selectedUser.name }) }}</span>
           <span v-if="isAdminUser(selectedUser)" class="text-xs font-medium bg-amber-100 text-amber-800 rounded-full px-2 py-0.5">
-            {{ $t('users.admin') }} - {{ $t('permissions.adminAlways') || 'always unrestricted' }}
+            {{ $t('users.admin') }} - {{ $t('notifications.permissions.adminAlways') || 'always unrestricted' }}
           </span>
         </div>
 
@@ -68,7 +68,7 @@
               :checked="isModuleFullyChecked(moduleKey)"
               :indeterminate="isModuleIndeterminate(moduleKey)"
               @change="(e) => toggleModule(moduleKey, e.target.checked)"
-              :aria-label="$t('permissions.module') + ' ' + module.label.en"
+              :aria-label="$t('notifications.permissions.module') + ' ' + module.label.en"
             />
             <label class="font-medium text-sm theme-text-primary cursor-pointer select-none"
               :for="`module-${moduleKey}`"
@@ -107,7 +107,7 @@
     </div>
 
     <div v-if="selectedUser && !serverError && !serverSuccess" class="mt-4 text-xs theme-text-muted">
-      {{ $t('permissions.saveHint') || 'Select the pages this user may see, then save.' }}
+      {{ $t('notifications.permissions.saveHint') || 'Select the pages this user may see, then save.' }}
     </div>
   </div>
 </template>
@@ -151,7 +151,7 @@ export default {
         const items = res.data?.items ?? res.data ?? []
         users.value = Array.isArray(items) ? items : []
       } catch (e) {
-        pickerError.value = t('permissions.loadError') || 'Failed to load users'
+        pickerError.value = t('notifications.permissions.loadError') || 'Failed to load users'
       } finally {
         loadingUsers.value = false
       }
@@ -166,7 +166,7 @@ export default {
         const perms = res.data?.permissions ?? []
         selectedKeys.value = Array.isArray(perms) ? [...perms] : []
       } catch (e) {
-        serverError.value = t('permissions.loadError') || 'Failed to load permissions'
+        serverError.value = t('notifications.permissions.loadError') || 'Failed to load permissions'
       }
     }
 
@@ -226,10 +226,10 @@ export default {
       serverSuccess.value = null
       try {
         await updateUserPermissions(selectedUser.value.id, selectedKeys.value)
-        serverSuccess.value = t('permissions.saveSuccess')
+        serverSuccess.value = t('notifications.permissions.saveSuccess')
         setTimeout(() => { serverSuccess.value = null }, 3000)
       } catch (e) {
-        serverError.value = e?.response?.data?.message || t('permissions.saveError')
+        serverError.value = e?.response?.data?.message || t('notifications.permissions.saveError')
       } finally {
         saving.value = false
       }

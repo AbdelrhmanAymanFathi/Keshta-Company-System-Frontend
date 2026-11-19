@@ -2227,20 +2227,25 @@
     "typePetroleum": "Petroleum Supply",
     "typeWallet": "Wallet",
     "viewAll": "View all notifications",
-    "users.permissions": "User Permissions",
-    "permissions.selectUser": "Select a user",
-    "permissions.configureFor": "Configure permissions for {name}",
-    "permissions.module": "Module",
-    "permissions.page": "Page / sub-page",
-    "permissions.selectAll": "Select all",
-    "permissions.clearAll": "Clear all",
-    "permissions.save": "Save permissions",
-    "permissions.saving": "Saving...",
-    "permissions.saveSuccess": "Permissions updated successfully",
-    "permissions.saveError": "Failed to update permissions",
-    "permissions.noUsers": "No users available",
-    "permissions.inheritNote": "Checking a module selects all of its pages",
-    "permissions.adminAlways": "always unrestricted",
-    "permissions.saveHint": "Select the pages this user may see, then save."
+    "users": {
+      "permissions": "User Permissions"
+    },
+    "permissions": {
+      "selectUser": "Select a user",
+      "configureFor": "Configure permissions for {name}",
+      "module": "Module",
+      "page": "Page / sub-page",
+      "selectAll": "Select all",
+      "clearAll": "Clear all",
+      "save": "Save permissions",
+      "saving": "Saving...",
+      "saveSuccess": "Permissions updated successfully",
+      "saveError": "Failed to update permissions",
+      "noUsers": "No users available",
+      "inheritNote": "Checking a module selects all of its pages",
+      "adminAlways": "always unrestricted",
+      "saveHint": "Select the pages this user may see, then save.",
+      "loadError": "Error loading permissions"
+    }
   }
 }
