@@ -520,6 +520,8 @@ import { resolveNotificationRoute } from '@/utils/notificationRouting'
 import { VueDraggable } from 'vue-draggable-plus'
 import NotificationChanges from '@/components/shared/NotificationChanges.vue'
 import { Button } from '@/components/ui/button'
+import { usePermissions } from '@/permissions/usePermissions'
+import { permissionKeyForRoute } from '@/permissions/registry'
 import {
   getSidebarAsideClasses,
   shouldShowBackdrop,
@@ -591,7 +593,9 @@ export default {
       setColorMode(isDarkMode.value ? 'light' : 'dark')
     }
 
-    return { authLogout, user, router, notificationStore, presenceMembers, presenceEnabled, togglePresence, isDarkMode, toggleColorMode }
+    const perm = usePermissions()
+
+    return { authLogout, user, router, notificationStore, presenceMembers, presenceEnabled, togglePresence, isDarkMode, toggleColorMode, can: perm.can, hasAnyPage: perm.hasAnyPage, permissionsForModule: perm.permissionsForModule }
   },
   data() {
     return {
@@ -669,6 +673,7 @@ export default {
           { name: 'changesByDate', label: 'changes.title', routeName: 'changes-by-date' },
           { name: 'approvalsInbox', label: 'approvals.title', routeName: 'approvals-inbox' },
           { name: 'usersList', label: 'users.title', routeName: 'users-list' },
+          { name: 'userPermissions', label: 'users.permissions', routeName: 'admin-user-permissions' },
           { name: 'locations', label: 'locations.title', routeName: 'locations' },
           { name: 'units', label: 'units.title', routeName: 'admin-units-list' },
           { name: 'databaseBackup', label: 'admin.databaseBackup', routeName: 'admin-database-backup' },
@@ -779,7 +784,7 @@ export default {
       return this.sidebarType === 'horizontal'
     },
     defaultTopKeys() {
-      const keys = Object.keys(this.topMenus)
+      const keys = Object.keys(this.topMenus).filter(k => this.hasAnyPage(k))
       if (this.isAdmin) return ['admin'].concat(keys.filter(k => k !== 'admin'))
       return keys.filter(k => k !== 'admin')
     },
@@ -888,7 +893,11 @@ export default {
       return 'supplies'
     },
     verticalMenu() {
-      const items = this.menuMap[this.selectedTop] || []
+      const allowedKeys = new Set(this.permissionsForModule(this.selectedTop) || [])
+      const items = (this.menuMap[this.selectedTop] || []).filter(item => {
+        const key = permissionKeyForRoute(item.routeName)
+        return !key || allowedKeys.has(key)
+      })
       const order = this.moduleOrders[this.selectedTop] || []
       if (!order.length) return items
       const ordered = []
@@ -966,7 +975,11 @@ export default {
       return String(this.$route?.params?.id) === String(report.id)
     },
     selectTop(key) {
-      const first = this.menuMap[key]?.[0]
+      const allowedKeys = new Set(this.permissionsForModule(key) || [])
+      const first = (this.menuMap[key] || []).find(item => {
+        const k = permissionKeyForRoute(item.routeName)
+        return !k || allowedKeys.has(k)
+      })
       if (first) {
         this.router.push({ name: first.routeName })
       }

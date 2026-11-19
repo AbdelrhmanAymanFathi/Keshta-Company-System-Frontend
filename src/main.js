@@ -15,10 +15,11 @@ import authManager from './auth'
 import { isAuthenticated, initializeAuthStore, user } from './composables/authStore'
 import { realtimeService } from './services/realtimeService'
 import { buildVersionService } from './services/buildVersionService'
-import { tokenManager } from './api' // Initialize API with token management
+import { tokenManager, refreshPermissions } from './api' // Initialize API with token management
 import { installHeaderMotion } from './utils/headerMotionMount'
 import appTable from './directives/appTable'
 import modalFocus from './directives/modalFocus'
+import { vCan } from './permissions/vCan'
 import { playChatSound } from './utils/notificationSound'
 import { initializeColorMode } from './utils/colorMode'
 
@@ -41,6 +42,7 @@ app.component('AppModal', Modal)
 app.component('ThemeIcon', ThemeIcon)
 app.directive('app-table', appTable)
 app.directive('modal-focus', modalFocus)
+app.directive('can', vCan)
 app.provide(ICON_REVISION_KEY, iconRevision)
 app.provide(THEME_REVISION_KEY, themeRevision)
 
@@ -120,6 +122,9 @@ function startRealtime() {
 }
 
 if (isAuthenticated.value) {
+  const start = () => { if (isAuthenticated.value) startRealtime() }
+  refreshPermissions().then(start, start)
+} else {
   startRealtime()
 }
 

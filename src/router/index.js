@@ -2,13 +2,20 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { isAuthenticated, user, loading } from '@/composables/authStore'
 import { watch } from 'vue'
 import { startRouteLoading, stopRouteLoading } from '@/composables/useRouteLoader'
+import { usePermissions } from '@/permissions/usePermissions'
+import { permissionKeyForRoute } from '@/permissions/registry'
+
+const { can, firstAllowedPage } = usePermissions()
 
 function isAdminUser(u) {
   return Array.isArray(u?.roles) && u.roles.some(role => role.roleId === 1)
 }
 
 function landingRoute(u) {
-  return isAdminUser(u) ? { name: 'admin-statistics' } : { name: 'supplies-list' }
+  if (isAdminUser(u)) return { name: 'admin-statistics' }
+  const first = firstAllowedPage()
+  if (first) return { name: first.route }
+  return { name: 'supplies-list' }
 }
 
 // Auth Pages
@@ -278,6 +285,12 @@ const routes = [
         name: 'users-list',
         component: UsersList,
         meta: { title: 'users.title', roles: ['admin'] }
+      },
+      {
+        path: 'admin/user-permissions',
+        name: 'admin-user-permissions',
+        component: () => import('@/views/UserPermissions.vue'),
+        meta: { title: 'users.permissions', roles: ['admin'] }
       },
       {
         path: 'admin/locations',
@@ -573,6 +586,17 @@ router.beforeEach(async (to, from, next) => {
       // User doesn't have required role, redirect to default page
       console.warn(`Access denied: User roles [${userRoles}] don't include [${to.meta.roles}]`)
       next({ name: 'supplies-list' })
+      return
+    }
+  }
+
+  // Permission-based access: block direct URL access to forbidden pages,
+  // redirect to the first allowed page (never a blank screen).
+  if (requiresAuth && isAuthenticated.value) {
+    const key = permissionKeyForRoute(to.name)
+    if (key && !can(key)) {
+      const first = firstAllowedPage()
+      next(first ? { name: first.route } : { name: 'login' })
       return
     }
   }
