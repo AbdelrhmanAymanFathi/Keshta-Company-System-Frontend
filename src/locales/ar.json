@@ -2257,7 +2257,29 @@
       "inheritNote": "تحديد القسم يحدد جميع صفحاته",
       "adminAlways": "غير مقيد دائمًا",
       "saveHint": "اختر الصفحات التي يمكن للمستخدم رؤيتها، ثم اضغط حفظ.",
-      "loadError": "خطأ في تحميل الصلاحيات"
+      "loadError": "خطأ في تحميل الصلاحيات",
+      "discard": "تجاهل",
+      "unsaved": "تغييرات غير محفوظة",
+      "adminLocked": "مسؤول — غير مقيد دائمًا",
+      "adminLockedDesc": "للمسؤولين حق الوصول الكامل لجميع الصفحات ولا يمكن تقييدهم.",
+      "summary": "{name} يمكنه الوصول إلى {pages} صفحة من {total} عبر {modules} وحدات",
+      "searchUsers": "ابحث عن مستخدم…",
+      "searchModules": "ابحث عن الوحدات والصفحات…",
+      "expandAll": "توسيع الكل",
+      "collapseAll": "طي الكل",
+      "noUserSelected": "لم يتم اختيار أي مستخدم",
+      "noUserSelectedDesc": "اختر مستخدمًا من القائمة لتكوين صلاحياته.",
+      "noResults": "لا توجد نتائج مطابقة",
+      "presetSupplies": "التوريدات فقط",
+      "presetTransport": "النقل فقط",
+      "presetReports": "التقارير فقط",
+      "presetFull": "وصول كامل",
+      "roleAdmin": "مسؤول",
+      "roleUser": "مستخدم",
+      "modulePages": "{checked} صفحة من {total}",
+      "confirmLeave": "لديك تغييرات غير محفوظة. هل تريد تجاهلها وتغيير المستخدم؟",
+      "confirmDiscard": "تجاهل",
+      "errorRetry": "إعادة المحاولة"
     }
   }
 }

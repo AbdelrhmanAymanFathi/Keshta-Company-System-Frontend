@@ -2245,7 +2245,29 @@
       "inheritNote": "Checking a module selects all of its pages",
       "adminAlways": "always unrestricted",
       "saveHint": "Select the pages this user may see, then save.",
-      "loadError": "Error loading permissions"
+      "loadError": "Error loading permissions",
+      "discard": "Discard",
+      "unsaved": "Unsaved changes",
+      "adminLocked": "Administrator — always unrestricted",
+      "adminLockedDesc": "Administrators have full access to all pages and cannot be restricted.",
+      "summary": "{name} can access {pages} pages across {modules} modules",
+      "searchUsers": "Search users…",
+      "searchModules": "Search modules and pages…",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "noUserSelected": "No user selected",
+      "noUserSelectedDesc": "Select a user from the list to configure their permissions.",
+      "noResults": "No matching results",
+      "presetSupplies": "Supplies only",
+      "presetTransport": "Transport only",
+      "presetReports": "Reports only",
+      "presetFull": "Full access",
+      "roleAdmin": "Administrator",
+      "roleUser": "User",
+      "modulePages": "{checked} of {total} pages",
+      "confirmLeave": "You have unsaved changes. Discard them and switch user?",
+      "confirmDiscard": "Discard",
+      "errorRetry": "Retry"
     }
   }
 }
