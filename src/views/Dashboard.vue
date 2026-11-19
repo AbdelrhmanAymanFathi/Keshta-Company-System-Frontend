@@ -344,7 +344,7 @@
             </div> -->
             <!-- App name visible only when expanded -->
             <transition name="sidebar-label">
-              <div v-if="showSidebarLabels" class="sidebar-label-text font-semibold text-base lg:text-lg">
+              <div v-if="showSidebarLabels" class="sidebar-label-text font-semibold text-base lg:text-lg theme-text-secondary">
                 {{ $t('appName') }}
               </div>
             </transition>
@@ -1495,6 +1495,13 @@ export default {
   backdrop-filter: blur(14px);
 }
 
+.dark .dashboard-shell .layout-sidebar {
+  background: var(--theme-surface-bg);
+  border-color: var(--theme-surface-border);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(14px);
+}
+
 .dashboard-shell .layout-sidebar :deep(.sidebar-link) {
   border-radius: 0.75rem;
   min-height: 2.875rem;
@@ -1510,12 +1517,23 @@ export default {
   box-shadow: inset 0 0 0 1px rgba(var(--theme-primary-rgb), 0.12);
 }
 
+.dark .dashboard-shell .layout-sidebar :deep(.sidebar-link:not(.sidebar-link-active):hover) {
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 .dashboard-shell .layout-sidebar :deep(.sidebar-link-active) {
   box-shadow: 0 8px 20px rgba(var(--theme-primary-rgb), 0.22);
 }
 
 .dashboard-shell .layout-sidebar :deep(.sidebar-link-icon) {
   border-radius: 0.75rem;
+}
+
+.dark .dashboard-shell .layout-sidebar :deep(.sidebar-link-icon) {
+  color: var(--theme-text-light-secondary);
+  fill: none;
+  stroke: currentColor;
 }
 
 .dashboard-shell .top-nav-item {
@@ -1578,6 +1596,9 @@ export default {
 .sidebar-link-collapsed:not(.sidebar-link-active) .sidebar-link-icon {
   background: transparent !important;
   color: rgb(var(--theme-primary-600)) !important;
+}
+.dark .sidebar-link-collapsed:not(.sidebar-link-active) .sidebar-link-icon {
+  color: var(--theme-text-light-secondary) !important;
 }
 
 .sidebar-link-collapsed:not(.sidebar-link-active):hover .sidebar-link-icon {

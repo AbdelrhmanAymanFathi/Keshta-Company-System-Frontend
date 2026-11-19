@@ -112,27 +112,6 @@ body,
   --theme-card-text: #0f172a;
 }
 
-.dark {
-  /* Layered dark palette: page < card < table header < hover row */
-  --theme-text-primary: #f8fafc;
-  --theme-text-secondary: #cbd5e1;
-  --theme-text-muted: #94a3b8;
-  --theme-heading-color: #ffffff;
-  --theme-card-text: #f8fafc;
-  --theme-sidebar-text: #cbd5e1;
-  --theme-link-color: var(--theme-primary-400);
-  --theme-surface-bg: #0f172a;
-  --theme-surface-muted-bg: #1e293b;
-  --theme-surface-border: rgba(255, 255, 255, 0.1);
-  --theme-glass-bg: rgba(15, 23, 42, 0.6);
-  --theme-glass-border: rgba(255, 255, 255, 0.1);
-  --theme-backdrop-bg: rgba(15, 23, 42, 0.7);
-  /* Table row layers */
-  --theme-table-bg: #0f172a;
-  --theme-table-hover-bg: rgba(255, 255, 255, 0.03);
-  --theme-table-zebra-bg: rgba(255, 255, 255, 0.02);
-}
-
 @layer components {
 /* =========================
    Text Semantic Classes
@@ -2647,7 +2626,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 .dark .bg-white:not([class*='bg-opacity-']) {
-  background-color: hsl(var(--shadcn-card)) !important;
+  background-color: hsl(var(--shadcn-card));
 }
 
 .dark [class~='bg-gray-50'],
@@ -2656,11 +2635,11 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark [class~='bg-slate-100'],
 .dark [class~='bg-zinc-50'],
 .dark [class~='bg-zinc-100'] {
-  background-color: var(--theme-surface-muted-bg) !important;
+  background-color: var(--theme-surface-muted-bg);
 }
 
 .dark :where(.border-gray-100, .border-gray-200, .border-slate-200, .border-slate-300) {
-  border-color: var(--theme-surface-border) !important;
+  border-color: var(--theme-surface-border);
 }
 
 .dark :where(input:not([type='color']), select, textarea) {
@@ -2679,7 +2658,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark [class~='text-slate-800'],
 .dark [class~='text-zinc-900'],
 .dark [class~='text-zinc-800'] {
-  color: hsl(var(--shadcn-foreground)) !important;
+  color: hsl(var(--shadcn-foreground));
 }
 
 .dark [class~='text-gray-700'],
@@ -2691,7 +2670,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark [class~='text-zinc-700'],
 .dark [class~='text-zinc-600'],
 .dark [class~='text-zinc-500'] {
-  color: hsl(var(--shadcn-muted-foreground)) !important;
+  color: hsl(var(--shadcn-muted-foreground));
 }
 
 /* =========================
@@ -2740,6 +2719,34 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   --border: hsl(var(--shadcn-border));
   --input: hsl(var(--shadcn-input));
   --ring: hsl(var(--shadcn-ring));
+}
+
+/* =========================
+   Dark mode — unified theme tokens
+   No !important; relies on cascade (.dark after :root).
+   Layered palette: page bg < surface < surface-muted < border
+   ========================= */
+.dark {
+  color-scheme: dark;
+  /* Text — light on dark */
+  --theme-text-primary: #f8fafc;
+  --theme-text-secondary: #cbd5e1;
+  --theme-text-muted: #94a3b8;
+  --theme-heading-color: #ffffff;
+  --theme-card-text: #f8fafc;
+  --theme-sidebar-text: #cbd5e1;
+  --theme-link-color: var(--theme-primary-400);
+  /* Surfaces — layered dark, never #000 */
+  --theme-surface-bg: #0f172a;
+  --theme-surface-muted-bg: #1e293b;
+  --theme-surface-border: rgba(255, 255, 255, 0.1);
+  --theme-glass-bg: rgba(15, 23, 42, 0.6);
+  --theme-glass-border: rgba(255, 255, 255, 0.1);
+  --theme-backdrop-bg: rgba(15, 23, 42, 0.7);
+  /* Table row layers */
+  --theme-table-bg: #0f172a;
+  --theme-table-hover-bg: rgba(255, 255, 255, 0.03);
+  --theme-table-zebra-bg: rgba(255, 255, 255, 0.02);
 }
 
 /* Spartan Button Styles */
@@ -2972,7 +2979,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   white-space: nowrap;
 }
 .dark .layout-sidebar {
-  background-color: var(--theme-surface-bg) !important;
+  background-color: var(--theme-surface-bg);
   color: hsl(var(--shadcn-foreground));
 }
 
@@ -2984,12 +2991,12 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 
 .dark .theme-header,
 .dark .theme-page-header-bar {
-  background: linear-gradient(135deg, #20252e 0%, #252a35 48%, #2b2b3b 100%) !important;
+  background: linear-gradient(135deg, var(--theme-surface-bg) 0%, var(--theme-surface-muted-bg) 100%);
   border-color: var(--theme-surface-border);
 }
 
 .dark .theme-main-gradient {
-  background: linear-gradient(135deg, #171b22 0%, #1c202a 55%, #222333 100%);
+  background: linear-gradient(135deg, var(--theme-surface-bg) 0%, var(--theme-surface-muted-bg) 55%, var(--theme-surface-bg) 100%);
 }
 
 .dark .theme-page-header-bar {
@@ -2999,8 +3006,8 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .dashboard-module-content table > thead,
 .dark .dashboard-module-content table > thead tr,
 .dark .dashboard-module-content table > thead th {
-  background-color: #191919 !important;
-  background-image: none !important;
+  background-color: var(--theme-surface-muted-bg);
+  background-image: none;
 }
 
 .dark .dashboard-module-content table > thead th {
@@ -3010,16 +3017,16 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 
 .dark .dashboard-module-content table,
 .dark .dashboard-module-content table tbody {
-  background-color: #080808;
-  color: hsl(var(--shadcn-foreground));
+  background-color: var(--theme-table-bg);
+  color: var(--theme-text-primary);
 }
 
 .dark .dashboard-module-content table tr:hover {
-  background-color: #141414;
+  background-color: var(--theme-table-hover-bg);
 }
 
 .dark .dashboard-module-content table tr:hover td:not([class*='bg-']) {
-  background-color: #141414;
+  background-color: var(--theme-table-hover-bg);
 }
 
 .dark .dashboard-module-content table tbody tr + tr td {
@@ -3029,38 +3036,38 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .dashboard-module-content table.app-table tbody,
 .dark .dashboard-module-content table.app-table tbody tr,
 .dark .dashboard-module-content table.app-table tbody td {
-  background-color: var(--theme-surface-bg) !important;
-  color: var(--theme-text-primary) !important;
+  background-color: var(--theme-table-bg);
+  color: var(--theme-text-primary);
 }
 
 .dark .dashboard-module-content table.app-table tbody tr.location-area-row,
 .dark .dashboard-module-content table.app-table tbody tr.location-area-row td {
-  background-color: var(--theme-surface-muted-bg) !important;
+  background-color: var(--theme-surface-muted-bg);
 }
 
 .dark .dashboard-module-content table.app-table tbody tr:hover,
 .dark .dashboard-module-content table.app-table tbody tr:hover td {
-  background-color: var(--theme-surface-muted-bg) !important;
+  background-color: var(--theme-surface-muted-bg);
 }
 
 .dark table td[class~='theme-text-primary'] {
-  color: var(--theme-text-primary) !important;
+  color: var(--theme-text-primary);
 }
 
 .dark table td[class~='theme-text-secondary'] {
-  color: var(--theme-text-secondary) !important;
+  color: var(--theme-text-secondary);
 }
 
 .dark table td[class~='theme-text-muted'] {
-  color: var(--theme-text-muted) !important;
+  color: var(--theme-text-muted);
 }
 
 .dark .dashboard-module-content :where(.bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100, .bg-zinc-50, .bg-zinc-100):not([class*='bg-opacity-']) {
-  background-color: var(--theme-surface-bg) !important;
+  background-color: var(--theme-surface-bg);
 }
 
 .dark .dashboard-module-content :where(.bg-white\/50, .bg-white\/60, .bg-white\/70, .bg-white\/80, .bg-white\/90) {
-  background-color: var(--theme-glass-bg) !important;
+  background-color: var(--theme-glass-bg);
 }
 
 .dark :where(.apexcharts-text, .apexcharts-legend-text, .apexcharts-title-text, .apexcharts-subtitle-text) {
@@ -3089,7 +3096,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   [class~='bg-zinc-50'],
   [class~='bg-zinc-100']
 ) {
-  background-color: var(--theme-surface-bg) !important;
+  background-color: var(--theme-surface-bg);
   background-image: none;
 }
 
@@ -3104,30 +3111,22 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   .report-input,
   .message-bubble--received
 ) {
-  background-color: var(--theme-surface-bg) !important;
-  background-image: none !important;
-  border-color: var(--theme-surface-border) !important;
+  background-color: var(--theme-surface-bg);
+  background-image: none;
+  border-color: var(--theme-surface-border);
 }
 
 .dark :where(.report-input, .report-secondary-button, .context-menu) {
-  color: var(--theme-text-primary) !important;
-}
-
-.dark .dashboard-module-content :is(.overflow-auto, .overflow-x-auto):has(> table),
-.dark .dashboard-module-content table > thead,
-.dark .dashboard-module-content table > thead tr,
-.dark .dashboard-module-content table > thead th {
-  background-color: #191919 !important;
-  background-image: none !important;
+  color: var(--theme-text-primary);
 }
 
 .dark .message-bubble--received {
-  color: var(--theme-text-primary) !important;
+  color: var(--theme-text-primary);
 }
 
 .dark .message-bubble--received .message-bubble__footer,
 .dark .context-menu-item {
-  color: var(--theme-text-secondary) !important;
+  color: var(--theme-text-secondary);
 }
 
 .dark .report-field-card,
@@ -3135,13 +3134,13 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .report-secondary-button,
 .dark .report-input,
 .dark .report-info-chip:not(.report-info-chip--accent) {
-  background: var(--theme-surface-bg) !important;
-  color: var(--theme-text-primary) !important;
-  border-color: var(--theme-surface-border) !important;
+  background: var(--theme-surface-bg);
+  color: var(--theme-text-primary);
+  border-color: var(--theme-surface-border);
 }
 
 .dark .report-field-card {
-  background-image: none !important;
+  background-image: none;
 }
 
 .dark :where(
@@ -3157,7 +3156,7 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   [class~='text-zinc-900'],
   [class~='text-stone-900']
 ) {
-  color: hsl(var(--shadcn-foreground)) !important;
+  color: hsl(var(--shadcn-foreground));
 }
 
 .dark :where(
@@ -3165,13 +3164,13 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   [class*='shadow-gray-100/'],
   [class*='shadow-white/']
 ) {
-  --tw-shadow-color: rgb(0 0 0 / 0.3) !important;
+  --tw-shadow-color: rgb(0 0 0 / 0.3);
 }
 
 .dark .theme-glow {
   box-shadow:
     0 0 0 1px rgba(var(--theme-primary-rgb), 0.1),
-    0 12px 26px rgb(0 0 0 / 0.24) !important;
+    0 12px 26px rgb(0 0 0 / 0.24);
 }
 
 .app-filter-grid {
@@ -3356,9 +3355,9 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 .dark .message-bubble--received {
-  color: #e2e8f0 !important;
-  background: #1e293b !important;
-  border-color: #334155 !important;
+  color: #e2e8f0;
+  background: #1e293b;
+  border-color: #334155;
 }
 
 .dark .message-bubble--received .message-bubble__footer {
@@ -3682,12 +3681,12 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 }
 
 /* Status badges / pills — dark tinted, readable text */
-.dark .bg-amber-50 { background-color: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
-.dark .text-amber-700 { color: #fbbf24 !important; }
-.dark .bg-red-50 { background-color: rgba(248, 113, 113, 0.15) !important; }
-.dark .text-red-600 { color: #f87171 !important; }
-.dark .text-red-500 { color: #f87171 !important; }
-.dark .hover\:bg-red-50:hover { background-color: rgba(248, 113, 113, 0.25) !important; }
+.dark .bg-amber-50 { background-color: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.dark .text-amber-700 { color: #fbbf24; }
+.dark .bg-red-50 { background-color: rgba(248, 113, 113, 0.15); }
+.dark .text-red-600 { color: #f87171; }
+.dark .text-red-500 { color: #f87171; }
+.dark .hover\:bg-red-50:hover { background-color: rgba(248, 113, 113, 0.25); }
 
 /* Inputs, selects, placeholders — readable in dark */
 .dark .border-gray-300 { border-color: rgba(255, 255, 255, 0.2); }
