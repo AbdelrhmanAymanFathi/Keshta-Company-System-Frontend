@@ -3377,3 +3377,125 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
 .dark .message-bubble--received .message-bubble__footer {
   color: #94a3b8 !important;
 }
+
+/* =========================
+   Dark mode — fix light buttons/containers (bg-white, bg-gray-100, hover states)
+   ========================= */
+.dark .bg-white,
+.dark .bg-white\/90,
+.dark .bg-white\/95,
+.dark .bg-slate-50\/70,
+.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-white\/10,
+.dark .bg-white\/12,
+.dark .bg-white\/14,
+.dark .bg-white\/16,
+.dark .bg-white\/20,
+.dark .bg-gray-100,
+.dark .bg-slate-100,
+.dark .bg-gray-200 {
+  background-color: rgba(15, 23, 42, 0.55) !important;
+}
+
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-slate-200,
+.dark .border-slate-200\/80 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .border-white\/15 {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.dark .hover\:bg-white\/10:hover,
+.dark .hover\:bg-white\/12:hover,
+.dark .hover\:bg-white\/14:hover,
+.dark .hover\:bg-white\/16:hover,
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-gray-200:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .hover\:bg-white\/10,
+.dark .hover\:bg-white\/12,
+.dark .hover\:bg-white\/14,
+.dark .hover\:bg-white\/16,
+.dark .hover\:bg-gray-100,
+.dark .hover\:bg-gray-200 {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+}
+
+.dark .text-gray-100,
+.dark .text-slate-200 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-slate-950,
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-gray-600 {
+  color: #e5e7eb !important;
+}
+
+.dark .shadow-slate-200\/40,
+.dark .shadow-slate-200\/60,
+.dark .shadow-slate-300\/50,
+.dark .shadow-slate-950\/10,
+.dark .shadow-slate-950\/20 {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Form inputs / selects stay readable in dark mode */
+.dark .bg-slate-50\/70,
+.dark .disabled\:bg-gray-100:disabled,
+.dark .disabled:bg-gray-100:disabled {
+  background-color: #1e293b !important;
+  color: #e5e7eb !important;
+}
+
+.dark .focus-visible\:bg-white:focus-visible,
+.dark .focus-visible\:bg-white\/70:focus-visible {
+  background-color: #1e293b !important;
+}
+
+/* Modal / panel backgrounds */
+.dark .bg-white.rounded-xl,
+.dark .bg-white.rounded-2xl,
+.dark .bg-white.rounded-lg,
+.dark .bg-white.shadow,
+.dark .bg-white.shadow-lg,
+.dark .bg-white.shadow-2xl,
+.dark .bg-white\/95.shadow {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e5e7eb !important;
+}
+
+/* Table rows / tbody in dark mode already handled; ensure cards inside tables */
+.dark .bg-white.divide-y,
+.dark .bg-white.divide-gray-200,
+.dark .bg-white.shadow-sm.rounded-lg {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+}
+
+/* Dropdown / context menus */
+.dark .bg-white.rounded-md.max-h-40,
+.dark .bg-white.rounded-xl.shadow-lg.py-2,
+.dark .bg-white.rounded-xl.shadow-lg.py-2.z-50 {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e5e7eb !important;
+}
+
+/* Logout / auth cards */
+.dark .rounded-lg.bg-white.shadow-sm,
+.dark .rounded-lg.bg-white.shadow-sm.hover\:shadow-md:hover {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+}
