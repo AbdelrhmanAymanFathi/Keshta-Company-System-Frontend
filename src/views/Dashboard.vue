@@ -599,7 +599,7 @@ export default {
   },
   data() {
     return {
-      topMenus: { supplies: 'supplies', transport: 'transport', equipmentLog: 'equipmentLog', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', orgCharts: 'orgCharts', reports: 'reports', admin: 'admin' }, // messaging: 'messaging' (hidden for now)
+      topMenus: { supplies: 'supplies', transport: 'transport', equipment: 'equipment', extracts: 'extracts', expenses: 'expenses', payments: 'payments', treasury: 'treasury', orgCharts: 'orgCharts', reports: 'reports', admin: 'admin' }, // messaging: 'messaging' (hidden for now)
       menuMap: {
         messaging: [
           { name: 'messaging', label: 'messaging.title', routeName: 'messaging' }
@@ -623,7 +623,7 @@ export default {
           { name: 'contractorTransportStatement', label: 'dashboard.contractorTransportStatement', routeName: 'contractor-transport-statement' },
           { name: 'transportReport', label: 'transport.reportMenu', routeName: 'transport-report' }
         ],
-        equipmentLog: [
+        equipment: [
           { name: 'equipmentLogList', label: 'dashboard.equipmentLog', routeName: 'equipment-log-list' },
           { name: 'contractorsList', label: 'dashboard.contractorsList', routeName: 'equipment-contractors-list' },
           { name: 'equipmentList', label: 'equipment.title', routeName: 'equipment-list' },
@@ -841,7 +841,7 @@ export default {
 
       // If route has explicit mode (params/query/meta) prefer it to determine the top menu
       const routeMode = (this.$route && (this.$route.params?.mode || this.$route.query?.mode || this.$route.meta?.mode)) || ''
-      if (String(routeMode).toLowerCase() === 'equipment') return 'equipmentLog'
+      if (String(routeMode).toLowerCase() === 'equipment') return 'equipment'
       // If we're opening a report, look up the report and use its module
       if (routeName === 'admin-reports-run') {
         const reportId = this.$route?.params?.id
@@ -859,7 +859,7 @@ export default {
         if (f === 'transport') return 'transport'
         if (f === 'supplies' || f === 'export') return 'supplies'
         // Accept various legacy and new identifiers for equipment/rentals
-        if (f === 'equipment' || f === 'equipmentlogs' || f === 'equipmentlog') return 'equipmentLog'
+        if (f === 'equipment' || f === 'equipmentlogs' || f === 'equipmentlog') return 'equipment'
         if (f === 'extract' || f === 'extracts') return 'extracts'
       }
       // Extracts module routes
@@ -877,7 +877,7 @@ export default {
       if (routeName === 'messaging') return 'messaging'
       if (suppliesRoutes.includes(routeName)) return 'supplies'
       if (transportRoutes.includes(routeName)) return 'transport'
-      if (equipmentRoutes.includes(routeName)) return 'equipmentLog'
+      if (equipmentRoutes.includes(routeName)) return 'equipment'
       if (paymentRoutes.includes(routeName)) return 'payments'
       if (expensesRoutes.includes(routeName)) return 'expenses'
       if (walletRoutes.includes(routeName)) return 'treasury'
@@ -946,7 +946,7 @@ export default {
         'rentals',
         'equipmentrental',
         'equipmentrentals'
-      ].includes(norm)) return 'equipmentLog'
+      ].includes(norm)) return 'equipment'
       if ([
         'companywallet',
         'wallet',
@@ -1030,7 +1030,7 @@ export default {
       let routeName = 'contractor-supply-statement'
       const top = this.selectedTop
       if (top === 'transport') routeName = 'contractor-transport-statement'
-      else if (top === 'equipmentLog') routeName = 'equipment-contractor-statement'
+      else if (top === 'equipment') routeName = 'equipment-contractor-statement'
       else if (top === 'extracts') routeName = 'contractor-extract-statement'
 
       this.router.push({ name: routeName, params: { id: contractorId } })
