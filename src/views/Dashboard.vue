@@ -778,9 +778,9 @@ export default {
       return this.sidebarType === 'horizontal'
     },
     defaultTopKeys() {
-      const keys = Object.keys(this.topMenus).filter(k => this.hasAnyPage(k))
+      const keys = Object.keys(this.topMenus)
       if (this.isAdmin) return ['admin'].concat(keys.filter(k => k !== 'admin'))
-      return keys.filter(k => k !== 'admin')
+      return keys.filter(k => this.hasAnyPage(k) && k !== 'admin')
     },
     currentModuleOrder: {
       get() {
