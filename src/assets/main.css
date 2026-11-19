@@ -3499,3 +3499,118 @@ table.app-table td[data-role='actions'] > :is(.flex, .inline-flex) {
   background-color: #0f172a !important;
   color: #e5e7eb !important;
 }
+
+/* =========================
+   Dark mode — icons (match PaymentsPage button look)
+   ========================= */
+.dark svg,
+.dark .theme-icon,
+.dark .theme-sidebar-icon svg,
+.dark .sidebar-link-icon svg,
+.dark .theme-sidebar-item svg,
+.dark .top-nav-toggle svg,
+.dark .theme-sidebar-collapse-btn svg,
+.dark .theme-accent-strong svg,
+.dark .theme-text-strong svg {
+  color: var(--theme-text-light) !important;
+  fill: var(--theme-text-light) !important;
+  stroke: var(--theme-text-light) !important;
+}
+
+/* Sidebar / nav icons slightly muted so active ones stand out */
+.dark .theme-sidebar-icon svg,
+.dark .sidebar-link-icon svg,
+.dark .theme-sidebar-item svg {
+  color: var(--theme-text-light-secondary) !important;
+  fill: var(--theme-text-light-secondary) !important;
+  stroke: var(--theme-text-light-secondary) !important;
+}
+
+.dark .theme-sidebar-item-active svg,
+.dark .theme-sidebar-item-active .theme-sidebar-icon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Active / emphasis icons keep primary color */
+.dark .theme-accent-strong svg,
+.dark .theme-text-strong svg {
+  color: var(--theme-primary-300) !important;
+  fill: var(--theme-primary-300) !important;
+  stroke: var(--theme-primary-300) !important;
+}
+
+/* Buttons (all variants) — mirror PaymentsPage dark look */
+.dark .bg-primary,
+.dark .text-primary-foreground,
+.dark .theme-btn-primary,
+.dark button[class*='bg-primary'] {
+  background-color: rgb(var(--theme-primary-500)) !important;
+  color: #ffffff !important;
+}
+.dark .bg-primary:hover,
+.dark .theme-btn-primary:hover,
+.dark button[class*='bg-primary']:hover {
+  background-color: rgb(var(--theme-primary-600)) !important;
+}
+
+/* Outline / ghost buttons stay readable on dark bg */
+.dark .border-border,
+.dark .bg-background,
+.dark .bg-muted,
+.dark .hover\:bg-muted:hover,
+.dark .hover\:bg-muted\/50:hover {
+  background-color: rgba(15, 23, 42, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #e5e7eb !important;
+}
+.dark .hover\:bg-muted:hover,
+.dark .hover\:bg-muted\/50:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Destructive / cancel buttons */
+.dark .bg-destructive\/10,
+.dark .bg-destructive\/20,
+.dark .text-destructive {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+.dark .bg-destructive\/10:hover,
+.dark .bg-destructive\/20:hover {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Text on buttons / action links */
+.dark .text-white,
+.dark .text-white\/70,
+.dark .text-white\/80 {
+  color: #ffffff !important;
+}
+.dark .theme-text-secondary,
+.dark .theme-text-muted {
+  color: #e5e7eb !important;
+}
+
+/* Status badges / pills */
+.dark .bg-emerald-100,
+.dark .bg-indigo-600,
+.dark .bg-green-600,
+.dark .bg-red-600,
+.dark .text-emerald-700,
+.dark .text-indigo-700,
+.dark .text-green-700,
+.dark .text-red-700 {
+  color: #e5e7eb !important;
+}
+.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.2) !important; }
+.dark .bg-indigo-600 { background-color: rgba(99, 102, 241, 0.2) !important; }
+.dark .bg-green-600 { background-color: rgba(34, 197, 94, 0.2) !important; }
+.dark .bg-red-600 { background-color: rgba(239, 68, 68, 0.2) !important; }
+
+/* Ensure text color tokens also apply to icon/button labels */
+.dark .theme-text-light { color: #ffffff !important; }
+.dark .theme-text-light-secondary { color: #e5e7eb !important; }
+.dark .theme-text-light-muted { color: #d1d5db !important; }
