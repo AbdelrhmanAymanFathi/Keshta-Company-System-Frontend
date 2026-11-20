@@ -233,15 +233,15 @@
       </div>
     </section>
 
-    <section class="relative z-10 rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-      <div class="flex flex-col gap-3 rounded-t-2xl border-b border-slate-100 bg-slate-50/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
+    <section class="relative z-10 rounded-2xl border border-slate-200/80 theme-card shadow-lg shadow-slate-200/40">
+      <div class="flex flex-col gap-3 rounded-t-2xl border-b border-slate-100 dark:border-white/10 theme-surface p-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4" style="background-color: var(--theme-surface-bg)">
         <div class="flex flex-wrap items-center gap-2">
           <TableCellsIcon class="h-5 w-5 theme-text" />
           <span class="text-sm font-semibold theme-text-primary">{{ locale === 'ar' ? 'النتائج' : 'Results' }}</span>
           <span v-if="hasResults && !executing" class="inline-flex items-center rounded-full theme-icon-bg px-2.5 py-0.5 text-xs font-medium theme-accent-muted">
             {{ dataRowCount }} {{ locale === 'ar' ? 'صف' : 'rows' }}
           </span>
-          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-200/80 px-2.5 py-0.5 text-xs font-medium theme-text-secondary">
+          <span v-if="columns.length && !executing" class="inline-flex items-center rounded-full bg-slate-200/80 dark:bg-white/10 px-2.5 py-0.5 text-xs font-medium theme-text-secondary">
             {{ columns.length }} {{ locale === 'ar' ? 'عمود' : 'cols' }}
           </span>
         </div>
@@ -307,7 +307,7 @@
         <p class="text-sm font-medium theme-text-muted">{{ $t('labels.loading') }}</p>
       </div>
 
-      <div v-else class="rounded-xl border border-slate-200/80">
+      <div v-else class="theme-card rounded-xl border border-slate-200/80">
         <table v-app-table class="app-table report-table">
           <thead>
             <tr>
@@ -333,9 +333,9 @@
           <tbody>
             <tr v-if="!(tableData && tableData.length)">
               <td :colspan="(columns && columns.length) || 1" class="px-6 py-16 text-center">
-                <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
-                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 theme-caption">
-                    <TableCellsIcon class="h-7 w-7" />
+                  <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/10 theme-caption">
+                      <TableCellsIcon class="h-7 w-7" />
                   </div>
                   <p class="text-sm font-medium theme-text-secondary">
                     {{ $t('reports.noResults') || 'No results' }}

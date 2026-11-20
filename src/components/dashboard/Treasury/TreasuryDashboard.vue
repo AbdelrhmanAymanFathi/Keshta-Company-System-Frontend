@@ -1,7 +1,7 @@
 <template>
   <div :dir="isRTL ? 'rtl' : 'ltr'" class="flex flex-col gap-6 lg:flex-row">
-    <aside class="h-fit w-full rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm theme-surface lg:sticky lg:top-4 lg:w-80">
-      <div class="flex items-center justify-between gap-3 border-b border-gray-100 pb-3">
+    <aside class="h-fit w-full rounded-2xl border border-gray-100 dark:border-white/20 theme-card p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm theme-surface lg:sticky lg:top-4 lg:w-80">
+      <div class="flex items-center justify-between gap-3 border-b border-gray-100 dark:border-white/20 pb-3">
         <div class="min-w-0">
           <h2 class="text-lg font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
           <p class="text-xs theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</p>
@@ -19,22 +19,22 @@
         </div>
       </div>
 
-      <div v-if="visibleTreasuries.length > 0" class="mt-3 flex items-center justify-between rounded-xl border border-emerald-100 bg-emerald-50/70 px-3 py-2.5">
-        <span class="text-xs font-semibold uppercase tracking-wide text-emerald-700">{{ t('treasury.balance') }}</span>
-        <span class="text-sm font-bold tabular-nums" :class="totalVisibleBalance < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(totalVisibleBalance) }}</span>
+      <div v-if="visibleTreasuries.length > 0" class="mt-3 flex items-center justify-between rounded-xl border border-emerald-100 dark:border-emerald-500/30 bg-emerald-50/70 dark:bg-emerald-900/20 px-3 py-2.5">
+        <span class="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">{{ t('treasury.balance') }}</span>
+        <span class="text-sm font-bold tabular-nums" :class="totalVisibleBalance < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'">{{ formatCurrency(totalVisibleBalance) }}</span>
       </div>
 
-      <div class="mt-3 space-y-2.5 border-b border-gray-100 pb-3">
+        <div class="mt-3 space-y-2.5 border-b border-gray-100 dark:border-white/20 pb-3">
         <div class="relative">
           <MagnifyingGlassIcon class="pointer-events-none absolute inset-y-0 start-3 my-auto h-4 w-4 text-gray-400" aria-hidden="true" />
           <Input
             v-model="treasurySearch"
             type="text"
-            class="theme-input-focus w-full rounded-xl border border-gray-200 py-2 pe-3 ps-9 text-sm"
+            class="theme-input-focus w-full rounded-xl border border-gray-200 dark:border-white/20 py-2 pe-3 ps-9 text-sm"
             :placeholder="t('treasury.searchTreasuriesPlaceholder')"
           />
         </div>
-        <div class="flex gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+        <div class="flex gap-1 rounded-xl border border-gray-200 dark:border-white/20 bg-gray-50 dark:bg-white/10 p-1">
           <Button
             v-for="opt in viewOptions"
             :key="opt.value"
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <div v-if="!visibleTreasuries.length" class="mt-4 rounded-xl border border-dashed border-gray-200 px-3 py-6 text-center text-xs text-gray-400">
+      <div v-if="!visibleTreasuries.length" class="mt-4 rounded-xl border border-dashed border-gray-200 dark:border-white/20 px-3 py-6 text-center text-xs text-gray-400 dark:text-slate-400">
         {{ t('labels.noData') }}
       </div>
 
@@ -63,7 +63,7 @@
           <div
             role="button"
             tabindex="0"
-            :class="['group flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-indigo-300', selectedId === treasury.id ? 'border-transparent bg-indigo-50/80 ring-1 ring-indigo-200/70' : 'border-gray-200 bg-white/70 hover:theme-hover-soft']"
+            :class="['group flex w-full items-center justify-between gap-2 rounded-xl border px-3 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-indigo-300', selectedId === treasury.id ? 'border-transparent bg-indigo-50/80 dark:bg-indigo-900/30 ring-1 ring-indigo-200/70' : 'border-gray-200 dark:border-white/20 bg-white/70 dark:bg-white/5 hover:theme-hover-soft']"
             @click="selectTreasury(treasury.id)"
             @keydown.enter.prevent="selectTreasury(treasury.id)"
             @keydown.space.prevent="selectTreasury(treasury.id)"
@@ -78,10 +78,10 @@
                 >{{ formatCurrency(treasury.balance) }}</span>
               </div>
               <div class="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] theme-text-secondary">
-                <span v-if="treasury.type === 'CUSTODY'" class="rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">{{ t('treasury.typeCustody') }}</span>
-                <span v-else class="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-700">{{ t('treasury.typeMain') }}</span>
-                <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
-                <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
+                <span v-if="treasury.type === 'CUSTODY'" class="rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 font-semibold text-purple-700 dark:text-purple-400">{{ t('treasury.typeCustody') }}</span>
+                <span v-else class="rounded-full bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 font-semibold text-blue-700 dark:text-blue-400">{{ t('treasury.typeMain') }}</span>
+                <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 font-semibold text-amber-700 dark:text-amber-400">{{ t('treasury.archived') }}</span>
+                <span v-else class="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 font-semibold text-emerald-700 dark:text-emerald-400">{{ t('treasury.active') }}</span>
               </div>
             </div>
             <div v-if="!treasury.deletedAt" class="shrink-0 opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100">
@@ -98,8 +98,8 @@
       </div>
     </aside>
 
-    <div class="min-w-0 flex-1 space-y-6">
-      <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm theme-surface">
+      <div class="min-w-0 flex-1 space-y-6">
+        <div class="rounded-2xl border border-gray-100 dark:border-white/20 bg-white/80 dark:bg-white/5 p-4 shadow-lg shadow-slate-200/50 backdrop-blur-sm theme-surface">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div class="min-w-0">
             <h1 class="text-xl font-semibold theme-heading theme-text-primary sm:text-2xl">
@@ -113,14 +113,14 @@
             <span
               v-if="selectedTreasury"
               class="inline-flex items-center justify-center rounded-full px-3 py-2 text-xs font-semibold sm:px-4"
-              :class="selectedTreasury.type === 'CUSTODY' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'"
+              :class="selectedTreasury.type === 'CUSTODY' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'"
             >
               {{ selectedTreasury.type === 'CUSTODY' ? t('treasury.typeCustody') : t('treasury.typeMain') }}
             </span>
             <span
               v-if="selectedTreasury"
               class="inline-flex items-center justify-center rounded-full px-3 py-2 text-xs font-semibold sm:px-4"
-              :class="selectedTreasury.deletedAt ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'"
+              :class="selectedTreasury.deletedAt ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'"
             >
               {{ selectedTreasury.deletedAt ? t('treasury.archived') : t('treasury.active') }}
             </span>
@@ -142,7 +142,7 @@
             </Button>
             <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && !selectedTreasury.deletedAt"
-              class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto"
+              class="w-full rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-white/10 px-4 py-2 text-sm font-medium theme-text-secondary dark:text-slate-300 transition hover:theme-hover-soft sm:w-auto"
               :disabled="!selectedTreasury"
               @click="openEditModal(selectedTreasury)"
             >
@@ -150,7 +150,7 @@
             </ShadcnButton>
             <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && !selectedTreasury.deletedAt"
-              class="w-full rounded-lg border border-amber-200 px-4 py-2 text-sm font-medium text-amber-700 transition hover:bg-amber-50 sm:w-auto"
+              class="w-full rounded-lg border border-amber-200 dark:border-amber-500/30 px-4 py-2 text-sm font-medium text-amber-700 dark:text-amber-400 transition hover:bg-amber-50 dark:hover:bg-white/10 sm:w-auto"
               :disabled="!selectedTreasury"
               @click="archiveSelectedTreasury"
             >
@@ -158,7 +158,7 @@
             </ShadcnButton>
             <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && selectedTreasury.deletedAt"
-              class="w-full rounded-lg border border-emerald-200 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 sm:w-auto"
+              class="w-full rounded-lg border border-emerald-200 dark:border-emerald-500/30 px-4 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400 transition hover:bg-emerald-50 dark:hover:bg-white/10 sm:w-auto"
               :disabled="!selectedTreasury"
               @click="restoreSelectedTreasury"
             >
@@ -166,7 +166,7 @@
             </ShadcnButton>
             <ShadcnButton variant="outline" size="native"
               v-if="selectedTreasury && selectedTreasury.type === 'CUSTODY'"
-              class="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60 sm:w-auto"
+              class="w-full rounded-lg border border-red-200 dark:border-red-500/30 px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 transition hover:bg-red-50 dark:hover:bg-white/10 disabled:opacity-60 sm:w-auto"
               :disabled="purging"
               @click="purgeSelectedTreasury"
             >
@@ -177,27 +177,27 @@
       </div>
 
       <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <div class="rounded-2xl border border-gray-100 p-3 shadow-sm theme-surface sm:p-4">
+        <div class="rounded-2xl border border-gray-100 dark:border-white/20 bg-white/80 dark:bg-white/5 p-3 shadow-sm theme-surface sm:p-4">
           <p class="text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.balance') }}</p>
           <p
             class="mt-2 text-2xl font-semibold sm:text-3xl"
-            :class="Number(store.summary.balance) < 0 ? 'text-red-600' : 'text-indigo-700'"
+            :class="Number(store.summary.balance) < 0 ? 'text-red-600 dark:text-red-400' : 'text-indigo-700 dark:text-indigo-400'"
           >
             {{ formatCurrency(store.summary.balance) }}
           </p>
         </div>
-        <div class="rounded-2xl border border-gray-100 p-3 shadow-sm theme-surface sm:p-4">
+        <div class="rounded-2xl border border-gray-100 dark:border-white/20 bg-white/80 dark:bg-white/5 p-3 shadow-sm theme-surface sm:p-4">
           <p class="text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.last30dIn') }}</p>
-          <p class="mt-2 text-2xl font-semibold text-emerald-700 sm:text-3xl">{{ formatCurrency(store.summary.last30dIn) }}</p>
+          <p class="mt-2 text-2xl font-semibold text-emerald-700 dark:text-emerald-400 sm:text-3xl">{{ formatCurrency(store.summary.last30dIn) }}</p>
         </div>
-        <div class="rounded-2xl border border-gray-100 p-3 shadow-sm theme-surface sm:p-4">
+        <div class="rounded-2xl border border-gray-100 dark:border-white/20 bg-white/80 dark:bg-white/5 p-3 shadow-sm theme-surface sm:p-4">
           <p class="text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.last30dOut') }}</p>
-          <p class="mt-2 text-2xl font-semibold text-red-700 sm:text-3xl">{{ formatCurrency(store.summary.last30dOut) }}</p>
+          <p class="mt-2 text-2xl font-semibold text-red-700 dark:text-red-400 sm:text-3xl">{{ formatCurrency(store.summary.last30dOut) }}</p>
         </div>
       </div>
 
       <div class="rounded-2xl border border-gray-100 bg-white/80 shadow-lg shadow-slate-200/50 theme-surface">
-        <div class="border-b border-gray-100 px-3 py-3 sm:px-4">
+        <div class="border-b border-gray-100 dark:border-white/20 px-3 py-3 sm:px-4">
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
               <p class="text-sm font-semibold theme-text-primary">{{ t('treasury.ledgerTitle') }}</p>
@@ -207,15 +207,15 @@
             <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateFrom') }}</label>
-                <DateField v-model="filters.startDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <DateField v-model="filters.startDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 dark:border-white/20 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateTo') }}</label>
-                <DateField v-model="filters.endDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <DateField v-model="filters.endDate" @update:modelValue="applyFilters" class="w-full rounded-xl border border-gray-200 dark:border-white/20 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.type') }}</label>
-                <select v-model="filters.type" @change="applyFilters" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus">
+                <select v-model="filters.type" @change="applyFilters" class="w-full rounded-xl border border-gray-200 dark:border-white/20 px-3 py-2 text-sm focus:outline-none theme-input-focus">
                   <option value="">{{ t('labels.all') }}</option>
                   <option value="DEPOSIT">{{ t('treasury.types.deposit') }}</option>
                   <option value="PAYMENT">{{ t('treasury.types.payment') }}</option>
@@ -225,7 +225,7 @@
               </div>
               <div class="sm:col-span-2 xl:col-span-1">
                 <label class="mb-1 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.amount') }}</label>
-                <input v-model="filters.amount" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
+                <input v-model="filters.amount" @input="debouncedApply" type="number" step="0.01" class="w-full rounded-xl border border-gray-200 dark:border-white/20 px-3 py-2 text-sm focus:outline-none theme-input-focus" />
               </div>
             </div>
 
@@ -237,15 +237,15 @@
                   type="text"
                   @input="debouncedApply"
                   @keyup.enter="applyFilters"
-                  class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none theme-input-focus"
+                  class="w-full rounded-xl border border-gray-200 dark:border-white/20 px-3 py-2 text-sm focus:outline-none theme-input-focus"
                   :placeholder="t('treasury.searchPlaceholder')"
                 />
               </div>
               <div class="flex flex-col gap-2 sm:flex-row md:shrink-0">
-                <ShadcnButton variant="outline" size="native" class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto" @click="applyFilters">
+                <ShadcnButton variant="outline" size="native" class="w-full rounded-xl bg-indigo-600 dark:bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto" @click="applyFilters">
                   {{ t('labels.search') }}
                 </ShadcnButton>
-                <ShadcnButton variant="outline" size="native" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium theme-text-secondary transition hover:theme-hover-soft sm:w-auto" @click="resetFilters">
+                <ShadcnButton variant="outline" size="native" class="w-full rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-white/10 px-4 py-2 text-sm font-medium theme-text-secondary dark:text-slate-300 transition hover:theme-hover-soft sm:w-auto" @click="resetFilters">
                   {{ t('labels.reset') }}
                 </ShadcnButton>
               </div>
@@ -254,10 +254,10 @@
         </div>
 
         <div v-if="loading" class="px-6 py-12 text-center text-sm theme-text-secondary">{{ t('labels.loading') }}</div>
-        <div v-else-if="error" class="px-6 py-12 text-center text-sm text-red-600">{{ error }}</div>
+        <div v-else-if="error" class="px-6 py-12 text-center text-sm text-red-600 dark:text-red-400">{{ error }}</div>
         <div v-else-if="!visibleTransactions.length" class="px-6 py-12 text-center text-sm theme-text-secondary">{{ t('treasury.noTransactions') }}</div>
         <div v-else>
-          <table v-app-table class="app-table divide-y divide-gray-100">
+          <table v-app-table class="app-table divide-y divide-gray-100 dark:divide-slate-700">
             <colgroup>
               <col style="width: 11%" />
               <col style="width: 9%" />
@@ -269,7 +269,7 @@
               <col style="width: 15%" />
               <col style="width: 7%" />
             </colgroup>
-            <thead class="bg-slate-50">
+            <thead style="background-color: var(--theme-surface-muted-bg); color: var(--theme-text-muted);">
               <tr>
                 <th data-col="subtitle" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary cursor-pointer select-none hover:opacity-80', isRTL ? 'text-right' : 'text-left']" @click="toggleSortOrder">
                   <span class="inline-flex items-center gap-1">
@@ -277,7 +277,7 @@
                     <SortIcon :active="true" :dir="sortOrder" />
                   </span>
                 </th>
-                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-amber-600', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'ت. التسوية' : 'Settlement' }}</th>
+                <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider text-amber-600 dark:text-amber-400', isRTL ? 'text-right' : 'text-left']">{{ isRTL ? 'ت. التسوية' : 'Settlement' }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.type') }}</th>
                 <th :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.source') }}</th>
                 <th data-col="title" :class="['px-4 py-3 text-xs font-medium uppercase tracking-wider theme-text-secondary', isRTL ? 'text-right' : 'text-left']">{{ t('treasury.description') }}</th>
@@ -287,12 +287,12 @@
                 <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider theme-text-secondary">{{ isRTL ? 'إجراءات' : 'Actions' }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 bg-white/70">
+            <tbody class="divide-y divide-gray-100 dark:divide-slate-700 theme-card">
               <template v-for="tx in visibleTransactions" :key="tx.id">
               <tr
                 :data-focus-id="tx.id"
                 class="transition hover:theme-hover-soft cursor-pointer"
-                :class="expandedTxId === tx.id ? 'bg-indigo-50/40' : ''"
+                :class="expandedTxId === tx.id ? 'bg-indigo-50/40 dark:bg-indigo-900/20' : ''"
                 @click="toggleExpand(tx)"
               >
                 <!-- القائمة مترتبة بتاريخ العملية، فنعرضه هو، ووقت الإدخال تحته -->

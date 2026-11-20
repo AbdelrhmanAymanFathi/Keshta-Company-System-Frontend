@@ -13,34 +13,34 @@
     </PageHeader>
 
     <!-- Tabs: main terms pick their sub-terms from the one sub-terms list -->
-    <div class="flex gap-2 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200/80 w-full sm:w-fit">
+    <div class="flex gap-2 p-1.5 rounded-2xl shadow-sm border border-slate-200/80 w-full sm:w-fit theme-card">
       <ShadcnButton variant="outline" size="native"
         v-for="tab in tabs"
         :key="tab.id"
         type="button"
         @click="activeTab = tab.id"
         class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2"
-        :class="activeTab === tab.id ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'"
+        :class="activeTab === tab.id ? 'bg-emerald-600 text-white shadow-sm dark:bg-emerald-500' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5'"
       >
         {{ tab.label }}
         <span
           class="text-xs px-2 py-0.5 rounded-full"
-          :class="activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'"
+          :class="activeTab === tab.id ? 'bg-white/20 text-white dark:bg-emerald-500/20' : 'bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400'"
         >{{ tab.count }}</span>
       </ShadcnButton>
     </div>
 
     <!-- Search & Tree Controls bar -->
-    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <div class="p-4 rounded-2xl shadow-sm border border-slate-200/80 theme-card flex flex-col sm:flex-row gap-4 items-center justify-between">
       <div class="relative flex-1 w-full">
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="activeTab === 'main' ? $t('expenses.searchTermsPlaceholder') : $t('expenses.searchSubTerm')"
-          class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl theme-input-focus text-sm transition-all"
+          class="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl theme-input-focus text-sm transition-all"
           :class="isRTL ? 'text-right pr-10 pl-4' : 'text-left pl-10 pr-4'"
         />
-        <svg class="w-5 h-5 text-slate-400 absolute top-3" :class="isRTL ? 'right-3' : 'left-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-slate-400 dark:text-slate-500 absolute top-3" :class="isRTL ? 'right-3' : 'left-3'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </div>
@@ -49,7 +49,7 @@
         <template v-if="activeTab === 'main'">
           <ShadcnButton variant="outline" size="native"
             @click="expandAll"
-            class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
+            class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/5 rounded-lg transition-colors flex items-center gap-1"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -58,7 +58,7 @@
           </ShadcnButton>
           <ShadcnButton variant="outline" size="native"
             @click="collapseAll"
-            class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1"
+            class="px-3 py-1.5 text-xs font-semibold theme-text-secondary bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/5 rounded-lg transition-colors flex items-center gap-1"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
@@ -74,14 +74,14 @@
     </div>
 
     <!-- Loading state -->
-    <div v-if="loading" class="flex justify-center items-center py-16 bg-white rounded-2xl border border-slate-200">
+    <div v-if="loading" class="flex justify-center items-center py-16 theme-card rounded-2xl border border-slate-200">
       <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600"></div>
     </div>
 
     <!-- ===================== Main terms tab ===================== -->
     <template v-else-if="activeTab === 'main'">
       <!-- Empty state -->
-      <div v-if="filteredCategories.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div v-if="filteredCategories.length === 0" class="text-center py-16 theme-card rounded-2xl border border-slate-200">
         <svg class="w-16 h-16 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
         </svg>
@@ -90,7 +90,7 @@
       </div>
 
       <!-- Main Terms Tree View Hierarchy -->
-      <div v-else class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6 space-y-3">
+      <div v-else class="theme-card rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6 space-y-3">
         <div
           v-for="cat in filteredCategories"
           :key="cat.id"
@@ -98,14 +98,15 @@
         >
           <!-- Main Term Node Header -->
           <div
-            class="p-4 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80 hover:bg-slate-100/80 cursor-pointer transition-colors select-none"
+            class="p-4 flex flex-wrap items-center justify-between gap-3 theme-surface rounded-xl overflow-hidden transition-all duration-200 cursor-pointer select-none"
+            style="background-color: var(--theme-surface-bg)"
             @click="toggleExpand(cat.id)"
           >
             <div class="flex items-center gap-3">
               <!-- Expand / Collapse Chevron Icon -->
               <ShadcnButton variant="outline" size="native"
                 type="button"
-                class="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-transform duration-200 shadow-2xs"
+                class="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition-transform duration-200 shadow-2xs"
                 :class="{ 'rotate-90': isExpanded(cat.id) }"
               >
                 <svg class="w-4 h-4" :class="isRTL ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,15 +115,15 @@
               </ShadcnButton>
 
               <!-- Folder Icon & Category Title -->
-              <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-sm shadow-2xs border border-emerald-200/60">
-                <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 font-bold flex items-center justify-center text-sm shadow-2xs border border-emerald-200/60 dark:border-emerald-500/30">
+                <svg class="w-5 h-5 text-emerald-700 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                 </svg>
               </span>
               <div>
                 <h3 class="text-base font-bold theme-text-primary flex items-center gap-2">
                   {{ cat.name }}
-                  <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                  <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/20 border border-emerald-200/60 dark:border-emerald-500/30 px-2 py-0.5 rounded-full">
                     {{ cat.subCategories ? cat.subCategories.length : 0 }} {{ $t('expenses.subcategoryCount') }}
                   </span>
                 </h3>
@@ -143,7 +144,7 @@
 
               <ShadcnButton variant="outline" size="native"
                 @click="openEditCategoryModal(cat)"
-                class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                class="p-2 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-white/10 rounded-lg transition-colors"
                 :title="$t('expenses.editMainTerm')"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,7 +154,7 @@
 
               <ShadcnButton variant="outline" size="native"
                 @click="confirmDeleteCategory(cat)"
-                class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                class="p-2 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-white/10 rounded-lg transition-colors"
                 :title="$t('expenses.deleteMainTerm')"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,17 +165,17 @@
           </div>
 
           <!-- Subcategories Tree Branch View -->
-          <div v-show="isExpanded(cat.id)" class="bg-slate-50/40 p-4 border-t border-slate-200/60">
+          <div v-show="isExpanded(cat.id)" class="theme-surface p-4 border-t border-slate-200/60 dark:border-white/10" style="background-color: var(--theme-surface-bg)">
             <div v-if="!cat.subCategories || cat.subCategories.length === 0" class="text-xs text-slate-400 italic py-3 px-6">
               {{ $t('expenses.noSubcategories') }}
             </div>
 
             <div v-else class="relative space-y-2" :class="isRTL ? 'pr-6 border-r-2 border-emerald-300/60' : 'pl-6 border-l-2 border-emerald-300/60'">
-              <div
-                v-for="subCat in cat.subCategories"
-                :key="subCat.id"
-                class="relative bg-white p-3 rounded-xl border border-slate-200/80 flex items-center justify-between hover:border-emerald-300 hover:shadow-xs transition-all"
-              >
+                <div
+                  v-for="subCat in cat.subCategories"
+                  :key="subCat.id"
+                  class="theme-card p-3 rounded-xl border border-slate-200/80 dark:border-white/20 flex items-center justify-between hover:border-emerald-300 dark:hover:border-emerald-500/30 hover:shadow-xs transition-all"
+                >
                 <!-- Branch Line Bullet -->
                 <div
                   class="absolute w-3 h-0.5 bg-emerald-300/80 top-1/2"
@@ -185,10 +186,10 @@
                   <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
                   </svg>
-                  <span class="text-sm font-semibold text-slate-800">{{ subCat.name }}</span>
+                  <span class="text-sm font-semibold theme-text-primary dark:text-white">{{ subCat.name }}</span>
                   <span
                     v-if="sharedCount(subCat.id) > 1"
-                    class="text-[11px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-full"
+                    class="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded-full"
                     :title="sharedCategoryNames(subCat.id)"
                   >في {{ sharedCount(subCat.id) }} بنود</span>
                 </div>
@@ -196,7 +197,7 @@
                 <div class="flex items-center gap-1">
                   <ShadcnButton variant="outline" size="native"
                     @click="openEditSubCategoryModal(subCat)"
-                    class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    class="p-1.5 text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-white/10 rounded-md transition-colors"
                     :title="$t('expenses.editSubcategory')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +206,7 @@
                   </ShadcnButton>
                   <ShadcnButton variant="outline" size="native"
                     @click="confirmUnlinkSubCategory(cat, subCat)"
-                    class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                    class="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-white/10 rounded-md transition-colors"
                     title="إزالة من هذا البند الرئيسي"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,14 +223,14 @@
 
     <!-- ===================== Sub terms tab (the master list) ===================== -->
     <template v-else>
-      <div v-if="filteredSubCategories.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-200">
+      <div v-if="filteredSubCategories.length === 0" class="text-center py-16 theme-card rounded-2xl border border-slate-200">
         <h3 class="text-lg font-semibold text-slate-700 mb-1">لا توجد بنود فرعية</h3>
         <p class="text-sm text-slate-500">أضف البنود الفرعية هنا مرة واحدة، ثم اخترها لأي بند رئيسي.</p>
       </div>
 
       <template v-else>
         <!-- Laptop/desktop: one card, all columns visible -->
-        <div class="terms-list-card hidden lg:block rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
+        <div class="terms-list-card theme-card rounded-2xl shadow-lg shadow-slate-200/40">
           <table class="terms-list-table">
             <colgroup>
               <col style="width: 5%" />
@@ -283,10 +284,10 @@
         </div>
 
         <!-- Phone: same card, rows stacked -->
-        <div class="lg:hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg shadow-slate-200/40">
-          <div v-for="sub in filteredSubCategories" :key="sub.id" class="border-b border-slate-100 last:border-b-0 p-4">
+        <div class="lg:hidden theme-card rounded-2xl shadow-lg shadow-slate-200/40">
+          <div v-for="sub in filteredSubCategories" :key="sub.id" class="border-b border-slate-100 dark:border-white/10 last:border-b-0 p-4">
             <div class="flex items-start justify-between gap-3 mb-2">
-              <h3 class="font-semibold theme-text-primary break-words">{{ sub.name }}</h3>
+              <h3 class="font-semibold theme-text-primary dark:text-white break-words">{{ sub.name }}</h3>
               <div class="flex items-center gap-1 shrink-0">
                 <ShadcnButton variant="outline" size="native" @click="openEditSubCategoryModal(sub)" class="p-1.5 text-slate-400 hover:text-blue-600 rounded-md" :title="$t('expenses.editSubcategory')">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -310,11 +311,11 @@
 
     <!-- Category Modal (Add / Edit Main Term) -->
     <div v-if="categoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="categoryModal.open = false">
-      <div v-modal-focus="{ onEscape: () => { categoryModal.open = false } }" class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
+      <div v-modal-focus="{ onEscape: () => { categoryModal.open = false } }" class="theme-card rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
           <div>
             <h3 class="font-bold text-lg">{{ categoryModal.isEdit ? $t('expenses.editMainTerm') : $t('expenses.addMainTerm') }}</h3>
-            <p v-if="!categoryModal.isEdit" class="text-emerald-100 text-xs mt-0.5">اضغط Tab لإضافة سطر جديد</p>
+            <p v-if="!categoryModal.isEdit" class="text-emerald-100 dark:text-emerald-200 text-xs mt-0.5">اضغط Tab لإضافة سطر جديد</p>
           </div>
           <ShadcnButton variant="outline" size="native" @click="categoryModal.open = false" class="text-white/80 hover:text-white text-2xl leading-none">&times;</ShadcnButton>
         </div>
@@ -338,7 +339,7 @@
           <div v-else class="space-y-2">
             <div class="flex items-center justify-between mb-1">
               <label class="text-sm font-medium theme-text-secondary">البنود الرئيسية <span class="text-red-500">*</span></label>
-              <span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">
+              <span class="text-xs text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/10 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/20">
                 {{ categoryModal.rows.filter(r => r.trim()).length }} بند
               </span>
             </div>
@@ -396,7 +397,7 @@
             <ShadcnButton variant="outline" size="native"
               type="button"
               @click="categoryModal.open = false"
-              class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
+              class="px-4 py-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/10 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 transition-colors text-sm font-medium"
             >
               {{ $t('labels.cancel') }}
             </ShadcnButton>
@@ -418,11 +419,11 @@
 
     <!-- SubCategory Modal (Add to the master list / Rename everywhere) -->
     <div v-if="subCategoryModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="subCategoryModal.open = false">
-      <div v-modal-focus="{ onEscape: () => { subCategoryModal.open = false } }" class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
+      <div v-modal-focus="{ onEscape: () => { subCategoryModal.open = false } }" class="theme-card rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center">
           <div>
             <h3 class="font-bold text-lg">{{ subCategoryModal.isEdit ? $t('expenses.editSubcategory') : 'إضافة بنود فرعية للقائمة' }}</h3>
-            <p class="text-emerald-100 text-xs mt-0.5">
+            <p class="text-emerald-100 dark:text-emerald-200 text-xs mt-0.5">
               {{ subCategoryModal.isEdit ? 'الاسم الجديد يظهر في كل البنود الرئيسية المرتبطة وفي مصروفاته' : 'اضغط Tab لإضافة سطر جديد' }}
             </p>
           </div>
@@ -448,7 +449,7 @@
           <div v-else class="space-y-2">
             <div class="flex items-center justify-between mb-1">
               <label class="text-sm font-medium theme-text-secondary">البنود الفرعية <span class="text-red-500">*</span></label>
-              <span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">
+              <span class="text-xs text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-white/10 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/20">
                 {{ subCategoryModal.rows.filter(r => r.trim()).length }} بند
               </span>
             </div>
@@ -496,7 +497,7 @@
             <ShadcnButton variant="outline" size="native"
               type="button"
               @click="subCategoryModal.open = false"
-              class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
+              class="px-4 py-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/10 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 transition-colors text-sm font-medium"
             >
               {{ $t('labels.cancel') }}
             </ShadcnButton>
@@ -518,7 +519,7 @@
 
     <!-- Picker Modal: choose a main term's sub-terms from the master list -->
     <div v-if="pickerModal.open" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" @keydown.esc="pickerModal.open = false">
-      <div v-modal-focus="{ onEscape: () => { pickerModal.open = false } }" class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
+      <div v-modal-focus="{ onEscape: () => { pickerModal.open = false } }" class="theme-card rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in duration-200 flex flex-col max-h-[90vh]">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white flex justify-between items-center shrink-0">
           <div>
             <h3 class="font-bold text-lg">اختيار البنود الفرعية</h3>
@@ -533,7 +534,7 @@
             v-model="pickerModal.search"
             type="text"
             :placeholder="$t('expenses.searchSubTerm')"
-            class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl theme-input-focus text-sm"
+            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl theme-input-focus text-sm"
             @keydown.enter.prevent="addPickerSearchAsSub"
           />
           <div class="flex items-center justify-between text-xs">
@@ -553,7 +554,7 @@
           <label
             v-for="sub in pickerOptions"
             :key="sub.id"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 cursor-pointer"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer"
           >
             <input
               type="checkbox"
@@ -561,7 +562,7 @@
               v-model="pickerModal.selected"
               class="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
             />
-            <span class="text-sm text-slate-800 flex-1">{{ sub.name }}</span>
+            <span class="text-sm theme-text-primary dark:text-white flex-1">{{ sub.name }}</span>
             <span v-if="sub.categories.length" class="text-[11px] text-slate-400 truncate max-w-[45%]" :title="sub.categories.map(c => c.name).join('، ')">
               {{ sub.categories.map(c => c.name).join('، ') }}
             </span>
@@ -572,7 +573,7 @@
           <ShadcnButton variant="outline" size="native"
             type="button"
             @click="pickerModal.open = false"
-            class="px-4 py-2 text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-sm font-medium"
+            class="px-4 py-2 text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/10 rounded-xl hover:bg-slate-200 dark:hover:bg-white/5 transition-colors text-sm font-medium"
           >
             {{ $t('labels.cancel') }}
           </ShadcnButton>
@@ -1071,7 +1072,7 @@ export default {
   font-size: 0.8rem;
   line-height: 1.4;
   text-align: start;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--theme-surface-border);
 }
 
 .terms-list-table th {
@@ -1090,8 +1091,13 @@ export default {
   padding: 0.1rem 0.5rem;
   border-radius: 9999px;
   font-size: 0.72rem;
-  background-color: #ecfdf5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.dark .term-chip {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
 }
 </style>

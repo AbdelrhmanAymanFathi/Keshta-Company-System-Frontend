@@ -3,12 +3,12 @@
     <aside class="h-fit w-full min-w-0 rounded-2xl theme-surface p-4 shadow-sm sm:p-5">
       <div class="flex items-center justify-between gap-3 border-b border-gray-200/70 pb-3">
         <h2 class="text-base font-semibold theme-heading theme-text-primary">{{ t('dashboard.treasury') }}</h2>
-        <span class="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
+        <span class="shrink-0 rounded-full bg-gray-100 dark:bg-white/10 px-2.5 py-1 text-xs font-medium theme-text-secondary">{{ visibleTreasuries.length }} {{ t('treasury.items') }}</span>
       </div>
       <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-2">
         <div>
           <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.view') }}</label>
-          <select v-model="treasuryView" class="h-10 w-full rounded-xl border border-gray-300 px-3 text-sm theme-input-focus">
+          <select v-model="treasuryView" class="h-10 w-full rounded-xl border border-gray-300 dark:border-white/20 px-3 text-sm theme-input-focus">
             <option value="active">{{ t('treasury.viewActive') }}</option>
             <option value="archived">{{ t('treasury.viewArchived') }}</option>
             <option value="all">{{ t('treasury.viewAll') }}</option>
@@ -19,21 +19,21 @@
           <Input v-model="treasurySearch" type="text" class="h-10 w-full rounded-xl" :placeholder="t('treasury.searchTreasuriesPlaceholder')" />
         </div>
       </div>
-      <div v-if="!visibleTreasuries.length" class="mt-4 rounded-lg border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500">
+      <div v-if="!visibleTreasuries.length" class="mt-4 rounded-lg border border-dashed border-gray-300 dark:border-white/20 px-3 py-6 text-center text-sm text-gray-500 dark:text-slate-400">
         {{ t('labels.noData') }}
       </div>
       <div v-else class="mt-4 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
         <ShadcnButton variant="outline" size="native" v-for="(treasury, index) in visibleTreasuries" :key="treasury.id" @click="selectTreasury(treasury.id)"
           :aria-pressed="store.selectedTreasuryId === treasury.id"
           :title="treasury.name"
-          :class="['!h-auto !min-h-[4.5rem] !w-full !min-w-0 !shrink !justify-start !whitespace-normal rounded-xl border px-3 py-3 text-start transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2', store.selectedTreasuryId === treasury.id ? 'theme-selected-soft theme-border-accent' : 'border-gray-200 theme-hover-soft']">
+          :class="['!h-auto !min-h-[4.5rem] !w-full !min-w-0 !shrink !justify-start !whitespace-normal rounded-xl border px-3 py-3 text-start transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2', store.selectedTreasuryId === treasury.id ? 'theme-selected-soft theme-border-accent' : 'border-gray-200 dark:border-white/20 theme-hover-soft']">
           <div class="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2">
             <span class="line-clamp-2 min-w-0 text-start text-sm font-semibold leading-5 theme-text-primary">{{ treasury.name }}</span>
-            <span dir="ltr" class="whitespace-nowrap text-end text-xs font-semibold tabular-nums" :class="Number(treasury.balance) < 0 ? 'text-red-600' : 'text-emerald-700'">{{ formatCurrency(treasury.balance) }}</span>
+            <span dir="ltr" class="whitespace-nowrap text-end text-xs font-semibold tabular-nums" :class="Number(treasury.balance) < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'">{{ formatCurrency(treasury.balance) }}</span>
             <div class="col-span-2 flex min-w-0 flex-wrap items-center gap-1.5 text-[11px] theme-text-secondary">
               <span class="shrink-0">#{{ index + 1 }}</span>
-              <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">{{ t('treasury.archived') }}</span>
-              <span v-else class="rounded-full bg-emerald-100 px-2 py-0.5 font-semibold text-emerald-700">{{ t('treasury.active') }}</span>
+              <span v-if="treasury.deletedAt" class="rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 font-semibold text-amber-700 dark:text-amber-400">{{ t('treasury.archived') }}</span>
+              <span v-else class="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 font-semibold text-emerald-700 dark:text-emerald-400">{{ t('treasury.active') }}</span>
             </div>
           </div>
         </ShadcnButton>
@@ -47,7 +47,7 @@
             <h1 class="text-2xl font-semibold theme-heading theme-text-primary">{{ selectedTreasury?.name || t('dashboard.treasury') }}</h1>
             <div class="mt-1 flex flex-wrap items-center gap-2">
               <p class="text-sm theme-text-secondary">{{ t('treasury.ledgerTitle') }}</p>
-              <span v-if="selectedTreasury" class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="selectedTreasuryIsArchived ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'">{{ selectedTreasuryIsArchived ? t('treasury.archived') : t('treasury.active') }}</span>
+              <span v-if="selectedTreasury" class="rounded-full px-2.5 py-1 text-xs font-semibold" :class="selectedTreasuryIsArchived ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'">{{ selectedTreasuryIsArchived ? t('treasury.archived') : t('treasury.active') }}</span>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2 xl:justify-end">
@@ -57,11 +57,11 @@
             <Button size="sm" :disabled="!selectedTreasury || !!exportingFormat || loading" @click="downloadReport('pdf')">{{ exportingFormat === 'pdf' ? t('labels.loading') : t('reports.downloadPdf') }}</Button>
           </div>
         </div>
-        <p v-if="exportError" class="mt-3 text-xs text-red-600">{{ exportError }}</p>
+        <p v-if="exportError" class="mt-3 text-xs text-red-600 dark:text-red-400">{{ exportError }}</p>
       </div>
 
-      <div class="min-w-0 overflow-hidden rounded-2xl border border-gray-200 theme-surface shadow-sm">
-        <div class="app-filter-panel border-b border-gray-200 px-4 py-5 sm:px-5">
+      <div class="min-w-0 overflow-hidden rounded-2xl border border-gray-200 dark:border-white/20 theme-surface shadow-sm">
+          <div class="app-filter-panel border-b border-gray-200 dark:border-white/20 px-4 py-5 sm:px-5">
           <div class="mb-4 flex items-center justify-between gap-3">
             <div>
               <h2 class="text-base font-semibold theme-text-primary">{{ t('treasury.filtersTitle') }}</h2>
@@ -71,15 +71,15 @@
           <div class="app-filter-grid grid min-w-0 grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 2xl:grid-cols-4">
             <div>
               <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateFrom') }}</label>
-              <DateField v-model="filters.startDate" :dir="isRTL ? 'rtl' : 'ltr'" class="h-10 w-full min-w-0 rounded-xl border border-gray-300 px-3 text-sm focus:outline-none theme-input-focus" />
+              <DateField v-model="filters.startDate" :dir="isRTL ? 'rtl' : 'ltr'" class="h-10 w-full min-w-0 rounded-xl border border-gray-300 dark:border-white/20 px-3 text-sm focus:outline-none theme-input-focus" />
             </div>
             <div>
               <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.dateTo') }}</label>
-              <DateField v-model="filters.endDate" :dir="isRTL ? 'rtl' : 'ltr'" class="h-10 w-full min-w-0 rounded-xl border border-gray-300 px-3 text-sm focus:outline-none theme-input-focus" />
+              <DateField v-model="filters.endDate" :dir="isRTL ? 'rtl' : 'ltr'" class="h-10 w-full min-w-0 rounded-xl border border-gray-300 dark:border-white/20 px-3 text-sm focus:outline-none theme-input-focus" />
             </div>
             <div>
               <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide theme-text-secondary">{{ t('treasury.type') }}</label>
-              <select v-model="filters.type" class="h-10 w-full rounded-xl border border-gray-300 px-3 text-sm focus:outline-none theme-input-focus">
+              <select v-model="filters.type" class="h-10 w-full rounded-xl border border-gray-300 dark:border-white/20 px-3 text-sm focus:outline-none theme-input-focus">
                 <option value="">{{ t('labels.all') }}</option>
                 <option value="DEPOSIT">{{ t('treasury.types.deposit') }}</option>
                 <option value="PAYMENT">{{ t('treasury.types.payment') }}</option>
