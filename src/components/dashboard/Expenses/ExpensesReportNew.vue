@@ -214,7 +214,7 @@
           <col style="width: 8%" />
           <col style="width: 10.5%" />
         </colgroup>
-        <thead class="bg-gray-50">
+        <thead style="background-color: var(--theme-surface-muted-bg); color: var(--theme-text-muted);">
           <tr>
             <th class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">#</th>
             <th data-col="subtitle" class="px-4 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">

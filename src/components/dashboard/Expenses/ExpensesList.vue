@@ -2842,12 +2842,13 @@ rows: [],
   position: sticky;
   top: 0;
   z-index: 10;
-  background-color: #f8fafc;
+  background-color: var(--theme-surface-muted-bg);
 }
 
 .expenses-list-card thead tr th {
-  background-color: #f8fafc;
-  box-shadow: 0 1px 0 0 #e2e8f0;
+  background-color: var(--theme-surface-muted-bg);
+  color: var(--theme-text-muted);
+  box-shadow: 0 1px 0 0 var(--theme-surface-border);
 }
 
 .expenses-list-card :deep(.actions-col) {

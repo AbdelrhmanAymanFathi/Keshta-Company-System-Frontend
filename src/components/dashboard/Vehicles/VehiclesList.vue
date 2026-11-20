@@ -267,7 +267,7 @@
             </h4>
             <div class="border rounded bg-white">
               <table v-app-table class="app-table text-sm">
-                <thead class="bg-gray-50">
+                <thead style="background-color: var(--theme-surface-muted-bg); color: var(--theme-text-muted);">
                   <tr>
                     <th data-col="title" class="px-3 py-2 text-left text-xs font-medium theme-text-muted uppercase tracking-wider">
                       {{ $t('vehicles.owner') }}

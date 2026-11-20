@@ -2359,13 +2359,26 @@ body,
   background-color: #fff;
 }
 
+.dark :where(.dashboard-module-content) table > thead {
+  background-color: var(--theme-surface-muted-bg);
+}
+
 .dashboard-module-content thead.theme-table-thead-gradient:not(.fixed *) {
   background-color: #fff;
+}
+
+.dark .dashboard-module-content thead.theme-table-thead-gradient:not(.fixed *) {
+  background-color: var(--theme-surface-muted-bg);
 }
 
 .dashboard-module-content thead:is(.theme-dashboard-bg-soft, .theme-table-thead):not(.fixed *) {
   background-color: #fff;
   background-image: linear-gradient(rgba(var(--theme-primary-rgb), 0.08), rgba(var(--theme-primary-rgb), 0.08));
+}
+
+.dark .dashboard-module-content thead:is(.theme-dashboard-bg-soft, .theme-table-thead):not(.fixed *) {
+  background-color: var(--theme-surface-muted-bg);
+  background-image: linear-gradient(rgba(var(--theme-primary-rgb), 0.12), rgba(var(--theme-primary-rgb), 0.06));
 }
 
 @media (max-width: 767px) {

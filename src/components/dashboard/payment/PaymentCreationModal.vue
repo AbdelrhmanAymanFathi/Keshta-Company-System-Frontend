@@ -164,13 +164,13 @@
 
                 <div class="overflow-x-auto rounded-xl border border-gray-200">
                   <table ref="tableRef" class="min-w-full divide-y divide-gray-200">
-                    <thead class="sticky top-0 z-10 bg-gray-50">
+                    <thead class="sticky top-0 z-10" style="background-color: var(--theme-surface-muted-bg); color: var(--theme-text-muted);">
                       <tr>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">#</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ contractorLabel }}</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ amountLabel }}</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ notesLabel }}</th>
-                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">{{ actionsLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide theme-text-muted">#</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide theme-text-muted">{{ contractorLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide theme-text-muted">{{ amountLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide theme-text-muted">{{ notesLabel }}</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold uppercase tracking-wide theme-text-muted">{{ actionsLabel }}</th>
                       </tr>
                     </thead>
 

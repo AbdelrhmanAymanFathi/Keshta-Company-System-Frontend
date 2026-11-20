@@ -1076,9 +1076,9 @@ export default {
 
 .terms-list-table th {
   font-weight: 600;
-  color: #475569;
-  background-color: #f8fafc;
-  box-shadow: 0 1px 0 0 #e2e8f0;
+  color: var(--theme-text-muted);
+  background-color: var(--theme-surface-muted-bg);
+  box-shadow: 0 1px 0 0 var(--theme-surface-border);
 }
 
 .terms-list-table .actions-col {
