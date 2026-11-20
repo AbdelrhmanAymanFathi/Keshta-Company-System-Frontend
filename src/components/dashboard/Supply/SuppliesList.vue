@@ -130,123 +130,58 @@
     <div class="app-table-card">
       <table v-app-table class="app-table divide-y divide-gray-200">
         <colgroup>
-          <col style="width: 2.5%" />
-          <col style="width: 6%" />
-          <col style="width: 6.5%" />
-          <col style="width: 8%" />
-          <col style="width: 6%" />
-          <col style="width: 6%" />
-          <col style="width: 6.5%" />
-          <col style="width: 6%" />
-          <col style="width: 6%" />
-          <col style="width: 5%" />
-          <col style="width: 5%" />
-          <col style="width: 4.5%" />
-          <col style="width: 4.5%" />
-          <col style="width: 6%" />
-          <col style="width: 4%" />
-          <col style="width: 6%" />
-          <col style="width: 5.5%" />
-          <col style="width: 6%" />
+          <col v-for="(col, ci) in visibleColumns" :key="ci" :style="`width: ${col.width || 'auto'}`" />
         </colgroup>
         <thead class="theme-table-thead-gradient">
           <tr>
             <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              #</th>
-            <th data-col="subtitle"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary"
-              @click="sortBy('date')">
-              {{ $t('labels.date') }}
-              <SortIcon :active="sortField === 'date'" :dir="sortOrder" />
+              v-for="col in visibleColumns"
+              :key="col.key"
+              :class="col.thClass"
+              :data-col="col.dataCol || null"
+              @click="col.sortable ? sortBy(col.sortKey) : null">
+              {{ col.label }}
+              <SortIcon
+                v-if="col.sortable"
+                :active="sortField === col.sortKey"
+                :dir="sortOrder" />
             </th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.item') }}</th>
-             <th data-col="title"
-               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-               {{ $t('labels.contractor') }}</th>
-             <th
-               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-               {{ $t('labels.status') || 'Status' }}</th>
-             <th
-               class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-               {{ $t('labels.crusher') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.location') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.area') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.vehicle') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.crusherTicket') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.companyTicket') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.companyCapacity') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.crusherCapacity') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-xs font-semibold theme-text-secondary uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.unitPrice') }}
-            </th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.discount') }}</th>
-            <th data-col="amount"
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.total') }}</th>
-
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.notes') }}</th>
-            <th
-              class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              {{ $t('labels.actions') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
           <tr v-if="supplies.length > 0" style="display: none;"></tr>
           <tr v-for="(supply, idx) in supplies" :key="`supply-${supply.id}`" :data-focus-id="supply.id" :class="['theme-table-row-hover', { 'row-pending-review': supply.hasPendingApproval }]" @contextmenu.prevent="onRowContextMenu($event, supply)">
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ (page - 1) * pageSize + idx + 1 }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap">{{ formatDate(supply.date) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.item?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">
-              {{ supply.contractor?.name || '-' }}
-            </td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap">
-              <StatusBadge
-                :status="supply.hasPendingApproval ? 'pending' : 'approved'"
-                :label="supply.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')"
-              />
-            </td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.crusher?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.location?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ getAreaName(supply) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.vehicle?.name || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.crusherTicket || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.companyTicket || '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ supply.companyCapacity ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black dark:text-slate-100 uppercase tracking-wider whitespace-nowrap">{{ supply.crusherCapacity ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wider whitespace-nowrap">{{ supply.discount ?? '-' }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap">{{ formatCurrency(supply.total) }}</td>
-            <td class="px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider">
-              <div>{{ supply.notes || '-' }}</div>
-            </td>
-
-            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap">
-              <RowActions :actions="rowActions(supply)" />
+            <td v-for="col in visibleColumns" :key="col.key" :class="col.tdClass">
+              <template v-if="col.key === '#'">{{ (page - 1) * pageSize + idx + 1 }}</template>
+              <template v-else-if="col.key === 'date'">{{ formatDate(supply.date) }}</template>
+              <template v-else-if="col.key === 'item'">{{ supply.item?.name || '-' }}</template>
+              <template v-else-if="col.key === 'contractor'">{{ supply.contractor?.name || '-' }}</template>
+              <template v-else-if="col.key === 'status'">
+                <StatusBadge
+                  :status="supply.hasPendingApproval ? 'pending' : 'approved'"
+                  :label="supply.hasPendingApproval ? ($t('labels.pendingReview') || 'Pending Review') : ($t('labels.approved') || 'Approved')" />
+              </template>
+              <template v-else-if="col.key === 'crusher'">{{ supply.crusher?.name || '-' }}</template>
+              <template v-else-if="col.key === 'location'">{{ supply.location?.name || '-' }}</template>
+              <template v-else-if="col.key === 'area'">{{ getAreaName(supply) }}</template>
+              <template v-else-if="col.key === 'vehicle'">{{ supply.vehicle?.name || '-' }}</template>
+              <template v-else-if="col.key === 'crusherTicket'">{{ supply.crusherTicket || '-' }}</template>
+              <template v-else-if="col.key === 'companyTicket'">{{ supply.companyTicket || '-' }}</template>
+              <template v-else-if="col.key === 'companyCapacity'">{{ supply.companyCapacity ?? '-' }}</template>
+              <template v-else-if="col.key === 'crusherCapacity'">{{ supply.crusherCapacity ?? '-' }}</template>
+              <template v-else-if="col.key === 'unitPrice'">{{ supply.unitPrice != null ? formatCurrency(supply.unitPrice) : '-' }}</template>
+              <template v-else-if="col.key === 'discount'">{{ supply.discount != null ? formatCurrency(supply.discount) : '-' }}</template>
+              <template v-else-if="col.key === 'total'">{{ formatCurrency(supply.total) }}</template>
+              <template v-else-if="col.key === 'notes'">
+                <div>{{ supply.notes || '-' }}</div>
+              </template>
+              <template v-else-if="col.key === 'actions'">
+                <RowActions :actions="rowActions(supply)" />
+              </template>
             </td>
           </tr>
           <tr v-if="supplies.length === 0">
-            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="18">
+            <td class="px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap" :colspan="visibleColumns.length">
               {{ $t('supply.noExportsFound') || 'No exports found' }}
             </td>
           </tr>
@@ -480,6 +415,7 @@ import StatusBadge from '@/components/shared/StatusBadge.vue'
 import { PencilIcon, TrashIcon } from '@acme/icon-packs/legacy'
 import { debounce } from '@/utils/debounce'
 import { getFocusId, clearFocusQuery, highlightRow, notifyFocusMissing } from '@/utils/focusRecord'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'SuppliesList',
@@ -551,7 +487,69 @@ export default {
       { initialPageSize: 20, resourceName: 'supplies' }
     )
 
-    return { supplies, page, pageSize, total, totalPages, loading, load, setPage, setPageSize }
+    const { t } = useI18n()
+
+    // Single source of truth for table columns. Header and body cells are both
+    // rendered from this array so they can never drift out of sync. A column is
+    // hidden from both header and body by flipping `visible` here.
+    const columns = [
+      { key: '#', label: t('labels.#'), visible: true, width: '2.5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'date', label: t('labels.date'), visible: true, width: '6%', sortable: true, sortKey: 'date',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap cursor-pointer select-none hover:theme-text-primary',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-accent-muted uppercase tracking-wider whitespace-nowrap' },
+      { key: 'item', label: t('labels.item'), visible: true, width: '6.5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'contractor', label: t('labels.contractor'), visible: true, width: '8%', dataCol: 'title',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'status', label: t('labels.status') || 'Status', visible: true, width: '6%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium uppercase tracking-wider whitespace-nowrap' },
+      { key: 'crusher', label: t('labels.crusher'), visible: true, width: '6%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'location', label: t('labels.location'), visible: true, width: '6.5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'area', label: t('labels.area'), visible: true, width: '6%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'vehicle', label: t('labels.vehicle'), visible: true, width: '6%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'crusherTicket', label: t('labels.crusherTicket'), visible: true, width: '5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'companyTicket', label: t('labels.companyTicket'), visible: true, width: '5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'companyCapacity', label: t('labels.companyCapacity'), visible: true, width: '4.5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'crusherCapacity', label: t('labels.crusherCapacity'), visible: true, width: '4.5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-black dark:text-slate-100 uppercase tracking-wider whitespace-nowrap' },
+      { key: 'unitPrice', label: t('labels.unitPrice'), visible: true, width: '6%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-xs font-semibold theme-text-secondary uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 min-w-[160px] text-start text-xs font-semibold theme-accent-muted uppercase tracking-wider whitespace-nowrap' },
+      { key: 'discount', label: t('labels.discount'), visible: true, width: '4%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wider whitespace-nowrap' },
+      { key: 'total', label: t('labels.total'), visible: true, width: '6%', dataCol: 'amount',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary uppercase tracking-wider whitespace-nowrap' },
+      { key: 'notes', label: t('labels.notes'), visible: true, width: '5.5%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-primary tracking-wider' },
+      { key: 'actions', label: t('labels.actions'), visible: true, width: '6%',
+        thClass: 'px-3 py-2 sm:px-6 sm:py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap',
+        tdClass: 'px-6 py-3 text-start text-xs font-medium theme-text-muted uppercase tracking-wider whitespace-nowrap' },
+    ]
+
+    return { supplies, page, pageSize, total, totalPages, loading, load, setPage, setPageSize, columns }
   },
 
   data() {
@@ -644,6 +642,9 @@ export default {
         return selected.children
       }
       return this.locations.filter(l => l.parentId === this.form.locationId)
+    },
+    visibleColumns() {
+      return this.columns.filter((col) => col.visible !== false)
     },
     
   },
